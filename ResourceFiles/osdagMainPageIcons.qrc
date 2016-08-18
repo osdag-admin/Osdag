@@ -1,0 +1,17 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>images/iitblogo.png</file>
+    <file>images/Osdag.png</file>
+    <file>images/iitb.png</file>
+    <file>images/logoiitb.png</file>
+    <file>images/workspace_icon 1.png</file>
+    <file>images/seatedAngle1.png</file>
+    <file>images/cleatangle.png</file>
+    <file>images/endplate.png</file>
+    <file>images/finplate.png</file>
+    <file>images/Fossee_logo.png</file>
+    <file>images/iit_logo.png</file>
+    <file>images/Osdag_header.png</file>
+    <file>images/workspace_icon.png</file>
+  </qresource>
+</RCC>

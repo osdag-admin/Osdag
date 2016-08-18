@@ -1,0 +1,90 @@
+
+
+.break {
+	page-break-before:always;	
+	}
+
+
+table 	{
+	width:100%;
+	border-collapse: collapse;
+	}
+table, td, th{
+	border:1px solid black;
+	/*text-align: left;*/
+	}
+th, td {
+	padding: 5px;
+	}
+
+.header0{
+	background-color:#8fac3a;
+	font-weight: bold;
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;	
+	}
+
+.header1{
+	font-weight: bold;
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	text-align :left;
+	}
+
+.header1_1{
+	font-weight: bold;
+	background-color:#D5DF93;  
+	font-weight: bold;
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+
+.header1_2{
+	font-weight: bold;
+	background-color:#E6E6E6;  
+	font-weight: bold;
+
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+.header1_3{
+	font-weight: bold;
+	background-color:#D5DF93;  
+	/*background-color:#E2D0D0; */ 
+	font-weight: bold;
+	font-size: 20;
+	/*color:#FFFFFF;*/
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+
+.header2{
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+
+.viewtbl{
+	width : 50%;
+	font-size: 20;
+	}
+
+.viewtbl1{
+	width : 50%;
+	font-size: 30;
+	font-weight: bold;
+	}
+
+.header2_col1{
+	font-weight: bold; 
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+
+.safe  {
+	color:green;
+	}
+
+.header3{
+	font-size: 20;
+	font-family: Helvetica, Arial, Sans Serif;
+	}
+

@@ -1,0 +1,45 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>images/beam.jpg</file>
+    <file>images/beam2.jpg</file>
+    <file>images/colF1.png</file>
+    <file>images/colF2.png</file>
+    <file>images/colFF_converted.png</file>
+    <file>images/colFF.png</file>
+    <file>images/colFlange.svg</file>
+    <file>images/colW1.png</file>
+    <file>images/colW3.png</file>
+    <file>images/colww.png</file>
+    <file>images/compre1.jpg</file>
+    <file>images/config.jpg</file>
+    <file>images/Conn1.jpg</file>
+    <file>images/conn2.jpg</file>
+    <file>images/download1.png</file>
+    <file>images/favicon.png</file>
+    <file>images/IbeamStype.gif</file>
+    <file>images/images.jpeg</file>
+    <file>images/images.jpg</file>
+    <file>images/index.jpeg</file>
+    <file>images/input.png</file>
+    <file>images/inputlogo.png</file>
+    <file>images/logo.jpg</file>
+    <file>images/logo2.jpg</file>
+    <file>images/output.png</file>
+    <file>images/querry.jpg</file>
+    <file>images/rotate-ccw.png</file>
+    <file>images/rotate-cw.png</file>
+    <file>images/save.png</file>
+    <file>images/tension.jpg</file>
+    <file>images/update.jpg</file>
+    <file>images/X-Y.eps</file>
+    <file>images/X-Y.png</file>
+    <file>images/Z-X.eps</file>
+    <file>images/Z-X.png</file>
+    <file>images/Z-Y.eps</file>
+    <file>images/Z-Y.png</file>
+    <file>images/zoom_in_01.png</file>
+    <file>images/zoom_in.png</file>
+    <file>images/zoom_out_01.png</file>
+    <file>images/zoom_out.png</file>
+  </qresource>
+</RCC>

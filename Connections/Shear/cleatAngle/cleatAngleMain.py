@@ -351,10 +351,40 @@ class MainController(QtGui.QMainWindow):
             font.setWeight(75)
             self.ui.outputBoltLbl.setFont(font)
              
-
-            
-            self.ui.comboColSec.clear()
+#             self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_beamcombolist())
+            
+# ---------------------------------------- Users input-----------------------------------------------------------------------------            
+            self.ui.comboColSec.setCurrentIndex(0)
+            self.ui.combo_Beam.setCurrentIndex(0)
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboBoltType.setCurrentIndex(0)
+            self.ui.comboBoltGrade.setCurrentIndex(0)
+            self.ui.comboCleatSection.setCurrentIndex(0)
+            
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtInputCleatHeight.clear()
+            
+# ---------------------------------------- Output-----------------------------------------------------------------------------            
+            self.ui.txtNoBolts_c.clear()
+            self.ui.txt_row_c.clear()
+            self.ui.txt_column_c.clear()
+            self.ui.txtBeamPitch_c.clear()
+            self.ui.txtBeamGuage_c.clear()
+            self.ui.txtEndDist_c.clear()
+            self.ui.txtEdgeDist_c.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_column.clear()
+            self.ui.txtBeamPitch.clear()
+            self.ui.txtBeamGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            self.ui.outputCleatHeight.clear()
+
+
             
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
             
@@ -381,13 +411,40 @@ class MainController(QtGui.QMainWindow):
             self.ui.outputBoltLbl.setText("Beam")
 
 
-            self.ui.comboColSec.clear()
+#             self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_columncombolist())
             
-            self.ui.combo_Beam.setCurrentIndex(0)
+# ---------------------------------------- Users input-----------------------------------------------------------------------------            
             self.ui.comboColSec.setCurrentIndex(0)
-    
-    
+            self.ui.combo_Beam.setCurrentIndex(0)
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboBoltType.setCurrentIndex(0)
+            self.ui.comboBoltGrade.setCurrentIndex(0)
+            self.ui.comboCleatSection.setCurrentIndex(0)
+            
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtInputCleatHeight.clear()
+            
+# ---------------------------------------- Output-----------------------------------------------------------------------------            
+            self.ui.txtNoBolts_c.clear()
+            self.ui.txt_row_c.clear()
+            self.ui.txt_column_c.clear()
+            self.ui.txtBeamPitch_c.clear()
+            self.ui.txtBeamGuage_c.clear()
+            self.ui.txtEndDist_c.clear()
+            self.ui.txtEdgeDist_c.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_column.clear()
+            self.ui.txtBeamPitch.clear()
+            self.ui.txtBeamGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            self.ui.outputCleatHeight.clear()
+
+
     def fillCleatSectionCombo(self):
             
         '''Populates the cleat section on the basis  beam section and column section
@@ -754,7 +811,7 @@ class MainController(QtGui.QMainWindow):
         
         fileName,pat =QtGui.QFileDialog.getSaveFileNameAndFilter(self,"Save File As", str(self.folder) + "/","Html Files (*.html)")
         fileName = str(fileName)
-        self.call_2d_Drawing("All")
+        base, base_front, base_top, base_side = self.call_2d_Drawing("All")
 #         self.outdict = self.resultObj#self.outputdict()
         
         self.inputdict = self.getuser_inputs()#self.getuser_inputss()
@@ -763,7 +820,7 @@ class MainController(QtGui.QMainWindow):
     
         dictColData  = self.fetchColumnPara()
         dictCleatData = self.fetchAnglePara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData , dictCleatData,popup_summary, fileName)
+        save_html(self.outdict, self.inputdict, dictBeamData, dictColData , dictCleatData,popup_summary, fileName,self.folder, base, base_front, base_top, base_side)
 
 #         path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
 #         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
@@ -1733,7 +1790,7 @@ class MainController(QtGui.QMainWindow):
             pass
 
         
-    def callDesired_View(self,fileName,view):
+    def callDesired_View(self,fileName,view, base_front, base_top, base_side):
         
         self. unchecked_allChkBox()
         
@@ -1743,28 +1800,50 @@ class MainController(QtGui.QMainWindow):
         dictcoldata = self.fetchColumnPara()
         dictangledata = self.fetchAnglePara()
         finCommonObj = cleatCommonData(uiObj,resultObj,dictbeamdata,dictcoldata,dictangledata,self.folder)
-        finCommonObj.saveToSvg(str(fileName),view)
+        base_front, base_top, base_side = finCommonObj.saveToSvg(str(fileName),view,base_front, base_top, base_side)
+        return (base_front, base_top, base_side)
     
     def call_2d_Drawing(self,view):
         
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from CleatAngle GUI.
         '''
+        base = ''
         loc = self.ui.comboConnLoc.currentText()
 
         if view == "All":
             fileName = ''
-            self.callDesired_View(fileName, view)
+            base_front = ''
+            base_side = ''
+            base_top = ''
+            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
             
             self.display.set_bg_gradient_color(255,255,255,255,255,255)
             if loc == "Column flange-Beam web":
-                data = "/css/3D_ModelCleatFB.png"
+                data = str(self.folder) + "/css/3D_ModelCleatFB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelCleatFB" + str(n) + ".png" 
+                        continue
+                base = os.path.basename(str(data))
                 
             elif loc == "Column web-Beam web":
-                data = "/css/3D_ModelCleatWB.png"
+                data = str(self.folder) + "/css/3D_ModelCleatWB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelCleatWB" + str(n) + ".png" 
+                        continue
+                base = os.path.basename(str(data))
+
             else:
-                data = "/css/3D_ModelCleatBB.png"
-            self.display.ExportToImage( str(self.folder) + data)
+                data = str(self.folder) + "/css/3D_ModelCleatBB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelCleatBB" + str(n) + ".png" 
+                        continue
+                base = os.path.basename(str(data))
+
+            self.display.ExportToImage(data)
             
         else:
             
@@ -1773,10 +1852,11 @@ class MainController(QtGui.QMainWindow):
                     "SVG files (*.svg)")
             f = open(fileName,'w')
             
-            self.callDesired_View(fileName, view)
+            self.callDesired_View(fileName, view, base_front, base_top, base_side)
            
             f.close()
-            
+        return (base, base1, base2, base3)
+           
             
     def closeEvent(self, event):
         '''

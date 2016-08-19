@@ -735,13 +735,11 @@ class MainController(QtGui.QMainWindow):
         dialog.show()
     
     def createDesignReport(self):
-        
         self.show_dialog()
         
     
     def save_design(self,popup_summary):
         
-                
         fileName,pat =QtGui.QFileDialog.getSaveFileNameAndFilter(self,"Save File As",str(self.folder) +"/","Html Files (*.html)")
         fileName = str(fileName)
         base, base_front, base_top, base_side = self.call2D_Drawing("All")
@@ -750,11 +748,7 @@ class MainController(QtGui.QMainWindow):
         
         dictBeamData  = self.fetchBeamPara()
         dictColData  = self.fetchColumnPara()
-#         basepng = self.call2D_Drawing()
         save_html(self.outdict, self.inputdict, dictBeamData, dictColData,popup_summary,fileName, self.folder, base, base_front, base_top, base_side)
-        
-#         ext = os.path.basename(str(fileName))
-#         base = ext[ :-5]
         
     # Creates PDF:
 # #         
@@ -1719,7 +1713,6 @@ class MainController(QtGui.QMainWindow):
                         data = str(self.folder) + "/css/3D_ModelFinFB" + str(n) + ".png" 
                         continue
                 base = os.path.basename(str(data))
-                print "basenameee",base
 
             elif loc == "Column web-Beam web":
                 data = str(self.folder) +  "/css/3D_ModelFinWB.png"
@@ -1753,16 +1746,11 @@ class MainController(QtGui.QMainWindow):
 #             self.callDesired_View(fileName, view)
 #             f.close()
 
-#             self.callDesired_View(fileName, view)
-        print "basenameee", base
-        print "base front", base1
-        print "base side", base2
-        print "base top", base3
         return (base, base1, base2, base3)
            
         
     def callDesired_View(self,fileName,view, base_front, base_top, base_side):
-        
+       
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
@@ -1775,9 +1763,7 @@ class MainController(QtGui.QMainWindow):
         finCommonObj = FinCommonData(uiObj,resultObj,dictbeamdata,dictcoldata,self.folder)
         base_front, base_top, base_side = finCommonObj.saveToSvg(str(fileName),view, base_front, base_top, base_side)
         return (base_front, base_top, base_side)
-#         return x, y ,z
-        print"sucessfully worked"
-            
+
     def closeEvent(self, event):
         '''
         Closing finPlate window.

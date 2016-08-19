@@ -174,7 +174,7 @@
         <rect>
          <x>420</x>
          <y>0</y>
-         <width>90</width>
+         <width>101</width>
          <height>29</height>
         </rect>
        </property>
@@ -202,9 +202,9 @@
       <widget class="QCheckBox" name="chkBxEndplate">
        <property name="geometry">
         <rect>
-         <x>515</x>
+         <x>530</x>
          <y>0</y>
-         <width>91</width>
+         <width>111</width>
          <height>29</height>
         </rect>
        </property>
@@ -355,6 +355,16 @@
         <bool>true</bool>
        </property>
       </widget>
+      <zorder>btnInput</zorder>
+      <zorder>btnOutput</zorder>
+      <zorder>btn3D</zorder>
+      <zorder>chkBxBeam</zorder>
+      <zorder>chkBxCol</zorder>
+      <zorder>chkBxEndplate</zorder>
+      <zorder>btn_front</zorder>
+      <zorder>btn_top</zorder>
+      <zorder>btn_side</zorder>
+      <zorder>splitter</zorder>
      </widget>
     </item>
     <item>
@@ -971,7 +981,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Shear force (kN) *</string>
+      <string>Shear force(kN) *</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtShear">
@@ -3542,7 +3552,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Gauge (mm)</string>
+      <string>Gauge(mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="labl123_7">
@@ -3562,7 +3572,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Capacity of bolt (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Capacity of bolt(kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtbearCapacity">
@@ -3601,7 +3611,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>End distance (mm)</string>
+      <string>End distance(mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_col_7">
@@ -3641,7 +3651,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Pitch (mm)</string>
+      <string>Pitch(mm)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtEdgeDist">
@@ -3700,7 +3710,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Edge distance (mm)</string>
+      <string>Edge distance(mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_156">
@@ -3720,7 +3730,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Shear capacity (kN)</string>
+      <string>Shear capacity(kN)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtEndDist">
@@ -3779,7 +3789,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bearing capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bearing capacity(kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_161">
@@ -3836,7 +3846,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear demand (kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear demand(kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_164">
@@ -3856,7 +3866,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Weld strength (kN/mm)</string>
+      <string>Weld strength(kN/mm)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtResltShr">
@@ -3951,7 +3961,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Height (mm)</string>
+      <string>Height(mm)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtplate_ht">
@@ -4009,7 +4019,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Width (mm)</string>
+      <string>Width(mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_10">
@@ -4029,7 +4039,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Bolt group capacity (kN)</string>
+      <string>Bolt group capacity(kN)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtboltgrpcapacity">
@@ -4068,7 +4078,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weld Length (mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weld Length(mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtWeldStrng_5">

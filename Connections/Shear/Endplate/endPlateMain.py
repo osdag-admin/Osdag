@@ -502,8 +502,42 @@ class MainController(QtGui.QMainWindow):
             #self.ui.comboColSec.setObjectName("comboSecondaryBeam")
             #self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
             self.ui.comboColSec.addItems(get_beamcombolist())
-            #self.ui.comboColSec.currentIndex()
             
+# ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
+            self.ui.combo_Beam.setCurrentIndex((0))
+            self.ui.comboColSec.setCurrentIndex((0))
+#             self.ui.comboConnLoc.setCurrentIndex((0))            
+            self.ui.comboDaimeter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.comboWldSize.setCurrentIndex((0))
+            
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+            
+#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+            self.ui.txtWeldStrng_5.clear()
+    
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
             
             self.ui.label_3.setText("Column Section *")
@@ -519,6 +553,41 @@ class MainController(QtGui.QMainWindow):
             
             self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
+# ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
+            self.ui.combo_Beam.setCurrentIndex((0))
+            self.ui.comboColSec.setCurrentIndex((0))
+#             self.ui.comboConnLoc.setCurrentIndex((0))            
+            self.ui.comboDaimeter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.comboWldSize.setCurrentIndex((0))
+            
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+            
+#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+            self.ui.txtWeldStrng_5.clear()
+    
             
     def checkBeam_B(self):
         loc = self.ui.comboConnLoc.currentText()
@@ -717,7 +786,6 @@ class MainController(QtGui.QMainWindow):
         
         return outObj
     
-    
     def show_dialog(self):
         
         dialog = MyPopupDialog(self)
@@ -727,17 +795,16 @@ class MainController(QtGui.QMainWindow):
         
         self.show_dialog()
         
-    
     def save_design(self,popup_summary):
         
         fileName,pat =QtGui.QFileDialog.getSaveFileNameAndFilter(self,"Save File As",str(self.folder) +"/","Html Files (*.html)")
         fileName = str(fileName)
-        self.call2D_Drawing("All")
+        base, base_front, base_top, base_side = self.call2D_Drawing("All")
         self.outdict = self.resultObj#self.outputdict()
         self.inputdict = self.uiObj#self.getuser_inputs()
         dictBeamData  = self.fetchBeamPara()
         dictColData  = self.fetchColumnPara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData,popup_summary,fileName)
+        save_html(self.outdict, self.inputdict, dictBeamData, dictColData,popup_summary,fileName, self.folder, base, base_front, base_top, base_side)
       
       #Creates pdf:  
 #         path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
@@ -1624,7 +1691,7 @@ class MainController(QtGui.QMainWindow):
         else:
             pass
 
-    def callDesired_View(self,fileName,view):
+    def callDesired_View(self,fileName,view, base_front, base_top, base_side):
         
         self. unchecked_allChkBox()
          
@@ -1633,7 +1700,8 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata  = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         endCommonObj = EndCommonData(uiObj,resultObj,dictbeamdata,dictcoldata, self.folder)
-        endCommonObj.saveToSvg(str(fileName),view)        
+        base_front, base_top, base_side = endCommonObj.saveToSvg(str(fileName),view,base_front, base_top, base_side)        
+        return (base_front, base_top, base_side)
     
              
     def call2D_Drawing(self,view):
@@ -1646,22 +1714,42 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
         
+        base = ''
         loc = self.ui.comboConnLoc.currentText()
         if view == "All":
             fileName = ''
-            self.callDesired_View(fileName, view)
-            
+            base_front = ''
+            base_side = ''
+            base_top = ''
+
+            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
             self.display.set_bg_gradient_color(255,255,255,255,255,255)
             if loc == "Column flange-Beam web":
-                data = "/css/3D_ModelEndFB.png"
+                data = str(self.folder) + "/css/3D_ModelEndFB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelEndFB" + str(n) + ".png" 
+                        continue
+                base = os.path.basename(str(data))
                 
             elif loc == "Column web-Beam web":
-                data = "/css/3D_ModelEndWB.png"
+                data = str(self.folder) +  "/css/3D_ModelEndWB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelEndWB" + str(n) + ".png"
+                        continue
+                base = os.path.basename(str(data))
+                
             else:
-                data = "/css/3D_ModelEndBB.png"
-            self.display.ExportToImage(str(self.folder) + data)
+                data = str(self.folder) +  "/css/3D_ModelEndBB.png"
+                for n in range(1,100,1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelEndBB" + str(n) + ".png"
+                        continue
+                base = os.path.basename(str(data))
+
+            self.display.ExportToImage(data)
             
-#             self.display.ExportToImage('Workspace/css/3D_ModelEnd.png')
             
         else:
             
@@ -1670,10 +1758,11 @@ class MainController(QtGui.QMainWindow):
                     "SVG files (*.svg)")
             f = open(fileName,'w')
             
-            self.callDesired_View(fileName, view)
+            self.callDesired_View(fileName, view, base_front, base_top, base_side)
            
             f.close()
-            
+        return (base, base1, base2, base3)
+           
     def closeEvent(self, event):
         '''
         Closing endPlate window.

@@ -362,7 +362,7 @@ class cleatCommonData(object):
         dwg.add(dwg.text(textUp, insert=(txtPtUp), fill='black',font_family = "sans-serif",font_size = 28))
         dwg.add(dwg.text(textDown, insert=(txtPtDwn), fill='black',font_family = "sans-serif",font_size = 28))
     
-    def saveToSvg(self,fileName,view):
+    def saveToSvg(self,fileName,view,base_front, base_top, base_side):
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
@@ -383,11 +383,28 @@ class cleatCommonData(object):
                 fin2DTop.callCFBWTop(fileName)
             else:
                 fileName = str(self.folder)+ '/css/cleatFrontFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatFrontFB" + str(n) + ".svg"
+                        continue
                 fin2DFront.callCFBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+
                 fileName = str(self.folder)+ '/css/cleatSideFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatSideFB" + str(n) + ".svg"
+                        continue
                 fin2DSide.callCFBWSide(fileName)
+                base_front = os.path.basename(str(fileName))
+             
                 fileName = str(self.folder) + '/css/cleatTopFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatTopFB" + str(n) + ".svg"
+                        continue
                 fin2DTop.callCFBWTop(fileName)
+                base_front = os.path.basename(str(fileName))
                 
             
         elif self.connectivity == 'Column web-Beam web':
@@ -399,11 +416,28 @@ class cleatCommonData(object):
                 fin2DTop.callCWBWTop(fileName)
             else:
                 fileName = str(self.folder)+ '/css/cleatFrontWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatFrontWB" + str(n) + ".svg"
+                        continue
                 fin2DFront.callCWBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+             
                 fileName = str(self.folder)+ '/css/cleatSideWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatSideWB" + str(n) + ".svg"
+                        continue
                 fin2DSide.callCWBWSide(fileName)
+                base_front = os.path.basename(str(fileName))
+            
                 fileName = str(self.folder)+ '/css/cleatTopWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatTopWB" + str(n) + ".svg"
+                        continue
                 fin2DTop.callCWBWTop(fileName)
+                base_front = os.path.basename(str(fileName))
             
         else:
             if view == "Front":
@@ -414,11 +448,29 @@ class cleatCommonData(object):
                 fin2DTop.callBWBWTop(fileName)
             else:
                 fileName = str(self.folder)+ '/css/cleatFrontBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatFrontBB" + str(n) + ".svg"
+                        continue
                 fin2DFront.callBWBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+              
                 fileName = str(self.folder)+ '/css/cleatSideBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatSideBB" + str(n) + ".svg"
+                        continue
                 fin2DSide.callBWBWSide(fileName)
+                base_front = os.path.basename(str(fileName))
+              
                 fileName = str(self.folder)+ '/css/cleatTopBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/cleatTopBB" + str(n) + ".svg"
+                        continue
                 fin2DTop.callBWBWTop(fileName)
+                base_front = os.path.basename(str(fileName))
+        return base_front, base_top, base_side 
 
 class cleat2DCreatorFront(object):
     

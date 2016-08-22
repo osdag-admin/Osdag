@@ -1,168 +1,71 @@
 <link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>
-<link rel="stylesheet" type="text/css" href="Connections/Shear/cleatAngle/log.css"/>
-pan>
+
+    <div  class="LOG INFO">
+        <span class="DATE">Mon, 22 Aug 2016 10:15:10</span>
         <span class="LEVEL">INFO</span>
         <span class="MSG">: Overall finplate connection design is safe 
 </span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:51:53</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:15:10</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>
 
     <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:02</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:15</span>
         <span class="LEVEL">ERROR</span>
-        <span class="MSG">:Column cannot accommodate the given cleat agle due to space restriction  </span>
+        <span class="MSG">: The plate height required is more than the maximum height possible</span>
     </div>
 
     <div  class="LOG WARNING">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:02</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:15</span>
         <span class="LEVEL">WARNING</span>
-        <span class="MSG">:Cleat legsize of the cleat angle should be less than or equal to 95.00 mm</span>
+        <span class="MSG">: Maximum plate height  required is 233.70 mm </span>
     </div>
 
     <div  class="LOG INFO">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:02</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:15</span>
         <span class="LEVEL">INFO</span>
-        <span class="MSG">:Decrease the cleat legsize</span>
+        <span class="MSG">Try to increase the plate thickness</span>
     </div>
 
     <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:02</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:15</span>
         <span class="LEVEL">ERROR</span>
         <span class="MSG">: Design is not safe 
  </span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:02</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:15</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>
 
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:11</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">:Column cannot accommodate the given cleat agle due to space restriction  </span>
-    </div>
-
-    <div  class="LOG WARNING">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:11</span>
-        <span class="LEVEL">WARNING</span>
-        <span class="MSG">:Cleat legsize of the cleat angle should be less than or equal to 95.00 mm</span>
-    </div>
-
     <div  class="LOG INFO">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:11</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:29</span>
         <span class="LEVEL">INFO</span>
-        <span class="MSG">:Decrease the cleat legsize</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:11</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Design is not safe 
- </span>
+        <span class="MSG">: Overall finplate connection design is safe 
+</span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:11</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:20:29</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>
 
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:25</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">:Column cannot accommodate the given cleat agle due to space restriction  </span>
-    </div>
-
-    <div  class="LOG WARNING">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:25</span>
-        <span class="LEVEL">WARNING</span>
-        <span class="MSG">:Cleat legsize of the cleat angle should be less than or equal to 95.00 mm</span>
-    </div>
-
     <div  class="LOG INFO">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:25</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:22:19</span>
         <span class="LEVEL">INFO</span>
-        <span class="MSG">:Decrease the cleat legsize</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:25</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Design is not safe 
- </span>
+        <span class="MSG">: Overall finplate connection design is safe 
+</span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:25</span>
-        <span class="LEVEL">DEBUG</span>
-        <span class="MSG"> :=========End Of design===========</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">:Cross center distance between bolt lines in column on either side of the supported beam is less than the specified gauge [reference-JSC:ch.4 check-1]</span>
-    </div>
-
-    <div  class="LOG WARNING">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">WARNING</span>
-        <span class="MSG">:Minimum specified cross center gauge is 90 mm</span>
-    </div>
-
-    <div  class="LOG INFO">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">INFO</span>
-        <span class="MSG">:Increase the cleat leg size</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Design is not safe 
- </span>
-    </div>
-
-    <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">DEBUG</span>
-        <span class="MSG"> :=========End Of design===========</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">:Cross center distance between bolt lines in column on either side of the supported beam is less than the specified gauge [reference-JSC:ch.4 check-1]</span>
-    </div>
-
-    <div  class="LOG WARNING">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">WARNING</span>
-        <span class="MSG">:Minimum specified cross center gauge is 90 mm</span>
-    </div>
-
-    <div  class="LOG INFO">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">INFO</span>
-        <span class="MSG">:Increase the cleat leg size</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Design is not safe 
- </span>
-    </div>
-
-    <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 18 Aug 2016 11:53:33</span>
+        <span class="DATE">Mon, 22 Aug 2016 10:22:19</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>

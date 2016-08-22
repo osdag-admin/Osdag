@@ -368,7 +368,7 @@ class EndCommonData(object):
         dwg.defs.add(weldMarker)
         self.drawEndArrow(line, weldMarker)
     
-    def saveToSvg(self,fileName,view):
+    def saveToSvg(self,fileName,view,base_front, base_top, base_side):
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
@@ -389,11 +389,28 @@ class EndCommonData(object):
                 end2DTop.callCFBWTop(fileName)
             else:
                 fileName = str(self.folder)+'/css/endFrontFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endFrontFB" + str(n) + ".svg"
+                        continue
                 end2DFront.callCFBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+
                 fileName = str(self.folder)+ '/css/endSideFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endSideFB" + str(n) + ".svg"
+                        continue
                 end2DSide.callCFBWSide(fileName)
+                base_side = os.path.basename(str(fileName))
+
                 fileName = str(self.folder)+ '/css/endTopFB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/finTopFB" + str(n) + ".svg"
+                        continue
                 end2DTop.callCFBWTop(fileName)
+                base_top = os.path.basename(str(fileName))
                 
             
         elif self.connectivity == 'Column web-Beam web':
@@ -405,11 +422,28 @@ class EndCommonData(object):
                 end2DTop.callCWBWTop(fileName)
             else:
                 fileName = str(self.folder)+'/css/endFrontWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endFrontWB" + str(n) + ".svg"
+                        continue
                 end2DFront.callCWBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+
                 fileName = str(self.folder)+'/css/endSideWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endSideWB" + str(n) + ".svg"
+                        continue
                 end2DSide.callCWBWSide(fileName)
+                base_side = os.path.basename(str(fileName))
+                
                 fileName = str(self.folder)+'/css/endTopWB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endTopWB" + str(n) + ".svg"
+                        continue
                 end2DTop.callCWBWTop(fileName)
+                base_top = os.path.basename(str(fileName))
             
         else:
             if view == "Front":
@@ -420,11 +454,29 @@ class EndCommonData(object):
                 end2DTop.callBWBWTop(fileName)
             else:
                 fileName = str(self.folder)+'/css/endFrontBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endFrontBB" + str(n) + ".svg"
+                        continue
                 end2DFront.callBWBWfront(fileName)
+                base_front = os.path.basename(str(fileName))
+                
                 fileName = str(self.folder)+'/css/endSideBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endSideBB" + str(n) + ".svg"
+                        continue
                 end2DSide.callBWBWSide(fileName)
+                base_side = os.path.basename(str(fileName))
+                
                 fileName = str(self.folder)+'/css/endTopBB.svg'
+                for n in range(1,100,1):
+                    if (os.path.exists(fileName)):
+                        fileName = str(self.folder) + "/css/endTopBB" + str(n) + ".svg"
+                        continue
                 end2DTop.callBWBWTop(fileName)
+                base_top = os.path.basename(str(fileName))
+        return base_front, base_top, base_side 
 
 class End2DCreatorFront(object):
     

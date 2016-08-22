@@ -652,27 +652,24 @@ class MainController(QtGui.QMainWindow):
     # QtViewer
     def init_display(self,backend_str=None, size=(1024, 768)):
 
-        global display,start_display, app, _, USED_BACKEND
+        if os.name == 'nt':
+
+            global display, start_display, app, _
+
+            from OCC.Display.backend import get_loaded_backend
+            lodedbkend = get_loaded_backend()
+            from OCC.Display.backend import get_backend, have_backend
+            from osdagMainSettings import backend_name
+            if (not have_backend() and backend_name() == "pyqt4"):
+                get_backend("qt-pyqt4")
+
 
         from OCC.Display.qtDisplay import qtViewer3d
-        if not backend_str:
-            USED_BACKEND = self.get_backend()
-        elif backend_str in [ 'pyside', 'pyqt4']:
-            USED_BACKEND = backend_str
-        else:
-            raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-            sys.exit(1)
 
-        # Qt based simple GUI
-        if USED_BACKEND in ['pyqt4', 'pyside']:
-            if USED_BACKEND == 'pyqt4':
-                from PyQt4 import QtCore, QtGui, QtOpenGL
-                from OCC.Display.pyqt4Display import qtViewer3d
-            
         self.ui.modelTab = qtViewer3d(self)
         #self.ui.model2dTab = qtViewer3d(self)
         
-        self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, USED_BACKEND))
+        self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name))
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab,"")
         #self.ui.mytabWidget.addTab(self.ui.model2dTab,"")

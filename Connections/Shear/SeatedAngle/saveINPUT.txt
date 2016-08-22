@@ -1,0 +1,49 @@
+(dp0
+S'Member'
+p1
+(dp2
+S'ColumSection'
+p3
+S'ISSC 200'
+p4
+sS'fu (MPa)'
+p5
+I410
+sS'BeamSection'
+p6
+S'ISMB 300'
+p7
+sS'fy (MPa)'
+p8
+I250
+sS'Connectivity'
+p9
+S'Column flange-Beam web'
+p10
+ssS'Load'
+p11
+(dp12
+S'ShearForce (kN)'
+p13
+I100
+ssS'Angle'
+p14
+(dp15
+S'AngleSection'
+p16
+S'ISA 150X75X12'
+p17
+ssS'Bolt'
+p18
+(dp19
+S'Grade'
+p20
+F4.6
+sS'Diameter (mm)'
+p21
+I12
+sS'Type'
+p22
+S'Black Bolt'
+p23
+ss.

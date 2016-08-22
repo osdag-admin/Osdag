@@ -1,0 +1,312 @@
+Tue, 24 Nov 2015 10:11:57 INFO : Overall finplate connection design is safe 
+Tue, 24 Nov 2015 10:11:57 DEBUG :=========End Of design=========== 
+Tue, 24 Nov 2015 10:11:57 INFO : Overall finplate connection design is safe 
+Tue, 24 Nov 2015 10:11:57 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 08:32:26 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 08:32:26 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 08:32:26 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 08:32:26 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 08:36:36 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 08:36:36 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 08:36:36 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 08:36:36 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:23:41 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:23:41 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:23:41 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:23:41 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:32:15 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:32:15 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:32:16 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:32:16 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:39:31 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:39:31 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 10:39:31 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 10:39:31 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:13:01 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:13:01 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:13:02 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:13:02 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:20:53 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:20:53 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:20:53 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:20:53 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:22:28 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:22:28 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:22:28 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:22:28 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:27:02 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:27:02 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:27:02 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:27:02 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:27:14 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:27:14 DEBUG :=========End Of design=========== 
+Wed, 25 Nov 2015 11:27:14 INFO : Overall Seat Angle connection design is safe 
+Wed, 25 Nov 2015 11:27:14 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:00:06 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:00:06 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:00:06 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:00:06 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:04:30 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:04:30 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:04:30 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:04:30 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:05:45 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:05:45 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:05:45 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:05:45 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:16:12 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:16:12 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:16:52 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:16:52 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:26:49 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:26:49 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:26:49 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:26:49 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:28:53 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:28:53 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:28:53 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:28:53 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:31:51 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:31:51 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:32:13 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:32:13 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:37:19 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:37:19 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:59:21 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:59:21 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 15:59:21 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 15:59:21 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 16:10:23 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 16:10:23 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 16:10:23 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 16:10:23 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 21:31:30 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 21:31:30 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 21:31:30 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 21:31:30 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 21:54:31 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 21:54:31 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 21:54:31 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 21:54:31 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:10:41 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:10:41 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:10:41 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:10:41 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:11:10 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:11:10 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:11:33 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:11:33 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:11:40 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:11:40 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:15:35 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:15:35 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:15:35 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:15:35 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:16:09 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:16:09 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:22:09 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:22:09 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:22:09 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:22:09 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:23:07 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:23:07 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:23:07 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:23:07 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:23:30 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:23:30 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:25:24 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:25:24 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:25:24 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:25:24 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:27:23 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:27:23 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:27:23 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:27:23 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:28:36 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:28:36 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:28:36 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:28:36 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:30:46 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:30:46 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:30:46 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:30:46 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:30:48 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:30:48 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:30:48 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:30:48 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:31:04 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:31:04 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:35:38 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:35:38 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:35:38 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:35:38 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:36:38 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:36:38 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:36:38 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:36:38 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:37:43 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:37:43 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:37:43 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:37:43 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:37:45 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:37:45 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:37:45 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:37:45 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:38:59 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:38:59 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:38:59 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:38:59 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:49:16 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:49:16 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:49:16 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:49:16 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:53:14 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:53:14 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:53:14 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:53:14 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:56:56 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:56:56 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:56:56 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:56:56 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:59:17 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:59:17 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 22:59:17 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 22:59:17 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:11:19 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:11:19 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:11:19 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:11:19 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:13:36 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:13:36 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:13:36 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:13:36 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:14:46 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:14:46 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:14:46 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:14:46 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:17:18 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:17:18 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:17:18 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:17:18 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:18:57 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:18:57 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:18:57 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:18:57 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:20:06 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:20:06 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:20:06 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:20:06 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:24:17 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:24:17 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:24:17 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:24:17 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:27:04 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:27:04 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:27:04 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:27:04 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:30:02 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:30:02 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:30:02 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:30:02 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:33:52 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:33:52 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:33:52 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:33:52 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:39:10 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:39:10 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:39:10 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:39:10 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:42:08 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:42:08 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:42:08 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:42:08 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:42:09 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:42:09 DEBUG :=========End Of design=========== 
+Thu, 26 Nov 2015 23:42:09 INFO : Overall Seat Angle connection design is safe 
+Thu, 26 Nov 2015 23:42:09 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 05:33:22 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 05:33:22 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 05:33:22 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 05:33:22 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 05:41:30 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 05:41:30 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 05:41:30 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 05:41:30 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:08:13 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:08:13 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:08:13 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:08:13 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:10:12 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:10:12 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:10:12 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:10:12 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:13:29 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:13:29 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:13:29 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:13:29 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:19:08 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:19:08 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:19:08 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:19:08 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:21:15 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:21:15 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:21:15 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:21:15 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:25:44 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:25:44 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:25:44 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:25:44 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:30:12 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:30:12 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:30:12 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:30:12 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:31:40 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:31:40 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:31:40 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:31:40 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:32:45 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:32:45 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:32:45 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:32:45 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:36:00 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:36:00 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:36:00 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:36:00 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:01 ERROR : Bolt strength is insufficient to carry the shear force 
+Fri, 27 Nov 2015 06:37:01 WARNING : Increase bolt diameter and/or bolt grade 
+Fri, 27 Nov 2015 06:37:01 ERROR : Design is not safe 
+Fri, 27 Nov 2015 06:37:01 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:10 ERROR : Bolt strength is insufficient to carry the shear force 
+Fri, 27 Nov 2015 06:37:10 WARNING : Increase bolt diameter and/or bolt grade 
+Fri, 27 Nov 2015 06:37:10 ERROR : Design is not safe 
+Fri, 27 Nov 2015 06:37:10 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:20 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:37:20 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:20 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:37:20 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:34 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:37:34 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:37:34 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:37:34 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:47:14 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:47:14 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:47:14 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:47:14 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:49:24 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:49:24 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:49:25 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:49:25 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:53:59 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:53:59 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:53:59 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:53:59 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:55:15 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:55:15 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:55:16 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:55:16 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:59:29 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:59:29 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 06:59:29 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 06:59:29 DEBUG :=========End Of design=========== 
+Fri, 27 Nov 2015 07:00:14 INFO : Overall Seat Angle connection design is safe 
+Fri, 27 Nov 2015 07:00:14 DEBUG :=========End Of design=========== 

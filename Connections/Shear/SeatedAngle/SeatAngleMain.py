@@ -11,6 +11,7 @@ import os.path
 from PyQt4.QtCore import pyqtSignal
 import shutil
 import webbrowser
+import pickle
 
 from OCC.gp import gp_Pnt
 from OCC import VERSION, BRepTools
@@ -26,7 +27,7 @@ import OCC.V3d
 
 from model import *
 from utilities import osdagDisplayShape
-from drawing_2D import FinCommonData
+# from drawing_2D import FinCommonData
 
 from ISection import ISection
 from angle import Angle
@@ -139,16 +140,16 @@ class MainController(QtGui.QMainWindow):
     
     closed = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, folder):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+
         self.ui.comboBeamSec.addItems(get_beamcombolist())
         self.ui.comboColSec.addItems(get_columncombolist())
         self.ui.comboAngleSec.addItems(get_anglecombolist())      
 
-        
         self.ui.inputDock.setFixedSize(310,710)
         
         self.gradeType ={'Please Select Type':'',
@@ -160,13 +161,14 @@ class MainController(QtGui.QMainWindow):
         
         
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-#         self.retrieve_prevstate()          #ENABLE THIS ONE SOON
+        self.retrieve_prevstate()
+
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         
-        self.ui.btn_front.clicked.connect(self.call_Frontview)
-        self.ui.btn_top.clicked.connect(self.call_Topview)
-        self.ui.btn_side.clicked.connect(self.call_Sideview)
+        # self.ui.btn_front.clicked.connect(self.call_Frontview)
+        # self.ui.btn_top.clicked.connect(self.call_Topview)
+        # self.ui.btn_side.clicked.connect(self.call_Sideview)
         
         self.ui.btn3D.clicked.connect(lambda:self.call_3DModel(True))
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
@@ -192,7 +194,11 @@ class MainController(QtGui.QMainWindow):
         minfyVal = 165
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy,self.ui.lbl_fy, minfyVal, maxfyVal))
-       
+
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        ##### MenuBar #####
+        # File Menu
+
         ##### MenuBar #####
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
@@ -300,57 +306,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxSeatAngle.setEnabled(True)
-        
-#     def fillPlateThickCombo(self):
-#         '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
-#         '''
-#         dictbeamdata = self.fetchBeamPara()
-#         beam_tw = float(dictbeamdata[QString("tw")])
-#         plateThickness = [6,8,10,12,14,16,18,20]
-#         newlist = ['Select plate thickness']
-#         for ele in plateThickness[1:]:
-#             item = int(ele)
-#             if item >= beam_tw:
-#                 newlist.append(str(item))
-#         self.ui.comboPlateThick_2.clear()
-#         for i in newlist[:]:
-#             self.ui.comboPlateThick_2.addItem(str(i))
-#         self.ui.comboPlateThick_2.setCurrentIndex(1)
-#            
-#     def populateWeldThickCombo(self):
-#         '''
-#         Returns the weld thickness on the basis column flange and plate thickness check
-#         '''
-#         newlist = ["Select weld thickness"]
-#         weldlist = [3,4,5,6,8,10,12,16]
-#         dictcoldata = self.fetchColumnPara()
-#         column_tf = float(dictcoldata[QString("T")])
-#         column_tw = float(dictcoldata[QString("tw")])
-#         plate_thick  =  float(self.ui.comboPlateThick_2.currentText())
-#         
-#         if self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-#             
-#             thickerPart = column_tf > plate_thick and column_tf or plate_thick
-#         
-#         else:
-#             thickerPart = column_tw > plate_thick and column_tw or plate_thick
-#             
-#         if thickerPart in range(0,11):
-#             weld_index = weldlist.index(3)
-#             newlist.extend(weldlist[weld_index:])
-#         elif thickerPart in range (11,21):
-#             weld_index = weldlist.index(5)
-#             newlist.extend(weldlist[weld_index:])
-#         elif thickerPart in range(21,33):
-#             weld_index = weldlist.index(6)
-#             newlist.extend(weldlist[weld_index: ])
-#         else:
-#             weld_index = weldlist.index(8)
-#             newlist.extend(weldlist[weld_index: ])
-#                 
-#         self.ui.comboWldSize.clear()
-#         for element in newlist[:]:
-#             self.ui.comboWldSize.addItem(str(element))
+
 
     
     def retrieve_prevstate(self):
@@ -394,22 +350,20 @@ class MainController(QtGui.QMainWindow):
         self.ui.lbl_connectivity.show()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column flange-Beam web":
-            
-            #pixmap = QtGui.QPixmap(":/newPrefix/images/beam2.jpg")
             pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             #self.ui.lbl_connectivity.show()
         elif(loc == "Column web-Beam web"):
-            #picmap = QtGui.QPixmap(":/newPrefix/images/beam.jpg")
             picmap = QtGui.QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
         else:
             self.ui.lbl_connectivity.hide()
-            
+
+        return True
         
     def getuser_inputs(self):
         '''(nothing) -> Dictionary
@@ -447,7 +401,6 @@ class MainController(QtGui.QMainWindow):
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
                     "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
-        #yaml.dump(uiObj, inputFile,allow_unicode=True, default_flow_style = False)
         pickle.dump(uiObj, inputFile)
         
     
@@ -520,33 +473,7 @@ class MainController(QtGui.QMainWindow):
         outf << self.ui.textEdit.toPlainText()
         QtGui.QApplication.restoreOverrideCursor()
 
-        #self.setCurrentFile(fileName);
-        
-        #QtGui.QMessageBox.about(self,'Information',"File saved")
-       
-    
-    ################
-    # def save_yaml(self,outObj,uiObj):
-    #     '''(dictiionary,dictionary) -> NoneType
-    #     Saving input and output to file in following format.
-    #     Bolt:
-    #       diameter: 6
-    #       grade: 8.800000190734863
-    #       type: HSFG
-    #     Load:
-    #       shearForce: 100
-    #
-    #     '''
-    #     newDict = {"INPUT": uiObj, "OUTPUT": outObj}
-    #     fileName = QtGui.QFileDialog.getSaveFileName(self,"Save File As","/home/jeffy/SaveDesign","Text File (*.txt)")
-    #     f = open(fileName,'w')
-    #     yaml.dump(newDict,f,allow_unicode=True, default_flow_style=False)
-    #
-    #     #return self.save_file(fileName+".txt")
-    #     #QtGui.QMessageBox.about(self,'Information',"File saved")
 
-        
-        
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
         
@@ -749,7 +676,6 @@ class MainController(QtGui.QMainWindow):
         
     # QtViewer
     def init_display(self,backend_str=None, size=(1024, 768)):
-
         if os.name == 'nt':
 
             global display, start_display, app, _
@@ -760,7 +686,23 @@ class MainController(QtGui.QMainWindow):
             from osdagMainSettings import backend_name
             if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
+        else:
+            global display, start_display, app, _, USED_BACKEND
 
+            if not backend_str:
+                USED_BACKEND = self.get_backend()
+            elif backend_str in ['pyside', 'pyqt4']:
+                USED_BACKEND = backend_str
+            else:
+                raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
+                sys.exit(1)
+
+            # Qt based simple GUI
+            if USED_BACKEND in ['pyqt4', 'pyside']:
+                if USED_BACKEND == 'pyqt4':
+                    import OCC.Display.qtDisplay
+                    from OCC.Display.qtDisplay import qtViewer3d
+                    from PyQt4 import QtCore, QtGui, QtOpenGL
 
         from OCC.Display.qtDisplay import qtViewer3d
 
@@ -776,11 +718,7 @@ class MainController(QtGui.QMainWindow):
         display = self.ui.modelTab._display
         #display_2d = self.ui.model2dTab._display
         
-        
-        # background gradient
         display.set_bg_gradient_color(23,1,32,23,1,32)
-        #display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        # display black trihedron
         display.display_trihedron()
         display.View.SetProj(1, 1, 1)
         def centerOnScreen(self):
@@ -794,12 +732,21 @@ class MainController(QtGui.QMainWindow):
             #self.ui.model2dTab.raise_()   # make the application float to the top
           
         return display, start_display
-    
+
+    def showColorDialog(self):
+
+        col = QtGui.QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+
     def display3Dmodel(self, component):
         self.display.EraseAll()
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
-        self.display.set_bg_gradient_color(23,1,32,23,1,32)
+        self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
         self.display.View_Front()
         self.display.View_Iso()
         self.display.FitAll()

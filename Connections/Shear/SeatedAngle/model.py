@@ -18,7 +18,7 @@ def set_databaseconnection():
     filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'CleatSections')
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
-    # db.open()
+    db.open()
     if not db.open():
         QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
                                    QtGui.qApp.tr("Unable to establish a database connection.\n"
@@ -108,9 +108,7 @@ def get_columndata(sect):
     queryStr = "Select * from Columns where Designation = '%s'" % section
     
     designQuery = QSqlQuery(queryStr)
-    # print(designQuery)
-    
-    # print designQuery.size()
+
     retDict = {}
     record = designQuery.record()
     

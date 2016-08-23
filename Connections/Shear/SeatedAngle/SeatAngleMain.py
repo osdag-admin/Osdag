@@ -1,51 +1,149 @@
 '''
 Created on 07-May-2015
-comment
-
 @author: deepa
-'''
-from PyQt4.QtCore import QString, pyqtSignal
-from OCC.TopoDS import topods, TopoDS_Shape
-from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
-from OCC import VERSION, BRepTools
-from ui_SeatAngle import Ui_MainWindow
-from model import *
-from SeatAngleCalc import SeatAngleConn
-# import yaml
-import pickle
-from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Quantity import Quantity_NOC_RED,Quantity_NOC_BLUE1,Quantity_NOC_SADDLEBROWN
-from ISection import ISection
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-# from weld import  Weld
-# from plate import Plate
-from angle import Angle
-from bolt import Bolt
-from nut import Nut 
-import os.path
-from utilities import osdagDisplayShape
 
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+Updated 23-Aug-2016
+@author: jayant
+'''
+
+import os.path
+
+from PyQt4.QtCore import pyqtSignal
+import shutil
+import webbrowser
+
+from OCC.gp import gp_Pnt
+from OCC import VERSION, BRepTools
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Quantity import Quantity_NOC_SADDLEBROWN
+from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from OCC import IGESControl
-from filletweld import FilletWeld
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
-from drawing_2D import Fin2DCreatorFront
-import svgwrite
-# Developed by deepa
+import OCC.V3d
+
+from model import *
+from utilities import osdagDisplayShape
+from drawing_2D import FinCommonData
+
+from ISection import ISection
+from angle import Angle
+from filletweld import FilletWeld
+from bolt import Bolt
+from nut import Nut
+from SeatAngleCalc import SeatAngleConn
+from nutBoltPlacement import NutBoltArray
+
+from colWebBeamWebConnectivity import ColWebBeamWeb
+from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+#from beamWebBeamWebConnectivity import BeamWebBeamWeb
+
+from reportGenerator import *
+from ui_SeatAngle import Ui_MainWindow
+from ui_summary_popup import Ui_Dialog
+from ui_aboutosdag import Ui_HelpOsdag
+from ui_tutorial import Ui_Tutorial
+
+
+class MyTutorials(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+class MyAboutOsdag(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_HelpOsdag()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+class DesignReportDialog(QtGui.QDialog):
+    print"my popup window"
+
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)
+        self.mainController = parent
+        self.setWindowTitle("Design Profile")
+        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
+        self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        self.accepted.connect(self.save_inputSummary)
+
+    def save_inputSummary(self):
+        input_summary = self.getPopUpInputs()
+        self.mainController.save_design(input_summary)
+
+    def getLogoFilePath(self, lblwidget):
+
+        self.ui.lbl_browse.clear
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+                                                     QtGui.QFileDialog.DontUseNativeDialog)
+
+        base = os.path.basename(str(filename))
+        lblwidget.setText(base)
+        self.desired_location(filename)
+
+        return str(filename)
+
+    def desired_location(self, filename):
+        shutil.copyfile(filename, str(self.mainController.folder) + "/css/cmpylogoFin.png")
+
+    def saveUserProfile(self):
+
+        inputData = self.getPopUpInputs()
+        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
+                                                     '*.txt')
+        infile = open(filename, 'w')
+        pickle.dump(inputData, infile)
+        infile.close()
+
+    def getPopUpInputs(self):
+
+        input_summary = {}
+        input_summary["ProfileSummary"] = {}
+        input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+        input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+        input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+        input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+        input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+        input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+
+        return input_summary
+
+    def useUserProfile(self):
+
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+                                                     "All Files (*)")
+        if os.path.isfile(filename):
+            outfile = open(filename, 'r')
+            reportsummary = pickle.load(outfile)
+            self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+            self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+            self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+            self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+        else:
+            pass
+
 
 class MainController(QtGui.QMainWindow):
     
     closed = pyqtSignal()
+
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+        self.folder = folder
         self.ui.comboBeamSec.addItems(get_beamcombolist())
         self.ui.comboColSec.addItems(get_columncombolist())
         self.ui.comboAngleSec.addItems(get_anglecombolist())      
@@ -1261,7 +1359,7 @@ def set_osdaglogger():
     # add handler to logger object
     logger.addHandler(fh)
     
-def launchFinPlateController(osdagMainWindow):
+def launchSeatedAngleController(osdagMainWindow):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)

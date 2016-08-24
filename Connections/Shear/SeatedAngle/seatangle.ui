@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Fin Plate</string>
+   <string>Seated Angle</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="ResourceFiles/icons.qrc">
     <normaloff>:/newPrefix/images/download1.png</normaloff>:/newPrefix/images/download1.png</iconset>
   </property>
   <property name="iconSize">
@@ -24,8 +24,8 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <widget class="QFrame" name="frame">
       <property name="minimumSize">
        <size>
@@ -48,14 +48,17 @@
       <widget class="QToolButton" name="btnInput">
        <property name="geometry">
         <rect>
-         <x>0</x>
+         <x>10</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
         </rect>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Left dock</string>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -64,7 +67,7 @@
         <string>input</string>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="ResourceFiles/icons.qrc">
          <normaloff>:/newPrefix/images/input.png</normaloff>:/newPrefix/images/input.png</iconset>
        </property>
        <property name="iconSize">
@@ -77,20 +80,23 @@
       <widget class="QToolButton" name="btnOutput">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>40</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
         </rect>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Right dock</string>
        </property>
        <property name="text">
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="ResourceFiles/icons.qrc">
          <normaloff>:/newPrefix/images/output.png</normaloff>:/newPrefix/images/output.png</iconset>
        </property>
        <property name="iconSize">
@@ -100,205 +106,59 @@
         </size>
        </property>
       </widget>
-      <widget class="QToolButton" name="btnZmOut">
+      <widget class="QCheckBox" name="btn3D">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>280</x>
          <y>0</y>
-         <width>28</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Zoom In</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/newPrefix/images/zoom_in_01.png</normaloff>:/newPrefix/images/zoom_in_01.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>18</width>
-         <height>18</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="btnZmIn">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>0</y>
-         <width>28</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Zoom Out</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/newPrefix/images/zoom_out_01.png</normaloff>:/newPrefix/images/zoom_out_01.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>18</width>
-         <height>18</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="btnSvgSave">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>0</y>
-         <width>28</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Save 3D Images</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/newPrefix/images/save.png</normaloff>:/newPrefix/images/save.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>18</width>
-         <height>18</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="btnTotatAcw">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>0</y>
-         <width>28</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Rotate Left</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/newPrefix/images/rotate-ccw.png</normaloff>:/newPrefix/images/rotate-ccw.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>22</width>
-         <height>22</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="btnRotatCw">
-       <property name="geometry">
-        <rect>
-         <x>170</x>
-         <y>0</y>
-         <width>28</width>
-         <height>28</height>
-        </rect>
-       </property>
-       <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
-       </property>
-       <property name="toolTip">
-        <string>Rotate Right</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/newPrefix/images/rotate-cw.png</normaloff>:/newPrefix/images/rotate-cw.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>25</width>
-         <height>25</height>
-        </size>
-       </property>
-      </widget>
-      <widget class="QToolButton" name="btn3D">
-       <property name="geometry">
-        <rect>
-         <x>390</x>
-         <y>0</y>
-         <width>28</width>
+         <width>81</width>
          <height>28</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Droid Serif</family>
+         <family>Arial</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
-         <italic>true</italic>
+         <italic>false</italic>
          <bold>true</bold>
          <underline>false</underline>
          <strikeout>false</strikeout>
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
        </property>
        <property name="toolTip">
         <string>3D Model</string>
        </property>
        <property name="text">
-        <string>3D</string>
-       </property>
-       <property name="autoRaise">
-        <bool>false</bool>
-       </property>
-       <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
+        <string>Model</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="chkBxBeam">
        <property name="geometry">
         <rect>
-         <x>430</x>
+         <x>390</x>
          <y>0</y>
-         <width>71</width>
+         <width>81</width>
          <height>29</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
          <weight>75</weight>
+         <italic>false</italic>
          <bold>true</bold>
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Beam only</string>
        </property>
        <property name="text">
         <string>Beam</string>
@@ -307,7 +167,7 @@
       <widget class="QCheckBox" name="chkBxCol">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>480</x>
          <y>0</y>
          <width>91</width>
          <height>29</height>
@@ -315,13 +175,18 @@
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
          <weight>75</weight>
+         <italic>false</italic>
          <bold>true</bold>
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Column only</string>
        </property>
        <property name="text">
         <string>Column</string>
@@ -330,21 +195,26 @@
       <widget class="QCheckBox" name="chkBxSeatAngle">
        <property name="geometry">
         <rect>
-         <x>600</x>
+         <x>590</x>
          <y>0</y>
-         <width>92</width>
+         <width>121</width>
          <height>29</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
          <weight>75</weight>
+         <italic>false</italic>
          <bold>true</bold>
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Seat Angle only</string>
        </property>
        <property name="text">
         <string>Seat Angle</string>
@@ -353,7 +223,7 @@
       <widget class="QToolButton" name="btn_front">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>120</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
@@ -367,10 +237,10 @@
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
        </property>
        <property name="acceptDrops">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="toolTip">
         <string>Front View</string>
@@ -379,7 +249,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="ResourceFiles/icons.qrc">
          <normaloff>:/newPrefix/images/Z-X.png</normaloff>:/newPrefix/images/Z-X.png</iconset>
        </property>
        <property name="iconSize">
@@ -395,7 +265,7 @@
       <widget class="QToolButton" name="btn_top">
        <property name="geometry">
         <rect>
-         <x>300</x>
+         <x>150</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
@@ -409,7 +279,7 @@
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
        </property>
        <property name="toolTip">
         <string>Top View</string>
@@ -418,7 +288,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="ResourceFiles/icons.qrc">
          <normaloff>:/newPrefix/images/X-Y.png</normaloff>:/newPrefix/images/X-Y.png</iconset>
        </property>
        <property name="iconSize">
@@ -434,7 +304,7 @@
       <widget class="QToolButton" name="btn_side">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>180</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
@@ -448,7 +318,7 @@
         </font>
        </property>
        <property name="focusPolicy">
-        <enum>Qt::NoFocus</enum>
+        <enum>Qt::WheelFocus</enum>
        </property>
        <property name="toolTip">
         <string>Side View</string>
@@ -457,7 +327,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
+        <iconset resource="ResourceFiles/icons.qrc">
          <normaloff>:/newPrefix/images/Z-Y.png</normaloff>:/newPrefix/images/Z-Y.png</iconset>
        </property>
        <property name="iconSize">
@@ -472,7 +342,7 @@
       </widget>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -545,6 +415,9 @@
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOn</enum>
        </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
        <property name="overwriteMode">
         <bool>true</bool>
        </property>
@@ -559,30 +432,86 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
+    <property name="styleSheet">
+     <string notr="true">QMenu {
+    background-color:#b2bd84;
+    border-color: black;
+    border: 1px solid;
+    margin: 2px; /* some spacing around the menu */
+}
+QMenu::separator {
+    height: 1px;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+QMenu::item {
+    color: black;
+    padding: 2px 20px 2px 20px;
+    border: 1px solid transparent; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+   color:white;
+    border-color: darkblue;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</string>
+    </property>
     <property name="title">
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="separator"/>
     <addaction name="actionOpen"/>
     <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="separator"/>
     <addaction name="actionSave_3D_model_as"/>
-    <addaction name="separator"/>
     <addaction name="actionSave_current_2D_image_as"/>
     <addaction name="separator"/>
+    <addaction name="actionSave_front_view"/>
+    <addaction name="actionSave_top_view"/>
+    <addaction name="actionSave_side_view"/>
+    <addaction name="separator"/>
     <addaction name="actionSave_log_messages"/>
-    <addaction name="separator"/>
     <addaction name="actionCreate_design_report"/>
-    <addaction name="separator"/>
     <addaction name="actionQuit_fin_plate_design"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
+    <property name="styleSheet">
+     <string notr="true">QMenu {
+    background-color:#b2bd84;
+    border-color: black;
+    border: 1px solid;
+    margin: 2px; /* some spacing around the menu */
+}
+QMenu::separator {
+    height: 1px;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+QMenu::item {
+    color: black;
+    padding: 2px 20px 2px 20px;
+    border: 1px solid transparent; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+   color:white;
+    border-color: darkblue;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</string>
+    </property>
     <property name="title">
      <string>Edit</string>
     </property>
@@ -591,6 +520,35 @@
     <addaction name="actionPaste"/>
    </widget>
    <widget class="QMenu" name="menuView">
+    <property name="styleSheet">
+     <string notr="true">QMenu {
+    background-color:#b2bd84;
+    border-color: black;
+    border: 1px solid;
+    margin: 2px; /* some spacing around the menu */
+}
+QMenu::separator {
+    height: 1px;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+QMenu::item {
+    color: black;
+    padding: 2px 20px 2px 20px;
+    border: 1px solid transparent; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+   color:white;
+    border-color: darkblue;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</string>
+    </property>
     <property name="title">
      <string>View</string>
     </property>
@@ -598,28 +556,91 @@
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
+    <property name="styleSheet">
+     <string notr="true">QMenu {
+    background-color:#b2bd84;
+    border-color: black;
+    border: 1px solid;
+    margin: 2px; /* some spacing around the menu */
+}
+QMenu::separator {
+    height: 1px;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+QMenu::item {
+    color: black;
+    padding: 2px 20px 2px 20px;
+    border: 1px solid transparent; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+   color:white;
+    border-color: darkblue;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+</string>
+    </property>
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionOsdag_Manual"/>
+    <addaction name="actionSample_Reports"/>
+    <addaction name="actionSampe_Problems"/>
+    <addaction name="actionVideo_Tutorials"/>
+    <addaction name="separator"/>
+    <addaction name="actionAsk_Us_a_Question"/>
+    <addaction name="actionFAQ"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout_Osdag"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
+    <property name="styleSheet">
+     <string notr="true">QMenu {
+    background-color:#b2bd84;
+    border-color: black;
+    border: 1px solid;
+    margin: 2px; /* some spacing around the menu */
+}
+QMenu::separator {
+    height: 1px;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+QMenu::item {
+    color: black;
+    padding: 2px 20px 2px 20px;
+    border: 1px solid transparent; /* reserve space for selection border */
+}
+
+QMenu::item:selected {
+   color:white;
+    border-color: darkblue;
+    background: #825051;
+    margin-left: 5px;
+    margin-right: 5px;
+}</string>
+    </property>
     <property name="title">
      <string>Graphics</string>
     </property>
     <addaction name="actionZoom_in"/>
-    <addaction name="separator"/>
     <addaction name="actionZoom_out"/>
-    <addaction name="separator"/>
     <addaction name="actionPan"/>
-    <addaction name="separator"/>
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
-    <addaction name="actionView_2D_on_XY"/>
+    <addaction name="actionBeam_2"/>
+    <addaction name="actionColumn_2"/>
+    <addaction name="actionSeatAngle_2"/>
+    <addaction name="actionShow_All"/>
     <addaction name="separator"/>
-    <addaction name="actionView_2D_on_YZ"/>
-    <addaction name="separator"/>
-    <addaction name="actionView_2D_on_ZX"/>
+    <addaction name="actionChange_Background"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -654,6 +675,8 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
+     <pointsize>11</pointsize>
      <weight>75</weight>
      <italic>false</italic>
      <bold>true</bold>
@@ -676,13 +699,15 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>220</y>
-       <width>161</width>
-       <height>25</height>
+       <y>230</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -695,13 +720,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>155</y>
+       <y>165</y>
        <width>151</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -716,12 +742,13 @@
       <rect>
        <x>150</x>
        <y>40</y>
-       <width>161</width>
-       <height>25</height>
+       <width>160</width>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -747,13 +774,15 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>190</y>
-       <width>161</width>
-       <height>25</height>
+       <y>200</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -810,6 +839,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>75</weight>
        <bold>true</bold>
@@ -830,6 +860,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -843,13 +874,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>190</y>
+       <y>200</y>
        <width>120</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -863,10 +895,18 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>155</y>
-       <width>161</width>
-       <height>25</height>
+       <y>165</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QComboBox { combobox-popup: 0; }</string>
@@ -879,13 +919,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>215</y>
+       <y>225</y>
        <width>120</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -899,13 +940,14 @@
      <property name="geometry">
       <rect>
        <x>1</x>
-       <y>240</y>
+       <y>250</y>
        <width>170</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -919,33 +961,36 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>270</y>
+       <y>280</y>
        <width>151</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
-      <string>Shear force (kN) *</string>
+      <string>Shear force (kN)*</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtShear">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>270</y>
-       <width>161</width>
-       <height>25</height>
+       <y>280</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -955,13 +1000,14 @@
      <property name="geometry">
       <rect>
        <x>1</x>
-       <y>300</y>
+       <y>310</y>
        <width>150</width>
        <height>30</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -978,13 +1024,15 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>360</y>
+       <y>370</y>
        <width>160</width>
-       <height>25</height>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -997,13 +1045,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>390</y>
+       <y>400</y>
        <width>100</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -1017,10 +1066,18 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>390</y>
+       <y>400</y>
        <width>160</width>
-       <height>25</height>
+       <height>27</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QComboBox { combobox-popup: 0; }</string>
@@ -1033,13 +1090,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>330</y>
+       <y>340</y>
        <width>131</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -1053,13 +1111,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>360</y>
+       <y>370</y>
        <width>100</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -1073,13 +1132,14 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>330</y>
+       <y>340</y>
        <width>160</width>
        <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -2878,54 +2938,22 @@
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_Reset">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>630</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Reset</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_Design">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>630</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Design</string>
-     </property>
-    </widget>
     <widget class="QComboBox" name="comboBeamSec">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>125</y>
-       <width>161</width>
-       <height>25</height>
+       <y>135</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QComboBox { combobox-popup: 0; }</string>
@@ -2938,9 +2966,9 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>70</y>
-       <width>60</width>
-       <height>50</height>
+       <y>72</y>
+       <width>81</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="scaledContents">
@@ -2951,13 +2979,14 @@
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>125</y>
+       <y>135</y>
        <width>131</width>
        <height>22</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -2971,13 +3000,14 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>420</y>
+       <y>430</y>
        <width>150</width>
        <height>30</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -2994,10 +3024,18 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>450</y>
-       <width>161</width>
-       <height>25</height>
+       <y>460</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
      </property>
      <property name="styleSheet">
       <string notr="true">QComboBox { combobox-popup: 0; }</string>
@@ -3009,14 +3047,15 @@
     <widget class="QLabel" name="lbl_comboAngleSec">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>450</y>
+       <x>6</x>
+       <y>460</y>
        <width>131</width>
        <height>22</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3029,14 +3068,15 @@
     <widget class="QLabel" name="lbl_txtanglethickness">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>480</y>
+       <x>6</x>
+       <y>490</y>
        <width>151</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3050,17 +3090,71 @@
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>480</y>
-       <width>161</width>
-       <height>25</height>
+       <y>490</y>
+       <width>160</width>
+       <height>27</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>540</y>
+       <width>195</width>
+       <height>35</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="btn_Reset">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Reset Inputs</string>
+        </property>
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+R</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_Design">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Design Connection</string>
+        </property>
+        <property name="text">
+         <string>Design</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+D</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -3085,6 +3179,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>11</pointsize>
      <weight>75</weight>
      <bold>true</bold>
@@ -3108,6 +3203,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3127,6 +3223,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3147,6 +3244,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3169,6 +3267,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3188,6 +3287,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3207,6 +3307,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3226,6 +3327,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3245,6 +3347,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3264,6 +3367,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3284,6 +3388,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3304,6 +3409,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3323,6 +3429,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3343,6 +3450,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3363,6 +3471,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3383,6 +3492,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3402,6 +3512,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3422,6 +3533,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3442,6 +3554,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3462,6 +3575,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3474,13 +3588,14 @@
      <property name="geometry">
       <rect>
        <x>-1</x>
-       <y>0</y>
+       <y>7</y>
        <width>66</width>
        <height>20</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3501,6 +3616,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3521,6 +3637,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3541,6 +3658,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3560,6 +3678,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3579,6 +3698,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3602,6 +3722,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3622,38 +3743,13 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
      <property name="readOnly">
       <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_SaveMessages">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>610</y>
-       <width>200</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Save messages</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_CreateDesign">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>650</y>
-       <width>200</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Create design report</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_txtSeatLength">
@@ -3667,6 +3763,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3687,9 +3784,13 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_txtBoltGroupCapacity">
@@ -3703,6 +3804,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3723,22 +3825,27 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_SeatAngle">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>370</y>
+       <y>365</y>
        <width>111</width>
-       <height>20</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
@@ -3759,6 +3866,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3778,13 +3886,14 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear capacity (kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear capacity(kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtBeamShearStrength">
@@ -3798,6 +3907,7 @@
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3811,20 +3921,53 @@
       <rect>
        <x>0</x>
        <y>550</y>
-       <width>191</width>
-       <height>25</height>
+       <width>171</width>
+       <height>21</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beam Shear Strength (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear Strength (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>610</y>
+       <width>192</width>
+       <height>69</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QPushButton" name="btn_SaveMessages">
+        <property name="toolTip">
+         <string>Save Log Messages</string>
+        </property>
+        <property name="text">
+         <string>Save messages</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_CreateDesign">
+        <property name="toolTip">
+         <string>Create Design Report</string>
+        </property>
+        <property name="text">
+         <string>Create design report</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
@@ -3853,10 +3996,16 @@
    <property name="text">
     <string>New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSave">
@@ -3878,15 +4027,24 @@
    <property name="text">
     <string>Cut</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
   </action>
   <action name="actionCopy">
    <property name="text">
     <string>Copy</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
   </action>
   <action name="actionPaste">
    <property name="text">
     <string>Paste</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionInput_Browser">
@@ -3901,7 +4059,7 @@
   </action>
   <action name="actionAbout_Osdag">
    <property name="text">
-    <string>About Finplate</string>
+    <string>About Osdag</string>
    </property>
   </action>
   <action name="actionBeam">
@@ -3949,19 +4107,28 @@
     <string>Rotate 3D model</string>
    </property>
   </action>
-  <action name="actionView_2D_on_XY">
+  <action name="actionBeam_2">
    <property name="text">
-    <string>View 2D on XY</string>
+    <string>Show beam</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+B</string>
    </property>
   </action>
-  <action name="actionView_2D_on_YZ">
+  <action name="actionColumn_2">
    <property name="text">
-    <string>View 2D on YZ</string>
+    <string>Show column</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionView_2D_on_ZX">
+  <action name="actionSeatAngle_2">
    <property name="text">
-    <string>View 2D on ZX</string>
+    <string>Show seat angle</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+A</string>
    </property>
   </action>
   <action name="actionModel">
@@ -3981,30 +4148,210 @@
   </action>
   <action name="actionSave_3D_model_as">
    <property name="text">
-    <string>Save 3D model as</string>
+    <string>Save 3D model</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+3</string>
    </property>
   </action>
   <action name="actionSave_current_2D_image_as">
    <property name="text">
-    <string>Save 2D image as</string>
+    <string>Save CAD image</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+I</string>
    </property>
   </action>
   <action name="actionSave_log_messages">
    <property name="text">
     <string>Save log messages</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+M</string>
+   </property>
   </action>
   <action name="actionCreate_design_report">
    <property name="text">
     <string>Create design report</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+C</string>
+   </property>
   </action>
   <action name="actionQuit_fin_plate_design">
    <property name="text">
-    <string>Quit fin plate design</string>
+    <string>Save design</string>
+   </property>
+  </action>
+  <action name="actionSave_front_view">
+   <property name="text">
+    <string>Save front view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+F</string>
+   </property>
+  </action>
+  <action name="actionSave_top_view">
+   <property name="text">
+    <string>Save top view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+T</string>
+   </property>
+  </action>
+  <action name="actionSave_side_view">
+   <property name="text">
+    <string>Save side view</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionShow_All">
+   <property name="text">
+    <string>Show All</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+M</string>
+   </property>
+  </action>
+  <action name="actionChange_Background">
+   <property name="text">
+    <string>Change background</string>
+   </property>
+  </action>
+  <action name="actionOsdag_Manual">
+   <property name="text">
+    <string>Osdag Manual</string>
+   </property>
+  </action>
+  <action name="actionSample_Reports">
+   <property name="text">
+    <string>Sample Reports</string>
+   </property>
+  </action>
+  <action name="actionSampe_Problems">
+   <property name="text">
+    <string>Sampe Problems</string>
+   </property>
+  </action>
+  <action name="actionVideo_Tutorials">
+   <property name="text">
+    <string>Video Tutorials</string>
+   </property>
+  </action>
+  <action name="actionAsk_Us_a_Question">
+   <property name="text">
+    <string>Ask Us a Question</string>
+   </property>
+  </action>
+  <action name="actionFAQ">
+   <property name="text">
+    <string>FAQ</string>
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>comboConnLoc</tabstop>
+  <tabstop>comboBeamSec</tabstop>
+  <tabstop>comboColSec</tabstop>
+  <tabstop>txtFu</tabstop>
+  <tabstop>txtFy</tabstop>
+  <tabstop>txtShear</tabstop>
+  <tabstop>comboDaimeter</tabstop>
+  <tabstop>comboType</tabstop>
+  <tabstop>comboGrade</tabstop>
+  <tabstop>comboAngleSec</tabstop>
+  <tabstop>txtanglethickness</tabstop>
+  <tabstop>btn_Design</tabstop>
+  <tabstop>btn_Reset</tabstop>
+  <tabstop>btn_SaveMessages</tabstop>
+  <tabstop>btn_CreateDesign</tabstop>
+  <tabstop>btnInput</tabstop>
+  <tabstop>btnOutput</tabstop>
+  <tabstop>btn_front</tabstop>
+  <tabstop>btn_top</tabstop>
+  <tabstop>btn_side</tabstop>
+  <tabstop>btn3D</tabstop>
+  <tabstop>chkBxBeam</tabstop>
+  <tabstop>chkBxCol</tabstop>
+  <tabstop>chkBxSeatAngle</tabstop>
+  <tabstop>txtSeatLength</tabstop>
+  <tabstop>txtExtMomnt</tabstop>
+  <tabstop>txtMomntCapacity</tabstop>
+  <tabstop>txtShearDemand</tabstop>
+  <tabstop>txtShearCapacity</tabstop>
+  <tabstop>txtBeamShearStrength</tabstop>
+  <tabstop>txtNoBolts_3</tabstop>
+  <tabstop>txtPitch_3</tabstop>
+  <tabstop>txtGuage_3</tabstop>
+  <tabstop>txtBoltCapacity_3</tabstop>
+  <tabstop>txtEndDist_3</tabstop>
+  <tabstop>txtEdgeDist_3</tabstop>
+  <tabstop>txtWeldThick_3</tabstop>
+  <tabstop>txtResltShr_3</tabstop>
+  <tabstop>txtWeldStrng_3</tabstop>
+  <tabstop>txtPlateThick_3</tabstop>
+  <tabstop>txtExtMomnt_3</tabstop>
+  <tabstop>txtMomntCapacity_3</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>btnReset_3</tabstop>
+  <tabstop>btnDesign_3</tabstop>
+  <tabstop>txtShrCapacity_4</tabstop>
+  <tabstop>txtbearCapacity_4</tabstop>
+  <tabstop>txtBoltCapacity_4</tabstop>
+  <tabstop>txtNoBolts_4</tabstop>
+  <tabstop>txtPitch_4</tabstop>
+  <tabstop>txtGuage_4</tabstop>
+  <tabstop>txtEndDist_4</tabstop>
+  <tabstop>txtEdgeDist_4</tabstop>
+  <tabstop>txtWeldThick_4</tabstop>
+  <tabstop>txtResltShr_4</tabstop>
+  <tabstop>txtWeldStrng_4</tabstop>
+  <tabstop>txtPlateThick_4</tabstop>
+  <tabstop>txtExtMomnt_4</tabstop>
+  <tabstop>txtMomntCapacity_4</tabstop>
+  <tabstop>lineEdit_7</tabstop>
+  <tabstop>lineEdit_8</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>btnReset_4</tabstop>
+  <tabstop>btnDesign_4</tabstop>
+  <tabstop>txtNoBolts_2</tabstop>
+  <tabstop>txtBoltCapacity_2</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>txtShrCapacity_2</tabstop>
+  <tabstop>txtbearCapacity_2</tabstop>
+  <tabstop>txtEdgeDist_2</tabstop>
+  <tabstop>txtPitch_2</tabstop>
+  <tabstop>txtPlateThick_2</tabstop>
+  <tabstop>txtExtMomnt_2</tabstop>
+  <tabstop>txtEndDist_2</tabstop>
+  <tabstop>txtWeldStrng_2</tabstop>
+  <tabstop>txtResltShr_2</tabstop>
+  <tabstop>txtGuage_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>txtMomntCapacity_2</tabstop>
+  <tabstop>btnReset_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>btnDesign_2</tabstop>
+  <tabstop>txtShearrCapacity</tabstop>
+  <tabstop>txtBearingCapacity</tabstop>
+  <tabstop>lineEdit_4</tabstop>
+  <tabstop>txtWeldThick_2</tabstop>
+  <tabstop>txtShrCapacity_3</tabstop>
+  <tabstop>txtbearCapacity_3</tabstop>
+  <tabstop>txtBoltCapacity</tabstop>
+  <tabstop>txtNoBolts</tabstop>
+  <tabstop>txtGuage</tabstop>
+  <tabstop>txtEndDist</tabstop>
+  <tabstop>txtEdgeDist</tabstop>
+  <tabstop>txtBoltGroupCapacity</tabstop>
+  <tabstop>txt_row</tabstop>
+  <tabstop>txt_col</tabstop>
+  <tabstop>txtPitch</tabstop>
+ </tabstops>
  <resources>
   <include location="ResourceFiles/icons.qrc"/>
  </resources>

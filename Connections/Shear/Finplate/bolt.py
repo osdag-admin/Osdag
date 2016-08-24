@@ -4,7 +4,7 @@ Created on 29-Nov-2014
 @author: deepa
 '''
 import numpy
-from ModelUtils import getGpPt,getGpDir,makeEdgesFromPoints,makeWireFromEdges,makePrismFromFace,makeFaceFromWire
+from ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.gp import  gp_Ax2
@@ -36,7 +36,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
     
     '''
     
-    def __init__(self,R,T,H,r):        
+    def __init__(self, R, T, H, r):        
         self.R = R
         self.H = H
         self.T = T
@@ -59,7 +59,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.shaftDir = shaftDir        
         self.computeParams()
         
-    def getPoint(self,theta):
+    def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
@@ -81,12 +81,12 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = -self.T * self.shaftDir # extrudeDir is a numpy array
-        boltHead =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = -self.T * self.shaftDir  # extrudeDir is a numpy array
+        boltHead = makePrismFromFace(aFace, extrudeDir)
         cylOrigin = self.origin
         boltCylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.shaftDir)), self.r, self.H).Shape()
         
-        whole_Bolt = BRepAlgoAPI_Fuse(boltHead,boltCylinder).Shape()
+        whole_Bolt = BRepAlgoAPI_Fuse(boltHead, boltCylinder).Shape()
         
         return whole_Bolt
 

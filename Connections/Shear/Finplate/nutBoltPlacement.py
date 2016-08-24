@@ -43,12 +43,12 @@ pDir      |      |       | End distance  |
 
     '''
     
-    def __init__(self,boltPlaceObj,nut,bolt,gap):
+    def __init__(self, boltPlaceObj, nut, bolt, gap):
         
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
-        self.boltDir =  None
+        self.boltDir = None
         
         self.initBoltPlaceParams(boltPlaceObj)
         
@@ -61,7 +61,7 @@ pDir      |      |       | End distance  |
         self.initialiseNutBolts()
         
         self.positions = []
-        #self.calculatePositions()
+        # self.calculatePositions()
         
         self.models = []
         
@@ -72,14 +72,14 @@ pDir      |      |       | End distance  |
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
-            self.bolts.append(Bolt(b.R,b.T, b.H, b.r))
-            self.nuts.append(Nut(n.R, n.T,n.H, n.r1))
+            self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
+            self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
         
-    def initBoltPlaceParams(self,boltPlaceObj):
+    def initBoltPlaceParams(self, boltPlaceObj):
         
         self.pitch = boltPlaceObj['Bolt']['pitch']
         self.gauge = boltPlaceObj['Bolt']['gauge']
-        #self.gauge = 30
+        # self.gauge = 30
         self.edge = boltPlaceObj['Bolt']['edge']
         self.plateedge = boltPlaceObj['Plate']['plateedge']
         self.end = boltPlaceObj['Bolt']['enddist']
@@ -94,11 +94,11 @@ pDir      |      |       | End distance  |
         for rw in  range(self.row):
             for col in range(self.col):
                 pos = self.origin 
-                #pos = pos + self.end * self.gaugeDir
-                ##pos = pos + self.edge * self.gaugeDir
+                # pos = pos + self.end * self.gaugeDir
+                # #pos = pos + self.edge * self.gaugeDir
                 pos = pos + self.plateedge * self.gaugeDir
                 pos = pos + col * self.gauge * self.gaugeDir 
-                #pos = pos + self.edge * self.pitchDir 
+                # pos = pos + self.edge * self.pitchDir 
                 pos = pos + self.end * self.pitchDir 
                 pos = pos + rw * self.pitch * self.pitchDir
                 

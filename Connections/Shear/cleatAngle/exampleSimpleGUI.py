@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 
-##Copyright 2009-2014 Thomas Paviot (tpaviot@gmail.com)
-##
-##This file is part of pythonOCC.
-##
-##pythonOCC is free software: you can redistribute it and/or modify
-##it under the terms of the GNU Lesser General Public License as published by
-##the Free Software Foundation, either version 3 of the License, or
-##(at your option) any later version.
-##
-##pythonOCC is distributed in the hope that it will be useful,
-##but WITHOUT ANY WARRANTY; without even the implied warranty of
-##MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##GNU Lesser General Public License for more details.
-##
-##You should have received a copy of the GNU Lesser General Public License
-##along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>.
+# #Copyright 2009-2014 Thomas Paviot (tpaviot@gmail.com)
+# #
+# #This file is part of pythonOCC.
+# #
+# #pythonOCC is free software: you can redistribute it and/or modify
+# #it under the terms of the GNU Lesser General Public License as published by
+# #the Free Software Foundation, either version 3 of the License, or
+# #(at your option) any later version.
+# #
+# #pythonOCC is distributed in the hope that it will be useful,
+# #but WITHOUT ANY WARRANTY; without even the implied warranty of
+# #MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# #GNU Lesser General Public License for more details.
+# #
+# #You should have received a copy of the GNU Lesser General Public License
+# #along with pythonOCC.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 from OCC import VERSION, Quantity
@@ -145,7 +145,7 @@ def init_display(backend_str=None, size=(1024, 768)):
                           (resolution.height() / 2) - (self.frameSize().height() / 2))
 
             def add_menu(self, menu_name):
-                _menu = self.menu_bar.addMenu("&"+menu_name)
+                _menu = self.menu_bar.addMenu("&" + menu_name)
                 self._menus[menu_name] = _menu
 
             def add_function_to_menu(self, menu_name, _callable):
@@ -169,9 +169,9 @@ def init_display(backend_str=None, size=(1024, 768)):
         if sys.platform != "linux2":
             display.EnableAntiAliasing()
         # background gradient
-        #display.set_bg_gradient_color(206, 215, 222, 128, 128, 128)
-        display.set_bg_gradient_color(23,1,32,23,1,32)
-        #display.View.SetVisualization(V3d_ORTHOGRAPHIC)
+        # display.set_bg_gradient_color(206, 215, 222, 128, 128, 128)
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display.View.SetVisualization(V3d_ORTHOGRAPHIC)
     
         # display black trihedron
         display.display_trihedron()
@@ -191,23 +191,23 @@ def init_display(backend_str=None, size=(1024, 768)):
 if __name__ == '__main__':
     display, start_display, add_menu, add_function_to_menu = init_display()
     from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere, BRepPrimAPI_MakeBox    
-    #print(display.Viewer.TypeOfView)
+    # print(display.Viewer.TypeOfView)
 
     def sphere(event=None):
         display.DisplayShape(BRepPrimAPI_MakeSphere(100).Shape(), update=True)
 
     def cube(event=None):
-        display.DisplayShape(BRepPrimAPI_MakeBox(1, 1, 5).Shape(), material= Graphic3d_NOM_ALUMINIUM,  update=True)
-        #display.Viewer.SetDefaultTypeOfView(V3d_ORTHOGRAPHIC)
+        display.DisplayShape(BRepPrimAPI_MakeBox(1, 1, 5).Shape(), material=Graphic3d_NOM_ALUMINIUM, update=True)
+        # display.Viewer.SetDefaultTypeOfView(V3d_ORTHOGRAPHIC)
         
-        #aColor1 = Quantity_Color(float(255)/255.,
+        # aColor1 = Quantity_Color(float(255)/255.,
         #                         float(0)/255.,
         #                         float(0)/255., Quantity_TOC_RGB)
 
-        #display.Viewer.SetDefaultBackgroundColor(aColor1)
+        # display.Viewer.SetDefaultBackgroundColor(aColor1)
         
-        #display.SetModeShaded()
-        #display.View_Top()
+        # display.SetModeShaded()
+        # display.View_Top()
         
     def exit(event=None):
         sys.exit()

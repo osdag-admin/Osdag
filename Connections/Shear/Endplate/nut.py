@@ -4,20 +4,20 @@ NUT COMMENT
 @author: deepa
 '''
 from OCC.BRepFilletAPI import BRepFilletAPI_MakeFillet
-#from OCC import TopoDS.TopoDS_Compound
+# from OCC import TopoDS.TopoDS_Compound
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut, BRepAlgoAPI_Fuse
 import numpy
 from ModelUtils import *
 import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
-#from OCC.BRepAlgo import BRepAlgo_BooleanOperation
+# from OCC.BRepAlgo import BRepAlgo_BooleanOperation
 
-from OCC.TopAbs import TopAbs_EDGE #TopAbs_FACE
+from OCC.TopAbs import TopAbs_EDGE  # TopAbs_FACE
 from OCC.TopExp import TopExp_Explorer
 from OCC.TopoDS import TopoDS_Compound, topods
 from OCC.TopTools import *
 from OCC.Geom import *
-from OCC.gp import gp_Pnt,gp_Ax2,gp_DZ,gp_Ax3,gp_Pnt2d,gp_Dir2d,gp_Ax2d
+from OCC.gp import gp_Pnt, gp_Ax2, gp_DZ, gp_Ax3, gp_Pnt2d, gp_Dir2d, gp_Ax2d
 from OCC.Geom import *
 from OCC.Geom2d import *
 from OCC.GCE2d import *
@@ -27,12 +27,12 @@ import OCC.BRep as BRep
 
 class Nut(object):
     
-    def __init__(self,R,T,H,innerR1):        
+    def __init__(self, R, T, H, innerR1):        
         self.R = R
         self.H = H
         self.T = T
         self.r1 = innerR1
-        #self.r2 = outerR2
+        # self.r2 = outerR2
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -44,7 +44,7 @@ class Nut(object):
         self.wDir = wDir        
         self.computeParams()
         
-    def getPoint(self,theta):
+    def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.secOrigin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
@@ -66,8 +66,8 @@ class Nut(object):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.T * self.wDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
         mkFillet = BRepFilletAPI_MakeFillet(prism)
         anEdgeExplorer = TopExp_Explorer(prism, TopAbs_EDGE)
         while anEdgeExplorer.More():
@@ -77,12 +77,12 @@ class Nut(object):
                 
         prism = mkFillet.Shape()
         cylOrigin = self.secOrigin
-        #cylOrigin = self.secOrigin + self.T * self.wDir
+        # cylOrigin = self.secOrigin + self.T * self.wDir
         innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r1, self.H).Shape()
-        #outerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r2, self.H).Shape()
-        #nutBody = BRepAlgoAPI_Fuse(prism, outerCyl).Shape()
-        #my_cyl = BRepPrimAPI_MakeCylinder(9.0, 6.0).Shape()
-        #result_shape = BRepAlgoAPI_Cut(nutBody, innerCyl).Shape() 
+        # outerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r2, self.H).Shape()
+        # nutBody = BRepAlgoAPI_Fuse(prism, outerCyl).Shape()
+        # my_cyl = BRepPrimAPI_MakeCylinder(9.0, 6.0).Shape()
+        # result_shape = BRepAlgoAPI_Cut(nutBody, innerCyl).Shape() 
         result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape() 
         
         

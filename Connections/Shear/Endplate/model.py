@@ -4,7 +4,7 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 import sys
-from PyQt4 import QtGui,QtCore
+from PyQt4 import QtGui, QtCore
 from PyQt4.QtSql import *
 import logging
 import os
@@ -16,12 +16,12 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__),'..','..','..','ResourceFiles','Database','Osdag')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Osdag')
 #     filepath = "D:\EclipseWorkspace\OsdagWorkshop\Database\Osdag"
     
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
-    #db.open()
+    # db.open()
     if not db.open():
         
         QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
@@ -71,7 +71,7 @@ def get_beamdata(sect):
     '''(None) --> (Dictionary)
     This Function returns the Indian Standard Beam section properties.
     '''
-    section  = sect
+    section = sect
    
     queryStr = "Select * from Beams where Designation = '%s'" % section
     
@@ -87,7 +87,7 @@ def get_beamdata(sect):
             colName = record.fieldName(i)
             retDict[colName] = designQuery.value(i).toString()
 
-    #print(retDict[QString("tw")])
+    # print(retDict[QString("tw")])
     
     return retDict
     
@@ -108,7 +108,7 @@ def get_columndata(sect):
     This Function returns the Indian Standard column section properties.
     '''
     section = sect
-    #section = Ui_MainWindow.comboColSec.currentText()
+    # section = Ui_MainWindow.comboColSec.currentText()
     queryStr = "Select * from Columns where Designation = '%s'" % section
     
     designQuery = QSqlQuery(queryStr)
@@ -125,4 +125,4 @@ def get_columndata(sect):
     
     return retDict
 
-#module_setup()
+# module_setup()

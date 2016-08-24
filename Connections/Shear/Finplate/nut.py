@@ -7,7 +7,7 @@ NUT COMMENT
 import math
 import numpy
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
-from ModelUtils import getGpPt,getGpDir,makeEdgesFromPoints,makeWireFromEdges,makePrismFromFace,makeFaceFromWire
+from ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.gp import gp_Ax2
 
@@ -36,12 +36,12 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
 
     '''
     
-    def __init__(self,R,T,H,innerR1):        
+    def __init__(self, R, T, H, innerR1):        
         self.R = R
         self.H = H
         self.T = T
         self.r1 = innerR1
-        #self.r2 = outerR2
+        # self.r2 = outerR2
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -53,7 +53,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.wDir = wDir        
         self.computeParams()
         
-    def getPoint(self,theta):
+    def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.secOrigin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
@@ -75,8 +75,8 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.T * self.wDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
                 
         cylOrigin = self.secOrigin
         innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r1, self.H).Shape()

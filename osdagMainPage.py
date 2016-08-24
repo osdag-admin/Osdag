@@ -22,10 +22,10 @@ class OsdagMainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        listItems = {'Osdagpage':0,'connectionpage':1,'tensionpage':2,'compressionpage':3,'flexuralpage':4}
+        listItems = {'Osdagpage':0, 'connectionpage':1, 'tensionpage':2, 'compressionpage':3, 'flexuralpage':4}
         
         self.ui.myStackedWidget.setCurrentIndex(listItems['Osdagpage'])
-        self.ui.btn_connection.clicked.connect(lambda:self.changePage(listItems['connectionpage'],listItems['Osdagpage']))
+        self.ui.btn_connection.clicked.connect(lambda:self.changePage(listItems['connectionpage'], listItems['Osdagpage']))
         self.ui.myListWidget.currentItemChanged.connect(self.changePage)
         self.ui.btn_start.clicked.connect(self.showConnection)
         self.ui.btn_beamCol.clicked.connect(self.notavailable)
@@ -83,7 +83,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
     
     def showConnection(self):
 #         foldernew = self.workspaceLaunch()
-        folder = str(QtGui.QFileDialog.getSaveFileName(self, "Select Workspace Directory","Osdag_Workspace", "File folder"))
+        folder = str(QtGui.QFileDialog.getSaveFileName(self, "Select Workspace Directory", "Osdag_Workspace", "File folder"))
         if not os.path.exists(folder):
             os.makedirs(folder, 0755)     
             
@@ -110,13 +110,13 @@ class OsdagMainWindow(QtGui.QMainWindow):
             # QtGui.QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
         
         elif self.ui.rdbtn_seat.isChecked():
-            QtGui.QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
+            QtGui.QMessageBox.about(self, "INFO", "Seated connection design is coming soon!")
         
         else:
-            QtGui.QMessageBox.about(self,"INFO","Please select appropriate connection")
+            QtGui.QMessageBox.about(self, "INFO", "Please select appropriate connection")
             
     def notavailable(self):    
-        QtGui.QMessageBox.about(self,"INFO","This module is not available in this version.")
+        QtGui.QMessageBox.about(self, "INFO", "This module is not available in this version.")
 #         self.ui.btn_beamCol.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
 #         self.ui.btn_compression.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
 #         self.ui.btn_flexural.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))

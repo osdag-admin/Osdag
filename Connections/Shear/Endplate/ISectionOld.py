@@ -61,30 +61,30 @@ class ISectionOld(object):
         
     def computeParams(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.secOrigin + (self.t/2.0) * self.uDir + ((self.D/2.0) - self.T) * self.vDir
-        self.b1 = self.secOrigin + (self.B/2.0) * self.uDir + ((self.D/2.0) - self.T) * self.vDir   
-        self.c1 = self.secOrigin + (self.B/2.0) * self.uDir + (self.D/2.0) * self.vDir
-        self.a2 = self.secOrigin + (-self.t/2.0) * self.uDir + ((self.D/2.0) - self.T) * self.vDir
-        self.b2 = self.secOrigin + (-self.B/2.0) * self.uDir + ((self.D/2.0) - self.T) * self.vDir   
-        self.c2 = self.secOrigin + (-self.B/2.0) * self.uDir + (self.D/2.0) * self.vDir
-        self.a3 = self.secOrigin + (-self.t/2.0) * self.uDir + -((self.D/2.0) - self.T) * self.vDir
-        self.b3 = self.secOrigin + (-self.B/2.0) * self.uDir + -((self.D/2.0) - self.T) * self.vDir   
-        self.c3 = self.secOrigin + (-self.B/2.0) * self.uDir + -(self.D/2.0) * self.vDir
-        self.a4 = self.secOrigin + (self.t/2.0) * self.uDir + -((self.D/2.0) - self.T) * self.vDir
-        self.b4 = self.secOrigin + (self.B/2.0) * self.uDir + -((self.D/2.0) - self.T) * self.vDir   
-        self.c4 = self.secOrigin + (self.B/2.0) * self.uDir + -(self.D/2.0) * self.vDir
-        self.points = [self.a1, self.b1, self.c1, 
+        self.a1 = self.secOrigin + (self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.b1 = self.secOrigin + (self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir   
+        self.c1 = self.secOrigin + (self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
+        self.a2 = self.secOrigin + (-self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.b2 = self.secOrigin + (-self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir   
+        self.c2 = self.secOrigin + (-self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
+        self.a3 = self.secOrigin + (-self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.b3 = self.secOrigin + (-self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir   
+        self.c3 = self.secOrigin + (-self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
+        self.a4 = self.secOrigin + (self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.b4 = self.secOrigin + (self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir   
+        self.c4 = self.secOrigin + (self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
+        self.points = [self.a1, self.b1, self.c1,
                        self.c2, self.b2, self.a2,
                        self.a3, self.b3, self.c3,
                        self.c4, self.b4, self.a4]
-        #self.points = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]  
+        # self.points = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]  
         
     def createModel(self):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.length * self.wDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
         
         return prism
     

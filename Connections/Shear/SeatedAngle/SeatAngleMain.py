@@ -189,17 +189,18 @@ class MainController(QtGui.QMainWindow):
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(
             lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
-        # ----------------------------------------------------
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-        ##### MenuBar #####
-        # File Menu
 
-        ##### MenuBar #####
+        #-------------------------------------------------
+        # Menu Bar
+        # File Menu
+        self.ui.actionSave_Front_View.triggered.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.actionSave_Side_View.triggered.connect(lambda: self.call2D_Drawing("Side"))
+        self.ui.actionSave_Top_View.triggered.connect(lambda: self.call2D_Drawing("Top"))
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
 
-        self.ui.actionCreate_design_report.triggered.connect(self.save_design)
+        self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
@@ -221,7 +222,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
-        self.ui.btn_CreateDesign.clicked.connect(self.save_design)  # Saves the create design report
+        self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
         # Saving and Restoring the finPlate window state.
@@ -431,6 +432,10 @@ class MainController(QtGui.QMainWindow):
         outObj['Bolt']["Edge Distance (mm)"] = float(self.ui.txtEdgeDist.text())
 
         return outObj
+
+    def create_design_report(self):
+        design_report_dialog = DesignReportDialog(self)
+        design_report_dialog.show()
 
     def save_design(self):
         self.outdict = self.outputdict()

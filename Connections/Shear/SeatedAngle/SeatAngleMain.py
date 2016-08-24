@@ -42,7 +42,7 @@ from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
 
 from reportGenerator import *
-from ui_SeatAngle import Ui_MainWindow
+from ui_seat_angle import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
@@ -190,15 +190,16 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtFy.editingFinished.connect(
             lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
-        #-------------------------------------------------
         # Menu Bar
+
         # File Menu
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.call2D_Drawing("Top"))
-        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
+        #TODO update ui variables with appropiate names and code below
+        self.ui.actionQuit_seat_plate_design.setShortcut('Ctrl+Q')
+        self.ui.actionQuit_seat_plate_design.setStatusTip('Exit application')
+        self.ui.actionQuit_seat_plate_design.triggered.connect(QtGui.qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -207,10 +208,14 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
         self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
         self.ui.actionSave_current_2D_image_as.triggered.connect(self.save2DcadImages)
-        self.ui.actionView_2D_on_ZX.triggered.connect(self.call_Frontview)
-        self.ui.actionView_2D_on_XY.triggered.connect(self.call_Topview)
-        self.ui.actionView_2D_on_YZ.triggered.connect(self.call_Sideview)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
+
+        # Graphics menu
+        self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
+        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
+        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle())
+        self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
+        self.ui.actionChange_background.triggered.connect(self.showColorDialog)
 
         # self.ui.comboBeamSec.addItems(get_beamcombolist())
         # self.ui.comboColSec.addItems(get_columncombolist())
@@ -225,16 +230,29 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
-        # Saving and Restoring the finPlate window state.
+        # Saving and Restoring the seat angle window state.
         # self.retrieve_prevstate()
 
         self.ui.btnZmIn.clicked.connect(self.callZoomin)
         self.ui.btnZmOut.clicked.connect(self.callZoomout)
         self.ui.btnRotatCw.clicked.connect(self.callRotation)
-        self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
+        self.ui.btnFront.clicked.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
+        self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
 
+        self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
+        # ************************************** Osdag logo for html***************************************************************************************************
+        self.ui.btn_Design.clicked.connect(self.osdag_header)
+
+        # ************************************ Help button *********************************************************************************************************
+        self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
+        self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
+        self.ui.actionSample_reports.triggered.connect(self.sample_report)
+        self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+
+        # -------------------------------------------------
         # Initialising the qtviewer
         self.display, _ = self.init_display(backend_str="pyqt4")
 

@@ -176,7 +176,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtFy.setValidator(validator)
 
         dbl_validator = QtGui.QDoubleValidator()
-        #add exhaustive validators
+        #TODO add exhaustive validators
         self.ui.txtShear.setValidator(dbl_validator)
         self.ui.txtShear.setMaxLength(7)
 
@@ -189,7 +189,7 @@ class MainController(QtGui.QMainWindow):
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(
             lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
-# ----------------------------------------------------
+        # ----------------------------------------------------
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         ##### MenuBar #####
         # File Menu
@@ -536,7 +536,7 @@ class MainController(QtGui.QMainWindow):
     def check_range(self, widget, lblwidget, minVal, maxVal):
 
         '''(QlineEdit,QLable,Number,Number)---> NoneType
-        Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
+        Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         '''
         textStr = widget.text()
         val = int(textStr)
@@ -587,7 +587,7 @@ class MainController(QtGui.QMainWindow):
         pitch_dist = resultObj['Bolt']['Pitch Distance (mm)']
         self.ui.txtPitch.setText(str(pitch_dist))
 
-        gauge_dist = resultObj['Bolt']['Guage Distance (mm)']
+        gauge_dist = resultObj['Bolt']['Gauge Distance (mm)']
         self.ui.txtGuage.setText(str(gauge_dist))
 
         end_dist = resultObj['Bolt']['End Distance (mm)']

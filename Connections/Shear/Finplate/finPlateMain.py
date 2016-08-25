@@ -5,7 +5,6 @@ comment
 @author: deepa
 '''
 from PyQt4.QtCore import QString, pyqtSignal
-
 from OCC.TopoDS import topods, TopoDS_Shape
 from OCC.gp import gp_Pnt
 from nutBoltPlacement import NutBoltArray
@@ -81,9 +80,7 @@ class MyPopupDialog(QtGui.QDialog):
 
     def save_inputSummary(self):
         input_summary = self.getPopUpInputs()
-#         base_name = self.mainController.call2D_Drawing()
         self.mainController.save_design(input_summary)
-        # return input_summary
 
     def getLogoFilePath(self, lblwidget):
 
@@ -101,8 +98,8 @@ class MyPopupDialog(QtGui.QDialog):
 
     def desired_location(self, filename):
 
-        shutil.copyfile(filename, str(self.mainController.folder) + 
-                        "/css/cmpylogoFin.png")
+        shutil.copyfile(filename, str(self.mainController.folder) +
+                        "/images_html/cmpylogoFin.png")
 
     def saveUserProfile(self):
 
@@ -158,8 +155,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.gradeType = {
-                          'Please Select Type': '', 'HSFG': [8.8, 10.8],
+        self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.8],
                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
@@ -238,9 +234,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
         # self.retrieve_prevstate()
 
-#         self.ui.btnZmIn.clicked.connect(self.callZoomin)
-#         self.ui.btnZmOut.clicked.connect(self.callZoomout)
-#         self.ui.btnRotatCw.clicked.connect(self.callRotation)
         self.ui.btnFront.clicked.connect(lambda: self.callFin2D_Drawing("Front"))
         self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
@@ -275,11 +268,11 @@ class MainController(QtGui.QMainWindow):
         self.uiObj = None
 
     def osdag_header(self):
-        image_path = "../Osdag/ResourceFiles/Osdag_header.png"
+        image_path = "ResourceFiles/Osdag_header.png"
         self.store_osdagheader(image_path)
 
     def store_osdagheader(self, image_path):
-        shutil.copyfile(image_path, str(self.folder) + "/css/Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_Beam.currentText()
@@ -625,7 +618,7 @@ class MainController(QtGui.QMainWindow):
         uiObj = {}
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
-        uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())                                                                                                                                                                                                                                                              
+        uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())
         uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
         uiObj["Weld"] = {}
@@ -714,9 +707,9 @@ class MainController(QtGui.QMainWindow):
 
         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", "output/finplate/Report", "Html Files (*.html)")
         fileName = str(fileName)
-        self.callFin2D_Drawing("All")
+        base, base1, base2, base3 = self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
         # self.inputdict = self.uiObj#self.getuser_inputs()
         # self.outdict = self.resultObj#self.outputdict()
@@ -739,7 +732,7 @@ class MainController(QtGui.QMainWindow):
 
         dictBeamData = self.fetchBeamPara()
         dictColData = self.fetchColumnPara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName)
+        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName,folder, base, base_front, base_top, base_side)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -952,10 +945,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtWeldStrng.setText(str(weld_strength))
 
         # Newly included fields
-        plate_ht = resultObj['Plate']['height'] 
+        plate_ht = resultObj['Plate']['height']
         self.ui.txtplate_ht.setText(str(plate_ht))
 
-        plate_width = resultObj['Plate']['width'] 
+        plate_width = resultObj['Plate']['width']
         self.ui.txtplate_width.setText(str(plate_width))
 
         moment_demand = resultObj['Plate']['externalmoment']
@@ -978,8 +971,8 @@ class MainController(QtGui.QMainWindow):
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
-        vscrollBar = self.ui.textEdit.verticalScrollBar();
-        vscrollBar.setValue(vscrollBar.maximum());
+        vscrollBar = self.ui.textEdit.verticalScrollBar()
+        vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
 
     # QtViewer
@@ -1009,7 +1002,6 @@ class MainController(QtGui.QMainWindow):
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
                     import OCC.Display.qtDisplay
-                    from OCC.Display.qtDisplay import qtViewer3d
                     from PyQt4 import QtCore, QtGui, QtOpenGL
 
         from OCC.Display.qtDisplay import qtViewer3d
@@ -1034,6 +1026,7 @@ class MainController(QtGui.QMainWindow):
                     resolution = QtGui.QDesktopWidget().screenGeometry()
                     self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                               (resolution.height() / 2) - (self.frameSize().height() / 2))
+
         def start_display():
             self.ui.modelTab.raise_()
 
@@ -1071,7 +1064,7 @@ class MainController(QtGui.QMainWindow):
         elif component == "Beam":
             osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
             # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
-        elif component == "Finplate" :
+        elif component == "Finplate":
             osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
@@ -1238,12 +1231,12 @@ class MainController(QtGui.QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
 
         if flag is True:
-            if self.ui.comboConnLoc.currentText() == "Column web-Beam web":    
+            if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 # self.create3DColWebBeamWeb()
                 self.connectivity = self.create3DColWebBeamWeb()
                 self.fuse_model = None
 
-            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":    
+            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create3DColFlangeBeamWeb()
                 self.fuse_model = None
@@ -1269,7 +1262,6 @@ class MainController(QtGui.QMainWindow):
 
         else:
             self.display.EraseAll()
-            # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)       
 
     def call_3DBeam(self):
         '''
@@ -1360,13 +1352,13 @@ class MainController(QtGui.QMainWindow):
         final_model = cadlist[0]
         for model in cadlist[1:]:
             final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-        return final_model 
+        return final_model
     # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        if self.connectivity == None:
+        if self.connectivity is None:
             self.connectivity = self.create3DColWebBeamWeb()
-        if self.fuse_model == None:
+        if self.fuse_model is None:
             self.fuse_model = self.create2Dcad(self.connectivity)
         shape = self.fuse_model
 
@@ -1422,7 +1414,8 @@ class MainController(QtGui.QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
-        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+        return base, base1, base2, base3
         # commLogicObj.call2D_Drawing(view,fname)
 
     def closeEvent(self, event):
@@ -1467,23 +1460,23 @@ class MainController(QtGui.QMainWindow):
 
 
 def set_osdaglogger():
-    
+
     global logger
-    if logger == None:
-        
+    if logger is None:
+
         logger = logging.getLogger("osdag")
     else:
         for handler in logger.handlers[:]:
             logger.removeHandler(handler)
-    
+
     logger.setLevel(logging.DEBUG)
- 
+
     # create the logging file handler
     fh = logging.FileHandler("Connections/Shear/Finplate/fin.log", mode="a")
-    
+
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
+
     formatter = logging.Formatter('''
     <div  class="LOG %(levelname)s">
         <span class="DATE">%(asctime)s</span>
@@ -1520,6 +1513,7 @@ def launchFinPlateController(osdagMainWindow, folder):
 
 
 if __name__ == '__main__':
+
     # launchFinPlateController(None)
 
     # linking css to log file to display colour logs.

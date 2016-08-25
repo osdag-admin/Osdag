@@ -388,26 +388,26 @@ class EndCommonData(object):
             elif view == "Top":
                 end2DTop.callCFBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/endFrontFB.svg'
+                fileName = str(self.folder) + '/images_html/endFrontFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endFrontFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endFrontFB" + str(n) + ".svg"
                         continue
                 end2DFront.callCFBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/css/endSideFB.svg'
+                fileName = str(self.folder) + '/images_html/endSideFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endSideFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endSideFB" + str(n) + ".svg"
                         continue
                 end2DSide.callCFBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/css/endTopFB.svg'
+                fileName = str(self.folder) + '/images_html/endTopFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finTopFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finTopFB" + str(n) + ".svg"
                         continue
                 end2DTop.callCFBWTop(fileName)
                 base_top = os.path.basename(str(fileName))
@@ -421,30 +421,30 @@ class EndCommonData(object):
             elif view == "Top":
                 end2DTop.callCWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/endFrontWB.svg'
+                fileName = str(self.folder) + '/images_html/endFrontWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endFrontWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endFrontWB" + str(n) + ".svg"
                         continue
                 end2DFront.callCWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/css/endSideWB.svg'
+                fileName = str(self.folder) + '/images_html/endSideWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endSideWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endSideWB" + str(n) + ".svg"
                         continue
                 end2DSide.callCWBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
                 
-                fileName = str(self.folder) + '/css/endTopWB.svg'
+                fileName = str(self.folder) + '/images_html/endTopWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endTopWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endTopWB" + str(n) + ".svg"
                         continue
                 end2DTop.callCWBWTop(fileName)
                 base_top = os.path.basename(str(fileName))
-            
+
         else:
             if view == "Front":
                 end2DFront.callBWBWfront(fileName)
@@ -453,26 +453,26 @@ class EndCommonData(object):
             elif view == "Top":
                 end2DTop.callBWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/endFrontBB.svg'
+                fileName = str(self.folder) + '/images_html/endFrontBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endFrontBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endFrontBB" + str(n) + ".svg"
                         continue
                 end2DFront.callBWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
-                
-                fileName = str(self.folder) + '/css/endSideBB.svg'
+
+                fileName = str(self.folder) + '/images_html/endSideBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endSideBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endSideBB" + str(n) + ".svg"
                         continue
                 end2DSide.callBWBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
-                
-                fileName = str(self.folder) + '/css/endTopBB.svg'
+
+                fileName = str(self.folder) + '/images_html/endTopBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/endTopBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/endTopBB" + str(n) + ".svg"
                         continue
                 end2DTop.callBWBWTop(fileName)
                 base_top = os.path.basename(str(fileName))

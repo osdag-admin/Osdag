@@ -382,26 +382,26 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin2DTop.callCFBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/cleatFrontFB.svg'
+                fileName = str(self.folder) + '/images_html/cleatFrontFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatFrontFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatFrontFB" + str(n) + ".svg"
                         continue
                 fin2DFront.callCFBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/css/cleatSideFB.svg'
+                fileName = str(self.folder) + '/images_html/cleatSideFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatSideFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatSideFB" + str(n) + ".svg"
                         continue
                 fin2DSide.callCFBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
              
-                fileName = str(self.folder) + '/css/cleatTopFB.svg'
+                fileName = str(self.folder) + '/images_html/cleatTopFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatTopFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatTopFB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCFBWTop(fileName)
                 base_front = os.path.basename(str(fileName))
@@ -415,26 +415,26 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin2DTop.callCWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/cleatFrontWB.svg'
+                fileName = str(self.folder) + '/images_html/cleatFrontWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatFrontWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatFrontWB" + str(n) + ".svg"
                         continue
                 fin2DFront.callCWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
              
-                fileName = str(self.folder) + '/css/cleatSideWB.svg'
+                fileName = str(self.folder) + '/images_html/cleatSideWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatSideWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatSideWB" + str(n) + ".svg"
                         continue
                 fin2DSide.callCWBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
             
-                fileName = str(self.folder) + '/css/cleatTopWB.svg'
+                fileName = str(self.folder) + '/images_html/cleatTopWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatTopWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatTopWB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCWBWTop(fileName)
                 base_front = os.path.basename(str(fileName))
@@ -447,26 +447,26 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin2DTop.callBWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/cleatFrontBB.svg'
+                fileName = str(self.folder) + '/images_html/cleatFrontBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatFrontBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatFrontBB" + str(n) + ".svg"
                         continue
                 fin2DFront.callBWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
               
-                fileName = str(self.folder) + '/css/cleatSideBB.svg'
+                fileName = str(self.folder) + '/images_html/cleatSideBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatSideBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatSideBB" + str(n) + ".svg"
                         continue
                 fin2DSide.callBWBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
               
-                fileName = str(self.folder) + '/css/cleatTopBB.svg'
+                fileName = str(self.folder) + '/images_html/cleatTopBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/cleatTopBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/cleatTopBB" + str(n) + ".svg"
                         continue
                 fin2DTop.callBWBWTop(fileName)
                 base_front = os.path.basename(str(fileName))

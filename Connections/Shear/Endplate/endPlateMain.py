@@ -78,7 +78,7 @@ class MyPopupDialog(QtGui.QDialog):
         return str(filename)
     
     def desired_location(self, filename):
-        shutil.copyfile(filename, str(self.mainController.folder) + "/css/cmpylogoEnd.png")
+        shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoEnd.png")
        
         
     def saveUserProfile(self):
@@ -250,9 +250,7 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         image_path = "../OsdagLIVE/ResourceFiles/Osdag_header.png"
         self.store_osdagheader(image_path)
-
-    def store_osdagheader(self, image_path):
-        shutil.copyfile(image_path, str(self.folder) + "/css/Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
     
         
     def showFontDialogue(self):
@@ -1725,26 +1723,26 @@ class MainController(QtGui.QMainWindow):
             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             if loc == "Column flange-Beam web":
-                data = str(self.folder) + "/css/3D_ModelEndFB.png"
+                data = str(self.folder) + "/images_html/3D_ModelEndFB.png"
                 for n in range(1, 100, 1):
                     if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelEndFB" + str(n) + ".png" 
+                        data = str(self.folder) + "/images_html/3D_ModelEndFB" + str(n) + ".png" 
                         continue
                 base = os.path.basename(str(data))
                 
             elif loc == "Column web-Beam web":
-                data = str(self.folder) + "/css/3D_ModelEndWB.png"
+                data = str(self.folder) + "/images_html/3D_ModelEndWB.png"
                 for n in range(1, 100, 1):
                     if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelEndWB" + str(n) + ".png"
+                        data = str(self.folder) + "/images_html/3D_ModelEndWB" + str(n) + ".png"
                         continue
                 base = os.path.basename(str(data))
                 
             else:
-                data = str(self.folder) + "/css/3D_ModelEndBB.png"
+                data = str(self.folder) + "/images_html/3D_ModelEndBB.png"
                 for n in range(1, 100, 1):
                     if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelEndBB" + str(n) + ".png"
+                        data = str(self.folder) + "/images_html/3D_ModelEndBB" + str(n) + ".png"
                         continue
                 base = os.path.basename(str(data))
 

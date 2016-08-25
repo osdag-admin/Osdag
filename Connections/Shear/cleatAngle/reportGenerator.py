@@ -27,11 +27,17 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     myfile.write(t('style'))
     myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
     myfile.write('th,td {padding:3px}')
+    # Provides light green background color(#D5DF93), font-weight bold, font-size 20 and font-family
     myfile.write('td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
+    # Provides font-weight bold, font-size 20 and font-family 
     myfile.write('td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
+    # Provides font-size 20 and font-family
     myfile.write('td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}')
+    # Provides dark green background color(#8FAC3A), font-weight bold, font-size 20 and font-family
     myfile.write('td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
+    # Provides grey background color(#E6E6E6), font-weight bold, font-size 20 and font-family
     myfile.write('td.header1{background-color:#E6E6E6; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
+    # Provides only font-size 20 and width of the images box
     myfile.write('td.header2{font-size:20; width:50%}')
     myfile.write(t('/style'))
 ##############################################################################################################################################
@@ -218,7 +224,7 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "css/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
     rstr += t('/tr')
@@ -605,7 +611,7 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "css/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
     rstr += t('/tr')
@@ -872,7 +878,7 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "css/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
     rstr += t('/tr')
@@ -1159,7 +1165,7 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "css/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
     rstr += t('/tr')
@@ -1232,44 +1238,44 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     
     rstr += t('tr')
     if connectivity == "Column flange-Beam web":
-        png = folder + "/css/" + base
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatFB.png" width ="400"></object">' % png
+        png = folder + "/images_html/" + base
+        datapng = '<object type="image/PNG" data="images_html/3D_ModelCleatFB.png" width ="400"></object">' % png
         
-        side = folder + "/css/" + base_side
-        dataside = '<object type="image/svg+xml" data="css/cleatSideFB.svg" width ="400"></object>' % side
+        side = folder + "/images_html/" + base_side
+        dataside = '<object type="image/svg+xml" data="images_html/cleatSideFB.svg" width ="400"></object>' % side
         
-        top = folder + "/css/" + base_top
-        datatop = '<object type="image/svg+xml" data="css/cleatTopFB.svg" width ="400"></object>' % top
+        top = folder + "/images_html/" + base_top
+        datatop = '<object type="image/svg+xml" data="images_html/cleatTopFB.svg" width ="400"></object>' % top
         
-        front = folder + "/css/" + base_front
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontFB.svg" width ="450"></object>' % front
+        front = folder + "/images_html/" + base_front
+        datafront = '<object type="image/svg+xml" data="images_html/cleatFrontFB.svg" width ="450"></object>' % front
         
     elif connectivity == "Column web-Beam web":
-        png = folder + "/css/" + base
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatWB.png" width ="400"></object">' % png
+        png = folder + "/images_html/" + base
+        datapng = '<object type="image/PNG" data="images_html/3D_ModelCleatWB.png" width ="400"></object">' % png
         
-        side = folder + "/css/" + base_side
-        dataside = '<object type="image/svg+xml" data="css/cleatSideWB.svg" width ="400"></object>' % side
+        side = folder + "/images_html/" + base_side
+        dataside = '<object type="image/svg+xml" data="images_html/cleatSideWB.svg" width ="400"></object>' % side
         
-        top = folder + "/css/" + base_top
-        datatop = '<object type="image/svg+xml" data="css/cleatTopWB.svg" width ="400"></object>' % top
+        top = folder + "/images_html/" + base_top
+        datatop = '<object type="image/svg+xml" data="images_html/cleatTopWB.svg" width ="400"></object>' % top
         
-        front = folder + "/css/" + base_front
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontWB.svg" width ="450"></object>' % front
+        front = folder + "/images_html/" + base_front
+        datafront = '<object type="image/svg+xml" data="images_html/cleatFrontWB.svg" width ="450"></object>' % front
         
 
     else:
-        png = folder + "/css/" + base
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatBB.png" width ="400"></object">' % png
+        png = folder + "/images_html/" + base
+        datapng = '<object type="image/PNG" data="images_html/3D_ModelCleatBB.png" width ="400"></object">' % png
         
-        side = folder + "/css/" + base_side
-        dataside = '<object type="image/svg+xml" data="css/cleatSideBB.svg" width ="400"></object>' % side
+        side = folder + "/images_html/" + base_side
+        dataside = '<object type="image/svg+xml" data="images_html/cleatSideBB.svg" width ="400"></object>' % side
         
-        top = folder + "/css/" + base_top
-        datatop = '<object type="image/svg+xml" data="css/cleatTopBB.svg" width ="400"></object>' % top
+        top = folder + "/images_html/" + base_top
+        datatop = '<object type="image/svg+xml" data="images_html/cleatTopBB.svg" width ="400"></object>' % top
         
-        front = folder + "/css/" + base_front
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontBB.svg" width ="450"></object>' % front
+        front = folder + "/images_html/" + base_front
+        datafront = '<object type="image/svg+xml" data="images_html/cleatFrontBB.svg" width ="450"></object>' % front
 
     row = [0, datapng, datatop]
     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
@@ -1292,7 +1298,7 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData, dictCleatData, report
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "css/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>', '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
     rstr += t('/tr')

@@ -377,33 +377,33 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCFBWTop(fileName)
             else:
-#                 mod_svg = str(self.folder) + "/css/finFrontFB.svg"
+#                 mod_svg = str(self.folder) + "/images_html/finFrontFB.svg"
 #                 tree.write(mod_svg)
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/css/finFrontFB.svg", write_to = str(self.folder) + '/css/finFrontFB.png' )
-                fileName = str(self.folder) + '/css/finFrontFB.svg'
+#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finFrontFB.svg", write_to = str(self.folder) + '/images_html/finFrontFB.png' )
+                fileName = str(self.folder) + '/images_html/finFrontFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finFrontFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finFrontFB" + str(n) + ".svg"
                         continue
                 fin2DFront.callCFBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
                 
                 
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/css/finSideFB.svg", write_to = str(self.folder) + '/css/finSideFB.png' )
-                fileName = str(self.folder) + '/css/finSideFB.svg'
+#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finSideFB.svg", write_to = str(self.folder) + '/images_html/finSideFB.png' )
+                fileName = str(self.folder) + '/images_html/finSideFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finSideFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finSideFB" + str(n) + ".svg"
                         continue
                 fin2DSide.callCFBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
                 
                 
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/css/finTopFB.svg", write_to = str(self.folder) + '/css/finTopFB.png' )
-                fileName = str(self.folder) + '/css/finTopFB.svg'
+#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finTopFB.svg", write_to = str(self.folder) + '/images_html/finTopFB.png' )
+                fileName = str(self.folder) + '/images_html/finTopFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finTopFB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finTopFB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCFBWTop(fileName)
                 base_top = os.path.basename(str(fileName))
@@ -417,29 +417,29 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCWBWTop(fileName)
             else:
-#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/css/FinFrontWB.svg", write_to = str(self.folder)+ '/css/FinFrontWB.png')
-                fileName = str(self.folder) + '/css/FinFrontWB.svg'
+#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/images_html/FinFrontWB.svg", write_to = str(self.folder)+ '/images_html/FinFrontWB.png')
+                fileName = str(self.folder) + '/images_html/FinFrontWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/FinFrontWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/FinFrontWB" + str(n) + ".svg"
                         continue
                 fin2DFront.callCWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/css/FinSideWB.svg'
+                fileName = str(self.folder) + '/images_html/FinSideWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/FinSideWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/FinSideWB" + str(n) + ".svg"
                         continue
-#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/css/FinSideWB.svg", write_to = str(self.folder)+ '/css/FinSideWB.png')
+#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/images_html/FinSideWB.svg", write_to = str(self.folder)+ '/images_html/FinSideWB.png')
                 fin2DSide.callCWBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
 
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/css/FinTopWB.svg", write_to = str(self.folder)+ '/css/FinTopWB.png')
-                fileName = str(self.folder) + '/css/FinTopWB.svg'
+#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/FinTopWB.svg", write_to = str(self.folder)+ '/images_html/FinTopWB.png')
+                fileName = str(self.folder) + '/images_html/FinTopWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/FinTopWB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/FinTopWB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCWBWTop(fileName)
                 base_top = os.path.basename(str(fileName))
@@ -452,28 +452,28 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callBWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/css/finFrontBB.svg'
+                fileName = str(self.folder) + '/images_html/finFrontBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finFrontBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finFrontBB" + str(n) + ".svg"
                         continue
                 fin2DFront.callBWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
-                
-                
-                fileName = str(self.folder) + '/css/finSideBB.svg'
+
+
+                fileName = str(self.folder) + '/images_html/finSideBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finSideBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finSideBB" + str(n) + ".svg"
                         continue
                 fin2DSide.callBWBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
-                
-                
-                fileName = str(self.folder) + '/css/finTopBB.svg'
+
+
+                fileName = str(self.folder) + '/images_html/finTopBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/css/finTopBB" + str(n) + ".svg"
+                        fileName = str(self.folder) + "/images_html/finTopBB" + str(n) + ".svg"
                         continue
                 fin2DTop.callBWBWTop(fileName)
                 base_top = os.path.basename(str(fileName))

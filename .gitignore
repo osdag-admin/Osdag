@@ -1,0 +1,7 @@
+*.txt
+*.pyc
+*.pyo
+*~
+*.html
+*.log
+output/*

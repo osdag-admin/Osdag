@@ -377,9 +377,6 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCFBWTop(fileName)
             else:
-#                 mod_svg = str(self.folder) + "/images_html/finFrontFB.svg"
-#                 tree.write(mod_svg)
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finFrontFB.svg", write_to = str(self.folder) + '/images_html/finFrontFB.png' )
                 fileName = str(self.folder) + '/images_html/finFrontFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -399,7 +396,6 @@ class FinCommonData(object):
                 base_side = os.path.basename(str(fileName))
                 
                 
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finTopFB.svg", write_to = str(self.folder) + '/images_html/finTopFB.png' )
                 fileName = str(self.folder) + '/images_html/finTopFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -417,7 +413,6 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCWBWTop(fileName)
             else:
-#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/images_html/FinFrontWB.svg", write_to = str(self.folder)+ '/images_html/FinFrontWB.png')
                 fileName = str(self.folder) + '/images_html/FinFrontWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -431,11 +426,9 @@ class FinCommonData(object):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/FinSideWB" + str(n) + ".svg"
                         continue
-#                 cairosvg.svg2png(bytestring = str(self.folder)+ "/images_html/FinSideWB.svg", write_to = str(self.folder)+ '/images_html/FinSideWB.png')
                 fin2DSide.callCWBWSide(fileName)
                 base_side = os.path.basename(str(fileName))
 
-#                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/FinTopWB.svg", write_to = str(self.folder)+ '/images_html/FinTopWB.png')
                 fileName = str(self.folder) + '/images_html/FinTopWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):

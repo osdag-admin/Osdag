@@ -804,51 +804,22 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     row = [0, "Views", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    # rstr += t('td class=" viewtbl "') + row[2] + t('/td')
     rstr += t('/tr')
-#     import os, os.path, time
-#     date_string = time.strftime("%Y-%m-%d %H:%M")
-    if connectivity == "Column flange-Beam web":
-        png = folder + "/images_html/" + base
-        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
-        
-        side = folder + "/images_html/" + base_side
-        dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
+    
+    png = folder + "/images_html/" + base
+    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+    
+    side = folder + "/images_html/" + base_side
+    dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
 
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
-            
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
+    top = folder + "/images_html/" + base_top
+    datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
+        
+    front = folder + "/images_html/" + base_front
+    datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
 
         
-    elif connectivity == "Column web-Beam web":
-        png = folder + "/images_html/" + base
-        datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png   
-        
-        side = folder + "/images_html/" + base_side          
-        dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
-
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
-        
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
-#         
-
-    else:
-        png = folder + "/images_html/" + base        
-        datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png 
      
-        side = folder + "/images_html/" + base_side
-        dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
-
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
-
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
- 
     row = [0, datapng, datatop]
     rstr += t('tr')
     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')

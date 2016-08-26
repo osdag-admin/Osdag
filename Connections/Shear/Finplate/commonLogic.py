@@ -57,6 +57,11 @@ class CommonDesignLogic(object):
         self.display = display
         self.resultObj = self.call_finCalculation()
         self.connectivityObj = None
+        self.folder = folder
+        self.base = base
+        self.base1 = base1
+        self.base2 = base2
+        self.base3 = base3
 
     #============================= FinCalculation ===========================================
 
@@ -225,7 +230,6 @@ class CommonDesignLogic(object):
 
         '''
         # self.dictbeamdata  = self.fetchBeamPara()
-        # print self.dictbeamdata
         # self.resultObj = self.call_finCalculation()
         fillet_length = self.resultObj['Plate']['height']
         fillet_thickness = self.resultObj['Weld']['thickness']
@@ -381,30 +385,12 @@ class CommonDesignLogic(object):
             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-            if loc == "Column flange-Beam web":
-
-                data = str(folder) + "/images_html/3D_ModelFinFB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-            elif loc == "Column web-Beam web":
-                data = str(folder) + "/images_html/3D_ModelFinWB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(folder) + "/images_html/3D_ModelFinWB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-            else:
-                data = str(folder) + "/images_html/3D_ModelFinBB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(folder) + "/images_html/3D_ModelFinBB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
+            data = str(folder) + "/images_html/3D_Model.png"
+            for n in range(1, 100, 1):
+                if (os.path.exists(data)):
+                    data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
+                    continue
+            base = os.path.basename(str(data))
 
             self.display.ExportToImage(data)
 
@@ -434,9 +420,9 @@ class CommonDesignLogic(object):
     def call_designReport(self, htmlfilename, profileSummary):
 
         fileName = str(htmlfilename)
-        if os.path.isfile(fileName):
-            print self.uiObj
-            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename)
+
+        if not os.path.isfile(fileName):
+            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder, self.base, self.base1, self.base2, self.base3)
 
     #=========================================================================================
 

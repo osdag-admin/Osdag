@@ -65,8 +65,6 @@ class MyAboutOsdag(QtGui.QDialog):
 
 class MyPopupDialog(QtGui.QDialog):
 
-    print"my popup window"
-
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -199,8 +197,8 @@ class MainController(QtGui.QMainWindow):
         # File Menu
 
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callFin2D_Drawing("Front"))
-        self.ui.actionSave_Side_View.triggered.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.actionSave_Top_View.triggered.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.actionSave_Side_View.triggered.connect(lambda: self.callFin2D_Drawing("Side"))
+        self.ui.actionSave_Top_View.triggered.connect(lambda: self.callFin2D_Drawing("Top"))
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
@@ -235,8 +233,8 @@ class MainController(QtGui.QMainWindow):
         # self.retrieve_prevstate()
 
         self.ui.btnFront.clicked.connect(lambda: self.callFin2D_Drawing("Front"))
-        self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.btnSide.clicked.connect(lambda: self.callFin2D_Drawing("Side"))
+        self.ui.btnTop.clicked.connect(lambda: self.callFin2D_Drawing("Top"))
 
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
@@ -471,7 +469,6 @@ class MainController(QtGui.QMainWindow):
                     newlist.append(str(item))
 
             self.ui.comboPlateThick_2.blockSignals(True)
-#             print newlist
             self.ui.comboPlateThick_2.clear()
             for i in newlist[:]:
                 self.ui.comboPlateThick_2.addItem(str(i))
@@ -705,53 +702,15 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", "output/finplate/Report", "Html Files (*.html)")
-        fileName = str(fileName)
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
+        fileName = str(fileName + ".html")
         base, base1, base2, base3 = self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
-        # self.inputdict = self.uiObj#self.getuser_inputs()
-        # self.outdict = self.resultObj#self.outputdict()
-        # 
-        # dictBeamData  = self.fetchBeamPara()
-        # save_html(self.outdict, self.inputdict, dictBeamData, dictColData,popup_summary,fileName)
-        # ext = os.path.basename(str(fileName))
-        # base = ext[ :-5]
-        #  
-        # path_wkthmltopdf = r'/home/deepa/Downloads/wkhtmltox/bin/wkhtmltopdf'
-        # config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-        # options = {
-        #             'margin-bottom': '10mm',
-        #             'footer-right': '[page]'
-        #             }
-        # pdfkit.from_file(fileName, 'output/finplate/Report/finplaterepoRT.pdf', configuration=config, options=options)
-        # #         pdfkit.from_file(fileName,'output/finplate/'+base+'.pdf',configuration=config, options=options)
-        self.inputdict = self.uiObj  # self.getuser_inputs()
-        self.outdict = self.resultObj  # self.outputdict()
-
-        dictBeamData = self.fetchBeamPara()
-        dictColData = self.fetchColumnPara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName,folder, base, base_front, base_top, base_side)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
-    # def save_design(self, popup_summary):
-    #
-    #
-    #     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-    #     fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
-    #     fileName = str(fileName)
-    #     base, base_front, base_top, base_side = self.call2D_Drawing("All")
-    #     self.inputdict = self.uiObj  # self.getuser_inputs()
-    #     self.outdict = self.resultObj  # self.outputdict()
-    #
-    #     dictBeamData = self.fetchBeamPara()
-    #     dictColData = self.fetchColumnPara()
-    #     save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base, base_front, base_top, base_side)
-    #
-    #     QtGui.QMessageBox.about(self, 'Information', "Report Saved")
-    #
     # # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     def save_log(self):
@@ -773,26 +732,6 @@ class MainController(QtGui.QMainWindow):
         QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         outf << self.ui.textEdit.toPlainText()
         QtGui.QApplication.restoreOverrideCursor()
-
-    # def save_yaml(self,outObj,uiObj):
-    #
-    #     '''(dictiionary,dictionary) -> NoneType
-    #     Saving input and output to file in following format.
-    #     Bolt:
-    #       diameter: 6
-    #       grade: 8.800000190734863
-    #       type: HSFG
-    #     Load:
-    #       shearForce: 100
-    #
-    #     '''
-    #     newDict = {"INPUT": uiObj, "OUTPUT": outObj} 
-    #     fileName = QtGui.QFileDialog.getSaveFileName(self,"Save File As","/home/deepa/SaveDesign","Html File (*.html)")
-    #     f = open(fileName,'w')
-    #     yaml.dump(newDict,f,allow_unicode=True, default_flow_style=False)
-    #
-    #     #return self.save_file(fileName+".txt")
-    #     #QtGui.QMessageBox.about(self,'Information',"File saved")
 
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
@@ -1041,46 +980,46 @@ class MainController(QtGui.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    def display3Dmodel(self, component):
-
-        self.display.EraseAll()
-
-        self.display.SetModeShaded()
-
-        self.display.DisableAntiAliasing()
-
-        # self.display.set_bg_gradient_color(23,1,32,150,150,170)
-        self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-
-        loc = self.ui.comboConnLoc.currentText()
-        if loc == "Column flange-Beam web":
-            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
-        else:
-            self.display.View_Iso()
-            self.display.FitAll()
-
-        if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-        elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
-        elif component == "Finplate":
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
-        elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+    # def display3Dmodel(self, component):
+    #
+    #     self.display.EraseAll()
+    #
+    #     self.display.SetModeShaded()
+    #
+    #     self.display.DisableAntiAliasing()
+    #
+    #     # self.display.set_bg_gradient_color(23,1,32,150,150,170)
+    #     self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+    #
+    #     loc = self.ui.comboConnLoc.currentText()
+    #     if loc == "Column flange-Beam web":
+    #         self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+    #     else:
+    #         self.display.View_Iso()
+    #         self.display.FitAll()
+    #
+    #     if component == "Column":
+    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+    #     elif component == "Beam":
+    #         osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+    #         # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
+    #     elif component == "Finplate":
+    #         osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
+    #         for nutbolt in nutboltlist:
+    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+    #         # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
+    #     elif component == "Model":
+    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
+    #         for nutbolt in nutboltlist:
+    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
     def checkBeam_B(self):
         loc = self.ui.comboConnLoc.currentText()
@@ -1330,8 +1269,12 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
+        base = ''
+        base_front = ''
+        base_side = ''
+        base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display) 
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
 
         self.resultObj = commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1405,8 +1348,12 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+        base = ''
+        base_front = ''
+        base_side = ''
+        base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display) 
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
         if view != 'All':
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -1500,21 +1447,15 @@ def launchFinPlateController(osdagMainWindow, folder):
     rawLogger.addHandler(fh)
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
 
-    # app = QtGui.QApplication(sys.argv)
     module_setup()
-    # app = QtGui.QApplication(sys.argv)
     window = MainController(folder)
     osdagMainWindow.hide()
 
     window.show()
     window.closed.connect(osdagMainWindow.show)
 
-    # sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
-
-    # launchFinPlateController(None)
 
     # linking css to log file to display colour logs.
     set_osdaglogger()

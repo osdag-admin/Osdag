@@ -185,10 +185,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_fu.editingFinished.connect(
             lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu_value, max_fu_value))
 
-        minfyVal = 165
-        maxfyVal = 450
-        self.ui.txtFy.editingFinished.connect(
-            lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
+        min_fy_value = 165
+        max_fy_value = 450
+        self.ui.txt_fy.editingFinished.connect(
+            lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value)
 
         # Menu Bar
 
@@ -219,7 +219,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
 
-        # TODO checkBeam_B
+        # TODO checkBeam_B is incomplete
         # self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         # self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         # self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
@@ -537,20 +537,20 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_moment_capacity.clear()
         self.ui.txt_seat_shear_demand.clear()
         self.ui.txt_seat_shear_capacity.clear()
-        # TODO placeholder
-        self.ui.txtBeamShearStrength.clear()
+        # TODO check seat OR beam shear strength
+        self.ui.txt_seat_shear_strength.clear()
 
-        self.ui.txtShrCapacity_2.clear()
-        self.ui.txtBearingCapacity.clear()
-        self.ui.txtBoltCapacity.clear()
-        self.ui.txtBoltGroupCapacity.clear()
-        self.ui.txtNoBolts.clear()
-        self.ui.txt_row.clear()
-        self.ui.txt_col.clear()
-        self.ui.txtPitch.clear()
-        self.ui.txtGuage.clear()
-        self.ui.txtEndDist.clear()
-        self.ui.txtEdgeDist.clear()
+        self.ui.txt_bolt_shear_capacity.clear()
+        self.ui.txt_bolt_bearing_capacity.clear()
+        self.ui.txt_bolt_capacity.clear()
+        self.ui.txt_bolt_group_capacity.clear()
+        self.ui.txt_no_bolts.clear()
+        self.ui.txt_bolt_rows.clear()
+        self.ui.txt_bolt_cols.clear()
+        self.ui.txt_bolt_pitch.clear()
+        self.ui.txt_bolt_gauge.clear()
+        self.ui.txt_end_distance.clear()
+        self.ui.txt_edge_distance.clear()
 
         # ------ Erase Display
         self.display.EraseAll()
@@ -564,7 +564,6 @@ class MainController(QtGui.QMainWindow):
 
         flag = widget.isHidden()
         if (flag):
-
             widget.show()
         else:
             widget.hide()
@@ -575,22 +574,22 @@ class MainController(QtGui.QMainWindow):
         '''
         items = self.gradeType[str(index)]
 
-        self.ui.comboGrade.clear()
+        self.ui.combo_bolt_grade.clear()
         strItems = []
         for val in items:
             strItems.append(str(val))
 
-        self.ui.comboGrade.addItems(strItems)
+        self.ui.combo_bolt_grade.addItems(strItems)
 
-    def check_range(self, widget, lblwidget, minVal, maxVal):
+    def check_range(self, widget, lblwidget, min_value, max_value):
 
         '''(QlineEdit,QLable,Number,Number)---> NoneType
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         '''
         textStr = widget.text()
         val = int(textStr)
-        if (val < minVal or val > maxVal):
-            QtGui.QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (minVal, maxVal))
+        if (val < min_value or val > max_value):
+            QtGui.QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
             widget.clear()
             widget.setFocus()
             palette = QtGui.QPalette()
@@ -600,6 +599,7 @@ class MainController(QtGui.QMainWindow):
             palette = QtGui.QPalette()
             lblwidget.setPalette(palette)
 
+    #TODO placeholder
     def display_output(self, outputObj):
         '''(dictionary) --> NoneType
         Setting design result values to the respective textboxes in the output window

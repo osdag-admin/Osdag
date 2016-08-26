@@ -748,53 +748,39 @@ class MainController(QtGui.QMainWindow):
 
     def display3Dmodel(self, component):
         self.display.EraseAll()
-        #TODO placeholder
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        self.display.View_Front()
-        self.display.View_Iso()
-        self.display.FitAll()
+
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Column flange-Beam web":
+            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        else:
+            self.display.View_Iso()
+            self.display.FitAll()
+
         if component == "Column":
             osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
         elif component == "Beam":
             osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif component == "SeatAngle":
-            #             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-                # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
             osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
             osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            #             osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color = 'red', update = True)
-            #             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-                # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
 
-    def fetchBeamPara(self):
-        beam_sec = self.ui.comboBeamSec.currentText()
-        dictbeamdata = get_beamdata(beam_sec)
-        return dictbeamdata
-
-    def fetchColumnPara(self):
-        column_sec = self.ui.comboColSec.currentText()
-        dictcoldata = get_columndata(column_sec)
-        return dictcoldata
-
-    def fetchAnglePara(self):
-        angle_sec = self.ui.comboAngleSec.currentText()
-        dictangledata = get_angledata(angle_sec)
-        return dictangledata
+# -------------------------------------------------------------------------
+# TODO check the 3D drawing generating functions below
 
     def create3DColWebBeamWeb(self):
         '''
@@ -978,9 +964,11 @@ class MainController(QtGui.QMainWindow):
         colflangeconn = ColFlangeBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
         colflangeconn.create_3dmodel()
         return colflangeconn
-
+# TODO check 3D drawing generating functions above
+#-------------------------------------------------------------------------------
     def call_3DModel(self, flag):
-        self.ui.btnSvgSave.setEnabled(True)
+        # self.ui.btnSvgSave.setEnabled(True)
+        self.ui.btn3D.setChecked(QtCore.Qt.Checked)
         if self.ui.btn3D.isEnabled():
             self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
@@ -992,25 +980,31 @@ class MainController(QtGui.QMainWindow):
                 # self.create3DColWebBeamWeb()
                 self.connectivity = self.create3DColWebBeamWeb()
                 self.fuse_model = None
-            else:
+
+            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create3DColFlangeBeamWeb()
                 self.fuse_model = None
 
-            self.display3Dmodel("Model")
+            else:
+                self.ui.mytabWidget.setCurrentIndex(0)
+                self.connectivity = self.create3DBeamWebBeamWeb()
+                self.fuse_model = None
 
+            self.display3Dmodel("Model")
 
         else:
             self.display.EraseAll()
-            self.display.DisplayMessage(gp_Pnt(1000, 0, 400), "Sorry, can not create 3D model", height=23.0)
 
     def call_3DBeam(self):
         '''
         Creating and displaying 3D Beam
         '''
+        self.ui.chkBxBeam.setChecked(QtCore.Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
             self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
         self.display3Dmodel("Beam")
@@ -1018,39 +1012,55 @@ class MainController(QtGui.QMainWindow):
     def call_3DColumn(self):
         '''
         '''
+        self.ui.chkBxCol.setChecked(QtCore.Qt.Checked)
         if self.ui.chkBxCol.isChecked():
             self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
             self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
         self.display3Dmodel("Column")
 
     def call_3DSeatAngle(self):
         '''Displaying Seat Angle in 3D
         '''
+        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Checked)
         if self.ui.chkBxSeatAngle.isChecked():
             self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
+            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
         self.display3Dmodel("SeatAngle")
 
+    def unchecked_allChkBox(self):
+
+        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+
     def design_btnclicked(self):
         '''
         '''
+        # TODO input validation
+        self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
+        self.unchecked_allChkBox()
 
-        # self.set_designlogger()
         # Getting User Inputs.
-        uiObj = self.getuser_inputs()
+        self.uiObj = self.getuser_inputs()
 
-        # FinPlate Design Calculations. 
-        resultObj = SeatAngleConn(uiObj)
+        # Seated Angle Design Calculations.
+        self.resultObj = SeatAngleConn(self.uiObj)
+        d = self.resultObj[self.resultObj.keys()[0]]
+        if len(str(d[d.keys()[0]])) == 0:
+            self.ui.btn_CreateDesign.setEnabled(False)
 
         # Displaying Design Calculations To Output Window
         self.display_output(resultObj)
 
-        # Displaying Messages related to FinPlate Design.
+        # Displaying Messages related to Seated Angle Design.
         self.displaylog_totextedit()
 
         # Displaying 3D Cad model
@@ -1066,9 +1076,7 @@ class MainController(QtGui.QMainWindow):
             final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
         return final_model
 
-
-
-
+    #TODO placeholder
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):

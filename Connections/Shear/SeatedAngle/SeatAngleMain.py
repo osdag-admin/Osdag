@@ -599,7 +599,6 @@ class MainController(QtGui.QMainWindow):
             palette = QtGui.QPalette()
             lblwidget.setPalette(palette)
 
-    #TODO placeholder
     def display_output(self, outputObj):
         '''(dictionary) --> NoneType
         Setting design result values to the respective textboxes in the output window
@@ -613,55 +612,56 @@ class MainController(QtGui.QMainWindow):
 
         # resultObj['Bolt']
         bolt_shear_capacity = resultObj['Bolt']['Shear Capacity (kN)']
-        self.ui.txtShearCapacity.setText(str(bolt_shear_capacity))
+        self.ui.txt_bolt_shear_capacity.setText(str(bolt_shear_capacity))
 
-        bearing_capacity = resultObj['Bolt']['Bearing Capacity (kN)']
-        self.ui.txtBearingCapacity.setText(str(bearing_capacity))
+        bolt_bearing_capacity = resultObj['Bolt']['Bearing Capacity (kN)']
+        self.ui.txt_bolt_bearing_capacity.setText(str(bolt_bearing_capacity))
 
         bolt_capacity = resultObj['Bolt']['Capacity Of Bolt (kN)']
-        self.ui.txtBoltCapacity.setText(str(bolt_capacity))
+        self.ui.txt_bolt_capacity.setText(str(bolt_capacity))
 
-        no_ofbolts = resultObj['Bolt']['No Of Bolts']
-        self.ui.txtNoBolts.setText(str(no_ofbolts))
+        no_of_bolts = resultObj['Bolt']['No Of Bolts']
+        self.ui.txt_no_bolts.setText(str(no_of_bolts))
         # newly added field
-        boltGrp_capacity = resultObj['Bolt']['Bolt group capacity (kN)']
-        self.ui.txtBoltGroupCapacity.setText(str(boltGrp_capacity))
+        bolt_grp_capacity = resultObj['Bolt']['Bolt group capacity (kN)']
+        self.ui.txt_bolt_group_capacity.setText(str(bolt_grp_capacity))
 
-        no_ofrows = resultObj['Bolt']['No.Of Row']
-        self.ui.txt_row.setText(str(no_ofrows))
+        no_of_rows = resultObj['Bolt']['No.Of Row']
+        self.ui.txt_bolt_rows.setText(str(no_of_rows))
 
-        no_ofcol = resultObj['Bolt']['No.Of Column']
-        self.ui.txt_col.setText(str(no_ofcol))
+        no_of_cols = resultObj['Bolt']['No.Of Column']
+        self.ui.txt_bolt_cols.setText(str(no_of_col))
 
         pitch_dist = resultObj['Bolt']['Pitch Distance (mm)']
         self.ui.txtPitch.setText(str(pitch_dist))
 
         gauge_dist = resultObj['Bolt']['Gauge Distance (mm)']
-        self.ui.txtGuage.setText(str(gauge_dist))
+        self.ui.txt_bolt_gauge.setText(str(gauge_dist))
 
         end_dist = resultObj['Bolt']['End Distance (mm)']
-        self.ui.txtEndDist.setText(str(end_dist))
+        self.ui.txt_end_distance.setText(str(end_dist))
         #
         edge_dist = resultObj['Bolt']['Edge Distance (mm)']
-        self.ui.txtEdgeDist.setText(str(edge_dist))
+        self.ui.txt_edge_distance.setText(str(edge_dist))
 
         angle_length = resultObj['SeatAngle']['Length (mm)']
-        self.ui.txtSeatLength.setText(str(angle_length))
+        self.ui.txt_seat_length.setText(str(angle_length))
 
         moment_demand = resultObj['SeatAngle']['Moment Demand (kNm)']
-        self.ui.txtExtMomnt.setText(str(moment_demand))
+        self.ui.txt_moment_demand.setText(str(moment_demand))
 
         moment_capacity = resultObj['SeatAngle']['Moment Capacity (kNm)']
-        self.ui.txtMomntCapacity.setText(str(moment_capacity))
+        self.ui.txt_moment_capacity.setText(str(moment_capacity))
 
         shear_demand = resultObj['SeatAngle']['Shear Demand (kN/mm)']
-        self.ui.txtShearDemand.setText(str(shear_demand))
+        self.ui.txt_seat_shear_demand.setText(str(shear_demand))
 
         angle_shear_capacity = resultObj['SeatAngle']['Shear Capacity (kN/mm)']
-        self.ui.txtShearCapacity_2.setText(str(angle_shear_capacity))
+        self.ui.txt_seat_shear_capacity.setText(str(angle_shear_capacity))
 
+        #TODO check seat or beam shear strength
         beam_shear_strength = resultObj['SeatAngle']['Beam Shear Strength (kN/mm)']
-        self.ui.txtBeamShearStrength.setText(str(beam_shear_strength))
+        self.ui.txt_seat_shear_strength.setText(str(beam_shear_strength))
 
     def displaylog_totextedit(self):
         '''
@@ -680,37 +680,11 @@ class MainController(QtGui.QMainWindow):
         vscrollBar.setValue(vscrollBar.maximum());
         afile.close()
 
-    def get_backend(self):
-        """
-        loads a backend
-        backends are loaded in order of preference
-        since python comes with Tk included, but that PySide or PyQt4
-        is much preferred
-        """
-        #         try:
-        #             from PySide import QtCore, QtGui
-        #             return 'pyside'
-        #         except:
-        #             pass
-        try:
-            from PyQt4 import QtCore, QtGui
-            return 'pyqt4'
-        except:
-            pass
-        # Check wxPython
-        try:
-            import wx
-            return 'wx'
-        except:
-            raise ImportError(
-                "No compliant GUI library found. You must have either PySide, PyQt4 or wxPython installed.")
-            sys.exit(1)
-
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
         if os.name == 'nt':
 
-            global display, start_display, app, _
+            global display, start_display, app
 
             from OCC.Display.backend import get_loaded_backend
             lodedbkend = get_loaded_backend()
@@ -719,7 +693,7 @@ class MainController(QtGui.QMainWindow):
             if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
         else:
-            global display, start_display, app, _, USED_BACKEND
+            global display, start_display, app, USED_BACKEND
 
             if not backend_str:
                 USED_BACKEND = self.get_backend()
@@ -739,16 +713,13 @@ class MainController(QtGui.QMainWindow):
         from OCC.Display.qtDisplay import qtViewer3d
 
         self.ui.modelTab = qtViewer3d(self)
-        # self.ui.model2dTab = qtViewer3d(self)
 
-        self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name))
+        self.setWindowTitle("Osdag Seated Angle Connection")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
-        # self.ui.mytabWidget.addTab(self.ui.model2dTab,"")
 
         self.ui.modelTab.InitDriver()
         display = self.ui.modelTab._display
-        # display_2d = self.ui.model2dTab._display
 
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         display.display_trihedron()
@@ -763,7 +734,6 @@ class MainController(QtGui.QMainWindow):
         def start_display():
 
             self.ui.modelTab.raise_()
-            # self.ui.model2dTab.raise_()   # make the application float to the top
 
         return display, start_display
 
@@ -778,6 +748,7 @@ class MainController(QtGui.QMainWindow):
 
     def display3Dmodel(self, component):
         self.display.EraseAll()
+        #TODO placeholder
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)

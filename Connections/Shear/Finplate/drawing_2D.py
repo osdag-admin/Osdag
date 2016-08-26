@@ -8,31 +8,29 @@ from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 from __builtin__ import str
-# import cairosvg
-# from lxml import etree
-# from cairosvg.parser import Tree
 import os.path
 
+
 class FinCommonData(object):
-    
+
     def __init__(self, inputObj, ouputObj, dictBeamdata, dictColumndata, folder):
         '''
         Provide all the data related to Finplate connection
-        
+
         :param inputObj:
         :type inputObj:dictionary(Input parameter dictionary)
         :param outputObj:
         :type ouputObj :dictionary (output parameter dictionary)
         :param dictBeamdata :
-        :type dictBeamdata:  dictionary (Beam sectional properties) 
+        :type dictBeamdata:  dictionary (Beam sectional properties)
         :param dictColumndata :
         :type dictBeamdata: dictionary (Column sectional properties dictionary)
 
         '''
         self.beam_T = float(dictBeamdata[QString("T")])
         self.col_T = float(dictColumndata[QString("T")])
-        self.D_beam = int (dictBeamdata[QString("D")])
-        self.D_col = int (dictColumndata[QString("D")])
+        self.D_beam = int(dictBeamdata[QString("D")])
+        self.D_col = int(dictColumndata[QString("D")])
         self.col_B = int(dictColumndata[QString("B")])
         self.beam_B = int(dictBeamdata[QString("B")])
         self.col_tw = float(dictColumndata[QString("tw")])
@@ -41,7 +39,7 @@ class FinCommonData(object):
         self.beam_Designation = dictBeamdata[QString("Designation")]
         self.beam_R1 = float(dictBeamdata[QString("R1")])
         self.col_R1 = float(dictColumndata[QString("R1")])
-        self.plate_ht = ouputObj['Plate']['height'] 
+        self.plate_ht = ouputObj['Plate']['height']
         self.plate_thick = inputObj['Plate']["Thickness (mm)"]
 
         self.plate_width = ouputObj['Plate']['width']
@@ -55,7 +53,7 @@ class FinCommonData(object):
         self.gauge = ouputObj['Bolt']["gauge"]
         self.end_dist = ouputObj['Bolt']["enddist"]
         self.edge_dist = ouputObj['Bolt']["edge"]
-        self.no_of_rows = ouputObj['Bolt']["numofrow"] 
+        self.no_of_rows = ouputObj['Bolt']["numofrow"]
         self.no_of_col = ouputObj['Bolt']["numofcol"]
         self.col_L = 700
         self.beam_L = 350
@@ -64,79 +62,74 @@ class FinCommonData(object):
         self.beamToBeamDist = 10
         self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
         self.notch_ht = self.col_T + self.col_R1
-        
+
         self.folder = folder
-    
+
     def addSMarker(self, dwg):
         '''
         Draws start arrow to given line  -------->
-        
+
         :param dwg :
         :type dwg : svgwrite (obj) ( Container for all svg elements)
-        
+
         '''
         smarker = dwg.marker(insert=(8, 3), size=(30, 30), orient="auto")
-        
+
         smarker.add(dwg.path(d=" M0,0 L3,3 L0,6 L8,3 L0,0", fill='black'))
         dwg.defs.add(smarker)
-        
+
         return smarker
-    
-    
+
     def addSectionMarker(self, dwg):
         '''
         Draws start arrow to given line  -------->
-        
+
         :param dwg :
         :type dwg : svgwrite (obj) ( Container for all svg elements)
-        
+
         '''
         sectionMarker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
         sectionMarker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))
         dwg.defs.add(sectionMarker)
-        
+
         return sectionMarker
-    
-    
+
     def addEMarker(self, dwg):
         '''
         This routine returns end arrow  <---------
-        
+
         :param dwg :
         :type dwg : svgwrite  ( Container for all svg elements)
-        
+
         '''
         emarker = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
         emarker.add(dwg.path(d=" M0,3 L8,6 L5,3 L8,0 L0,3", fill='black'))
         dwg.defs.add(emarker)
-        
+
         return emarker
-    
+
     def drawStartArrow(self, line, s_arrow):
         line['marker-start'] = s_arrow.get_funciri()
-        
 
     def drawEndArrow(self, line, e_arrow):
         line['marker-end'] = e_arrow.get_funciri()
-        
-    
+
     def drawFaintLine(self, ptOne, ptTwo, dwg):
         '''
         Draw faint line to show dimensions.
-        
+
         :param dwg :
         :type dwg : svgwrite (obj)
         :param: ptOne :
         :type NumPy Array
         :param ptTwo :
         :type NumPy Array
-        
+
         '''
         dwg.add(dwg.line(ptOne, ptTwo).stroke('#D8D8D8', width=2.5, linecap='square', opacity=0.7))
-        
-    
+
     def draw_dimension_outerArrow(self, dwg, pt1, pt2, text, params):  
-          
+
         '''
         :param dwg :
         :type dwg : svgwrite (obj)
@@ -150,20 +143,20 @@ class FinCommonData(object):
         :type params["offset"] : offset of the dimension line
         :param params["textoffset"]:
         :type params["textoffset"]: float (offset of text from dimension line)
-        :param params["lineori"]: 
+        :param params["lineori"]:
         :type params ["lineori"]: String (right/left) 
         :param params["endlinedim"]:
-        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)       
+        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)
         '''
         smarker = self.addSMarker(dwg)
-        emarker = self.addEMarker(dwg)  
+        emarker = self.addEMarker(dwg)
 
         lineVec = pt2 - pt1  # [a, b]
         normalVec = np.array([-lineVec[1], lineVec[0]])  # [-b, a]
         normalUnitVec = self.normalize(normalVec)
         if(params["lineori"] == "left"):
             normalUnitVec = -normalUnitVec
-            
+
         Q1 = pt1 + params["offset"] * normalUnitVec
         Q2 = pt2 + params["offset"] * normalUnitVec
         line = dwg.add(dwg.line(Q1, Q2).stroke('black', width=2.5, linecap='square'))
@@ -173,21 +166,21 @@ class FinCommonData(object):
         Q12mid = 0.5 * (Q1 + Q2)
         txtPt = Q12mid + params["textoffset"] * normalUnitVec
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
-        
+
         L1 = Q1 + params["endlinedim"] * normalUnitVec
         L2 = Q1 + params["endlinedim"] * (-normalUnitVec)
         dwg.add(dwg.line(L1, L2).stroke('black', width=2.5, linecap='square', opacity=1.0))
         L3 = Q2 + params["endlinedim"] * normalUnitVec
         L4 = Q2 + params["endlinedim"] * (-normalUnitVec)
-        
+
         dwg.add(dwg.line(L3, L4).stroke('black', width=2.5, linecap='square', opacity=1.0))
-        
+
     def normalize(self, vec):
         a = vec[0]
         b = vec[1]
         mag = math.sqrt(a * a + b * b)
         return vec / mag
-    
+
     def draw_cross_section(self, dwg, ptA, ptB, txtPt, text):
         '''
         :param dwg :
@@ -200,13 +193,13 @@ class FinCommonData(object):
         :type txtPt : NumPy Array
         :param text :
         :type text : String
-        
+s
         '''
         line = dwg.add(dwg.line((ptA), (ptB)).stroke('black', width=2.5, linecap='square'))
         sec_arrow = self.addSectionMarker(dwg)
         self.drawEndArrow(line, sec_arrow)
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=52))
-        
+
     def draw_dimension_innerArrow(self, dwg, ptA, ptB, text, params):
         '''
         :param dwg :
@@ -220,18 +213,18 @@ class FinCommonData(object):
         :param params["textoffset"]:
         :type params["textoffset"]: float (offset of text from dimension line)
         :param params["endlinedim"]:
-        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)   
+        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)
         :param params["arrowlen"]:
         :type params["arrowlen"]: float (Size of the arrow)
         '''
         smarker = self.addSMarker(dwg)
-        emarker = self.addEMarker(dwg)  
-        
+        emarker = self.addEMarker(dwg)
+
         u = ptB - ptA  # [a, b]
         uUnit = self.normalize(u)
-        
+
         vUnit = np.array([-uUnit[1], uUnit[0]])  # [-b, a]
-        
+
         A1 = ptA + params["endlinedim"] * vUnit
         A2 = ptA + params["endlinedim"] * (-vUnit)
         dwg.add(dwg.line(A1, A2).stroke('black', width=2.5, linecap='square'))
@@ -240,7 +233,7 @@ class FinCommonData(object):
         dwg.add(dwg.line(B1, B2).stroke('black', width=2.5, linecap='square'))
         A3 = ptA - params["arrowlen"] * uUnit
         B3 = ptB + params["arrowlen"] * uUnit
-        
+
         line = dwg.add(dwg.line(A3, ptA).stroke('black', width=2.5, linecap='square'))
         self.drawEndArrow(line, smarker)
         # self.drawStartArrow(line, emarker)
@@ -251,15 +244,14 @@ class FinCommonData(object):
             txtPt = B3 + params["textoffset"] * uUnit
         else:
             txtPt = A3 - (params["textoffset"] + 100) * uUnit
-        
+
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
-        
-        
+
     def drawOrientedArrow(self, dwg, pt, theta, orientation, offset, textUp, textDown, element):
-    
+
         '''
         Drawing an arrow on given direction 
-        
+
         :param dwg :
         :type dwg : svgwrite (obj)
         :param: ptA :
@@ -274,17 +266,17 @@ class FinCommonData(object):
         :type textUp : String
         :param textDown :
         :type textup : String
-        
+
         '''
         # Right Up.
         theta = math.radians(theta)
         charWidth = 16
         xVec = np.array([1, 0])
         yVec = np.array([0, 1])
-        
+
         p1 = pt
         lengthA = offset / math.sin(theta)
-        
+
         arrowVec = None
         if(orientation == "NE"):
             arrowVec = np.array([-math.cos(theta), math.sin(theta)])
@@ -294,12 +286,12 @@ class FinCommonData(object):
             arrowVec = np.array([-math.cos(theta), -math.sin(theta)])
         elif(orientation == "SW"):
             arrowVec = np.array([math.cos(theta), -math.sin(theta)])
-            
+
         p2 = p1 - lengthA * arrowVec
-        
+
         text = textDown if len(textDown) > len(textUp) else textUp
         lengthB = len(text) * charWidth
-        
+
         labelVec = None
         if(orientation == "NE"):
             labelVec = -xVec
@@ -310,9 +302,8 @@ class FinCommonData(object):
         elif(orientation == "SW"):
             labelVec = xVec
 
-        
         p3 = p2 + lengthB * (-labelVec)
-            
+
         txtOffset = 18
         offsetVec = -yVec
 
@@ -323,11 +314,11 @@ class FinCommonData(object):
         elif(orientation == "NW"):
             txtPtUp = p3 + 0.2 * lengthB * labelVec + txtOffset * offsetVec
             txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec
-            
+
         elif(orientation == "SE"):
             txtPtUp = p2 + 0.1 * lengthB * (-labelVec) + txtOffset * offsetVec
             txtPtDwn = p2 - 0.1 * lengthB * (labelVec) - (txtOffset + 15) * offsetVec
-            
+
         elif(orientation == "SW"):
             txtPtUp = p3 + 0.1 * lengthB * labelVec + (txtOffset) * offsetVec
             txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec

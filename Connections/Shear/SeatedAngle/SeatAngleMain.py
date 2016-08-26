@@ -217,25 +217,19 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
 
-        # self.ui.comboBeamSec.addItems(get_beamcombolist())
-        # self.ui.comboColSec.addItems(get_columncombolist())
-        #         self.ui.comboBeamSec.currentIndexChanged[str].connect(self.fillPlateThickCombo)
-        #         self.ui.comboColSec.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        #         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        #         self.ui.comboPlateThick_2.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        #
+        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
+
+        # TODO checkBeam_B
+        # self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
+        # self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
+        # self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
+        #     lambda: self.populateWeldThickCombo("comboPlateThick_2"))
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
-        # Saving and Restoring the seat angle window state.
-        # self.retrieve_prevstate()
-
-        # self.ui.btnZmIn.clicked.connect(self.callZoomin)
-        # self.ui.btnZmOut.clicked.connect(self.callZoomout)
-        # self.ui.btnRotatCw.clicked.connect(self.callRotation)
         self.ui.btnFront.clicked.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
@@ -243,21 +237,20 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
-        # ************************************** Osdag logo for html***************************************************************************************************
+        # Osdag logo for html
         self.ui.btn_Design.clicked.connect(self.osdag_header)
 
-        # ************************************ Help button *********************************************************************************************************
+        # Help button
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
 
         from osdagMainSettings import backend_name
-        # Initialising the qtviewer
+
         self.display, _ = self.init_display(backend_str=backend_name())
 
         self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
-        # self.ui.btnSvgSave.clicked.connect(lambda:self.saveTopng(self.display))
 
         self.connectivity = None
         self.fuse_model = None
@@ -275,9 +268,8 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata = get_beamdata(beam_sec)
         return dictbeamdata
 
-    # -------------------------------------------------
     def fetchColumnPara(self):
-        column_sec = self.ui.comboColSec.currentText()
+        column_sec = self.ui.combo_column_section.currentText()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             dictcoldata = get_beamdata(column_sec)
@@ -313,65 +305,66 @@ class MainController(QtGui.QMainWindow):
 
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
             self.display.ExportToImage(fName)
-        QtGui.QMessageBox.about(self, 'Information', "File saved")
+            QtGui.QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
         '''
         Disables the all buttons in toolbar
         '''
-        self.ui.btn_front.setEnabled(False)
-        self.ui.btn_top.setEnabled(False)
-        self.ui.btn_side.setEnabled(False)
-
+        self.ui.btnFront.setEnabled(False)
+        self.ui.btnSide.setEnabled(False)
+        self.ui.btnTop.setEnabled(False)
         self.ui.btn3D.setEnabled(False)
         self.ui.chkBxBeam.setEnabled(False)
         self.ui.chkBxCol.setEnabled(False)
         self.ui.chkBxSeatAngle.setEnabled(False)
+        self.ui.btn_CreateDesign.setEnabled(False)
+        self.ui.btn_SaveMessages.setEnabled(False)
+
+        # Disable Menubar
+        self.ui.menubar.setEnabled(False)
 
     def enableViewButtons(self):
         '''
         Enables the all buttons in toolbar
         '''
-        self.ui.btn_front.setEnabled(True)
-        self.ui.btn_top.setEnabled(True)
-        self.ui.btn_side.setEnabled(True)
-
+        self.ui.btnFront.setEnabled(True)
+        self.ui.btnSide.setEnabled(True)
+        self.ui.btnTop.setEnabled(True)
         self.ui.btn3D.setEnabled(True)
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxSeatAngle.setEnabled(True)
+        self.ui.btn_CreateDesign.setEnabled(True)
+        self.ui.btn_SaveMessages.setEnabled(True)
+
+        self.ui.menubar.setEnabled(True)
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
-        if (uiObj != None):
-            self.ui.comboBeamSec.setCurrentIndex(self.ui.comboBeamSec.findText(uiObj['Member']['BeamSection']))
-            self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
-
-            self.ui.txtFu.setText(str(uiObj['Member']['fu (MPa)']))
-            self.ui.txtFy.setText(str(uiObj['Member']['fy (MPa)']))
+        if (uiObj is not None):
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
-            self.ui.txtShear.setText(str(uiObj['Load']['ShearForce (kN)']))
+            if uiObj['Member']['Connectivity'] == 'Beam-Beam':
+                self.ui.lbl_beam.setText('Secondary beam *')
+                self.ui.lbl_column.setText('Primary beam *')
+                self.ui.comboColSec.addItems(get_beamcombolist())
 
-            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
-            comboTypeIndex = self.ui.comboType.findText(str(uiObj['Bolt']['Type']))
-            self.ui.comboType.setCurrentIndex(comboTypeIndex)
+            self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumSection']))
+
+            self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
+            self.ui.txt_fy.setText(str(uiObj['Member']['fy (MPa)']))
+
+            self.ui.txt_shear_force.setText(str(uiObj['Load']['ShearForce (kN)']))
+
+            self.ui.combo_bolt_diameter.setCurrentIndex(self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            comboTypeIndex = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
+            self.ui.combo_bolt_type.setCurrentIndex(comboTypeIndex)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
-
-            prevValue = str(uiObj['Bolt']['Grade'])
-
-            comboGradeIndex = self.ui.comboGrade.findText(prevValue)
-
-            self.ui.comboGrade.setCurrentIndex(comboGradeIndex)
-
-            selection = str(uiObj['Plate']['Thickness (mm)'])
-            selectionIndex = self.ui.comboPlateThick_2.findText(selection)
-            self.ui.comboPlateThick_2.setCurrentIndex(selectionIndex)
-            self.ui.txtPlateLen.setText(str(uiObj['Plate']['Height (mm)']))
-            self.ui.txtPlateWidth.setText(str(uiObj['Plate']['Width (mm)']))
-
-            self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
+            comboGradeIndex = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
+            self.ui.combo_bolt_grade.setCurrentIndex(comboGradeIndex)
 
     def setimage_connection(self):
         '''
@@ -403,22 +396,22 @@ class MainController(QtGui.QMainWindow):
         '''
         uiObj = {}
         uiObj["Bolt"] = {}
-        uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
-        uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())
-        uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
+        uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText().toInt()[0]
+        uiObj["Bolt"]["Grade"] = float(self.ui.combo_bolt_grade.currentText())
+        uiObj["Bolt"]["Type"] = str(self.ui.combo_bolt_type.currentText())
 
         uiObj['Member'] = {}
-        uiObj['Member']['BeamSection'] = str(self.ui.comboBeamSec.currentText())
-        uiObj['Member']['ColumSection'] = str(self.ui.comboColSec.currentText())
+        uiObj['Member']['BeamSection'] = str(self.ui.combo_beam_section.currentText())
+        uiObj['Member']['ColumSection'] = str(self.ui.combo_column_section.currentText())
         uiObj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
-        uiObj['Member']['fu (MPa)'] = self.ui.txtFu.text().toInt()[0]
-        uiObj['Member']['fy (MPa)'] = self.ui.txtFy.text().toInt()[0]
+        uiObj['Member']['fu (MPa)'] = self.ui.txt_fu.text().toInt()[0]
+        uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text().toInt()[0]
 
         uiObj['Load'] = {}
-        uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text().toInt()[0]
+        uiObj['Load']['ShearForce (kN)'] = self.ui.txt_shear_force.text().toInt()[0]
 
         uiObj['Angle'] = {}
-        uiObj['Angle']['AngleSection'] = str(self.ui.comboAngleSec.currentText())
+        uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
 
         return uiObj
 
@@ -451,25 +444,26 @@ class MainController(QtGui.QMainWindow):
         '''
         outObj = {}
         outObj['SeatAngle'] = {}
-        outObj['SeatAngle']["Length (mm)"] = float(self.ui.txtSeatLength.text())
-        outObj['SeatAngle']["Moment Demand (kNm)"] = float(self.ui.txtExtMomnt.text())
-        outObj['SeatAngle']["Moment Capacity (kNm)"] = float(self.ui.txtMomntCapacity.text())
-        outObj['SeatAngle']["Shear Demand (kN/mm)"] = float(self.ui.txtShearDemand.text())
-        outObj['SeatAngle']["Shear Capacity (kN/mm)"] = float(self.ui.txtShearCapacity_2.text())
-        outObj['SeatAngle']["Beam Shear Strength (kN/mm)"] = float(self.ui.txtBeamShearStrength.text())
+        outObj['SeatAngle']["Length (mm)"] = float(self.ui.txt_seat_length.text())
+        outObj['SeatAngle']["Moment Demand (kNm)"] = float(self.ui.txt_moment_demand.text())
+        outObj['SeatAngle']["Moment Capacity (kNm)"] = float(self.ui.txt_moment_capacity.text())
+        outObj['SeatAngle']["Shear Demand (kN/mm)"] = float(self.ui.txt_seat_shear_demand.text())
+        outObj['SeatAngle']["Shear Capacity (kN/mm)"] = float(self.ui.txt_seat_shear_capacity.text())
+        # TODO confirm after checking UI: beam shear strength (mostly) vs seat shear strength(?)
+        outObj['SeatAngle']["Beam Shear Strength (kN/mm)"] = float(self.ui.txt_seat_shear_strength.text())
 
         outObj['Bolt'] = {}
-        outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txtShearCapacity.text())
-        outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txtBearingCapacity.text())
-        outObj['Bolt']["Capacity Of Bolt (kN)"] = float(self.ui.txtBoltCapacity.text())
-        outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txtBoltGroupCapacity.text())
-        outObj['Bolt']["No Of Bolts"] = float(self.ui.txtNoBolts.text())
-        outObj['Bolt']["No.Of Row"] = int(self.ui.txt_row.text())
-        outObj['Bolt']["No.Of Column"] = int(self.ui.txt_col.text())
-        outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txtPitch.text())
-        outObj['Bolt']["Guage Distance (mm)"] = float(self.ui.txtGuage.text())
-        outObj['Bolt']["End Distance (mm)"] = float(self.ui.txtEndDist.text())
-        outObj['Bolt']["Edge Distance (mm)"] = float(self.ui.txtEdgeDist.text())
+        outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
+        outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txt_bolt_bearing_capacity.text())
+        outObj['Bolt']["Capacity Of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
+        outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txt_bolt_group_capacity.text())
+        outObj['Bolt']["No Of Bolts"] = float(self.ui.txt_no_bolts.text())
+        outObj['Bolt']["No.Of Row"] = int(self.ui.txt_bolt_rows.text())
+        outObj['Bolt']["No.Of Column"] = int(self.ui.txt_bolt_cols.text())
+        outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
+        outObj['Bolt']["Guage Distance (mm)"] = float(self.ui.txt_bolt_gauge.text())
+        outObj['Bolt']["End Distance (mm)"] = float(self.ui.txt_end_distance.text())
+        outObj['Bolt']["Edge Distance (mm)"] = float(self.ui.txt_edge_distance.text())
 
         return outObj
 
@@ -478,11 +472,20 @@ class MainController(QtGui.QMainWindow):
         design_report_dialog.show()
 
     def save_design(self):
-        self.outdict = self.outputdict()
-        self.inputdict = self.getuser_inputs()
-        self.save_yaml(self.outdict, self.inputdict)
 
-        # self.save(self.outdict,self.inputdict)
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
+                                                                   "Html Files (*.html)")
+        fileName = str(fileName)
+        base, base_front, base_top, base_side = self.call2D_Drawing("All")
+        inputdict = self.uiObj
+        outdict = self.resultObj
+
+        dictBeamData = self.fetchBeamPara()
+        dictColData = self.fetchColumnPara()
+        save_html(outdict, inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base,
+                  base_front, base_top, base_side)
+
+        QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
@@ -511,29 +514,30 @@ class MainController(QtGui.QMainWindow):
         Resets all fields in input as well as output window
     
         '''
-        # user Inputs
+        # Input
 
-        self.ui.comboDiameter.setCurrentIndex(0)
-        self.ui.comboGrade.setCurrentIndex(0)
-        self.ui.comboType.setCurrentIndex(0)
-
-        self.ui.comboBeamSec.setCurrentIndex(0)
-        self.ui.comboColSec.setCurrentIndex(0)
+        self.ui.combo_beam_section.setCurrentIndex(0)
+        self.ui.combo_column_section.setCurrentIndex(0)
         self.ui.comboConnLoc.setCurrentIndex(0)
-        self.ui.txtFu.clear()
-        self.ui.txtFy.clear()
+        self.ui.txt_fu.clear()
+        self.ui.txt_fy.clear()
 
-        self.ui.txtShear.clear()
+        self.ui.txt_shear_force.clear()
 
-        self.ui.comboAngleSec.setCurrentIndex(0)
+        self.ui.combo_bolt_diameter.setCurrentIndex(0)
+        self.ui.combo_bolt_grade.setCurrentIndex(0)
+        self.ui.combo_bolt_type.setCurrentIndex(0)
 
-        # ----Output
+        self.ui.combo_angle_section.setCurrentIndex(0)
 
-        self.ui.txtSeatLength.clear()
-        self.ui.txtExtMomnt.clear()
-        self.ui.txtMomntCapacity.clear()
-        self.ui.txtShearDemand.clear()
-        self.ui.txtShearCapacity.clear()
+        # Output
+
+        self.ui.txt_seat_length.clear()
+        self.ui.txt_moment_demand.clear()
+        self.ui.txt_moment_capacity.clear()
+        self.ui.txt_seat_shear_demand.clear()
+        self.ui.txt_seat_shear_capacity.clear()
+        # TODO placeholder
         self.ui.txtBeamShearStrength.clear()
 
         self.ui.txtShrCapacity_2.clear()

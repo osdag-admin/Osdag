@@ -1,0 +1,5 @@
+This converts designer file(.ui file)to python file (.py file)
+pyuic4 -x finplatewindow.ui -o ui_finplatewindow.py
+
+This compiles resource file (.qrc file) to python file(.pyfile)
+pyrcc4 ./ResourceFiles/icons.qrc -o icons_rc.py

@@ -94,7 +94,7 @@ class DesignReportDialog(QtGui.QDialog):
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, str(self.mainController.folder) + "/css/cmpylogoFin.png")
+        shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoFin.png")
 
     def saveUserProfile(self):
         inputData = self.getPopUpInputs()
@@ -143,18 +143,18 @@ class MainController(QtGui.QMainWindow):
         self.ui.setupUi(self)
         self.folder = folder
 
-        self.ui.comboBeamSec.addItems(get_beamcombolist())
-        self.ui.comboColSec.addItems(get_columncombolist())
-        self.ui.comboAngleSec.addItems(get_anglecombolist())
+        self.ui.combo_beam_section.addItems(get_beamcombolist())
+        self.ui.combo_column_section.addItems(get_columncombolist())
+        self.ui.combo_angle_section.addItems(get_anglecombolist())
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.gradeType = {'Please Select Type': '',
+        self.grade_type = {'Please Select Type': '',
                           'HSFG': [8.8, 10.8],
                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
-        self.ui.comboType.addItems(self.gradeType.keys())
-        self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
-        self.ui.comboType.setCurrentIndex(0)
+        self.ui.combo_bolt_type.addItems(self.gradeType.keys())
+        self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
+        self.ui.combo_bolt_type.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
@@ -172,18 +172,18 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
 
         validator = QtGui.QIntValidator()
-        self.ui.txtFu.setValidator(validator)
-        self.ui.txtFy.setValidator(validator)
+        self.ui.txt_fu.setValidator(validator)
+        self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QtGui.QDoubleValidator()
         #TODO add exhaustive validators
-        self.ui.txtShear.setValidator(dbl_validator)
-        self.ui.txtShear.setMaxLength(7)
+        self.ui.txt_shear_force.setValidator(dbl_validator)
+        self.ui.txt_shear_force.setMaxLength(7)
 
-        minfuVal = 290
-        maxfuVal = 590
-        self.ui.txtFu.editingFinished.connect(
-            lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, minfuVal, maxfuVal))
+        min_fu_value = 290
+        max_fu_value = 590
+        self.ui.txt_fu.editingFinished.connect(
+            lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu_value, max_fu_value))
 
         minfyVal = 165
         maxfyVal = 450
@@ -227,15 +227,15 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
-        self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
+        self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
         # Saving and Restoring the seat angle window state.
         # self.retrieve_prevstate()
 
-        self.ui.btnZmIn.clicked.connect(self.callZoomin)
-        self.ui.btnZmOut.clicked.connect(self.callZoomout)
-        self.ui.btnRotatCw.clicked.connect(self.callRotation)
+        # self.ui.btnZmIn.clicked.connect(self.callZoomin)
+        # self.ui.btnZmOut.clicked.connect(self.callZoomout)
+        # self.ui.btnRotatCw.clicked.connect(self.callRotation)
         self.ui.btnFront.clicked.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
@@ -252,9 +252,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
 
-        # -------------------------------------------------
+        from osdagMainSettings import backend_name
         # Initialising the qtviewer
-        self.display, _ = self.init_display(backend_str="pyqt4")
+        self.display, _ = self.init_display(backend_str=backend_name())
 
         self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
         # self.ui.btnSvgSave.clicked.connect(lambda:self.saveTopng(self.display))
@@ -262,6 +262,28 @@ class MainController(QtGui.QMainWindow):
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
+        self.resultObj = None
+        self.uiObj = None
+
+    def osdag_header(self):
+        # osdag_header() and store_osdagheader(str) functions are combined here
+        image_path = "../../ResourceFiles/Osdag_header.png"
+        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+
+    def fetchBeamPara(self):
+        beam_sec = self.ui.combo_beam.currentText()
+        dictbeamdata = get_beamdata(beam_sec)
+        return dictbeamdata
+
+    # -------------------------------------------------
+    def fetchColumnPara(self):
+        column_sec = self.ui.comboColSec.currentText()
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Beam-Beam":
+            dictcoldata = get_beamdata(column_sec)
+        else:
+            dictcoldata = get_columndata(column_sec)
+        return dictcoldata
 
     def showFontDialogue(self):
 

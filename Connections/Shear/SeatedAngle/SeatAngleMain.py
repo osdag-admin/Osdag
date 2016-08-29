@@ -188,12 +188,12 @@ class MainController(QtGui.QMainWindow):
         min_fy_value = 165
         max_fy_value = 450
         self.ui.txt_fy.editingFinished.connect(
-            lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value)
+            lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
 
         # Menu Bar
-
         # File Menu
-        self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
+
+        self.ui.actionSave_front_view.triggered.connect(lambda:self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
         #TODO update ui variables with appropiate names and code below
@@ -1180,7 +1180,7 @@ class MainController(QtGui.QMainWindow):
     #
     #         # start_display()
 
-    def call2D_Drawing(self, view):
+    def call2D_Drawing(view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
             '''
@@ -1235,7 +1235,7 @@ class MainController(QtGui.QMainWindow):
             f = open(fileName, 'w')
 
             self.callDesired_View(fileName, view, base_front, base_top, base_side)
-            f.close() #TODO check with fin plate module
+            # f.close() #TODO check with fin plate module
 
         print "basenameee", base
         print "base front", base1
@@ -1272,7 +1272,7 @@ class MainController(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
-#TODO placeholder
+
     # Following functions are trimmed in Seated angle module
         # about_osdag(), MyAboutOsdag(), tutorials(), MyTutorials(), open_tutorials()
     # open_osdag() also calls about_osdag()
@@ -1304,8 +1304,10 @@ def set_osdaglogger():
 
     logger.setLevel(logging.DEBUG)
 
-    # create the logging file handler
-    fh = logging.FileHandler("Connections/Shear/SeatedAngle/seatangle.log", mode="a")
+    # while launching from Osdag Main:
+    # fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="a")
+    # while launching from Seated angle folder
+    fh = logging.FileHandler("./seatangle.log", mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1325,11 +1327,17 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
+    # while launching from Osdag Main:
     fh = logging.FileHandler("./Connections/Shear/SeatAngle/seatangle.log", mode="w")
+    #while launching from Seated Angle folder
+    # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatAngle/log.css"/>''')
+    # while launching from Osdag Main:
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    # while launching from Seated Angle folder:
+    # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
     window = MainController()
     osdagMainWindow.hide()
@@ -1343,14 +1351,22 @@ if __name__ == '__main__':
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    fh = logging.FileHandler("Connections/Shear/SeatedAngle/seatangle.log", mode="w")
+    # while launching from Osdag Main:
+    fh = logging.FileHandler("./Connections/Shear/SeatAngle/seatangle.log", mode="w")
+    # while launching from Seated Angle folder
+    # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
+    # while launching from Osdag Main:
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    # while launching from Seated Angle folder:
+    # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
     app = QtGui.QApplication(sys.argv)
     module_setup()
     window = MainController()
     window.show()
     sys.exit(app.exec_())
+
+#TODO : connect to osdag main window

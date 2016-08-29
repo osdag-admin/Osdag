@@ -42,7 +42,7 @@ from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
 
 from reportGenerator import *
-from ui_seat_angle import Ui_MainWindow
+from ui_seat_angle import Ui_MainWindow #this is the revised ui
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
@@ -193,13 +193,13 @@ class MainController(QtGui.QMainWindow):
         # Menu Bar
 
         # File Menu
-        self.ui.actionSave_Front_View.triggered.connect(lambda: self.call2D_Drawing("Front"))
-        self.ui.actionSave_Side_View.triggered.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.actionSave_Top_View.triggered.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
+        self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
         #TODO update ui variables with appropiate names and code below
-        self.ui.actionQuit_seat_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_seat_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_seat_plate_design.triggered.connect(QtGui.qApp.quit)
+        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
+        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
+        self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -1076,7 +1076,6 @@ class MainController(QtGui.QMainWindow):
             final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
         return final_model
 
-    #TODO placeholder
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
@@ -1087,7 +1086,7 @@ class MainController(QtGui.QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', "/home/jeffy/Cadfiles/untitled.igs", files_types)
+        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
@@ -1099,7 +1098,6 @@ class MainController(QtGui.QMainWindow):
             iges_writer.Write(fName)
 
         elif file_extension == 'brep':
-
             BRepTools.breptools.Write(shape, fName)
 
         elif file_extension == 'stp':
@@ -1138,145 +1136,132 @@ class MainController(QtGui.QMainWindow):
         else:
             pass
 
-    def display2DModel(self, final_model, viewName):
+    # def display2DModel(self, final_model, viewName):
+    #
+    #     # display, start_display, _, _ = self.simpleGUI()
+    #     # self.display2d,_,_ = self.init_display(backend_str="pyqt4")
+    #     self.display.EraseAll()
+    #
+    #     self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+    #
+    #     self.display.SetModeHLR()
+    #     # self.display.SetModeShaded()
+    #     # Get Context
+    #     ais_context = self.display.GetContext().GetObject()
+    #
+    #     # Get Prs3d_drawer from previous context
+    #     drawer_handle = ais_context.DefaultDrawer()
+    #     drawer = drawer_handle.GetObject()
+    #     drawer.EnableDrawHiddenLine()
+    #
+    #     hla = drawer.HiddenLineAspect().GetObject()
+    #     hla.SetWidth(2)
+    #     hla.SetColor(Quantity_NOC_RED)
+    #
+    #     # increase line width in the current viewer
+    #     # This is only viewed in the HLR mode (hit 'e' key for instance)
+    #
+    #     line_aspect = drawer.SeenLineAspect().GetObject()
+    #     line_aspect.SetWidth(2.8)
+    #     line_aspect.SetColor(Quantity_NOC_BLUE1)
+    #
+    #     self.display.DisplayShape(final_model, update=False)
+    #
+    #     if (viewName == "Front"):
+    #         self.display.View_Front()
+    #     elif (viewName == "Top"):
+    #         self.display.View_Top()
+    #     elif (viewName == "Right"):
+    #         self.display.View_Right()
+    #     elif (viewName == "Left"):
+    #         self.display.View_Left()
+    #     else:
+    #         pass
+    #
+    #         # start_display()
 
-        # display, start_display, _, _ = self.simpleGUI()
-        # self.display2d,_,_ = self.init_display(backend_str="pyqt4")
-        self.display.EraseAll()
+    def call2D_Drawing(self, view):
+        ''' This routine saves the 2D SVG image as per the connectivity selected
+            SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
+            '''
+        base = ''
 
-        self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+        loc = self.ui.comboConnLoc.currentText()
+        if view == "All":
+            fileName = ''
+            base_front = ''
+            base_side = ''
+            base_top = ''
 
-        self.display.SetModeHLR()
-        # self.display.SetModeShaded()
-        # Get Context
-        ais_context = self.display.GetContext().GetObject()
+            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-        # Get Prs3d_drawer from previous context
-        drawer_handle = ais_context.DefaultDrawer()
-        drawer = drawer_handle.GetObject()
-        drawer.EnableDrawHiddenLine()
+            if loc == "Column flange-Beam web":
 
-        hla = drawer.HiddenLineAspect().GetObject()
-        hla.SetWidth(2)
-        hla.SetColor(Quantity_NOC_RED)
+                data = str(self.folder) + "/css/3D_ModelSeatFB.png"
+                for n in range(1, 100, 1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelSeatFB" + str(n) + ".png"
+                        continue
+                base = os.path.basename(str(data))
+                print "basenameee", base
 
-        # increase line width in the current viewer
-        # This is only viewed in the HLR mode (hit 'e' key for instance)
+            elif loc == "Column web-Beam web":
+                data = str(self.folder) + "/css/3D_ModelSeatWB.png"
+                for n in range(1, 100, 1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelSeatWB" + str(n) + ".png"
+                        continue
+                base = os.path.basename(str(data))
 
-        line_aspect = drawer.SeenLineAspect().GetObject()
-        line_aspect.SetWidth(2.8)
-        line_aspect.SetColor(Quantity_NOC_BLUE1)
 
-        self.display.DisplayShape(final_model, update=False)
+            else:
+                data = str(self.folder) + "/css/3D_ModelSeatBB.png"
+                for n in range(1, 100, 1):
+                    if (os.path.exists(data)):
+                        data = str(self.folder) + "/css/3D_ModelSeatBB" + str(n) + ".png"
+                        continue
+                base = os.path.basename(str(data))
 
-        if (viewName == "Front"):
-            self.display.View_Front()
-        elif (viewName == "Top"):
-            self.display.View_Top()
-        elif (viewName == "Right"):
-            self.display.View_Right()
-        elif (viewName == "Left"):
-            self.display.View_Left()
+            self.display.ExportToImage(data)
+
+
         else:
-            pass
+            #             fileName = webbrowser.open_new(r'file:///untitled.svg')
 
-            # start_display()
+            fileName = QtGui.QFileDialog.getSaveFileName(self,
+                                                         "Save SVG", str(self.folder) + '/untitled.svg',
+                                                         "SVG files (*.svg)")
+            f = open(fileName, 'w')
 
-    def call_Frontview(self):
+            self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            f.close() #TODO check with fin plate module
 
-        '''Displays front view of 2Dmodel
-        '''
-        self.ui.btnSvgSave.setEnabled(False)
+        print "basenameee", base
+        print "base front", base1
+        print "base side", base2
+        print "base top", base3
+        return (base, base1, base2, base3)
+
+    def callDesired_View(self, fileName, view, base_front, base_top, base_side):
+
+        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-        if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-            self.display.EraseAll()
-            self.ui.mytabWidget.setCurrentIndex(1)
-            if self.connectivity == None:
-                self.connectivity = self.create3DColWebBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Front")
+        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-            self.call2D_Drawing()
-        else:
-            self.display.EraseAll()
-            self.ui.mytabWidget.setCurrentIndex(0)
-            if self.connectivity == None:
-                self.connectivity = self.create3DColFlangeBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Left")
-            self.call2D_Drawing()
-
-    def call2D_Drawing(self):
-        uiObj = self.getuser_inputs()
-
-        resultObj = SeatAngleConn(uiObj)
+        #TODO update for common logic. Won't work currently
+        uiObj = self.uiObj
+        resultObj = self.resultObj
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
-        fin2DFront = Fin2DCreatorFront(uiObj, resultObj, dictbeamdata, dictcoldata)
-        fin2DFront.saveToSvg()
-
-    def call_Topview(self):
-
-        '''Displays Top view of 2Dmodel
-        '''
-        self.ui.btnSvgSave.setEnabled(False)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-
-        if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-            self.display.EraseAll()
-            self.ui.mytabWidget.setCurrentIndex(1)
-
-            if self.connectivity == None:
-                self.connectivity = self.create3DColWebBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Top")
-        else:
-            self.display.EraseAll()
-            self.ui.mytabWidget.setCurrentIndex(0)
-
-            if self.connectivity == None:
-                self.connectivity = self.create3DColFlangeBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Top")
-
-    def call_Sideview(self):
-
-        '''Displays Side view of the 2Dmodel'
-        '''
-        self.ui.btnSvgSave.setEnabled(False)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-
-        if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-            self.ui.mytabWidget.setCurrentIndex(1)
-
-            if self.connectivity == None:
-                self.connectivity = self.create3DColWebBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Right")
-        else:
-            self.ui.mytabWidget.setCurrentIndex(0)
-
-            if self.connectivity == None:
-                self.connectivity = self.create3DColFlangeBeamWeb()
-            if self.fuse_model == None:
-                self.fuse_model = self.create2Dcad(self.connectivity)
-            self.display2DModel(self.fuse_model, "Front")
+        seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
+        base_front, base_top, base_side = seatCommonObj.saveToSvg(str(fileName), view, base_front, base_top,
+                                                                 base_side)
+        return (base_front, base_top, base_side)
+        print"sucessfully worked"
 
     def closeEvent(self, event):
-        '''
-        Closing Seat Angle window.
-        '''
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
         reply = QtGui.QMessageBox.question(self, 'Message',
@@ -1287,32 +1272,56 @@ class MainController(QtGui.QMainWindow):
             event.accept()
         else:
             event.ignore()
+#TODO placeholder
+    # Following functions are trimmed in Seated angle module
+        # about_osdag(), MyAboutOsdag(), tutorials(), MyTutorials(), open_tutorials()
+    # open_osdag() also calls about_osdag()
+    def open_osdag(self):
+        # dialog=MyAboutOsdag(self)
+        # dialog.show()
+        pass
 
+    def sample_report(self):
+        #TODO: update path below
+        # url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder',
+        #                    'Sample_Report', 'The_PyQt4_tutorial.pdf')
+        # webbrowser.open_new(r'file:///' + url)
+        pass
+
+    def sample_problem(self):
+        # webbrowser.open_new(
+        #     r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
+        pass
 
 def set_osdaglogger():
-    logger = logging.getLogger("osdag")
+    global logger
+    if logger == None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
     logger.setLevel(logging.DEBUG)
 
     # create the logging file handler
-    fh = logging.FileHandler("./seatangle.log", mode="a")
+    fh = logging.FileHandler("Connections/Shear/SeatedAngle/seatangle.log", mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     formatter = logging.Formatter('''
-    <div  class="LOG %(levelname)s">
-        <span class="DATE">%(asctime)s</span>
-        <span class="LEVEL">%(levelname)s</span>
-        <span class="MSG">%(message)s</span>
-    </div>''')
+      <div  class="LOG %(levelname)s">
+          <span class="DATE">%(asctime)s</span>
+          <span class="LEVEL">%(levelname)s</span>
+          <span class="MSG">%(message)s</span>
+      </div>''')
     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
     fh.setFormatter(formatter)
 
-    # add handler to logger object
     logger.addHandler(fh)
 
-
-def launchSeatedAngleController(osdagMainWindow):
+def launchSeatedAngleController(osdagMainWindow, folder):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
@@ -1322,30 +1331,26 @@ def launchSeatedAngleController(osdagMainWindow):
     rawLogger.addHandler(fh)
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatAngle/log.css"/>''')
 
-    # app = QtGui.QApplication(sys.argv)
     window = MainController()
     osdagMainWindow.hide()
 
     window.show()
     window.closed.connect(osdagMainWindow.show)
 
-    # sys.exit(app.exec_())
-
-
 if __name__ == '__main__':
-    # launchFinPlateController(None)
+    # launchSeatAngleController(None)
 
-    # linking css to log file to display colour logs.
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    fh = logging.FileHandler("fin.log", mode="w")
+    fh = logging.FileHandler("Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
 
     app = QtGui.QApplication(sys.argv)
+    module_setup()
     window = MainController()
     window.show()
     sys.exit(app.exec_())

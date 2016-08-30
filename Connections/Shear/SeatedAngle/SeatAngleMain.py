@@ -164,6 +164,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
         # self.ui.btn_front.clicked.connect(self.call_Frontview)
+        # self.ui.btn_front.clicked.connect(self.call_Frontview)
         # self.ui.btn_top.clicked.connect(self.call_Topview)
         # self.ui.btn_side.clicked.connect(self.call_Sideview)
 
@@ -249,7 +250,7 @@ class MainController(QtGui.QMainWindow):
 
         from osdagMainSettings import backend_name
 
-        self.display, _ = self.init_display(backend_str=backend_name())
+        self.display, self.start_display = self.init_display(backend_str=backend_name())
 
         self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 
@@ -271,7 +272,7 @@ class MainController(QtGui.QMainWindow):
 
     def fetchColumnPara(self):
         column_sec = self.ui.combo_column_section.currentText()
-        loc = self.ui.comboConnLoc.currentText()
+        loc = self.ui.combo_connectivity.currentText()
         if loc == "Beam-Beam":
             dictcoldata = get_beamdata(column_sec)
         else:
@@ -345,7 +346,7 @@ class MainController(QtGui.QMainWindow):
         uiObj = self.get_prevstate()
         if (uiObj is not None):
 
-            self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
+            self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.lbl_beam.setText('Secondary beam *')
@@ -372,7 +373,7 @@ class MainController(QtGui.QMainWindow):
         Setting image to connctivity.
         '''
         self.ui.lbl_connectivity.show()
-        loc = self.ui.comboConnLoc.currentText()
+        loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
             pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
@@ -404,7 +405,7 @@ class MainController(QtGui.QMainWindow):
         uiObj['Member'] = {}
         uiObj['Member']['BeamSection'] = str(self.ui.combo_beam_section.currentText())
         uiObj['Member']['ColumSection'] = str(self.ui.combo_column_section.currentText())
-        uiObj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
+        uiObj['Member']['Connectivity'] = str(self.ui.combo_connectivity.currentText())
         uiObj['Member']['fu (MPa)'] = self.ui.txt_fu.text().toInt()[0]
         uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text().toInt()[0]
 
@@ -523,7 +524,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.combo_beam_section.setCurrentIndex(0)
         self.ui.combo_column_section.setCurrentIndex(0)
-        self.ui.comboConnLoc.setCurrentIndex(0)
+        self.ui.combo_connectivity.setCurrentIndex(0)
         self.ui.txt_fu.clear()
         self.ui.txt_fy.clear()
 
@@ -735,7 +736,6 @@ class MainController(QtGui.QMainWindow):
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                       (resolution.height() / 2) - (self.frameSize().height() / 2))
-
         def start_display():
 
             self.ui.modelTab.raise_()
@@ -752,12 +752,15 @@ class MainController(QtGui.QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def display3Dmodel(self, component):
+        # TODO check display initialisation in other modules
+        self.display, _ = self.init_display()
+
         self.display.EraseAll()
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
-        loc = self.ui.comboConnLoc.currentText()
+        loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
         else:
@@ -981,12 +984,12 @@ class MainController(QtGui.QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
 
         if flag == True:
-            if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
+            if self.ui.combo_connectivity.currentText() == "Column web-Beam web":
                 # self.create3DColWebBeamWeb()
                 self.connectivity = self.create3DColWebBeamWeb()
                 self.fuse_model = None
 
-            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
+            elif self.ui.combo_connectivity.currentText() == "Column flange-Beam web":
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create3DColFlangeBeamWeb()
                 self.fuse_model = None
@@ -1191,7 +1194,7 @@ class MainController(QtGui.QMainWindow):
             '''
         base = ''
 
-        loc = self.ui.comboConnLoc.currentText()
+        loc = self.ui.combo_connectivity.currentText()
         if view == "All":
             fileName = ''
             base_front = ''

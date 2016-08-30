@@ -307,7 +307,8 @@ class CommonDesignLogic(object):
         return colflangeconn
     #=========================================================================================
 
-    def display_3DModel(self):
+    def display_3DModel(self, component):
+        self.component = component
 
         self.display.EraseAll()
 
@@ -359,7 +360,7 @@ class CommonDesignLogic(object):
             else:
                 self.connectivityObj = self.create3DBeamWebBeamWeb()
 
-            self.display_3DModel()
+            self.display_3DModel("Model")
 
         else:
             self.display.EraseAll()
@@ -426,7 +427,7 @@ class CommonDesignLogic(object):
 
     #=========================================================================================
 
-    def laod_userProfile(self):
+    def load_userProfile(self):
         pass
 
     #=========================================================================================
@@ -441,20 +442,3 @@ class CommonDesignLogic(object):
     #=========================================================================================
     def save_CADimages(self):  # png,jpg and tiff
         pass
-    #=========================================================================================
-
-    def save_CADformats(self):  # stl,igs,step,brep
-
-        pass
-
-    #=========================================================================================
-
-
-
-
-
-
-
-
-
-

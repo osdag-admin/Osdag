@@ -209,7 +209,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
         self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_curren_image_as.triggered.connect(self.save2DcadImages)
+        self.ui.actionSave_curren_image_as.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
         # graphics
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
@@ -251,19 +251,13 @@ class MainController(QtGui.QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-        # Initialising the qtviewer
 
-        # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
-        # self.ui.btnSvgSave.clicked.connect(lambda:self.saveTopng(self.display))
-
-#         self.dictbeamdata = self.fetchBeamPara()
-#         self.dictcoldata = self.fetchColumnPara()
-        # self.loc = self.ui.comboConnLoc.currentText()
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
+        self.commLogicObj = None
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
@@ -404,7 +398,7 @@ class MainController(QtGui.QMainWindow):
     def call_Pannig(self):
         self.display.Pan(50, 0)
 
-    def save2DcadImages(self):
+    def save_cadImages(self):
 
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
         fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
@@ -647,7 +641,6 @@ class MainController(QtGui.QMainWindow):
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
-        # yaml.dump(uiObj, inputFile,allow_unicode=True, default_flow_style = False)
         pickle.dump(uiObj, inputFile)
 
     def get_prevstate(self):
@@ -980,47 +973,6 @@ class MainController(QtGui.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    # def display3Dmodel(self, component):
-    #
-    #     self.display.EraseAll()
-    #
-    #     self.display.SetModeShaded()
-    #
-    #     self.display.DisableAntiAliasing()
-    #
-    #     # self.display.set_bg_gradient_color(23,1,32,150,150,170)
-    #     self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-    #
-    #     loc = self.ui.comboConnLoc.currentText()
-    #     if loc == "Column flange-Beam web":
-    #         self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
-    #     else:
-    #         self.display.View_Iso()
-    #         self.display.FitAll()
-    #
-    #     if component == "Column":
-    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-    #     elif component == "Beam":
-    #         osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-    #         # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
-    #     elif component == "Finplate":
-    #         osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
-    #         for nutbolt in nutboltlist:
-    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-    #         # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
-    #     elif component == "Model":
-    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-    #         osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
-    #         for nutbolt in nutboltlist:
-    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-
     def checkBeam_B(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
@@ -1160,47 +1112,8 @@ class MainController(QtGui.QMainWindow):
 
     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-    def call_3DModel(self, flag): 
-        # self.ui.btnSvgSave.setEnabled(True)
-        self.ui.btn3D.setChecked(QtCore.Qt.Checked)
-        if self.ui.btn3D.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
-            self.ui.mytabWidget.setCurrentIndex(0)
-
-        if flag is True:
-            if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-                # self.create3DColWebBeamWeb()
-                self.connectivity = self.create3DColWebBeamWeb()
-                self.fuse_model = None
-
-            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DColFlangeBeamWeb()
-                self.fuse_model = None
-
-            else:
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DBeamWebBeamWeb()
-                self.fuse_model = None
-
-            self.display3Dmodel("Model")
-            # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
-            # gpBeamOrigin = getGpPt(beamOrigin)
-            # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-            # self.display.DisplayShape(my_sphere2,color = 'red',update = True)
-            # beamOrigin = self.connectivity.beam.secOrigin 
-            # gpBeamOrigin = getGpPt(beamOrigin)
-            # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-            # self.display.DisplayShape(my_sphere2,color = 'blue',update = True)
-            # plateOrigin =  (self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0 * (self.connectivity.plate.vDir) + self.connectivity.plate.T * (-self.connectivity.weldLeft.uDir))
-            # gpPntplateOrigin=  getGpPt(plateOrigin)
-            # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
-            # self.display.DisplayShape(my_sphere,update=True)
-
-        else:
-            self.display.EraseAll()
+    def call_3DModel(self, flag):
+        self.commLogicObj.call_3DModel(flag)
 
     def call_3DBeam(self):
         '''
@@ -1213,7 +1126,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Beam")
+        self.commLogicObj.display_3DModel("Beam")
 
     def call_3DColumn(self):
         '''
@@ -1224,10 +1137,11 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.display3Dmodel("Column")
+        self.commLogicObj.display_3DModel("Column")
 
     def call_3DFinplate(self):
-        '''Displaying FinPlate in 3D
+        '''
+        Displaying FinPlate in 3D
         '''
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Checked)
         if self.ui.chkBxFinplate.isChecked():
@@ -1236,9 +1150,12 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Finplate")
+        self.commLogicObj.display_3DModel("Finplate")
 
     def unchecked_allChkBox(self):
+        '''
+        This routine is responsible for unchecking all checkboxes in GUI
+        '''
 
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
@@ -1246,6 +1163,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
 
     def designParameters(self):
+        '''
+        This routine returns the neccessary design parameters.
+        '''
         self.uiObj = self.getuser_inputs()
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
@@ -1261,8 +1181,6 @@ class MainController(QtGui.QMainWindow):
     def design_btnclicked(self):
         '''
         '''
-        '''
-        '''
         self.alist = self.designParameters()
 
         self.validateInputsOnDesignBtn()
@@ -1274,35 +1192,52 @@ class MainController(QtGui.QMainWindow):
         base_side = ''
         base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
 
-        self.resultObj = commLogicObj.call_finCalculation()
+        self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
         self.display_output(self.resultObj)
-        self.displaylog_totextedit(commLogicObj)
+        self.displaylog_totextedit(self.commLogicObj)
         status = self.resultObj['Bolt']['status']
 
-        commLogicObj.call_3DModel(status)
+        self.commLogicObj.call_3DModel(status)
+
 
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-    def create2Dcad(self, connectivity):
-        ''' Returns the fuse model of finplate
+    def create2Dcad(self):
+        ''' Returns the 3D model of finplate depending upon component
         '''
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.columnModel
+
+        elif self.commLogicObj.component == "Finplate":
+            cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
+                       self.commLogicObj.connectivityObj.weldModelRight,
+                       self.commLogicObj.connectivityObj.plateModel,
+                       self.commLogicObj.connectivityObj.nutBoltArray.getModels()]
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
+
     # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        if self.connectivity is None:
-            self.connectivity = self.create3DColWebBeamWeb()
+
         if self.fuse_model is None:
-            self.fuse_model = self.create2Dcad(self.connectivity)
+            self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"

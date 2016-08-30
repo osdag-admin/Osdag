@@ -26,6 +26,7 @@ import logging
 flag = 1
 logger = None
 
+
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
@@ -33,19 +34,25 @@ module_setup()
 
 # Function for net area of ordinary bolts
 # Source: Subramanian's book, page: 348
+
+
 def netArea_calc(dia):
     netArea = {12:84.5, 16:157, 20:245, 22:303, 24:353, 27:459, 30:561, 36:817};
     return netArea[dia]
 
 # BOLT: determination of shear capacity 
+
+
 def bolt_shear(dia, n, fu):
     A = netArea_calc(dia)
     root3 = math.sqrt(3);
     Vs = fu * n * A / (root3 * 1.25 * 1000);
     Vs = round(Vs.real, 3);
     return Vs
-    
+
 # BOLT: determination of bearing capacity 
+
+
 def bolt_bearing(dia, t, kb, fu):
     Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000);
     Vb = round(Vb.real, 3);
@@ -60,47 +67,55 @@ def fin_min_h(beam_d):
 
 # PLATE THICKNESS: minimum thickness of fin plate
 # [Source: Subramanian's book, page: 373]
+
+
 def fin_min_thk(shear_load, bolt_fy, web_plate_l):
     min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l);
     return min_plate_thk;
 
 # PLATE THICKNESS: maximum thickness of fin plate
 # [Source: INSDAG detailing manual, page: 5-7]
+
+
 def fin_max_thk(beam_d):
     max_plate_thk = 0.5 * beam_d;
     return max_plate_thk;
 
 # Function for block shear capacity calculation
+
+
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
     if numcol == 1:
         Avg = platethk * ((numrow - 1) * pitch + end_dist)
         Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
         Atg = platethk * edge_dist
         Atn = platethk * (edge_dist - 0.5 * dia_hole)
-        
+
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1, Tdb2)
+        Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
-        
+
     elif numcol == 2:
         Avg = platethk * ((numrow - 1) * pitch + end_dist)
         Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
         Atg = platethk * (edge_dist + gauge)
         Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
-        
+
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1, Tdb2)
+        Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
-        
+
     return Tdb
-        
+
+
 def fetchBeamPara(self):
     beam_sec = self.ui.combo_Beam.currentText()
     dictbeamdata = get_beamdata(beam_sec)
     return dictbeamdata
-     
+
+
 def fetchColumnPara(self):
     column_sec = self.ui.comboColSec.currentText()
     loc = self.ui.comboConnLoc.currentText()
@@ -111,29 +126,31 @@ def fetchColumnPara(self):
     return dictcoldata
 ##################################################################################
 # Start of main program
+
+
 def finConn(uiObj):
-    
+
     global logger
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumSection']
     connectivity = uiObj['Member']['Connectivity']
     beam_fu = uiObj['Member']['fu (MPa)']
     beam_fy = uiObj['Member']['fy (MPa)']
-                    
+
     shear_load = uiObj['Load']['ShearForce (kN)']
-                        
+
     bolt_dia = uiObj['Bolt']['Diameter (mm)']
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = uiObj['Bolt']['Grade']
-                    
+
     web_plate_t = uiObj['Plate']['Thickness (mm)']
     web_plate_w = uiObj['Plate']['Width (mm)']
     web_plate_l = uiObj['Plate']['Height (mm)']
     web_plate_fu = uiObj['Member']['fu (MPa)']
     web_plate_fy = uiObj['Member']['fy (MPa)']
-                    
+
     weld_t = uiObj["Weld"]['Size (mm)']
-       
+
 #####################################################################################
 
 # Hard-code input data required to check overall calculation as independent file  
@@ -142,11 +159,10 @@ def finConn(uiObj):
 #     connectivity = "Column flange-Beam web"
 #     beam_fu = 410
 #     beam_fy = 250
-#     beam_w_t = 8.9   
+#     beam_w_t = 8.9
 #     beam_d = 400
 #     beam_f_t = 16
-#     beam_R1 = 14   
-#     PBeam_T = 17.2
+#     beam_R1 = 14   #     PBeam_T = 17.2
 #     PBeam_R1 = 17
 #     shear_load = 140
 #     bolt_dia = 20
@@ -168,7 +184,7 @@ def finConn(uiObj):
     else:
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_columndata(column_sec)
-     
+    
     beam_w_t = float(dictbeamdata[QString("tw")])
     beam_f_t = float(dictbeamdata[QString("T")])
     beam_d = float(dictbeamdata[QString("D")])
@@ -178,29 +194,29 @@ def finConn(uiObj):
 
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
-    
+
     # Plate thickness check
     if web_plate_t < beam_w_t:
         web_plate_t = beam_w_t
         logger.error(": Chosen web plate thickness is not sufficient")
         logger.warning(" : Minimum required thickness %2.2f mm" % (beam_w_t))
-    
+
     # # Plate height check
-    
+
     # Maximum plate height for Column-Beam connectivity (Note: # 5 mm extra gap is provided from top and bottom)
     if connectivity == "Column flange-Beam web" or connectivity == "Column web-Beam web":
-        max_plate_height = beam_d - 2 * beam_f_t - 2 * beam_R1 - 2 * 5     
+        max_plate_height = beam_d - 2 * beam_f_t - 2 * beam_R1 - 2 * 5
     # Maximum plate height for Beam-Beam connectivity
-    elif  connectivity == "Beam-Beam":
+    elif connectivity == "Beam-Beam":
         max_plate_height = beam_d - beam_f_t - beam_R1 - PBeam_T - PBeam_R1 - 5
     max_plate_height = round(max_plate_height, 3)
-    
+
     # Minimum plate height (valid for all connectivity)
     min_plate_height = fin_min_h(beam_d);
     min_plate_height = round(min_plate_height, 3)
-    
+
     # Plate height input and check for maximum and minimum values
-             
+
     if web_plate_l != 0:
         if web_plate_l > max_plate_height :
             if connectivity == "Beam-Beam":

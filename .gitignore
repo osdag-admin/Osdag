@@ -1,6 +1,6 @@
 *.txt
-*.pyc
 *.pyo
+*.pyc
 *~
 *.html
 *.log

@@ -4,21 +4,16 @@ Created on 14-Mar-2016
 @author: deepa
 '''
 from OCC.gp import gp_Circ, gp_Ax2
-'''
-Created on 29-Nov-2014
-
-@author: deepa
-'''
 import numpy
-from ModelUtils import *
+from ModelUtils import make_edge, getGpPt, getGpDir, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+
 
 class Notch(object):
     '''
-                                                    
-    ''' 
-    
-    def __init__(self, R1, height, width, length):  
-        
+    '''
+
+    def __init__(self, R1, height, width, length):
+
         self.R1 = R1
         self.height = height
         self.width = width
@@ -26,37 +21,36 @@ class Notch(object):
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0.0, 1.0])
-        
+
         self.computeParams()
-    
+
     def place(self, secOrigin, uDir, wDir):
         self.secOrigin = secOrigin
         self.uDir = uDir
-        self.wDir = wDir        
+        self.wDir = wDir
         self.computeParams()
-        
+
     def computeParams(self):
-        
+
         self.vDir = numpy.cross(self.wDir, self.uDir)
         self.a = self.secOrigin + (self.width / 2.0) * self.uDir
         self.b1 = self.a + (self.height - self.R1) * (-self.vDir)
         self.o1 = self.b1 + self.R1 * (-self.uDir)
         self.b = self.secOrigin + (self.width / 2.0) * self.uDir + self.height * (-self.vDir)
         self.b2 = self.b + self.R1 * (-self.uDir)
-        
+
         self.d = self.secOrigin + (-self.width / 2.0) * self.uDir 
         self.c1 = self.d + (self.height - self.R1) * (-self.vDir)
         self.o2 = self.c1 + self.R1 * self.uDir
         self.c = self.secOrigin + (self.width / 2.0) * (-self.uDir) + self.height * (-self.vDir)
         self.c2 = self.c + self.R1 * (self.uDir)
-        
+
         self.points = [self.a, self.b1, self.o1, self.b, self.b2, self.d, self.c1, self.o2, self.c, self.c2]
-        
+
         # self.points = [self.a, self.b, self.c, self.d]
-          
-    
+
     def createEdges(self):
-        
+
         edges = []
         # Join points a,b
         edge = make_edge(getGpPt(self.a), getGpPt(self.b))
@@ -79,9 +73,8 @@ class Notch(object):
         edge = make_edge(getGpPt(self.d), getGpPt(self.a))
         edges.append(edge)
 
-          
         return edges
-    
+
     def createModel(self):
         edges = self.createEdges()
         wire = makeWireFromEdges(edges)
@@ -89,6 +82,3 @@ class Notch(object):
         extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
         return prism
-    
-        
-        

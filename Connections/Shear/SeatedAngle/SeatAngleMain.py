@@ -215,11 +215,11 @@ class MainController(QtGui.QMainWindow):
         # Graphics menu
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
         self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
-        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle())
-        self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
-        self.ui.actionChange_background.triggered.connect(self.showColorDialog)
+        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
+        self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel(True))
+        self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
+        # self.ui.combo_beam_section.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
 
         # TODO checkBeam_B is incomplete
         # self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
@@ -232,9 +232,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
-        self.ui.btnFront.clicked.connect(lambda: self.call2D_Drawing("Front"))
-        self.ui.btnSide.clicked.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.btnTop.clicked.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.btn_front.clicked.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.btn_side.clicked.connect(lambda: self.call2D_Drawing("Side"))
+        self.ui.btn_top.clicked.connect(lambda: self.call2D_Drawing("Top"))
 
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
@@ -243,16 +243,18 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Design.clicked.connect(self.osdag_header)
 
         # Help button
-        self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
-        self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
-        self.ui.actionSample_reports.triggered.connect(self.sample_report)
-        self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
+        # TODO update UI for actionSample_Tutorials
+        # self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
+        self.ui.actionSample_Reports.triggered.connect(self.sample_report)
+        # TODO update UI actionSample_Problems
+        self.ui.actionSampe_Problems.triggered.connect(self.sample_problem)
 
         from osdagMainSettings import backend_name
 
         self.display, self.start_display = self.init_display(backend_str=backend_name())
 
-        self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
+        # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 
         self.connectivity = None
         self.fuse_model = None
@@ -262,8 +264,8 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = "../../ResourceFiles/Osdag_header.png"
-        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+        image_path = os.path.dirname(os.path.abspath(__file__))+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + os.sep+os.path.join("images_html","Osdag_header.png")
 
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_beam.currentText()
@@ -313,9 +315,9 @@ class MainController(QtGui.QMainWindow):
         '''
         Disables the all buttons in toolbar
         '''
-        self.ui.btnFront.setEnabled(False)
-        self.ui.btnSide.setEnabled(False)
-        self.ui.btnTop.setEnabled(False)
+        self.ui.btn_front.setEnabled(False)
+        self.ui.btn_side.setEnabled(False)
+        self.ui.btn_top.setEnabled(False)
         self.ui.btn3D.setEnabled(False)
         self.ui.chkBxBeam.setEnabled(False)
         self.ui.chkBxCol.setEnabled(False)
@@ -330,9 +332,9 @@ class MainController(QtGui.QMainWindow):
         '''
         Enables the all buttons in toolbar
         '''
-        self.ui.btnFront.setEnabled(True)
-        self.ui.btnSide.setEnabled(True)
-        self.ui.btnTop.setEnabled(True)
+        self.ui.btn_front.setEnabled(True)
+        self.ui.btn_side.setEnabled(True)
+        self.ui.btn_top.setEnabled(True)
         self.ui.btn3D.setEnabled(True)
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
@@ -578,7 +580,7 @@ class MainController(QtGui.QMainWindow):
 
         '''(Number) -> NoneType
         '''
-        items = self.gradeType[str(index)]
+        items = self.grade_type[str(index)]
 
         self.ui.combo_bolt_grade.clear()
         strItems = []
@@ -1038,7 +1040,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("SeatAngle")
+        # TODO uncomment display3D model after debugging
+        # self.display3Dmodel("SeatAngle")
 
     def unchecked_allChkBox(self):
 

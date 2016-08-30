@@ -42,7 +42,7 @@ from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
 
 from reportGenerator import *
-from ui_seat_angle import Ui_MainWindow #this is the revised ui
+from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
@@ -66,8 +66,7 @@ class MyAboutOsdag(QtGui.QDialog):
 
 # below class was previously MyPopupDialog in the other modules
 class DesignReportDialog(QtGui.QDialog):
-    # print"my popup window"
-
+    print "Design Report - Dseign Profile dialog box"
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -135,6 +134,7 @@ class DesignReportDialog(QtGui.QDialog):
 
 
 class MainController(QtGui.QMainWindow):
+
     closed = pyqtSignal()
 
     def __init__(self, folder):
@@ -152,11 +152,12 @@ class MainController(QtGui.QMainWindow):
         self.grade_type = {'Please Select Type': '',
                           'HSFG': [8.8, 10.8],
                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
-        self.ui.combo_bolt_type.addItems(self.gradeType.keys())
+        self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.combo_bolt_type.setCurrentIndex(0)
 
-        self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        #comboConnLoc renamed to combo_connectivity
+        self.ui.combo_connectivity.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
@@ -201,7 +202,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
 
-        self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
+        self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
@@ -299,7 +300,7 @@ class MainController(QtGui.QMainWindow):
 
     def save2DcadImages(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', "/home/jeffy/Cadfiles/untitled.png", files_types)
+        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
@@ -467,9 +468,13 @@ class MainController(QtGui.QMainWindow):
 
         return outObj
 
-    def create_design_report(self):
+    def show_design_report_dialog(self):
         design_report_dialog = DesignReportDialog(self)
         design_report_dialog.show()
+
+    def create_design_report(self):
+        self.show_design_report_dialog()
+        # function name changed from createDesignReport
 
     def save_design(self):
 
@@ -489,7 +494,7 @@ class MainController(QtGui.QMainWindow):
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", "/home/jeffy/SaveMessages",
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.foler)+"/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1328,7 +1333,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # while launching from Osdag Main:
-    fh = logging.FileHandler("./Connections/Shear/SeatAngle/seatangle.log", mode="w")
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     #while launching from Seated Angle folder
     # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
@@ -1339,7 +1344,9 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
-    window = MainController()
+    module_setup()
+
+    window = MainController(folder)
     osdagMainWindow.hide()
 
     window.show()

@@ -10,6 +10,7 @@ from ui_OsdagMainPage import Ui_MainWindow
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
 from Connections.Shear.Endplate.endPlateMain import launchEndPlateController
+from Connections.Shear.SeatedAngle.SeatAngleMain import launchSeatedAngleController
 
 # from os.path import expanduser                       #enters in home folder
 import os.path
@@ -110,7 +111,9 @@ class OsdagMainWindow(QtGui.QMainWindow):
             # QtGui.QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
         
         elif self.ui.rdbtn_seat.isChecked():
-            QtGui.QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
+            launchSeatedAngleController(self, folder)
+            self.ui.myStackedWidget.setCurrentIndex(0)
+            # QtGui.QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
         
         else:
             QtGui.QMessageBox.about(self,"INFO","Please select appropriate connection")

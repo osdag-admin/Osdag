@@ -78,6 +78,7 @@ class DesignReportDialog(QtGui.QDialog):
         self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
         self.accepted.connect(self.save_inputSummary)
 
+    # noinspection PyPep8Naming
     def save_inputSummary(self):
         input_summary = self.getPopUpInputs()
         self.mainController.save_design(input_summary)
@@ -265,10 +266,11 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
         image_path = os.path.dirname(os.path.abspath(__file__))+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
-        shutil.copyfile(image_path, str(self.folder) + os.sep+os.path.join("images_html","Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + os.sep+os.path.join("images_html","Osdag_header.png"))
 
+    # noinspection PyPep8Naming
     def fetchBeamPara(self):
-        beam_sec = self.ui.combo_beam.currentText()
+        beam_sec = self.ui.combo_beam_section.currentText()
         dictbeamdata = get_beamdata(beam_sec)
         return dictbeamdata
 

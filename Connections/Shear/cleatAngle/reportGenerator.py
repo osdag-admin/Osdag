@@ -14,7 +14,7 @@ from PyQt4.Qt import QString
 
 
 
-def save_html(outputObj, uiObj, dictBeamData, dictColData,dictCleatData,reportsummary,filename):
+def save_html(outputObj, uiObj, dictBeamData, dictColData,dictCleatData,reportsummary,filename, folder, base, base_front, base_top, base_side):
     print outputObj
     fileName = (filename)
     myfile = open(fileName, 'w')
@@ -1232,23 +1232,44 @@ def save_html(outputObj, uiObj, dictBeamData, dictColData,dictCleatData,reportsu
     
     rstr += t('tr')
     if connectivity == "Column flange-Beam web":
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatFB.png" width ="400"></object">'
-        dataside = '<object type="image/svg+xml" data="css/cleatSideFB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/cleatTopFB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontFB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data="css/3D_ModelCleatFB.png" width ="400"></object">' %png
+        
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data="css/cleatSideFB.svg" width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data="css/cleatTopFB.svg" width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data="css/cleatFrontFB.svg" width ="450"></object>'  %front
         
     elif connectivity == "Column web-Beam web":
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatWB.png" width ="400"></object">'
-        dataside = '<object type="image/svg+xml" data="css/cleatSideWB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/cleatTopWB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontWB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data="css/3D_ModelCleatWB.png" width ="400"></object">' %png
+        
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data="css/cleatSideWB.svg" width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data="css/cleatTopWB.svg" width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data="css/cleatFrontWB.svg" width ="450"></object>'  %front
         
 
     else:
-        datapng = '<object type="image/PNG" data="css/3D_ModelCleatBB.png" width ="400"></object">'
-        dataside = '<object type="image/svg+xml" data="css/cleatSideBB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/cleatTopBB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/cleatFrontBB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data="css/3D_ModelCleatBB.png" width ="400"></object">' %png
+        
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data="css/cleatSideBB.svg" width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data="css/cleatTopBB.svg" width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data="css/cleatFrontBB.svg" width ="450"></object>'  %front
 
     row = [0, datapng, datatop]
     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')

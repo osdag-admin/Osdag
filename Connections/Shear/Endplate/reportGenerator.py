@@ -12,7 +12,7 @@ import time
 import math
 from PyQt4.QtCore import QString
 
-def save_html(outObj, uiObj, dictbeamdata, dictcolumndata,reportsummary, filename):
+def save_html(outObj, uiObj, dictbeamdata, dictcolumndata,reportsummary, filename,  folder, base, base_front, base_top, base_side):
     print outObj
     fileName = (filename)
     myfile = open(fileName, "w")
@@ -788,23 +788,43 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata,reportsummary, filenam
     rstr += t('/tr')
      
     if connectivity == "Column flange-Beam web":
-        datapng = '<object type="image/PNG" data="css/3D_ModelEndFB.png" width ="450"></object">'
-        dataside = '<object type="image/svg+xml" data="css/endSideFB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/endTopFB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/endFrontFB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data= %s  width ="450"></object">' %png
+        
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data=%s  width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data= %s  width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data=%s  width ="450"></object>'  %front
         
     elif connectivity == "Column web-Beam web":
-        datapng = '<object type="image/PNG" data="css/3D_ModelEndWB.png" width ="450"></object">'
-        dataside = '<object type="image/svg+xml" data="css/endSideWB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/endTopWB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/endFrontWB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data=%s  width ="450"></object">' %png
         
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data=%s  width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data=%s  width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data=%s  width ="450"></object>'  %front
 
     else:
-        datapng = '<object type="image/PNG" data="css/3D_ModelEndBB.png" width ="450"></object">'
-        dataside = '<object type="image/svg+xml" data="css/endSideBB.svg" width ="400"></object>'
-        datatop = '<object type="image/svg+xml" data="css/endTopBB.svg" width ="400"></object>'
-        datafront = '<object type="image/svg+xml" data="css/endFrontBB.svg" width ="450"></object>'
+        png = folder + "/css/" + base
+        datapng = '<object type="image/PNG" data= %s  width ="450"></object">' %png
+        
+        side = folder + "/css/" + base_side
+        dataside = '<object type="image/svg+xml" data= %s  width ="400"></object>' %side
+        
+        top = folder + "/css/" + base_top
+        datatop = '<object type="image/svg+xml" data= %s  width ="400"></object>' %top
+        
+        front = folder + "/css/" + base_front
+        datafront = '<object type="image/svg+xml" data= %s  width ="450"></object>'  %front
 
     row = [0, datapng, datatop]
     rstr += t('tr')

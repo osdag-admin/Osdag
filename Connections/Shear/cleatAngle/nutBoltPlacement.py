@@ -11,18 +11,18 @@ from ModelUtils import getGpPt
 import copy
 
 class NutBoltArray():
-    def __init__(self,boltPlaceObj,nut,bolt,gap,cgap):
+    def __init__(self, boltPlaceObj, nut, bolt, gap, cgap):
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
-        self.boltDir =  None
+        self.boltDir = None
         
         #################################
         self.cOrigin = None
         self.cOrigin1 = None
         self.cGaugeDir = None
         self.cPitchDir = None
-        self.cBoltDir =  None
+        self.cBoltDir = None
         ############################################
         
         self.initBoltPlaceParams(boltPlaceObj)
@@ -42,7 +42,7 @@ class NutBoltArray():
         self.cBolts1 = []
         self.cNuts1 = []
         ##################################
-        #self.calculatePositions()
+        # self.calculatePositions()
         self.initialiseNutBolts()
         
         self.models = []
@@ -51,17 +51,17 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
-            self.bolts.append(Bolt(b.R,b.T, b.H, b.r))
-            self.nuts.append(Nut(n.R, n.T,n.H, n.r1))
-    #Newly added
+            self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
+            self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
+    # Newly added
         for i in range(self.cRow * self.cCol):
-            self.cBolts.append(Bolt(b.R,b.T, b.H, b.r))
-            self.cNuts.append(Nut(n.R, n.T,n.H, n.r1))
+            self.cBolts.append(Bolt(b.R, b.T, b.H, b.r))
+            self.cNuts.append(Nut(n.R, n.T, n.H, n.r1))
         for i in range(self.cRow * self.cCol):
-            self.cBolts1.append(Bolt(b.R,b.T, b.H, b.r))
-            self.cNuts1.append(Nut(n.R, n.T,n.H, n.r1))
+            self.cBolts1.append(Bolt(b.R, b.T, b.H, b.r))
+            self.cNuts1.append(Nut(n.R, n.T, n.H, n.r1))
         
-    def initBoltPlaceParams(self,boltPlaceObj):
+    def initBoltPlaceParams(self, boltPlaceObj):
         self.pitch = boltPlaceObj['Bolt']['pitch']
         self.gauge = boltPlaceObj['Bolt']['gauge']
         self.edge = boltPlaceObj['Bolt']['edge']
@@ -124,12 +124,12 @@ class NutBoltArray():
         self.cOrigin = cOrigin
         self.cGaugeDir = cGaugeDir
         self.cPitchDir = cPitchDir
-        self.cBoltDir =  cBoltDir
+        self.cBoltDir = cBoltDir
         
         self.cOrigin1 = cOrigin1
         self.cGaugeDir1 = cGaugeDir1
         self.cPitchDir1 = cPitchDir1
-        self.cBoltDir1 =  cBoltDir1
+        self.cBoltDir1 = cBoltDir1
         
         ################################################
         

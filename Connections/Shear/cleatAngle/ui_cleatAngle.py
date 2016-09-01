@@ -474,7 +474,7 @@ class Ui_MainWindow(object):
         font.setBold(False)
         font.setWeight(50)
         self.inputBolt_lbl.setFont(font)
-        self.inputBolt_lbl.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.inputBolt_lbl.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
         self.inputBolt_lbl.setObjectName(_fromUtf8("inputBolt_lbl"))
         self.comboBoltType = QtGui.QComboBox(self.dockWidgetContents)
         self.comboBoltType.setGeometry(QtCore.QRect(150, 360, 160, 27))

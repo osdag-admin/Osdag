@@ -17,7 +17,7 @@ class Notch(object):
                                                     
     ''' 
     
-    def __init__(self, R1,height, width, length):  
+    def __init__(self, R1, height, width, length):  
       
 
         self.R1 = R1
@@ -39,26 +39,26 @@ class Notch(object):
     def computeParams(self):
         
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a = self.secOrigin + (self.width/2.0) * self.uDir
-        self.b1 = self.a + (self.height - self.R1)  * (-self.vDir)
+        self.a = self.secOrigin + (self.width / 2.0) * self.uDir
+        self.b1 = self.a + (self.height - self.R1) * (-self.vDir)
         self.o1 = self.b1 + self.R1 * (-self.uDir)
-        self.b = self.secOrigin + (self.width/2.0) * self.uDir + self.height * (-self.vDir)
+        self.b = self.secOrigin + (self.width / 2.0) * self.uDir + self.height * (-self.vDir)
         self.b2 = self.b + self.R1 * (-self.uDir)
         
-        self.d = self.secOrigin + (-self.width/2.0) * self.uDir 
+        self.d = self.secOrigin + (-self.width / 2.0) * self.uDir 
         self.c1 = self.d + (self.height - self.R1) * (-self.vDir)
         self.o2 = self.c1 + self.R1 * self.uDir
-        self.c = self.secOrigin + (self.width/2.0) * (-self.uDir) + self.height * (-self.vDir)
+        self.c = self.secOrigin + (self.width / 2.0) * (-self.uDir) + self.height * (-self.vDir)
         self.c2 = self.c + self.R1 * (self.uDir)
         
-        self.points = [self.a, self.b1, self.o1, self.b, self.b2,self.d, self.c1,self.o2,self.c,self.c2]
+        self.points = [self.a, self.b1, self.o1, self.b, self.b2, self.d, self.c1, self.o2, self.c, self.c2]
         
-        #self.points = [self.a, self.b, self.c, self.d]
+        # self.points = [self.a, self.b, self.c, self.d]
           
     
     def createEdges(self):
         
-        edges= []
+        edges = []
         # Join points a,b
         edge = make_edge(getGpPt(self.a), getGpPt(self.b))
         edges.append(edge)
@@ -87,8 +87,8 @@ class Notch(object):
         edges = self.createEdges()
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.length * self.wDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
         return prism
     
         

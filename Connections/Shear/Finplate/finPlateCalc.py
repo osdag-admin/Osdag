@@ -26,6 +26,7 @@ import logging
 flag = 1
 logger = None
 
+
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
@@ -33,74 +34,88 @@ module_setup()
 
 # Function for net area of ordinary bolts
 # Source: Subramanian's book, page: 348
+
+
 def netArea_calc(dia):
     netArea = {12:84.5, 16:157, 20:245, 22:303, 24:353, 27:459, 30:561, 36:817};
     return netArea[dia]
 
 # BOLT: determination of shear capacity 
+
+
 def bolt_shear(dia, n, fu):
     A = netArea_calc(dia)
     root3 = math.sqrt(3);
     Vs = fu * n * A / (root3 * 1.25 * 1000);
-    Vs = round(Vs.real,3);
+    Vs = round(Vs.real, 3);
     return Vs
-    
+
 # BOLT: determination of bearing capacity 
+
+
 def bolt_bearing(dia, t, kb, fu):
     Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000);
-    Vb = round(Vb.real,3);
+    Vb = round(Vb.real, 3);
     return Vb;
  
 
 # PLATE HEIGHT: minimum height of fin plate
 # [Source: INSDAG detailing manual, page: 5-7] 
 def fin_min_h(beam_d):
-    min_plate_ht = 0.6*beam_d;
+    min_plate_ht = 0.6 * beam_d;
     return min_plate_ht;
 
 # PLATE THICKNESS: minimum thickness of fin plate
 # [Source: Subramanian's book, page: 373]
-def fin_min_thk(shear_load,bolt_fy,web_plate_l):
-    min_plate_thk = (5*shear_load*1000)/(bolt_fy*web_plate_l);
+
+
+def fin_min_thk(shear_load, bolt_fy, web_plate_l):
+    min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l);
     return min_plate_thk;
 
 # PLATE THICKNESS: maximum thickness of fin plate
 # [Source: INSDAG detailing manual, page: 5-7]
+
+
 def fin_max_thk(beam_d):
     max_plate_thk = 0.5 * beam_d;
     return max_plate_thk;
 
 # Function for block shear capacity calculation
-def blockshear(numrow,numcol,dia_hole,fy,fu,edge_dist,end_dist,pitch,gauge,platethk):
+
+
+def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
     if numcol == 1:
-        Avg = platethk * ((numrow-1)*pitch + end_dist)
-        Avn = platethk * ((numrow-1)*pitch + end_dist - (numrow-1+0.5)*dia_hole)
+        Avg = platethk * ((numrow - 1) * pitch + end_dist)
+        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
         Atg = platethk * edge_dist
         Atn = platethk * (edge_dist - 0.5 * dia_hole)
-        
-        Tdb1 = (Avg * fy / (math.sqrt(3)*1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3)*1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1,Tdb2)
-        Tdb = round(Tdb/1000,3)
-        
+
+        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
+        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
+        Tdb = round(Tdb / 1000, 3)
+
     elif numcol == 2:
-        Avg = platethk * ((numrow-1)*pitch + end_dist)
-        Avn = platethk * ((numrow-1)*pitch + end_dist - (numrow-1+0.5)*dia_hole)
+        Avg = platethk * ((numrow - 1) * pitch + end_dist)
+        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
         Atg = platethk * (edge_dist + gauge)
         Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
-        
-        Tdb1 = (Avg * fy / (math.sqrt(3)*1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3)*1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1,Tdb2)
-        Tdb = round(Tdb/1000,3)
-        
+
+        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
+        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
+        Tdb = round(Tdb / 1000, 3)
+
     return Tdb
-        
+
+
 def fetchBeamPara(self):
     beam_sec = self.ui.combo_Beam.currentText()
-    dictbeamdata  = get_beamdata(beam_sec)
+    dictbeamdata = get_beamdata(beam_sec)
     return dictbeamdata
-     
+
+
 def fetchColumnPara(self):
     column_sec = self.ui.comboColSec.currentText()
     loc = self.ui.comboConnLoc.currentText()
@@ -111,29 +126,31 @@ def fetchColumnPara(self):
     return dictcoldata
 ##################################################################################
 # Start of main program
+
+
 def finConn(uiObj):
-    
+
     global logger
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumSection']
     connectivity = uiObj['Member']['Connectivity']
     beam_fu = uiObj['Member']['fu (MPa)']
     beam_fy = uiObj['Member']['fy (MPa)']
-                    
+
     shear_load = uiObj['Load']['ShearForce (kN)']
-                        
+
     bolt_dia = uiObj['Bolt']['Diameter (mm)']
-    bolt_type  = uiObj["Bolt"]["Type"]
+    bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = uiObj['Bolt']['Grade']
-                    
+
     web_plate_t = uiObj['Plate']['Thickness (mm)']
     web_plate_w = uiObj['Plate']['Width (mm)']
     web_plate_l = uiObj['Plate']['Height (mm)']
     web_plate_fu = uiObj['Member']['fu (MPa)']
     web_plate_fy = uiObj['Member']['fy (MPa)']
-                    
+
     weld_t = uiObj["Weld"]['Size (mm)']
-       
+
 #####################################################################################
 
 # Hard-code input data required to check overall calculation as independent file  
@@ -142,11 +159,10 @@ def finConn(uiObj):
 #     connectivity = "Column flange-Beam web"
 #     beam_fu = 410
 #     beam_fy = 250
-#     beam_w_t = 8.9   
+#     beam_w_t = 8.9
 #     beam_d = 400
 #     beam_f_t = 16
-#     beam_R1 = 14   
-#     PBeam_T = 17.2
+#     beam_R1 = 14   #     PBeam_T = 17.2
 #     PBeam_R1 = 17
 #     shear_load = 140
 #     bolt_dia = 20
@@ -166,9 +182,9 @@ def finConn(uiObj):
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_beamdata(column_sec)
     else:
-        dictbeamdata  = get_beamdata(beam_sec)
-        dictcolumndata  = get_columndata(column_sec)
-     
+        dictbeamdata = get_beamdata(beam_sec)
+        dictcolumndata = get_columndata(column_sec)
+    
     beam_w_t = float(dictbeamdata[QString("tw")])
     beam_f_t = float(dictbeamdata[QString("T")])
     beam_d = float(dictbeamdata[QString("D")])
@@ -178,29 +194,29 @@ def finConn(uiObj):
 
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
-    
+
     # Plate thickness check
     if web_plate_t < beam_w_t:
         web_plate_t = beam_w_t
-        logger.error(": Chosen web plate thickness is not sufficient" )
+        logger.error(": Chosen web plate thickness is not sufficient")
         logger.warning(" : Minimum required thickness %2.2f mm" % (beam_w_t))
-    
-    ## Plate height check
-    
+
+    # # Plate height check
+
     # Maximum plate height for Column-Beam connectivity (Note: # 5 mm extra gap is provided from top and bottom)
     if connectivity == "Column flange-Beam web" or connectivity == "Column web-Beam web":
-        max_plate_height = beam_d - 2 * beam_f_t - 2* beam_R1 - 2*5     
+        max_plate_height = beam_d - 2 * beam_f_t - 2 * beam_R1 - 2 * 5
     # Maximum plate height for Beam-Beam connectivity
-    elif  connectivity == "Beam-Beam":
+    elif connectivity == "Beam-Beam":
         max_plate_height = beam_d - beam_f_t - beam_R1 - PBeam_T - PBeam_R1 - 5
-    max_plate_height = round(max_plate_height,3)
-    
+    max_plate_height = round(max_plate_height, 3)
+
     # Minimum plate height (valid for all connectivity)
     min_plate_height = fin_min_h(beam_d);
-    min_plate_height = round(min_plate_height,3)
-    
+    min_plate_height = round(min_plate_height, 3)
+
     # Plate height input and check for maximum and minimum values
-             
+
     if web_plate_l != 0:
         if web_plate_l > max_plate_height :
             if connectivity == "Beam-Beam":
@@ -235,7 +251,7 @@ def finConn(uiObj):
     def boltDesign(web_plate_l):
         # I: Check for number of bolts -------------------
         bolt_fu = int(bolt_grade) * 100
-        bolt_fy = (bolt_grade - int(bolt_grade))*bolt_fu;
+        bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;
          
         # Spacing of bolts for web plate -------------------
         if bolt_dia == 12 or bolt_dia == 14:
@@ -251,26 +267,26 @@ def finConn(uiObj):
         min_end_dist = int(1.7 * (dia_hole));
          
         # Calculation of kb
-        kbChk1 = min_end_dist/float(3*dia_hole);
-        kbChk2 = min_pitch/float(3*dia_hole)-0.25;
-        kbChk3 = bolt_fu/float(beam_fu);
+        kbChk1 = min_end_dist / float(3 * dia_hole);
+        kbChk2 = min_pitch / float(3 * dia_hole) - 0.25;
+        kbChk3 = bolt_fu / float(beam_fu);
         kbChk4 = 1;
-        kb = min(kbChk1,kbChk2,kbChk3,kbChk4);
-        kb = round(kb,3)
+        kb = min(kbChk1, kbChk2, kbChk3, kbChk4);
+        kb = round(kb, 3)
          
         # Bolt capacity calculation
-        t_thinner = min(beam_w_t.real,web_plate_t.real);
+        t_thinner = min(beam_w_t.real, web_plate_t.real);
         bolt_planes = 1
-        bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu).real;
-        bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,beam_fu,kb).real;
+        bolt_shear_capacity = bolt_shear(bolt_dia, bolt_planes, bolt_fu).real;
+        bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, beam_fu, kb).real;
          
         bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
         if shear_load != 0:
 #                 bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
 
-            bolts_required = int(math.ceil(shear_load/bolt_capacity)) + 1; 
+            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1; 
         else:
-            bolts_required = int(shear_load/bolt_capacity)
+            bolts_required = int(shear_load / bolt_capacity)
             
         if bolts_required > 0 and  bolts_required <= 2 :
             bolts_required = 3;
@@ -278,17 +294,17 @@ def finConn(uiObj):
         # Bolt group capacity
         bolt_group_capacity = bolts_required * bolt_capacity;
          
-        if min_pitch%10 != 0 or min_gauge%10 != 0:
-            min_pitch = (min_pitch/10)*10 + 10;
-            min_gauge = (min_gauge/10)*10 + 10;
+        if min_pitch % 10 != 0 or min_gauge % 10 != 0:
+            min_pitch = (min_pitch / 10) * 10 + 10;
+            min_gauge = (min_gauge / 10) * 10 + 10;
         else:
             min_pitch = min_pitch;
             min_gauge = min_gauge;
-        #clause 10.2.2 is800
-        max_spacing = int(min(100 + 4 * t_thinner, 200));   #clause 10.2.3.3 is800
+        # clause 10.2.2 is800
+        max_spacing = int(min(100 + 4 * t_thinner, 200));  # clause 10.2.3.3 is800
              
-        if min_end_dist%10 != 0:
-            min_end_dist = (min_end_dist/10)*10 + 10;
+        if min_end_dist % 10 != 0:
+            min_end_dist = (min_end_dist / 10) * 10 + 10;
             min_edge_dist = min_end_dist
         else:
             min_end_dist = min_end_dist
@@ -296,29 +312,29 @@ def finConn(uiObj):
             
         # Pitch calculation for a user given finplate height
         if web_plate_l != 0:
-            length_avail = (web_plate_l-2*min_end_dist);
-            pitch = round(length_avail/(bolts_required-1),3);
+            length_avail = (web_plate_l - 2 * min_end_dist);
+            pitch = round(length_avail / (bolts_required - 1), 3);
         
         # Calculation of finplate height for optional height input
         elif web_plate_l == 0:
             bolt_line = 1
-            web_plate_l_opt = (bolts_required - 1)*min_pitch + 2*min_end_dist
-            length_avail = (web_plate_l_opt-2*min_end_dist);
+            web_plate_l_opt = (bolts_required - 1) * min_pitch + 2 * min_end_dist
+            length_avail = (web_plate_l_opt - 2 * min_end_dist);
             pitch = min_pitch    
             # Check for maximum/minimum plate height for optional finplate height input
             if web_plate_l_opt > max_plate_height :
                 bolt_line = 2
                 if bolts_required % 2 == 0:
-                    bolts_one_line = bolts_required/2
+                    bolts_one_line = bolts_required / 2
                 else:
-                    bolts_one_line = (bolts_required/2) + 1
-                web_plate_l_opt = (bolts_one_line - 1)*min_pitch + 2*min_end_dist
-                length_avail = (web_plate_l_opt-2*min_end_dist)
+                    bolts_one_line = (bolts_required / 2) + 1
+                web_plate_l_opt = (bolts_one_line - 1) * min_pitch + 2 * min_end_dist
+                length_avail = (web_plate_l_opt - 2 * min_end_dist)
                 if min_plate_height > web_plate_l_opt:
                     web_plate_l_opt = min_plate_height
-                    length_avail = (web_plate_l_opt-2*min_end_dist);
-                    pitch = (web_plate_l_opt - 2 * min_end_dist)/(bolts_one_line-1)
-                    pitch = round(pitch,3)
+                    length_avail = (web_plate_l_opt - 2 * min_end_dist);
+                    pitch = (web_plate_l_opt - 2 * min_end_dist) / (bolts_one_line - 1)
+                    pitch = round(pitch, 3)
                 if web_plate_l_opt > max_plate_height :
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
@@ -331,17 +347,17 @@ def finConn(uiObj):
                 
             elif min_plate_height > web_plate_l_opt:
                 web_plate_l_opt = min_plate_height
-                length_avail = (web_plate_l_opt-2*min_end_dist);
-                pitch = (web_plate_l_opt - 2 * min_end_dist)/(bolts_required-1)
-                pitch = round(pitch,3) 
+                length_avail = (web_plate_l_opt - 2 * min_end_dist);
+                pitch = (web_plate_l_opt - 2 * min_end_dist) / (bolts_required - 1)
+                pitch = round(pitch, 3) 
         
-        ## Calculation of minimum plate thickness and maximum end/edge distance
+        # # Calculation of minimum plate thickness and maximum end/edge distance
         if web_plate_l != 0:
-            min_plate_thk = (5*shear_load*1000)/(bolt_fy*web_plate_l)
-            max_edge_dist = int((12 * min_plate_thk * math.sqrt(250/beam_fy)).real)-1
+            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l)
+            max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         elif web_plate_l == 0:
-            min_plate_thk = (5*shear_load*1000)/(bolt_fy*web_plate_l_opt)
-            max_edge_dist = int((12 * min_plate_thk * math.sqrt(250/beam_fy)).real)-1
+            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
+            max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         
         # Moment demand calculation for user defined plate height and width (1st case)
         if web_plate_l != 0 and web_plate_w != 0:
@@ -351,26 +367,26 @@ def finConn(uiObj):
              
             # Moment demand for single line of bolts due to its shear capacity
             if pitch >= min_pitch:
-                bolt_line =1;
+                bolt_line = 1;
                 gauge = 0;
                 bolts_one_line = bolts_required;
                 K = bolts_one_line / 2;
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        M2 = M2 + 2*(bolt_shear_capacity * ((length_avail/2 - k * pitch)**2/(length_avail/2 - k * pitch)));
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        M2 = M2 + 2 * (bolt_shear_capacity * ((length_avail / 2 - k * pitch) ** 2 / (length_avail / 2 - k * pitch)));
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)
               
             # moment demand for multi-line of bolts 
             if pitch < min_pitch:
                 bolt_line = 2;
                 if bolts_required % 2 == 0:
-                    bolts_one_line = bolts_required/2;
+                    bolts_one_line = bolts_required / 2;
                 else:
-                    bolts_one_line = (bolts_required/2) + 1;
+                    bolts_one_line = (bolts_required / 2) + 1;
                   
-                pitch = round(length_avail/(bolts_one_line-1),3); 
+                pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
                 Ecc = web_plate_w - min_gauge - min_edge_dist        
                 # Moment due to external shear force
@@ -378,22 +394,22 @@ def finConn(uiObj):
                 # Moment demand for single line of bolts due to its shear capacity 
                 if pitch >= min_pitch:
                     K = bolts_one_line / 2;
-                    M2=0;
-                    if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                        for k in range (0,K):
-                            V = length_avail/2 - k * pitch
-                            H = gauge/2;
-                            d = math.sqrt(V**2 + H**2);
-                            M2 = M2 + 2*(bolt_shear_capacity * (d**2/d));
-                        M2=M2*2;
-                        moment_demand = max(M1,M2);
-                        moment_demand =  round(moment_demand * 0.001,3)
+                    M2 = 0;
+                    if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                        for k in range (0, K):
+                            V = length_avail / 2 - k * pitch
+                            H = gauge / 2;
+                            d = math.sqrt(V ** 2 + H ** 2);
+                            M2 = M2 + 2 * (bolt_shear_capacity * (d ** 2 / d));
+                        M2 = M2 * 2;
+                        moment_demand = max(M1, M2);
+                        moment_demand = round(moment_demand * 0.001, 3)
               
                 # Design is not safe: iterations required
                 else:
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
-                    moment_demand=0.0
+                    moment_demand = 0.0
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
@@ -403,49 +419,49 @@ def finConn(uiObj):
              
             # Moment demand for single line of bolts due to its shear capacity
             if pitch >= min_pitch:
-                bolt_line =1;
+                bolt_line = 1;
                 gauge = 0;
                 bolts_one_line = bolts_required;
                 K = bolts_one_line / 2;
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        M2 = M2 + 2*(bolt_shear_capacity * ((length_avail/2 - k * pitch)**2/(length_avail/2 - k * pitch)));
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        M2 = M2 + 2 * (bolt_shear_capacity * ((length_avail / 2 - k * pitch) ** 2 / (length_avail / 2 - k * pitch)));
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)
               
             # moment demand for multi-line of bolts 
             if pitch < min_pitch:
                 bolt_line = 2;
                 if bolts_required % 2 == 0:
-                    bolts_one_line = bolts_required/2;
+                    bolts_one_line = bolts_required / 2;
                 else:
-                    bolts_one_line = (bolts_required/2) + 1;
+                    bolts_one_line = (bolts_required / 2) + 1;
                   
-                pitch = round(length_avail/(bolts_one_line-1),3); 
+                pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge/2 + 20   
+                Ecc = min_edge_dist + min_gauge / 2 + 20   
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
                 if pitch >= min_pitch:
                     K = bolts_one_line / 2;
-                    M2=0;
-                    if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                        for k in range (0,K):
-                            V = length_avail/2 - k * pitch
-                            H = gauge/2;
-                            d = math.sqrt(V**2 + H**2);
-                            M2 = M2 + 2*(bolt_shear_capacity * (d**2/d));
-                        M2=M2*2;
-                        moment_demand = max(M1,M2);
-                        moment_demand =  round(moment_demand * 0.001,3)
+                    M2 = 0;
+                    if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                        for k in range (0, K):
+                            V = length_avail / 2 - k * pitch
+                            H = gauge / 2;
+                            d = math.sqrt(V ** 2 + H ** 2);
+                            M2 = M2 + 2 * (bolt_shear_capacity * (d ** 2 / d));
+                        M2 = M2 * 2;
+                        moment_demand = max(M1, M2);
+                        moment_demand = round(moment_demand * 0.001, 3)
               
                 # Design is not safe: iterations required
                 else:
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
-                    moment_demand=0.0
+                    moment_demand = 0.0
                     
         # Moment demand calculation for optional height and user given width input (3rd case)
         elif web_plate_l == 0 and web_plate_w != 0:
@@ -457,12 +473,12 @@ def finConn(uiObj):
                 gauge = 0;
                 bolts_one_line = bolts_required;
                 K = bolts_one_line / 2;
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        M2 = M2 + 2*(bolt_shear_capacity * ((length_avail/2 - k * pitch)**2/(length_avail/2 - k * pitch)));
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        M2 = M2 + 2 * (bolt_shear_capacity * ((length_avail / 2 - k * pitch) ** 2 / (length_avail / 2 - k * pitch)));
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)
             elif bolt_line == 2:        
                 gauge = min_gauge
                 Ecc = web_plate_w - min_gauge - min_edge_dist
@@ -470,16 +486,16 @@ def finConn(uiObj):
                 M1 = shear_load * Ecc
                 # Moment demand for single line of bolts due to its shear capacity 
                 K = bolts_one_line / 2
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        V = length_avail/2 - k * pitch
-                        H = gauge/2;
-                        d = math.sqrt(V**2 + H**2);
-                        M2 = M2 + 2*(bolt_shear_capacity * (d**2/d));
-                    M2=M2*2;
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        V = length_avail / 2 - k * pitch
+                        H = gauge / 2;
+                        d = math.sqrt(V ** 2 + H ** 2);
+                        M2 = M2 + 2 * (bolt_shear_capacity * (d ** 2 / d));
+                    M2 = M2 * 2;
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)
         
         # Moment demand calculation for optional height and width input (4th case)
         elif web_plate_l == 0 and web_plate_w == 0:
@@ -491,33 +507,33 @@ def finConn(uiObj):
                 gauge = 0;
                 bolts_one_line = bolts_required;
                 K = bolts_one_line / 2;
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        M2 = M2 + 2*(bolt_shear_capacity * ((length_avail/2 - k * pitch)**2/(length_avail/2 - k * pitch)));
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        M2 = M2 + 2 * (bolt_shear_capacity * ((length_avail / 2 - k * pitch) ** 2 / (length_avail / 2 - k * pitch)));
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)
             elif bolt_line == 2:        
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge/2 + 20
+                Ecc = min_edge_dist + min_gauge / 2 + 20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc
                 # Moment demand for single line of bolts due to its shear capacity 
                 K = bolts_one_line / 2
-                M2=0;
-                if bolts_required % 2 ==0 or bolts_required % 2 !=0:
-                    for k in range (0,K):
-                        V = length_avail/2 - k * pitch
-                        H = gauge/2;
-                        d = math.sqrt(V**2 + H**2);
-                        M2 = M2 + 2*(bolt_shear_capacity * (d**2/d));
-                    M2=M2*2;
-                    moment_demand = max(M1,M2);
-                    moment_demand =  round(moment_demand * 0.001,3)    
+                M2 = 0;
+                if bolts_required % 2 == 0 or bolts_required % 2 != 0:
+                    for k in range (0, K):
+                        V = length_avail / 2 - k * pitch
+                        H = gauge / 2;
+                        d = math.sqrt(V ** 2 + H ** 2);
+                        M2 = M2 + 2 * (bolt_shear_capacity * (d ** 2 / d));
+                    M2 = M2 * 2;
+                    moment_demand = max(M1, M2);
+                    moment_demand = round(moment_demand * 0.001, 3)    
     
         ######################################################################33
         # Fetch bolt design output parameters dictionary
-        if web_plate_l ==0:
+        if web_plate_l == 0:
             boltParam = {}
             boltParam['shearcapacity'] = bolt_shear_capacity
             boltParam['bearingcapacity'] = bolt_bearing_capacity
@@ -569,10 +585,10 @@ def finConn(uiObj):
     boltParameters = boltDesign(web_plate_l); 
     
     # Check for long joint connections
-    length_joint =(boltParameters['numofrow']-1) * boltParameters['pitch']
-    if length_joint > 15*bolt_dia:
-        beta_lj = 1.075 - length_joint/(200*bolt_dia);
-        bolt_shear_capacity = beta_lj *  boltParameters['shearcapacity']
+    length_joint = (boltParameters['numofrow'] - 1) * boltParameters['pitch']
+    if length_joint > 15 * bolt_dia:
+        beta_lj = 1.075 - length_joint / (200 * bolt_dia);
+        bolt_shear_capacity = beta_lj * boltParameters['shearcapacity']
 #         new_bolt_param = boltDesign(bolt_shear_capacity_new)
         new_bolt_param = boltDesign(web_plate_l)
     else:
@@ -609,16 +625,16 @@ def finConn(uiObj):
     
     # Moment capacity of the fin plate (also known as web-side plate)
     if web_plate_l != 0:
-        moment_capacity = 1.2 * (web_plate_fy/1.1) * (web_plate_t * web_plate_l * web_plate_l)/6 * 0.001;
-        moment_capacity = round(moment_capacity * 0.001,3);
+        moment_capacity = 1.2 * (web_plate_fy / 1.1) * (web_plate_t * web_plate_l * web_plate_l) / 6 * 0.001;
+        moment_capacity = round(moment_capacity * 0.001, 3);
     elif web_plate_l == 0:
-        moment_capacity = 1.2 * (web_plate_fy/1.1) * (web_plate_t * boltParameters['plateheightoptional'] * boltParameters['plateheightoptional'])/6 * 0.001;
-        moment_capacity = round(moment_capacity * 0.001,3);
+        moment_capacity = 1.2 * (web_plate_fy / 1.1) * (web_plate_t * boltParameters['plateheightoptional'] * boltParameters['plateheightoptional']) / 6 * 0.001;
+        moment_capacity = round(moment_capacity * 0.001, 3);
     
     # Plate height calculation based on moment demand
     if web_plate_l == 0:
         if moment_capacity < boltParameters['moment']:
-            web_plate_l_mom = math.sqrt(boltParameters['moment'] * 1.1 * 6*1000000/float(1.2*250*web_plate_t)) 
+            web_plate_l_mom = math.sqrt(boltParameters['moment'] * 1.1 * 6 * 1000000 / float(1.2 * 250 * web_plate_t)) 
             moment_capacity = boltParameters['moment']
         else:
             web_plate_l_mom = boltParameters['plateheightoptional']
@@ -631,9 +647,9 @@ def finConn(uiObj):
     
     # Calculation of plate height based on both minimum height and moment criteria (for optional input)
     if web_plate_l == 0:
-        web_plate_l_opt = max(web_plate_l_mom,boltParameters['plateheightoptional'])
-        if web_plate_l_opt%10 != 0:
-            web_plate_l_opt = (web_plate_l_opt//10)*10 +10
+        web_plate_l_opt = max(web_plate_l_mom, boltParameters['plateheightoptional'])
+        if web_plate_l_opt % 10 != 0:
+            web_plate_l_opt = (web_plate_l_opt // 10) * 10 + 10
         else:
             web_plate_l_opt = web_plate_l_opt
         if web_plate_l_opt > max_plate_height:
@@ -643,29 +659,29 @@ def finConn(uiObj):
     
     # Calculation for maximum/minimum plate thickness
     max_plate_thk = fin_max_thk(beam_d);
-    max_plate_thk = round(max_plate_thk,3);
+    max_plate_thk = round(max_plate_thk, 3);
     if web_plate_l != 0:
-        min_plate_thk = fin_min_thk(shear_load,beam_fy,web_plate_l);
-        min_plate_thk = round(min_plate_thk,3);    
+        min_plate_thk = fin_min_thk(shear_load, beam_fy, web_plate_l);
+        min_plate_thk = round(min_plate_thk, 3);    
     if web_plate_l == 0:
-        min_plate_thk = fin_min_thk(shear_load,beam_fy,web_plate_l_opt);
-        min_plate_thk = round(min_plate_thk,3);
-        if min_plate_thk > web_plate_t: # Change
-           web_plate_l_opt = 5*shear_load*1000/float(web_plate_t*beam_fy)
-           web_plate_l_opt = round(web_plate_l_opt,3)
+        min_plate_thk = fin_min_thk(shear_load, beam_fy, web_plate_l_opt);
+        min_plate_thk = round(min_plate_thk, 3);
+        if min_plate_thk > web_plate_t:  # Change
+           web_plate_l_opt = 5 * shear_load * 1000 / float(web_plate_t * beam_fy)
+           web_plate_l_opt = round(web_plate_l_opt, 3)
            if boltParameters['numofcol'] == 1:
-               new_bolt_param['pitch'] = (web_plate_l_opt - 2*boltParameters['enddist'])/(boltParameters['numofrow'] - 1)
-               new_bolt_param['pitch'] = round(new_bolt_param['pitch'],3)
+               new_bolt_param['pitch'] = (web_plate_l_opt - 2 * boltParameters['enddist']) / (boltParameters['numofrow'] - 1)
+               new_bolt_param['pitch'] = round(new_bolt_param['pitch'], 3)
            elif boltParameters['numofcol'] == 2:
-               new_bolt_param['pitch'] = (web_plate_l_opt - 2*boltParameters['enddist'])/(boltParameters['numofrow'] - 1)
-               new_bolt_param['pitch'] = round(new_bolt_param['pitch'],3)
+               new_bolt_param['pitch'] = (web_plate_l_opt - 2 * boltParameters['enddist']) / (boltParameters['numofrow'] - 1)
+               new_bolt_param['pitch'] = round(new_bolt_param['pitch'], 3)
         if web_plate_l_opt > max_plate_height:
            logger.error(": The plate height required is more than the maximum height possible")
            logger.warning(": Maximum plate height  required is %2.2f mm " % (max_plate_height))
            logger.info("Try to increase the plate thickness")
    ##############
         
-    ## Calculation of plate height and thickness and checks for extreme values 
+    # # Calculation of plate height and thickness and checks for extreme values 
     # Check for maximum and minimum plate thickness
     if web_plate_l != 0:
         if web_plate_t < min_plate_thk:
@@ -677,19 +693,19 @@ def finConn(uiObj):
             logger.info(": Select a higher depth secondary beam section") 
     
     # Calculation of plate height required (for optional input) 
-    web_plate_l_req1 = math.sqrt((boltParameters['moment']*1000000*6*1.1)/(1.2*beam_fy*web_plate_t));
-    web_plate_l_req1 = round(web_plate_l_req1,3)
+    web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));
+    web_plate_l_req1 = round(web_plate_l_req1, 3)
     # Single line of bolts
     if boltParameters['numofcol'] == 1:
-        web_plate_l_req2 = (boltParameters['numofbolts']-1) * boltParameters['minpitch'] + 2 * boltParameters['enddist'];
+        web_plate_l_req2 = (boltParameters['numofbolts'] - 1) * boltParameters['minpitch'] + 2 * boltParameters['enddist'];
         if web_plate_l == 0 or web_plate_l == min_plate_height or web_plate_l == max_plate_height:
             web_plate_l_req = max(web_plate_l_req1, web_plate_l_req2, web_plate_l);
         else:
-            web_plate_l_req = max(web_plate_l_req1, web_plate_l_req2,min_plate_height);
+            web_plate_l_req = max(web_plate_l_req1, web_plate_l_req2, min_plate_height);
 
     # Multi line of bolts
     if boltParameters['numofcol'] == 2:
-        web_plate_l_req2 = (boltParameters['numofrow']-1) * boltParameters['minpitch'] + 2 * boltParameters['enddist'];
+        web_plate_l_req2 = (boltParameters['numofrow'] - 1) * boltParameters['minpitch'] + 2 * boltParameters['enddist'];
     
         if web_plate_l == 0 or web_plate_l == min_plate_height or web_plate_l == max_plate_height:
             web_plate_l_req = max(web_plate_l_req1, web_plate_l_req2, web_plate_l);
@@ -701,30 +717,30 @@ def finConn(uiObj):
     else:
         if web_plate_l < web_plate_l_req:
             logger.error(": Plate height provided is less than the minimum required [cl. 10.2.2/10.2.4]")
-            logger.warning(": Minimum plate width required is %2.2f mm " %(web_plate_l_req))
+            logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_l_req))
             
     if web_plate_w != 0:
         if web_plate_w < web_plate_w_req: 
            
             logger.error(": Plate width provided is less than the minimum required [cl. 10.2.2/10.2.4]")
-            logger.warning(": Minimum plate width required is %2.2f mm " %(web_plate_w_req))
+            logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_w_req))
     else:
         pass
                 
     # Block shear capacity of plate
     
-    Tdb = blockshear(boltParameters['numofrow'],boltParameters['numofcol'],boltParameters['dia_hole'],\
-                     beam_fy,beam_fu,boltParameters['enddist'],\
-                     boltParameters['enddist'],boltParameters['pitch'],\
-                     boltParameters['gauge'],web_plate_t) 
+    Tdb = blockshear(boltParameters['numofrow'], boltParameters['numofcol'], boltParameters['dia_hole'], \
+                     beam_fy, beam_fu, boltParameters['enddist'], \
+                     boltParameters['enddist'], boltParameters['pitch'], \
+                     boltParameters['gauge'], web_plate_t) 
     if Tdb < shear_load:
         logger.error(": The block shear capacity of the plate is lass than the applied shear force [cl. 6.4.1]")
-        logger.warning(": Minimum block shear capacity required is " %(shear_load))
+        logger.warning(": Minimum block shear capacity required is " % (shear_load))
         logger.info(": Increase the plate thickness")
         
     ##################################################################################
     
-    ## Weld design
+    # # Weld design
     # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) [source: Subramanian's book]
     weld_fu = 410;
     weld_fy = 250;
@@ -737,9 +753,9 @@ def finConn(uiObj):
     else:
         weld_l = web_plate_l_opt - weld_t * 2
     
-    ## Weld shear strength 
+    # # Weld shear strength 
     # Direct shear
-    Vy1 = shear_load *1000 /float(2*weld_l);        
+    Vy1 = shear_load * 1000 / float(2 * weld_l);        
     
     # Shear due to moment (Note: for single line of weld)
     xCritical = 0;                    
@@ -747,19 +763,19 @@ def finConn(uiObj):
     
     Ip = weld_l * weld_l * weld_l / 12;
     
-    Vx = boltParameters['moment'] * yCritical *1000000 / (2 * Ip);
+    Vx = boltParameters['moment'] * yCritical * 1000000 / (2 * Ip);
     Vy2 = boltParameters['moment'] * xCritical * 1000000 / (2 * Ip);
     
     # Resultant shear
     Vr = math.sqrt(Vx ** 2 + (Vy1 + Vy2) ** 2);
-    Vr = round(Vr,3);
+    Vr = round(Vr, 3);
     
     weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * 1.25);
-    weld_strength = round(weld_strength,3);
+    weld_strength = round(weld_strength, 3);
     
-    weld_t_req_chk1 = (Vr * (math.sqrt(3) * 1.25))/(0.7 * weld_fu);
+    weld_t_req_chk1 = (Vr * (math.sqrt(3) * 1.25)) / (0.7 * weld_fu);
     weld_t_req_chk2 = 0.8 * web_plate_t;
-    weld_t_req = max(weld_t_req_chk1,weld_t_req_chk2);
+    weld_t_req = max(weld_t_req_chk1, weld_t_req_chk2);
     
     if weld_t_req != int(weld_t_req):
         weld_t_req = int(weld_t_req) + 1;
@@ -777,7 +793,7 @@ def finConn(uiObj):
     # Output for user given fin plate height
     if web_plate_l != 0 and web_plate_w != 0:
         outputObj = {}
-        outputObj['Bolt'] ={}
+        outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = True
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
@@ -810,7 +826,7 @@ def finConn(uiObj):
     # Output for optional height and user given width of fin plate
     elif web_plate_l == 0 and web_plate_w != 0:
         outputObj = {}
-        outputObj['Bolt'] ={}
+        outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = True
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
@@ -843,7 +859,7 @@ def finConn(uiObj):
     # Output for user given height but optional width of fin plate
     elif web_plate_l != 0 and web_plate_w == 0:
         outputObj = {}
-        outputObj['Bolt'] ={}
+        outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = True
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
@@ -876,7 +892,7 @@ def finConn(uiObj):
     # Output for optional height and width of fin plate
     else:
         outputObj = {}
-        outputObj['Bolt'] ={}
+        outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = True
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
@@ -919,7 +935,7 @@ def finConn(uiObj):
     outputObj['Bolt']['dia_hole'] = boltParameters['dia_hole']
     
     outputObj['Plate']['web_plate_fy'] = web_plate_fy
-    #$$$$$$$$$$$$$$$$$$$$
+    # $$$$$$$$$$$$$$$$$$$$
     
     outputObj['Plate']['platethk'] = web_plate_t
     outputObj['Plate']['beamdepth'] = beam_d
@@ -928,13 +944,13 @@ def finConn(uiObj):
     outputObj['Plate']['beamflangethk'] = beam_f_t
     outputObj['Plate']['colflangethk'] = PBeam_T
  
-    #$$$$$$$$$$$$$$$$$$$$$$$$
+    # $$$$$$$$$$$$$$$$$$$$$$$$
     
     outputObj['Weld']['weld_fu'] = weld_fu
     outputObj['Weld']['effectiveWeldlength'] = weld_l
     
 #     return outputObj
-### Checks  to delete dictionary
+# ## Checks  to delete dictionary
 # Delete the dictionary when shear force is 0
     if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
          for k in outputObj.keys():
@@ -942,7 +958,7 @@ def finConn(uiObj):
                             outputObj[k][key] = ""
         
 #     Delete dictionary for unsafe design for user defined plate height and width
-    if web_plate_l != 0 and web_plate_w !=0 :
+    if web_plate_l != 0 and web_plate_w != 0 :
         if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
             for k in outputObj.keys():
                         for key in outputObj[k].keys():
@@ -991,7 +1007,7 @@ def finConn(uiObj):
             for k in outputObj.keys():
                 for key in outputObj[k].keys():
                     outputObj[k][key] = ""
-        elif boltParameters['numofcol']==2:
+        elif boltParameters['numofcol'] == 2:
             if boltParameters['pitch'] < boltParameters['minpitch']:
                 for k in outputObj.keys():
                     for key in outputObj[k].keys():
@@ -1011,7 +1027,7 @@ def finConn(uiObj):
             for k in outputObj.keys():
                 for key in outputObj[k].keys():
                     outputObj[k][key] = ""
-        elif boltParameters['numofcol']==2:
+        elif boltParameters['numofcol'] == 2:
             if boltParameters['pitch'] < boltParameters['minpitch']:
                 for k in outputObj.keys():
                     for key in outputObj[k].keys():

@@ -17,7 +17,7 @@ from OCC.TopExp import TopExp_Explorer
 
 class Bolt(object):
     #
-    def __init__(self,R,T,H,r):        
+    def __init__(self, R, T, H, r):        
         self.R = R
         self.H = H
         self.T = T
@@ -33,7 +33,7 @@ class Bolt(object):
         self.a5 = None
         self.a6 = None
         self.points = []        
-        #self.computeParams()
+        # self.computeParams()
     
     def place(self, origin, uDir, shaftDir):
         self.origin = origin
@@ -41,7 +41,7 @@ class Bolt(object):
         self.shaftDir = shaftDir        
         self.computeParams()
         
-    def getPoint(self,theta):
+    def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
@@ -63,8 +63,8 @@ class Bolt(object):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = -self.T * self.shaftDir # extrudeDir is a numpy array
-        boltHead =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = -self.T * self.shaftDir  # extrudeDir is a numpy array
+        boltHead = makePrismFromFace(aFace, extrudeDir)
         mkFillet = BRepFilletAPI_MakeFillet(boltHead)
         anEdgeExplorer = TopExp_Explorer(boltHead, TopAbs_EDGE)
         while anEdgeExplorer.More():
@@ -76,7 +76,7 @@ class Bolt(object):
         cylOrigin = self.origin
       
         boltCylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.shaftDir)), self.r, self.H).Shape()
-        whole_Bolt = BRepAlgoAPI_Fuse(boltHead,boltCylinder).Shape()
+        whole_Bolt = BRepAlgoAPI_Fuse(boltHead, boltCylinder).Shape()
         mkFillet = BRepFilletAPI_MakeFillet(whole_Bolt)
         
         return whole_Bolt

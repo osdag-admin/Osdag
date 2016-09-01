@@ -44,107 +44,105 @@ from plate import Plate
 from notch import Notch
 from ui_endplate import Ui_MainWindow
 from utilities import osdagDisplayShape
-from weld import  Weld
+from weld import Weld
 from drawing_2D import EndCommonData
 
+
 class MyPopupDialog(QtGui.QDialog):
-    
+
     def __init__(self, parent=None):
-        
+
         QtGui.QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.mainController = parent
         self.setWindowTitle("Design Profile")
-        self.ui.btn_browse.clicked.connect(lambda:self.getLogoFilePath(self.ui.lbl_browse))
+        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
         self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
         self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
         self.accepted.connect(self.save_inputSummary)
-    
+
     def save_inputSummary(self):
         input_summary = self.getPopUpInputs()
         self.mainController.save_design(input_summary)
         # return input_summary
-        
+
     def getLogoFilePath(self, lblwidget):
-        
+
         self.ui.lbl_browse.clear
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QtGui.QFileDialog.DontUseNativeDialog)
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
         self.desired_location(filename)
-       
+
         return str(filename)
-    
+
     def desired_location(self, filename):
         shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoEnd.png")
-       
-        
+
     def saveUserProfile(self):
         inputData = self.getPopUpInputs()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile", '*.txt')
-        
+
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
-        infile.close()                                
-        
+        infile.close()
+
     def getPopUpInputs(self):
-        
-        
+
         input_summary = {}
         input_summary["ProfileSummary"] = {}
         input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
         input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
         input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
         input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
-        
+
         input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
         input_summary["Method"] = str(self.ui.comboBox_method.currentText())
-        
+
         return input_summary
-    
+
     def useUserProfile(self):
-        files_types = "All Files (*))"
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", "All Files (*)")
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
-            reportsummary = pickle.load(outfile)            
+            reportsummary = pickle.load(outfile)
             self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
-            self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])                      
+            self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
             self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
             self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
-           
+
         else:
             pass
-        
+
+
 class MainController(QtGui.QMainWindow):
-    
 
     closed = pyqtSignal()
+
     def __init__(self, folder):
 
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         self.ui.combo_Beam.addItems(get_beamcombolist())
         self.ui.comboColSec.addItems(get_columncombolist())
-        
+
         self.ui.inputDock.setFixedSize(310, 710)
         self.folder = folder
-        
-        self.gradeType = {'Please Select Type':'',
-                         'HSFG': [8.8, 10.8],
-                         'Black Bolt':[3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+
+        self.gradeType = {'Please Select Type': '',
+                          'HSFG': [8.8, 10.8],
+                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboType.setCurrentIndex(0)
-        
-        
+
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         ###################
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
@@ -152,12 +150,12 @@ class MainController(QtGui.QMainWindow):
         self.retrieve_prevstate()
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
-        
-        self.ui.btn_front.clicked.connect(lambda:self.call2D_Drawing("Front"))
-        self.ui.btn_top.clicked.connect(lambda:self.call2D_Drawing("Top"))
-        self.ui.btn_side.clicked.connect(lambda:self.call2D_Drawing("Side"))
-        
-        self.ui.btn3D.clicked.connect(lambda:self.call_3DModel(True))
+
+        self.ui.btn_front.clicked.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.btn_top.clicked.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.btn_side.clicked.connect(lambda: self.call2D_Drawing("Side"))
+
+        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel(True))
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxEndplate.clicked.connect(self.call_3DEndplate)
@@ -165,7 +163,7 @@ class MainController(QtGui.QMainWindow):
         validator = QtGui.QIntValidator()
         self.ui.txtFu.setValidator(validator)
         self.ui.txtFy.setValidator(validator)
-        
+
         dbl_validator = QtGui.QDoubleValidator()
         self.ui.txtPlateLen.setValidator(dbl_validator)
         self.ui.txtPlateLen.setMaxLength(7)
@@ -173,20 +171,20 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtPlateWidth.setMaxLength(7)
         self.ui.txtShear.setValidator(dbl_validator)
         self.ui.txtShear.setMaxLength(7)
-        
+
         minfuVal = 290
         maxfuVal = 590
         self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, minfuVal, maxfuVal))
-        
+
         minfyVal = 165
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
-       
+
         ##### MenuBar #####
         self.ui.actionQuit_end_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_end_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_end_plate_design.triggered.connect(QtGui.qApp.quit)
-        
+
         self.ui.actionCreate_design_report_2.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages_2.triggered.connect(self.save_log)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
@@ -194,105 +192,100 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
         self.ui.actionSave_3D_model.triggered.connect(self.save3DcadImages)
         self.ui.actionSave_CAD_image.triggered.connect(self.save2DcadImages)
-        self.ui.actionSave_front_view.triggered.connect(lambda:self.call2D_Drawing("Front"))
-        self.ui.actionSave_side_view.triggered.connect(lambda:self.call2D_Drawing("Side"))
-        self.ui.actionSave_top_view.triggered.connect(lambda:self.call2D_Drawing("Top"))
+        self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
+        self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
+        self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
         self.ui.actionPan.triggered.connect(self.call_Pannig)
-        
+
         self.ui.actionShow_beam.triggered.connect(self.call_3DBeam)
         self.ui.actionShow_column.triggered.connect(self.call_3DColumn)
         self.ui.actionShoe_end_plate.triggered.connect(self.call_3DEndplate)
-        self.ui.actionShow_all.triggered.connect(lambda:self.call_3DModel(True))
+        self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
-        
+
         # self.ui.combo_Beam.addItems(get_beamcombolist())
         # self.ui.comboColSec.addItems(get_columncombolist())
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda:self.fillPlateThickCombo())
+        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo())
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         # self.ui.comboColSec.currentIndexChanged[int].connect(lambda:self.populateWeldThickCombo("comboColSec"))
         # self.ui.comboConnLoc.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda:self.populateWeldThickCombo())
+        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo())
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.checkPlateHeight(self.ui.txtPlateLen))
-        
-#         self.ui.combo_Beam.currentIndexChanged[str].connect(self.fillPlateThickCombo)
-#         self.ui.comboColSec.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-#         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-#         self.ui.comboPlateThick_2.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        
-        
+
+        # self.ui.combo_Beam.currentIndexChanged[str].connect(self.fillPlateThickCombo)
+        # self.ui.comboColSec.currentIndexChanged[str].connect(self.populateWeldThickCombo)
+        # self.ui.comboConnLoc.currentIndexChanged[str].connect(self.populateWeldThickCombo)
+        # self.ui.comboPlateThick_2.currentIndexChanged[str].connect(self.populateWeldThickCombo)
+
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
-        
-        
+
         # Saving and Restoring the endPlate window state.
         # self.retrieve_prevstate()
-        
+
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
-        
+
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Design.clicked.connect(self.osdag_header)
         # Initialising the qtviewer
         from osdagMainSettings import backend_name 
-        self.display, _ = self.init_display(backend_str=backend_name())        
-#         self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
+        self.display, _ = self.init_display(backend_str=backend_name())
+        # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
         # self.ui.btnSvgSave.clicked.connect(lambda:self.saveTopng(self.display))
-        
+
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-    
-    
+
     def osdag_header(self):
-        image_path = "../OsdagLIVE/ResourceFiles/Osdag_header.png"
+        image_path = "ResourceFiles/Osdag_header.png"
         self.store_osdagheader(image_path)
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
-    
-        
+
     def showFontDialogue(self):
-        
+
         font, ok = QtGui.QFontDialog.getFont()
         if ok:
             self.ui.inputDock.setFont(font)
             self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
-    
+
     def showColorDialog(self):
-      
+
         col = QtGui.QColorDialog.getColor()
         colorTup = col.getRgb()
         r = colorTup[0]
         g = colorTup[1]
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
-        
+
     def callZoomin(self):
         self.display.ZoomFactor(2)
-        
+
     def callZoomout(self):
         self.display.ZoomFactor(0.5)
-        
+
     def callRotation(self):
         self.display.Rotation(15, 0)
+
     def call_Pannig(self):
         self.display.Pan(50, 0)
-    
-        
+
     def save2DcadImages(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
         fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
-        
+
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
             self.display.ExportToImage(fName)
             QtGui.QMessageBox.about(self, 'Information', "File saved")
-            
-    
+
     def disableViewButtons(self):
         '''
         Disables the all buttons in toolbar
@@ -300,32 +293,32 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_front.setEnabled(False)
         self.ui.btn_top.setEnabled(False)
         self.ui.btn_side.setEnabled(False)
-        
+
         self.ui.btn3D.setEnabled(False)
         self.ui.chkBxBeam.setEnabled(False)
         self.ui.chkBxCol.setEnabled(False)
         self.ui.chkBxEndplate.setEnabled(False)
         self.ui.menubar.setEnabled(False)
-        
-#         self.ui.actionSave_3D_model.setEnabled(False)
-#         self.ui.actionSave_CAD_image.setEnabled(False)
-#         self.ui.actionSave_front_view.setEnabled(False)
-#         self.ui.actionSave_top_view.setEnabled(False)
-#         self.ui.actionSave_side_view.setEnabled(False)
-#         self.ui.actionZoom_in.setEnabled(False)
-#         self.ui.actionZoom_out.setEnabled(False)
-#         self.ui.actionRotate_3D_model.setEnabled(False)
-#         self.ui.actionShow_beam.setEnabled(False)
-#         self.ui.actionShow_column.setEnabled(False)
-#         self.ui.actionShoe_end_plate.setEnabled(False)
-#         self.ui.actionShow_all.setEnabled(False)
-#         self.ui.actionCreate_design_report_2.setEnabled(False)
-#         self.ui.actionSave_log_messages_2.setEnabled(False)
-#         self.ui.actionSave_design.setEnabled(False)
+
+        # self.ui.actionSave_3D_model.setEnabled(False)
+        # self.ui.actionSave_CAD_image.setEnabled(False)
+        # self.ui.actionSave_front_view.setEnabled(False)
+        # self.ui.actionSave_top_view.setEnabled(False)
+        # self.ui.actionSave_side_view.setEnabled(False)
+        # self.ui.actionZoom_in.setEnabled(False)
+        # self.ui.actionZoom_out.setEnabled(False)
+        # self.ui.actionRotate_3D_model.setEnabled(False)
+        # self.ui.actionShow_beam.setEnabled(False)
+        # self.ui.actionShow_column.setEnabled(False)
+        # self.ui.actionShoe_end_plate.setEnabled(False)
+        # self.ui.actionShow_all.setEnabled(False)
+        # self.ui.actionCreate_design_report_2.setEnabled(False)
+        # self.ui.actionSave_log_messages_2.setEnabled(False)
+        # self.ui.actionSave_design.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
         self.ui.btn_CreateDesign.setEnabled(False)
 
-    
+
     def enableViewButtons(self):
         '''
         Enables the all buttons in toolbar
@@ -333,31 +326,31 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_front.setEnabled(True)
         self.ui.btn_top.setEnabled(True)
         self.ui.btn_side.setEnabled(True)
-        
+
         self.ui.btn3D.setEnabled(True)
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxEndplate.setEnabled(True)
         self.ui.menubar.setEnabled(True)
-        
-#         self.ui.actionSave_3D_model.setEnabled(True)
-#         self.ui.actionSave_CAD_image.setEnabled(True)
-#         self.ui.actionSave_front_view.setEnabled(True)
-#         self.ui.actionSave_top_view.setEnabled(True)
-#         self.ui.actionSave_side_view.setEnabled(True)
-#         self.ui.actionZoom_in.setEnabled(True)
-#         self.ui.actionZoom_out.setEnabled(True)
-#         self.ui.actionRotate_3D_model.setEnabled(True)
-#         self.ui.actionShow_beam.setEnabled(True)
-#         self.ui.actionShow_column.setEnabled(True)
-#         self.ui.actionShoe_end_plate.setEnabled(True)
-#         self.ui.actionShow_all.setEnabled(True)
-#         self.ui.actionCreate_design_report_2.setEnabled(True)
-#         self.ui.actionSave_log_messages_2.setEnabled(True)
-#         self.ui.actionSave_design.setEnabled(True)
+
+        # self.ui.actionSave_3D_model.setEnabled(True)
+        # self.ui.actionSave_CAD_image.setEnabled(True)
+        # self.ui.actionSave_front_view.setEnabled(True)
+        # self.ui.actionSave_top_view.setEnabled(True)
+        # self.ui.actionSave_side_view.setEnabled(True)
+        # self.ui.actionZoom_in.setEnabled(True)
+        # self.ui.actionZoom_out.setEnabled(True)
+        # self.ui.actionRotate_3D_model.setEnabled(True)
+        # self.ui.actionShow_beam.setEnabled(True)
+        # self.ui.actionShow_column.setEnabled(True)
+        # self.ui.actionShoe_end_plate.setEnabled(True)
+        # self.ui.actionShow_all.setEnabled(True)
+        # self.ui.actionCreate_design_report_2.setEnabled(True)
+        # self.ui.actionSave_log_messages_2.setEnabled(True)
+        # self.ui.actionSave_design.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
         self.ui.btn_CreateDesign.setEnabled(True)
-        
+
     def fillPlateThickCombo(self):
         '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
         '''
@@ -373,9 +366,8 @@ class MainController(QtGui.QMainWindow):
         for i in newlist[:]:
             self.ui.comboPlateThick_2.addItem(str(i))
         self.ui.comboPlateThick_2.setCurrentIndex(1)
-     
-     
-     
+
+
     def checkPlateHeight(self, widget):
         loc = self.ui.comboConnLoc.currentText()
         plateHeight = widget.text()
@@ -383,7 +375,7 @@ class MainController(QtGui.QMainWindow):
         if plateHeight == 0:
             self.ui.btn_Design.setDisabled(False)
         else:
-           
+
             dictBeamData = self.fetchBeamPara()
             dictColumnData = self.fetchColumnPara()
             beam_D = float(dictBeamData[QString('D')])
@@ -402,7 +394,7 @@ class MainController(QtGui.QMainWindow):
                 QtGui.QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(minPlateHeight), int(clearDepth)))
             else:
                 self.ui.btn_Design.setDisabled(False)
-                
+
     def checkPlateWidth(self, widget):
         loc = self.ui.comboConnLoc.currentText()
         plateWidth = widget.text()
@@ -410,7 +402,7 @@ class MainController(QtGui.QMainWindow):
         if plateWidth == 0:
             self.ui.btn_Design.setDisabled(False)
         else:
-           
+
             dictColumnData = self.fetchColumnPara()
             col_D = float(dictColumnData[QString('D')])
             col_T = float(dictColumnData[QString('T')])
@@ -424,56 +416,52 @@ class MainController(QtGui.QMainWindow):
                 QtGui.QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clearDepth)))
             else:
                 self.ui.btn_Design.setDisabled(False)
-            
-               
-            
-    
+
     def populateWeldThickCombo(self):
         '''
         Returns the weld thickness on the basis column flange and plate thickness check
-        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum or of a
-        Single Run Fillet Weld)
+        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum 
+        or of a Single Run Fillet Weld)
         '''
         if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return
-             
+
         else:
             newlist = ["Select weld thickness"]
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
-            
+
             plate_thickness = self.ui.comboPlateThick_2.currentText()
             plate_thick = int(plate_thickness)
-        
+
             if plate_thick <= 10:
-                
+
                 for i in weldlist[:]:
                     newlist.append(str(i))
             elif plate_thick <= 20 and plate_thick > 10:
-                
+
                 for i in weldlist[2:]:
                     newlist.append(str(i))
             elif plate_thick <= 32 and plate_thick > 20:
-                
+
                 for i in weldlist[3:]:
-                    newlist.append(str(i))               
+                    newlist.append(str(i))
             else:
-                
+
                 for i in weldlist[5:]:
                     newlist.append(str(i))
-    
-                     
+
             self.ui.comboWldSize.clear()
             for element in newlist[:]:
                 self.ui.comboWldSize.addItem(str(element))
-    
+
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_Beam.currentText()
         dictbeamdata = get_beamdata(beam_sec)
         return dictbeamdata
-    
+
     def fetchColumnPara(self):
         column_sec = self.ui.comboColSec.currentText()
         loc = self.ui.comboConnLoc.currentText()
@@ -482,42 +470,41 @@ class MainController(QtGui.QMainWindow):
         else:
             dictcoldata = get_columndata(column_sec)
         return dictcoldata
-    
-    
+
     def convertColComboToBeam(self):
-        
+
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.label_9.setText(" Secondary beam *")
             self.ui.label_3.setText("Primary beam *")
-            
+
             self.ui.chkBxBeam.setText("SBeam")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
-            
+
             self.ui.comboColSec.clear()
             # self.ui.comboColSec.setObjectName("comboSecondaryBeam")
             # self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
             self.ui.comboColSec.addItems(get_beamcombolist())
-            
+
 # ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
             self.ui.combo_Beam.setCurrentIndex((0))
             self.ui.comboColSec.setCurrentIndex((0))
-#             self.ui.comboConnLoc.setCurrentIndex((0))            
+#             self.ui.comboConnLoc.setCurrentIndex((0))
             self.ui.comboDaimeter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.comboWldSize.setCurrentIndex((0))
-            
+
             self.ui.txtFu.clear()
             self.ui.txtFy.clear()
             self.ui.txtShear.clear()
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
-            
-#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------Output ----------------------------------------------------------------------------------------------------
             self.ui.txtShrCapacity.clear()
             self.ui.txtbearCapacity.clear()
             self.ui.txtBoltCapacity.clear()
@@ -529,45 +516,45 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtGuage.clear()
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
-            
+
             self.ui.txtplate_ht.clear()
             self.ui.txtplate_width.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
             self.ui.txtWeldStrng_5.clear()
-    
+
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-            
+
             self.ui.label_3.setText("Column Section *")
             self.ui.label_9.setText("Beam section *")
-            
+
             self.ui.chkBxBeam.setText("Beam")
             self.ui.chkBxBeam.setToolTip("Beam only")
             self.ui.chkBxCol.setText("Column")
             self.ui.chkBxCol.setToolTip("Column only")
-            
+
             self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_columncombolist())
-            
+
             self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
 # ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
             self.ui.combo_Beam.setCurrentIndex((0))
             self.ui.comboColSec.setCurrentIndex((0))
-#             self.ui.comboConnLoc.setCurrentIndex((0))            
+#             self.ui.comboConnLoc.setCurrentIndex((0))
             self.ui.comboDaimeter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.comboWldSize.setCurrentIndex((0))
-            
+
             self.ui.txtFu.clear()
             self.ui.txtFy.clear()
             self.ui.txtShear.clear()
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
-            
-#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+
+# ----------------------------------------------Output ----------------------------------------------------------------------------------------------------
             self.ui.txtShrCapacity.clear()
             self.ui.txtbearCapacity.clear()
             self.ui.txtBoltCapacity.clear()
@@ -579,28 +566,27 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtGuage.clear()
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
-            
+
             self.ui.txtplate_ht.clear()
             self.ui.txtplate_width.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
             self.ui.txtWeldStrng_5.clear()
-    
-            
+
     def checkBeam_B(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
             column = self.ui.comboColSec.currentText()
-            
+
             dictBeamData = self.fetchBeamPara()
             dictColData = self.fetchColumnPara()
             column_D = float(dictColData[QString("D")])
             column_T = float(dictColData[QString("T")])
             column_R1 = float(dictColData[QString("R1")])
             columnWebDepth = column_D - 2.0 * (column_T)
-            
+
             beam_B = float(dictBeamData[QString("B")])
-            
+
             if columnWebDepth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
                 QtGui.QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
@@ -608,30 +594,27 @@ class MainController(QtGui.QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         elif loc == "Beam-Beam":
             primaryBeam = self.ui.comboColSec.currentText()
-            
+
             dictSBeamData = self.fetchBeamPara()
             dictPBeamData = self.fetchColumnPara()
             PBeam_D = float(dictPBeamData[QString("D")])
             PBeam_T = float(dictPBeamData[QString("T")])
             PBeamWebDepth = PBeam_D - 2.0 * (PBeam_T)
-            
+
             SBeam_D = float(dictSBeamData[QString("D")])
-            
+
             if PBeamWebDepth <= SBeam_D:
                 self.ui.btn_Design.setDisabled(True)
                 QtGui.QMessageBox.about(self, 'Information', "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
-    
-    
-    
-    
+
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
         if(uiObj != None):
-            
+
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
-            
+
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.label_9.setText('Secondary beam *')
                 self.ui.label_3.setText('Primary beam *')

@@ -153,6 +153,7 @@ def get_angledata(sect):
     retDict = {}
     record = designQuery.record()
 
+    # TODO rework angle section name 
     while (designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)

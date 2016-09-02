@@ -1,67 +1,44 @@
 '''
-Created on 29-sept-2015
-
-@author: jeffy
-
+Created on 2-Sept-2016
+@author: jayant patil
 '''
-# from lxml.etree import tostring
-# from lxml.etree import tostring
 
 ''' 
-Example 5.14 Page 406 N. Subramanium
-Design of steel structures
-Design of unstiffened seat angle connection:
+References:
+
+Design of Steel Structures (DoSS) - N. Subramanian
+First published 2008, 14th impression 2014
+    Chapter 5: Bolted Connections
+    Example 5.14, Page 406
 
 '''
-import cmath;
 import math
-import sys;
+import logging
 
 from model import *
 from PyQt4.Qt import QString
-import logging
 flag  = 1
 logger = None
 
-def module_setup():
-    
-    global logger
-    logger = logging.getLogger("osdag.SeatAngleCalc")
+logger = logging.getLogger("osdag.SeatAngleCalc")
 
-module_setup()
-# def set_designlogger():
-#         global logger
-#         logger = logging.getLogger("Designlogger")
-#         logger.setLevel(logging.DEBUG)
-#      
-#         # create the logging file handler
-#         fh = logging.FileHandler("fin.log", mode="w")
-#         
-#         #,datefmt='%a, %d %b %Y %H:%M:%S'
-#         #formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#         
-#         formatter = logging.Formatter('''
-#         <div  class="LOG %(levelname)s">
-#             <span class="DATE">%(asctime)s</span>
-#             <span class="LEVEL">%(levelname)s</span>
-#             <span class="MSG">%(message)s</span>
-#         </div>''')
-#         formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
-#         fh.setFormatter(formatter)
-#      
-#         # add handler to logger object
-#         logger.addHandler(fh)
-#         
-        
+'''
 
-#FUNCTION DEFINITIONS---------------
-#BOLT: determination of shear capacity = fu * n * A / (root(3) * Y)
-def bolt_shear(dia, n, fu):
-    A = math.pi * dia * dia * 0.25 * 0.78; #threaded area = 0.78 x shank area
-    root3 = math.sqrt(3);
-    Vs = fu * n * A / (root3 * 1.25 * 1000);
-    Vs = round(Vs.real,3);
-    return Vs
+List of assumptions:
+
+'''
+
+# Bolt calculations
+# Factored shear capacity = f_u * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
+
+def bolt_shear(bolt_diameter, number_of bolts, f_u):
+    # assuming shear plane passes through threaded area of all bolts
+    # assuming the tensile stress area equal to the threaded area
+    # values for tensile stress area at root from Table 5.9 DoSS - N. Subramanian
+    bolt_area = math.pi * bolt_diameter * bolt_diameter * 0.25 * 0.78
+    bolt_nominal_shear_capacity = f_u * number_of_bolts * bolt_area / (math.sqrt(3) * 1000)
+    Vs = round(Vs.real,3)
+    return round( bolt_nominal_shear_capacity/ 1.25, 3) # gamma_mb = 1.25
     
 #BOLT: determination of bearing capacity = 2.5 * kb * d * t * fu / Y
 def bolt_bearing(dia, t, fu):

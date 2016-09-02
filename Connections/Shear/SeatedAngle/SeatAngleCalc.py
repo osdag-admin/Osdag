@@ -12,10 +12,20 @@ First published 2008, 14th impression 2014
     Example 5.14, Page 406
 
 '''
+
 import math
 import logging
+import model
 
-from model import *
+'''
+
+Rework namespace usage for model.py functions:
+    model.get_angledata
+    model.get_columndata
+    model.get_beamdata
+
+'''
+
 from PyQt4.Qt import QString
 
 # flag = 1
@@ -83,22 +93,22 @@ def SeatAngleConn(inputObj):
     bolt_planes = 1
 
     # angle_sec = 'ISA 15075'
-    # TODO rework
+    # TODO rework angle section name
     angle_sec = inputObj['Angle']["AngleSection"]
     # angle_t = 12
 
-    dictbeamdata = get_beamdata(beam_section)
-    beam_w_t = float(dictbeamdata[QString("tw")])
-    beam_f_t = float(dictbeamdata[QString("T")])
-    beam_d = float(dictbeamdata[QString("D")])
-    beam_w_f = float(dictbeamdata[QString("B")])
-    beam_R1 = float(dictbeamdata[QString("R1")])
+    dict_beam_data = model.get_beamdata(beam_section)
+    beam_w_t = float(dict_beam_data[QString("tw")])
+    beam_f_t = float(dict_beam_data[QString("T")])
+    beam_d = float(dict_beam_data[QString("D")])
+    beam_w_f = float(dict_beam_data[QString("B")])
+    beam_R1 = float(dict_beam_data[QString("R1")])
 
-    dictcolumndata = get_columndata(column_section)
+    dictcolumndata = model.get_columndata(column_section)
     column_f_t = float(dictcolumndata[QString("T")])
     columnt_f_t = 15
 
-    dictangledata = get_angledata(angle_sec)
+    dictangledata = model.get_angledata(angle_sec)
     angle_t = float(dictangledata[QString("t")])
     # angle_t = 12
     angle_a = float(dictangledata[QString("A")])

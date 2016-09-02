@@ -11,6 +11,9 @@ First published 2008, 14th impression 2014
     Chapter 5: Bolted Connections
     Example 5.14, Page 406
 
+IS 800: 2007
+    General construction in steel - Code of practice (Third revision)
+
 '''
 
 import math
@@ -33,6 +36,7 @@ List of assumptions:
 
 # Bolt calculations
 # Bolt factored shear capacity = f_u * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
+# IS 800, Cl 10.3.3
 # Reduction factors for long joints, large grip lengths, and packing plates
 def bolt_shear(bolt_diameter, number_of_bolts, f_u):
     # assuming shear plane passes through threaded area of all bolts
@@ -48,6 +52,7 @@ def bolt_shear(bolt_diameter, number_of_bolts, f_u):
 
 
 # Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
+# IS 800, Cl 10.3.4
 def bolt_bearing(bolt_diameter, thickness_plate, f_u):
     # currently assuming k_b = 0.5
     # TODO calculate k_b
@@ -113,7 +118,7 @@ def SeatAngleConn(inputObj):
     # ------------------------------------------------------
     # Bolt design:
 
-    bolt_fu = int(bolt_grade) * 100
+    bolt_fu = int(bolt_grade) * 100 # Table 1 of IS 800
     # TODO bolt f_y
         # confirm python arbitrary precision calcs will not cause issues in below logic
         # bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;
@@ -126,31 +131,64 @@ def SeatAngleConn(inputObj):
 
     bolt_value = min(bolt_shear_capacity, bolt_bearing_capacity)
 
-    bolts_required = int(shear_force / bolt_value) + 1
+    bolts_required = math.ceil(shear_force / bolt_value)
+
+    # TODO SCI minimum 3 bolts
+        # assumption: provide minimum 3 bolts based on SCI guidelines
+        # check if odd number of bolts can be allowed
     if bolts_required <= 2:
         bolts_required = 3
 
-    # even number of bolts -- confirm with sir(doubt)
-    else:
-        if bolts_required % 2 == 1:
-            bolts_required = bolts_required + 1
+    # print "no of bolts required = " + str(bolts_required)
 
-    print "no of bolts required =" + str(bolts_required)
-
+    # TODO bolt group capacity
+        # check applicable reduction factors
     bolt_group_capacity = bolts_required * bolt_value
-    print "bolt group capacity =" + str(bolt_group_capacity)
+    # print "bolt group capacity = " + str(bolt_group_capacity)
 
-    # Spacing of bolts for web plate -------------------
-    if bolt_diameter == 12 or bolt_diameter == 14:
-        dia_hole = bolt_diameter + 1
-    elif bolt_diameter == 16 or bolt_diameter == 18 or bolt_diameter == 20 or bolt_diameter == 22 or bolt_diameter == 24:
-        dia_hole = bolt_diameter + 2
-    else:
-        dia_hole = bolt_diameter + 3
+    # Bolt hole clearance
+    # IS 800, Table 19 Clearances for Fastener HOles
+    # TODO Bolt hole clearance
+        # update clearance dictionary for other bolt diameters
+        # update clearance dictionary for oversized holes
+    bolt_hole_type = 1
+    def bolt_hole_clearance(bolt_hole_type, bolt_diameter):
+        if bolt_hole_type == 1: # standard hole
+            clearance = {
+                12: 1,
+                14: 1,
+                16: 2,
+                18: 2,
+                20: 2,
+                22: 2,
+                24: 2,
+                30: 3,
+                36: 3
+            }[bolt_diameter]
+        elif bolt_hole_type == 0: # over size hole
+            clearance = {
+                12: 3,
+                14: 3,
+                16: 4,
+                18: 4,
+                20: 4,
+                22: 4,
+                24: 6,
+                30: 8,
+                36: 8
+            }[bolt_diameter]
+        return clearance # units: mm
 
-        # Minimum/maximum pitch and gauge
+    bolt_hole_diameter = bolt_diameter + bolt_hole_clearance(bolt_hole_type, bolt_diameter)
+
+    # Minimum pitch and gauge IS 800 Cl 10.2.2
+    # TODO minimum spacing
+        # check with thickness of connected members <= 32t, 300
+
+    # TODO bookmark current
     min_pitch = int(2.5 * bolt_diameter)
     min_gauge = int(2.5 * bolt_diameter)
+
 
     if min_pitch % 10 != 0 or min_gauge % 10 != 0:
         min_pitch = (min_pitch / 10) * 10 + 10
@@ -165,7 +203,7 @@ def SeatAngleConn(inputObj):
     max_spacing = int(min(100 + 4 * thickness_governing, 200))  # clause 10.2.3.3 is800
     print "max spacing=" + str(max_spacing)
 
-    min_edge_dist = int(1.5 * (dia_hole)) + 10  # 10 mm added than min. value
+    min_edge_dist = int(1.5 * (bolt_hole_diameter)) + 10  # 10 mm added than min. value
     if min_edge_dist % 10 != 0:
         min_edge_dist = (min_edge_dist / 10) * 10 + 10
     else:

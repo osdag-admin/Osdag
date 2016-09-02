@@ -414,7 +414,7 @@ class MainController(QtGui.QMainWindow):
         uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text().toInt()[0]
 
         uiObj['Load'] = {}
-        uiObj['Load']['ShearForce (kN)'] = self.ui.txt_shear_force.text().toInt()[0]
+        uiObj['Load']['ShearForce (kN)'] = float(self.ui.txt_shear_force.text())
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())

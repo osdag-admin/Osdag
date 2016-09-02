@@ -408,7 +408,7 @@ class MainController(QtGui.QMainWindow):
 
         uiObj['Member'] = {}
         uiObj['Member']['BeamSection'] = str(self.ui.combo_beam_section.currentText())
-        uiObj['Member']['ColumSection'] = str(self.ui.combo_column_section.currentText())
+        uiObj['Member']['ColumnSection'] = str(self.ui.combo_column_section.currentText())
         uiObj['Member']['Connectivity'] = str(self.ui.combo_connectivity.currentText())
         uiObj['Member']['fu (MPa)'] = self.ui.txt_fu.text().toInt()[0]
         uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text().toInt()[0]
@@ -418,6 +418,7 @@ class MainController(QtGui.QMainWindow):
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
+        #TODO delete angle - thickness input from UI
 
         return uiObj
 

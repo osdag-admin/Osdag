@@ -154,7 +154,7 @@ def SeatAngleConn(inputObj):
     bolt_hole_type = 1
     def bolt_hole_clearance(bolt_hole_type, bolt_diameter):
         if bolt_hole_type == 1: # standard hole
-            clearance = {
+            hole_clearance = {
                 12: 1,
                 14: 1,
                 16: 2,
@@ -166,7 +166,7 @@ def SeatAngleConn(inputObj):
                 36: 3
             }[bolt_diameter]
         elif bolt_hole_type == 0: # over size hole
-            clearance = {
+            hole_clearance = {
                 12: 3,
                 14: 3,
                 16: 4,
@@ -177,48 +177,55 @@ def SeatAngleConn(inputObj):
                 30: 8,
                 36: 8
             }[bolt_diameter]
-        return clearance # units: mm
+        return hole_clearance # units: mm
 
     bolt_hole_diameter = bolt_diameter + bolt_hole_clearance(bolt_hole_type, bolt_diameter)
 
     # Minimum pitch and gauge IS 800 Cl 10.2.2
     # TODO minimum spacing
         # check with thickness of connected members <= 32t, 300
-
-    # TODO bookmark current
     min_pitch = int(2.5 * bolt_diameter)
     min_gauge = int(2.5 * bolt_diameter)
 
-
+    # assumption: rounding off min pitch and gauge distances to upper multiple of 10
     if min_pitch % 10 != 0 or min_gauge % 10 != 0:
         min_pitch = (min_pitch / 10) * 10 + 10
         min_gauge = (min_gauge / 10) * 10 + 10
-    else:
-        min_pitch = min_pitch
-        min_gauge = min_gauge
-        # clause 10.2.2 is800
-    print "minimum pitch =" + str(min_pitch)
-    print "minimum gauge =" + str(min_gauge)
 
-    max_spacing = int(min(100 + 4 * thickness_governing, 200))  # clause 10.2.3.3 is800
+    print "minimum pitch = " + str(min_pitch)
+    print "minimum gauge = " + str(min_gauge)
+
+    # Max spacing IS 800 Cl 10.2.3.3
+    max_spacing = int(min(100 + 4 * thickness_governing, 200))
     print "max spacing=" + str(max_spacing)
 
-    min_edge_dist = int(1.5 * (bolt_hole_diameter)) + 10  # 10 mm added than min. value
+    # Max spacing IS 800 Cl 10.2.4.2
+    min_edge_multiplier = 1.5
+    min_edge_dist = int(min_edge_multiplier * (bolt_hole_diameter))
     if min_edge_dist % 10 != 0:
         min_edge_dist = (min_edge_dist / 10) * 10 + 10
-    else:
-        min_edge_dist = min_edge_dist
 
-    max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / beam_fy)).real) - 1
+    # TODO current bookmark
+    # Max spacing IS 800 Cl 10.2.4.3
+    max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / beam_fy)).real)
 
     # Determine single or double line of bolts
-
     length_avail = (angle_a - 2 * min_edge_dist)
-    pitch = round(length_avail / (bolts_required - 1), 3)
+    pitch = round(length_avail / (bolts_required - 1), 1)
 
-    ## Calculation of moment demand
+    # TODO : rework the moment demand logic
+        # determine lines of bolts
+        # capacity based moment demand or force based?
+    # Calculation of moment demand
 
-    M1 = bolt_shear_capacity * (20 + min_edge_dist / 2)
+
+    # assumption: end clearance of beam from face of column = 5mm
+    # and tolerance = 5mm
+    clearance = 5
+    tolerance = 5
+    clear_gap = clearance + tolerance
+
+    M1 = bolt_shear_capacity * (clear_gap + min_edge_dist / 2)
     # Single line of bolts
     if pitch >= min_pitch:
         bolt_line = 1
@@ -285,11 +292,10 @@ def SeatAngleConn(inputObj):
     bearing_length = round(bearing_length, 3)
     print "length of bearing required at the root line of beam=" + str(bearing_length)
 
-    # assuming end clearance of beam from face of column as 5mm and tolerance of 5mm
-    clearance = 5
-    tolerance = 5
-    # Required length of outstanding leg = bearing length + clearance + tolerance
-    outstanding_leg_length = bearing_length + tolerance + clearance
+
+    # Required length of outstanding leg = bearing length + clearance + tolerance,
+    # clear_gap = clearance + tolerance
+    outstanding_leg_length = bearing_length + clear_gap
     print "outstanding leg length =" + str(outstanding_leg_length)
 
     if outstanding_leg_length > angle_b:
@@ -304,7 +310,7 @@ def SeatAngleConn(inputObj):
     print "length of bearing on cleat" + str(bearing_length_on_cleat)
 
     # for ISA 150*75*12, distance from the end of bearing on cleat to root angle OR A TO B =b2
-    b2 = b1 + clearance + tolerance - angle_t - angle_ra
+    b2 = b1 + clear_gap - angle_t - angle_ra
     print "distance A to B = " + str(b2)
 
     # **************************************

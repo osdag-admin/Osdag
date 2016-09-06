@@ -12,13 +12,12 @@ from numpy import math
 from model import *
 
 
-
 class cleatCommonData(object):
-    
+
     def __init__(self, inputObj, outputObj, dictBeamdata, dictColumndata, dictAngleData, folder):
         '''
         Provide all the data related to Finplate connection
-        
+
         :param inputObj:
         :type inputObj:dictionary(Input parameter dictionary)
         :param outputObj:
@@ -31,8 +30,8 @@ class cleatCommonData(object):
         '''
         self.beam_T = float(dictBeamdata[QString("T")])
         self.col_T = float(dictColumndata[QString("T")])
-        self.D_beam = int (dictBeamdata[QString("D")])
-        self.D_col = int (dictColumndata[QString("D")])
+        self.D_beam = int(dictBeamdata[QString("D")])
+        self.D_col = int(dictColumndata[QString("D")])
         self.col_B = int(dictColumndata[QString("B")])
         self.beam_B = int(dictBeamdata[QString("B")])
         self.col_tw = float(dictColumndata[QString("tw")])
@@ -44,14 +43,14 @@ class cleatCommonData(object):
         self.cleat_ht = outputObj['cleat']["height"]
         self.cleat_legsize = int(dictAngleData[QString("A")])
         self.cleat_legsize_1 = int(dictAngleData[QString("B")])
-#         self.cleat_legsize_1 = 120
+        # self.cleat_legsize_1 = 120
         self.cleat_thk = int(dictAngleData[QString("t")])
-#         self.plate_ht= outputObj['Plate']['height'] 
-#         self.cleat_thk = inputObj['Plate']["Thickness (mm)"]
-
-#         self.plate_width = outputObj['Plate']['width']
-#         self.cleat_thk = outputObj['Plate']['height']
-#         self.cleat_thk =  outputObj['Weld']['thickness']
+        # self.plate_ht= outputObj['Plate']['height'] 
+        # self.cleat_thk = inputObj['Plate']["Thickness (mm)"]
+        # 
+        # self.plate_width = outputObj['Plate']['width']
+        # self.cleat_thk = outputObj['Plate']['height']
+        self.cleat_thk =  outputObj['Weld']['thickness']
         self.bolt_dia = inputObj["Bolt"]["Diameter (mm)"]
         self.bolt_type = inputObj["Bolt"]["Type"]
         self.bolt_grade = inputObj['Bolt']['Grade']        
@@ -73,51 +72,50 @@ class cleatCommonData(object):
         self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
         self.notch_L = (self.col_B / 2 - self.col_tw / 2) + 10
         self.notch_offset = (self.col_T + self.col_R1)
-    
+
         self.folder = folder
-        
+
     def addSMarker(self, dwg):
         '''
         Draws start arrow to given line  -------->
-        
+
         :param dwg :
         :type dwg : svgwrite (obj) ( Container for all svg elements)
-        
+
         '''
-        
+
         smarker = dwg.marker(insert=(8, 3), size=(30, 30), orient="auto")
-        
+
         smarker.add(dwg.path(d=" M0,0 L3,3 L0,6 L8,3 L0,0", fill='black'))
         dwg.defs.add(smarker)
-        
+
         # smarker = dwg.marker(insert=(-8,0), size =(30,20), orient="auto")
         # smarker.add(dwg.polyline([(-2.5,0), (0,3), (-8,0), (0,-3)], fill='black'))
         # smarker.add(dwg.polyline([(0,0), (3,3), (0,6), (8,3),(0,0)], fill='black'))
-        
+
         return smarker
-    
+
     def addSectionMarker(self, dwg):
         '''
         Draws start arrow to given line  -------->
-        
+
         :param dwg :
         :type dwg : svgwrite (obj) ( Container for all svg elements)
-        
+
         '''
         sectionMarker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
         sectionMarker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))
         dwg.defs.add(sectionMarker)
-        
+
         return sectionMarker
-    
-    
+
     def addEMarker(self, dwg):
         '''
         This routine returns end arrow  <---------
-        
+
         :param dwg :
         :type dwg : svgwrite  ( Container for all svg elements)
-        
+
         '''
         # emarker = dwg.marker(insert=(8,0), size =(30,20), orient="auto")
         emarker = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
@@ -127,7 +125,7 @@ class cleatCommonData(object):
         emarker.add(dwg.path(d=" M0,3 L8,6 L5,3 L8,0 L0,3", fill='black'))
         dwg.defs.add(emarker)
         return emarker
-    
+
     def drawArrow(self, line, s_arrow, e_arrow):
         line['marker-start'] = s_arrow.get_funciri()
         line['marker-end'] = e_arrow.get_funciri()
@@ -137,24 +135,24 @@ class cleatCommonData(object):
 
     def drawEndArrow(self, line, e_arrow):
         line['marker-end'] = e_arrow.get_funciri()
-    
+
     def drawFaintLine(self, ptOne, ptTwo, dwg):
         '''
         Draw faint line to show dimensions.
-        
+
         :param dwg :
         :type dwg : svgwrite (obj)
         :param: ptOne :
         :type NumPy Array
         :param ptTwo :
         :type NumPy Array
-        
+
         '''
         dwg.add(dwg.line(ptOne, ptTwo).stroke('#D8D8D8', width=2.5, linecap='square', opacity=0.7))
-        
-    
-    def draw_dimension_outerArrow(self, dwg, pt1, pt2, text, params):  
-          
+
+
+    def draw_dimension_outerArrow(self, dwg, pt1, pt2, text, params):
+
         '''
         :param dwg :
         :type dwg : svgwrite (obj)
@@ -168,20 +166,20 @@ class cleatCommonData(object):
         :type params["offset"] : offset of the dimension line
         :param params["textoffset"]:
         :type params["textoffset"]: float (offset of text from dimension line)
-        :param params["lineori"]: 
-        :type params ["lineori"]: String (right/left) 
+        :param params["lineori"]:
+        :type params ["lineori"]: String (right/left)
         :param params["endlinedim"]:
-        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)       
+        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)
         '''
         smarker = self.addSMarker(dwg)
-        emarker = self.addEMarker(dwg)  
+        emarker = self.addEMarker(dwg)
 
         lineVec = pt2 - pt1  # [a, b]
         normalVec = np.array([-lineVec[1], lineVec[0]])  # [-b, a]
         normalUnitVec = self.normalize(normalVec)
         if(params["lineori"] == "left"):
             normalUnitVec = -normalUnitVec
-            
+
         # Q1 = pt1 + params["offset"] * normalUnitVec
         # Q2 = pt2 + params["offset"] * normalUnitVec
         Q1 = pt1 + params["offset"] * normalUnitVec
@@ -193,20 +191,20 @@ class cleatCommonData(object):
         Q12mid = 0.5 * (Q1 + Q2)
         txtPt = Q12mid + params["textoffset"] * normalUnitVec
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
-        
+
         L1 = Q1 + params["endlinedim"] * normalUnitVec
         L2 = Q1 + params["endlinedim"] * (-normalUnitVec)
         dwg.add(dwg.line(L1, L2).stroke('black', width=2.5, linecap='square', opacity=1.0))
         L3 = Q2 + params["endlinedim"] * normalUnitVec
         L4 = Q2 + params["endlinedim"] * (-normalUnitVec)
         dwg.add(dwg.line(L3, L4).stroke('black', width=2.5, linecap='square', opacity=1.0))
-        
+
     def normalize(self, vec):
         a = vec[0]
         b = vec[1]
         mag = math.sqrt(a * a + b * b)
         return vec / mag
-    
+
     def draw_cross_section(self, dwg, ptA, ptB, txtPt, text):
         '''
         :param dwg :
@@ -219,14 +217,13 @@ class cleatCommonData(object):
         :type txtPt : NumPy Array
         :param text :
         :type text : String
-        
+
         '''
         line = dwg.add(dwg.line((ptA), (ptB)).stroke('black', width=2.5, linecap='square'))
         sec_arrow = self.addSectionMarker(dwg)
         self.drawEndArrow(line, sec_arrow)
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=52))
-    
-        
+
     def draw_dimension_innerArrow(self, dwg, ptA, ptB, text, params):
         '''
         :param dwg :
@@ -244,17 +241,17 @@ class cleatCommonData(object):
         :param params["arrowlen"]:
         :type params["arrowlen"]: float (Size of the arrow)
         '''
-        
+
         # smarker = self.addSMarker(dwg)
-        # emarker = self.addEMarker(dwg)  
+        # emarker = self.addEMarker(dwg)
         smarker = self.addSMarker(dwg)
-        emarker = self.addEMarker(dwg)  
-        
+        emarker = self.addEMarker(dwg)
+
         u = ptB - ptA  # [a, b]
         uUnit = self.normalize(u)
-        
+
         vUnit = np.array([-uUnit[1], uUnit[0]])  # [-b, a]
-        
+
         A1 = ptA + params["endlinedim"] * vUnit
         A2 = ptA - params["endlinedim"] * (-vUnit)
         dwg.add(dwg.line(A1, A2).stroke('black', width=2.5, linecap='square'))
@@ -263,7 +260,7 @@ class cleatCommonData(object):
         dwg.add(dwg.line(B1, B2).stroke('black', width=2.5, linecap='square'))
         A3 = ptA - params["arrowlen"] * uUnit
         B3 = ptB + params["arrowlen"] * uUnit
-        
+
         line = dwg.add(dwg.line(A3, ptA).stroke('black', width=2.5, linecap='square'))
         self.drawEndArrow(line, smarker)
         # self.drawStartArrow(line, emarker)
@@ -272,15 +269,12 @@ class cleatCommonData(object):
         # self.drawStartArrow(line, emarker)
         txtPt = B3 + params["textoffset"] * uUnit
         dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
-        
-    
-        
-        
+
+
     def drawOrientedArrow(self, dwg, pt, theta, orientation, offset, textUp, textDown):
-    
+
         '''
-        Drawing an arrow on given direction 
-        
+        Drawing an arrow on given direction
         :param dwg :
         :type dwg : svgwrite (obj)
         :param: ptA :
@@ -295,17 +289,15 @@ class cleatCommonData(object):
         :type textUp : String
         :param textDown :
         :type textup : String
-        
         '''
         # Right Up.
         theta = math.radians(theta)
         charWidth = 16
         xVec = np.array([1, 0])
         yVec = np.array([0, 1])
-        
         p1 = pt
         lengthA = offset / math.sin(theta)
-        
+
         arrowVec = None
         if(orientation == "NE"):
             arrowVec = np.array([-math.cos(theta), math.sin(theta)])
@@ -315,12 +307,12 @@ class cleatCommonData(object):
             arrowVec = np.array([-math.cos(theta), -math.sin(theta)])
         elif(orientation == "SW"):
             arrowVec = np.array([math.cos(theta), -math.sin(theta)])
-            
+
         p2 = p1 - lengthA * arrowVec
-        
+
         text = textDown if len(textDown) > len(textUp) else textUp
         lengthB = len(text) * charWidth
-        
+
         labelVec = None
         if(orientation == "NE"):
             labelVec = -xVec
@@ -331,9 +323,8 @@ class cleatCommonData(object):
         elif(orientation == "SW"):
             labelVec = xVec
 
-        
         p3 = p2 + lengthB * (-labelVec)
-            
+
         txtOffset = 18
         offsetVec = -yVec
 
@@ -350,30 +341,28 @@ class cleatCommonData(object):
         elif(orientation == "SW"):
             txtPtUp = p3 + 0.1 * lengthB * labelVec + (txtOffset) * offsetVec
             txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec
-        
+
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
-        
-        
+
         # smarker = self.addSMarker(dwg)
         emarker = self.addEMarker(dwg)
         # self.drawStartArrow(line, smarker)
         self.drawStartArrow(line, emarker)
-        
+
         dwg.add(dwg.text(textUp, insert=(txtPtUp), fill='black', font_family="sans-serif", font_size=28))
         dwg.add(dwg.text(textDown, insert=(txtPtDwn), fill='black', font_family="sans-serif", font_size=28))
-    
+
     def saveToSvg(self, fileName, view, base_front, base_top, base_side):
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
         CWBW = Column Web Beam Web
         BWBW = Beam Web Beam Web
-        
         '''
         fin2DFront = cleat2DCreatorFront(self)
         fin2DTop = cleat2DCreatorTop(self)
         fin2DSide = cleat2DCreatorSide(self)
-        
+
         if self.connectivity == 'Column flange-Beam web':
             if view == "Front":
                 fin2DFront.callCFBWfront(fileName)
@@ -397,7 +386,7 @@ class cleatCommonData(object):
                         continue
                 fin2DSide.callCFBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
-             
+
                 fileName = str(self.folder) + '/images_html/cleatTopFB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -405,8 +394,7 @@ class cleatCommonData(object):
                         continue
                 fin2DTop.callCFBWTop(fileName)
                 base_front = os.path.basename(str(fileName))
-                
-            
+
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
                 fin2DFront.callCWBWfront(fileName)
@@ -422,7 +410,7 @@ class cleatCommonData(object):
                         continue
                 fin2DFront.callCWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
-             
+
                 fileName = str(self.folder) + '/images_html/cleatSideWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -430,7 +418,7 @@ class cleatCommonData(object):
                         continue
                 fin2DSide.callCWBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
-            
+
                 fileName = str(self.folder) + '/images_html/cleatTopWB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -438,7 +426,7 @@ class cleatCommonData(object):
                         continue
                 fin2DTop.callCWBWTop(fileName)
                 base_front = os.path.basename(str(fileName))
-            
+
         else:
             if view == "Front":
                 fin2DFront.callBWBWfront(fileName)
@@ -454,7 +442,7 @@ class cleatCommonData(object):
                         continue
                 fin2DFront.callBWBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
-              
+
                 fileName = str(self.folder) + '/images_html/cleatSideBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -462,7 +450,7 @@ class cleatCommonData(object):
                         continue
                 fin2DSide.callBWBWSide(fileName)
                 base_front = os.path.basename(str(fileName))
-              
+
                 fileName = str(self.folder) + '/images_html/cleatTopBB.svg'
                 for n in range(1, 100, 1):
                     if (os.path.exists(fileName)):
@@ -470,202 +458,197 @@ class cleatCommonData(object):
                         continue
                 fin2DTop.callBWBWTop(fileName)
                 base_front = os.path.basename(str(fileName))
-        return base_front, base_top, base_side 
+        return base_front, base_top, base_side
+
 
 class cleat2DCreatorFront(object):
-    
+
     def __init__(self, finCommonObj):
-        
+
         self.dataObj = finCommonObj
-        
+
         self.A2 = (self.dataObj.col_B, (self.dataObj.col_L - self.dataObj.D_beam) / 2)
         self.B = (self.dataObj.col_B, 0)
         self.A = (0, 0)
         self.D = (0, self.dataObj.col_L)
         self.C = (self.dataObj.col_B, self.dataObj.col_L)
         self.B2 = (self.dataObj.col_B, (self.dataObj.D_beam + self.dataObj.col_L) / 2)
-        
+
         ptEx = (self.dataObj.col_B - self.dataObj.col_tw) / 2
         ptEy = 0.0
         self.E = (ptEx, ptEy)
-        
+
         ptHx = (self.dataObj.col_B - self.dataObj.col_tw) / 2
         ptHy = self.dataObj.col_L
         self.H = (ptHx, ptHy)
-        
+
         ptFx = (self.dataObj.col_B + self.dataObj.col_tw) / 2
         ptFy = 0
         self.F = (ptFx, ptFy)
-        
+
         ptGx = (self.dataObj.col_B + self.dataObj.col_tw) / 2
         ptGy = self.dataObj.col_L
         self.G = np.array([ptGx, ptGy])
-        
+
         # Draw rectangle for finPlate PRSU
         ptPx = (self.dataObj.col_B + self.dataObj.col_tw) / 2
         ptPy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
-        self.P = (ptPx, ptPy) 
+        self.P = (ptPx, ptPy)
         self.ptP = np.array([ptPx, ptPy])
-        
+
         self.U = self.ptP + (self.dataObj.cleat_ht) * np.array([0, 1])
-        
+
         ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.cleat_legsize
         ptRy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.R = (ptRx, ptRy)
-        
+
         ptSx = ptRx
         ptSy = ptPy + self.dataObj.cleat_ht
         self.S = (ptSx, ptSy)
-        
+
         ptC1x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptC1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.C1 = np.array([ptC1x, ptC1y])
-        
+
         ptA1x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptA1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2)
         self.A1 = np.array([ptA1x, ptA1y])
-        
+
         ptA3x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptA3y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2)
         self.A3 = (ptA3x, ptA3y)
-        
+
         ptB3x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
-        ptB3y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) 
+        ptB3y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2)
         self.B3 = (ptB3x, ptB3y)
-        
+
         ptB1x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
-        ptB1y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) 
+        ptB1y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2)
         self.B1 = np.array([ptB1x, ptB1y])
         self.ptB1 = np.array([ptB1x, ptB1y])
-        
+
         ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
         ptC2y = ptC1y + self.dataObj.cleat_ht
         self.C2 = (ptC2x, ptC2y)
-        
+
         ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
         ptA5y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A5 = ptA5x, ptA5y
-        
+
         ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
         ptA4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A4 = (ptA4x, ptA4y)
-        
+
         ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
-        ptB4y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T  
+        ptB4y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B4 = (ptB4x, ptB4y)
-        
-        ptBx5 = ((self.dataObj.col_B + 
-        self.dataObj.col_tw) / 2) + 20
+
+        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
         ptBy5 = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B5 = (ptBx5, ptBy5)
-        
+
         ptP1x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.edge_dist)
         ptP1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.col_tw + self.dataObj.beam_R1 + 3) + self.dataObj.end_dist)
         self.P1 = (ptP1x, ptP1y)
-        
 
         #### Column flange points for column flange beam web connectivity #####
-        
+
         fromPlate_pt = self.dataObj.D_col + self.dataObj.gap  # 20 mm clear distance between colume and beam
         ptFAx = 0
         ptFAy = 0
         self.FA = (ptFAx, ptFAy)
-         
+
         ptFEx = self.dataObj.col_T
         ptFEy = 0.0
         self.FE = (ptFEx, ptFEy)
-         
+
         ptFFx = self.dataObj.D_col - self.dataObj.col_T
         ptFFy = 0.0
         self.FF = (ptFFx, ptFFy)
-         
-        ptFBx = self.dataObj.D_col 
+
+        ptFBx = self.dataObj.D_col
         ptFBy = 0.0
         self.FB = (ptFBx, ptFBy)
-         
+
         ptFCx = self.dataObj.D_col
         ptFCy = self.dataObj.col_L
         self.FC = np.array([ptFBx, ptFCy])
-         
+
         ptFGx = self.dataObj.D_col - self.dataObj.col_T
         ptFGy = self.dataObj.col_L
         self.FG = (ptFGx, ptFGy)
-         
+
         ptFHx = self.dataObj.col_T
         ptFHy = self.dataObj.col_L
         self.FH = (ptFHx, ptFHy)
-         
+
         ptFDx = 0.0
         ptFDy = self.dataObj.col_L
         self.FD = (ptFDx, ptFDy)
-        
+
         ptFPx = self.dataObj.D_col
         ptFPy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.FP = (ptFPx, ptFPy)
         self.ptFP = np.array([ptFPx, ptFPy])
-        
+
         self.FW = self.FP + self.dataObj.cleat_thk * np.array([1, 0])
-        
+
         ptFUx = self.dataObj.D_col
         ptFUy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + self.dataObj.cleat_ht
         self.FU = (ptFUx, ptFUy)
-        
-        
+
         # FC1
-        ptFC1x = fromPlate_pt 
+        ptFC1x = fromPlate_pt
         ptFC1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.FC1 = np.array([ptFC1x, ptFC1y])
-        
+
         # FC2
         ptFC2x = fromPlate_pt
         ptFC2y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + self.dataObj.cleat_ht
         self.FC2 = (ptFC2x, ptFC2y)
-        
+
         # FA1
         ptFA1x = fromPlate_pt
         ptFA1y = (self.dataObj.col_L - self.dataObj.D_beam) / 2
         self.FA1 = np.array([ptFA1x, ptFA1y])
-        
+
         # FA4
         ptFA4x = fromPlate_pt
         ptFA4y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.beam_T
         self.FA4 = ptFA4x, ptFA4y
-        
+
         # FA2
         ptFA2x = ptFC1x + self.dataObj.beam_L
         ptFA2y = ptFA1y
         self.FA2 = np.array([ptFA2x, ptFA2y])
-        
+
         # FA3
         ptFA3x = fromPlate_pt + self.dataObj.beam_L
-        ptFA3y = (((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T) 
+        ptFA3y = (((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T)
         self.FA3 = ptFA3x, ptFA3y
-        
+
         # FB3
         ptFB3x = fromPlate_pt + self.dataObj.beam_L
         ptFB3y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB3 = (ptFB3x, ptFB3y)
-        
-        
+
         # FB2
         ptFB2x = fromPlate_pt + self.dataObj.beam_L
-        ptFB2y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam 
+        ptFB2y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam
         self.FB2 = ptFB2x, ptFB2y
-        
+
         # FB1
         ptFB1x = self.dataObj.D_col + self.dataObj.gap
-        ptFB1y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam 
+        ptFB1y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam
         self.FB1 = np.array([ptFB1x, ptFB1y])
-                
 
-        
         # FB4
         ptFB4x = fromPlate_pt
         ptFB4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB4 = ptFB4x, ptFB4y
-        
+
         ##### Points for Beam-Beam connection ######
-        
+
         # for primary beam
         self.BA = (0, 0)
         self.BB = self.BA + (self.dataObj.col_B) * np.array([1, 0])
@@ -679,7 +662,7 @@ class cleat2DCreatorFront(object):
         self.BJ = self.BI + (self.dataObj.col_B - self.dataObj.col_tw) / 2 * np.array([1, 0])
         self.BK = self.BJ - (self.dataObj.D_col - 2 * self.dataObj.col_T) * np.array([0, 1])
         self.BL = self.BI - (self.dataObj.D_col - 2 * self.dataObj.col_T) * np.array([0, 1])
-        
+
         # for secondary beam
         self.D_notch = self.dataObj.col_T + self.dataObj.col_R1
         self.BA1 = self.BB + 10 * np.array([1, 0])
@@ -693,22 +676,22 @@ class cleat2DCreatorFront(object):
         self.BC1 = self.BB1 - (self.dataObj.D_beam - self.dataObj.notch_offset) * np.array([0, 1])
         self.BC2 = self.BC1 + self.dataObj.cleat_ht * np.array([0, 1])
         self.BA5 = self.BA1 + self.dataObj.notch_offset * np.array([0, 1])
-        
+
         # for cleat angle
-        
+
         self.BP = self.BC1 - self.dataObj.gap * np.array([1, 0])
         self.BQ = self.BP + self.dataObj.cleat_thk * np.array([1, 0])
-        self.BR = self.BP + self.dataObj.cleat_legsize * np.array([1, 0]) 
-        self.BP1 = self.BP + self.dataObj.cleat_ht * np.array([0, 1]) 
+        self.BR = self.BP + self.dataObj.cleat_legsize * np.array([1, 0])
+        self.BP1 = self.BP + self.dataObj.cleat_ht * np.array([0, 1])
         self.BQ1 = self.BP1 + self.dataObj.cleat_thk * np.array([1, 0])
-        self.BR1 = self.BP1 + self.dataObj.cleat_legsize * np.array([1, 0])      
-        
+        self.BR1 = self.BP1 + self.dataObj.cleat_legsize * np.array([1, 0])
+
     def callBWBWfront(self, fileName):
         v_height = self.dataObj.D_col + 850
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
 #         dwg = svgwrite.Drawing(fileName, size=('1200mm', '1225mm'), viewBox=('-500 -250 1500 1225'))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-500 -350 1500 ' + str(v_height)))
-        
+
         ################# Cross section A-A ##################
         ptSecA = self.BA + (320 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
@@ -732,7 +715,7 @@ class cleat2DCreatorFront(object):
 #         "M10 10 C 20 20, 40 20, 50 10"
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
         pt2 = self.BA5 - self.dataObj.col_R1 * np.array([1, 0])
-        
+
 #         d=[]
 #         d.append("M")
 #         d.append(pt1)
@@ -759,7 +742,7 @@ class cleat2DCreatorFront(object):
 #         d="M80 230
 #            A 45 45, 0, 0, 1, 125 275
 #            L 125 230 Z" fill="purple"
-       
+
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col
         nr_c = self.dataObj.no_of_crows
@@ -769,14 +752,14 @@ class cleat2DCreatorFront(object):
 
         for i in range(1, (nr + 1)):
             colList = []
-            for j in range (1, (nc + 1)):
-                pt = self.BP + (self.dataObj.cleat_legsize - self.dataObj.end_dist) * np.array([1, 0]) + self.dataObj.edge_dist * np.array ([0, 1]) + \
+            for j in range(1, (nc + 1)):
+                pt = self.BP + (self.dataObj.cleat_legsize - self.dataObj.end_dist) * np.array([1, 0]) + self.dataObj.edge_dist * np.array([0, 1]) + \
                     (i - 1) * self.dataObj.pitch * np.array([0, 1]) + (j - 1) * self.dataObj.gauge * np.array([-1, 0])
                 dwg.add(dwg.circle(center=(pt), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
                 ptC = pt - (bolt_r + 4) * np.array([1, 0])
                 PtD = pt + (bolt_r + 4) * np.array([1, 0])
                 dwg.add(dwg.line((ptC), (PtD)).stroke('red', width=2.0, linecap='square'))
-                
+
                 ptE = pt - (bolt_r + 4) * np.array([0, 1])
                 PtF = pt + (bolt_r + 4) * np.array([0, 1])
                 dwg.add(dwg.line((ptE), (PtF)).stroke('red', width=2.0, linecap='square'))
@@ -785,8 +768,7 @@ class cleat2DCreatorFront(object):
 #                 dwg.add(dwg.line((ptE),(ptF)).stroke('blue',width = 1.5,linecap = 'square').dasharray(dasharray = ([20, 5, 1, 5])))   
                 colList.append(pt)
             ptList.append(colList)
-        
-        
+
         for i in range(1, (nr_c + 1)):
             pt_c = self.BP + self.dataObj.cedge_dist * np.array([0, 1]) - self.dataObj.col_tw * np.array([1, 0]) + (i - 1) * self.dataObj.cpitch * np.array([0, 1])
             pt1_c = pt_c - bolt_r * np.array([0, 1])
@@ -796,14 +778,13 @@ class cleat2DCreatorFront(object):
             pt_B1 = pt_c - 10 * np.array([1, 0])
             pt_B2 = pt_c + (self.dataObj.col_T + self.dataObj.cleat_thk + 10) * np.array([1, 0])
             dwg.add(dwg.line((pt_B1), (pt_B2)).stroke('black', width=2.0, linecap='square'))
-            ptList_c.append(pt_c)    
-        
+            ptList_c.append(pt_c)
+
         pitchPts = []
         for row in ptList:
             if len(row) > 0:
                 pitchPts.append(row[0])
 
-        
         # Included cleat height and pitch details of column bolt group
         # Drawing faint lines at right top and bottom corners of cleat
 #         rt1 = self.FP + self.dataObj.cleat_legsize * np.array([1,0])
@@ -813,10 +794,10 @@ class cleat2DCreatorFront(object):
         rb2 = rt2 + self.dataObj.cleat_ht * np.array([0, 1])
         self.dataObj.drawFaintLine(self.BR1, rb2, dwg)
         # drawing inner arrow to represent cleat height
-        params = {"offset": self.dataObj.beam_L , "textoffset": 10, "lineori": "left", "endlinedim":10}
+        params = {"offset": self.dataObj.beam_L, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outerArrow(dwg, self.BR, self.BR1, str(int(self.dataObj.cleat_ht)), params)
-        
-        ############################BEAM CONNECTIVITY MARKING###############################
+
+        # ########################### BEAM CONNECTIVITY MARKING ###############################
         # Drawing faint lines at bolt groups on Beam
         bt1 = np.array(ptList[0][0])
         bt2 = bt1 + (self.dataObj.beam_L + 150) * np.array([1, 0])
@@ -824,14 +805,14 @@ class cleat2DCreatorFront(object):
         bb1 = np.array(ptList[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 150) * np.array([1, 0])
         self.dataObj.drawFaintLine(bb1, bb2, dwg)
-        #######drawing outer arrow on beam bolt group to represent pitch and end distance##########
+        # ###### drawing outer arrow on beam bolt group to represent pitch and end distance ##########
         # pitch @ no_of_beam_bolt_row
-        params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "left", "endlinedim":10}
+        params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outerArrow(dwg, bt1, bb1, str(len(pitchPts) - 1) + "@" + str(int(self.dataObj.pitch)) + " c/c", params)
         # end distance
-        bt2 = bt1 - self.dataObj.edge_dist * np.array([0, 1])  
-        params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "right", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, bt1, bt2, str(self.dataObj.edge_dist), params)          
+        bt2 = bt1 - self.dataObj.edge_dist * np.array([0, 1])
+        params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "right", "endlinedim": 10}
+        self.dataObj.draw_dimension_outerArrow(dwg, bt1, bt2, str(self.dataObj.edge_dist), params)
         # end Distance
         bb2 = bb1 + self.dataObj.edge_dist * np.array([0, 1])  
         params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "left", "endlinedim":10}

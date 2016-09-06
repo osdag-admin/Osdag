@@ -25,9 +25,10 @@ import OCC.BRepLib as BRepLib
 from OCC.BRepOffsetAPI import *
 import OCC.BRep as BRep
 
+
 class Nut(object):
-    
-    def __init__(self, R, T, H, innerR1):        
+
+    def __init__(self, R, T, H, innerR1):
         self.R = R
         self.H = H
         self.T = T
@@ -37,18 +38,18 @@ class Nut(object):
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.computeParams()
-    
+
     def place(self, secOrigin, uDir, wDir):
         self.secOrigin = secOrigin
         self.uDir = uDir
-        self.wDir = wDir        
+        self.wDir = wDir
         self.computeParams()
-        
+
     def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.secOrigin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
-    
+
     def computeParams(self):
         
         self.vDir = numpy.cross(self.wDir, self.uDir)

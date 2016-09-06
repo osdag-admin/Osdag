@@ -45,6 +45,7 @@ import pdfkit
 import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
+from fileinput import filename
 
 
 class MyTutorials(QtGui.QDialog):
@@ -1332,11 +1333,19 @@ class MainController(QtGui.QMainWindow):
         self.tutorials()
 
     def sample_report(self):
-        url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder', 'Sample_Report', 'The_PyQt4_tutorial.pdf')
-        webbrowser.open_new(r'file:///' + url)
+
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+#         counter = 0
+        for pdf_file in os.listdir(root_Path):
+            if pdf_file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
+#                 counter = counter + 1
 
     def sample_problem(self):
-        webbrowser.open_new(r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_Path):
+            if file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
 
 # ********************************************************************************************************************************************************
 

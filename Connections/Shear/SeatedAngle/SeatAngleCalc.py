@@ -225,68 +225,64 @@ def SeatAngleConn(inputObj):
     clearance = 5
     tolerance = 5
     clear_gap = clearance + tolerance
+    gamma_m0 = 1.1 #material safety factor for bolts
 
     # Seating Angle Design and Check
-    # *************************************
     # length of angle = beam flange width
     angle_l = beam_w_f
     print "length of angle = " + str(angle_l)
 
-    # length of bearing required at the root line of beam = R*gamma_m0/t_w*f_yw
+    # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
     # Changed form of Equation from Cl 8.7.4
-    bearing_length = (shear_force *1000) * 1.1 / (beam_w_t * beam_fy)
+    bearing_length = (shear_force * 1000) * gamma_m0 / (beam_w_t * beam_fy)
     bearing_length = round(bearing_length, 3)
     print "length of bearing required at the root line of beam = " + str(bearing_length)
 
-
     # Required length of outstanding leg = bearing length + clearance + tolerance,
     # clear_gap = clearance + tolerance
-    outstanding_leg_length = bearing_length + clear_gap
-    print "outstanding leg length =" + str(outstanding_leg_length)
+    outstanding_leg_length_required = bearing_length + clear_gap
+    print "outstanding leg length =" + str(outstanding_leg_length_required)
 
-    if outstanding_leg_length > angle_B:
-        logger.error(": Assumed angle outstanding leg length need to be changed")
-        logger.warning(": Outstanding leg length should be less than " + str(angle_B))
+    if outstanding_leg_length_required > angle_B:
+        logger.error(": Connection is not safe")
+        logger.warning(": Outstanding leg length of Seated Angle should be more than " + str(outstanding_leg_length_required))
         safe = False
-        print "error: assumed angle outstanding leg length is not sufficient"
+        print "Error: Seated Angle's outstanding leg length needs to be increased"
 
-    # length of bearing on cleat = b1
-    bearing_length_on_cleat = bearing_length - (beam_f_t + beam_R1)  # find out what these values are DOUBT
-    b1 = bearing_length_on_cleat
-    print "length of bearing on cleat" + str(bearing_length_on_cleat)
+    # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
+    # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
 
-    # for ISA 150*75*12, distance from the end of bearing on cleat to root angle OR A TO B =b2
+    b1 = bearing_length - beam_f_t - beam_R1
+    print "Length of bearing on cleat" + str(b1)
+
+    # Distance from the end of bearing on cleat to root angle OR A TO B =b2
     b2 = b1 + clear_gap - angle_t - angle_R1
-    print "distance A to B = " + str(b2)
+    print "Distance A to B = " + str(b2)
 
-    # **************************************
-    # Moment Calculation
-    # **************************************
-    # assuming uniformly distributed load on length b1
-    # moment at root of angle, that is , at B due to load to the right of B
-    moment_at_root_angle = shear_force * (b2 / b1) * (b2 / 2)
-    moment_at_root_angle = round(moment_at_root_angle, 3)
-    print "moment at root angle =" + str(moment_at_root_angle)
+    # Moment capacity check
+    # assumption: load is uniform on length b1
+    # moment at root of angle (at B) due to load to the right of B
+    moment_at_root_angle = round(shear_force * (b2 / b1) * (b2 / 2), 3)
+    print "Moment at root angle = " + str(moment_at_root_angle)
 
-    # Moment capacity = 1.2*Z*fy/Y0
-    moment_capacity = 1.2 * (beam_fy / 1.1) * angle_l * (angle_t ** 2) * 0.001 / 6
-    moment_capacity = round(moment_capacity, 3)
-    print "Moment capacity =" + str(moment_capacity)
+    # Moment capacity = 1.2*Z*f_y/gamma_m0
+    # assumption: using elastic moment capacity of the outstanding leg
+    moment_capacity_angle = round( 1.2 * (beam_fy / gamma_m0) * angle_l * (angle_t ** 2) * 0.001 / 6, 3)
+    print "Moment capacity =" + str(moment_capacity_angle)
 
-    if moment_capacity < moment_at_root_angle:
+    if moment_capacity_angle < moment_at_root_angle:
         logger.error(": Connection is not safe")
         logger.warning(": Moment Capacity should be at least " + str(moment_at_root_angle))
         safe = False
-        print "error: connection not safe"
+        print "Error: connection not safe"
 
-    # **************************************
-    # Shear capacity calculation
-    # **************************************
-    # shear capacity of the outstanding leg of cleat = w*t*fy/(y0*(root 3))
-    root3 = math.sqrt(3);
-    outstanding_leg_shear_strength = beam_w_f * angle_t * beam_fy * 0.001 / (1.1 * root3)
-    outstanding_leg_shear_strength = round(outstanding_leg_shear_strength, 3)
-    print "outstanding leg shear strength =" + str(outstanding_leg_shear_strength)
+    # TODO current bookmark
+    # Shear capacity check
+    # shear capacity of the outstanding leg of cleat = A_v * f_yw / root(3) / gamma_m0
+    # = w*t*fy/(gamma_m0*(root_3))
+    root_3 = math.sqrt(3);
+    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / (gamma_m0 * root_3), 3)
+    print "Shear strength of outstanding leg of Seated Anlge = " + str(outstanding_leg_shear_strength)
 
     if outstanding_leg_shear_strength < shear_force:
         logger.error(": Shear capacity is insufficient")
@@ -294,8 +290,8 @@ def SeatAngleConn(inputObj):
         safe = False
         print "error: shear capacity is insufficient"
 
-    # shear capacity of beam, Vd = Av*Fyw/root3*y0
-    beam_shear_capacity = beam_d * beam_w_t * beam_fy / (root3 * 1.10 * 1000)
+    # shear capacity of beam, Vd = Av*Fyw/root_3*y0
+    beam_shear_capacity = beam_d * beam_w_t * beam_fy / (root_3 * 1.10 * 1000)
     beam_shear_capacity = round(beam_shear_capacity, 3)
     print "beam shear strength = " + str(beam_shear_capacity)
 
@@ -331,7 +327,7 @@ def SeatAngleConn(inputObj):
 
     outputObj['SeatAngle']["Length (mm)"] = angle_l
     outputObj['SeatAngle']["Moment Demand (kNm)"] = moment_at_root_angle
-    outputObj['SeatAngle']["Moment Capacity (kNm)"] = moment_capacity
+    outputObj['SeatAngle']["Moment Capacity (kNm)"] = moment_capacity_angle
     outputObj['SeatAngle']["Shear Demand (kN/mm)"] = shear_force
     outputObj['SeatAngle']["Shear Capacity (kN/mm)"] = outstanding_leg_shear_strength
     outputObj['SeatAngle']["Beam Shear Strength (kN/mm)"] = beam_shear_capacity

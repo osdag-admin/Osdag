@@ -180,6 +180,8 @@ def SeatAngleConn(inputObj):
             }[bolt_diameter]
         return hole_clearance # units: mm
 
+
+
     bolt_hole_diameter = bolt_diameter + bolt_hole_clearance(bolt_hole_type, bolt_diameter)
 
     # Minimum pitch and gauge IS 800 Cl 10.2.2

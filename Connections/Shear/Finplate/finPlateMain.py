@@ -13,6 +13,7 @@ from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
 from finPlateCalc import finConn
 import pickle
@@ -45,6 +46,14 @@ import pdfkit
 import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
+
+
+class DesignPreferences(QtGui.QTabWidget):
+    def __init__(self, parent=None):
+        QtGui.QTabWidget.__init__(self, parent)
+        self.ui = Ui_ShearDesignPreferences()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class MyTutorials(QtGui.QDialog):
@@ -247,6 +256,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
 
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
@@ -1337,6 +1348,10 @@ class MainController(QtGui.QMainWindow):
 
     def sample_problem(self):
         webbrowser.open_new(r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
+
+    def design_preferences(self):
+        widget = DesignPreferences(self)
+        widget.show()
 
 # ********************************************************************************************************************************************************
 

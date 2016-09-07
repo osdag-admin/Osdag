@@ -399,7 +399,7 @@
      <x>0</x>
      <y>0</y>
      <width>1328</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -491,6 +491,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="actionDesign_Preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -4551,6 +4552,16 @@ QMenu::item:selected {
   <action name="actionFAQ">
    <property name="text">
     <string>FAQ</string>
+   </property>
+  </action>
+  <action name="actionDesign_Preferences">
+   <property name="text">
+    <string>Design Preferences</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>DejaVu Serif</family>
+    </font>
    </property>
   </action>
  </widget>

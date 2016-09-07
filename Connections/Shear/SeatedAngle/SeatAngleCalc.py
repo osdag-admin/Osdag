@@ -109,9 +109,10 @@ def SeatAngleConn(inputObj):
     dict_angle_data = model.get_angledata(angle_sec)
     angle_t = float(dict_angle_data[QString("t")])
     # angle_t = 12
-    angle_a = float(dict_angle_data[QString("A")])
-    angle_b = float(dict_angle_data[QString("B")])
-    angle_ra = float(dict_angle_data[QString("R1")])
+    # intentional PEP8 violation in variable naming for angle parameters below
+    angle_A = float(dict_angle_data[QString("A")])
+    angle_B = float(dict_angle_data[QString("B")])
+    angle_R1 = float(dict_angle_data[QString("R1")])
 
     safe = True
 
@@ -200,97 +201,42 @@ def SeatAngleConn(inputObj):
     print "max spacing=" + str(max_spacing)
 
     # Max spacing IS 800 Cl 10.2.4.2
-    min_edge_multiplier = 1.5
+    min_edge_multiplier = 1.5 #input from design preferences
     min_edge_dist = int(min_edge_multiplier * (bolt_hole_diameter))
     if min_edge_dist % 10 != 0:
         min_edge_dist = (min_edge_dist / 10) * 10 + 10
 
-    # TODO current bookmark
+
     # Max spacing IS 800 Cl 10.2.4.3
     max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / beam_fy)).real)
 
+    # in case of corrosive influences, the maximum edge distance shall not exceed
+    # 40mm plus 4t, where t is the thickness of the thinner connected plate.
+    # max_edge_dist = min(max_edge_dist, 40 + 4*thickness_governing)
+
     # Determine single or double line of bolts
-    length_avail = (angle_a - 2 * min_edge_dist)
+    length_avail = (angle_A - 2 * min_edge_dist)
     pitch = round(length_avail / (bolts_required - 1), 1)
 
-    # TODO : rework the moment demand logic
-        # determine lines of bolts
-        # capacity based moment demand or force based?
-    # Calculation of moment demand
-
-
+    # TODO : additional Moment check
+        # moment demand based on shear capacity?
     # assumption: end clearance of beam from face of column = 5mm
     # and tolerance = 5mm
     clearance = 5
     tolerance = 5
     clear_gap = clearance + tolerance
 
-    M1 = bolt_shear_capacity * (clear_gap + min_edge_dist / 2)
-    # Single line of bolts
-    if pitch >= min_pitch:
-        bolt_line = 1
-        gauge = 0
-        bolts_one_line = bolts_required
-        K = bolts_one_line / 2
-        M2 = 0
-        if bolts_required % 2 == 0 or bolts_required % 2 != 0:
-            for k in range(0, K):
-                M2 = M2 + 2 * (
-                bolt_shear_capacity * ((length_avail / 2 - k * pitch) ** 2 / (length_avail / 2 - k * pitch)))
-            moment_demand = max(M1, M2)
-            moment_demand = round(moment_demand * 0.001, 3)
-
-    # Multi-line of bolts
-    if pitch < min_pitch:
-        bolt_line = 2
-        if bolts_required % 2 == 0:
-            bolts_one_line = bolts_required / 2
-        else:
-            bolts_one_line = (bolts_required / 2) + 1
-
-        pitch = round(length_avail / (bolts_one_line - 1), 3)
-        gauge = min_gauge
-        M1 = bolt_shear_capacity * (20 + min_edge_dist + gauge / 2)
-
-        if pitch >= min_pitch:
-            K = bolts_one_line / 2
-            M2 = 0
-            if bolts_required % 2 == 0 or bolts_required % 2 != 0:
-                for k in range(0, K):
-                    V = length_avail / 2 - k * pitch
-                    H = gauge / 2
-                    d = math.sqrt(V ** 2 + H ** 2)
-                    M2 = M2 + 2 * (bolt_shear_capacity * (d ** 2 / d))
-                M2 = M2 * 2
-                moment_demand = max(M1, M2)
-                moment_demand = round(moment_demand * 0.001, 3)
-
-                # Needs discussion with Sir
-        else:
-            logger.error(": Bolt strength is insufficient to carry the shear force")
-            safe = False
-            logger.warning(": Increase bolt diameter and/or bolt grade")
-            moment_demand = 0.0
-
-    if bolt_line == 1:
-        angle_b_req = 2 * min_edge_dist
-        end_dist = angle_b / 2
-    if bolt_line == 2:
-        angle_b_req = gauge + 2 * min_edge_dist
-        end_dist = (angle_b - gauge) / 2
-
-    # *************************************
     # Seating Angle Design and Check
     # *************************************
     # length of angle = beam flange width
     angle_l = beam_w_f
-    print "length of angle =" + str(angle_l)
+    print "length of angle = " + str(angle_l)
 
-    # length of bearing required at the root line of beam = R*Y0/tw*fyw
-    #
-    bearing_length = shear_force * 1.1 * 1000 / (beam_w_t * beam_fy)
+    # length of bearing required at the root line of beam = R*gamma_m0/t_w*f_yw
+    # Changed form of Equation from Cl 8.7.4
+    bearing_length = (shear_force *1000) * 1.1 / (beam_w_t * beam_fy)
     bearing_length = round(bearing_length, 3)
-    print "length of bearing required at the root line of beam=" + str(bearing_length)
+    print "length of bearing required at the root line of beam = " + str(bearing_length)
 
 
     # Required length of outstanding leg = bearing length + clearance + tolerance,
@@ -298,9 +244,9 @@ def SeatAngleConn(inputObj):
     outstanding_leg_length = bearing_length + clear_gap
     print "outstanding leg length =" + str(outstanding_leg_length)
 
-    if outstanding_leg_length > angle_b:
+    if outstanding_leg_length > angle_B:
         logger.error(": Assumed angle outstanding leg length need to be changed")
-        logger.warning(": Outstanding leg length should be less than " + str(angle_b))
+        logger.warning(": Outstanding leg length should be less than " + str(angle_B))
         safe = False
         print "error: assumed angle outstanding leg length is not sufficient"
 
@@ -310,7 +256,7 @@ def SeatAngleConn(inputObj):
     print "length of bearing on cleat" + str(bearing_length_on_cleat)
 
     # for ISA 150*75*12, distance from the end of bearing on cleat to root angle OR A TO B =b2
-    b2 = b1 + clear_gap - angle_t - angle_ra
+    b2 = b1 + clear_gap - angle_t - angle_R1
     print "distance A to B = " + str(b2)
 
     # **************************************

@@ -161,7 +161,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1328, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1328, 25))
         self.menubar.setStyleSheet(_fromUtf8(""))
         self.menubar.setNativeMenuBar(False)
         self.menubar.setObjectName(_fromUtf8("menubar"))
@@ -452,7 +452,7 @@ class Ui_MainWindow(object):
         font.setBold(False)
         font.setWeight(50)
         self.label_5.setFont(font)
-        self.label_5.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        self.label_5.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_5.setObjectName(_fromUtf8("label_5"))
         self.comboType = QtGui.QComboBox(self.dockWidgetContents)
         self.comboType.setGeometry(QtCore.QRect(150, 360, 160, 27))
@@ -1661,6 +1661,11 @@ class Ui_MainWindow(object):
         self.actionAsk_Us_a_Question.setObjectName(_fromUtf8("actionAsk_Us_a_Question"))
         self.actionFAQ = QtGui.QAction(MainWindow)
         self.actionFAQ.setObjectName(_fromUtf8("actionFAQ"))
+        self.actionDesign_Preferences = QtGui.QAction(MainWindow)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("DejaVu Serif"))
+        self.actionDesign_Preferences.setFont(font)
+        self.actionDesign_Preferences.setObjectName(_fromUtf8("actionDesign_Preferences"))
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
@@ -1677,6 +1682,7 @@ class Ui_MainWindow(object):
         self.menuEdit.addAction(self.actionCut)
         self.menuEdit.addAction(self.actionCopy)
         self.menuEdit.addAction(self.actionPaste)
+        self.menuEdit.addAction(self.actionDesign_Preferences)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionOsdag_Manual)
@@ -2054,15 +2060,6 @@ class Ui_MainWindow(object):
         self.actionOsdag_Manual.setText(_translate("MainWindow", "Osdag Manual", None))
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question", None))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ", None))
+        self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences", None))
 
 import icons_rc
-
-if __name__ == "__main__":
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    MainWindow = QtGui.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
-

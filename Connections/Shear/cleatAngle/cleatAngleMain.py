@@ -39,12 +39,13 @@ from reportGenerator import *
 from drawing2D import *
 from model import *
 from notch import Notch
-from nut import Nut 
+from nut import Nut
 from nutBoltPlacement import NutBoltArray
 from ui_popUpWindow import Ui_Capacitydetals
 from ui_summary_popup import Ui_Dialog
+from ui_aboutosdag import Ui_HelpOsdag
+from ui_tutorial import Ui_Tutorial
 from utilities import osdagDisplayShape
-
 from OCC.Display import OCCViewer
 # from OCC.Display.backend import get_qt_modules
 from macpath import basename
@@ -56,6 +57,22 @@ from macpath import basename
 # import OCC.Display.qtDisplay
 # from Connections.Shear.cleatAngle.ui_popUpWindow import Ui_Capacitydetals
 # Developed by aravind
+
+
+class MyTutorials(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
+class MyAboutOsdag(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_HelpOsdag()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class MyPopupDialog(QtGui.QDialog):
@@ -270,8 +287,13 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
 # ************************************** Osdag logo for html***************************************************************************************************
-
         self.ui.btn_Design.clicked.connect(self.osdag_header)
+
+# ************************************ Help button *******************************************************************************
+        self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
+        self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
+        self.ui.actionSample_Reports.triggered.connect(self.sample_report)
+        self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
 
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
@@ -286,6 +308,8 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
         self.store_osdagheader(image_path)
+
+    def store_osdagheader(self, image_path):
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
     def show_capacityDialog(self):
@@ -1788,11 +1812,43 @@ class MainController(QtGui.QMainWindow):
 
         else:
             event.ignore()
+# ********************************* Help Action *********************************************************************************************
+
+    def about_osdag(self):
+        dialog = MyAboutOsdag(self)
+        dialog.show()
+
+    def open_osdag(self):
+        self.about_osdag()
+
+    def tutorials(self):
+        dialog = MyTutorials(self)
+        dialog.show()
+
+    def open_tutorials(self):
+        self.tutorials()
+
+    def sample_report(self):
+
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+#         counter = 0
+        for pdf_file in os.listdir(root_Path):
+            if pdf_file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
+#                 counter = counter + 1
+
+    def sample_problem(self):
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_Path):
+            if pdf_file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
+
+# ********************************************************************************************************************************************************
 
 
 def set_osdaglogger():
     global logger
-    if logger == None:
+    if logger is None:
         logger = logging.getLogger("osdag")
     else:
         for handler in logger.handlers[:]:

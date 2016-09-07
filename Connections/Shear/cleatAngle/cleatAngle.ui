@@ -174,7 +174,7 @@
         <rect>
          <x>420</x>
          <y>0</y>
-         <width>90</width>
+         <width>101</width>
          <height>29</height>
         </rect>
        </property>
@@ -202,9 +202,9 @@
       <widget class="QCheckBox" name="checkBoxCleat">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>530</x>
          <y>0</y>
-         <width>100</width>
+         <width>131</width>
          <height>29</height>
         </rect>
        </property>
@@ -602,7 +602,15 @@ QMenu::item:selected {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_Cleat_Angle"/>
+    <addaction name="actionOsdag_Manual"/>
+    <addaction name="actionSample_Reports"/>
+    <addaction name="actionSample_Problems"/>
+    <addaction name="actionVideo_Tutorials"/>
+    <addaction name="separator"/>
+    <addaction name="actionAsk_Us_a_Question"/>
+    <addaction name="actionFAQ"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Osdag"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
     <property name="styleSheet">
@@ -4101,6 +4109,41 @@ QMenu::item:selected {
   <action name="actionAbout_Cleat_Angle">
    <property name="text">
     <string>About Cleat Angle</string>
+   </property>
+  </action>
+  <action name="actionOsdag_Manual">
+   <property name="text">
+    <string>Osdag Manual</string>
+   </property>
+  </action>
+  <action name="actionSample_Reports">
+   <property name="text">
+    <string>Sample Reports</string>
+   </property>
+  </action>
+  <action name="actionSample_Problems">
+   <property name="text">
+    <string>Sample Problems</string>
+   </property>
+  </action>
+  <action name="actionVideo_Tutorials">
+   <property name="text">
+    <string>Video Tutorials</string>
+   </property>
+  </action>
+  <action name="actionAsk_Us_a_Question">
+   <property name="text">
+    <string>Ask Us a Question</string>
+   </property>
+  </action>
+  <action name="actionFAQ">
+   <property name="text">
+    <string>FAQ</string>
+   </property>
+  </action>
+  <action name="actionAbout_Osdag">
+   <property name="text">
+    <string>About Osdag</string>
    </property>
   </action>
  </widget>

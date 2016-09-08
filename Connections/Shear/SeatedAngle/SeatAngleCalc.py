@@ -54,6 +54,9 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 '''
 
 List of assumptions:
+Bolts:
+# for all bolts, shear plane passes through threaded area
+# for all bolts, tensile stress area equals the threaded area
 
 '''
 
@@ -63,16 +66,25 @@ List of assumptions:
 # IS 800, Cl 10.3.3
 # Reduction factors for long joints, large grip lengths, and packing plates
 def bolt_shear(bolt_diameter, number_of_bolts, f_u):
-    # assuming shear plane passes through threaded area of all bolts
-    # assuming the tensile stress area equal to the threaded area
+    gamma_mb = 1.25 # partial safety factor for bolt
+    # assumption: for all bolts, shear plane passes through threaded area
+    # assumption: for all bolts, tensile stress area equals the threaded area
     # values for tensile stress area (mm^2) from Table 5.9 DoSS - N. Subramanian
     # TODO area of bolts for lower diameters
         # 5, 6, 8, 10 - either omit these from inputs or add to below dictionary
-    area_bolts = {'12': 84.3, '16': 157, '20': 245, '22': 303, '24': 353, '27': 459, '30': 561, '36': 817}
-    bolt_area = area_bolts[str(bolt_diameter)]
+    bolt_area = {
+        '12': 84.3,
+        '16': 157,
+        '20': 245,
+        '22': 303,
+        '24': 353,
+        '27': 459,
+        '30': 561,
+        '36': 817
+    }[str(bolt_diameter)]
     # bolt_area_approx = math.pi * bolt_diameter * bolt_diameter * 0.25 * 0.78
-    bolt_nominal_shear_capacity = f_u * number_of_bolts * bolt_area / (math.sqrt(3) * 1000)
-    return round(bolt_nominal_shear_capacity / 1.25, 3)  # gamma_mb = 1.25
+    bolt_nominal_shear_capacity = f_u * number_of_bolts * bolt_area / math.sqrt(3)/ 1000
+    return round(bolt_nominal_shear_capacity /gamma_mb, 3)
 
 
 # Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb

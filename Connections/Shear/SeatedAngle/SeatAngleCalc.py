@@ -22,9 +22,6 @@ import model
 
 from PyQt4.Qt import QString
 
-# flag = 1
-# logger = None
-
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 '''
@@ -74,8 +71,6 @@ def bolt_bearing(bolt_diameter, thickness_plate, f_u):
 
 
 def SeatAngleConn(inputObj):
-
-    #------------------------------------------------------
 
     connectivity = inputObj['Member']['Connectivity']
     beam_section = inputObj['Member']['BeamSection']
@@ -195,12 +190,12 @@ def SeatAngleConn(inputObj):
         min_pitch = (min_pitch / 10) * 10 + 10
         min_gauge = (min_gauge / 10) * 10 + 10
 
-    print "minimum pitch = " + str(min_pitch)
-    print "minimum gauge = " + str(min_gauge)
+    print "Minimum pitch = " + str(min_pitch)
+    print "Minimum gauge = " + str(min_gauge)
 
     # Max spacing IS 800 Cl 10.2.3.3
     max_spacing = int(min(100 + 4 * thickness_governing, 200))
-    print "max spacing=" + str(max_spacing)
+    print "Max spacing=" + str(max_spacing)
 
     # Max spacing IS 800 Cl 10.2.4.2
     min_edge_multiplier = 1.5 #input from design preferences
@@ -232,24 +227,24 @@ def SeatAngleConn(inputObj):
     # Seating Angle Design and Check
     # length of angle = beam flange width
     angle_l = beam_w_f
-    print "length of angle = " + str(angle_l)
+    print "Length of angle = " + str(angle_l)
 
     # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
     # Changed form of Equation from Cl 8.7.4
     bearing_length = (shear_force * 1000) * gamma_m0 / (beam_w_t * beam_fy)
     bearing_length = round(bearing_length, 3)
-    print "length of bearing required at the root line of beam = " + str(bearing_length)
+    print "Length of bearing required at the root line of beam = " + str(bearing_length)
 
     # Required length of outstanding leg = bearing length + clearance + tolerance,
     # clear_gap = clearance + tolerance
     outstanding_leg_length_required = bearing_length + clear_gap
-    print "outstanding leg length =" + str(outstanding_leg_length_required)
+    print "Outstanding leg length =" + str(outstanding_leg_length_required)
 
     if outstanding_leg_length_required > angle_B:
         logger.error(": Connection is not safe")
-        logger.warning(": Outstanding leg length of Seated Angle should be more than " + str(outstanding_leg_length_required))
+        logger.warning(": Outstanding leg length of seated angle should be more than " + str(outstanding_leg_length_required))
         safe = False
-        print "Error: Seated Angle's outstanding leg length needs to be increased"
+        print "Error: Seated angle's outstanding leg length needs to be increased"
 
     # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
     # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
@@ -274,87 +269,69 @@ def SeatAngleConn(inputObj):
 
     if moment_capacity_angle < moment_at_root_angle:
         logger.error(": Connection is not safe")
-        logger.warning(": Moment Capacity should be at least " + str(moment_at_root_angle))
+        logger.warning(": Moment capacity should be at least " + str(moment_at_root_angle))
         safe = False
-        print "Error: connection not safe"
+        print "Error: Connection not safe"
 
     # TODO current bookmark
-    # Shear capacity check
-    # shear capacity of the outstanding leg of cleat = A_v * f_yw / root(3) / gamma_m0
-    # = w*t*fy/(gamma_m0*(root_3))
+    # Shear capacity check Cl 8.4.1
+    # shear capacity of the outstanding leg of cleat = A_v * f_yw / root_3 / gamma_m0
+    # = w*t*fy/gamma_m0/root_3
     root_3 = math.sqrt(3);
-    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / (gamma_m0 * root_3), 3)
+    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / (gamma_m0 * root_3), 3) #kN
     print "Shear strength of outstanding leg of Seated Anlge = " + str(outstanding_leg_shear_strength)
 
     if outstanding_leg_shear_strength < shear_force:
         logger.error(": Shear capacity is insufficient")
-        logger.warning(": Shear Capacity should be at least " + str(shear_force)
+        logger.warning(": Shear capacity should be at least " + str(shear_force))
         safe = False
-        print "error: shear capacity is insufficient"
+        print "Error: Shear capacity is insufficient"
 
-    # shear capacity of beam, Vd = Av*Fyw/root_3*y0
-    beam_shear_capacity = beam_d * beam_w_t * beam_fy / (root_3 * 1.10 * 1000)
-    beam_shear_capacity = round(beam_shear_capacity, 3)
-    print "beam shear strength = " + str(beam_shear_capacity)
+    # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0
+    beam_shear_capacity = round(beam_d * beam_w_t * beam_fy / root_3 /gamma_m0/ 1000, 3)
+    print "Beam shear capacity = " + str(beam_shear_capacity)
 
     if beam_shear_capacity < shear_force:
-        logger.error(": Beam Shear Capacity is insufficient")
-        logger.warning(": Beam Shear Capacity should be at least " + str(shear_force + "kN/mm")
+        logger.error(": Beam shear capacity is insufficient")
+        logger.warning(": Beam shear capacity should be at least " + str(shear_force + "kN"))
+        logger.warning(": Beam design is outside the scope of this module")
         safe = False
-
-
-
-
 
 
         # End of calculation
-    #     outputObj = {}
-    #     outputObj['Bolt'] ={}
-
-    #     outputObj['Bolt']['shearcapacity'] = bolt_shear_capacity
-    #     outputObj['Bolt']['bearingcapacity'] = bolt_bearing_capacity
-    #     outputObj['Bolt']['boltcapacity'] = bolt_value
-    #     outputObj['Bolt']['numofbolts'] = bolts_required
-    #     outputObj['Bolt']['boltgrpcapacity'] = bolt_group_capacity
-    #     outputObj['Bolt'][''] = bolts_one_line
-    #     outputObj['Bolt']['numofcol'] = bolt_line
-    #     outputObj['Bolt']['pitch'] = pitch
-    #     outputObj['Bolt']['enddist'] = float(end_dist)
-    #     outputObj['Bolt']['edge'] = float(min_edge_dist)
-    #     outputObj['Bolt']['gauge'] = float(gauge)
-    #
 
     outputObj = {}
-    outputObj['SeatAngle'] = {}
+    outputObj['SeatAngle'] = {
+        "Length (mm)": angle_l,
+        "Moment Demand (kNm)": moment_at_root_angle,
+        "Moment Capacity (kNm)": moment_capacity_angle,
+        "Shear Demand (kN/mm)": shear_force,
+        "Shear Capacity (kN/mm)": outstanding_leg_shear_strength,
+        "Beam Shear Strength (kN/mm)": beam_shear_capacity
+        }
 
-    outputObj['SeatAngle']["Length (mm)"] = angle_l
-    outputObj['SeatAngle']["Moment Demand (kNm)"] = moment_at_root_angle
-    outputObj['SeatAngle']["Moment Capacity (kNm)"] = moment_capacity_angle
-    outputObj['SeatAngle']["Shear Demand (kN/mm)"] = shear_force
-    outputObj['SeatAngle']["Shear Capacity (kN/mm)"] = outstanding_leg_shear_strength
-    outputObj['SeatAngle']["Beam Shear Strength (kN/mm)"] = beam_shear_capacity
-
-    outputObj['Bolt'] = {}
-    outputObj['Bolt']['status'] = safe
-    outputObj['Bolt']["Shear Capacity (kN)"] = bolt_shear_capacity
-    outputObj['Bolt']["Bearing Capacity (kN)"] = bolt_bearing_capacity
-    outputObj['Bolt']["Capacity Of Bolt (kN)"] = bolt_value
-    outputObj['Bolt']["Bolt group capacity (kN)"] = bolt_group_capacity
-    outputObj['Bolt']["No Of Bolts"] = bolts_required
-    outputObj['Bolt']["No.Of Row"] = bolts_one_line
-    outputObj['Bolt']["No.Of Column"] = bolt_line
-    outputObj['Bolt']["Pitch Distance (mm)"] = pitch
-    outputObj['Bolt']["Guage Distance (mm)"] = gauge
-    outputObj['Bolt']["End Distance (mm)"] = end_dist
-    outputObj['Bolt']["Edge Distance (mm)"] = min_edge_dist
+    outputObj['Bolt'] = {
+        "status": safe,
+        "Shear Capacity (kN)": bolt_shear_capacity,
+        "Bearing Capacity (kN)": bolt_bearing_capacity,
+        "Capacity Of Bolt (kN)": bolt_value,
+        "Bolt group capacity (kN)": bolt_group_capacity,
+        "No Of Bolts": bolts_required,
+        # "No.Of Row": bolts_one_line,
+        # "No.Of Column": bolt_line,
+        "Pitch Distance (mm)": pitch,
+        # "Guage Distance (mm)": gauge,
+        # "End Distance (mm)": end_dist,
+        "Edge Distance (mm)": min_edge_dist
+        }
 
     if outputObj['Bolt']['status'] == True:
 
         logger.info(": Overall Seat Angle connection design is safe \n")
-        logger.debug(" :=========End Of design===========")
+        logger.debug(": =========End Of design===========")
 
     else:
         logger.error(": Design is not safe \n ")
-        logger.debug(" :=========End Of design===========")
+        logger.debug(": =========End Of design===========")
 
     return outputObj

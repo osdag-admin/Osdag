@@ -14,8 +14,9 @@ First published 2008, 14th impression 2014
 
 IS 800: 2007
     General construction in steel - Code of practice (Third revision)
+'''
 
-
+'''
 ASCII diagram
 
             +-+-------------+-+   +-------------------------+

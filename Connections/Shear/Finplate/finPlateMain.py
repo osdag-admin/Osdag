@@ -49,11 +49,42 @@ from commonLogic import CommonDesignLogic
 
 
 class DesignPreferences(QtGui.QTabWidget):
+
     def __init__(self, parent=None):
         QtGui.QTabWidget.__init__(self, parent)
         self.ui = Ui_ShearDesignPreferences()
         self.ui.setupUi(self)
         self.mainController = parent
+        self.ui.btn_boltdefaults.clicked.connect(self.bolt_default_para)
+
+    def bolt_default_para(self, boltDia, boltGrade):
+        '''
+        '''
+        uiObj = self.mainController.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        boltGrade = float(uiObj["Bolt"]["Grade"])
+        clearance = str(self.get_clearance(boltDia))
+        bolt_fu = str(self.get_boltFu(boltGrade))
+        self.ui.txt_boltHoleClearance.setText(clearance)
+        self.ui.txt_boltFu.setText(bolt_fu)
+
+    def get_clearance(self, boltDia):
+
+        standardClearance = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3}
+        overheadClearance = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8}
+
+        if self.ui.combo_boltHoleType.currentText() == "Standard":
+            clearance = standardClearance[boltDia]
+        else:
+            clearance = overheadClearance[boltDia]
+        return clearance
+
+    def get_boltFu(self, boltGrade):
+        '''
+        This routine returns ultimate strength of bolt depending upon grade of bolt chosen
+        '''
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
+        return boltFu[boltGrade]
 
 
 class MyTutorials(QtGui.QDialog):
@@ -256,7 +287,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
-        
+
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
 
         # Initialising the qtviewer

@@ -24,7 +24,7 @@
    <bool>true</bool>
   </property>
   <property name="currentIndex">
-   <number>3</number>
+   <number>1</number>
   </property>
   <property name="elideMode">
    <enum>Qt::ElideNone</enum>
@@ -64,7 +64,7 @@
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QComboBox" name="comboBox_boltHoleType">
+       <widget class="QComboBox" name="combo_boltHoleType">
         <property name="focusPolicy">
          <enum>Qt::TabFocus</enum>
         </property>
@@ -88,7 +88,7 @@
        </widget>
       </item>
       <item row="3" column="2">
-       <widget class="QLineEdit" name="lineEdit_boltHoleDiaClearance">
+       <widget class="QLineEdit" name="txt_boltHoleClearance">
         <property name="text">
          <string>2</string>
         </property>
@@ -132,7 +132,7 @@
        </widget>
       </item>
       <item row="5" column="2">
-       <widget class="QLineEdit" name="lineEdit_boltFu">
+       <widget class="QLineEdit" name="txt_boltFu">
         <property name="text">
          <string>800</string>
         </property>
@@ -328,7 +328,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_weldType">
+         <widget class="QComboBox" name="combo_weldType">
           <item>
            <property name="text">
             <string>Shop weld</string>
@@ -486,7 +486,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="2" column="1" colspan="2">
-       <widget class="QComboBox" name="comboBox_detailingEdgeType">
+       <widget class="QComboBox" name="combo_detailingEdgeType">
         <item>
          <property name="text">
           <string>a - Sheared or hand flame cut</string>
@@ -507,7 +507,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_detailingGap">
+       <widget class="QLineEdit" name="txt_detailingGap">
         <property name="text">
          <string>10</string>
         </property>
@@ -657,9 +657,9 @@ p, li { white-space: pre-wrap; }
    <zorder>line_5</zorder>
    <zorder>textBrowser_detailingDescription</zorder>
    <zorder>label_39</zorder>
-   <zorder>comboBox_detailingEdgeType</zorder>
+   <zorder>combo_detailingEdgeType</zorder>
    <zorder>label_29</zorder>
-   <zorder>lineEdit_detailingGap</zorder>
+   <zorder>txt_detailingGap</zorder>
    <zorder>label_36</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>line_11</zorder>
@@ -808,18 +808,18 @@ p, li { white-space: pre-wrap; }
   </widget>
  </widget>
  <tabstops>
-  <tabstop>comboBox_boltHoleType</tabstop>
-  <tabstop>lineEdit_boltHoleDiaClearance</tabstop>
-  <tabstop>lineEdit_boltFu</tabstop>
+  <tabstop>combo_boltHoleType</tabstop>
+  <tabstop>txt_boltHoleClearance</tabstop>
+  <tabstop>txt_boltFu</tabstop>
   <tabstop>btn_boltdefaults</tabstop>
   <tabstop>btn_boltsave</tabstop>
   <tabstop>btn_boltclose</tabstop>
-  <tabstop>comboBox_weldType</tabstop>
+  <tabstop>combo_weldType</tabstop>
   <tabstop>btn_welddefaults</tabstop>
   <tabstop>btn_weldsave</tabstop>
   <tabstop>btn_weldclose</tabstop>
-  <tabstop>comboBox_detailingEdgeType</tabstop>
-  <tabstop>lineEdit_detailingGap</tabstop>
+  <tabstop>combo_detailingEdgeType</tabstop>
+  <tabstop>txt_detailingGap</tabstop>
   <tabstop>btn_detailingdefaults</tabstop>
   <tabstop>btn_detailingsave</tabstop>
   <tabstop>btn_detailingclose</tabstop>

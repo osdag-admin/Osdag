@@ -1,3 +1,4 @@
+
 '''
 Created on 2-Sept-2016
 @author: jayant patil
@@ -14,7 +15,32 @@ First published 2008, 14th impression 2014
 IS 800: 2007
     General construction in steel - Code of practice (Third revision)
 
+
+ASCII diagram
+
+            +-+-------------+-+   +-------------------------+
+            | |             | |   |-------------------------|
+            | |             | |   |                         |
+            | |             | |   |                         |
+            | |             | |   |                         |
+            | |             | |   |                         |
+            | |             | |   |-------------------------|
+            | |             | |   +-------------------------+
+            | |             | |+-----------+
+            | |             | || +---------+
+            | |             | || |
+            | |         +---|-||-|---+
+            | |         +---|-||-|---+
+            | |             | || |
+            | |         +---|-||-|---+
+            | |         +---|-||-|---+
+            | |             | ||_|
+            | |             | |
+            | |             | |
+            +-+-------------+-+
+
 '''
+
 
 import math
 import logging
@@ -91,18 +117,18 @@ def SeatAngleConn(inputObj):
     # angle_t = 12
 
     dict_beam_data = model.get_beamdata(beam_section)
-    beam_w_t = float(dict_beam_data[QString("tw")])
-    beam_f_t = float(dict_beam_data[QString("T")])
-    beam_d = float(dict_beam_data[QString("D")])
-    beam_w_f = float(dict_beam_data[QString("B")])
-    beam_R1 = float(dict_beam_data[QString("R1")])
+    beam_w_t = float(dict_beam_data[QString("tw")]) # beam web thickness
+    beam_f_t = float(dict_beam_data[QString("T")]) # beam flange thickness
+    beam_d = float(dict_beam_data[QString("D")]) # beam depth
+    beam_w_f = float(dict_beam_data[QString("B")]) # beam width
+    beam_R1 = float(dict_beam_data[QString("R1")]) # beam root radius
 
     dict_column_data = model.get_columndata(column_section)
-    column_f_t = float(dict_column_data[QString("T")])
+    column_f_t = float(dict_column_data[QString("T")]) # column flange thickness
     # columnt_f_t = 15
 
     dict_angle_data = model.get_angledata(angle_sec)
-    angle_t = float(dict_angle_data[QString("t")])
+    angle_t = float(dict_angle_data[QString("t")]) # angle thickness
     # angle_t = 12
     # intentional PEP8 violation in variable naming for angle parameters below
     angle_A = float(dict_angle_data[QString("A")])
@@ -111,20 +137,33 @@ def SeatAngleConn(inputObj):
 
     safe = True
 
-    # ------------------------------------------------------
-    # Bolt design:
+    # -----------------------------------------------------------------------------------------------------------
+    # Design Preferences:
+
+    bolt_hole_type = 1 # standard bolt hole
+    # bolt_hole_type = 0  # oversize bolt hole
+    # bolt hole clearance - user overwrite
+    custom_hole_clearance = None # set this to user defined hole clearance, in case
+    # assumption: end clearance of beam from face of column = 5mm
+    # and tolerance = 5mm
+    clearance = 5
+    tolerance = 5
+    clear_gap = clearance + tolerance
+    gamma_m0 = 1.1  # material safety factor for bolts
+    # min edge distance multiplier based on edge type Cl 10.2.4.2
+    min_edge_multiplier = 1.5  # machine flame cut edges
+    # min_edge_multiplier = 1.7  # sheared or hand flame cut edges
+
+    # -----------------------------------------------------------------------------------------------------------
+    # -----------------------------------------------------------------------------------------------------------
+    #  BOLT DESIGN
 
     bolt_fu = int(bolt_grade) * 100 # Table 1 of IS 800
-    # TODO bolt f_y
-        # confirm python arbitrary precision calcs will not cause issues in below logic
-        # bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;
-        # confirm that fy is not required in calculations
+    # bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;    # Bolt f_y is not required in calculations
 
-    # I: Check for number of bolts -------------------
     thickness_governing = min(beam_w_t.real, angle_t.real)
     bolt_shear_capacity = bolt_shear(bolt_diameter, 1, bolt_fu).real
     bolt_bearing_capacity = bolt_bearing(bolt_diameter, column_f_t, beam_fu).real
-
     bolt_value = min(bolt_shear_capacity, bolt_bearing_capacity)
 
     bolts_required = math.ceil(shear_force / bolt_value)
@@ -134,8 +173,7 @@ def SeatAngleConn(inputObj):
         # check if odd number of bolts can be allowed
     if bolts_required <= 2:
         bolts_required = 3
-
-    # print "no of bolts required = " + str(bolts_required)
+    print "Number of bolts required = " + str(bolts_required)
 
     # TODO bolt group capacity
         # check applicable reduction factors
@@ -147,7 +185,7 @@ def SeatAngleConn(inputObj):
     # TODO Bolt hole clearance
         # update clearance dictionary for other bolt diameters
         # update clearance dictionary for oversized holes
-    bolt_hole_type = 1
+
     def bolt_hole_clearance(bolt_hole_type, bolt_diameter):
         if bolt_hole_type == 1: # standard hole
             hole_clearance = {
@@ -173,9 +211,10 @@ def SeatAngleConn(inputObj):
                 30: 8,
                 36: 8
             }[bolt_diameter]
-        return hole_clearance # units: mm
 
-
+        if custom_hole_clearance is not None:
+            hole_clearance = custom_hole_clearance # units: mm
+        return hole_clearance  # units: mm
 
     bolt_hole_diameter = bolt_diameter + bolt_hole_clearance(bolt_hole_type, bolt_diameter)
 
@@ -198,11 +237,9 @@ def SeatAngleConn(inputObj):
     print "Max spacing=" + str(max_spacing)
 
     # Max spacing IS 800 Cl 10.2.4.2
-    min_edge_multiplier = 1.5 #input from design preferences
     min_edge_dist = int(min_edge_multiplier * (bolt_hole_diameter))
     if min_edge_dist % 10 != 0:
         min_edge_dist = (min_edge_dist / 10) * 10 + 10
-
 
     # Max spacing IS 800 Cl 10.2.4.3
     max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / beam_fy)).real)
@@ -214,17 +251,12 @@ def SeatAngleConn(inputObj):
     # Determine single or double line of bolts
     length_avail = (angle_A - 2 * min_edge_dist)
     pitch = round(length_avail / (bolts_required - 1), 1)
-
-    # TODO : additional Moment check
-        # moment demand based on shear capacity?
-    # assumption: end clearance of beam from face of column = 5mm
-    # and tolerance = 5mm
-    clearance = 5
-    tolerance = 5
-    clear_gap = clearance + tolerance
-    gamma_m0 = 1.1 #material safety factor for bolts
+    # -----------------------------------------------------------------------------------------------------------
 
     # Seating Angle Design and Check
+    # TODO : additional Moment check
+        # check moment demand based on shear capacity too?
+
     # length of angle = beam flange width
     angle_l = beam_w_f
     print "Length of angle = " + str(angle_l)

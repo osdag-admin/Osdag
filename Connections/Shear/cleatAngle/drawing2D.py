@@ -47,10 +47,10 @@ class cleatCommonData(object):
         self.cleat_thk = int(dictAngleData[QString("t")])
         # self.plate_ht= outputObj['Plate']['height'] 
         # self.cleat_thk = inputObj['Plate']["Thickness (mm)"]
-        # 
+
         # self.plate_width = outputObj['Plate']['width']
         # self.cleat_thk = outputObj['Plate']['height']
-        self.cleat_thk =  outputObj['Weld']['thickness']
+        # self.cleat_thk = outputObj['Weld']['thickness']
         self.bolt_dia = inputObj["Bolt"]["Diameter (mm)"]
         self.bolt_type = inputObj["Bolt"]["Type"]
         self.bolt_grade = inputObj['Bolt']['Grade']        
@@ -385,7 +385,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatSideFB" + str(n) + ".svg"
                         continue
                 fin2DSide.callCFBWSide(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/cleatTopFB.svg'
                 for n in range(1, 100, 1):
@@ -393,7 +393,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatTopFB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCFBWTop(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_top = os.path.basename(str(fileName))
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -417,7 +417,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatSideWB" + str(n) + ".svg"
                         continue
                 fin2DSide.callCWBWSide(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/cleatTopWB.svg'
                 for n in range(1, 100, 1):
@@ -425,7 +425,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatTopWB" + str(n) + ".svg"
                         continue
                 fin2DTop.callCWBWTop(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_top = os.path.basename(str(fileName))
 
         else:
             if view == "Front":
@@ -449,7 +449,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatSideBB" + str(n) + ".svg"
                         continue
                 fin2DSide.callBWBWSide(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/cleatTopBB.svg'
                 for n in range(1, 100, 1):
@@ -457,7 +457,7 @@ class cleatCommonData(object):
                         fileName = str(self.folder) + "/images_html/cleatTopBB" + str(n) + ".svg"
                         continue
                 fin2DTop.callBWBWTop(fileName)
-                base_front = os.path.basename(str(fileName))
+                base_top = os.path.basename(str(fileName))
         return base_front, base_top, base_side
 
 

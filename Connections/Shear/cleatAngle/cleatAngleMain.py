@@ -1749,50 +1749,32 @@ class MainController(QtGui.QMainWindow):
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from CleatAngle GUI.
         '''
         base = ''
+        base_front = ''
+        base_side = ''
+        base_top = ''
         loc = self.ui.comboConnLoc.currentText()
 
         if view == "All":
             fileName = ''
-            base_front = ''
-            base_side = ''
-            base_top = ''
             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
 
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-            if loc == "Column flange-Beam web":
-                data = str(self.folder) + "/images_html/3D_ModelCleatFB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelCleatFB" + str(n) + ".png" 
-                        continue
-                base = os.path.basename(str(data))
-
-            elif loc == "Column web-Beam web":
-                data = str(self.folder) + "/images_html/3D_ModelCleatWB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelCleatWB" + str(n) + ".png" 
-                        continue
-                base = os.path.basename(str(data))
-
-            else:
-                data = str(self.folder) + "/images_html/3D_ModelCleatBB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelCleatBB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
+            data = str(self.folder) + "/images_html/3D_Model.png"
+            for n in range(1, 100, 1):
+                if (os.path.exists(data)):
+                    data = str(self.folder) + "/images_html/3D_Model" + str(n) + ".png" 
+                    continue
+            base = os.path.basename(str(data))
 
             self.display.ExportToImage(data)
 
         else:
-
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
                                                          "SVG files (*.svg)")
             f = open(fileName, 'w')
 
-            self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
 
             f.close()
         return (base, base1, base2, base3)

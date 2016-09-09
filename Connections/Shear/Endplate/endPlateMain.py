@@ -48,6 +48,7 @@ from ui_endplate import Ui_MainWindow
 from utilities import osdagDisplayShape
 from weld import Weld
 from drawing_2D import EndCommonData
+from PyQt4 import QtSvg
 
 
 class MyTutorials(QtGui.QDialog):
@@ -1567,11 +1568,11 @@ class MainController(QtGui.QMainWindow):
         # Getting User Inputs.
         self.uiObj = self.getuser_inputs()
 
-        # EndPlate Design Calculations. 
+        # EndPlate Design Calculations.
         self.resultObj = endConn(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
-            self.ui.btn_CreateDesign.setEnabled(False)   
+            self.ui.btn_CreateDesign.setEnabled(False)
 
         # Displaying Design Calculations To Output Window
         self.display_output(self.resultObj)
@@ -1582,6 +1583,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['Bolt']['status']
         self.call_3DModel(status)
+#         base, base_front, base_top, base_side = self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of endplate
@@ -1675,52 +1677,42 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
         base = ''
+        fileName = ''
+        base_front = ''
+        base_side = ''
+        base_top = ''
         loc = self.ui.comboConnLoc.currentText()
         if view == "All":
-            fileName = ''
-            base_front = ''
-            base_side = ''
-            base_top = ''
 
             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-            if loc == "Column flange-Beam web":
-                data = str(self.folder) + "/images_html/3D_ModelEndFB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelEndFB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-            elif loc == "Column web-Beam web":
-                data = str(self.folder) + "/images_html/3D_ModelEndWB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelEndWB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-            else:
-                data = str(self.folder) + "/images_html/3D_ModelEndBB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/images_html/3D_ModelEndBB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
+            data = str(self.folder) + "/images_html/3D_Model.png"
+            for n in range(1, 5, 1):
+                if (os.path.exists(data)):
+                    data = str(self.folder) + "/images_html/3D_Model" + '(' + str(n) + ')' + ".png"
+                    continue
+            base = os.path.basename(str(data))
 
             self.display.ExportToImage(data)
 
         else:
-
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
                                                          "SVG files (*.svg)")
             f = open(fileName, 'w')
-
-            self.callDesired_View(fileName, view, base_front, base_top, base_side)
-
+            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+#             self.callDesired_View(fileName, view, base_front, base_top, base_side)
             f.close()
         return (base, base1, base2, base3)
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# for opening the window
+#             app = QtGui.QApplication(sys.argv)
+#             svgWidget = QtSvg.QSvgWidget(" ")
+#             svgWidget.setGeometry(50, 50, 759, 668)
+#             svgWidget.show()
+           # sys.exit(app.exec_())
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     def closeEvent(self, event):
         '''

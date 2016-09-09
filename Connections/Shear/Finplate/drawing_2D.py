@@ -322,44 +322,43 @@ s
         elif(orientation == "SW"):
             txtPtUp = p3 + 0.1 * lengthB * labelVec + (txtOffset) * offsetVec
             txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec
-        
+
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
-        
+
         emarker = self.addEMarker(dwg)
         self.drawStartArrow(line, emarker)
-        
+
         dwg.add(dwg.text(textUp, insert=(txtPtUp), fill='black', font_family="sans-serif", font_size=28))
         dwg.add(dwg.text(textDown, insert=(txtPtDwn), fill='black', font_family="sans-serif", font_size=28))
-        
+
         if element == "weld" :
             if orientation == "NW":
                 self.draw_weld_Marker(dwg, 15, 7.5, line)
             else:
                 self.draw_weld_Marker(dwg, 45, 7.5, line)
-                
-    
+
     def draw_weld_Marker(self, dwg, oriX, oriY, line):
-        
+
         weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
         weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
         dwg.defs.add(weldMarker)
         self.drawEndArrow(line, weldMarker)
-        
+
         pass
-    
+
     def saveToSvg(self, fileName, view, base_front, base_top, base_side):
-        
+
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
         CWBW = Column Web Beam Web
         BWBW = Beam Web Beam Web
-        
+
         '''
         fin2DFront = Fin2DCreatorFront(self)
         fin2DTop = Fin2DCreatorTop(self)
         fin2DSide = Fin2DCreatorSide(self)
-        
+
         if self.connectivity == 'Column flange-Beam web':
             if view == "Front":
                 fin2DFront.callCFBWfront(fileName)
@@ -369,17 +368,17 @@ s
                 fin2DTop.callCFBWTop(fileName)
             else:
                 fileName = str(self.folder) + '/images_html/finFrontFB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finFrontFB" + str(n) + ".svg"
                         continue
                 fin2DFront.callCFBWfront(fileName)
                 base_front = os.path.basename(str(fileName))
-                
-                
+
+
 #                 cairosvg.svg2png(bytestring = str(self.folder) + "/images_html/finSideFB.svg", write_to = str(self.folder) + '/images_html/finSideFB.png' )
                 fileName = str(self.folder) + '/images_html/finSideFB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finSideFB" + str(n) + ".svg"
                         continue
@@ -388,7 +387,7 @@ s
                 
                 
                 fileName = str(self.folder) + '/images_html/finTopFB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finTopFB" + str(n) + ".svg"
                         continue
@@ -405,7 +404,7 @@ s
                 fin2DTop.callCWBWTop(fileName)
             else:
                 fileName = str(self.folder) + '/images_html/FinFrontWB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/FinFrontWB" + str(n) + ".svg"
                         continue
@@ -413,7 +412,7 @@ s
                 base_front = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/FinSideWB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/FinSideWB" + str(n) + ".svg"
                         continue
@@ -421,7 +420,7 @@ s
                 base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/FinTopWB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/FinTopWB" + str(n) + ".svg"
                         continue
@@ -437,7 +436,7 @@ s
                 fin2DTop.callBWBWTop(fileName)
             else:
                 fileName = str(self.folder) + '/images_html/finFrontBB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finFrontBB" + str(n) + ".svg"
                         continue
@@ -446,7 +445,7 @@ s
 
 
                 fileName = str(self.folder) + '/images_html/finSideBB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finSideBB" + str(n) + ".svg"
                         continue
@@ -455,7 +454,7 @@ s
 
 
                 fileName = str(self.folder) + '/images_html/finTopBB.svg'
-                for n in range(1, 100, 1):
+                for n in range(1, 5, 1):
                     if (os.path.exists(fileName)):
                         fileName = str(self.folder) + "/images_html/finTopBB" + str(n) + ".svg"
                         continue

@@ -51,13 +51,48 @@ from commonLogic import CommonDesignLogic
 class DesignPreferences(QtGui.QTabWidget):
 
     def __init__(self, parent=None):
+
         QtGui.QTabWidget.__init__(self, parent)
         self.ui = Ui_ShearDesignPreferences()
         self.ui.setupUi(self)
         self.mainController = parent
-        self.ui.btn_boltdefaults.clicked.connect(self.bolt_default_para)
+        self.ui.btn_boltdefaults.clicked.connect(self.set_default_para)
+        self.ui.btn_welddefaults.clicked.connect(self.set_default_para)
+        self.ui.btn_detailingdefaults.clicked.connect(self.set_default_para)
+        self.ui.btn_boltsave.clicked.connect(self.save_designPref_para)
+        self.ui.btn_weldsave.clicked.connect(self.save_designPref_para)
+        self.ui.btn_detailingsave.clicked.connect(self.save_designPref_para)
 
-    def bolt_default_para(self, boltDia, boltGrade):
+    def save_designPref_para(self):
+        '''
+        This routine is responsible for saving all design preferences selected by the user
+        '''
+        designPref = {}
+        designPref["Bolt"] = {}
+        designPref["Bolt"]["boltHoleType"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["Bolt"]["boltHoleClearance"] = int(self.ui.txt_boltHoleClearance.text())
+        designPref["Bolt"]["boltFu"] = int(self.ui.txt_boltFu.text())
+
+        designPref["Weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["Weld"]["typeOfWeld"] = weldType
+        if weldType == "Shop weld":
+            designPref["Weld"]["safetyFactor"] = float(1.2)
+        else:
+            designPref["Weld"]["safetyFactor"] = float(1.5)
+
+        designPref["Detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType)
+        designPref["Detailing"]["typeOfEdge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            designPref["Detailing"]["minEdgeNEndDist"] = float(1.7)
+        else:
+            designPref["Detailing"]["minEdgeNEndDist"] = float(1.5)
+        designPref["Detailing"]["gap"] = int(20)
+
+        self.mainController.call_designPref(designPref)
+
+    def set_default_para(self):
         '''
         '''
         uiObj = self.mainController.getuser_inputs()
@@ -67,6 +102,9 @@ class DesignPreferences(QtGui.QTabWidget):
         bolt_fu = str(self.get_boltFu(boltGrade))
         self.ui.txt_boltHoleClearance.setText(clearance)
         self.ui.txt_boltFu.setText(bolt_fu)
+        self.ui.combo_weldType.setCurrentIndex(0)
+        self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+        self.ui.txt_detailingGap.setText(20)
 
     def get_clearance(self, boltDia):
 
@@ -1204,6 +1242,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
 
+    def call_designPref(self, designPref):
+        pass
+
     def designParameters(self):
         '''
         This routine returns the neccessary design parameters.
@@ -1383,6 +1424,7 @@ class MainController(QtGui.QMainWindow):
     def design_preferences(self):
         widget = DesignPreferences(self)
         widget.show()
+        
 
 # ********************************************************************************************************************************************************
 

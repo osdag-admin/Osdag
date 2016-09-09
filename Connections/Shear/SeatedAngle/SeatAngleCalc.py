@@ -144,8 +144,8 @@ def SeatAngleConn(inputObj):
     angle_t = float(dict_angle_data[QString("t")]) # angle thickness
     # angle_t = 12
     # intentional PEP8 violation in variable naming for angle parameters below
-    angle_A = float(dict_angle_data[QString("A")])
-    angle_B = float(dict_angle_data[QString("B")])
+    angle_A = float(dict_angle_data[QString("A")]) # longer leg of unequal angle
+    angle_B = float(dict_angle_data[QString("B")]) # shorter leg of unequal angle
     angle_R1 = float(dict_angle_data[QString("R1")])
 
     safe = True
@@ -270,14 +270,14 @@ def SeatAngleConn(inputObj):
     # TODO : additional Moment check
         # check moment demand based on shear capacity too?
 
+    # Angle bearing WIDTH <=> Angle Length (angle_l)
     # length of angle = beam flange width
     angle_l = beam_w_f
     print "Length of angle = " + str(angle_l)
 
     # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
     # Changed form of Equation from Cl 8.7.4
-    bearing_length = (shear_force * 1000) * gamma_m0 / (beam_w_t * beam_fy)
-    bearing_length = round(bearing_length, 3)
+    bearing_length = round((shear_force * 1000) * gamma_m0 / beam_w_t / beam_fy, 3)
     print "Length of bearing required at the root line of beam = " + str(bearing_length)
 
     # Required length of outstanding leg = bearing length + clearance + tolerance,
@@ -291,9 +291,23 @@ def SeatAngleConn(inputObj):
         safe = False
         print "Error: Seated angle's outstanding leg length needs to be increased"
 
+    # comparing 0.6*shear strength (0.6*V_d) vs shear force V for calling moment capacity routine
+    # TODO current bookmark
+    # Shear capacity check Cl 8.4.1
+    # shear capacity of the outstanding leg of cleat = A_v * f_yw / root_3 / gamma_m0
+    # = w*t*fy/gamma_m0/root_3
+    root_3 = math.sqrt(3);
+    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / root_3 * gamma_m0, 3)  # kN
+    print "Shear strength of outstanding leg of Seated Anlge = " + str(outstanding_leg_shear_strength)
+
+    if outstanding_leg_shear_strength < shear_force:
+        logger.error(": Shear capacity is insufficient")
+        logger.warning(": Shear capacity should be at least " + str(shear_force))
+        safe = False
+        print "Error: Shear capacity is insufficient"
+
     # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
     # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
-
     b1 = bearing_length - beam_f_t - beam_R1
     print "Length of bearing on cleat" + str(b1)
 
@@ -302,12 +316,12 @@ def SeatAngleConn(inputObj):
     print "Distance A to B = " + str(b2)
 
     # Moment capacity check
-    # assumption: load is uniform on length b1
+    # assumption: load is uniform over the stiff bearing length (b1)
     # moment at root of angle (at B) due to load to the right of B
     moment_at_root_angle = round(shear_force * (b2 / b1) * (b2 / 2), 3)
     print "Moment at root angle = " + str(moment_at_root_angle)
 
-    # Moment capacity = 1.2*Z*f_y/gamma_m0
+    # Moment capacity = 1.2*(f_y/gamma_m0)*Z
     # assumption: using elastic moment capacity of the outstanding leg
     moment_capacity_angle = round( 1.2 * (beam_fy / gamma_m0) * angle_l * (angle_t ** 2) * 0.001 / 6, 3)
     print "Moment capacity =" + str(moment_capacity_angle)
@@ -318,19 +332,6 @@ def SeatAngleConn(inputObj):
         safe = False
         print "Error: Connection not safe"
 
-    # TODO current bookmark
-    # Shear capacity check Cl 8.4.1
-    # shear capacity of the outstanding leg of cleat = A_v * f_yw / root_3 / gamma_m0
-    # = w*t*fy/gamma_m0/root_3
-    root_3 = math.sqrt(3);
-    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / (gamma_m0 * root_3), 3) #kN
-    print "Shear strength of outstanding leg of Seated Anlge = " + str(outstanding_leg_shear_strength)
-
-    if outstanding_leg_shear_strength < shear_force:
-        logger.error(": Shear capacity is insufficient")
-        logger.warning(": Shear capacity should be at least " + str(shear_force))
-        safe = False
-        print "Error: Shear capacity is insufficient"
 
     # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0
     beam_shear_capacity = round(beam_d * beam_w_t * beam_fy / root_3 /gamma_m0/ 1000, 3)

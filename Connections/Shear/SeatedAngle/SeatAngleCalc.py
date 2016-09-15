@@ -91,7 +91,7 @@ def bolt_shear(bolt_diameter, number_of_bolts, f_u):
 # IS 800, Cl 10.3.4
 def bolt_bearing(bolt_diameter, thickness_plate, f_u):
     # currently assuming k_b = 0.5
-    # TODO calculate k_b
+    # TODO calculate k_b after design
     # given pitch, gauge, edge distance
     k_b = 0.5
     bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * thickness_plate * f_u / (1000)
@@ -116,6 +116,7 @@ def SeatAngleConn(inputObj):
     column_section = inputObj['Member']['ColumnSection']
     beam_fu = inputObj['Member']['fu (MPa)']
     beam_fy = inputObj['Member']['fy (MPa)']
+    angle_fy = beam_fy # assumption : angle_fy = beam_fy; take user input fy in later modules
 
     shear_force = inputObj['Load']['ShearForce (kN)']
 
@@ -195,7 +196,7 @@ def SeatAngleConn(inputObj):
 
     # Bolt hole clearance
     # IS 800, Table 19 Clearances for Fastener HOles
-    # TODO Bolt hole clearance
+    # TODO bolt hole clearance
         # update clearance dictionary for other bolt diameters
         # update clearance dictionary for oversized holes
 
@@ -255,7 +256,7 @@ def SeatAngleConn(inputObj):
         min_edge_dist = (min_edge_dist / 10) * 10 + 10
 
     # Max spacing IS 800 Cl 10.2.4.3
-    max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / beam_fy)).real)
+    max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / angle_fy)).real)
 
     # in case of corrosive influences, the maximum edge distance shall not exceed
     # 40mm plus 4t, where t is the thickness of the thinner connected plate.
@@ -267,7 +268,7 @@ def SeatAngleConn(inputObj):
     # -----------------------------------------------------------------------------------------------------------
 
     # Seating Angle Design and Check
-    # TODO : additional Moment check
+    # TODO additional Moment check
         # check moment demand based on shear capacity too?
 
     # Angle bearing WIDTH <=> Angle Length (angle_l)
@@ -277,7 +278,7 @@ def SeatAngleConn(inputObj):
 
     # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
     # Changed form of Equation from Cl 8.7.4
-    bearing_length = round((shear_force * 1000) * gamma_m0 / beam_w_t / beam_fy, 3)
+    bearing_length = round((shear_force * 1000) * gamma_m0 / beam_w_t / angle_fy, 3)
     print "Length of bearing required at the root line of beam = " + str(bearing_length)
 
     # Required length of outstanding leg = bearing length + clearance + tolerance,
@@ -292,12 +293,11 @@ def SeatAngleConn(inputObj):
         print "Error: Seated angle's outstanding leg length needs to be increased"
 
     # comparing 0.6*shear strength (0.6*V_d) vs shear force V for calling moment capacity routine
-    # TODO current bookmark
     # Shear capacity check Cl 8.4.1
     # shear capacity of the outstanding leg of cleat = A_v * f_yw / root_3 / gamma_m0
     # = w*t*fy/gamma_m0/root_3
     root_3 = math.sqrt(3);
-    outstanding_leg_shear_strength = round(angle_l * angle_t * beam_fy * 0.001 / root_3 * gamma_m0, 3)  # kN
+    outstanding_leg_shear_strength = round(angle_l * angle_t * angle_fy * 0.001 / root_3 * gamma_m0, 3)  # kN
     print "Shear strength of outstanding leg of Seated Anlge = " + str(outstanding_leg_shear_strength)
 
     if outstanding_leg_shear_strength < shear_force:
@@ -321,10 +321,34 @@ def SeatAngleConn(inputObj):
     moment_at_root_angle = round(shear_force * (b2 / b1) * (b2 / 2), 3)
     print "Moment at root angle = " + str(moment_at_root_angle)
 
-    # Moment capacity = 1.2*(f_y/gamma_m0)*Z
-    # assumption: using elastic moment capacity of the outstanding leg
-    moment_capacity_angle = round( 1.2 * (beam_fy / gamma_m0) * angle_l * (angle_t ** 2) * 0.001 / 6, 3)
-    print "Moment capacity =" + str(moment_capacity_angle)
+    # moment_capacity_angle = round( 1.2 * (angle_fy / gamma_m0) * angle_l * (angle_t ** 2) * 0.001 / 6, 3)
+    # print "Moment capacity =" + str(moment_capacity_angle)
+
+    #Cl 8.2.1.2
+    # assumption: beta_b = 1.0 as the outstanding leg is plastic section
+    # assumption: using Z_p (plastic section modulus) for moment capacity
+    leg_moment_d = (angle_fy / gamma_m0) * (angle_l * (angle_t ** 2) / 4)
+
+    # TODO logger msgs for outst leg moment cap routines
+    if shear_force <= 0.6*outstanding_leg_shear_strength:
+        # to avoid irreversible deformation (in case of cantilever),
+        # under serviceablitiy loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
+        leg_moment_d_limiting = 1.5*(angle_fy/gamma_m0)*(angle_l*(angle_t**2)/6)
+        angle_outst_leg_mcapacity = min(leg_moment_d, leg_moment_d_limiting)
+    else:
+        # Cl 8.2.1.3
+        # M_d = M_dv (as defined in Cl 9.2) -> angle_outst_leg_mcapacity
+        # Cl 9.2.2 for plastic section
+        # assumption : M_fd=0 as the shear resiting area and moment resisting area are the same,
+        # for the cross section of the outstanding leg
+        # M_dv = min ((1-beta)*M_d, 1.2*Z_e*f_y/gamma_m0)
+        # beta = ((2V/V_d) - 1)^2
+        leg_moment_d_limiting = 1.2 * (angle_fy / gamma_m0) * (angle_l * (angle_t ** 2) / 6)
+        beta_moment = ((2*shear_force/outstanding_leg_shear_strength)-1)**2
+        angle_outst_leg_mcapacity = min((1-beta_moment)*leg_moment_d, leg_moment_d_limiting)
+
+    moment_capacity_angle = round( angle_outst_leg_mcapacity, 3)
+    print "Moment capacity = " + str(moment_capacity_angle)
 
     if moment_capacity_angle < moment_at_root_angle:
         logger.error(": Connection is not safe")

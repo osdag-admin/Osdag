@@ -266,7 +266,9 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
         image_path = os.path.dirname(os.path.abspath(__file__))+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
-        shutil.copyfile(image_path, str(self.folder) + os.sep+os.path.join("images_html","Osdag_header.png"))
+        print str(image_path)
+        print str(os.path.join("images_html","Osdag_header.png"))
+        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html","Osdag_header.png"))
 
     # noinspection PyPep8Naming
     def fetchBeamPara(self):
@@ -358,7 +360,7 @@ class MainController(QtGui.QMainWindow):
                 self.ui.comboColSec.addItems(get_beamcombolist())
 
             self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
-            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumSection']))
+            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
 
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
             self.ui.txt_fy.setText(str(uiObj['Member']['fy (MPa)']))
@@ -462,11 +464,11 @@ class MainController(QtGui.QMainWindow):
         outObj['Bolt'] = {}
         outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
         outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txt_bolt_bearing_capacity.text())
-        outObj['Bolt']["Capacity Of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
+        outObj['Bolt']["Capacity of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
         outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txt_bolt_group_capacity.text())
-        outObj['Bolt']["No Of Bolts"] = float(self.ui.txt_no_bolts.text())
-        outObj['Bolt']["No.Of Row"] = int(self.ui.txt_bolt_rows.text())
-        outObj['Bolt']["No.Of Column"] = int(self.ui.txt_bolt_cols.text())
+        outObj['Bolt']["No. of Bolts"] = float(self.ui.txt_no_bolts.text())
+        outObj['Bolt']["No. of Row"] = int(self.ui.txt_bolt_rows.text())
+        outObj['Bolt']["No. of Column"] = int(self.ui.txt_bolt_cols.text())
         outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
         outObj['Bolt']["Guage Distance (mm)"] = float(self.ui.txt_bolt_gauge.text())
         outObj['Bolt']["End Distance (mm)"] = float(self.ui.txt_end_distance.text())
@@ -628,19 +630,19 @@ class MainController(QtGui.QMainWindow):
         bolt_bearing_capacity = resultObj['Bolt']['Bearing Capacity (kN)']
         self.ui.txt_bolt_bearing_capacity.setText(str(bolt_bearing_capacity))
 
-        bolt_capacity = resultObj['Bolt']['Capacity Of Bolt (kN)']
+        bolt_capacity = resultObj['Bolt']['Capacity of Bolt (kN)']
         self.ui.txt_bolt_capacity.setText(str(bolt_capacity))
 
-        no_of_bolts = resultObj['Bolt']['No Of Bolts']
+        no_of_bolts = resultObj['Bolt']['No. of Bolts']
         self.ui.txt_no_bolts.setText(str(no_of_bolts))
         # newly added field
         bolt_grp_capacity = resultObj['Bolt']['Bolt group capacity (kN)']
         self.ui.txt_bolt_group_capacity.setText(str(bolt_grp_capacity))
 
-        no_of_rows = resultObj['Bolt']['No.Of Row']
+        no_of_rows = resultObj['Bolt']['No. of Row']
         self.ui.txt_bolt_rows.setText(str(no_of_rows))
 
-        no_of_cols = resultObj['Bolt']['No.Of Column']
+        no_of_cols = resultObj['Bolt']['No. of Column']
         self.ui.txt_bolt_cols.setText(str(no_of_col))
 
         pitch_dist = resultObj['Bolt']['Pitch Distance (mm)']
@@ -1057,7 +1059,7 @@ class MainController(QtGui.QMainWindow):
         '''
         '''
         # TODO input validation
-        self.validateInputsOnDesignBtn()
+        # self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()

@@ -384,14 +384,15 @@ def SeatAngleConn(inputObj):
         "status": safe,
         "Shear Capacity (kN)": bolt_shear_capacity,
         "Bearing Capacity (kN)": bolt_bearing_capacity,
-        "Capacity Of Bolt (kN)": bolt_value,
+        "Capacity of Bolt (kN)": bolt_value,
         "Bolt group capacity (kN)": bolt_group_capacity,
-        "No Of Bolts": bolts_required,
-        # "No.Of Row": bolts_one_line,
-        # "No.Of Column": bolt_line,
+        "No. of Bolts": bolts_required,
+        # TODO initializing for debugging
+        "No. of Row": 1,
+        "No. of Column": 1,
+        "Gauge Distance (mm)": 1,
+        "End Distance (mm)": 1,
         "Pitch Distance (mm)": pitch,
-        # "Guage Distance (mm)": gauge,
-        # "End Distance (mm)": end_dist,
         "Edge Distance (mm)": min_edge_dist
         }
 

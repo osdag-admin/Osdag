@@ -15,8 +15,6 @@ from cmath import sqrt
 from xml.etree.ElementTree import XML, fromstring, tostring
 import xml.etree.ElementTree as ET
 import cairosvg
-from urllib import url2pathname, urlopen
-from pip._vendor.requests.packages import urllib3
 
 
 class EndCommonData(object):
@@ -437,7 +435,7 @@ class EndCommonData(object):
             else:
                 fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callCWBWfront(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -448,7 +446,7 @@ class EndCommonData(object):
 
                 fileName = str(self.folder) + '/images_html/endSide.svg'
                 end2DSide.callCWBWSide(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -459,7 +457,7 @@ class EndCommonData(object):
 
                 fileName = str(self.folder) + '/images_html/endTop.svg'
                 end2DTop.callCWBWTop(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -478,7 +476,7 @@ class EndCommonData(object):
             else:
                 fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callBWBWfront(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -489,7 +487,7 @@ class EndCommonData(object):
 
                 fileName = str(self.folder) + '/images_html/endSide.svg'
                 end2DSide.callBWBWSide(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -500,7 +498,7 @@ class EndCommonData(object):
 
                 fileName = str(self.folder) + '/images_html/endTop.svg'
                 end2DTop.callBWBWTop(fileName)
-                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):

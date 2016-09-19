@@ -60,6 +60,12 @@ Bolts:
 
 '''
 
+# TODO docstrings for functions
+# TODO block shear check
+# TODO test cases
+# TODO SA - atleast 2 rows of bolts should fit
+# TODO
+
 
 # Bolt calculations
 # Bolt factored shear capacity = f_u * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
@@ -130,14 +136,20 @@ def SeatAngleConn(inputObj):
     angle_sec = inputObj['Angle']["AngleSection"]
     # angle_t = 12
 
-    dict_beam_data = model.get_beamdata(beam_section)
+    if connectivity == "Beam-Beam":
+        dict_beam_data = model.get_beamdata(beam_section)
+        dict_column_data = model.get_beamdata(column_section)
+    else:
+        dict_beam_data = model.get_beamdata(beam_section)
+        dict_column_data = model.get_columndata(column_section)
+
     beam_w_t = float(dict_beam_data[QString("tw")]) # beam web thickness
     beam_f_t = float(dict_beam_data[QString("T")]) # beam flange thickness
     beam_d = float(dict_beam_data[QString("D")]) # beam depth
     beam_w_f = float(dict_beam_data[QString("B")]) # beam width
     beam_R1 = float(dict_beam_data[QString("R1")]) # beam root radius
 
-    dict_column_data = model.get_columndata(column_section)
+
     column_f_t = float(dict_column_data[QString("T")]) # column flange thickness
     # columnt_f_t = 15
 
@@ -398,7 +410,7 @@ def SeatAngleConn(inputObj):
 
     if outputObj['Bolt']['status'] == True:
 
-        logger.info(": Overall Seat Angle connection design is safe \n")
+        logger.info(": Overall seated angle connection design is safe \n")
         logger.debug(": =========End Of design===========")
 
     else:
@@ -406,3 +418,8 @@ def SeatAngleConn(inputObj):
         logger.debug(": =========End Of design===========")
 
     return outputObj
+
+## Test Case(s) below:
+# if __name__ == '__main__':
+#     output = SeatAngleConn()
+#     print output

@@ -12,7 +12,9 @@ import time
 import math
 from PyQt4.QtCore import QString
 
-def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filename, folder, base, base_front, base_top, base_side):
+# def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filename, folder, base, base_front, base_top, base_side):
+def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filename, folder):
+
     print outObj
     fileName = (filename)
     myfile = open(fileName, "w")
@@ -718,7 +720,7 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
-#*************************************************************************************************************************
+# *************************************************************************************************************************
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
 
@@ -735,13 +737,13 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
 #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
     row = [0, companyname]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    
+
     row = [0, 'Project Title']
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, projecttitle]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
@@ -752,7 +754,7 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
     row = [0, subtitle]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
@@ -775,12 +777,12 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-        
-    rstr += t('hr')
-    rstr += t('/hr')    
 
-#*************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    rstr += t('hr')
+    rstr += t('/hr')
+
+# ************************************************************************************************************************************
+# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Digram
@@ -792,52 +794,41 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
     # rstr += t('td class=" viewtbl "') + row[2] + t('/td')
     rstr += t('/tr')
-     
-    if connectivity == "Column flange-Beam web":
-        png = folder + "/images_html/" + base
-        datapng = '<object type="image/PNG" data= %s  width ="450"></object">' % png
-        
-        side = folder + "/images_html/" + base_side
-        dataside = '<object type="image/svg+xml" data=%s  width ="400"></object>' % side
-        
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data= %s  width ="400"></object>' % top
-        
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data=%s  width ="450"></object>' % front
-        
-    elif connectivity == "Column web-Beam web":
-        png = folder + "/images_html/" + base
-        datapng = '<object type="image/PNG" data=%s  width ="450"></object">' % png
-        
-        side = folder + "/images_html/" + base_side
-        dataside = '<object type="image/svg+xml" data=%s  width ="400"></object>' % side
-        
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data=%s  width ="400"></object>' % top
-        
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data=%s  width ="450"></object>' % front
 
-    else:
-        png = folder + "/images_html/" + base
-        datapng = '<object type="image/PNG" data= %s  width ="450"></object">' % png
-        
-        side = folder + "/images_html/" + base_side
-        dataside = '<object type="image/svg+xml" data= %s  width ="400"></object>' % side
-        
-        top = folder + "/images_html/" + base_top
-        datatop = '<object type="image/svg+xml" data= %s  width ="400"></object>' % top
-        
-        front = folder + "/images_html/" + base_front
-        datafront = '<object type="image/svg+xml" data= %s  width ="450"></object>' % front
+#     png = folder + "/images_html/" + base
+    png = folder + "/images_html/3D_Model.png"
+    datapng = '<object type="image/PNG" data= %s  width ="450"></object">' % png
+
+# **************************************************** for svg to png ********************************************************************
+#     side = folder + "/images_html/" + base_side
+#     side = folder + "/images_html/endSide.svg"
+#     dataside = '<object type="image/svg+xml" data=%s  width ="400"></object>' % side
+# ******************************************************************************************************************************************
+    side = folder + "/images_html/endSide.png"
+    dataside = '<object type="image/PNG" data=%s  width ="400"></object>' % side
+
+# ******************************************** for svg to png *****************************************************************************
+#     top = folder + "/images_html/" + base_top
+#     top = folder + "/images_html/endTop.svg"
+#     datatop = '<object type="image/svg+xml" data= %s  width ="400"></object>' % top
+# *****************************************************************************************************************************************
+    top = folder + "/images_html/endTop.png"
+    datatop = '<object type="image/PNG" data= %s  width ="400"></object>' % top
+
+# ******************************************** for svg to png ****************************************************************************
+#     front = folder + "/images_html/" + base_front
+#     front = folder + "/images_html/endFront.svg"
+#     datafront = '<object type="image/svg+xml" data=%s  width ="450"></object>' % front
+# ******************************************************************************************************************************************
+    front = folder + "/images_html/endFront.png"
+    datafront = '<object type="image/PNG" data=%s  width ="450"></object>' % front
 
     row = [0, datapng, datatop]
     rstr += t('tr')
     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, dataside, datafront]
     rstr += t('tr')
     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')

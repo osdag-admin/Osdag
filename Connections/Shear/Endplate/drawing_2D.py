@@ -12,6 +12,11 @@ from numpy import math
 from model import *
 from endPlateCalc import endConn
 from cmath import sqrt
+from xml.etree.ElementTree import XML, fromstring, tostring
+import xml.etree.ElementTree as ET
+import cairosvg
+from urllib import url2pathname, urlopen
+from pip._vendor.requests.packages import urllib3
 
 
 class EndCommonData(object):
@@ -360,7 +365,11 @@ class EndCommonData(object):
         dwg.defs.add(weldMarker)
         self.drawEndArrow(line, weldMarker)
 
-    def saveToSvg(self, fileName, view, base_front, base_top, base_side):
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#     def saveToSvg(self, fileName, view, base_front, base_top, base_side):
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    def saveToSvg(self, fileName, view):
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
@@ -380,29 +389,43 @@ class EndCommonData(object):
             elif view == "Top":
                 fileName = end2DTop.callCFBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/endFrontFB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endFrontFB" + '(' + str(n) + ')' + ".svg"
-                        continue
+#                 url = str(self.folder) + '/images_html/endFront.svg'
+#                 cairosvg.svg2png(url = str(self.folder) + '/images_html/endFront.svg', write_to =  str(self.folder) + '/images_html/endFront.png')
+                fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callCFBWfront(fileName)
-                base_front = os.path.basename(str(fileName))
+                print "filename for svg",fileName
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
 
-                fileName = str(self.folder) + '/images_html/endSideFB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endSideFB" + '(' + str(n) + ')' + ".svg"
-                        continue
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endFrontFB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 end2DFront.callCFBWfront(fileName)
+#                 base_front = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                fileName = str(self.folder) + '/images_html/endSide.svg'
                 end2DSide.callCFBWSide(fileName)
-                base_side = os.path.basename(str(fileName))
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endSideFB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_side = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                fileName = str(self.folder) + '/images_html/endTopFB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/finTopFB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endTop.svg'
                 end2DTop.callCFBWTop(fileName)
-                base_top = os.path.basename(str(fileName))
+                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/finTopFB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_top = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -412,29 +435,38 @@ class EndCommonData(object):
             elif view == "Top":
                 end2DTop.callCWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/endFrontWB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endFrontWB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callCWBWfront(fileName)
-                base_front = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endFrontWB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_front = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                fileName = str(self.folder) + '/images_html/endSideWB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endSideWB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endSide.svg'
                 end2DSide.callCWBWSide(fileName)
-                base_side = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endSideWB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_side = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                fileName = str(self.folder) + '/images_html/endTopWB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endTopWB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endTop.svg'
                 end2DTop.callCWBWTop(fileName)
-                base_top = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endTopWB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_top = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         else:
             if view == "Front":
@@ -444,31 +476,40 @@ class EndCommonData(object):
             elif view == "Top":
                 end2DTop.callBWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/endFrontBB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endFrontBB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callBWBWfront(fileName)
-                base_front = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endFrontBB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_front = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                fileName = str(self.folder) + '/images_html/endSideBB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endSideBB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endSide.svg'
                 end2DSide.callBWBWSide(fileName)
-                base_side = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endSide.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endSideBB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_side = os.path.basename(str(fileName))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                fileName = str(self.folder) + '/images_html/endTopBB.svg'
-                for n in range(1, 5, 1):
-                    if (os.path.exists(fileName)):
-                        fileName = str(self.folder) + "/images_html/endTopBB" + '(' + str(n) + ')' + ".svg"
-                        continue
+                fileName = str(self.folder) + '/images_html/endTop.svg'
                 end2DTop.callBWBWTop(fileName)
-                base_top = os.path.basename(str(fileName))
+                cairosvg.svg2png(url = fileName, write_to = str(self.folder) + '/images_html/endTop.png')
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#                 for n in range(1, 5, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/endTopBB" + '(' + str(n) + ')' + ".svg"
+#                         continue
+#                 base_top = os.path.basename(str(fileName))
 
-        return base_front, base_top, base_side
+#         return base_front, base_top, base_side
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 class End2DCreatorFront(object):

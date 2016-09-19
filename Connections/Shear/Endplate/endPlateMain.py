@@ -239,7 +239,6 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
-        self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
         # Saving and Restoring the endPlate window state.
@@ -247,9 +246,12 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
-        
+
 # ************************************** Osdag logo for html***************************************************************************************************
-        self.ui.btn_Design.clicked.connect(self.osdag_header)
+#         self.ui.btn_Design.clicked.connect(self.osdag_header)
+        self.ui.btn_CreateDesign.clicked.connect(self.osdag_header)
+        self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
+
 # ************************************ Help button *******************************************************************************
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
@@ -270,10 +272,14 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
-        self.store_osdagheader(image_path)
-
-    def store_osdagheader(self, image_path):
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+#         report_index = self.createDesignReport("report_index")
+#         shutil.copyfile(image_path, str(self.folder) + '/Report' + report_index)
+#         self.store_osdagheader(image_path)
+
+#     def store_osdagheader(self, image_path, report_index):
+#         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+#         shutil.copyfile(image_path, self.folder + '/Report' + report_index)
 
     def showFontDialogue(self):
 
@@ -346,7 +352,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
         self.ui.btn_CreateDesign.setEnabled(False)
 
-
     def enableViewButtons(self):
         '''
         Enables the all buttons in toolbar
@@ -394,7 +399,6 @@ class MainController(QtGui.QMainWindow):
         for i in newlist[:]:
             self.ui.comboPlateThick_2.addItem(str(i))
         self.ui.comboPlateThick_2.setCurrentIndex(1)
-
 
     def checkPlateHeight(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -639,7 +643,7 @@ class MainController(QtGui.QMainWindow):
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
-        if(uiObj != None):
+        if(uiObj is not None):
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
@@ -787,7 +791,7 @@ class MainController(QtGui.QMainWindow):
         dialog = MyPopupDialog(self)
         dialog.show()
 
-    def createDesignReport(self):
+    def createDesignReport(self, report_index):
 
         self.show_dialog()
 
@@ -795,21 +799,24 @@ class MainController(QtGui.QMainWindow):
 
         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
         fileName = str(fileName)
-        base, base_front, base_top, base_side = self.call2D_Drawing("All")
+#         base, base_front, base_top, base_side = self.call2D_Drawing("All")
+        self.call2D_Drawing("All")
         self.outdict = self.resultObj  # self.outputdict()
         self.inputdict = self.uiObj  # self.getuser_inputs()
         dictBeamData = self.fetchBeamPara()
         dictColData = self.fetchColumnPara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base, base_front, base_top, base_side)
+#         save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base, base_front, base_top, base_side)
+        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder)
 
-        # Creates pdf:
-        # path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        # config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-        # options = {
-        #             'margin-bottom': '10mm',
-        #             'footer-right': '[page]'
-        #             }
-        # pdfkit.from_file(fileName,"Workspace/css/EndPlateReport.pdf", configuration=config, options=options)
+        # ########################################## Creates pdf: ####################################################################
+        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+                   'margin-bottom': '10mm',
+                   'footer-right': '[page]'
+        }
+        pdfkit.from_file(fileName, self.folder + "/EndPlateReport.pdf", configuration=config, options=options)
+#         pdfkit.from_file(fileName,"Workspace/css/EndPlateReport.pdf", configuration=config, options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1653,9 +1660,11 @@ class MainController(QtGui.QMainWindow):
             self.display.View_Right()
         else:
             pass
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#     def callDesired_View(self, fileName, view, base_front, base_top, base_side):
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    def callDesired_View(self, fileName, view, base_front, base_top, base_side):
-
+    def callDesired_View(self, fileName, view):
         self. unchecked_allChkBox()
 
         uiObj = self.getuser_inputs()
@@ -1663,8 +1672,11 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         endCommonObj = EndCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
-        base_front, base_top, base_side = endCommonObj.saveToSvg(str(fileName), view, base_front, base_top, base_side)
-        return (base_front, base_top, base_side)
+        endCommonObj.saveToSvg(fileName, view)
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#         base_front, base_top, base_side = endCommonObj.saveToSvg(str(fileName), view, base_front, base_top, base_side)
+#         return (base_front, base_top, base_side)
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     def call2D_Drawing(self, view):
 
@@ -1676,22 +1688,28 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        base = ''
-        fileName = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
-        loc = self.ui.comboConnLoc.currentText()
-        if view == "All":
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#         base = ''
+#         base_front = ''
+#         base_side = ''
+#         base_top = ''
+#         loc = self.ui.comboConnLoc.currentText()
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+        if view == "All":
+            fileName = ''
+            self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
-            for n in range(1, 5, 1):
-                if (os.path.exists(data)):
-                    data = str(self.folder) + "/images_html/3D_Model" + '(' + str(n) + ')' + ".png"
-                    continue
-            base = os.path.basename(str(data))
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+#             for n in range(1, 5, 1):
+#                 if (os.path.exists(data)):
+#                     data = str(self.folder) + "/images_html/3D_Model" + '(' + str(n) + ')' + ".png"
+#                     continue
+#             base = os.path.basename(str(data))
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
             self.display.ExportToImage(data)
 
@@ -1700,19 +1718,18 @@ class MainController(QtGui.QMainWindow):
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
                                                          "SVG files (*.svg)")
             f = open(fileName, 'w')
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
-#             self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            self.callDesired_View(fileName, view)
             f.close()
-        return (base, base1, base2, base3)
+#             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+#         return (base, base1, base2, base3)
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-# for opening the window
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for opening the window %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #             app = QtGui.QApplication(sys.argv)
 #             svgWidget = QtSvg.QSvgWidget(" ")
 #             svgWidget.setGeometry(50, 50, 759, 668)
 #             svgWidget.show()
-           # sys.exit(app.exec_())
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#             sys.exit(app.exec_())
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     def closeEvent(self, event):
         '''
@@ -1789,6 +1806,7 @@ def set_osdaglogger():
 
     # add handler to logger object
     logger.addHandler(fh)
+
 
 def launchEndPlateController(osdagMainWindow, folder):
     set_osdaglogger()

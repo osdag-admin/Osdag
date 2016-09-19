@@ -46,6 +46,8 @@ import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
 from fileinput import filename
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 
 class MyTutorials(QtGui.QDialog):
@@ -194,7 +196,7 @@ class MainController(QtGui.QMainWindow):
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         # File Menu
 
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callFin2D_Drawing("Front"))
@@ -218,14 +220,14 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionFinplate_2.triggered.connect(self.call_3DFinplate)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
         self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo("comboPlateThick_2"))
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -697,7 +699,7 @@ class MainController(QtGui.QMainWindow):
     def save_design(self, popup_summary):
 
         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
-        fileName = str(fileName + ".html")
+#         fileName = str(fileName + ".html")
         base, base1, base2, base3 = self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
@@ -1193,7 +1195,8 @@ class MainController(QtGui.QMainWindow):
         base_side = ''
         base_top = ''
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+                                              self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1204,7 +1207,6 @@ class MainController(QtGui.QMainWindow):
         status = self.resultObj['Bolt']['status']
 
         self.commLogicObj.call_3DModel(status)
-
 
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -1289,14 +1291,22 @@ class MainController(QtGui.QMainWindow):
         base_side = ''
         base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                         self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
         if view != 'All':
+#             from PyQt4 import QtSvg
+#             fileName1 = open(self.folder + "/images_html/" + fileName)
+#             app = QtGui.QApplication(sys.argv)
+#             svgWidget = QtSvg.QSvgWidget(fileName1)
+#             svgWidget.setGeometry(50, 50, 759, 668)
+#             svgWidget.show()
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
                                                          "SVG files (*.svg)")
             fname = str(fileName)
         else:
             fname = ''
+
         base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
         return base, base1, base2, base3
         # commLogicObj.call2D_Drawing(view,fname)
@@ -1344,7 +1354,7 @@ class MainController(QtGui.QMainWindow):
     def sample_problem(self):
         root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
         for pdf_file in os.listdir(root_Path):
-            if file.endswith('.pdf'):
+            if pdf_file.endswith('.pdf'):
                 os.startfile("%s/%s" % (root_Path, pdf_file))
 
 # ********************************************************************************************************************************************************

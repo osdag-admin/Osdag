@@ -273,13 +273,11 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
-#         report_index = self.createDesignReport("report_index")
-#         shutil.copyfile(image_path, str(self.folder) + '/Report' + report_index)
+        
 #         self.store_osdagheader(image_path)
 
 #     def store_osdagheader(self, image_path, report_index):
 #         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
-#         shutil.copyfile(image_path, self.folder + '/Report' + report_index)
 
     def showFontDialogue(self):
 
@@ -815,15 +813,13 @@ class MainController(QtGui.QMainWindow):
                    'margin-bottom': '10mm',
                    'footer-right': '[page]'
         }
-        pdfkit.from_file(fileName, self.folder + "/EndPlateReport.pdf", configuration=config, options=options)
-#         pdfkit.from_file(fileName,"Workspace/css/EndPlateReport.pdf", configuration=config, options=options)
-
+        pdfkit.from_file(fileName, fileName[:-5] + ".pdf", configuration=config, options=options)
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/Logmessages", "Text files (*.txt)")
-        return self.save_file(fileName + ".txt")
+        return self.save_file(fileName)
 
     def save_file(self, fileName):
         '''(file open for writing)-> boolean

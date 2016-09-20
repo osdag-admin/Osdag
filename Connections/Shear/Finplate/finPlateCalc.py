@@ -262,8 +262,8 @@ def finConn(uiObj):
         t_thinner = min(beam_w_t.real,web_plate_t.real);
         bolt_planes = 1
         bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu).real;
-        bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,beam_fu,kb).real;
-         
+        bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,kb, beam_fu).real;
+
         bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
         if shear_load != 0:
 #                 bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
@@ -286,7 +286,8 @@ def finConn(uiObj):
             min_gauge = min_gauge;
         #clause 10.2.2 is800
         max_spacing = int(min(100 + 4 * t_thinner, 200));   #clause 10.2.3.3 is800
-             
+        #TODO: check max spacing
+
         if min_end_dist%10 != 0:
             min_end_dist = (min_end_dist/10)*10 + 10;
             min_edge_dist = min_end_dist

@@ -64,17 +64,24 @@ Bolts:
 # TODO block shear check
 # TODO test cases
 # TODO SA - atleast 2 rows of bolts should fit
-# TODO
-
-
+# TODO add input validation to select only angles which can accomodate 2 lines of bolts
+# TODO check if a clause exists on minimum angle thickness
+# TODO refactor code with SA calc class
+# TODO calculate other geometry params for SA
+    # include bolt design function
 # Bolt calculations
 # Bolt factored shear capacity = f_u * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
 # IS 800, Cl 10.3.3
 # Reduction factors for long joints, large grip lengths, and packing plates
 def bolt_shear(bolt_diameter, number_of_bolts, f_u):
-    gamma_mb = 1.25 # partial safety factor for bolt
-    # assumption: for all bolts, shear plane passes through threaded area
-    # assumption: for all bolts, tensile stress area equals the threaded area
+
+    '''
+    assumptions:
+        1)for all bolts, shear plane passes through threaded area
+        2)for all bolts, tensile stress area equals the threaded area
+        3)reduction factors for long joints, large grip lengths, packing plates are not applicable
+    '''
+    gamma_mb = 1.25  # partial safety factor for bolt
     # values for tensile stress area (mm^2) from Table 5.9 DoSS - N. Subramanian
     # TODO area of bolts for lower diameters
         # 5, 6, 8, 10 - either omit these from inputs or add to below dictionary
@@ -95,11 +102,8 @@ def bolt_shear(bolt_diameter, number_of_bolts, f_u):
 
 # Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
 # IS 800, Cl 10.3.4
-def bolt_bearing(bolt_diameter, thickness_plate, f_u):
-    # currently assuming k_b = 0.5
-    # TODO calculate k_b after design
+def bolt_bearing(bolt_diameter, thickness_plate, k_b, f_u):
     # given pitch, gauge, edge distance
-    k_b = 0.5
     bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * thickness_plate * f_u / (1000)
     return round(bolt_nominal_bearing_capacity / 1.25, 3)
 
@@ -123,7 +127,7 @@ def SeatAngleConn(inputObj):
     beam_fu = inputObj['Member']['fu (MPa)']
     beam_fy = inputObj['Member']['fy (MPa)']
     angle_fy = beam_fy # assumption : angle_fy = beam_fy; take user input fy in later modules
-
+    angle_fu = beam_fu # assumption : angle_fu = beam_fu; take user input fy in later modules
     shear_force = inputObj['Load']['ShearForce (kN)']
 
     bolt_diameter = inputObj['Bolt']['Diameter (mm)']
@@ -131,7 +135,6 @@ def SeatAngleConn(inputObj):
     bolt_grade = inputObj['Bolt']['Grade']
     # bolt_planes = 1
 
-    # angle_sec = 'ISA 15075'
     # TODO rework angle section name
     angle_sec = inputObj['Angle']["AngleSection"]
     # angle_t = 12
@@ -187,25 +190,6 @@ def SeatAngleConn(inputObj):
     bolt_fu = int(bolt_grade) * 100 # Table 1 of IS 800
     # bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;    # Bolt f_y is not required in calculations
 
-    thickness_governing = min(beam_w_t.real, angle_t.real)
-    bolt_shear_capacity = bolt_shear(bolt_diameter, 1, bolt_fu).real
-    bolt_bearing_capacity = bolt_bearing(bolt_diameter, column_f_t, beam_fu).real
-    bolt_value = min(bolt_shear_capacity, bolt_bearing_capacity)
-
-    bolts_required = math.ceil(shear_force / bolt_value)
-
-    # TODO SCI minimum 3 bolts
-        # assumption: provide minimum 3 bolts based on SCI guidelines
-        # check if odd number of bolts can be allowed
-    if bolts_required <= 2:
-        bolts_required = 3
-    print "Number of bolts required = " + str(bolts_required)
-
-    # TODO bolt group capacity
-        # check applicable reduction factors
-    bolt_group_capacity = bolts_required * bolt_value
-    # print "bolt group capacity = " + str(bolt_group_capacity)
-
     # Bolt hole clearance
     # IS 800, Table 19 Clearances for Fastener HOles
     # TODO bolt hole clearance
@@ -250,33 +234,59 @@ def SeatAngleConn(inputObj):
     min_pitch = int(2.5 * bolt_diameter)
     min_gauge = int(2.5 * bolt_diameter)
 
-    # assumption: rounding off min pitch and gauge distances to upper multiple of 10
+    # Min edge and end distances IS 800 Cl 10.2.4.2
+    min_end_dist = int(min_edge_multiplier*bolt_hole_diameter)
+    min_edge_dist = int(min_edge_multiplier * (bolt_hole_diameter))
+
+    # TODO: rethink rounding off of MINIMUM distances
+        # round off the actual distances and check against minimum
     if min_pitch % 10 != 0 or min_gauge % 10 != 0:
         min_pitch = (min_pitch / 10) * 10 + 10
         min_gauge = (min_gauge / 10) * 10 + 10
+    if min_edge_dist % 10 != 0:
+        min_edge_dist = (min_edge_dist / 10) * 10 + 10
+        min_end_dist = (min_end_dist / 10) * 10 + 10
 
-    print "Minimum pitch = " + str(min_pitch)
-    print "Minimum gauge = " + str(min_gauge)
+    # Calculation of k_b
+    k_b = min(min_end_dist/float(3*bolt_hole_diameter),
+              min_pitch/float(3*bolt_hole_diameter)-0.25,
+              bolt_fu/float(angle_fu),
+              1)
+    k_b = round(k_b, 3)
+
+    # Bolt capacity
+    thickness_governing = min(beam_w_t.real, angle_t.real)
+    bolt_shear_capacity = bolt_shear(bolt_diameter, number_of_bolts=1, bolt_fu).real
+    bolt_bearing_capacity = bolt_bearing(bolt_diameter, column_f_t, beam_fu, k_b).real
+    bolt_value = min(bolt_shear_capacity, bolt_bearing_capacity)
+
+    bolts_required = math.ceil(shear_force / bolt_value)
+
+    # TODO SCI minimum 3 bolts
+    # assumption: provide minimum 3 bolts based on SCI guidelines
+    # check if odd number of bolts can be allowed
+    if bolts_required <= 2:
+        bolts_required = 3
+        # print "Number of bolts required = " + str(bolts_required)
+
+    # TODO bolt group capacity
+    # check applicable reduction factors
+    bolt_group_capacity = bolts_required * bolt_value
+    # print "bolt group capacity = " + str(bolt_group_capacity)
 
     # Max spacing IS 800 Cl 10.2.3.3
     max_spacing = int(min(100 + 4 * thickness_governing, 200))
-    print "Max spacing=" + str(max_spacing)
-
-    # Max spacing IS 800 Cl 10.2.4.2
-    min_edge_dist = int(min_edge_multiplier * (bolt_hole_diameter))
-    if min_edge_dist % 10 != 0:
-        min_edge_dist = (min_edge_dist / 10) * 10 + 10
+    # print "Max spacing = " + str(max_spacing)
 
     # Max spacing IS 800 Cl 10.2.4.3
     max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / angle_fy)).real)
+    # print "Max edge distance = " + str(max_edge_dist)
 
+    # Cl 10.2.4.3 continued..
     # in case of corrosive influences, the maximum edge distance shall not exceed
     # 40mm plus 4t, where t is the thickness of the thinner connected plate.
     # max_edge_dist = min(max_edge_dist, 40 + 4*thickness_governing)
 
-    # Determine single or double line of bolts
-    length_avail = (angle_A - 2 * min_edge_dist)
-    pitch = round(length_avail / (bolts_required - 1), 1)
     # -----------------------------------------------------------------------------------------------------------
 
     # Seating Angle Design and Check
@@ -286,7 +296,44 @@ def SeatAngleConn(inputObj):
     # Angle bearing WIDTH <=> Angle Length (angle_l)
     # length of angle = beam flange width
     angle_l = beam_w_f
-    print "Length of angle = " + str(angle_l)
+    # print "Length of angle = " + str(angle_l)
+    # Determine single or double line of bolts
+    length_avail = (angle_l - 2 * min_edge_dist)
+
+    # check to see if one bolt line is sufficient:
+    bolt_lines = 1
+    bolts_per_line = bolts_required
+    gauge = round(length_avail / (bolts_per_line - 1), 3)
+    if gauge < min_gauge:
+        bolt_lines = 2
+        bolts_per_line = int((bolts_required+1)/2)
+        gauge = round(length_avail / (bolts_per_line - 1), 3)
+        if gauge < min_gauge:
+            logger.error(": Required gauge length with 2 rows for selected bolt size is less than minimum gauge lenth")
+            logger.warning(": Gauge length should be more than  %2.2f mm " % (min_gauge))
+            logger.warning(": Maximum gauge length allowed is %2.2f mm " % (max_spacing))
+            logger.info(": Increase the bolt diameter (size) or bolt grade (to decrease the number of required bolts)")
+    if gauge>max_spacing:
+        # Assumption: keeping minimum edge distance the same and increasing the number
+        # of bolts, to meet the max spacing requirement.
+        # The engineer can choose to revise this logic by keeping the number of bolts same,
+        # and increasing the edge distance. Uncomment the below block and comment the latter block
+        # to achieve this:
+        # gauge = max_spacing
+        # edge_distance = (angle_l - (bolts_per_line-1)*gauge)/2
+        '''
+        1) set gauge = max spacing
+        2) get approx (conservative) number of bolts per line based on this gauge
+        3) use the revised number of bolts per line to get revised gauge length
+        '''
+        gauge = max_spacing
+        bolts_per_line = math.ceil((length_avail/gauge)+1)
+        gauge = round(length_avail / (bolts_per_line - 1), 3)
+
+    # TODO min thickness and max end/edge distance
+        # # Calculation of minimum plate thickness and maximum end/edge distance
+        # min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
+        # max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
 
     # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
     # Changed form of Equation from Cl 8.7.4
@@ -399,13 +446,22 @@ def SeatAngleConn(inputObj):
         "Capacity of Bolt (kN)": bolt_value,
         "Bolt group capacity (kN)": bolt_group_capacity,
         "No. of Bolts": bolts_required,
-        # TODO initializing for debugging
+        # TODO initializing values (for debugging)
         "No. of Row": 1,
         "No. of Column": 1,
-        "Gauge Distance (mm)": 1,
-        "End Distance (mm)": 1,
         "Pitch Distance (mm)": pitch,
-        "Edge Distance (mm)": min_edge_dist
+        "Gauge Distance (mm)": gauge,
+        "End Distance (mm)": min_end_dist,
+        "Edge Distance (mm)": min_edge_dist,
+
+        # output dictionary items for design report
+        "bolt_fu" : bolt_fu,
+        "bolt_dia" : bolt_diameter,
+        "k_b": k_b,
+        "beam_w_t": beam_w_t,
+        "beam_fu": beam_fu,
+        "shearforce": shear_force,
+        "hole_dia": bolt_hole_diameter
         }
 
     if outputObj['Bolt']['status'] == True:

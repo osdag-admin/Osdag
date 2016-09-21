@@ -126,7 +126,7 @@ class MyPopupDialog(QtGui.QDialog):
         return input_summary
 
     def useUserProfile(self):
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", "All Files (*)")
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -794,8 +794,8 @@ class MainController(QtGui.QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
-
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
+#         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", (self.folder) + "/", "Html Files (*.html)")
+        fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
 #         base, base_front, base_top, base_side = self.call2D_Drawing("All")
         self.call2D_Drawing("All")
@@ -813,7 +813,8 @@ class MainController(QtGui.QMainWindow):
                    'margin-bottom': '10mm',
                    'footer-right': '[page]'
         }
-        pdfkit.from_file(fileName, fileName[:-5] + ".pdf", configuration=config, options=options)
+#         pdfkit.from_file(fileName, fileName[:-5] + ".pdf", configuration=config, options=options)
+        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
@@ -1586,7 +1587,6 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['Bolt']['status']
         self.call_3DModel(status)
-#         base, base_front, base_top, base_side = self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of endplate

@@ -129,7 +129,7 @@ class MyPopupDialog(QtGui.QDialog):
 
     def useUserProfile(self):
 
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", "All Files (*)")
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -698,12 +698,23 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
-#         fileName = str(fileName + ".html")
-        base, base1, base2, base3 = self.callFin2D_Drawing("All")
+#         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
+        fileName = self.folder + "/images_html/Html_Report.html"
+        fileName = str(fileName)
+#         base, base1, base2, base3 = self.callFin2D_Drawing("All")
+        self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)  #, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
+
+        # ########################################## Creates pdf: ####################################################################
+        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+                   'margin-bottom': '10mm',
+                   'footer-right': '[page]'
+        }
+        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1196,7 +1207,7 @@ class MainController(QtGui.QMainWindow):
         base_top = ''
 
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
+                                              self.alist[7], self.alist[8], self.display, self.folder) #, base, base_front, base_side, base_top)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1286,13 +1297,13 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
+#         base = ''
+#         base_front = ''
+#         base_side = ''
+#         base_top = ''
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                         self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
+                                         self.alist[8], self.display, self.folder) #, base, base_front, base_side, base_top)
         if view != 'All':
 #             from PyQt4 import QtSvg
 #             fileName1 = open(self.folder + "/images_html/" + fileName)
@@ -1306,9 +1317,10 @@ class MainController(QtGui.QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
+        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 
-        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
-        return base, base1, base2, base3
+#         base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+#         return base, base1, base2, base3
         # commLogicObj.call2D_Drawing(view,fname)
 
     def closeEvent(self, event):

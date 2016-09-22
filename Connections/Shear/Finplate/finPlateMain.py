@@ -5,116 +5,141 @@ comment
 @author: deepa
 '''
 from PyQt4.QtCore import QString, pyqtSignal
-from OCC.TopoDS import topods, TopoDS_Shape
-from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
 from OCC import VERSION, BRepTools
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
-from ui_design_preferences import Ui_ShearDesignPreferences
+from Connections.Shear.Finplate.ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
-from finPlateCalc import finConn
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Quantity import Quantity_NOC_SADDLEBROWN
-from ISection import ISection
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-from weld import  Weld
-from plate import Plate
-from bolt import Bolt
-from nut import Nut 
-from notch import Notch
 import os.path
-from utilities import osdagDisplayShape
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
-from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from OCC import IGESControl
-from filletweld import FilletWeld
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
-from drawing_2D import FinCommonData
-from reportGenerator import *
-from ModelUtils import getGpPt
+#from reportGenerator import *
+#from ModelUtils import getGpPt
 ##### Testing imports
-import OCC.V3d
+#import OCC.V3d
 import pdfkit
 import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
 
 
-class DesignPreferences(QtGui.QTabWidget):
+class DesignPreferences(QtGui.QDialog):
 
     def __init__(self, parent=None):
 
-        QtGui.QTabWidget.__init__(self, parent)
+        QtGui.QDialog.__init__(self, parent)
         self.ui = Ui_ShearDesignPreferences()
         self.ui.setupUi(self)
-        self.mainController = parent
-        self.ui.btn_boltdefaults.clicked.connect(self.set_default_para)
-        self.ui.btn_welddefaults.clicked.connect(self.set_default_para)
-        self.ui.btn_detailingdefaults.clicked.connect(self.set_default_para)
-        self.ui.btn_boltsave.clicked.connect(self.save_designPref_para)
-        self.ui.btn_weldsave.clicked.connect(self.save_designPref_para)
-        self.ui.btn_detailingsave.clicked.connect(self.save_designPref_para)
+        self.main_controller = parent
+        self.saved = None
+        self.set_default_para()
+        self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
     def save_designPref_para(self):
         '''
         This routine is responsible for saving all design preferences selected by the user
         '''
         designPref = {}
-        designPref["Bolt"] = {}
-        designPref["Bolt"]["boltHoleType"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["Bolt"]["boltHoleClearance"] = int(self.ui.txt_boltHoleClearance.text())
-        designPref["Bolt"]["boltFu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
 
-        designPref["Weld"] = {}
+        designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
-        designPref["Weld"]["typeOfWeld"] = weldType
+        designPref["weld"]["typeof_weld"] = weldType
         if weldType == "Shop weld":
-            designPref["Weld"]["safetyFactor"] = float(1.2)
+            designPref["weld"]["safety_factor"] = float(1.25)
         else:
-            designPref["Weld"]["safetyFactor"] = float(1.5)
+            designPref["weld"]["safety_factor"] = float(1.5)
 
-        designPref["Detailing"] = {}
-        typeOfEdge = str(self.ui.combo_detailingEdgeType)
-        designPref["Detailing"]["typeOfEdge"] = typeOfEdge
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
         if typeOfEdge == "a - Sheared or hand flame cut":
-            designPref["Detailing"]["minEdgeNEndDist"] = float(1.7)
+            designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
-            designPref["Detailing"]["minEdgeNEndDist"] = float(1.5)
-        designPref["Detailing"]["gap"] = int(20)
+            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text().isEmpty():
 
-        self.mainController.call_designPref(designPref)
+            designPref["detailing"]["gap"] = int(20)
+        else:
+            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+
+        self.saved = True
+
+        QtGui.QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return designPref
+
+        #self.main_controller.call_designPref(designPref)
 
     def set_default_para(self):
         '''
         '''
-        uiObj = self.mainController.getuser_inputs()
+        uiObj = self.main_controller.getuser_inputs()
         boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        boltGrade = float(uiObj["Bolt"]["Grade"])
+        bolt_grade = float(uiObj["Bolt"]["Grade"])
         clearance = str(self.get_clearance(boltDia))
-        bolt_fu = str(self.get_boltFu(boltGrade))
+        bolt_fu = str(self.get_boltFu(bolt_grade))
+
+        self.ui.combo_boltHoleType.setCurrentIndex(0)
         self.ui.txt_boltHoleClearance.setText(clearance)
         self.ui.txt_boltFu.setText(bolt_fu)
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
         self.ui.combo_weldType.setCurrentIndex(0)
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        designPref["weld"]["safety_factor"] = float(1.2)
+
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        self.ui.txt_detailingGap.setText(20)
+        self.ui.txt_detailingGap.setText(str(20))
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        designPref["detailing"]["gap"] = int(20)
+        self.saved = False
+
+        return designPref
+
+    def set_bolthole_clernce(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        clearance = self.get_clearance(boltDia)
+        self.ui.txt_boltHoleClearance.setText(str(clearance))
+
+    def set_boltFu(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltGrade = float(uiObj["Bolt"]["Grade"])
+        boltfu = str(self.get_boltFu(boltGrade))
+        self.ui.txt_boltFu.setText(boltfu)
 
     def get_clearance(self, boltDia):
 
-        standardClearance = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3}
-        overheadClearance = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8}
+        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3}
+        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
-            clearance = standardClearance[boltDia]
+            clearance = standard_clrnce[boltDia]
         else:
-            clearance = overheadClearance[boltDia]
+            clearance = overhead_clrnce[boltDia]
         return clearance
 
     def get_boltFu(self, boltGrade):
@@ -277,9 +302,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callFin2D_Drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.callFin2D_Drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callFin2D_Drawing("Top"))
-        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
+        self.ui.actionfinPlate_quit.setShortcut('Ctrl+Q')
+        self.ui.actionfinPlate_quit.setStatusTip('Exit application')
+        self.ui.actionfinPlate_quit.triggered.connect(QtGui.qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -303,6 +328,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo("comboPlateThick_2"))
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
+        self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -338,6 +365,7 @@ class MainController(QtGui.QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.commLogicObj = None
+        self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
@@ -775,12 +803,32 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
-        fileName = str(fileName + ".html")
-        base, base1, base2, base3 = self.callFin2D_Drawing("All")
+#         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
+        fileName = self.folder + "/images_html/Html_Report"
+#         fileName = str(fileName + ".html")
+        self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
         commLogicObj.call_designReport(fileName, popup_summary)
+
+        path_wkhtmltopdf = '/home/deepa/Osdag_softwares/wkhtmltox/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+        options = {
+                    'margin-bottom': '10mm',
+                    'footer-right': '[page]'
+                    }
+        ##########################
+        #path_wkthmltopdf = r'/home/deepa/Downloads/wkhtmltox/bin/wkhtmltopdf'
+        # config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        # options = {
+        #             'margin-bottom': '10mm',
+        #             'footer-right': '[page]'
+        #             }
+        # pdfkit.from_file(fileName, 'output/finplate/Report/finplaterepoRT.pdf', configuration=config, options=options)
+        # #         pdfkit.from_file(fileName,'output/finplate/'+base+'.pdf',configuration=config, options=options)
+        ##########################
+        
+        pdfkit.from_file(fileName,str(QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder), "PDF(*.pdf)")), configuration=config, options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1243,13 +1291,23 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
 
     def call_designPref(self, designPref):
-        pass
+        self.uiObj = self.getuser_inputs()
+        self.uiObj
+        print"printing designpreferences"
+        print designPref
 
     def designParameters(self):
         '''
         This routine returns the neccessary design parameters.
         '''
         self.uiObj = self.getuser_inputs()
+        if self.designPrefDialog.saved is not True:
+            design_pref = self.designPrefDialog.set_default_para()
+        else:
+            design_pref = self.designPrefDialog.save_designPref_para()
+        self.uiObj.update(design_pref)
+        print "printing designprefernces", self.uiObj
+
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         loc = str(self.ui.comboConnLoc.currentText())
@@ -1270,12 +1328,12 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
+#         base = ''
+#         base_front = ''
+#         base_side = ''
+#         base_top = ''
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder) 
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1286,7 +1344,6 @@ class MainController(QtGui.QMainWindow):
         status = self.resultObj['Bolt']['status']
 
         self.commLogicObj.call_3DModel(status)
-
 
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -1371,7 +1428,7 @@ class MainController(QtGui.QMainWindow):
         base_side = ''
         base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
         if view != 'All':
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -1379,8 +1436,8 @@ class MainController(QtGui.QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
-        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
-        return base, base1, base2, base3
+        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+#         return base, base1, base2, base3
         # commLogicObj.call2D_Drawing(view,fname)
 
     def closeEvent(self, event):
@@ -1422,9 +1479,14 @@ class MainController(QtGui.QMainWindow):
         webbrowser.open_new(r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
 
     def design_preferences(self):
-        widget = DesignPreferences(self)
-        widget.show()
-        
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearace(self):
+        self.designPrefDialog.set_bolthole_clernce()
+
+    def call_boltFu(self):
+        self.designPrefDialog.set_boltFu()
+
 
 # ********************************************************************************************************************************************************
 

@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(1328, 767)
+        MainWindow.resize(1328, 761)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/newPrefix/images/finwindow.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -1666,6 +1666,8 @@ class Ui_MainWindow(object):
         font.setFamily(_fromUtf8("DejaVu Serif"))
         self.actionDesign_Preferences.setFont(font)
         self.actionDesign_Preferences.setObjectName(_fromUtf8("actionDesign_Preferences"))
+        self.actionfinPlate_quit = QtGui.QAction(MainWindow)
+        self.actionfinPlate_quit.setObjectName(_fromUtf8("actionfinPlate_quit"))
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
@@ -1679,6 +1681,8 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionSave_log_messages)
         self.menuFile.addAction(self.actionCreate_design_report)
         self.menuFile.addAction(self.actionSave)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionfinPlate_quit)
         self.menuEdit.addAction(self.actionCut)
         self.menuEdit.addAction(self.actionCopy)
         self.menuEdit.addAction(self.actionPaste)
@@ -2061,5 +2065,17 @@ class Ui_MainWindow(object):
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question", None))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ", None))
         self.actionDesign_Preferences.setText(_translate("MainWindow", "Design Preferences", None))
+        self.actionfinPlate_quit.setText(_translate("MainWindow", "Quit", None))
+        self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q", None))
 
 import icons_rc
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    MainWindow = QtGui.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+

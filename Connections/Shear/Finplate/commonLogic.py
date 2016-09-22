@@ -43,7 +43,7 @@ class CommonDesignLogic(object):
         #------------------------------------------- self.connectivityObj = None
 
 
-    def __init__(self, uiObj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T, display, folder, base, base1, base2, base3):
+    def __init__(self, uiObj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T, display, folder):
 
         self.uiObj = uiObj
         self.dictbeamdata = dictbeamdata
@@ -58,10 +58,10 @@ class CommonDesignLogic(object):
         self.resultObj = self.call_finCalculation()
         self.connectivityObj = None
         self.folder = folder
-        self.base = base
-        self.base1 = base1
-        self.base2 = base2
-        self.base3 = base3
+#         self.base = base
+#         self.base1 = base1
+#         self.base2 = base2
+#         self.base3 = base3
 
     #============================= FinCalculation ===========================================
 
@@ -376,22 +376,22 @@ class CommonDesignLogic(object):
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
+#         base = ''
+#         base_front = ''
+#         base_side = ''
+#         base_top = ''
         if view == "All":
             ''
 
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side, folder)
+            self.callDesired_View(fileName, view, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
             data = str(folder) + "/images_html/3D_Model.png"
-            for n in range(1, 100, 1):
-                if (os.path.exists(data)):
-                    data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
-                    continue
-            base = os.path.basename(str(data))
+#             for n in range(1, 100, 1):
+#                 if (os.path.exists(data)):
+#                     data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
+#                     continue
+#             base = os.path.basename(str(data))
 
             self.display.ExportToImage(data)
 
@@ -399,16 +399,14 @@ class CommonDesignLogic(object):
 
             f = open(fileName, 'w')
 
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side, folder)
+            self.callDesired_View(fileName, view, folder)
             f.close()
-        return (base, base1, base2, base3)
 
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    def callDesired_View(self, fileName, view, base_front, base_top, base_side, folder):
+    def callDesired_View(self, fileName, view, folder):
 
         finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
-        base_front, base_top, base_side = finCommonObj.saveToSvg(str(fileName), view, base_front, base_top, base_side)
-        return (base_front, base_top, base_side)
+        finCommonObj.saveToSvg(str(fileName), view)
 
     #=========================================================================================
     def call_saveMessages(self):  # Done
@@ -423,7 +421,7 @@ class CommonDesignLogic(object):
         fileName = str(htmlfilename)
 
         if not os.path.isfile(fileName):
-            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder, self.base, self.base1, self.base2, self.base3)
+            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
 
     #=========================================================================================
 

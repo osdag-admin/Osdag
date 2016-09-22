@@ -20,7 +20,7 @@ from PyQt4.QtCore import QString
 # import mystyle.css
 
 
-def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename, folder, base, base_front, base_top, base_side):
+def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename, folder):
     fileName = (filename)
 #     self.folder = folder
     myfile = open(fileName, "w")
@@ -799,17 +799,17 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    png = folder + "/images_html/" + base
+    png = folder + "/images_html/3D_Model.png"
     datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
 
-    side = folder + "/images_html/" + base_side
-    dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
+    side = folder + "/images_html/finSide.png"
+    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
 
-    top = folder + "/images_html/" + base_top
-    datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
+    top = folder + "/images_html/finTop.png"
+    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
 
-    front = folder + "/images_html/" + base_front
-    datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
+    front = folder + "/images_html/finFront.png"
+    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
     row = [0, datapng, datatop]
     rstr += t('tr')

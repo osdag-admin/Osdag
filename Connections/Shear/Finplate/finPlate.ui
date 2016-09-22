@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1328</width>
-    <height>767</height>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -454,6 +454,8 @@ QMenu::item:selected {
     <addaction name="actionSave_log_messages"/>
     <addaction name="actionCreate_design_report"/>
     <addaction name="actionSave"/>
+    <addaction name="separator"/>
+    <addaction name="actionfinPlate_quit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="styleSheet">
@@ -4562,6 +4564,14 @@ QMenu::item:selected {
     <font>
      <family>DejaVu Serif</family>
     </font>
+   </property>
+  </action>
+  <action name="actionfinPlate_quit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+Q</string>
    </property>
   </action>
  </widget>

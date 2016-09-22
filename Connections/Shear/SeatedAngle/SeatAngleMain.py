@@ -34,7 +34,7 @@ from angle import Angle
 from filletweld import FilletWeld
 from bolt import Bolt
 from nut import Nut
-from SeatAngleCalc import SeatAngleConn
+from SeatAngleCalc import SeatAngleConnection
 from nutBoltPlacement import NutBoltArray
 
 from colWebBeamWebConnectivity import ColWebBeamWeb
@@ -802,7 +802,7 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with column web beam web
         '''
         uiObj = self.getuser_inputs()
-        resultObj = SeatAngleConn(uiObj)
+        resultObj = SeatAngleConnection.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
@@ -893,7 +893,7 @@ class MainController(QtGui.QMainWindow):
         
         '''
         uiObj = self.getuser_inputs()
-        resultObj = SeatAngleConn(uiObj)
+        resultObj = SeatAngleConnection.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         #         fillet_length = resultObj['Plate']['height']
@@ -1068,7 +1068,7 @@ class MainController(QtGui.QMainWindow):
         self.uiObj = self.getuser_inputs()
 
         # Seated Angle Design Calculations.
-        self.resultObj = SeatAngleConn(self.uiObj)
+        self.resultObj = SeatAngleConnection.seat_angle_connection(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)

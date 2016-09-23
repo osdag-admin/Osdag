@@ -372,16 +372,20 @@ s
                 fin2DFront.callCFBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
 
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callCFBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callCFBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
 #                         fileName = str(self.folder) + "/images_html/finFrontFB" + str(n) + ".svg"
 #                         continue
 #                 fin2DFront.callCFBWfront(fileName)
 #                 base_front = os.path.basename(str(fileName))
-
-                fileName = str(self.folder) + '/images_html/finSide.svg'
-                fin2DSide.callCFBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
 
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -390,9 +394,6 @@ s
 #                 fin2DSide.callCFBWSide(fileName)
 #                 base_side = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/images_html/finTop.svg'
-                fin2DTop.callCFBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
 
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -413,6 +414,14 @@ s
                 fin2DFront.callCWBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
 
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callCWBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callCWBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
 #                         fileName = str(self.folder) + "/images_html/FinFrontWB" + str(n) + ".svg"
@@ -420,20 +429,12 @@ s
 #                 fin2DFront.callCWBWfront(fileName)
 #                 base_front = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/images_html/finSide.svg'
-                fin2DSide.callCWBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
-
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
 #                         fileName = str(self.folder) + "/images_html/FinSideWB" + str(n) + ".svg"
 #                         continue
 #                 fin2DSide.callCWBWSide(fileName)
 #                 base_side = os.path.basename(str(fileName))
-
-                fileName = str(self.folder) + '/images_html/finTop.svg'
-                fin2DTop.callCWBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
 
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -454,16 +455,20 @@ s
                 fin2DFront.callBWBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
 
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callBWBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callBWBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
 #                         fileName = str(self.folder) + "/images_html/finFrontBB" + str(n) + ".svg"
 #                         continue
 #                 fin2DFront.callBWBWfront(fileName)
 #                 base_front = os.path.basename(str(fileName))
-
-                fileName = str(self.folder) + '/images_html/finSide.svg'
-                fin2DSide.callBWBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
 
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):
@@ -472,9 +477,6 @@ s
 #                 fin2DSide.callBWBWSide(fileName)
 #                 base_side = os.path.basename(str(fileName))
 
-                fileName = str(self.folder) + '/images_html/finTop.svg'
-                fin2DTop.callBWBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
 
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(fileName)):

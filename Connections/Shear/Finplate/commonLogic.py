@@ -397,10 +397,12 @@ class CommonDesignLogic(object):
 
         else:
 
-            f = open(fileName, 'w')
+#             f = open(fileName, 'w')
             self.callDesired_View(fileName, view, folder)
+            data = str(folder) + "/"
+            self.display.ExportToImage(data)
 #             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side, folder)
-            f.close()
+#             f.close()
 #         return (base, base1, base2, base3)
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

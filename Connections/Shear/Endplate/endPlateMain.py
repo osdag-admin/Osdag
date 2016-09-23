@@ -1697,6 +1697,7 @@ class MainController(QtGui.QMainWindow):
             self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
+            self.display.ExportToImage(data)
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
@@ -1706,13 +1707,10 @@ class MainController(QtGui.QMainWindow):
 #                     continue
 #             base = os.path.basename(str(data))
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-            self.display.ExportToImage(data)
-
         else:
             fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
+                                                        "Save SVG", str(self.folder) + '/untitled.svg',
+                                                        "SVG files (*.svg)")
             f = open(fileName, 'w')
             self.callDesired_View(fileName, view)
             f.close()

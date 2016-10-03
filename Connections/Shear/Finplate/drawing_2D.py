@@ -763,7 +763,7 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.FA2 + (472 * np.array([0, -1]))
+        ptSecC = self.FA2 + (520 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -939,7 +939,7 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.A3 + (472 * np.array([0, -1]))
+        ptSecC = self.A3 + (520 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -1780,7 +1780,7 @@ class Fin2DCreatorTop(object):
     def callBWBWTop(self, fileName):
         vb_ht = str(float(1.8 * self.dataObj.col_L))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -300 950 ' + vb_ht))
-        
+
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BE), (self.BH)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BF), (self.BG)).stroke('blue', width=2.5, linecap='square'))
@@ -2145,10 +2145,9 @@ class Fin2DCreatorSide(object):
         vb_width = str(float(3.5 * self.dataObj.D_col))
         vb_ht = str(float(1.4 * self.dataObj.col_L))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -100 ' + vb_width + ' ' + vb_ht))
+
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
-        
-        
         dwg.add(dwg.rect(insert=(self.FQ), size=(self.dataObj.plate_thick, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))  # dwg.add(dwg.line((self.ptMid),(self.ptMid1)).stroke('green',width = 2.5,linecap = 'square'))
         # Diagonal Hatching for WELD
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
@@ -2252,17 +2251,17 @@ class Fin2DCreatorSide(object):
         vb_width = str(float(1.6 * self.dataObj.col_L))
         vb_ht = str(float(1.7 * self.dataObj.D_col))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -200 ' + vb_width + ' ' + vb_ht))
-        
+
         dwg.add(dwg.polyline(points=[(self.BA1), (self.BA2), (self.BA5), (self.BA6), (self.BA1)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BA8), (self.BA3)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BA7), (self.BA4)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BE), (self.BF), (self.BG), (self.BH), (self.BI), (self.BJ), (self.BK), (self.BL), (self.BA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
-        
+
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.BX), size=(8, self.dataObj.weld_len), fill="url(#diagonalHatch)", stroke='white', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.BQ), size=(self.dataObj.plate_thick, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
-        
+
         nr = self.dataObj.no_of_rows
         pitchPts = []
         for row in range(nr):
@@ -2278,10 +2277,10 @@ class Fin2DCreatorSide(object):
             dwg.add(dwg.rect(insert=(bltPt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
             bltPt3 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.plate_thick * np.array([-1, 0])
             bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0]) 
-            dwg.add(dwg.line((bltPt1), (bltPt2)).stroke('black', width=1.5, linecap='square'))   
-            dwg.add(dwg.line((bltPt3), (bltPt4)).stroke('black', width=1.5, linecap='square'))   
+            dwg.add(dwg.line((bltPt1), (bltPt2)).stroke('black', width=1.5, linecap='square'))
+            dwg.add(dwg.line((bltPt3), (bltPt4)).stroke('black', width=1.5, linecap='square'))
             pitchPts.append(pt)
-        
+
         # Draw Faint Line
         pt2 = self.BP + ((self.dataObj.col_L / 2) + 100) * np.array([1, 0])
         self.dataObj.drawFaintLine(self.BP, pt2, dwg)
@@ -2353,7 +2352,3 @@ class Fin2DCreatorSide(object):
         dwg.save()
 
         pass
-    
-        
-
-        

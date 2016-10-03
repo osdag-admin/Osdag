@@ -814,7 +814,7 @@ class MainController(QtGui.QMainWindow):
                    'footer-right': '[page]'
         }
 #         pdfkit.from_file(fileName, fileName[:-5] + ".pdf", configuration=config, options=options)
-        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
+        pdfkit.from_file(fileName, str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
@@ -1587,6 +1587,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['Bolt']['status']
         self.call_3DModel(status)
+        self.call2D_Drawing('All')
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of endplate
@@ -1708,22 +1709,60 @@ class MainController(QtGui.QMainWindow):
 #             base = os.path.basename(str(data))
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         else:
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                        "Save SVG", str(self.folder) + '/untitled.svg',
-                                                        "SVG files (*.svg)")
-            f = open(fileName, 'w')
-            self.callDesired_View(fileName, view)
-            f.close()
+#             self.go_to_open_svg(view)
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for opening the window %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#           app2 = QtGui.QApplication(sys.argv)
+
+#     def go_to_open_svg(self, view):
+
+            if view == "Front":
+                fileName = self.folder + "/images_html/endFront.svg"
+    
+            elif view == "Side":
+                fileName = self.folder + "/images_html/endSide.svg"
+    
+            else:
+                fileName = self.folder + "/images_html/endTop.svg"
+    
+            self.svgWidget = QtSvg.QSvgWidget(fileName)
+    #             svgWidget.setGeometry(50, 50, 759, 668)
+            self.svgWidget.setFixedSize(900, 800)
+            self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
+            self.btn_save.setToolTip('Saves 2D Image as PNG')
+            self.btn_save.resize(self.btn_save.sizeHint())
+            self.btn_save.move(750, 750)
+            self.svgWidget.setWindowTitle('2D View')
+            self.svgWidget.show()
+#             self.btn_save.clicked.connect(self.save_2D_image_names)
+            self.open_new(view)
+            sys.exit(app.exec_())
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
 #         return (base, base1, base2, base3)
+    def open_new(self, view):
+        self.btn_save.clicked.connect(self.save_2D_image_names)
+        return self.save_2D_image_names(view)
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for opening the window %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#             app = QtGui.QApplication(sys.argv)
-#             svgWidget = QtSvg.QSvgWidget(" ")
-#             svgWidget.setGeometry(50, 50, 759, 668)
-#             svgWidget.show()
-#             sys.exit(app.exec_())
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    def save_2D_image_names(self, view):
+#         view = self.go_to_open_svg(view)
+        if view == "Front":
+            png_image_path = self.folder + "/images_html/endFront.png"
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+        elif view == "Side":
+            png_image_path = self.folder + "/images_html/endSide.png"
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+        else:
+            png_image_path = self.folder + "/images_html/endTop.png"
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+
+        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
+
+#     def save_2D_images(self, fileName, view):
+#         fileName = fileName
+#         f = open(fileName, 'w')
+#         f.write(self.callDesired_View(fileName, view))
+#         print "saving only imagesssss", fileName
+#         f.close()
 
     def closeEvent(self, event):
         '''

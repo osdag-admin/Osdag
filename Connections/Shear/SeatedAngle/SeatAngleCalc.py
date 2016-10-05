@@ -13,9 +13,7 @@ First published 2008, 14th impression 2014
 
 IS 800: 2007
     General construction in steel - Code of practice (Third revision)
-'''
 
-'''
 ASCII diagram
 
             +-+-------------+-+   +-------------------------+
@@ -56,7 +54,6 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 # TODO calculate other geometry params for SA
 # TODO check code block for min ply thk
 # TODO include bolt design function
-# TODO SCI minimum 3 bolts (chapter 6 in SCI - for fin plate)
 # TODO check reduction factors for bolt group capacity
 # TODO area of bolts for smaller bolt diameters
     # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
@@ -64,6 +61,73 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 
 class SeatAngleConnection(object):
     """Perform design and detailing checks for seated angle connection.
+
+    Attributes:
+        gamma_mb (float): partial safety factor for material - resistance of connection - bolts
+        gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
+        gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
+        bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
+        custom_hole_clearance (float): user defined hole clearance, if any
+        clear_gap (int): clearance + tolerance
+        min_edge_multiplier (float): multipler for min edge distance check - based on edge type
+        angle_root_clearance (int): clearance of bolt row from the root of seated angle
+
+        top_angle (string)
+        connectivity (string)
+        beam_section (string)
+        column_section (string)
+        beam_fu (float)
+        beam_fy (float)
+        angle_fy (float)
+        angle_fu (float)
+        shear_force (float)
+        bolt_diameter (int)
+        bolt_type (string)
+        bolt_grade (float)
+        bolt_fu (int)
+        bolt_diameter (int)
+        bolt_hole_diameter (int)
+        angle_sec
+        dict_angle_data = model.get_angledata(angle_sec)
+        beam_w_t (float): beam web thickness
+        beam_f_t (float): beam flange thickness
+        beam_d  (float): beam depth
+        beam_w_f  (float): beam width
+        beam_R1 (float): beam root radius
+        column_f_t (float): column flange thickness
+        angle_t (float): angle thickness
+        angle_A  (float): longer leg of unequal angle
+        angle_B  (float): shorter leg of unequal angle
+        angle_R1 (float)
+        angle_l (float)
+
+        safe (Boolean) : status of connection, True if safe
+        output_dict (dictionary)
+
+        moment_at_root_angle (float)
+        moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
+        outstanding_leg_shear_strength (float)
+        beam_shear_capacity (float)
+        bolt_shear_capacity (float)
+        k_b (float)
+        bolt_bearing_capacity (float)
+        bolt_value (float)
+        bolt_group_capacity (float)
+        bolts_required (int)
+        num_rows (int)
+        num_cols (int)
+        pitch (float)
+        gauge (float)
+        min_end_dist (int)
+        min_edge_dist (int)
+        min_pitch (int)
+        min_gauge (int)
+        end_dist (int)
+        edge_dist (int)
+        pitch (float)
+        gauge (float)
+        max_spacing (int)
+        max_edge_dist (int)
 
     """
 
@@ -73,9 +137,17 @@ class SeatAngleConnection(object):
     def sa_params(self, input_dict):
         """Intialise variables to use in calculations from input dictionary.
 
-        Assumptions:
+        Args:
+            input_dict: dictionary generated based on user inputs in GUI
+
+        Returns:
+            none
+
+        Note:
+            Assumptions:
             angle f_y and f_u are equal to beam f_y and f_u respectively
             clear gap = 5 + 5 mm
+
         """
         # Initialise Design Preferences
         self.gamma_mb = 1.25  # partial safety factor for material - resistance of connection - bolts
@@ -89,7 +161,6 @@ class SeatAngleConnection(object):
         self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
-        # Intialise seated angle connection parameters
         self.top_angle = "ISA 100X65X8"
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
@@ -164,15 +235,24 @@ class SeatAngleConnection(object):
         }
 
     def bolt_shear(self, bolt_diameter, number_of_bolts, bolt_fu):
-        """Calculate and return bolt shear capacity (float) based on IS 800, Cl 10.3.3.
+        """Calculate factored shear capacity of bolt(s) based on IS 800, Cl 10.3.3.
 
-        Bolt factored shear capacity = bolt_fu * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
+        Args:
+            bolt_diameter (int)
+            number_of_bolts (int)
+            bolt_fu (int)
 
-        Assumptions:
+        Returns:
+            Factored shear capacity of bolt(s) as float.
+
+        Note:
+            Bolt factored shear capacity = bolt_fu * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
+            Assumptions:
             1)for all bolts, shear plane passes through threaded area
             2)for all bolts, tensile stress area equals the threaded area
             3)reduction factors for long joints, large grip lengths, packing plates are not applicable
             4) values for tensile stress area (mm^2) are taken from Table 5.9 in DoSS - N. Subramanian
+
         """
         bolt_area = {
             '12': 84.3,
@@ -188,24 +268,38 @@ class SeatAngleConnection(object):
         return round(bolt_nominal_shear_capacity / self.gamma_mb, 3)
 
     def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, bolt_fu):
-        """Calculate and return factored bearing capacity of single (float) based on IS 800, Cl 10.3.4.
+        """Calculate factored bearing capacity of bolt(s) based on IS 800, Cl 10.3.4.
 
-        Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
+        Args:
+            bolt_diameter (int)
+            number_of_bolts (int)
+            thickness_plate (float)
+            k_b (float)
+            bolt_fu (int)
+
+        Return:
+             Factored bearing capacity of bolt(s) as float.
+
+        Note:
+            Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
+
         """
         bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * bolt_fu / (1000)
         return round(bolt_nominal_bearing_capacity / self.gamma_mb, 3)
 
     def bolt_hole_clearance(self, bolt_diameter):
-        """Calculate and return bolt hole clearance as int.
+        """Calculate bolt hole clearance.
 
-        INPUTS:
-            bolt_diameter: int
+        Args:
+            bolt_diameter (int)
 
-        RETURN:
-            hole_clearance: int
+        Returns:
+            hole_clearance (int)
 
-        Reference:
+        Note:
+            Reference:
             IS 800, Table 19 (Cl 10.2.1) : Clearances for Fastener Holes
+
         """
         if self.bolt_hole_type == 1:  # standard hole
             hole_clearance = {
@@ -236,7 +330,15 @@ class SeatAngleConnection(object):
         return hole_clearance  # units: mm
 
     def bolt_design(self):
-        """Calculate bolt capacities and layout."""
+        """Calculate bolt capacities and layout.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        """
         self.angle_root_clearance = 5
         self.bolt_hole_diameter = self.bolt_diameter + bolt_hole_clearance(self.bolt_diameter)
 
@@ -271,42 +373,43 @@ class SeatAngleConnection(object):
         self.k_b = round(self.k_b, 3)
 
         # Bolt capacity
-        self.thickness_governing = min(beam_w_t.real, angle_t.real)
+        thickness_governing = min(self.beam_w_t.real, self.angle_t.real)
         self.bolt_shear_capacity = bolt_shear(self.bolt_diameter, number_of_bolts=1, self.bolt_fu).real
-        self.bolt_bearing_capacity = bolt_bearing(self.bolt_diameter, number_of_bolts=1, self.thickness_governing,
+        self.bolt_bearing_capacity = bolt_bearing(self.bolt_diameter, number_of_bolts=1, thickness_governing,
                                                   self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
-
-        # TODO SCI minimum 3 bolts (chapter 6 in SCI - for fin plate)
-        # assumption: provide minimum 3 bolts based on SCI guidelines
-        # check if odd number of bolts can be allowed
-        if self.bolts_required <= 2:
-            self.bolts_required = 3
-            # print "Number of bolts required = " + str(bolts_required)
 
         self.bolt_group_capacity = self.bolts_required * self.bolt_value
         # print "bolt group capacity = " + str(self.bolt_group_capacity)
 
         # Max spacing IS 800 Cl 10.2.3.1
-        self.max_spacing = int(min(32 * self.thickness_governing, 300))
+        self.max_spacing = int(min(32 * thickness_governing, 300))
         # print "Max spacing = " + str(self.max_spacing)
 
         # Max spacing IS 800 Cl 10.2.4.3
-        self.max_edge_dist = int((12 * self.thickness_governing * math.sqrt(250 / self.angle_fy)).real)
+        self.max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / self.angle_fy)).real)
         # print "Max edge distance = " + str(self.max_edge_dist)
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
-        # self.max_edge_dist = min(self.max_edge_dist, 40 + 4*self.thickness_governing)
+        # self.max_edge_dist = min(self.max_edge_dist, 40 + 4*thickness_governing)
 
     def block_shear_check(self):
         # TODO discuss the block shear case(s) with team. Non-trivial assumptions involved.
         # TODO add block shear check to seat_angle_connection()
-        """Calculate and return block shear capacity of seated angle.
+        """Calculate block shear capacity of seated angle.
 
-         Assumption:
+        Args:
+            None
+
+        Returns:
+            block_shear_db (float)
+
+        Note:
+            Assumption:
             1) horizontal leg does not contribute to block shear capacity (very conservative)
+
         """
         root_3 = math.sqrt(3)
         thickness = self.angle_t
@@ -335,19 +438,21 @@ class SeatAngleConnection(object):
         return block_shear_db
 
     def seat_angle_connection(self, input_dict):
-        """ Perform design and detailing checks based on input dict and return a dict containing results of calculations.
+        """ Perform design and detailing checks based for seated angle connection.
 
-        INPUTS:
-            input_dict: dictionary
+        Args:
+            input_dict (dictionary)
 
-        RETURNS:
-            output_dict: dictionary
+        Returns:
+            output_dict (dictionary)
 
-        Algorithm:
+        Note:
+            Algorithm:
             1) Initialise variables to use
             2) Bolt Design (layout and spacing)
             3) Determine length of outstanding leg of seated angle
             4) Determine shear strength of outstanding leg and compare with capacity
+
         """
         self.sa_params(input_dict)
         self.bolt_design()

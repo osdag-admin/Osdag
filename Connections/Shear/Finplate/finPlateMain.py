@@ -206,7 +206,7 @@ class MyPopupDialog(QtGui.QDialog):
 
         inputData = self.getPopUpInputs()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files',
-                                                     str(self. mainController.folder) + "/Profile", '*.txt')
+                                                     str(self. mainController.foldloader) + "/Profile", '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -380,6 +380,7 @@ class MainController(QtGui.QMainWindow):
         return dictbeamdata
 
     def fetchColumnPara(self):
+
         column_sec = self.ui.comboColSec.currentText()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -395,17 +396,12 @@ class MainController(QtGui.QMainWindow):
             self.ui.lbl_column.setText("Primary beam *")
 
             self.ui.chkBxBeam.setText("SBeam")
-            # self.ui.chkBxBeam.setShortcut("MainWindow", "Alt+Shift+B")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
-            # self.ui.chkBxCol.setShortcut("MainWindow", "Alt+Shift+C")
             self.ui.chkBxCol.setToolTip("Primary beam")
 
             self.ui.comboColSec.clear()
-            # self.ui.comboColSec.setObjectName("comboSecondaryBeam")
-            # self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
             self.ui.comboColSec.addItems(get_beamcombolist())
-            # self.ui.comboColSec.currentIndex()
             self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
 
@@ -531,7 +527,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
 
-        # Disable Menubar 
+        # Disable Menubar
         self.ui.menubar.setEnabled(False)
 
     def enableViewButtons(self):
@@ -709,7 +705,8 @@ class MainController(QtGui.QMainWindow):
         return True
 
     def getuser_inputs(self):
-        '''(none) -> Dictionary
+        '''
+        keyword arguments: None
 
         Returns the dictionary object with the user input fields for designing fin plate connection
 
@@ -741,10 +738,15 @@ class MainController(QtGui.QMainWindow):
         return uiObj
 
     def save_inputs(self, uiObj):
+        '''Save the user inputs in text format
 
-        '''(Dictionary)--> None
+        Args:
+            :param uiObj: User inputs
+            :type uiObj:Dictionary
+
 
         '''
+
         inputFile = QtCore.QFile('Connections/Shear/Finplate/saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
@@ -803,9 +805,9 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-#         fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
+        #fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
         fileName = self.folder + "/images_html/Html_Report"
-#         fileName = str(fileName + ".html")
+        #fileName = str(fileName + ".html")
         self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
@@ -827,8 +829,8 @@ class MainController(QtGui.QMainWindow):
         # pdfkit.from_file(fileName, 'output/finplate/Report/finplaterepoRT.pdf', configuration=config, options=options)
         # #         pdfkit.from_file(fileName,'output/finplate/'+base+'.pdf',configuration=config, options=options)
         ##########################
-        
-        pdfkit.from_file(fileName,str(QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder), "PDF(*.pdf)")), configuration=config, options=options)
+
+        pdfkit.from_file(fileName, str(QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder), "PDF(*.pdf)")), configuration=config, options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1328,10 +1330,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
-#         base = ''
-#         base_front = ''
-#         base_side = ''
-#         base_top = ''
 
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder) 
 
@@ -1423,10 +1421,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
         if view != 'All':
@@ -1437,8 +1431,6 @@ class MainController(QtGui.QMainWindow):
         else:
             fname = ''
         commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
-#         return base, base1, base2, base3
-        # commLogicObj.call2D_Drawing(view,fname)
 
     def closeEvent(self, event):
         '''
@@ -1557,8 +1549,3 @@ if __name__ == '__main__':
     window = MainController()
     window.show()
     sys.exit(app.exec_())
-
-
-
-
-

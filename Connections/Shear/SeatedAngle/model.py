@@ -3,8 +3,8 @@ Created on 09-Sep-2014
 
 @author: deepa
 '''
-import sys
-from PyQt4 import QtGui, QtCore
+
+from PyQt4 import QtGui
 from PyQt4.QtSql import *
 import logging, os
 

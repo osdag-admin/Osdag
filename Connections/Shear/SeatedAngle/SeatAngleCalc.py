@@ -41,7 +41,7 @@ ASCII diagram
 
 import math
 import logging
-import model
+from model import get_angledata, get_beamdata, get_columndata, module_setup
 from PyQt4.Qt import QString
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
@@ -132,7 +132,7 @@ class SeatAngleConnection(object):
     """
 
     def __init__(self):
-        pass
+        module_setup() #sets database connection for model.py functions
 
     def sa_params(self, input_dict):
         """Intialise variables to use in calculations from input dictionary.
@@ -175,37 +175,37 @@ class SeatAngleConnection(object):
         self.bolt_grade = input_dict['Bolt']['Grade']
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
-        if connectivity == "Beam-Beam":
-            self.dict_beam_data = model.get_beamdata(self.beam_section)
-            self.dict_column_data = model.get_beamdata(self.column_section)
+        if self.connectivity == "Beam-Beam":
+            self.dict_beam_data = get_beamdata(self.beam_section)
+            self.dict_column_data = get_beamdata(self.column_section)
         else:
-            self.dict_beam_data = model.get_beamdata(self.beam_section)
-            self.dict_column_data = model.get_columndata(self.column_section)
-        self.dict_angle_data = model.get_angledata(angle_sec)
+            self.dict_beam_data = get_beamdata(self.beam_section)
+            self.dict_column_data = get_columndata(self.column_section)
+        self.dict_angle_data = get_angledata(self.angle_sec)
 
         self.beam_w_t = float(self.dict_beam_data[QString("tw")])  # beam web thickness
         self.beam_f_t = float(self.dict_beam_data[QString("T")])  # beam flange thickness
         self.beam_d = float(self.dict_beam_data[QString("D")])  # beam depth
         self.beam_w_f = float(self.dict_beam_data[QString("B")])  # beam width
         self.beam_R1 = float(self.dict_beam_data[QString("R1")])  # beam root radius
-        self.column_f_t = float(dict_column_data[QString("T")])  # column flange thickness
-        self.angle_t = float(dict_angle_data[QString("t")])  # angle thickness
-        self.angle_A = float(dict_angle_data[QString("A")])  # longer leg of unequal angle
-        self.angle_B = float(dict_angle_data[QString("B")])  # shorter leg of unequal angle
-        self.angle_R1 = float(dict_angle_data[QString("R1")])
+        self.column_f_t = float(self.dict_column_data[QString("T")])  # column flange thickness
+        self.angle_t = float(self.dict_angle_data[QString("t")])  # angle thickness
+        self.angle_A = float(self.dict_angle_data[QString("A")])  # longer leg of unequal angle
+        self.angle_B = float(self.dict_angle_data[QString("B")])  # shorter leg of unequal angle
+        self.angle_R1 = float(self.dict_angle_data[QString("R1")])
 
         self.safe = True
 
     def sa_output(self):
         """Create and return dictionary of output parameters."""
-        self.output_dict = {}
+        self.output_dict = {'SeatAngle':{}, 'Bolt':{}}
         self.output_dict['SeatAngle'] = {
             "Length (mm)": self.angle_l,
-            "Moment Demand (kNm)": self.moment_at_root_angle,
-            "Moment Capacity (kNm)": self.moment_capacity_angle,
+            "Moment Demand (kNm)": self.moment_at_root_angle, #TODO check units
+            "Moment Capacity (kNm)": self.moment_capacity_angle, #TODO check units
             "Shear Demand (kN/mm)": self.shear_force,
             "Shear Capacity (kN/mm)": self.outstanding_leg_shear_strength,
-            "Beam Shear Strength (kN/mm)": self.beam_shear_capacity
+            "Beam Shear Strength (kN/mm)": self.beam_shear_capacity,
             "Top Angle": self.top_angle
         }
 
@@ -374,8 +374,9 @@ class SeatAngleConnection(object):
 
         # Bolt capacity
         thickness_governing = min(self.beam_w_t.real, self.angle_t.real)
-        self.bolt_shear_capacity = bolt_shear(self.bolt_diameter, number_of_bolts=1, self.bolt_fu).real
-        self.bolt_bearing_capacity = bolt_bearing(self.bolt_diameter, number_of_bolts=1, thickness_governing,
+        single_bolt = 1
+        self.bolt_shear_capacity = bolt_shear(self.bolt_diameter, single_bolt, self.bolt_fu).real
+        self.bolt_bearing_capacity = bolt_bearing(self.bolt_diameter, single_bolt, thickness_governing,
                                                   self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
@@ -617,7 +618,5 @@ class SeatAngleConnection(object):
 
         return self.output_dict
 
-## Test Case(s) below:
 # if __name__ == '__main__':
-#     output = SeatAngleConn()
-#     print output
+

@@ -46,7 +46,6 @@ from PyQt4.Qt import QString
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
-# TODO docstrings for functions
 # TODO block shear check
 # TODO test cases
 # TODO add input validation to select only angles which can accomodate 2 lines of bolts
@@ -132,7 +131,7 @@ class SeatAngleConnection(object):
     """
 
     def __init__(self):
-        module_setup() #sets database connection for model.py functions
+        pass
 
     def sa_params(self, input_dict):
         """Intialise variables to use in calculations from input dictionary.

@@ -195,6 +195,34 @@ class SeatAngleConnection(object):
 
         self.safe = True
 
+    def print_section_properties(self):
+        """Print geometric-shape properties of beam, angle and column.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        """
+        print "\nBeam section ", self.beam_section
+        print self.beam_w_t, "Beam web thickness"
+        print self.beam_f_t, "Beam flange thickness"
+        print self.beam_d , "Beam depth"
+        print self.beam_w_f, "Beam width"
+        print self.beam_R1 , " Beam root radius"
+        print "\nColumn section ", self.column_section
+        print self.column_f_t , "Column flange thickness"
+        print float(self.dict_column_data[QString("tw")]), "Column web thickness"
+        print float(self.dict_column_data[QString("D")]), "Column depth"
+        print float(self.dict_column_data[QString("B")]), "Column width"
+        print float(self.dict_column_data[QString("R1")]), "Column root radius"
+        print "\nAngle section ", self.angle_sec
+        print self.angle_t , "Angle thickness"
+        print self.angle_A , "Longer leg of unequal angle"
+        print self.angle_B , "Shorter leg of unequal angle"
+        print self.angle_R1, "Root radius of angle"
+
     def sa_output(self):
         """Create and return dictionary of output parameters."""
         self.output_dict = {'SeatAngle':{}, 'Bolt':{}}

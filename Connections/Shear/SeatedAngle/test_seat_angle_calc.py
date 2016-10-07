@@ -39,13 +39,39 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
     def test_sa_output(self):
         pass
 
-    def test_bolt_shear(self):
-        pass
-    #     self.assertEqual(SeatAngleConnection.bolt_shear(self, 20, 1, 410), 45.3)
-    #TODO bookmark current
+    def test_bolt_shear_capacity_single_bolt(self):
+        """
+        Note:
+            Values marked in inline comments # are calculated with V_nsb=185 MPa
 
-    def test_bolt_bearing(self):
-        pass
+        """
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 12, 1, 400), 1), 15.6)
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 16, 1, 400), 1), 29.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 20, 1, 400), 1), 45.3)
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 22, 1, 400), 1), 56.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 24, 1, 400), 1), 65.2) #65.3
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 27, 1, 400), 1), 84.8) #84.9
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 30, 1, 400), 1), 103.6) #103.8
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 36, 1, 400), 1), 150.9) #151.1
+
+    def test_bolt_bearing_capacity_single_bolt(self):
+        """
+        Note:
+            Values tested
+            Diameters: 12, 16, 20, 22, 24, 27, 30, 36
+            k_b: 0.25, 0.5
+            thickness_plate: 10, 20
+            bolt_fu: 400, 800
+
+        """
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 12, 1, 10, 0.5, 400), 1), 48.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 16, 1, 10, 0.5, 400), 1), 64.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 20, 1, 20, 0.5, 400), 1), 160.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 22, 1, 20, 0.5, 400), 1), 176.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 24, 1, 10, 0.25, 400), 1), 48.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 27, 1, 10, 0.25, 400), 1), 54.0)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 30, 1, 10, 0.25, 800), 1), 120)
+        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 36, 1, 10, 0.25, 800), 1), 144)
 
     def test_bolt_hole_clearance(self):
         self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 12), 1)
@@ -77,10 +103,6 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
 
     def test_seat_angle_connection(self):
         pass
-
-
-
-
 
 def create_sample_ui_input():
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}

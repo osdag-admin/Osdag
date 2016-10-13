@@ -193,6 +193,8 @@ class SeatAngleConnection(object):
         self.angle_B = float(self.dict_angle_data[QString("B")])  # shorter leg of unequal angle
         self.angle_R1 = float(self.dict_angle_data[QString("R1")])
 
+        self.pitch = 0
+
         self.safe = True
 
     def print_section_properties(self):
@@ -294,7 +296,7 @@ class SeatAngleConnection(object):
         bolt_nominal_shear_capacity = bolt_fu * number_of_bolts * bolt_area / math.sqrt(3) / 1000
         return round(bolt_nominal_shear_capacity / self.gamma_mb, 3)
 
-    def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, bolt_fu):
+    def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, plate_fu):
         """Calculate factored bearing capacity of bolt(s) based on IS 800, Cl 10.3.4.
 
         Args:
@@ -302,7 +304,7 @@ class SeatAngleConnection(object):
             number_of_bolts (int)
             thickness_plate (float)
             k_b (float)
-            bolt_fu (int)
+            plate_fu (int)
 
         Return:
              Factored bearing capacity of bolt(s) as float.
@@ -311,7 +313,7 @@ class SeatAngleConnection(object):
             Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
 
         """
-        bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * bolt_fu / (1000)
+        bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (1000)
         return round(bolt_nominal_bearing_capacity / self.gamma_mb, 3)
 
     def bolt_hole_clearance(self, bolt_diameter):
@@ -356,8 +358,8 @@ class SeatAngleConnection(object):
             hole_clearance = self.custom_hole_clearance  # units: mm
         return hole_clearance  # units: mm
 
-    def bolt_design(self):
-        """Calculate bolt capacities and layout.
+    def bolt_design(self, bolt_diameter):
+        """Calculate bolt capacities, distances and layout.
 
         Args:
             None
@@ -367,30 +369,31 @@ class SeatAngleConnection(object):
 
         """
         self.angle_root_clearance = 5
-        self.bolt_hole_diameter = self.bolt_diameter + bolt_hole_clearance(self.bolt_diameter)
+        self.bolt_hole_diameter = bolt_diameter + self.bolt_hole_clearance(bolt_diameter)
 
-        self.bolt_fu = int(self.bolt_grade) * 100
+        self.bolt_fu = int(float(self.bolt_grade)) * 100
 
         # Minimum pitch and gauge IS 800 Cl 10.2.2
-        self.min_pitch = int(2.5 * self.bolt_diameter)
-        self.min_gauge = int(2.5 * self.bolt_diameter)
+        self.min_pitch = int(2.5 * bolt_diameter)
+        self.min_gauge = int(2.5 * bolt_diameter)
 
         # Min edge and end distances IS 800 Cl 10.2.4.2
-        self.min_end_dist = int(self.min_edge_multiplier * self.bolt_hole_diameter)
-        self.min_edge_dist = int(self.min_edge_multiplier * self.bolt_hole_diameter)
+        self.min_end_dist = int(math.ceil(self.min_edge_multiplier * self.bolt_hole_diameter))
+        self.min_edge_dist = int(math.ceil(self.min_edge_multiplier * self.bolt_hole_diameter))
 
         # TODO: rethink rounding off of MINIMUM distances
         # round off the actual distances and check against minimum
-        if self.min_pitch % 10 != 0 or self.min_gauge % 10 != 0:
-            self.min_pitch = (self.min_pitch / 10) * 10 + 10
-            self.min_gauge = (self.min_gauge / 10) * 10 + 10
-        if self.min_edge_dist % 10 != 0:
-            self.min_edge_dist = (self.min_edge_dist / 10) * 10 + 10
-            self.min_end_dist = (self.min_end_dist / 10) * 10 + 10
+        if self.min_pitch % 5 != 0 or self.min_gauge % 5 != 0:
+            self.min_pitch = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
+            self.min_gauge = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
+        if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
+            self.min_edge_dist = ((self.min_edge_dist / 5)+1) * 5 - self.min_edge_dist % 5
+            self.min_end_dist = ((self.min_end_dist / 5)+1) * 5 - self.min_end_dist % 5
 
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
-        if not self.pitch:
+        if self.pitch == 0:
+            # if pitch is set in previous (first) iteration
             self.pitch = self.min_pitch
         # Calculation of k_b
         self.k_b = min(self.end_dist / float(3 * self.bolt_hole_diameter),
@@ -400,10 +403,10 @@ class SeatAngleConnection(object):
         self.k_b = round(self.k_b, 3)
 
         # Bolt capacity
-        thickness_governing = min(self.beam_w_t.real, self.angle_t.real)
+        thickness_governing = min(self.column_f_t.real, self.angle_t.real)
         single_bolt = 1
-        self.bolt_shear_capacity = bolt_shear(self.bolt_diameter, single_bolt, self.bolt_fu).real
-        self.bolt_bearing_capacity = bolt_bearing(self.bolt_diameter, single_bolt, thickness_governing,
+        self.bolt_shear_capacity = self.bolt_shear(bolt_diameter, single_bolt, self.bolt_fu).real
+        self.bolt_bearing_capacity = self.bolt_bearing(bolt_diameter, single_bolt, thickness_governing,
                                                   self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
@@ -483,7 +486,7 @@ class SeatAngleConnection(object):
 
         """
         self.sa_params(input_dict)
-        self.bolt_design()
+        self.bolt_design(self.bolt_diameter)
 
         # ------------------------------------------------------------------------
         self.angle_l = self.beam_w_f

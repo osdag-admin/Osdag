@@ -1,5 +1,5 @@
 import sys
-import unittest, model
+import unittest, model, math
 from SeatAngleCalc import SeatAngleConnection
 from PyQt4 import QtGui
 
@@ -96,7 +96,18 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
         self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 36), 8)
 
     def test_bolt_design(self):
-        pass
+        self.bolt_design(12)
+        self.assertEqual(self.min_pitch, 30)
+        self.assertEqual(self.min_gauge, 30)
+        self.min_edge_multiplier = 1.5
+        self.assertEqual(self.min_end_dist, 20)
+        self.assertEqual(self.min_edge_dist, 20)
+        self.assertEqual(self.k_b, 0.513)
+        self.assertEqual(round(self.bolt_shear_capacity, 1), 15.6)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 60.6)
+        self.assertEqual(round(self.bolts_required, 1), math.ceil(100/15.6))
+        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity*7, 1))
+
 
     def test_block_shear_check(self):
         pass
@@ -148,7 +159,7 @@ def create_sample_ui_output():
         "k_b": 0.5,
         "beam_w_t": 7.7,
         "beam_fu": 410,
-        "shearforce": 140,
+        "shearforce": 100,
         "hole_dia": 22
     }
     return output_dict

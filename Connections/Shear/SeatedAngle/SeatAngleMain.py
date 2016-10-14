@@ -461,12 +461,12 @@ class MainController(QtGui.QMainWindow):
         outObj = {}
         outObj['SeatAngle'] = {}
         outObj['SeatAngle']["Length (mm)"] = float(self.ui.txt_seat_length.text())
-        outObj['SeatAngle']["Moment Demand (kNm)"] = float(self.ui.txt_moment_demand.text())
-        outObj['SeatAngle']["Moment Capacity (kNm)"] = float(self.ui.txt_moment_capacity.text())
-        outObj['SeatAngle']["Shear Demand (kN/mm)"] = float(self.ui.txt_seat_shear_demand.text())
-        outObj['SeatAngle']["Shear Capacity (kN/mm)"] = float(self.ui.txt_seat_shear_capacity.text())
+        outObj['SeatAngle']["Moment Demand (kN-mm)"] = float(self.ui.txt_moment_demand.text())
+        outObj['SeatAngle']["Moment Capacity (kN-mm)"] = float(self.ui.txt_moment_capacity.text())
+        outObj['SeatAngle']["Shear Demand (kN)"] = float(self.ui.txt_seat_shear_demand.text())
+        outObj['SeatAngle']["Shear Capacity (kN)"] = float(self.ui.txt_seat_shear_capacity.text())
         # TODO confirm after checking UI: beam shear strength (mostly) vs seat shear strength(?)
-        outObj['SeatAngle']["Beam Shear Strength (kN/mm)"] = float(self.ui.txt_seat_shear_strength.text())
+        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_seat_shear_strength.text())
 
         outObj['Bolt'] = {}
         outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
@@ -477,7 +477,7 @@ class MainController(QtGui.QMainWindow):
         outObj['Bolt']["No. of Row"] = int(self.ui.txt_bolt_rows.text())
         outObj['Bolt']["No. of Column"] = int(self.ui.txt_bolt_cols.text())
         outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
-        outObj['Bolt']["Guage Distance (mm)"] = float(self.ui.txt_bolt_gauge.text())
+        outObj['Bolt']["Gauge Distance (mm)"] = float(self.ui.txt_bolt_gauge.text())
         outObj['Bolt']["End Distance (mm)"] = float(self.ui.txt_end_distance.text())
         outObj['Bolt']["Edge Distance (mm)"] = float(self.ui.txt_edge_distance.text())
 
@@ -667,20 +667,20 @@ class MainController(QtGui.QMainWindow):
         angle_length = resultObj['SeatAngle']['Length (mm)']
         self.ui.txt_seat_length.setText(str(angle_length))
 
-        moment_demand = resultObj['SeatAngle']['Moment Demand (kNm)']
+        moment_demand = resultObj['SeatAngle']['Moment Demand (kN-mm)']
         self.ui.txt_moment_demand.setText(str(moment_demand))
 
-        moment_capacity = resultObj['SeatAngle']['Moment Capacity (kNm)']
+        moment_capacity = resultObj['SeatAngle']['Moment Capacity (kN-mm)']
         self.ui.txt_moment_capacity.setText(str(moment_capacity))
 
-        shear_demand = resultObj['SeatAngle']['Shear Demand (kN/mm)']
+        shear_demand = resultObj['SeatAngle']['Shear Demand (kN)']
         self.ui.txt_seat_shear_demand.setText(str(shear_demand))
 
-        angle_shear_capacity = resultObj['SeatAngle']['Shear Capacity (kN/mm)']
+        angle_shear_capacity = resultObj['SeatAngle']['Shear Capacity (kN)']
         self.ui.txt_seat_shear_capacity.setText(str(angle_shear_capacity))
 
         #TODO check seat or beam shear strength
-        beam_shear_strength = resultObj['SeatAngle']['Beam Shear Strength (kN/mm)']
+        beam_shear_strength = resultObj['SeatAngle']['Beam Shear Strength (kN)']
         self.ui.txt_seat_shear_strength.setText(str(beam_shear_strength))
 
     def displaylog_totextedit(self):

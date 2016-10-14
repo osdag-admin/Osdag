@@ -47,12 +47,9 @@ from PyQt4.Qt import QString
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 # TODO block shear check
-# TODO test cases
 # TODO add input validation to select only angles which can accomodate 2 lines of bolts
 # TODO check if a clause exists on minimum angle thickness
 # TODO calculate other geometry params for SA
-# TODO check code block for min ply thk
-# TODO include bolt design function
 # TODO check reduction factors for bolt group capacity
 # TODO area of bolts for smaller bolt diameters
     # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
@@ -230,12 +227,12 @@ class SeatAngleConnection(object):
         self.output_dict = {'SeatAngle':{}, 'Bolt':{}}
         self.output_dict['SeatAngle'] = {
             "Length (mm)": self.angle_l,
-            "Moment Demand (kNm)": self.moment_at_root_angle, #TODO check units
-            "Moment Capacity (kNm)": self.moment_capacity_angle, #TODO check units
-            "Shear Demand (kN/mm)": self.shear_force,
+            "Moment Demand (kN-mm)": self.moment_at_root_angle,
+            "Moment Capacity (kN-mm)": self.moment_capacity_angle,
+            "Shear Demand (kN)": self.shear_force,
             # TODO update ui: Angle shear capacity, Beam shear strength
-            "Shear Capacity (kN/mm)": self.outstanding_leg_shear_capacity,
-            "Beam Shear Strength (kN/mm)": self.beam_shear_strength,
+            "Shear Capacity (kN)": self.outstanding_leg_shear_capacity,
+            "Beam Shear Strength (kN)": self.beam_shear_strength,
             "Top Angle": self.top_angle
         }
 
@@ -554,7 +551,6 @@ class SeatAngleConnection(object):
         self.outstanding_leg_shear_capacity = round(
             self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 3)  # kN
         print "Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_capacity)
-        #TODO change shear demand and capacity units in UI to kN
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
@@ -584,7 +580,6 @@ class SeatAngleConnection(object):
 
         self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 3)
         # print "Moment at root angle = " + str(self.moment_at_root_angle)
-        #TODO change ui units of Moment demand and Moment capacity to kN-mm
 
         self.moment_capacity_angle = round( 1.2 * self.angle_fy * self.angle_l * self.angle_t ** 2 / self.gamma_m0 /6 /1000, 3)
         # print "Moment capacity =" + str(self.moment_capacity_angle)

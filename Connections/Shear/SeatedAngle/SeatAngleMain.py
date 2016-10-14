@@ -287,6 +287,11 @@ class MainController(QtGui.QMainWindow):
         else:
             dictcoldata = get_columndata(column_sec)
         return dictcoldata
+    
+    def fetchAnglePara(self):
+        angle_sec = self.ui.combo_angle_section.currentText()
+        dictangledata = get_angledata(angle_sec)
+        return dictangledata
 
     def showFontDialogue(self):
 
@@ -900,7 +905,8 @@ class MainController(QtGui.QMainWindow):
         
         '''
         uiObj = self.getuser_inputs()
-        resultObj = SeatAngleConnection.seat_angle_connection(uiObj)
+        seat_angle_connobj = SeatAngleConnection()
+        resultObj = seat_angle_connobj.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         #         fillet_length = resultObj['Plate']['height']
@@ -945,7 +951,8 @@ class MainController(QtGui.QMainWindow):
         angle_b = int(dictangledata[QString("B")])
         angle_t = float(dictangledata[QString("t")])
         angle_r1 = float(dictangledata[QString("R1")])
-        angle_r2 = float(dictangledata[QString("R2")])
+        
+        angle_r2 = dictangledata[QString("R2")].toFloat()
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)

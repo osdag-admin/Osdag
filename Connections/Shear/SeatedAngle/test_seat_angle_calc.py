@@ -3,8 +3,8 @@ import unittest, model, math
 from SeatAngleCalc import SeatAngleConnection
 from PyQt4 import QtGui
 
-class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
 
+class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
     def setUp(self):
         app = QtGui.QApplication(sys.argv)
         model.module_setup()
@@ -49,10 +49,10 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
         self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 16, 1, 400), 1), 29.0)
         self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 20, 1, 400), 1), 45.3)
         self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 22, 1, 400), 1), 56.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 24, 1, 400), 1), 65.2) #65.3
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 27, 1, 400), 1), 84.8) #84.9
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 30, 1, 400), 1), 103.6) #103.8
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 36, 1, 400), 1), 150.9) #151.1
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 24, 1, 400), 1), 65.2)  # 65.3
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 27, 1, 400), 1), 84.8)  # 84.9
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 30, 1, 400), 1), 103.6)  # 103.8
+        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 36, 1, 400), 1), 150.9)  # 151.1
 
     def test_bolt_bearing_capacity_single_bolt(self):
         """
@@ -105,15 +105,51 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
         self.assertEqual(self.k_b, 0.513)
         self.assertEqual(round(self.bolt_shear_capacity, 1), 15.6)
         self.assertEqual(round(self.bolt_bearing_capacity, 1), 60.6)
-        self.assertEqual(round(self.bolts_required, 1), math.ceil(100/15.6))
-        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity*7, 1))
+        self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 15.6))
+        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 7, 1))
+        self.assertEqual(round(self.max_spacing, 0) , 300)
+        self.assertEqual(round(self.max_edge_dist, 0), 144)
 
+        self.bolt_design(16)
+        self.assertEqual(self.min_pitch, 40)
+        self.assertEqual(self.min_gauge, 40)
+        self.assertEqual(self.min_end_dist, 30)
+        self.assertEqual(self.min_edge_dist, 30)
+        self.assertEqual(self.k_b, 0.491)
+        self.assertEqual(round(self.bolt_shear_capacity, 1), 29.0)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 77.3)
+        self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 29.0))
+        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 4, 1))
+
+        self.bolt_design(24)
+        self.assertEqual(self.min_pitch, 60)
+        self.assertEqual(self.min_gauge, 60)
+        self.assertEqual(self.min_end_dist, 40)
+        self.assertEqual(self.min_edge_dist, 40)
+        self.assertEqual(self.k_b, 0.513)
+        self.assertEqual(round(self.bolt_shear_capacity, 1), 65.2)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 121.2)
+        self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 65.2))
+        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 2, 1))
+
+        self.bolt_design(20)
+        self.assertEqual(self.min_pitch, 50)
+        self.assertEqual(self.min_gauge, 50)
+        self.assertEqual(self.min_end_dist, 35)
+        self.assertEqual(self.min_edge_dist, 35)
+        self.assertEqual(self.k_b, 0.508)
+        self.assertEqual(round(self.bolt_shear_capacity, 1), 45.3)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 100.0)
+        self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 45.3))
+        self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 3, 1))
 
     def test_block_shear_check(self):
         pass
 
     def test_seat_angle_connection(self):
+        self.seat_angle_connection(create_sample_ui_input())
         pass
+
 
 def create_sample_ui_input():
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
@@ -128,6 +164,7 @@ def create_sample_ui_input():
     input_dict['Bolt']['Grade'] = "4.6"
     input_dict['Angle']["AngleSection"] = "ISA 150X75X12"
     return input_dict
+
 
 def create_sample_ui_output():
     output_dict = {'SeatAngle': {}, 'Bolt': {}}
@@ -188,5 +225,3 @@ if __name__ == '__main__':
     # window.show()
     ex = TestSeatAngleConnection()
     sys.exit(app.exec_())
-
-

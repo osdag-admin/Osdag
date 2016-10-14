@@ -7,8 +7,11 @@ Updated 23-Aug-2016
 '''
 
 import os.path
+import sys
 
 from PyQt4.QtCore import pyqtSignal
+from PyQt4 import QtCore
+from PyQt4 import QtGui
 import shutil
 import webbrowser
 import pickle
@@ -241,7 +244,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
         # Osdag logo for html
-        self.ui.btn_Design.clicked.connect(self.osdag_header)
+        # self.ui.btn_Design.clicked.connect(self.osdag_header)
 
         # Help button
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
@@ -265,7 +268,7 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = os.path.dirname(os.path.abspath(__file__))+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
+        image_path = os.path.dirname(os.path.abspath(__file__))+os.path+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
         print str(image_path)
         print str(os.path.join("images_html","Osdag_header.png"))
         shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html","Osdag_header.png"))
@@ -357,7 +360,7 @@ class MainController(QtGui.QMainWindow):
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
-                self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.combo_column_section.addItems(get_beamcombolist())
 
             self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
             self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
@@ -368,11 +371,14 @@ class MainController(QtGui.QMainWindow):
             self.ui.txt_shear_force.setText(str(uiObj['Load']['ShearForce (kN)']))
 
             self.ui.combo_bolt_diameter.setCurrentIndex(self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
-            comboTypeIndex = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
-            self.ui.combo_bolt_type.setCurrentIndex(comboTypeIndex)
+            combo_type_index = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
+            self.ui.combo_bolt_type.setCurrentIndex(combo_type_index)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
-            comboGradeIndex = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
-            self.ui.combo_bolt_grade.setCurrentIndex(comboGradeIndex)
+            combo_grade_index = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
+            self.ui.combo_bolt_grade.setCurrentIndex(combo_grade_index)
+            combo_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
+            self.ui.combo_angle_section.setCurrentIndex(combo_angle_index)
+            self.ui.txt_angle_thickness.setText(str(uiObj['Angle']['Thickness']))
 
     def setimage_connection(self):
         '''
@@ -420,6 +426,7 @@ class MainController(QtGui.QMainWindow):
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
+        uiObj['Angle']['Thickness'] = str(self.ui.txt_angle_thickness.text())
         #TODO delete angle - thickness input from UI
 
         return uiObj
@@ -643,10 +650,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_bolt_rows.setText(str(no_of_rows))
 
         no_of_cols = resultObj['Bolt']['No. of Column']
-        self.ui.txt_bolt_cols.setText(str(no_of_col))
+        self.ui.txt_bolt_cols.setText(str(no_of_cols))
 
         pitch_dist = resultObj['Bolt']['Pitch Distance (mm)']
-        self.ui.txtPitch.setText(str(pitch_dist))
+        self.ui.txt_bolt_pitch.setText(str(pitch_dist))
 
         gauge_dist = resultObj['Bolt']['Gauge Distance (mm)']
         self.ui.txt_bolt_gauge.setText(str(gauge_dist))
@@ -1068,19 +1075,20 @@ class MainController(QtGui.QMainWindow):
         self.uiObj = self.getuser_inputs()
 
         # Seated Angle Design Calculations.
-        self.resultObj = SeatAngleConnection.seat_angle_connection(self.uiObj)
+        seat_angle_connection_obj = SeatAngleConnection()
+        self.resultObj = seat_angle_connection_obj.seat_angle_connection(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
 
         # Displaying Design Calculations To Output Window
-        self.display_output(resultObj)
+        self.display_output(self.resultObj)
 
         # Displaying Messages related to Seated Angle Design.
         self.displaylog_totextedit()
 
         # Displaying 3D Cad model
-        status = resultObj['Bolt']['status']
+        status = self.resultObj['Bolt']['status']
         self.call_3DModel(status)
 
     def create2Dcad(self, connectivity):
@@ -1370,7 +1378,7 @@ if __name__ == '__main__':
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # while launching from Osdag Main:
-    fh = logging.FileHandler("./Connections/Shear/SeatAngle/seatangle.log", mode="w")
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     # while launching from Seated Angle folder
     # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
@@ -1383,7 +1391,8 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     module_setup()
-    window = MainController()
+    folder = None
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())
 

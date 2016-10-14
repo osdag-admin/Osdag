@@ -9,7 +9,7 @@ from OCC.ShapeConstruct import shapeconstruct, \
     ShapeConstruct_CompBezierCurves2dToBSplineCurve2d
 from OCC.TopExp import TopExp_Explorer
 from OCC.TopoDS import topods
-from OCC._TopAbs import TopAbs_EDGE
+from OCC.TopAbs import TopAbs_EDGE
 import math
 import numpy
 
@@ -25,6 +25,7 @@ class Angle(object):
         self.T = T
         self.R1 = R1
         self.R2 = R2
+        print "self.R2 =",self.R2
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -41,7 +42,7 @@ class Angle(object):
         self.vDir = numpy.cross(self.wDir, self.uDir)
         root2 = math.sqrt(2)
         self.a1 = self.secOrigin
-        self.a2 = self.secOrigin + self.A * self.vDir
+        self.a2 = self.secOrigin + (self.A) * self.vDir
         self.a3 = self.secOrigin + (self.T - self.R2)* self.uDir + self.A * self.vDir 
         self.a4 = self.secOrigin + (self.T - self.R2 + self.R2/root2)* self.uDir + (self.A - self.R2 + self.R2/root2) * self.vDir 
         self.a5 = self.secOrigin + (self.T)* self.uDir + (self.A - self.R2) * self.vDir 

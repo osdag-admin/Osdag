@@ -952,12 +952,13 @@ class MainController(QtGui.QMainWindow):
         angle_t = float(dictangledata[QString("t")])
         angle_r1 = float(dictangledata[QString("R1")])
         
-        angle_r2 = dictangledata[QString("R2")].toFloat()
+        angle_r2 = (dictangledata[QString("R2")]).toFloat()
+        print "angle_r2=", angle_r2[0]
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
+        angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
 
-        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
+        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 

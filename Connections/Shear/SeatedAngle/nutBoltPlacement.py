@@ -77,12 +77,14 @@ class NutBoltArray():
         
     def initBoltPlaceParams(self,boltPlaceObj):
         self.pitch = boltPlaceObj['Bolt']["Pitch Distance (mm)"]
-        self.gauge = boltPlaceObj['Bolt']["Guage Distance (mm)"]
+        self.gauge = boltPlaceObj['Bolt']["Gauge Distance (mm)"]
         #self.gauge = 30
         self.edge = boltPlaceObj['Bolt']["Edge Distance (mm)"]
         self.end = boltPlaceObj['Bolt']["End Distance (mm)"]
-        self.row = boltPlaceObj['Bolt']["No.Of Row"]
-        self.col = boltPlaceObj['Bolt']["No.Of Column"]
+        self.row = boltPlaceObj['Bolt']["No. of Row"]
+        print "self.row =",self.row
+        self.col = boltPlaceObj['Bolt']["No. of Column"]
+        print "self.col =",self.col
         self.brow = 1
         self.bcol= 2
         

@@ -387,14 +387,13 @@ class SeatAngleConnection(object):
             self.min_pitch = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
             self.min_gauge = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
         if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
-            self.min_edge_dist = ((self.min_edge_dist / 5)+1) * 5 - self.min_edge_dist % 5
-            self.min_end_dist = ((self.min_end_dist / 5)+1) * 5 - self.min_end_dist % 5
+            self.min_edge_dist = (float(self.min_edge_dist) / 5+1) * 5 - (self.min_edge_dist % 5)
+            self.min_end_dist = (float(self.min_end_dist) / 5+1) * 5 - (self.min_end_dist % 5)
 
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
-        if self.pitch == 0:
-            # if pitch is set in previous (first) iteration
-            self.pitch = self.min_pitch
+        self.pitch = self.min_pitch
+
         # Calculation of k_b
         self.k_b = min(self.end_dist / float(3 * self.bolt_hole_diameter),
                        self.pitch / float(3 * self.bolt_hole_diameter) - 0.25,
@@ -415,11 +414,11 @@ class SeatAngleConnection(object):
         # print "bolt group capacity = " + str(self.bolt_group_capacity)
 
         # Max spacing IS 800 Cl 10.2.3.1
-        self.max_spacing = int(min(32 * thickness_governing, 300))
+        self.max_spacing = math.ceil(min(32 * thickness_governing, 300))
         # print "Max spacing = " + str(self.max_spacing)
 
         # Max spacing IS 800 Cl 10.2.4.3
-        self.max_edge_dist = int((12 * thickness_governing * math.sqrt(250 / self.angle_fy)).real)
+        self.max_edge_dist = math.ceil((12 * thickness_governing * math.sqrt(250 / self.angle_fy)).real)
         # print "Max edge distance = " + str(self.max_edge_dist)
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed

@@ -105,8 +105,8 @@ class SeatAngleConnection(object):
 
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
-        outstanding_leg_shear_strength (float)
-        beam_shear_capacity (float)
+        outstanding_leg_shear_capacity (float)
+        beam_shear_strength (float)
         bolt_shear_capacity (float)
         k_b (float)
         bolt_bearing_capacity (float)
@@ -233,8 +233,9 @@ class SeatAngleConnection(object):
             "Moment Demand (kNm)": self.moment_at_root_angle, #TODO check units
             "Moment Capacity (kNm)": self.moment_capacity_angle, #TODO check units
             "Shear Demand (kN/mm)": self.shear_force,
-            "Shear Capacity (kN/mm)": self.outstanding_leg_shear_strength,
-            "Beam Shear Strength (kN/mm)": self.beam_shear_capacity,
+            # TODO update ui: Angle shear capacity, Beam shear strength
+            "Shear Capacity (kN/mm)": self.outstanding_leg_shear_capacity,
+            "Beam Shear Strength (kN/mm)": self.beam_shear_strength,
             "Top Angle": self.top_angle
         }
 
@@ -503,11 +504,12 @@ class SeatAngleConnection(object):
             self.gauge = round(length_avail / (self.num_cols - 1), 3)
             if self.gauge < self.min_gauge:
                 logger.error(
-                    ": Calculated gauge length with 2 rows for selected bolt size is less than minimum gauge lenth")
+                    ": Calculated gauge length with 2 rows for selected bolt size is less than minimum gauge length")
                 logger.warning(": Gauge length should be more than  %2.2f mm " % (self.min_gauge))
                 logger.warning(": Maximum gauge length allowed is %2.2f mm " % (self.max_spacing))
                 logger.info(
-                    ": Increase the bolt diameter (size) or bolt grade (to decrease the number of required bolts)")
+                    ": Increase the bolt diameter (size) or bolt grade (to decrease the number of required bolts) or "+
+                    "select a beam with greater width")
         if self.gauge > self.max_spacing:
             """
             Assumption: keeping minimum edge distance the same and increasing the number of bolts,
@@ -549,11 +551,12 @@ class SeatAngleConnection(object):
          = w*t*fy/gamma_m0/root_3
         """
         root_3 = math.sqrt(3)
-        self.outstanding_leg_shear_strength = round(
+        self.outstanding_leg_shear_capacity = round(
             self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 3)  # kN
-        print "Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_strength)
+        print "Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_capacity)
+        #TODO change shear demand and capacity units in UI to kN
 
-        if self.outstanding_leg_shear_strength < self.shear_force:
+        if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
             logger.error(": Shear capacity is insufficient")
             logger.warning(": Shear capacity should be at least " + str(self.shear_force))
@@ -581,8 +584,9 @@ class SeatAngleConnection(object):
 
         self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 3)
         # print "Moment at root angle = " + str(self.moment_at_root_angle)
+        #TODO change ui units of Moment demand and Moment capacity to kN-mm
 
-        self.moment_capacity_angle = round( 1.2 * (self.angle_fy / self.gamma_m0) * self.angle_l * (self.angle_t ** 2) * 0.001 / 6, 3)
+        self.moment_capacity_angle = round( 1.2 * self.angle_fy * self.angle_l * self.angle_t ** 2 / self.gamma_m0 /6 /1000, 3)
         # print "Moment capacity =" + str(self.moment_capacity_angle)
 
         """
@@ -590,12 +594,12 @@ class SeatAngleConnection(object):
             1) beta_b (in the equation in Cl 8.2.1.2) = 1.0 as the outstanding leg is plastic section
             2) using Z_p (plastic section modulus) for moment capacity
         """
-        leg_moment_d = (self.angle_fy / self.gamma_m0) * (self.angle_l * (self.angle_t ** 2) / 4)
+        leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 4) /1000
 
-        if self.shear_force <= 0.6 * self.outstanding_leg_shear_strength:
+        if self.shear_force <= 0.6 * self.outstanding_leg_shear_capacity:
             # to avoid irreversible deformation (in case of cantilever),
             # under serviceablitiy loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
-            leg_moment_d_limiting = 1.5 * (self.angle_fy / self.gamma_m0) * (self.angle_l * (self.angle_t ** 2) / 6)
+            leg_moment_d_limiting = 1.5 * (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6)  /1000
             angle_outst_leg_mcapacity = min(leg_moment_d, leg_moment_d_limiting)
         else:
             """ Cl 8.2.1.3
@@ -611,8 +615,8 @@ class SeatAngleConnection(object):
             M_dv = min ((1-beta)*M_d, 1.2*Z_e*f_y/gamma_m0)
             where, beta = ((2V/V_d) - 1)^2
             """
-            leg_moment_d_limiting = 1.2 * (self.angle_fy / self.gamma_m0) * (self.angle_l * (self.angle_t ** 2) / 6)
-            beta_moment = ((2 * self.shear_force / self.outstanding_leg_shear_strength) - 1) ** 2
+            leg_moment_d_limiting = 1.2 * (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6) /1000
+            beta_moment = ((2 * self.shear_force / self.outstanding_leg_shear_capacity) - 1) ** 2
             angle_outst_leg_mcapacity = min((1 - beta_moment) * leg_moment_d, leg_moment_d_limiting)
 
         self.moment_capacity_angle = round(angle_outst_leg_mcapacity, 3)
@@ -621,24 +625,24 @@ class SeatAngleConnection(object):
         if self.moment_capacity_angle < self.moment_at_root_angle:
             self.safe = False
             logger.error(": Connection is not safe")
-            logger.warning(": Moment capacity should be at least " + str(moment_at_root_angle))
+            logger.warning(": Moment capacity should be at least " + str(self.moment_at_root_angle))
             print "Error: Connection not safe"
 
         # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0
-        self.beam_shear_capacity = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 3)
-        print "Beam shear capacity = " + str(self.beam_shear_capacity)
+        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 3)
+        print "Beam shear capacity = " + str(self.beam_shear_strength)
 
-        if self.beam_shear_capacity < self.shear_force:
+        if self.beam_shear_strength < self.shear_force:
             self.safe = False
             logger.error(": Beam shear capacity is insufficient")
-            logger.warning(": Beam shear capacity should be at least " + str(self.shear_force + "kN"))
+            logger.warning(": Beam shear capacity should be at least " + str(self.shear_force) + "kN")
             logger.warning(": Beam design is outside the scope of this module")
 
         # End of calculation
         #---------------------------------------------------------------------------
         self.sa_output()
 
-        if output_dict['Bolt']['status'] == True:
+        if self.output_dict['Bolt']['status'] == True:
             logger.info(": Overall seated angle connection design is safe \n")
             logger.debug(": =========End Of design===========")
         else:

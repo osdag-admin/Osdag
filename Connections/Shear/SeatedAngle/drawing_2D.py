@@ -254,7 +254,7 @@ class Fin2DCreatorFront(object):
             self.callBWBWfront()
             
     def callCFBWfront(self):
-        dwg = svgwrite.Drawing('finfront.svg', profile='full')
+        dwg = svgwrite.Drawing('seatfront.svg', profile='full')
         smarker = dwg.marker(insert=(-2.5,0), size=(10,10), orient="auto")
         smarker.add(dwg.polyline([(-2.5,0), (0,3), (-10,0), (0,-3)], fill='black'))
         
@@ -297,7 +297,7 @@ class Fin2DCreatorFront(object):
         
     def callCWBWfront(self):
         
-        dwg = svgwrite.Drawing('finfront.svg', profile='full')
+        dwg = svgwrite.Drawing('seatfront.svg', profile='full')
         smarker = dwg.marker(insert=(-2.5,0), size=(10,10), orient="auto")
         smarker.add(dwg.polyline([(-2.5,0), (0,3), (-10,0), (0,-3)], fill='black'))
         

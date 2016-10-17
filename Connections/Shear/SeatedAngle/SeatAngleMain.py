@@ -37,7 +37,7 @@ from angle import Angle
 from filletweld import FilletWeld
 from bolt import Bolt
 from nut import Nut
-from SeatAngleCalc import SeatAngleConnection
+from SeatAngleCalc import SeatAngleCalculation
 from nutBoltPlacement import NutBoltArray
 
 from colWebBeamWebConnectivity import ColWebBeamWeb
@@ -265,6 +265,7 @@ class MainController(QtGui.QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
+        self.saObj = SeatAngleCalculation()
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
@@ -287,6 +288,11 @@ class MainController(QtGui.QMainWindow):
         else:
             dictcoldata = get_columndata(column_sec)
         return dictcoldata
+
+    def fetchAnglePara(self):
+        angle_sec = self.ui.combo_angle_section.currentText()
+        dictangledata = get_angledata(angle_sec)
+        return dictangledata
 
     def showFontDialogue(self):
 
@@ -809,7 +815,7 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with column web beam web
         '''
         uiObj = self.getuser_inputs()
-        resultObj = SeatAngleConnection.seat_angle_connection(uiObj)
+        resultObj = self.saObj.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
@@ -900,7 +906,7 @@ class MainController(QtGui.QMainWindow):
         
         '''
         uiObj = self.getuser_inputs()
-        resultObj = SeatAngleConnection.seat_angle_connection(uiObj)
+        resultObj = self.saObj.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         #         fillet_length = resultObj['Plate']['height']
@@ -1075,8 +1081,7 @@ class MainController(QtGui.QMainWindow):
         self.uiObj = self.getuser_inputs()
 
         # Seated Angle Design Calculations.
-        seat_angle_connection_obj = SeatAngleConnection()
-        self.resultObj = seat_angle_connection_obj.seat_angle_connection(self.uiObj)
+        self.resultObj = self.saObj.seat_angle_connection(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)

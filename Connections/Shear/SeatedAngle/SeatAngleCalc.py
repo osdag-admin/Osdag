@@ -55,7 +55,7 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
     # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
 # TODO add logger messages
 
-class SeatAngleConnection(object):
+class SeatAngleCalculation(object):
     """Perform design and detailing checks for seated angle connection.
 
     Attributes:
@@ -244,8 +244,8 @@ class SeatAngleConnection(object):
             "Bolt group capacity (kN)": self.bolt_group_capacity,
             "No. of Bolts": self.bolts_required,
             # TODO remove hardcoded values
-            "No. of Row": self.num_rows,
-            "No. of Column": self.num_cols,
+            "No. of Row": int(self.num_rows),
+            "No. of Column": int(self.num_cols),
             "Pitch Distance (mm)": self.pitch,
             "Gauge Distance (mm)": self.gauge,
             "End Distance (mm)": self.min_end_dist,
@@ -521,7 +521,7 @@ class SeatAngleConnection(object):
             # edge_distance = (angle_l - (bolts_per_line-1)*gauge)/2
             """
             self.gauge = self.max_spacing
-            self.num_cols = math.ceil((length_avail / gauge) + 1)
+            self.num_cols = int(math.ceil((length_avail / gauge) + 1))
             self.gauge = round(length_avail / (self.num_cols - 1), 3)
 
         self.pitch = (self.num_rows-1)*(self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.angle_root_clearance)

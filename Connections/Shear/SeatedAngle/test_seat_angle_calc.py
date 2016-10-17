@@ -1,10 +1,10 @@
 import sys
 import unittest, model, math
-from SeatAngleCalc import SeatAngleConnection
+from SeatAngleCalc import SeatAngleCalculation
 from PyQt4 import QtGui
 
 
-class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
+class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
         app = QtGui.QApplication(sys.argv)
         model.module_setup()
@@ -45,14 +45,14 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
             Values marked in inline comments # are calculated with V_nsb=185 MPa
 
         """
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 12, 1, 400), 1), 15.6)
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 16, 1, 400), 1), 29.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 20, 1, 400), 1), 45.3)
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 22, 1, 400), 1), 56.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 24, 1, 400), 1), 65.2)  # 65.3
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 27, 1, 400), 1), 84.8)  # 84.9
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 30, 1, 400), 1), 103.6)  # 103.8
-        self.assertEqual(round(SeatAngleConnection.bolt_shear(self, 36, 1, 400), 1), 150.9)  # 151.1
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 12, 1, 400), 1), 15.6)
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 16, 1, 400), 1), 29.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 20, 1, 400), 1), 45.3)
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 22, 1, 400), 1), 56.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 24, 1, 400), 1), 65.2)  # 65.3
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 27, 1, 400), 1), 84.8)  # 84.9
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 30, 1, 400), 1), 103.6)  # 103.8
+        self.assertEqual(round(SeatAngleCalculation.bolt_shear(self, 36, 1, 400), 1), 150.9)  # 151.1
 
     def test_bolt_bearing_capacity_single_bolt(self):
         """
@@ -64,36 +64,36 @@ class TestSeatAngleConnection(unittest.TestCase, SeatAngleConnection):
             bolt_fu: 400, 800
 
         """
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 12, 1, 10, 0.5, 400), 1), 48.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 16, 1, 10, 0.5, 400), 1), 64.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 20, 1, 20, 0.5, 400), 1), 160.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 22, 1, 20, 0.5, 400), 1), 176.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 24, 1, 10, 0.25, 400), 1), 48.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 27, 1, 10, 0.25, 400), 1), 54.0)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 30, 1, 10, 0.25, 800), 1), 120)
-        self.assertEqual(round(SeatAngleConnection.bolt_bearing(self, 36, 1, 10, 0.25, 800), 1), 144)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 12, 1, 10, 0.5, 400), 1), 48.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 16, 1, 10, 0.5, 400), 1), 64.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 20, 1, 20, 0.5, 400), 1), 160.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 22, 1, 20, 0.5, 400), 1), 176.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 24, 1, 10, 0.25, 400), 1), 48.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 27, 1, 10, 0.25, 400), 1), 54.0)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 30, 1, 10, 0.25, 800), 1), 120)
+        self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 36, 1, 10, 0.25, 800), 1), 144)
 
     def test_bolt_hole_clearance(self):
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 12), 1)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 14), 1)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 16), 2)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 18), 2)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 20), 2)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 22), 2)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 24), 2)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 30), 3)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 36), 3)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 12), 1)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 14), 1)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 16), 2)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 18), 2)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 20), 2)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 22), 2)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 24), 2)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 30), 3)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 36), 3)
 
         self.bolt_hole_type = 0
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 12), 3)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 14), 3)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 16), 4)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 18), 4)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 20), 4)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 22), 4)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 24), 6)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 30), 8)
-        self.assertEqual(SeatAngleConnection.bolt_hole_clearance(self, 36), 8)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 12), 3)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 14), 3)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 16), 4)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 18), 4)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 20), 4)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 22), 4)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 24), 6)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 30), 8)
+        self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 36), 8)
 
     def test_bolt_design(self):
         self.bolt_design(12)
@@ -223,5 +223,5 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     # window = MainController()
     # window.show()
-    ex = TestSeatAngleConnection()
+    ex = TestSeatAngleCalculation()
     sys.exit(app.exec_())

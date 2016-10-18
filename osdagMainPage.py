@@ -10,7 +10,7 @@ from ui_OsdagMainPage import Ui_MainWindow
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
 from Connections.Shear.Endplate.endPlateMain import launchEndPlateController
-from Connections.Shear.SeatedAngle.SeatAngleMain import launchSeatedAngleController
+from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleController
 
 # from os.path import expanduser                       #enters in home folder
 import os.path

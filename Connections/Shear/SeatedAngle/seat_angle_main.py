@@ -34,17 +34,17 @@ from utilities import osdagDisplayShape
 
 from ISection import ISection
 from angle import Angle
-from filletweld import FilletWeld
+from fillet_weld import FilletWeld
 from bolt import Bolt
 from nut import Nut
-from SeatAngleCalc import SeatAngleCalculation
-from nutBoltPlacement import NutBoltArray
+from seat_angle_calc import SeatAngleCalculation
+from nut_bolt_placement import NutBoltArray
 
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+from col_web_beam_web_connectivity import ColWebBeamWeb
+from col_flange_beam_web_connectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
 
-from reportGenerator import *
+from report_generator import *
 from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag

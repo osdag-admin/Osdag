@@ -676,8 +676,3 @@ def endConn(uiObj):
         logger.debug(" :=========End Of design===========")
     
     return outputObj
-    
-
-
-
-

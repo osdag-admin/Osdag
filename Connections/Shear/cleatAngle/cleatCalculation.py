@@ -835,8 +835,4 @@ def cleatAngleConn(uiObj):
         logger.error(": Design is not safe \n ")
         logger.debug(" :=========End Of design===========")
      
-    return outputObj                          
-    
-
-
-
+    return outputObj

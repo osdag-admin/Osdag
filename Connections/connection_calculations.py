@@ -41,6 +41,29 @@ class ConnectionCalculations(object):
         bolt_nominal_shear_capacity = bolt_fu * number_of_bolts * bolt_area / math.sqrt(3) / 1000
         return round(bolt_nominal_shear_capacity / gamma_mb, 3)
 
+    def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, plate_fu):
+        """Calculate factored bearing capacity of bolt(s) based on IS 800, Cl 10.3.4.
+
+        Args:
+            bolt_diameter (int)
+            number_of_bolts (int)
+            thickness_plate (float)
+            k_b (float)
+            plate_fu (int)
+
+        Return:
+             Factored bearing capacity of bolt(s) as float.
+
+        Note:
+            Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
+            #TODO : implement reduction factor 0.7 for over size holes - Cl 10.3.4
+
+        """
+        gamma_mb = 1.25
+        bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
+        1000)
+        return round(bolt_nominal_bearing_capacity / gamma_mb, 3)
+
     def bolt_hole_clearance(self, bolt_hole_type, bolt_diameter, custom_hole_clearance):
         """Calculate bolt hole clearance.
 
@@ -82,3 +105,63 @@ class ConnectionCalculations(object):
         if custom_hole_clearance is not None:
             hole_clearance = custom_hole_clearance  # units: mm
         return hole_clearance  # units: mm
+
+    def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier):
+        """Calculate minimum pitch, gauge, end and edge distances.
+
+        Args:
+            bolt_diameter (int)
+            bolt_hole_diameter (int)
+            min_edge_multiplier (float)
+
+        Returns:
+            None
+
+        Note:
+            # Minimum pitch and gauge IS 800 Cl 10.2.2
+            # Min edge and end distances IS 800 Cl 10.2.4.2
+        """
+        # Minimum pitch and gauge IS 800 Cl 10.2.2
+        self.min_pitch = int(2.5 * bolt_diameter)
+        self.min_gauge = int(2.5 * bolt_diameter)
+
+        # Min edge and end distances IS 800 Cl 10.2.4.2
+        self.min_end_dist = int(math.ceil(min_edge_multiplier * bolt_hole_diameter))
+        self.min_edge_dist = int(math.ceil(min_edge_multiplier * bolt_hole_diameter))
+
+        # TODO: rethink rounding off of MINIMUM distances
+        # round off the actual distances and check against minimum
+        if self.min_pitch % 5 != 0 or self.min_gauge % 5 != 0:
+            self.min_pitch = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
+            self.min_gauge = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
+        if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
+            self.min_edge_dist = int((int(self.min_edge_dist / 5) + 1) * 5)
+            self.min_end_dist = int((int(self.min_end_dist / 5) + 1) * 5)
+
+        # Max spacing IS 800 Cl 10.2.3.1
+        self.max_spacing = math.ceil(min(32 * thickness_governing, 300))
+        # print "Max spacing = " + str(self.max_spacing)
+
+        # Max spacing IS 800 Cl 10.2.4.3
+        self.max_edge_dist = math.ceil((12 * thickness_governing * math.sqrt(250 / self.angle_fy)).real)
+        # print "Max edge distance = " + str(self.max_edge_dist)
+
+        # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
+        # 40mm plus 4t, where t is the thickness of the thinner connected plate.
+        # self.max_edge_dist = min(self.max_edge_dist, 40 + 4*thickness_governing)
+
+    def calculate_kb(self):
+        """Calculate k_b for bearing capacity of bolt
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        """
+        self.k_b = min(self.end_dist / float(3 * self.bolt_hole_diameter),
+                       self.pitch / float(3 * self.bolt_hole_diameter) - 0.25,
+                       self.bolt_fu / float(self.angle_fu),
+                       1)
+        self.k_b = round(self.k_b, 3)

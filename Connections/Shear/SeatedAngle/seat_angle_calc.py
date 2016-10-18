@@ -171,6 +171,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_diameter = input_dict['Bolt']['Diameter (mm)']
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
+        self.bolt_fu = int(float(self.bolt_grade)) * 100
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
         if self.connectivity == "Beam-Beam":
@@ -263,27 +264,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             "hole_dia": self.bolt_hole_diameter
         }
 
-    def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, plate_fu):
-        """Calculate factored bearing capacity of bolt(s) based on IS 800, Cl 10.3.4.
-
-        Args:
-            bolt_diameter (int)
-            number_of_bolts (int)
-            thickness_plate (float)
-            k_b (float)
-            plate_fu (int)
-
-        Return:
-             Factored bearing capacity of bolt(s) as float.
-
-        Note:
-            Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
-            #TODO : implement reduction factor 0.7 for over size holes - Cl 10.3.4
-
-        """
-        bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (1000)
-        return round(bolt_nominal_bearing_capacity / self.gamma_mb, 3)
-
     def bolt_design(self, bolt_diameter):
         """Calculate bolt capacities, distances and layout.
 
@@ -297,36 +277,12 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_root_clearance = 5
         self.bolt_hole_diameter = bolt_diameter + self.bolt_hole_clearance(self.bolt_hole_type, bolt_diameter, self.custom_hole_clearance)
 
-        self.bolt_fu = int(float(self.bolt_grade)) * 100
-
-        # Minimum pitch and gauge IS 800 Cl 10.2.2
-        self.min_pitch = int(2.5 * bolt_diameter)
-        self.min_gauge = int(2.5 * bolt_diameter)
-
-        # Min edge and end distances IS 800 Cl 10.2.4.2
-        self.min_end_dist = int(math.ceil(self.min_edge_multiplier * self.bolt_hole_diameter))
-        self.min_edge_dist = int(math.ceil(self.min_edge_multiplier * self.bolt_hole_diameter))
-
-        # TODO: rethink rounding off of MINIMUM distances
-        # round off the actual distances and check against minimum
-        if self.min_pitch % 5 != 0 or self.min_gauge % 5 != 0:
-            self.min_pitch = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
-            self.min_gauge = ((self.min_pitch / 5)+1) * 5 - self.min_pitch % 5
-        if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
-            self.min_edge_dist = int((int(self.min_edge_dist / 5)+1) * 5)
-            self.min_end_dist = int((int(self.min_end_dist / 5)+1) * 5)
-
+        self.calculate_distances(bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier)
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         self.pitch = self.min_pitch
 
-
-        # Calculation of k_b
-        self.k_b = min(self.end_dist / float(3 * self.bolt_hole_diameter),
-                       self.pitch / float(3 * self.bolt_hole_diameter) - 0.25,
-                       self.bolt_fu / float(self.angle_fu),
-                       1)
-        self.k_b = round(self.k_b, 3)
+        self.calculate_kb()
 
         # Bolt capacity
         thickness_governing = min(self.column_f_t.real, self.angle_t.real)
@@ -338,19 +294,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
 
         self.bolt_group_capacity = self.bolts_required * self.bolt_value
-        # print "bolt group capacity = " + str(self.bolt_group_capacity)
-
-        # Max spacing IS 800 Cl 10.2.3.1
-        self.max_spacing = math.ceil(min(32 * thickness_governing, 300))
-        # print "Max spacing = " + str(self.max_spacing)
-
-        # Max spacing IS 800 Cl 10.2.4.3
-        self.max_edge_dist = math.ceil((12 * thickness_governing * math.sqrt(250 / self.angle_fy)).real)
-        # print "Max edge distance = " + str(self.max_edge_dist)
-
-        # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
-        # 40mm plus 4t, where t is the thickness of the thinner connected plate.
-        # self.max_edge_dist = min(self.max_edge_dist, 40 + 4*thickness_governing)
 
     def block_shear_check(self):
         # TODO discuss the block shear case(s) with team. Non-trivial assumptions involved.

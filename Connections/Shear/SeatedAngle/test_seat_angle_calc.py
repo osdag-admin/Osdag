@@ -112,7 +112,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(round(self.bolt_bearing_capacity, 1), 60.6)
         self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 15.6))
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 7, 1))
-        self.assertEqual(round(self.max_spacing, 0) , 300)
+        self.assertEqual(round(self.max_spacing, 0), 300)
         self.assertEqual(round(self.max_edge_dist, 0), 144)
 
         self.bolt_design(16)

@@ -277,7 +277,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_root_clearance = 5
         self.bolt_hole_diameter = bolt_diameter + self.bolt_hole_clearance(self.bolt_hole_type, bolt_diameter, self.custom_hole_clearance)
 
-        self.calculate_distances(bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier)
+        thickness_governing_min = min(self.column_f_t.real, self.angle_t.real)
+        self.calculate_distances(bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier, thickness_governing_min)
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         self.pitch = self.min_pitch
@@ -285,10 +286,10 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.calculate_kb()
 
         # Bolt capacity
-        thickness_governing = min(self.column_f_t.real, self.angle_t.real)
+        thickness_governing_min = min(self.column_f_t.real, self.angle_t.real)
         single_bolt = 1
         self.bolt_shear_capacity = self.bolt_shear(bolt_diameter, single_bolt, self.bolt_fu).real
-        self.bolt_bearing_capacity = self.bolt_bearing(bolt_diameter, single_bolt, thickness_governing,
+        self.bolt_bearing_capacity = self.bolt_bearing(bolt_diameter, single_bolt, thickness_governing_min,
                                                   self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
@@ -519,4 +520,3 @@ class SeatAngleCalculation(ConnectionCalculations):
         return self.output_dict
 
 # if __name__ == '__main__':
-

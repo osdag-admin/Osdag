@@ -125,7 +125,7 @@ class ConnectionCalculations(object):
         1000)
         return round(bolt_nominal_bearing_capacity / gamma_mb, 3)
 
-    def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_max):
+    def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min):
         """Calculate minimum pitch, gauge, end and edge distances.
 
         Args:
@@ -158,11 +158,11 @@ class ConnectionCalculations(object):
             self.min_end_dist = int((int(self.min_end_dist / 5) + 1) * 5)
 
         # Max spacing IS 800 Cl 10.2.3.1
-        self.max_spacing = math.ceil(min(32 * thickness_governing_max, 300))
+        self.max_spacing = math.ceil(min(32 * thickness_governing_min, 300))
         # print "Max spacing = " + str(self.max_spacing)
 
         # Max spacing IS 800 Cl 10.2.4.3
-        self.max_edge_dist = math.ceil((12 * thickness_governing_max * math.sqrt(250 / self.angle_fy)).real)
+        self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)).real)
         # print "Max edge distance = " + str(self.max_edge_dist)
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed

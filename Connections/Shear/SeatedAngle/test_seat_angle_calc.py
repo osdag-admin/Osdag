@@ -74,7 +74,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(round(SeatAngleCalculation.bolt_bearing(self, 36, 1, 10, 0.25, 800), 1), 144)
 
     def test_bolt_hole_clearance(self):
-        #standard hole
+        # standard hole
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 1, 12, None), 1)
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 1, 14, None), 1)
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 1, 16, None), 2)
@@ -85,7 +85,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 1, 30, None), 3)
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 1, 36, None), 3)
 
-       #oversize hole
+        # oversize hole
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 0, 12, None), 3)
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 0, 14, None), 3)
         self.assertEqual(SeatAngleCalculation.bolt_hole_clearance(self, 0, 16, None), 4)

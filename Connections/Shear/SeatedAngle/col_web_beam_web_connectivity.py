@@ -12,7 +12,7 @@ from ModelUtils import *
 import copy
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.gp import gp_Pnt
-from nut_bolt_placement import lacement import NutBoltArray
+from nut_bolt_placement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 

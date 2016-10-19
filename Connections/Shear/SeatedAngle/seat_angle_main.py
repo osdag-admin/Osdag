@@ -369,6 +369,7 @@ class MainController(QtGui.QMainWindow):
                 self.ui.combo_column_section.addItems(get_beamcombolist())
 
             self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            print uiObj
             self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
 
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
@@ -515,7 +516,7 @@ class MainController(QtGui.QMainWindow):
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.foler)+"/LogMessages",
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1383,7 +1384,7 @@ if __name__ == '__main__':
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # while launching from Osdag Main:
-    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
+    fh = logging.FileHandler("./seatangle.log", mode="w")
     # while launching from Seated Angle folder
     # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')

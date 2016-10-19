@@ -1,1 +1,75 @@
 <link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>
+
+      <div  class="LOG ERROR">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">ERROR</span>
+          <span class="MSG">: SA thickness is not sufficient [Cl A.B.C]</span>
+      </div>
+
+      <div  class="LOG WARNING">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">WARNING</span>
+          <span class="MSG">: Minimum thickness required is one</span>
+      </div>
+
+      <div  class="LOG INFO">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Select a SA with higher thickness</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">===========End of design===========</span>
+      </div>
+
+      <div  class="LOG INFO">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Overall seated angle connection design is safe 
+</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">: =========End Of design===========</span>
+      </div>
+
+      <div  class="LOG ERROR">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">ERROR</span>
+          <span class="MSG">: SA thickness is not sufficient [Cl A.B.C]</span>
+      </div>
+
+      <div  class="LOG WARNING">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">WARNING</span>
+          <span class="MSG">: Minimum thickness required is one</span>
+      </div>
+
+      <div  class="LOG INFO">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Select a SA with higher thickness</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">===========End of design===========</span>
+      </div>
+
+      <div  class="LOG INFO">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Overall seated angle connection design is safe 
+</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Wed, 19 Oct 2016 15:50:22</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">: =========End Of design===========</span>
+      </div>

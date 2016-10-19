@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Design preferences</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_5">
    <item row="1" column="0">
@@ -30,14 +30,14 @@
       </spacer>
      </item>
      <item row="0" column="2">
-      <widget class="QPushButton" name="btn_boltsave">
+      <widget class="QPushButton" name="btn_save">
        <property name="text">
         <string>Save</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="btn_boltdefaults">
+      <widget class="QPushButton" name="btn_defaults">
        <property name="text">
         <string>Defaults</string>
        </property>
@@ -57,7 +57,7 @@
       </spacer>
      </item>
      <item row="0" column="3">
-      <widget class="QPushButton" name="btn_boltclose">
+      <widget class="QPushButton" name="btn_close">
        <property name="text">
         <string>Close</string>
        </property>
@@ -68,7 +68,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">

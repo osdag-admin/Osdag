@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'design_preferences1.ui'
+# Form implementation generated from reading ui file 'design_preferences.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -22,29 +22,29 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_ShearDesignPreferences(object):
-    def setupUi(self, ShearDesignPreferences):
-        ShearDesignPreferences.setObjectName(_fromUtf8("ShearDesignPreferences"))
-        ShearDesignPreferences.resize(822, 462)
-        self.gridLayout_5 = QtGui.QGridLayout(ShearDesignPreferences)
+class Ui_DesignPreferences(object):
+    def setupUi(self, Dialog):
+        Dialog.setObjectName(_fromUtf8("Dialog"))
+        Dialog.resize(822, 462)
+        self.gridLayout_5 = QtGui.QGridLayout(Dialog)
         self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
         self.gridLayout_2 = QtGui.QGridLayout()
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         spacerItem = QtGui.QSpacerItem(28, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem, 0, 0, 1, 1)
-        self.btn_save = QtGui.QPushButton(ShearDesignPreferences)
+        self.btn_save = QtGui.QPushButton(Dialog)
         self.btn_save.setObjectName(_fromUtf8("btn_save"))
         self.gridLayout_2.addWidget(self.btn_save, 0, 2, 1, 1)
-        self.btn_defaults = QtGui.QPushButton(ShearDesignPreferences)
+        self.btn_defaults = QtGui.QPushButton(Dialog)
         self.btn_defaults.setObjectName(_fromUtf8("btn_defaults"))
         self.gridLayout_2.addWidget(self.btn_defaults, 0, 1, 1, 1)
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem1, 0, 4, 1, 1)
-        self.btn_close = QtGui.QPushButton(ShearDesignPreferences)
+        self.btn_close = QtGui.QPushButton(Dialog)
         self.btn_close.setObjectName(_fromUtf8("btn_close"))
         self.gridLayout_2.addWidget(self.btn_close, 0, 3, 1, 1)
         self.gridLayout_5.addLayout(self.gridLayout_2, 1, 0, 1, 1)
-        self.tabWidget = QtGui.QTabWidget(ShearDesignPreferences)
+        self.tabWidget = QtGui.QTabWidget(Dialog)
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
@@ -206,22 +206,21 @@ class Ui_ShearDesignPreferences(object):
         self.tabWidget.addTab(self.tab_6, _fromUtf8(""))
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
-        self.retranslateUi(ShearDesignPreferences)
+        self.retranslateUi(Dialog)
         self.tabWidget.setCurrentIndex(2)
-        QtCore.QObject.connect(self.btn_close, QtCore.SIGNAL(_fromUtf8("clicked()")), ShearDesignPreferences.close)
-        QtCore.QMetaObject.connectSlotsByName(ShearDesignPreferences)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-    def retranslateUi(self, ShearDesignPreferences):
-        ShearDesignPreferences.setWindowTitle(_translate("ShearDesignPreferences", "Dialog", None))
-        self.btn_save.setText(_translate("ShearDesignPreferences", "Save", None))
-        self.btn_defaults.setText(_translate("ShearDesignPreferences", "Defaults", None))
-        self.btn_close.setText(_translate("ShearDesignPreferences", "Close", None))
-        self.label_5.setText(_translate("ShearDesignPreferences", "Inputs", None))
-        self.label_3.setText(_translate("ShearDesignPreferences", "Description", None))
-        self.label.setText(_translate("ShearDesignPreferences", "Bolt hole type", None))
-        self.combo_boltHoleType.setItemText(0, _translate("ShearDesignPreferences", "Standard", None))
-        self.combo_boltHoleType.setItemText(1, _translate("ShearDesignPreferences", "Over-sized", None))
-        self.textBrowser.setHtml(_translate("ShearDesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(_translate("Dialog", "Design preferences", None))
+        self.btn_save.setText(_translate("Dialog", "Save", None))
+        self.btn_defaults.setText(_translate("Dialog", "Defaults", None))
+        self.btn_close.setText(_translate("Dialog", "Close", None))
+        self.label_5.setText(_translate("Dialog", "Inputs", None))
+        self.label_3.setText(_translate("Dialog", "Description", None))
+        self.label.setText(_translate("Dialog", "Bolt hole type", None))
+        self.combo_boltHoleType.setItemText(0, _translate("Dialog", "Standard", None))
+        self.combo_boltHoleType.setItemText(1, _translate("Dialog", "Over-sized", None))
+        self.textBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -275,51 +274,51 @@ class Ui_ShearDesignPreferences(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Calibri\'; font-size:10pt;\">and spray metallized with aluminium (thickness &gt; 50  micro-m)</span></p></td>\n"
 "<td style=\" vertical-align:top; padding-left:0; padding-right:0; padding-top:0; padding-bottom:0;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Calibri\'; font-size:10pt;\">0.5</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"> </span></p></td></tr></table></body></html>", None))
-        self.label_2.setText(_translate("ShearDesignPreferences", "Bolt hole clearance", None))
-        self.txt_boltHoleClearance.setText(_translate("ShearDesignPreferences", "2", None))
-        self.label_9.setText(_translate("ShearDesignPreferences", "mm", None))
-        self.label_4.setText(_translate("ShearDesignPreferences", "Material grade overwrite", None))
-        self.label_8.setText(_translate("ShearDesignPreferences", "Fu", None))
-        self.txt_boltFu.setText(_translate("ShearDesignPreferences", "800", None))
-        self.label_11.setText(_translate("ShearDesignPreferences", "MPa", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("ShearDesignPreferences", "Bolt", None))
-        self.label_16.setText(_translate("ShearDesignPreferences", "Inputs", None))
-        self.label_22.setText(_translate("ShearDesignPreferences", "Type of weld", None))
-        self.combo_weldType.setItemText(0, _translate("ShearDesignPreferences", "Shop weld", None))
-        self.combo_weldType.setItemText(1, _translate("ShearDesignPreferences", "Field weld", None))
-        self.label_17.setText(_translate("ShearDesignPreferences", "Description", None))
-        self.textBrowser_weldDescription.setHtml(_translate("ShearDesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.label_2.setText(_translate("Dialog", "Bolt hole clearance", None))
+        self.txt_boltHoleClearance.setText(_translate("Dialog", "2", None))
+        self.label_9.setText(_translate("Dialog", "mm", None))
+        self.label_4.setText(_translate("Dialog", "Material grade overwrite", None))
+        self.label_8.setText(_translate("Dialog", "Fu", None))
+        self.txt_boltFu.setText(_translate("Dialog", "800", None))
+        self.label_11.setText(_translate("Dialog", "MPa", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Dialog", "Bolt", None))
+        self.label_16.setText(_translate("Dialog", "Inputs", None))
+        self.label_22.setText(_translate("Dialog", "Type of weld", None))
+        self.combo_weldType.setItemText(0, _translate("Dialog", "Shop weld", None))
+        self.combo_weldType.setItemText(1, _translate("Dialog", "Field weld", None))
+        self.label_17.setText(_translate("Dialog", "Description", None))
+        self.textBrowser_weldDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:10pt;\">Field weld takes a material safety factor of 1.5</span></p></body></html>", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("ShearDesignPreferences", "Weld", None))
-        self.label_38.setText(_translate("ShearDesignPreferences", "Inputs", None))
-        self.label_39.setText(_translate("ShearDesignPreferences", "Type of edges", None))
-        self.combo_detailingEdgeType.setItemText(0, _translate("ShearDesignPreferences", "a - Sheared or hand flame cut", None))
-        self.combo_detailingEdgeType.setItemText(1, _translate("ShearDesignPreferences", "b - Rolled, machine-flame cut, sawn and planed", None))
-        self.label_29.setText(_translate("ShearDesignPreferences", "Gap between beam & support", None))
-        self.txt_detailingGap.setText(_translate("ShearDesignPreferences", "10", None))
-        self.label_36.setText(_translate("ShearDesignPreferences", "mm", None))
-        self.label_18.setText(_translate("ShearDesignPreferences", "Description", None))
-        self.textBrowser_detailingDescription.setHtml(_translate("ShearDesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("Dialog", "Weld", None))
+        self.label_38.setText(_translate("Dialog", "Inputs", None))
+        self.label_39.setText(_translate("Dialog", "Type of edges", None))
+        self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut", None))
+        self.combo_detailingEdgeType.setItemText(1, _translate("Dialog", "b - Rolled, machine-flame cut, sawn and planed", None))
+        self.label_29.setText(_translate("Dialog", "Gap between beam & support", None))
+        self.txt_detailingGap.setText(_translate("Dialog", "10", None))
+        self.label_36.setText(_translate("Dialog", "mm", None))
+        self.label_18.setText(_translate("Dialog", "Description", None))
+        self.textBrowser_detailingDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-family:\'Calibri\'; font-size:10pt; font-weight:600; vertical-align:middle;\">1.7 </span><span style=\" font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\">times the hole diameter in case of [</span><span style=\" font-family:\'Calibri\'; font-size:10pt; font-weight:600; vertical-align:middle;\">a - sheared or hand flame cut edges</span><span style=\" font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\">] and </span><span style=\" font-family:\'Calibri\'; font-size:10pt; font-weight:600; vertical-align:middle;\">1.5 </span><span style=\" font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\">times the hole diameter in case of [</span><span style=\" font-family:\'Calibri\'; font-size:10pt; font-weight:600; vertical-align:middle;\">b - Rolled, machine-flame cut, sawn and planed edges</span><span style=\" font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\">] (IS 800 - Cl. 10.2.4.2)</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:10pt; vertical-align:middle;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Calibri\'; font-size:10pt;\">This gap should include the tolerance value of 5 mm. So if the assumed clearance is 5 mm, then the gap should be = 10 mm ( = 5 mm {clearance} + 5 mm {tolerance} )</span></p></body></html>", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("ShearDesignPreferences", "Detailing", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("ShearDesignPreferences", "Design", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("Dialog", "Detailing", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("Dialog", "Design", None))
 
 
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
-    ShearDesignPreferences = QtGui.QDialog()
-    ui = Ui_ShearDesignPreferences()
-    ui.setupUi(ShearDesignPreferences)
-    ShearDesignPreferences.show()
+    Dialog = QtGui.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
     sys.exit(app.exec_())
 

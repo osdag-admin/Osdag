@@ -10,7 +10,7 @@ from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
-from Connections.Shear.Finplate.ui_design_preferences import Ui_ShearDesignPreferences
+from ui_design_preferences import Ui_DesignPreferences
 from model import *
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -35,7 +35,7 @@ class DesignPreferences(QtGui.QDialog):
     def __init__(self, parent=None):
 
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_ShearDesignPreferences()
+        self.ui = Ui_DesignPreferences()
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None

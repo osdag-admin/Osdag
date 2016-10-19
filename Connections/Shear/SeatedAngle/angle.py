@@ -25,7 +25,6 @@ class Angle(object):
         self.T = T
         self.R1 = R1
         self.R2 = R2
-        print "self.R2 =",self.R2
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])

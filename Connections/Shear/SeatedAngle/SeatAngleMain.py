@@ -294,11 +294,7 @@ class MainController(QtGui.QMainWindow):
         dictangledata = get_angledata(angle_sec)
         return dictangledata
 
-    def fetchAnglePara(self):
-        angle_sec = self.ui.combo_angle_section.currentText()
-        dictangledata = get_angledata(angle_sec)
-        return dictangledata
-
+    
     def showFontDialogue(self):
 
         font, ok = QtGui.QFontDialog.getFont()
@@ -725,9 +721,10 @@ class MainController(QtGui.QMainWindow):
                 get_backend("qt-pyqt4")
         else:
             global display, start_display, app, USED_BACKEND
+            from OCC.Display.SimpleGui import get_backend
 
             if not backend_str:
-                USED_BACKEND = self.get_backend()
+                USED_BACKEND = get_backend
             elif backend_str in ['pyside', 'pyqt4']:
                 USED_BACKEND = backend_str
             else:
@@ -784,6 +781,7 @@ class MainController(QtGui.QMainWindow):
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        self.display.set_bg_gradient_color(255,255,255,255,255,255)
 
         loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
@@ -806,11 +804,11 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
             osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            #osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
+            #osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+            #nutboltlist = self.connectivity.nutBoltArray.getModels()
+            #for nutbolt in nutboltlist:
+                #osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
 # -------------------------------------------------------------------------
 # TODO check the 3D drawing generating functions below
@@ -1026,7 +1024,7 @@ class MainController(QtGui.QMainWindow):
                 self.connectivity = self.create3DBeamWebBeamWeb()
                 self.fuse_model = None
 
-            self.display3Dmodel("Model")
+            self.display3Dmodel("Column")
 
         else:
             self.display.EraseAll()
@@ -1216,7 +1214,7 @@ class MainController(QtGui.QMainWindow):
     #
     #         # start_display()
 
-    def call2D_Drawing(view):
+    def call2D_Drawing(self, view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
             '''

@@ -47,15 +47,15 @@ from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
-# TODO block shear check
 # TODO add input validation to select only angles which can accomodate 2 lines of bolts
 # TODO check if a clause exists on minimum angle thickness
-# TODO calculate other geometry params for SA
 # TODO check reduction factors for bolt group capacity
 # TODO area of bolts for smaller bolt diameters
     # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
-# TODO add logger messages
-
+# TODO bolts_provided and bolts_required in UI and output_dict
+# TODO pitch and gauge rounding off issues
+# TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
+# TODO display top angle in UI - output dock
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -239,7 +239,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Moment Demand (kN-mm)": self.moment_at_root_angle,
             "Moment Capacity (kN-mm)": self.moment_capacity_angle,
             "Shear Demand (kN)": self.shear_force,
-            # TODO update ui: Angle shear capacity, Beam shear strength
             "Shear Capacity (kN)": self.outstanding_leg_shear_capacity,
             "Beam Shear Strength (kN)": self.beam_shear_strength,
             "Top Angle": self.top_angle,
@@ -300,49 +299,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolts_required = int(math.ceil(self.shear_force / self.bolt_value))
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
-    # TODO Assuming block shear is not a governing mode of failure for seated angle connection.
-    def block_shear_check(self):
-        # TODO discuss the block shear case(s) with team. Non-trivial assumptions involved.
-        # TODO add block shear check to seat_angle_connection()
-        """Calculate block shear capacity of seated angle.
-
-        Args:
-            None
-
-        Returns:
-            block_shear_db (float)
-
-        Note:
-            Assumption:
-            1) horizontal leg does not contribute to block shear capacity (very conservative)
-
-        """
-        root_3 = math.sqrt(3)
-        thickness = self.angle_t
-        # pitch = self.pitch
-        end_dist = self.end_dist
-        edge_dist = self.edge_dist
-        bolt_hole_diameter = self.bolt_hole_diameter
-        f_y = self.angle_fy
-        f_u = self.angle_fu
-        gamma_m0 = self.gamma_m0
-        gamma_m1 = self.gamma_m1
-        number_rows = self.num_rows
-        # number_cols = self.num_cols
-        vertical_leg_length = self.angle_A
-
-        area_vg = thickness * (vertical_leg_length - end_dist)
-        area_vn = thickness * (vertical_leg_length - end_dist - (number_rows - 1 + 0.5) * bolt_hole_diameter)
-        area_tg = thickness * edge_dist
-        area_tn = thickness * (edge_dist - 0.5 * bolt_hole_diameter)
-
-        block_shear_db1 = area_vg * f_y / (root_3 * gamma_m0) + 0.9 * area_tn * f_u / gamma_m1
-        block_shear_db2 = 0.9 * area_vn * f_u(root_3 * gamma_m1) + area_tg * f_y / gamma_m0
-        block_shear_db = min(block_shear_db1, block_shear_db2)
-        block_shear_db = round(block_shear_db / 1000, 3)
-
-        return block_shear_db
-
     def seat_angle_connection(self, input_dict):
         """ Perform design and detailing checks based for seated angle connection.
 
@@ -365,9 +321,9 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         if self.connectivity == "Column web-Beam web":
             limiting_angle_length = self.column_d - 2*self.column_f_t - 2*self.column_R1 - self.root_clearance
-            self.angle_l = min(self.beam_w_f, limiting_angle_length)
+            self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
         elif self.connectivity == "Column flange-Beam web":
-            self.angle_l = min(self.beam_w_f, self.column_w_f)
+            self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
 
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)

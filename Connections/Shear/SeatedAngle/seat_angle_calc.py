@@ -251,8 +251,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Bearing Capacity (kN)": self.bolt_bearing_capacity,
             "Capacity of Bolt (kN)": self.bolt_value,
             "Bolt group capacity (kN)": self.bolt_group_capacity,
-            "No. of Bolts": self.bolts_required,
-            # TODO remove hardcoded values
+            "No. of Bolts": self.bolts_provided,
             "No. of Row": int(self.num_rows),
             "No. of Column": int(self.num_cols),
             "Pitch Distance (mm)": self.pitch,
@@ -298,8 +297,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_bearing_capacity = self.bolt_bearing(bolt_diameter, single_bolt, thickness_governing_min,
                                                   self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
-        self.bolts_required = math.ceil(self.shear_force / self.bolt_value)
-        self.bolt_group_capacity = self.bolts_required * self.bolt_value
+        self.bolts_required = int(math.ceil(self.shear_force / self.bolt_value))
+        self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
     # TODO Assuming block shear is not a governing mode of failure for seated angle connection.
     def block_shear_check(self):
@@ -375,11 +374,11 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.num_rows = 1
         self.num_cols = self.bolts_required
-        self.gauge = round(length_avail / (self.num_cols - 1), 3)
+        self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
         if self.gauge < self.min_gauge:
             self.num_rows = 2
             self.num_cols = int((self.bolts_required + 1) / 2)
-            self.gauge = round(length_avail / (self.num_cols - 1), 3)
+            self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
             if self.gauge < self.min_gauge:
                 self.safe = False
                 logger.error(": Bolt gauge is less than minimum gauge length [Cl 10.2.2]")
@@ -399,12 +398,13 @@ class SeatAngleCalculation(ConnectionCalculations):
             # gauge = max_spacing
             # edge_distance = (angle_l - (bolts_per_line-1)*gauge)/2
             """
-            self.gauge = self.max_spacing
+            self.gauge = int(math.ceil(self.max_spacing))
             self.num_cols = int(math.ceil((length_avail / gauge) + 1))
-            self.gauge = round(length_avail / (self.num_cols - 1), 3)
+            self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
 
         self.bolts_provided = self.num_cols*self.num_rows
-        self.pitch = (self.num_rows-1)*(self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)
+        self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)
+        self.pitch = int(math.ceil((self.num_rows-1)*(self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
         if self.pitch < self.min_pitch and self.num_rows == 2:
             self.safe = False
             logger.error(": Bolt pitch provided is less than minimum pitch [Cl 10.2.2]")
@@ -434,7 +434,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         """
         root_3 = math.sqrt(3)
         self.outstanding_leg_shear_capacity = round(
-            self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 3)  # kN
+            self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 1)  # kN
         # logger.info(": Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_capacity))
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
@@ -464,7 +464,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             use appropriate moment capacity equation
         """
 
-        self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 3)
+        self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 1)
         # logger.info(": Moment at root angle = " + str(self.moment_at_root_angle))
 
         """
@@ -499,7 +499,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             angle_outst_leg_mcapacity = min((1 - beta_moment) * leg_moment_d, leg_moment_d_limiting)
             angle_moment_capacity_clause = "[Cl 8.2.1.3]"
 
-        self.moment_capacity_angle = round(angle_outst_leg_mcapacity, 3)
+        self.moment_capacity_angle = round(angle_outst_leg_mcapacity, 1)
         # logger.info("Moment capacity of outstanding leg = " + str(self.moment_capacity_angle))
 
         if self.moment_capacity_angle < self.moment_at_root_angle:
@@ -510,7 +510,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.info(": Increase thickness or decrease length of outstanding leg of seated angle")
 
         # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
-        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 3)
+        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 1)
         # logger.info(": Beam shear capacity = " + str(self.beam_shear_strength))
 
         if self.beam_shear_strength < self.shear_force:

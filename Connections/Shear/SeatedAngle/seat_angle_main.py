@@ -1094,7 +1094,7 @@ class MainController(QtGui.QMainWindow):
         self.displaylog_totextedit()
 
         # Displaying 3D Cad model
-        status = self.resultObj['Bolt']['status']
+        status = self.resultObj['SeatAngle']['status']
         self.call_3DModel(status)
 
     def create2Dcad(self, connectivity):

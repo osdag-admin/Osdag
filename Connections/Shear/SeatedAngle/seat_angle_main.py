@@ -182,7 +182,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QtGui.QDoubleValidator()
-        #TODO add exhaustive validators
+        #TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -202,7 +202,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_front_view.triggered.connect(lambda:self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
-        #TODO update ui variables with appropiate names and code below
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
@@ -472,8 +471,8 @@ class MainController(QtGui.QMainWindow):
         outObj['SeatAngle']["Moment Capacity (kN-mm)"] = float(self.ui.txt_moment_capacity.text())
         outObj['SeatAngle']["Shear Demand (kN)"] = float(self.ui.txt_seat_shear_demand.text())
         outObj['SeatAngle']["Shear Capacity (kN)"] = float(self.ui.txt_seat_shear_capacity.text())
-        # TODO confirm after checking UI: beam shear strength (mostly) vs seat shear strength(?)
-        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_seat_shear_strength.text())
+        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_beam_shear_strength.text())
+        outObj['SeatAngle']["Top Angle"] = float(self.ui.txt_top_angle.text())
 
         outObj['Bolt'] = {}
         outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
@@ -564,8 +563,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_moment_capacity.clear()
         self.ui.txt_seat_shear_demand.clear()
         self.ui.txt_seat_shear_capacity.clear()
-        # TODO check seat OR beam shear strength
-        self.ui.txt_seat_shear_strength.clear()
+        self.ui.txt_beam_shear_strength.clear()
+        self.ui.txt_top_angle.clear()
 
         self.ui.txt_bolt_shear_capacity.clear()
         self.ui.txt_bolt_bearing_capacity.clear()
@@ -686,9 +685,11 @@ class MainController(QtGui.QMainWindow):
         angle_shear_capacity = resultObj['SeatAngle']['Shear Capacity (kN)']
         self.ui.txt_seat_shear_capacity.setText(str(angle_shear_capacity))
 
-        #TODO check seat or beam shear strength
         beam_shear_strength = resultObj['SeatAngle']['Beam Shear Strength (kN)']
-        self.ui.txt_seat_shear_strength.setText(str(beam_shear_strength))
+        self.ui.txt_beam_shear_strength.setText(str(beam_shear_strength))
+
+        top_angle = resultObj['SeatAngle']['Top Angle']
+        self.ui.txt_top_angle.setText(str(top_angle))
 
     def displaylog_totextedit(self):
         '''
@@ -773,7 +774,6 @@ class MainController(QtGui.QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def display3Dmodel(self, component):
-        # TODO check display initialisation in other modules
         self.display, _ = self.init_display()
 
         self.display.EraseAll()
@@ -1401,5 +1401,3 @@ if __name__ == '__main__':
     window = MainController(folder)
     window.show()
     sys.exit(app.exec_())
-
-#TODO : connect to osdag main window

@@ -84,7 +84,7 @@ class ConnectionCalculations(object):
             '36': 817
         }[str(bolt_diameter)]
         bolt_nominal_shear_capacity = bolt_fu * number_of_bolts * bolt_area / math.sqrt(3) / 1000
-        return round(bolt_nominal_shear_capacity / gamma_mb, 3)
+        return round(bolt_nominal_shear_capacity / gamma_mb, 1)
 
     def calculate_kb(self):
         """Calculate k_b for bearing capacity of bolt
@@ -123,7 +123,7 @@ class ConnectionCalculations(object):
         gamma_mb = 1.25
         bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
         1000)
-        return round(bolt_nominal_bearing_capacity / gamma_mb, 3)
+        return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min):
         """Calculate minimum pitch, gauge, end and edge distances.

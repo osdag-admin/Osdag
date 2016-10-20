@@ -3240,7 +3240,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>No. of bolts required</string>
+      <string>No. of bolts provided</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_bolt_shear_capacity">
@@ -3906,7 +3906,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Angle shear capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_seat_shear_strength">
+    <widget class="QLineEdit" name="txt_beam_shear_strength">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3978,6 +3978,47 @@ QMenu::item:selected {
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QLineEdit" name="txt_top_angle">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>580</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_175">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>580</y>
+       <width>171</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Top Angle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -4296,7 +4337,7 @@ QMenu::item:selected {
   <tabstop>txt_moment_capacity</tabstop>
   <tabstop>txt_seat_shear_demand</tabstop>
   <tabstop>txt_seat_shear_capacity</tabstop>
-  <tabstop>txt_seat_shear_strength</tabstop>
+  <tabstop>txt_beam_shear_strength</tabstop>
   <tabstop>txtNoBolts_3</tabstop>
   <tabstop>txtPitch_3</tabstop>
   <tabstop>txtGuage_3</tabstop>

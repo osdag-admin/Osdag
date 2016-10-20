@@ -51,6 +51,34 @@ from drawing_2D import EndCommonData
 from PyQt4 import QtSvg
 
 
+class Svg_window(QtSvg.QSvgWidget):
+    def __init__(self, fileName, view, parent=None):
+        QtGui.QApplication.__init__(self, parent)
+        self.mainController = parent
+        self.call_svgwindow(fileName, view)
+
+    def call_svgwindow(self, fileName, view):
+        self.svgWidget = QtSvg.QSvgWidget(fileName)
+    #             svgWidget.setGeometry(50, 50, 759, 668)
+        self.svgWidget.setFixedSize(900, 800)
+        self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
+        self.btn_save.setToolTip('Saves 2D Image as PNG')
+        self.btn_save.resize(self.btn_save.sizeHint())
+        self.btn_save.setFixedHeight(40)
+        self.btn_save.setFixedWidth(110)
+        self.btn_save.move(760, 700)
+        myfont = QtGui.QFont()
+        myfont.setBold(True)
+        myfont.setPointSize(9)
+        self.btn_save.setFont(myfont)
+        self.svgWidget.setWindowTitle('2D View')
+        self.svgWidget.show()
+        print "viewfrom call_svgwindow", view
+        self.btn_save.clicked.connect(lambda: self.mainController.save_2D_image_names)
+#         self.open_new(view)
+#         sys.exit(app.exec_())
+
+
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -68,7 +96,6 @@ class MyAboutOsdag(QtGui.QDialog):
 
 
 class MyPopupDialog(QtGui.QDialog):
-
     def __init__(self, parent=None):
 
         QtGui.QDialog.__init__(self, parent)
@@ -270,14 +297,12 @@ class MainController(QtGui.QMainWindow):
         self.resultObj = None
         self.uiObj = None
 
+        svgWinObj = Svg_window()
+        self.svgWinObj = svgWinObj
+
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
-        
-#         self.store_osdagheader(image_path)
-
-#     def store_osdagheader(self, image_path, report_index):
-#         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
     def showFontDialogue(self):
 
@@ -1717,34 +1742,32 @@ class MainController(QtGui.QMainWindow):
 
             if view == "Front":
                 fileName = self.folder + "/images_html/endFront.svg"
-    
+
             elif view == "Side":
                 fileName = self.folder + "/images_html/endSide.svg"
-    
+
             else:
                 fileName = self.folder + "/images_html/endTop.svg"
-    
-            self.svgWidget = QtSvg.QSvgWidget(fileName)
-    #             svgWidget.setGeometry(50, 50, 759, 668)
-            self.svgWidget.setFixedSize(900, 800)
-            self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
-            self.btn_save.setToolTip('Saves 2D Image as PNG')
-            self.btn_save.resize(self.btn_save.sizeHint())
-            self.btn_save.move(750, 750)
-            self.svgWidget.setWindowTitle('2D View')
-            self.svgWidget.show()
-#             self.btn_save.clicked.connect(self.save_2D_image_names)
-            self.open_new(view)
-            sys.exit(app.exec_())
+
+            self.svgWinObj.call_svgwindow(fileName, view)
+#             self.svgWidget.setWindowTitle('2D View')
+#             self.svgWidget.show()
+# #             self.btn_save.clicked.connect(self.save_2D_image_names(view))
+# #             self.save_2D_image_names(view)
+#             sys.exit(app.exec_())
+#         return self.open_new(view)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
 #         return (base, base1, base2, base3)
-    def open_new(self, view):
-        self.btn_save.clicked.connect(self.save_2D_image_names)
-        return self.save_2D_image_names(view)
+
+#     def open_new(self, view):
+#         self.btn_save.clicked.connect(self.save_2D_image_names)
+#         return self.save_2D_image_names(view)
 
     def save_2D_image_names(self, view):
 #         view = self.go_to_open_svg(view)
+#         self.btn_save.clicked.connect(view)
+
         if view == "Front":
             png_image_path = self.folder + "/images_html/endFront.png"
             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))

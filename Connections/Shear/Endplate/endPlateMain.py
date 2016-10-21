@@ -36,7 +36,6 @@ from bolt import Bolt
 from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 from colWebBeamWebConnectivity import ColWebBeamWeb
-from drawing_2D import *
 from filletweld import FilletWeld
 from endPlateCalc import endConn
 from model import *
@@ -49,34 +48,35 @@ from utilities import osdagDisplayShape
 from weld import Weld
 from drawing_2D import EndCommonData
 from PyQt4 import QtSvg
+from Svg_Window import Svg_window
 
 
-class Svg_window(QtSvg.QSvgWidget):
-    def __init__(self, fileName, view, parent=None):
-        QtGui.QApplication.__init__(self, parent)
-        self.mainController = parent
-        self.call_svgwindow(fileName, view)
-
-    def call_svgwindow(self, fileName, view):
-        self.svgWidget = QtSvg.QSvgWidget(fileName)
-    #             svgWidget.setGeometry(50, 50, 759, 668)
-        self.svgWidget.setFixedSize(900, 800)
-        self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
-        self.btn_save.setToolTip('Saves 2D Image as PNG')
-        self.btn_save.resize(self.btn_save.sizeHint())
-        self.btn_save.setFixedHeight(40)
-        self.btn_save.setFixedWidth(110)
-        self.btn_save.move(760, 700)
-        myfont = QtGui.QFont()
-        myfont.setBold(True)
-        myfont.setPointSize(9)
-        self.btn_save.setFont(myfont)
-        self.svgWidget.setWindowTitle('2D View')
-        self.svgWidget.show()
-        print "viewfrom call_svgwindow", view
-        self.btn_save.clicked.connect(lambda: self.mainController.save_2D_image_names)
-#         self.open_new(view)
-#         sys.exit(app.exec_())
+# class Svg_window(QtSvg.QSvgWidget):
+#     def __init__(self, fileName, view, parent=None):
+#         QtGui.QApplication.__init__(self, parent)
+#         self.mainController = parent
+#         self.call_svgwindow(fileName, view)
+# 
+#     def call_svgwindow(self, fileName, view):
+#         self.svgWidget = QtSvg.QSvgWidget(fileName)
+#     #             svgWidget.setGeometry(50, 50, 759, 668)
+#         self.svgWidget.setFixedSize(900, 800)
+#         self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
+#         self.btn_save.setToolTip('Saves 2D Image as PNG')
+#         self.btn_save.resize(self.btn_save.sizeHint())
+#         self.btn_save.setFixedHeight(40)
+#         self.btn_save.setFixedWidth(110)
+#         self.btn_save.move(760, 700)
+#         myfont = QtGui.QFont()
+#         myfont.setBold(True)
+#         myfont.setPointSize(9)
+#         self.btn_save.setFont(myfont)
+#         self.svgWidget.setWindowTitle('2D View')
+#         self.svgWidget.show()
+#         print "viewfrom call_svgwindow", view
+#         self.btn_save.clicked.connect(lambda: self.mainController.save_2D_image_names)
+# #         self.open_new(view)
+# #         sys.exit(app.exec_())
 
 
 class MyTutorials(QtGui.QDialog):
@@ -297,8 +297,8 @@ class MainController(QtGui.QMainWindow):
         self.resultObj = None
         self.uiObj = None
 
-        svgWinObj = Svg_window()
-        self.svgWinObj = svgWinObj
+#         svgWinObj = Svg_window(fileName, view)
+#         self.svgWinObj = svgWinObj
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
@@ -1736,9 +1736,6 @@ class MainController(QtGui.QMainWindow):
         else:
 #             self.go_to_open_svg(view)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for opening the window %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#           app2 = QtGui.QApplication(sys.argv)
-
-#     def go_to_open_svg(self, view):
 
             if view == "Front":
                 fileName = self.folder + "/images_html/endFront.svg"
@@ -1749,7 +1746,9 @@ class MainController(QtGui.QMainWindow):
             else:
                 fileName = self.folder + "/images_html/endTop.svg"
 
-            self.svgWinObj.call_svgwindow(fileName, view)
+            svgfile = Svg_window()
+            return svgfile.call_svgwindow(fileName, view)
+#             return self.svgWinObj.call_svgwindow(fileName, view)
 #             self.svgWidget.setWindowTitle('2D View')
 #             self.svgWidget.show()
 # #             self.btn_save.clicked.connect(self.save_2D_image_names(view))

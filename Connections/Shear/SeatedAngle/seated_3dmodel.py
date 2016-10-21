@@ -29,7 +29,7 @@ A = 150
 B = 75
 T = 12
 R1 = 10
-R2 = 0
+R2 = 0.0
 secOrigin = numpy.array([0, 0, 0])
 uDir = numpy.array([1.0, 0, 0])
 wDir = numpy.array([0.0, 0, 1.0])
@@ -52,40 +52,51 @@ a12 = secOrigin + B * uDir
 
 points = [a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12]
 
-if R2 == float(0):
+edges = []
+if R2 == float(0.0):
     a3= a4 =a5
-    
-edge1 = BRepBuilderAPI_MakeEdge(getGpPt(a1),getGpPt(a2))
-edge2 = BRepBuilderAPI_MakeEdge(getGpPt(a2),getGpPt(a3))
-#arc1 = GC_MakeArcOfCircle(getGpPt(a3),getGpPt(a4),getGpPt(a5))
-edge3 = None
-#edge3 = BRepBuilderAPI_MakeEdge(getGpPt(a3),getGpPt(a6)) if R2 == float(0) else BRepBuilderAPI_MakeEdge(GC_MakeArcOfCircle(getGpPt(a3),getGpPt(a4),getGpPt(a5)).Value())
-if R2 == float(0):
+    edge1 = BRepBuilderAPI_MakeEdge(getGpPt(a1),getGpPt(a2))
+    edges.append(edge1)
+    edge2 = BRepBuilderAPI_MakeEdge(getGpPt(a2),getGpPt(a3))
+    edges.append(edge2)
     edge3 = BRepBuilderAPI_MakeEdge(getGpPt(a3),getGpPt(a6))
-else:
+    edges.append(edge3)
+    arc2 = GC_MakeArcOfCircle(getGpPt(a6),getGpPt(a7),getGpPt(a8))
+    edge4 = BRepBuilderAPI_MakeEdge(arc2.Value())
+    edges.append(edge4)
+    edge5 = BRepBuilderAPI_MakeEdge(getGpPt(a8),getGpPt(a9))
+    edges.append(edge5)
+    edge6 = BRepBuilderAPI_MakeEdge(getGpPt(a9),getGpPt(a12))
+    edges.append(edge6)
+    edge7 = BRepBuilderAPI_MakeEdge(getGpPt(a12),getGpPt(a1))
+    edges.append(edge7)
+else:    
+    edge1 = BRepBuilderAPI_MakeEdge(getGpPt(a1),getGpPt(a2))
+    edges.append(edge1)
+    edge2 = BRepBuilderAPI_MakeEdge(getGpPt(a2),getGpPt(a3))
+    edges.append(edge2)
     arc1 = GC_MakeArcOfCircle(getGpPt(a3),getGpPt(a4),getGpPt(a5))
     edge3 = BRepBuilderAPI_MakeEdge(arc1.Value())
-edge4 = BRepBuilderAPI_MakeEdge(getGpPt(a5),getGpPt(a6))
-arc2 = GC_MakeArcOfCircle(getGpPt(a6),getGpPt(a7),getGpPt(a8))
-edge5 = BRepBuilderAPI_MakeEdge(arc2.Value())
-edge6 = BRepBuilderAPI_MakeEdge(getGpPt(a8),getGpPt(a9))
-edge7 = BRepBuilderAPI_MakeEdge(getGpPt(a9),getGpPt(a11)) if R2 == float(0) else BRepBuilderAPI_MakeEdge(GC_MakeArcOfCircle(getGpPt(a9),getGpPt(a10),getGpPt(a11)).Value())
+    edges.append(edge3)
+    edge4 = BRepBuilderAPI_MakeEdge(getGpPt(a5),getGpPt(a6))
+    edges.append(edge4)
+    arc2 = GC_MakeArcOfCircle(getGpPt(a6),getGpPt(a7),getGpPt(a8))
+    edge5 = BRepBuilderAPI_MakeEdge(arc2.Value())
+    edges.append(edge5)
+    edge6 = BRepBuilderAPI_MakeEdge(getGpPt(a8),getGpPt(a9))
+    edges.append(edge6)
+    arc3 = GC_MakeArcOfCircle(getGpPt(a9),getGpPt(a10),getGpPt(a11))
+    edge7 = BRepBuilderAPI_MakeEdge(arc3.Value())
+    edges.append(edge7)
+    edge8 = BRepBuilderAPI_MakeEdge(getGpPt(a11),getGpPt(a12))
+    edges.append(edge8)
+    edge9 = BRepBuilderAPI_MakeEdge(getGpPt(a12),getGpPt(a1))
+    edges.append(edge9)
+print"%%%%%%%%%%%%%%%%",edges
 
-#arc3 = GC_MakeArcOfCircle(getGpPt(a9),getGpPt(a10),getGpPt(a11))
-#edge7 = BRepBuilderAPI_MakeEdge(arc3.Value())
-edge8 = BRepBuilderAPI_MakeEdge(getGpPt(a11),getGpPt(a12))
-edge9 = BRepBuilderAPI_MakeEdge(getGpPt(a12),getGpPt(a1))
-#         wire = makeWireFromEdges(edge1,edge2,edge3,edge4,edge5,edge6,edge7,edge8,edge9)
-wire = BRepBuilderAPI_MakeWire(edge1.Edge(),edge2.Edge(),edge3.Edge(),edge4.Edge())
-wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge5.Edge())
-wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge6.Edge())
-wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge7.Edge())
-wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge8.Edge())
-wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge9.Edge())
-
-aFace = makeFaceFromWire(wire.Wire())
+wire = makeWireFromEdges(edges)
+aFace = makeFaceFromWire(wire)
 extrudeDir = L * wDir # extrudeDir is a numpy array
-
 prism =  makePrismFromFace(aFace, extrudeDir)
 mkFillet = BRepFilletAPI_MakeFillet(prism)
 anEdgeExplorer = TopExp_Explorer(prism, TopAbs_EDGE)
@@ -93,8 +104,28 @@ while anEdgeExplorer.More():
     aEdge = topods.Edge(anEdgeExplorer.Current())
     mkFillet.Add(T / 17. , aEdge)
     anEdgeExplorer.Next()
-        
+         
 prism = mkFillet.Shape()
+
+# wire = BRepBuilderAPI_MakeWire(edge1.Edge(),edge2.Edge(),edge3.Edge(),edge4.Edge())
+# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge5.Edge())
+# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge6.Edge())
+# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge7.Edge())
+# #wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge8.Edge())
+# #wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge9.Edge())
+#  
+# aFace = makeFaceFromWire(wire.Wire())
+# extrudeDir = L * wDir # extrudeDir is a numpy array
+#  
+# prism =  makePrismFromFace(aFace, extrudeDir)
+# mkFillet = BRepFilletAPI_MakeFillet(prism)
+# anEdgeExplorer = TopExp_Explorer(prism, TopAbs_EDGE)
+# while anEdgeExplorer.More():
+#     aEdge = topods.Edge(anEdgeExplorer.Current())
+#     mkFillet.Add(T / 17. , aEdge)
+#     anEdgeExplorer.Next()
+#          
+# prism = mkFillet.Shape()
 
 
 display, start_display, add_menu, add_function_to_menu = init_display()

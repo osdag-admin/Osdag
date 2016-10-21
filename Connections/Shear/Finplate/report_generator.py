@@ -13,21 +13,21 @@ from PyQt4.QtCore import QString
 def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_summary, file_name, folder, base, base_front, base_top, base_side):
     file_name = (file_name)
     myfile = open(file_name, "w")
-    myfile.write(t('! DOCTYPE html'))
-    myfile.write(t('html'))
-    myfile.write(t('head'))
+    myfile.write(t('! DOCTYPE html')+nl())
+    myfile.write(t('html')+nl())
+    myfile.write(t('head')+nl())
     myfile.write(t('link type="text/css" rel="stylesheet" ')+nl())
     
-    myfile.write(t('style'))
+    myfile.write(html_space(4)+t('style'))
     myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
-    myfile.write('th,td {padding:3px}')
-    myfile.write('td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-    myfile.write('td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-    myfile.write('td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}')
-    myfile.write('td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-    myfile.write('td.header1{background-color:#E6E6E6; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-    myfile.write('td.header2{font-size:20; width:50%}'+nl())
-    myfile.write(t('/style')+nl())
+    myfile.write('th,td {padding:3px}'+nl())
+    myfile.write(html_space(8)+'td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}'+nl())
+    myfile.write(html_space(8)+'td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}'+nl())
+    myfile.write(html_space(8)+'td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}'+nl())
+    myfile.write(html_space(8)+'td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}'+nl())
+    myfile.write(html_space(8)+'td.header1{background-color:#E6E6E6; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}'+nl())
+    myfile.write(html_space(8)+'td.header2{font-size:20; width:50%}'+nl())
+    myfile.write(html_space(4)+t('/style')+nl())
 
     myfile.write(t('/head')+nl())
     myfile.write(t('body')+nl())
@@ -99,53 +99,53 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')+nl()
     rstr += t('tr')+nl()
     row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>','<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60 ''&nbsp></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')+nl()
-    rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')+nl()
+    rstr += html_space(1)+ t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td colspan="2" align= "right"') + row[2] + t('/td')+nl()
     rstr += t('/tr')+nl()
 
     rstr += t('tr')+nl()
     row = [0,'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     
     row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')
     
     rstr += t('tr')
     row = [0,  'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0,  'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')+nl()
     
     rstr += t('tr')+nl()
     row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')+nl()
 
     rstr += t('tr')+nl()
     row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, 'Method']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     row = [0, method]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')
     rstr += t('/table')+nl()
     
@@ -157,13 +157,13 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
 
     row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
     rstr += t('tr')+nl()
-    rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')+nl()
+    rstr += html_space(1) + t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')+nl()
       
     row = [1, "Finplate", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('tr')
-    rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail1"') + row[2] + t('/td')
+    rstr += html_space(1) + t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail1"') + row[2] + t('/td')+nl()
     #rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
      
@@ -937,3 +937,7 @@ def quote(m):
 
 def nl():
     return '\n'
+
+
+def html_space(n):
+    return " " * n

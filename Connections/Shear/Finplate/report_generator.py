@@ -271,12 +271,13 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
      
-    #row = [1, "Plate Section ", "PLT 300X10X100 "]
-    row = [1, "Plate Section",plateDimension]
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # #row = [1, "Plate Section ", "PLT 300X10X100 "]
+    # row = [1, "Plate Section",plateDimension]
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1,"Plate Section","detail1",text_two=plateDimension,text_two_css="detail2")
      
     #row = [2, "Thickness (mm)", "10"]
     row = [2, "Thickness (mm)", plateThick]
@@ -941,3 +942,29 @@ def nl():
 
 def html_space(n):
     return " " * n
+
+
+def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
+    """Create formatted html row entry.
+
+    Args:
+        tab_spaces (int): number of (tab) spaces
+        text_one (str): Text entry
+        text_one_css (str): Key pointing to table-data css format
+        text_two (str): Text entry
+        text_two_css (str): Key pointing to table-data css format
+
+    Returns (str):
+        Formatted line of html-code.
+
+    """
+    text_two = kwargs.get('text_two', None)
+    text_two_css = kwargs.get('text_two_css', text_one_css)
+
+    # row = [1, "Plate Section ", "PLT 300X10X100 "]
+    # row = [1, "Plate Section",plateDimension]
+    row_string = t('tr') + nl()
+    row_string = row_string + html_space(4) + t('td class=' + text_one_css) + space(tab_spaces) + text_one + t('/td') + nl()
+    row_string = row_string + html_space(4) + t('td class=' + text_two_css) + text_two + t('/td') + nl()
+    row_string = row_string + t('/tr') + nl()
+    return row_string

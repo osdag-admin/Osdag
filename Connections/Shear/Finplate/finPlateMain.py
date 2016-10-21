@@ -1358,9 +1358,9 @@ class MainController(QtGui.QMainWindow):
     def save_2D_images(self,view):
 
         fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                     "Save SVG", str(self.folder) + '/untitled.svg',
+                                                     "Save as PNG", str(self.folder) + '/untitled.png',
                                                      "PNG files (*.png)")
-        f = save(self.callFin2D_Drawing(view), 'w')
+        f = open(self.callFin2D_Drawing(view), 'w')
         f.close()
         QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 

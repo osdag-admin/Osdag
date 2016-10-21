@@ -147,18 +147,19 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     row = [0, method]
     rstr += html_space(1)+ t('td class="detail" ') + space(row[0]) + row[1] + t('/td')+nl()
     rstr += t('/tr')
-    rstr += t('/table')+nl()
+    rstr += t('/table')+nl()+" "+nl()
     
     rstr += t('hr')
-    rstr += t('/hr')+nl()
+    rstr += t('/hr')+nl()+" "+nl()
 
     # Design conclusion
     rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ')+nl()
 
-    row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
-    rstr += t('tr')+nl()
-    rstr += html_space(1) + t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')+nl()
-    rstr += t('/tr')+nl()
+    # row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
+    # rstr += t('tr')
+    # rstr += html_space(1) + t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')+nl()
+    rstr += design_summary_row(0,"Design Conclusion","header0",col_span="2")
       
     row = [1, "Finplate", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('tr')
@@ -167,27 +168,32 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     #rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
      
-    row = [0, "Finplate", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Finplate", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Finplate","header0",col_span="2")
      
-    row = [0, "Connection Properties", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Connection Properties", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Connection Properties","detail",col_span="2")
      
-    row = [0, "Connection ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-     
-    row = [1, "Connection Title", " Single Finplate"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-     
+    # row = [0, "Connection ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Connection ", "detail1", col_span="2")
+
+    # row = [1, "Connection Title", " Single Finplate"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Connection Title", "detail2", text_two=" Single Finplate")
+
+    # TODO : current bookmark
     row = [1, "Connection Type", "Shear Connection"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
@@ -958,13 +964,20 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
         Formatted line of html-code.
 
     """
-    text_two = kwargs.get('text_two', None)
+    text_two = kwargs.get('text_two'," ")
     text_two_css = kwargs.get('text_two_css', text_one_css)
+    col_span = kwargs.get('col_span', "1")
 
     # row = [1, "Plate Section ", "PLT 300X10X100 "]
     # row = [1, "Plate Section",plateDimension]
     row_string = t('tr') + nl()
-    row_string = row_string + html_space(4) + t('td class=' + text_one_css) + space(tab_spaces) + text_one + t('/td') + nl()
-    row_string = row_string + html_space(4) + t('td class=' + text_two_css) + text_two + t('/td') + nl()
+
+    if col_span == "2":
+        row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css+'"') + space(
+            tab_spaces) + text_one + t('/td') + nl()
+    else:
+        row_string = row_string + html_space(4) + t('td class="' + text_one_css+'"') + space(tab_spaces) + text_one \
+                     + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + text_two_css+'"') + text_two + t('/td') + nl()
     row_string = row_string + t('/tr') + nl()
     return row_string

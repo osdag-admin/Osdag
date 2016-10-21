@@ -44,7 +44,7 @@ from drawing_2D import FinCommonData
 from PyQt4.QtWebKit import *
 from PyQt4.Qt import QPrinter
 # Developed by deepa
-from reportGenerator import *
+from report_generator import * # TODO experimental = report_generator; originial = reportGenerator
 from ModelUtils import getGpPt
 ##### Testing imports
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere

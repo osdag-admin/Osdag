@@ -13,8 +13,8 @@ from PyQt4.QtCore import QString
 def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_summary, file_name, folder, base, base_front, base_top, base_side):
     file_name = (file_name)
     myfile = open(file_name, "w")
-    myfile.write(t('! DOCTYPE html')+nl())
-    myfile.write(t('html')+nl())
+    myfile.write(t('! DOCTYPE html'))
+    myfile.write(t('html'))
     myfile.write(t('head'))
     myfile.write(t('link type="text/css" rel="stylesheet" ')+nl())
     
@@ -924,7 +924,7 @@ def space(n):
 
 
 def t(n):
-    return '<' + n + '/>'
+    return '<' + n + '>'
 
 
 def w(n):
@@ -936,4 +936,4 @@ def quote(m):
 
 
 def nl():
-    return '<br> \n'
+    return '\n'

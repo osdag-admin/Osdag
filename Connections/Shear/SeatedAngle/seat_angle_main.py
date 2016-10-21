@@ -83,8 +83,8 @@ class DesignReportDialog(QtGui.QDialog):
 
     # noinspection PyPep8Naming
     def save_inputSummary(self):
-        input_summary = self.getPopUpInputs()
-        self.mainController.save_design(input_summary)
+        report_summary = self.get_report_summary()
+        self.mainController.save_design(report_summary)
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear
@@ -100,28 +100,28 @@ class DesignReportDialog(QtGui.QDialog):
         shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoFin.png")
 
     def saveUserProfile(self):
-        inputData = self.getPopUpInputs()
+        inputData = self.get_report_summary()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
                                                      '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
 
-    def getPopUpInputs(self):
-        input_summary = {}
-        input_summary["ProfileSummary"] = {}
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-        input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+    def get_report_summary(self):
+        report_summary = {}
+        report_summary["ProfileSummary"] = {}
+        report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+        report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+        report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+        report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
 
-        input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-        input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-        input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-        input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+        report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+        report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+        report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+        report_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
-        return input_summary
+        return report_summary
 
     def useUserProfile(self):
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
@@ -497,18 +497,18 @@ class MainController(QtGui.QMainWindow):
         self.show_design_report_dialog()
         # function name changed from createDesignReport
 
-    def save_design(self):
+    def save_design(self, report_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
+        file_name, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
                                                                    "Html Files (*.html)")
-        fileName = str(fileName)
+        file_name = str(file_name)
         base, base_front, base_top, base_side = self.call2D_Drawing("All")
         inputdict = self.uiObj
         outdict = self.resultObj
 
-        dictBeamData = self.fetchBeamPara()
-        dictColData = self.fetchColumnPara()
-        save_html(outdict, inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base,
+        dict_beam_data = self.fetchBeamPara()
+        dict_col_data = self.fetchColumnPara()
+        save_html(outdict, inputdict, dict_beam_data, dict_col_data, report_summary, file_name, self.folder, base,
                   base_front, base_top, base_side)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
@@ -1210,7 +1210,7 @@ class MainController(QtGui.QMainWindow):
     #
     #         # start_display()
 
-    def call2D_Drawing(view):
+    def call2D_Drawing(self, view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
             '''

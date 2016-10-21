@@ -163,7 +163,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
         self.top_angle = "ISA 100X65X8"
-        TODO specify non-arbitrary top angle section
+        # TODO specify non-arbitrary top angle section
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']

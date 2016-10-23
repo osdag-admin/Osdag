@@ -60,11 +60,15 @@ def points_to_bspline(pnts):
 
 def makeWireFromEdges(edges):
     wire = None
+    
     for edge in edges:
+        print 'start'
         if wire :
             wire = make_wire(wire, edge)
         else:
             wire = make_wire(edge)
+        print 'hello'
+    print 'out'    
     return wire
 
 def makeFaceFromWire(wire):

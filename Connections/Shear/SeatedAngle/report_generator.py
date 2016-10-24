@@ -115,8 +115,8 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data, report
     web_plate_fy = str(output_object['Plate']['web_plate_fy'])
     weld_fu = str(output_object['Weld']['weld_fu'])
     weld_l = str(output_object['Weld']['effectiveWeldlength'])
-    shear_capacity = str(round(output_object['Bolt']['shearCapacity'], 3))
-    bearing_capacity = str(round(output_object['Bolt']['bearingCapacity'], 4))
+    shear_capacity = str(round(output_object['Bolt']['shearcapacity'], 3))
+    bearing_capacity = str(round(output_object['Bolt']['bearingcapacity'], 4))
     moment_demand = str(output_object['Plate']['externalmoment'])
 
     # Header of the pdf fetched from dialog box

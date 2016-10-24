@@ -706,6 +706,30 @@ class MainController(QtGui.QMainWindow):
         vscrollBar = self.ui.textEdit.verticalScrollBar();
         vscrollBar.setValue(vscrollBar.maximum());
         afile.close()
+    def get_backend(self):
+        """
+        loads a backend
+        backends are loaded in order of preference
+        since python comes with Tk included, but that PySide or PyQt4
+        is much preferred
+        """
+#         try:
+#             from PySide import QtCore, QtGui
+#             return 'pyside'
+#         except:
+#             pass
+        try:
+            from PyQt4 import QtCore, QtGui
+            return 'pyqt4'
+        except:
+            pass
+        # Check wxPython
+        try:
+            import wx
+            return 'wx'
+        except:
+            raise ImportError("No compliant GUI library found. You must have either PySide, PyQt4 or wxPython installed.")
+            sys.exit(1)
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
@@ -719,13 +743,13 @@ class MainController(QtGui.QMainWindow):
             from osdagMainSettings import backend_name
             if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
+        #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         else:
-            global display, start_display, app, USED_BACKEND
-            from OCC.Display.SimpleGui import get_backend
+            global display, start_display, app, _, USED_BACKEND
 
             if not backend_str:
-                USED_BACKEND = get_backend
-            elif backend_str in ['pyside', 'pyqt4']:
+                USED_BACKEND = self.get_backend()
+            elif backend_str in [ 'pyside', 'pyqt4']:
                 USED_BACKEND = backend_str
             else:
                 raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
@@ -735,12 +759,33 @@ class MainController(QtGui.QMainWindow):
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
                     import OCC.Display.qtDisplay
-                    from OCC.Display.qtDisplay import qtViewer3d
                     from PyQt4 import QtCore, QtGui, QtOpenGL
 
         from OCC.Display.qtDisplay import qtViewer3d
-
         self.ui.modelTab = qtViewer3d(self)
+        #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+#         else:
+#             global display, start_display, app, USED_BACKEND
+#             from OCC.Display.SimpleGui import get_backend
+# 
+#             if not backend_str:
+#                 USED_BACKEND = get_backend
+#             elif backend_str in ['pyside', 'pyqt4']:
+#                 USED_BACKEND = backend_str
+#             else:
+#                 raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
+#                 sys.exit(1)
+# 
+#             # Qt based simple GUI
+#             if USED_BACKEND in ['pyqt4', 'pyside']:
+#                 if USED_BACKEND == 'pyqt4':
+#                     import OCC.Display.qtDisplay
+#                     from OCC.Display.qtDisplay import qtViewer3d
+#                     from PyQt4 import QtCore, QtGui, QtOpenGL
+# 
+#         from OCC.Display.qtDisplay import qtViewer3d
+# 
+#         self.ui.modelTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Seated Angle Connection")
         self.ui.mytabWidget.resize(size[0], size[1])
@@ -774,8 +819,6 @@ class MainController(QtGui.QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def display3Dmodel(self, component):
-        # TODO check display initialisation in other modules
-        self.display, _ = self.init_display()
 
         self.display.EraseAll()
         self.display.SetModeShaded()
@@ -796,6 +839,7 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
         elif component == "SeatAngle":
+            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
@@ -956,7 +1000,6 @@ class MainController(QtGui.QMainWindow):
         angle_r1 = float(dictangledata[QString("R1")])
         
         angle_r2 = (dictangledata[QString("R2")]).toFloat()
-        print "angle_r2=", angle_r2[0]
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
@@ -1024,7 +1067,7 @@ class MainController(QtGui.QMainWindow):
                 self.connectivity = self.create3DBeamWebBeamWeb()
                 self.fuse_model = None
 
-            self.display3Dmodel("Column")
+            self.display3Dmodel("SeatAngle")
 
         else:
             self.display.EraseAll()

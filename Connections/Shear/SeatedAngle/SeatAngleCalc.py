@@ -529,18 +529,18 @@ class SeatAngleCalculation(object):
         # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
         # Rearranged equation from Cl 8.7.4
         bearing_length = round((self.shear_force * 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
-        print "Length of bearing required at the root line of beam = " + str(bearing_length)
+        #print "Length of bearing required at the root line of beam = " + str(bearing_length)
 
         # Required length of outstanding leg = bearing length + clear_gap,
         outstanding_leg_length_required = bearing_length + self.clear_gap
-        print "Outstanding leg length = " + str(outstanding_leg_length_required)
+        #print "Outstanding leg length = " + str(outstanding_leg_length_required)
 
         if outstanding_leg_length_required > self.angle_B:
             self.safe = False
             logger.error(": Connection is not safe")
             logger.warning(
                 ": Outstanding leg length of seated angle should be more than " + str(outstanding_leg_length_required))
-            print "Error: Seated angle's outstanding leg length needs to be increased"
+            #print "Error: Seated angle's outstanding leg length needs to be increased"
 
         """ comparing 0.6*shear strength (0.6*V_d) vs shear force V for calling moment capacity routine
         Shear capacity check Cl 8.4.1
@@ -550,22 +550,22 @@ class SeatAngleCalculation(object):
         root_3 = math.sqrt(3)
         self.outstanding_leg_shear_capacity = round(
             self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 3)  # kN
-        print "Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_capacity)
+        #print "Shear strength of outstanding leg of Seated Angle = " + str(self.outstanding_leg_shear_capacity)
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
             logger.error(": Shear capacity is insufficient")
             logger.warning(": Shear capacity should be at least " + str(self.shear_force))
-            print "Error: Shear capacity is insufficient"
+            #print "Error: Shear capacity is insufficient"
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
         b1 = bearing_length - self.beam_f_t - self.beam_R1
-        print "Length of bearing on cleat" + str(b1)
+        #print "Length of bearing on cleat" + str(b1)
 
         # Distance from the end of bearing on cleat to root angle OR A TO B = b2
         b2 = b1 + self.clear_gap - self.angle_t - self.angle_R1
-        print "Distance A to B = " + str(b2)
+        #print "Distance A to B = " + str(b2)
 
         """Check moment capacity of outstanding leg
 
@@ -615,17 +615,17 @@ class SeatAngleCalculation(object):
             angle_outst_leg_mcapacity = min((1 - beta_moment) * leg_moment_d, leg_moment_d_limiting)
 
         self.moment_capacity_angle = round(angle_outst_leg_mcapacity, 3)
-        print "Moment capacity = " + str(self.moment_capacity_angle)
+        #print "Moment capacity = " + str(self.moment_capacity_angle)
 
         if self.moment_capacity_angle < self.moment_at_root_angle:
             self.safe = False
             logger.error(": Connection is not safe")
             logger.warning(": Moment capacity should be at least " + str(self.moment_at_root_angle))
-            print "Error: Connection not safe"
+            #print "Error: Connection not safe"
 
         # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0
         self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 3)
-        print "Beam shear capacity = " + str(self.beam_shear_strength)
+        #print "Beam shear capacity = " + str(self.beam_shear_strength)
 
         if self.beam_shear_strength < self.shear_force:
             self.safe = False

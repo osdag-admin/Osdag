@@ -152,6 +152,7 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     rstr += t('hr')
     rstr += t('/hr')+nl()+" "+nl()
 
+    # TODO delete html-code-generating lines that have been commented out
     # Design conclusion
     rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ')+nl()
 
@@ -194,88 +195,101 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     rstr += design_summary_row(1, "Connection Title", "detail2", text_two=" Single Finplate")
 
     # TODO : current bookmark
-    row = [1, "Connection Type", "Shear Connection"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Connection Type", "Shear Connection"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Connection Type", "detail2", text_two=" Shear Connection")
+
      
-    row = [0, "Connection Category ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Connection Category ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Connection Category","detail1")
      
-    #row = [1, "Connectivity", "Column Web Beam Web"]
-    row = [1, "Connectivity", connectivity]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Connectivity", "Column Web Beam Web"]
+    # row = [1, "Connectivity", connectivity]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Connectivity", "detail2", text_two=str(connectivity))
      
    
-    row = [1, "Beam Connection", "Bolted"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Beam Connection", "Bolted"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Beam Connection", "detail2", text_two="Bolted")
      
-# 
-    row = [1, "Column Connection", "Welded"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Column Connection", "Welded"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Column Connection", "detail2", text_two="Welded")
      
-    row = [0, "Loading (Factored Load) ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Loading (Factored Load) ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Loading (Factored Load)", "detail1")
      
-    #row = [1, "Shear Force (kN)", "140"]
-    row = [1,"Shear Force (kN)", shear_load]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # #row = [1, "Shear Force (kN)", "140"]
+    # row = [1,"Shear Force (kN)", shear_load]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Shear Force (kN)", "detail2", text_two=str(shear_load))
      
      
-    row = [0, "Components ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Components ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Components ", "detail1", col_span="2")
      
-    #row = [1, "Column Section", "ISSC 200"]
-    row = [1,"Column Section", column_sec]
+    # # row = [1, "Column Section", "ISSC 200"]
+    # row = [1,"Column Section", column_sec]
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Column Section", "detail1", text_two=str(column_sec), text_two_css="detail2")
      
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Material", "Fe "+beam_fu]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(beam_fu))
      
-    row = [2, "Material", "Fe "+beam_fu]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # #row = [1, "Beam Section", "ISMB 400"]
+    # row = [1,"Beam Section",beam_sec]
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Beam Section", "detail1", text_two=str(beam_sec), text_two_css="detail2")
      
-    #row = [1, "Beam Section", "ISMB 400"]
-    row = [1,"Beam Section",beam_sec]
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Material", "Fe "+beam_fu]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(beam_fu))
      
-    row = [2, "Material", "Fe "+beam_fu]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-     
-    row = [2, "Hole", "STD"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Hole", "STD"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    # TODO take hole type from design preferences
+    rstr += design_summary_row(2, "Hole", "detail2", text_two="STD")
      
     # #row = [1, "Plate Section ", "PLT 300X10X100 "]
     # row = [1, "Plate Section",plateDimension]
@@ -285,145 +299,165 @@ def save_html(output_object, input_object, dict_beam_data, dict_col_data,report_
     # rstr += t('/tr')
     rstr += design_summary_row(1,"Plate Section","detail1",text_two=plateDimension,text_two_css="detail2")
      
-    #row = [2, "Thickness (mm)", "10"]
-    row = [2, "Thickness (mm)", plateThick]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Thickness (mm)", "10"]
+    # row = [2, "Thickness (mm)", plateThick]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Thickness (mm)", "detail2", text_two=plateThick)
+
      
-    #row = [2, "Width (mm)", "10"]
-    row = [2, "Width (mm)", plateWidth]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Width (mm)", "10"]
+    # row = [2, "Width (mm)", plateWidth]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Width (mm)", "detail2", text_two=plateWidth)
+
+    # # row = [2, "Depth (mm)", "300"]
+    # row = [2, "Depth (mm)", plateLength]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Depth (mm)", "detail2", text_two=plateLength)
      
-    #row = [2, "Depth (mm)", "300"]
-    row = [2, "Depth (mm)", plateLength]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Hole", "STD"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    # TODO Hole type - parameterise
+    rstr += design_summary_row(2, "Hole", "detail2", text_two="STD")
      
-    row = [2, "Hole", "STD"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Weld ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Weld", "detail1", col_span="2")
      
-    row = [1, "Weld ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Type", "Double Fillet"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Type", "detail2", text_two="Double Fillet")
      
-    row = [2, "Type", "Double Fillet"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Size (mm)", "6"]
+    # row = [2, "Size (mm)", weldSize]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Size (mm)", "detail2", text_two=weldSize)
      
-    #row = [2, "Size (mm)", "6"]
-    row = [2, "Size (mm)", weldSize]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Bolts ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Bolts", "detail1", col_span="2")
      
-    row = [1, "Bolts ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Type", "HSFG"]
+    # row = [2, "Type", boltType]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Type", "detail2", text_two=boltType)
      
-    #row = [2, "Type", "HSFG"]
-    row = [2, "Type", boltType]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Grade", "8.8"]
+    # row = [2, "Grade", boltGrade]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Grade", "detail2", text_two=boltGrade)
      
-    #row = [2, "Grade", "8.8"]
-    row = [2, "Grade", boltGrade]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Diameter (mm)", "20"]
+    # row = [2, "Diameter (mm)", boltDia]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Diameter (mm)", "detail2", text_two=boltDia)
      
-    #row = [2, "Diameter (mm)", "20"]
-    row = [2, "Diameter (mm)", boltDia]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Bolt Numbers", "3"]
+    # row = [2, "Bolt Numbers", noOfBolts]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Bolt Numbers", "detail2", text_two=noOfBolts)
      
-    #row = [2, "Bolt Numbers", "3"]
-    row = [2, "Bolt Numbers", noOfBolts]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Columns (Vertical Lines)", "1 "]
+    # row = [2, "Columns (Vertical Lines)", noOfCol]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Columns (Vertical Lines)", "detail2", text_two=noOfCol)
      
-    #row = [2, "Columns (Vertical Lines)", "1 "]
-    row = [2, "Columns (Vertical Lines)", noOfCol]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Bolts Per Column", "3"]
+    # row = [2, "Bolts Per Column", noOfRows]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Bolts Per Columne", "detail2", text_two=noOfRows)
      
-    #row = [2, "Bolts Per Column", "3"]
-    row = [2, "Bolts Per Column", noOfRows]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Gauge (mm)", "0"]
+    # row = [2, "Gauge (mm)", gauge]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Gauge (mm)", "detail2", text_two=gauge)
      
-    #row = [2, "Gauge (mm)", "0"]
-    row = [2, "Gauge (mm)", gauge]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Pitch (mm)", "100"]
+    # row = [2, "Pitch (mm)", pitch]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Pitch (mm)", "detail2", text_two=pitch)
      
-    #row = [2, "Pitch (mm)", "100"]
-    row = [2, "Pitch (mm)", pitch]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "End Distance (mm)", "50"]
+    # row = [2, "End Distance (mm)", end]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "End Distance (mm)", "detail2", text_two=end)
      
-    #row = [2, "End Distance (mm)", "50"]
-    row = [2, "End Distance (mm)", end]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # # row = [2, "Edge Distance (mm)", "50"]
+    # row = [2, "Edge Distance (mm)", edge]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(2, "Edge Distance (mm)", "detail2", text_two=edge)
      
-    #row = [2, "Edge Distance (mm)", "50"]
-    row = [2, "Edge Distance (mm)", edge]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-     
-    row = [0, "Assembly ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-     
-    #row = [1, "Column-Beam Clearance (mm)", "20"]
-    row = [1, "Column-Beam Clearance (mm)", gap]
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Assembly ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(0, "Assembly", "detail1", col_span="2")
+
+    # # row = [1, "Column-Beam Clearance (mm)", "20"]
+    # row = [1, "Column-Beam Clearance (mm)", gap]
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    rstr += design_summary_row(1, "Column-Beam Clearance (mm)", "detail1", text_two=gap, text_two_css="detail2")
     
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"') # page break
     rstr += t('/h1')
 
-#*************************************************************************************************************************
-#&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+    # --------------------------------------------------------------------------------------------------------
     rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
     rstr += t('tr')
     row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>','<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp' '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']

@@ -8,6 +8,7 @@ from ModelUtils import *
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 from notch import Notch
 
+
 class ISection(object):
     '''
                               ^ v
@@ -82,9 +83,7 @@ class ISection(object):
                        self.a3, self.b3, self.c3,
                        self.c4, self.b4, self.a4]
         # self.points = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]
-          
-   
-    
+
     def createModel(self):
         
         edges = makeEdgesFromPoints(self.points)
@@ -105,6 +104,5 @@ class ISection(object):
             prism = BRepAlgoAPI_Cut(prism, notchModel).Shape() 
         
         return prism
-    
         
         + self.notchObj.height / 2.0 * self.uDir

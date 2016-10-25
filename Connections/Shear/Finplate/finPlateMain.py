@@ -44,7 +44,7 @@ from drawing_2D import FinCommonData
 from PyQt4.QtWebKit import *
 from PyQt4.Qt import QPrinter
 # Developed by deepa
-from report_generator import * # TODO experimental = report_generator; originial = reportGenerator
+from report_generator import * # TODO refactored code in report_generator; old = reportGenerator
 from ModelUtils import getGpPt
 ##### Testing imports
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
@@ -748,6 +748,7 @@ class MainController(QtGui.QMainWindow):
         
         dictBeamData  = self.fetchBeamPara()
         dictColData  = self.fetchColumnPara()
+
         save_html(self.outdict, self.inputdict, dictBeamData, dictColData,popup_summary,fileName, self.folder, base, base_front, base_top, base_side)
         
     # Creates PDF:

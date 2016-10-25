@@ -508,7 +508,8 @@ class MainController(QtGui.QMainWindow):
 
         dict_beam_data = self.fetchBeamPara()
         dict_col_data = self.fetchColumnPara()
-        save_html(outdict, inputdict, dict_beam_data, dict_col_data, report_summary, file_name, self.folder, base,
+        report_generator_instance = ReportGenerator(self.saObj)
+        report_generator_instance.save_html(outdict, inputdict, dict_beam_data, dict_col_data, report_summary, file_name, self.folder, base,
                   base_front, base_top, base_side)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")

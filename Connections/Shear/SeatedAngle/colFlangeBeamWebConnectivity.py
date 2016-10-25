@@ -45,8 +45,6 @@ class ColFlangeBeamWeb(object):
         self.creatColumGeometry()
         self.createBeamGeometry()
         self.createAngleGeometry()
-#         self.createPlateGeometry()
-#         self.createFilletWeldGeometry()
         self.createNutBoltArray()
         
         # Call for createModel

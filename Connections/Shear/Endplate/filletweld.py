@@ -7,6 +7,7 @@ import numpy
 from ModelUtils import *
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
+
 class FilletWeld(object):
     
     def __init__(self, b, h, L):        
@@ -30,8 +31,7 @@ class FilletWeld(object):
         self.a2 = self.secOrigin + self.b * self.uDir
         self.a3 = self.secOrigin + self.h * self.vDir
         self.points = [self.a1, self.a2, self.a3, ]
-       
-        
+
     def createModel(self):
         Pnt = getGpPt(self.secOrigin)
         edges = makeEdgesFromPoints(self.points)

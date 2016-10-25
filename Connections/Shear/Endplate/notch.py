@@ -9,8 +9,9 @@ Created on 29-Nov-2014
 
 @author: deepa
 '''
-import numpy
 from ModelUtils import *
+import numpy
+
 
 class Notch(object):
     '''
@@ -18,7 +19,6 @@ class Notch(object):
     ''' 
     
     def __init__(self, R1, height, width, length):  
-      
 
         self.R1 = R1
         self.height = height
@@ -54,8 +54,7 @@ class Notch(object):
         self.points = [self.a, self.b1, self.o1, self.b, self.b2, self.d, self.c1, self.o2, self.c, self.c2]
         
         # self.points = [self.a, self.b, self.c, self.d]
-          
-    
+
     def createEdges(self):
         
         edges = []
@@ -80,7 +79,6 @@ class Notch(object):
         edge = make_edge(getGpPt(self.d), getGpPt(self.a))
         edges.append(edge)
 
-          
         return edges
     
     def createModel(self):
@@ -89,7 +87,5 @@ class Notch(object):
         aFace = makeFaceFromWire(wire)
         extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
+
         return prism
-    
-        
-        

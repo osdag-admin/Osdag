@@ -25,6 +25,7 @@ import OCC.BRepLib as BRepLib
 from OCC.BRepOffsetAPI import *
 import OCC.BRep as BRep
 
+
 class Nut(object):
     
     def __init__(self, R, T, H, innerR1):        
@@ -143,9 +144,7 @@ class Nut(object):
 #         aBuilder.MakeCompound(aRes)
 #         aBuilder.Add(aRes, result_shape)
 #         aBuilder.Add(aRes, myThreading)
-#         final_shape = BRepAlgoAPI_Cut(result_shape, myThreading).Shape() 
-
+#         final_shape = BRepAlgoAPI_Cut(result_shape, myThreading).Shape()
         
         return result_shape
-    
-            
+

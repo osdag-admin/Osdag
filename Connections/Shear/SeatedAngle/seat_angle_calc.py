@@ -66,7 +66,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
         bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
         custom_hole_clearance (float): user defined hole clearance, if any
-        clear_gap (int): clearance + tolerance
+        beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multipler for min edge distance check - based on edge type
         root_clearance (int): clearance of bolt row from the root of seated angle
 
@@ -76,6 +76,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         column_section (string)
         beam_fu (float)
         beam_fy (float)
+        column_fu (float)
+        column_fy (float)
         angle_fy (float)
         angle_fu (float)
         shear_force (float)
@@ -140,7 +142,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_m1 = 0.0
         self.bolt_hole_type = 1
         self.custom_hole_clearance = None
-        self.clear_gap = 0
+        self.beam_col_clear_gap = 0
         self.min_edge_multiplier = 1
         self.root_clearance = 0
         self.top_angle = ""
@@ -149,6 +151,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.column_section = ""
         self.beam_fu = 0
         self.beam_fy = 0
+        self.column_fu = 0
+        self.column_fy = 0
         self.angle_fy = 0
         self.angle_fu = 0
         self.shear_force = 0.0
@@ -225,7 +229,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_hole_type = 1  # standard bolt hole
         # self.bolt_hole_type = 0  # oversize bolt hole
         self.custom_hole_clearance = None  # user defined hole clearance, if any
-        self.clear_gap = 5 + 5  # clearance + tolerance
+        self.beam_col_clear_gap = 5 + 5  # clearance + tolerance
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
         self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
@@ -237,6 +241,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.column_section = input_dict['Member']['ColumnSection']
         self.beam_fu = input_dict['Member']['fu (MPa)']
         self.beam_fy = input_dict['Member']['fy (MPa)']
+        self.column_fy = self.beam_fy
+        self.column_fu = self.beam_fu
         self.angle_fy = self.beam_fy
         self.angle_fu = self.beam_fu
         self.shear_force = input_dict['Load']['ShearForce (kN)']
@@ -429,7 +435,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.bolts_provided = self.num_cols*self.num_rows
         self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)
-        self.pitch = int(math.ceil((self.num_rows-1)*(self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
+        self.pitch = int(math.ceil((self.num_rows-1) * (self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
         if self.pitch < self.min_pitch and self.num_rows == 2:
             self.safe = False
             logger.error(": Bolt pitch provided is less than minimum pitch [Cl 10.2.2]")
@@ -442,8 +448,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         bearing_length = round((self.shear_force * 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
         # logger.info(": Length of bearing required at the root line of beam = " + str(bearing_length))
 
-        # Required length of outstanding leg = bearing length + clear_gap,
-        outstanding_leg_length_required = bearing_length + self.clear_gap
+        # Required length of outstanding leg = bearing length + beam_col_clear_gap,
+        outstanding_leg_length_required = bearing_length + self.beam_col_clear_gap
         # logger.info(": Outstanding leg length = " + str(outstanding_leg_length_required))
 
         if outstanding_leg_length_required > self.angle_B:
@@ -475,7 +481,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # logger.info(": Length of bearing on cleat" + str(b1))
 
         # Distance from the end of bearing on cleat to root angle OR A TO B = b2
-        b2 = b1 + self.clear_gap - self.angle_t - self.angle_R1
+        b2 = b1 + self.beam_col_clear_gap - self.angle_t - self.angle_R1
         # logger.info(": Distance A to B = " + str(b2))
 
         """Check moment capacity of outstanding leg

@@ -58,23 +58,28 @@ def points_to_bspline(pnts):
     crv = GeomAPI_PointsToBSpline(pts)
     return crv.Curve()
 
+
 def makeWireFromEdges(edges):
     wire = None
     for edge in edges:
-        if wire :
+        if wire:
             wire = make_wire(wire, edge)
         else:
             wire = make_wire(edge)
     return wire
 
+
 def makeFaceFromWire(wire):
     return BRepBuilderAPI_MakeFace(wire).Face()
+
 
 def getGpPt(point):
     return gp_Pnt(point[0], point[1], point[2])
 
+
 def getGpDir(direction):
     return gp_Dir(direction[0], direction[1], direction[2])
+
 
 def makeEdgesFromPoints(points):
     edges = []
@@ -88,7 +93,7 @@ def makeEdgesFromPoints(points):
     
     return edges
 
+
 def makePrismFromFace(aFace, eDir):
     return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.), gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
     # return BRepPrimAPI_MakePrism(aFace, gpDir, False).Shape()
-

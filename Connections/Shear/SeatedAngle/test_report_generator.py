@@ -55,8 +55,8 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
            Returns:
                None
            """
-        print create_sample_ui_input()
-        print create_sample_ui_output()
+        # print create_sample_ui_input()
+        # print create_sample_ui_output()
 
     def test_save_html_report(self):
         """Save html report with dummy images in the views section.
@@ -68,7 +68,6 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
             None
         """
         self.save_design_hardcoded(self.report_summary)
-        print "test_save_html_report was executed"
 
     def save_design_hardcoded(self, report_summary):
         """Save html design report at hardcoded location.
@@ -86,17 +85,16 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         output_dict = create_sample_ui_output()
         input_dict = create_sample_ui_input()
         file_name = "design_report.html"
-        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one"
+        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
         base = "3D_ModelFinFB.png"
         base_front = "finFrontFB.svg"
         base_top = "finSideFB.svg"
         base_side = "finTopFB.svg"
 
         report_generator_instance = ReportGenerator(self.sa_calc_obj)
-        report_generator_instance.save_html(output_dict, input_dict, report_summary, file_name,
+        report_generator_instance.save_html(output_dict, input_dict, report_summary, folder_location+file_name,
                                             folder_location, base,
                                             base_front, base_top, base_side)
-        print "save_design_hardcoded was executed."
 
 
 def create_sample_report_summary():

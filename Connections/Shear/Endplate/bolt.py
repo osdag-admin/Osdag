@@ -15,6 +15,7 @@ from OCC.TopAbs import TopAbs_EDGE
 from OCC.TopoDS import topods
 from OCC.TopExp import TopExp_Explorer
 
+
 class Bolt(object):
     #
     def __init__(self, R, T, H, r):        
@@ -55,9 +56,7 @@ class Bolt(object):
         self.a5 = self.getPoint(240)
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
-       
-    
-        
+
     def createModel(self):
         
         edges = makeEdgesFromPoints(self.points)
@@ -69,7 +68,7 @@ class Bolt(object):
         anEdgeExplorer = TopExp_Explorer(boltHead, TopAbs_EDGE)
         while anEdgeExplorer.More():
             aEdge = topods.Edge(anEdgeExplorer.Current())
-            mkFillet.Add(self.T / 17. , aEdge)
+            mkFillet.Add(self.T / 17., aEdge)
             anEdgeExplorer.Next()
                 
         boltHead = mkFillet.Shape()
@@ -80,7 +79,3 @@ class Bolt(object):
         mkFillet = BRepFilletAPI_MakeFillet(whole_Bolt)
         
         return whole_Bolt
-
-        
-    
-            

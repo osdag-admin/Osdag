@@ -660,7 +660,8 @@ class MainController(QtGui.QMainWindow):
 
             if PBeamWebDepth <= SBeam_D:
                 self.ui.btn_Design.setDisabled(True)
-                QtGui.QMessageBox.about(self, 'Information', "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                QtGui.QMessageBox.about(self, 'Information',
+                                        "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
 
@@ -765,7 +766,7 @@ class MainController(QtGui.QMainWindow):
         inputFile = QtCore.QFile('saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
-                    "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
+                                      "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         # yaml.dump(uiObj, inputFile,allow_unicode=True, default_flow_style = False)
         pickle.dump(uiObj, inputFile)
 
@@ -854,7 +855,7 @@ class MainController(QtGui.QMainWindow):
 
         if not fname.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
-                    "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
+                                      "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
         outf = QtCore.QTextStream(fname)
@@ -1169,8 +1170,8 @@ class MainController(QtGui.QMainWindow):
                     resolution = QtGui.QDesktopWidget().screenGeometry()
                     self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                               (resolution.height() / 2) - (self.frameSize().height() / 2))
-        def start_display():
 
+        def start_display():
             self.ui.modelTab.raise_()
             # self.ui.model2dTab.raise_()   # make the application float to the top
 

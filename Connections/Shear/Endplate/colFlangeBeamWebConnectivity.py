@@ -32,8 +32,7 @@ class ColFlangeBeamWeb(object):
         self.plateModel = None
         self.sphereModel = None
         self.clearDist = 20.0  # This distance between edge of the column web/flange and beam cross section
-        
-    
+
     def create_3dmodel(self):
         self.creatColumGeometry()
         self.createBeamGeometry()
@@ -103,7 +102,6 @@ class ColFlangeBeamWeb(object):
         
         nutboltArrayOrigin1 = nutboltArrayOrigin + (self.plate.W) * self.plate.wDir
 
-        
         gaugeDir = self.plate.wDir
         pitchDir = -self.plate.vDir
         boltDir = self.plate.uDir
@@ -129,11 +127,3 @@ class ColFlangeBeamWeb(object):
         for bolt in nutBoltlist[:]:
             finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
         return finalBeam
-        
-    
-    
-    
-    
-    
-    
-    

@@ -34,8 +34,8 @@ class EndCommonData(object):
         '''
         self.beam_T = float(dictBeamdata[QString("T")])
         self.col_T = float(dictColumndata[QString("T")])
-        self.D_beam = int (dictBeamdata[QString("D")])
-        self.D_col = int (dictColumndata[QString("D")])
+        self.D_beam = int(dictBeamdata[QString("D")])
+        self.D_col = int(dictColumndata[QString("D")])
         self.col_B = int(dictColumndata[QString("B")])
         self.beam_B = int(dictBeamdata[QString("B")])
         self.col_tw = float(dictColumndata[QString("tw")])
@@ -388,7 +388,7 @@ class EndCommonData(object):
             else:
                 fileName = str(self.folder) + '/images_html/endFront.svg'
                 end2DFront.callCFBWfront(fileName)
-                cairosvg.svg2png(file_obj = fileName, write_to = str(self.folder) + '/images_html/endFront.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/endFront.png')
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
@@ -694,7 +694,7 @@ class End2DCreatorFront(object):
         ptFB4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB4 = ptFB4x, ptFB4y
 
-        ######################################### POINTS FOR BEAM BEAM CONNECTION ####################################################
+# ######################################## POINTS FOR BEAM BEAM CONNECTION ####################################################
 
         # for primary beam
         self.BA = (0, 0)
@@ -829,7 +829,7 @@ class End2DCreatorFront(object):
         params = {"offset": self.dataObj.col_B / 2 - self.dataObj.col_tw / 2 + 50, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outerArrow(dwg, np.array(ptList[-1]), edgPt1, str(int(self.dataObj.end_dist)), params)
         self.dataObj.drawFaintLine(edgPt1, edgPt1 - (self.dataObj.col_B + self.dataObj.col_tw + 100) / 2 * np.array([1, 0]), dwg)
-        ###### Draws faint line to show dimensions #########
+        # ##### Draws faint line to show dimensions #########
         # Faint lines for gauge and edge distances
 
         ptTwo = np.array(ptList[0]) - (self.dataObj.col_B - self.dataObj.col_tw + 100) / 2 * np.array([1, 0])
@@ -1006,7 +1006,7 @@ class End2DCreatorFront(object):
         ptD2 = ptD1 + 240 * np.array([0, 1])
 #         self.dataObj.drawFaintLine(ptD1,ptD2,dwg)
 
-        ###### Draws faint line to show dimensions #########
+        # ##### Draws faint line to show dimensions #########
         # Faint lines for gauge and edge distances
         ptOne = self.FP - (60 + self.dataObj.D_col) * np.array([1, 0])
         self.dataObj.drawFaintLine(self.FP, ptOne, dwg)
@@ -1910,7 +1910,7 @@ class End2DCreatorSide(object):
         self.Q1 = self.P + self.dataObj.plate_width / 2 * np.array([1, 0])
         self.X1 = self.P + (self.dataObj.beam_tw / 2 + 2.5) * np.array([1, 0])
 
-        #### CFBW connectivity
+        # ### CFBW connectivity
         self.FA = np.array([0, 0])
         self.FB = self.FA + self.dataObj.col_B * np.array([1, 0])
         self.ptMid = self.FA + ((self.dataObj.col_B / 2) + (self.dataObj.col_tw / 2)) * np.array([1, 0])

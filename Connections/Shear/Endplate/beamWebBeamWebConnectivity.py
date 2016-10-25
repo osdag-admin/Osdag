@@ -124,15 +124,13 @@ class BeamWebBeamWeb(object):
         boltDir = self.plate.uDir
         self.nutBoltArray.place(nutboltArrayOrigin, nutboltArrayOrigin1, gaugeDir, pitchDir, -boltDir)
         
-        
     def get_models(self):
         '''Returning 3D models
         '''
         # + self.nutBoltArray.getnutboltModels()
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nutBoltArray.getModels()
-        
-                
+
     def get_nutboltmodels(self):
         return self.nutBoltArray.getModels()
         # return self.nutBoltArray.getboltModels()      
@@ -143,5 +141,3 @@ class BeamWebBeamWeb(object):
         for bolt in nutBoltlist[:]:
             finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
         return finalBeam
-                
-                

@@ -53,8 +53,6 @@ class ColWebBeamWeb(object):
         wDir1 = numpy.array([0.0, 0, 1.0])
         self.column.place(columnOrigin, column_uDir, wDir1)
         
-        
-        
     def createBeamGeometry(self):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
@@ -102,12 +100,10 @@ class ColWebBeamWeb(object):
         
         nutboltArrayOrigin1 = nutboltArrayOrigin + (self.plate.W) * self.plate.wDir
 
-        
         gaugeDir = self.plate.wDir
         pitchDir = -self.plate.vDir
         boltDir = self.plate.uDir
         self.nutBoltArray.place(nutboltArrayOrigin, nutboltArrayOrigin1, gaugeDir, pitchDir, -boltDir)
-        
         
     def get_models(self):
         '''Returning 3D models
@@ -115,8 +111,7 @@ class ColWebBeamWeb(object):
         # + self.nutBoltArray.getnutboltModels()
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nutBoltArray.getModels()
-        
-                
+
     def get_nutboltmodels(self):
         return self.nutBoltArray.getModels()
         # return self.nutBoltArray.getboltModels()      
@@ -127,5 +122,4 @@ class ColWebBeamWeb(object):
         for bolt in nutBoltlist[:]:
             finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
         return finalBeam
-                
-                
+

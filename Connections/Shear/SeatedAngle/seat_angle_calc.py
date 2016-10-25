@@ -133,7 +133,75 @@ class SeatAngleCalculation(ConnectionCalculations):
     """
 
     def __init__(self):
-        pass
+        """Initialize all attributes."""
+        self.max_spacing = 0.0
+        self.gamma_mb = 0.0
+        self.gamma_m0 = 0.0
+        self.gamma_m1 = 0.0
+        self.bolt_hole_type = 1
+        self.custom_hole_clearance = None
+        self.clear_gap = 0
+        self.min_edge_multiplier = 1
+        self.root_clearance = 0
+        self.top_angle = ""
+        self.connectivity = ""
+        self.beam_section = ""
+        self.column_section = ""
+        self.beam_fu = 0
+        self.beam_fy = 0
+        self.angle_fy = 0
+        self.angle_fu = 0
+        self.shear_force = 0.0
+        self.bolt_diameter = 1
+        self.bolt_type = 1
+        self.bolt_grade = ""
+        self.bolt_fu = 0
+        self.bolt_diameter = 1
+        self.bolt_hole_diameter = 1
+        self.angle_sec = ""
+        self.dict_angle_data = {}
+        self.beam_w_t = 1
+        self.beam_f_t = 1
+        self.beam_d = 1
+        self.beam_w_f = 1
+        self.beam_R1 = 1
+        self.column_f_t = 1
+        self.column_d = 1
+        self.column_w_f = 1
+        self.column_R1 = 1
+        self.angle_t = 1
+        self.angle_A = 1
+        self.angle_B = 1
+        self.angle_R1 = 1
+        self.angle_l = 1
+
+        self.safe = True
+        self.output_dict = {}
+
+        self.moment_at_root_angle =  0.0
+        self.moment_capacity_angle =  0.0
+        self.outstanding_leg_shear_capacity =  0.0
+        self.beam_shear_strength = 0.0
+        self.bolt_shear_capacity =  0.0
+        self.k_b =  0.0
+        self.bolt_bearing_capacity =  0.0
+        self.bolt_value =  0.0
+        self.bolt_group_capacity =  0.0
+        self.bolts_required = 1
+        self.num_rows = 1
+        self.num_cols = 1
+        self.pitch = 1
+        self.gauge = 1
+        self.min_end_dist = 1
+        self.min_edge_dist = 1
+        self.min_pitch = 1
+        self.min_gauge = 1
+        self.end_dist = 1
+        self.edge_dist = 1
+        self.pitch = 1
+        self.gauge = 1
+        self.max_spacing = 1
+        self.max_edge_dist = 1
 
     def sa_params(self, input_dict):
         """Intialise variables to use in calculations from input dictionary.

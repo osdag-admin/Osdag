@@ -84,93 +84,91 @@ class ReportGenerator(SeatAngleCalculation):
 
     """
 
-    def __init__(self, saObj):
+    def __init__(self, sa_calc_object):
         """
         Args:
-            saObj (SeatAngleCalculation): SeatAngleCalculation class instance
+            sa_calc_object (SeatAngleCalculation): SeatAngleCalculation class instance
 
         Returns:
             None
         """
-        self.max_spacing = saObj.max_spacing
-        self.gamma_mb = saObj.gamma_mb
-        self.gamma_m0 = saObj.gamma_m0
-        self.gamma_m1 = saObj.gamma_m1
-        self.bolt_hole_type = saObj.bolt_hole_type
-        self.custom_hole_clearance = self.custom_hole_clearance
-        self.clear_gap = saObj.clear_gap
-        self.min_edge_multiplier = saObj.min_edge_multiplier
-        self.root_clearance = saObj.root_clearance
-        self.top_angle = saObj.top_angle
-        self.connectivity = saObj.connectivity
-        self.beam_section = saObj.beam_section
-        self.column_section = saObj.column_section
-        self.beam_fu = saObj.beam_fu
-        self.beam_fy = saObj.beam_fy
-        self.angle_fy = saObj.angle_fy
-        self.angle_fu = saObj.angle_fu
-        self.shear_force = saObj.shear_force
-        self.bolt_diameter = saObj.bolt_diameter
-        self.bolt_type = saObj.bolt_type
-        self.bolt_grade = saObj.bolt_grade
-        self.bolt_fu = saObj.bolt_fu
-        self.bolt_diameter = saObj.bolt_diameter
-        self.bolt_hole_diameter = saObj.bolt_hole_diameter
-        self.angle_sec = saObj.angle_sec
-        self.dict_angle_data = saObj.dict_angle_data
-        self.beam_w_t = saObj.beam_w_t
-        self.beam_f_t = saObj.beam_f_t
-        self.beam_d = saObj.beam_d
-        self.beam_w_f = saObj.beam_w_f
-        self.beam_R1 = saObj.beam_R1
-        self.column_f_t = saObj.column_f_t
-        self.column_d = saObj.column_d
-        self.column_w_f = saObj.column_w_f
-        self.column_R1 = saObj.column_R1
-        self.angle_t = saObj.angle_t
-        self.angle_A = saObj.angle_A
-        self.angle_B = saObj.angle_B
-        self.angle_R1 = saObj.angle_R1
-        self.angle_l = saObj.angle_l
+        self.max_spacing = sa_calc_object.max_spacing
+        self.gamma_mb = sa_calc_object.gamma_mb
+        self.gamma_m0 = sa_calc_object.gamma_m0
+        self.gamma_m1 = sa_calc_object.gamma_m1
+        self.bolt_hole_type = sa_calc_object.bolt_hole_type
+        self.custom_hole_clearance = sa_calc_object.custom_hole_clearance
+        self.clear_gap = sa_calc_object.clear_gap
+        self.min_edge_multiplier = sa_calc_object.min_edge_multiplier
+        self.root_clearance = sa_calc_object.root_clearance
+        self.top_angle = sa_calc_object.top_angle
+        self.connectivity = sa_calc_object.connectivity
+        self.beam_section = sa_calc_object.beam_section
+        self.column_section = sa_calc_object.column_section
+        self.beam_fu = sa_calc_object.beam_fu
+        self.beam_fy = sa_calc_object.beam_fy
+        self.angle_fy = sa_calc_object.angle_fy
+        self.angle_fu = sa_calc_object.angle_fu
+        self.shear_force = sa_calc_object.shear_force
+        self.bolt_diameter = sa_calc_object.bolt_diameter
+        self.bolt_type = sa_calc_object.bolt_type
+        self.bolt_grade = sa_calc_object.bolt_grade
+        self.bolt_fu = sa_calc_object.bolt_fu
+        self.bolt_diameter = sa_calc_object.bolt_diameter
+        self.bolt_hole_diameter = sa_calc_object.bolt_hole_diameter
+        self.angle_sec = sa_calc_object.angle_sec
+        self.dict_angle_data = sa_calc_object.dict_angle_data
+        self.beam_w_t = sa_calc_object.beam_w_t
+        self.beam_f_t = sa_calc_object.beam_f_t
+        self.beam_d = sa_calc_object.beam_d
+        self.beam_w_f = sa_calc_object.beam_w_f
+        self.beam_R1 = sa_calc_object.beam_R1
+        self.column_f_t = sa_calc_object.column_f_t
+        self.column_d = sa_calc_object.column_d
+        self.column_w_f = sa_calc_object.column_w_f
+        self.column_R1 = sa_calc_object.column_R1
+        self.angle_t = sa_calc_object.angle_t
+        self.angle_A = sa_calc_object.angle_A
+        self.angle_B = sa_calc_object.angle_B
+        self.angle_R1 = sa_calc_object.angle_R1
+        self.angle_l = sa_calc_object.angle_l
 
-        self.safe = saObj.safe
-        self.output_dict = saObj.output_dict
+        self.safe = sa_calc_object.safe
+        self.output_dict = sa_calc_object.output_dict
 
-        self.moment_at_root_angle = saObj.moment_at_root_angle
-        self.moment_capacity_angle = saObj.moment_capacity_angle
-        self.outstanding_leg_shear_capacity = saObj.outstanding_leg_shear_capacity
-        self.beam_shear_strength = saObj.beam_shear_strength
-        self.bolt_shear_capacity = saObj.bolt_shear_capacity
-        self.k_b = saObj.k_b
-        self.bolt_bearing_capacity = saObj.bolt_bearing_capacity
-        self.bolt_value = saObj.bolt_value
-        self.bolt_group_capacity = saObj.bolt_group_capacity
-        self.bolts_required = saObj.bolts_required
-        self.num_rows = saObj.num_rows
-        self.num_cols = saObj.num_cols
-        self.pitch = saObj.pitch
-        self.gauge = saObj.gauge
-        self.min_end_dist = saObj.min_end_dist
-        self.min_edge_dist = saObj.min_edge_dist
-        self.min_pitch = saObj.min_pitch
-        self.min_gauge = saObj.min_gauge
-        self.end_dist = saObj.end_dist
-        self.edge_dist = saObj.edge_dist
-        self.pitch = saObj.pitch
-        self.gauge = saObj.gauge
-        self.max_spacing = saObj.max_spacing
-        self.max_edge_dist = saObj.max_edge_dist
+        self.moment_at_root_angle = sa_calc_object.moment_at_root_angle
+        self.moment_capacity_angle = sa_calc_object.moment_capacity_angle
+        self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
+        self.beam_shear_strength = sa_calc_object.beam_shear_strength
+        self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
+        self.k_b = sa_calc_object.k_b
+        self.bolt_bearing_capacity = sa_calc_object.bolt_bearing_capacity
+        self.bolt_value = sa_calc_object.bolt_value
+        self.bolt_group_capacity = sa_calc_object.bolt_group_capacity
+        self.bolts_required = sa_calc_object.bolts_required
+        self.num_rows = sa_calc_object.num_rows
+        self.num_cols = sa_calc_object.num_cols
+        self.pitch = sa_calc_object.pitch
+        self.gauge = sa_calc_object.gauge
+        self.min_end_dist = sa_calc_object.min_end_dist
+        self.min_edge_dist = sa_calc_object.min_edge_dist
+        self.min_pitch = sa_calc_object.min_pitch
+        self.min_gauge = sa_calc_object.min_gauge
+        self.end_dist = sa_calc_object.end_dist
+        self.edge_dist = sa_calc_object.edge_dist
+        self.pitch = sa_calc_object.pitch
+        self.gauge = sa_calc_object.gauge
+        self.max_spacing = sa_calc_object.max_spacing
+        self.max_edge_dist = sa_calc_object.max_edge_dist
 
-    def save_html(self, output_object, input_object, dict_beam_data, dict_col_data, report_summary, file_name, folder, base,
+    def save_html(self, output_object, input_object, report_summary, file_name, folder, base,
                   base_front, base_top, base_side):
         """Create and save html report for Seated angle connection.
 
         Args:
-            output_object (dict): Calculated output parameters
-            input_object (dict): User input parameters
-            dict_beam_data (dict): beam section properties
-            dict_col_data (dict): column section properties
-            report_summary (dict): User input parameters for design report
+            output_object (dict): Calculated output parameters of connection
+            input_object (dict): User input parameters of connection
+            report_summary (dict): Structural Engineer details design report
             file_name (string): Name of design report file
             folder (path): Location of folder to save design report
             base (path): Location of folder to save design report dependencies
@@ -181,7 +179,6 @@ class ReportGenerator(SeatAngleCalculation):
         Returns:
             None
             """
-        file_name = (file_name)
         myfile = open(file_name, "w")
         myfile.write(t('! DOCTYPE html') + nl())
         myfile.write(t('html') + nl())
@@ -222,55 +219,54 @@ class ReportGenerator(SeatAngleCalculation):
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
-        connectivity = str(input_object['Member']['Connectivity'])
-        shear_load = str(input_object['Load']['ShearForce (kN)'])
-        column_sec = str(input_object['Member']['ColumnSection'])
-        beam_sec = str(input_object['Member']['BeamSection'])
-        plate_thk = str(input_object['Plate']['Thickness (mm)'])
+        connectivity = self.connectivity
+        shear_load = str(self.shear_force)
+        column_sec = self.column_section
+        beam_sec = self.beam_section
+        plate_thk = str(12)
         boltType = str(input_object['Bolt']['Type'])
         boltGrade = str(input_object['Bolt']['Grade'])
         bolt_diameter = str(input_object['Bolt']['Diameter (mm)'])
-        weld_thickness= str(input_object['Weld']['Size (mm)'])
+        weld_thickness= str(10)
 
-        beam_depth = str(int(round(output_object['Plate']['beamdepth'], 1)))
-        beam_flange_thickness = str(int(round(output_object['Plate']['beamflangethk'], 1)))
-        beam_root_radius = str(int(round(output_object['Plate']['beamrootradius'], 1)))
-        plate_thickness = str(int(round(output_object['Plate']['platethk'], 1)))
-        block_shear = str(int(round(output_object['Plate']['blockshear'], 1)))
-        col_flange_thickness = str(int(round(output_object['Plate']["colflangethk"], 1)))
-        col_root_radius = str(int(round(output_object['Plate']['colrootradius'])))
+        beam_depth = str(300)
+        beam_flange_thickness = str(13.1)
+        beam_root_radius = str(14)
+        plate_thickness = str(1)
+        block_shear = str(1000)
+        col_flange_thickness = str(15)
+        col_root_radius = str(14)
 
-        plate_width = str(int(round(output_object['Plate']['width'], 1)))
-        plate_length = str(int(round(output_object['Plate']['height'], 1)))
-        weld_size = str(int(round(output_object['Weld']['thickness'], 1)))
+        plate_width = str(100)
+        plate_length = str(240)
+        weld_size = str(10)
 
         plate_dimension = plate_length + 'X' + plate_width + 'X' + plate_thk
-        number_of_bolts = str(output_object['Bolt']['numofbolts'])
-        number_of_rows = str(output_object['Bolt']['numofrow'])
-        number_of_cols = str(output_object['Bolt']['numofcol'])
-        edge = str(int(round(output_object['Bolt']['edge'], 1)))
-        gauge = str(int(round(output_object['Bolt']['gauge'], 1)))
-        pitch = str(int(round(output_object['Bolt']['pitch'], 1)))
-        end = str(int(round(output_object['Bolt']['enddist'], 1)))
-        weld_strength = str(round(float(output_object['Weld']['weldstrength'] / 1000), 3))
-        moment_demand = str(output_object['Plate']['externalmoment'])
+        number_of_bolts = str(output_object['Bolt']['No. of Bolts'])
+        number_of_rows = str(output_object['Bolt']['No. of Row'])
+        number_of_cols = str(output_object['Bolt']['No. of Column'])
+        edge = str(int(round(output_object['Bolt']['Edge Distance (mm)'], 1)))
+        gauge = str(int(round(output_object['Bolt']['Gauge Distance (mm)'], 1)))
+        pitch = str(int(round(output_object['Bolt']['Pitch Distance (mm)'], 1)))
+        end = str(int(round(output_object['Bolt']['End Distance (mm)'], 1)))
+        weld_strength = str(500)
+        moment_demand = str(10)
         gap = '20'
         # TODO replace hardcoded gap value
-        beam_tw = str(float(dict_beam_data[QString("tw")]))
 
         bolt_fu = str(output_object['Bolt']['bolt_fu'])
         bolt_dia = str(output_object['Bolt']['bolt_dia'])
         kb = str(output_object['Bolt']['k_b'])
         beam_w_t = str(output_object['Bolt']['beam_w_t'])
-        web_plate_t = str(output_object['Bolt']['web_plate_t'])
+        web_plate_t = str(12)
         beam_fu = str(output_object['Bolt']['beam_fu'])
-        dia_hole = str(output_object['Bolt']['dia_hole'])
-        web_plate_fy = str(output_object['Plate']['web_plate_fy'])
-        weld_fu = str(output_object['Weld']['weld_fu'])
-        weld_l = str(output_object['Weld']['effectiveWeldlength'])
-        shear_capacity = str(round(output_object['Bolt']['shearcapacity'], 3))
-        bearing_capacity = str(round(output_object['Bolt']['bearingcapacity'], 4))
-        moment_demand = str(output_object['Plate']['externalmoment'])
+        dia_hole = str(output_object['Bolt']['hole_dia'])
+        web_plate_fy = str(330)
+        weld_fu = str(800)
+        weld_l = str(240)
+        shear_capacity = str(round(output_object['Bolt']['Shear Capacity (kN)'], 3))
+        bearing_capacity = str(round(output_object['Bolt']['Bearing Capacity (kN)'], 3))
+        moment_demand = str(10)
 
         # Header of the pdf fetched from dialog box
         rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
@@ -723,7 +719,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
         row = [0, "Bolt bearing capacity (kN)", "",
-               " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu + ")/(1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]",
+               " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" + beam_fu + ")/(1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]",
                ""]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -773,9 +769,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
         minPitch = str(int(2.5 * float(bolt_dia)))
-        maxPitch = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
+        maxPitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
         row = [0, "Bolt pitch (mm)",
-               " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_tw + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
+               " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
                pitch, "  <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -786,9 +782,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
         minGauge = str(int(2.5 * float(bolt_dia)))
-        maxGauge = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
+        maxGauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
         row = [0, "Bolt gauge (mm)",
-               " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
+               " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
                gauge, ""]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -799,9 +795,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
         minEnd = str(1.7 * float(dia_hole))
-        maxEnd = str(12 * float(beam_tw))
+        maxEnd = str(12 * float(beam_w_t))
         row = [0, "End distance (mm)",
-               " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",
+               " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
                end, "  <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -812,9 +808,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
         minEdge = str(1.7 * float(dia_hole))
-        maxEdge = str(12 * float(beam_tw))
+        maxEdge = str(12 * float(beam_w_t))
         row = [0, "Edge distance (mm)",
-               " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + "<br> [cl. 10.2.4]",
+               " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [cl. 10.2.4]",
                edge, " <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1117,57 +1113,109 @@ class ReportGenerator(SeatAngleCalculation):
         myfile.close()
 
 
-    def space(n):
-        rstr = "&nbsp;" * 4 * n
-        return rstr
+def space(n):
+    """Create html code to create tab space in html-output.
+
+    Args:
+        n (int): number of tab spaces to be created in the html-output.
+
+    Returns:
+        rstr (str): html code that creates 'n' number of tab spaces.
+    """
+    rstr = "&nbsp;" * 4 * n
+    return rstr
 
 
-    def t(n):
-        return '<' + n + '>'
+def t(param):
+    """Enclose argument in html tag.
+
+    Args:
+        param (str): parameter to be enclosed in html tag <>.
+
+    Returns:
+        rstr (str): given param enclosed in html tag <>.
+    """
+    return '<' + param + '>'
 
 
-    def w(n):
-        return '{' + n + '}'
+def w(param):
+    """Enclose argument in curly brace parenthesis.
+
+    Args:
+        param (str): parameter to be enclosed in curly brace parenthesis.
+
+    Returns:
+        rstr (str): given param enclosed in curly brace parenthesis.
+    """
+    return '{' + n + '}'
 
 
-    def quote(m):
-        return '"' + m + '"'
+def quote(m):
+    """Enclose argument in double quotes.
+
+    Args:
+        param (str): parameter to be enclosed in double quotes
+
+    Returns:
+        rstr (str): given param enclosed in double quotes
+    """
+    return '"' + m + '"'
 
 
-    def nl():
-        return '\n'
+def nl():
+    """Create new line.
+
+    Args:
+        None
+
+    Returns:
+        new line tag.
+
+    Note:
+        Instead of directly inserting the new line tag '\n' in the code, this function was created,
+        to enable custom formatting in future.
+    """
+    return '\n'
 
 
-    def html_space(n):
-        return " " * n
+def html_space(n):
+    """Create space in html code.
+
+    Args:
+        n (int): number of spaces to be created in the html-code.
+
+    Returns:
+        (str): specified number_of_spaces
+    """
+    return " " * n
 
 
-    def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
-        """Create formatted html row entry.
+def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
+    """Create formatted html row entry.
 
-        Args:
-            tab_spaces (int): number of (tab) spaces
-            text_one (str): Text entry
-            text_one_css (str): Key pointing to table-data css format
-            text_two (str): Text entry
-            text_two_css (str): Key pointing to table-data css format
+    Args:
+        tab_spaces (int): number of (tab) spaces
+        text_one (str): Text entry
+        text_one_css (str): Key pointing to table-data css format
+        text_two (str): Text entry
+        text_two_css (str): Key pointing to table-data css format
 
-        Returns (str):
-            Formatted line of html-code.
+    Returns (str):
+        Formatted line of html-code.
 
-        """
-        text_two = kwargs.get('text_two', " ")
-        text_two_css = kwargs.get('text_two_css', text_one_css)
-        col_span = kwargs.get('col_span', "1")
+    """
+    text_two = kwargs.get('text_two', " ")
+    text_two_css = kwargs.get('text_two_css', text_one_css)
+    col_span = kwargs.get('col_span', "1")
 
-        row_string = t('tr') + nl()
+    row_string = t('tr') + nl()
 
-        if col_span == "2":
-            row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css + '"') + space(
-                tab_spaces) + text_one + t('/td') + nl()
-        else:
-            row_string = row_string + html_space(4) + t('td class="' + text_one_css + '"') + space(tab_spaces) + text_one \
-                         + t('/td') + nl()
-            row_string = row_string + html_space(4) + t('td class="' + text_two_css + '"') + text_two + t('/td') + nl()
-        row_string = row_string + t('/tr') + nl()
-        return row_string
+    if col_span == "2":
+        row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css + '"') + space(
+            tab_spaces) + text_one + t('/td') + nl()
+    else:
+        row_string = row_string + html_space(4) + t('td class="' + text_one_css + '"') + space(tab_spaces) + text_one \
+                     + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + text_two_css + '"') + text_two + t('/td') + nl()
+    row_string = row_string + t('/tr') + nl()
+    return row_string

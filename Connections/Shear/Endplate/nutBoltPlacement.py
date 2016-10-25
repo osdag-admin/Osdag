@@ -9,6 +9,7 @@ from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
 
+
 class NutBoltArray():
     def __init__(self, boltPlaceObj, nut, bolt, gap):
         self.origin = None
@@ -59,7 +60,7 @@ class NutBoltArray():
          
     def calculatePositions(self):
         self.positions = []
-        for rw in  range(self.row):
+        for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin 
                 pos = pos + (self.edge) * self.gaugeDir
@@ -69,7 +70,7 @@ class NutBoltArray():
                 
                 self.positions.append(pos)
         self.positions1 = []        
-        for rw in  range(self.row):
+        for rw in range(self.row):
             for col in range(self.col):
                 pos = self.origin1 
                 pos = pos - (self.edge) * self.gaugeDir
@@ -94,8 +95,7 @@ class NutBoltArray():
         for index, pos in enumerate (self.positions1):
             self.bolts1[index].place(pos, gaugeDir, boltDir)
             self.nuts1[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
-    
-        
+
     def createModel(self):
         for bolt in self.bolts:
             self.models.append(bolt.createModel())        
@@ -120,5 +120,4 @@ class NutBoltArray():
         
     def getModels(self): 
         return self.models   
-        
-        
+

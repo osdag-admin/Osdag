@@ -113,8 +113,8 @@ def create_sample_report_summary():
     report_summary["ProfileSummary"]["Group/TeamName"] = "Osdag"
     report_summary["ProfileSummary"]["Designer"] = "Jayant Patil"
 
-    report_summary["ProjectTitle"] = "Connections Module Development"
-    report_summary["Subtitle"] = "Seated Angle Development"
+    report_summary["ProjectTitle"] = "Connection modules development"
+    report_summary["Subtitle"] = "Seated angle connection"
     report_summary["JobNumber"] = "SA001"
     report_summary["AdditionalComments"] = "Add more comments here."
     report_summary["Method"] = "Limit State Design (No Earthquake Load)"

@@ -18,7 +18,7 @@ class ReportGenerator(SeatAngleCalculation):
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
         bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
         custom_hole_clearance (float): user defined hole clearance, if any
-        clear_gap (int): clearance + tolerance
+        beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multipler for min edge distance check - based on edge type
         root_clearance (int): clearance of bolt row from the root of seated angle
 
@@ -98,7 +98,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.gamma_m1 = sa_calc_object.gamma_m1
         self.bolt_hole_type = sa_calc_object.bolt_hole_type
         self.custom_hole_clearance = sa_calc_object.custom_hole_clearance
-        self.clear_gap = sa_calc_object.clear_gap
+        self.beam_col_clear_gap = sa_calc_object.beam_col_clear_gap
         self.min_edge_multiplier = sa_calc_object.min_edge_multiplier
         self.root_clearance = sa_calc_object.root_clearance
         self.top_angle = sa_calc_object.top_angle
@@ -107,6 +107,8 @@ class ReportGenerator(SeatAngleCalculation):
         self.column_section = sa_calc_object.column_section
         self.beam_fu = sa_calc_object.beam_fu
         self.beam_fy = sa_calc_object.beam_fy
+        self.column_fu = sa_calc_object.column_fu
+        self.column_fy = sa_calc_object.column_fy
         self.angle_fy = sa_calc_object.angle_fy
         self.angle_fu = sa_calc_object.angle_fu
         self.shear_force = sa_calc_object.shear_force
@@ -141,11 +143,16 @@ class ReportGenerator(SeatAngleCalculation):
         self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
         self.beam_shear_strength = sa_calc_object.beam_shear_strength
         self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
+        if sa_calc_object.bolt_hole_type == 1:
+            self.bolt_hole_type = "STD"
+        elif sa_calc_object.bolt_hole_type == 0:
+            self.bolt_hole_type = "OVS"
         self.k_b = sa_calc_object.k_b
         self.bolt_bearing_capacity = sa_calc_object.bolt_bearing_capacity
         self.bolt_value = sa_calc_object.bolt_value
         self.bolt_group_capacity = sa_calc_object.bolt_group_capacity
         self.bolts_required = sa_calc_object.bolts_required
+        self.bolts_provided = sa_calc_object.bolts_provided
         self.num_rows = sa_calc_object.num_rows
         self.num_cols = sa_calc_object.num_cols
         self.pitch = sa_calc_object.pitch
@@ -219,54 +226,65 @@ class ReportGenerator(SeatAngleCalculation):
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
-        connectivity = self.connectivity
+        connectivity = str(self.connectivity)
         shear_load = str(self.shear_force)
-        column_sec = self.column_section
-        beam_sec = self.beam_section
+        column_sec = str(self.column_section)
+        column_fu = str(self.column_fu)
+        beam_sec = str(self.beam_section)
         plate_thk = str(12)
-        boltType = str(input_object['Bolt']['Type'])
-        boltGrade = str(input_object['Bolt']['Grade'])
-        bolt_diameter = str(input_object['Bolt']['Diameter (mm)'])
+        beam_col_clear_gap = str(self.beam_col_clear_gap)
+
+        boltGrade = str(self.bolt_grade)
+        bolt_diameter = str(self.bolt_diameter)
+        bolt_hole_type = str(self.bolt_hole_type)
         weld_thickness= str(10)
 
-        beam_depth = str(300)
-        beam_flange_thickness = str(13.1)
-        beam_root_radius = str(14)
+        beam_depth = str(self.beam_d)
+        beam_flange_thickness = str(self.beam_f_t)
+        beam_root_radius = str(self.beam_R1)
         plate_thickness = str(1)
         block_shear = str(1000)
-        col_flange_thickness = str(15)
-        col_root_radius = str(14)
+        col_flange_thickness = str(self.column_f_t)
+        col_root_radius = str(self.column_R1)
+
+        seated_angle_section = str(self.angle_sec)
+        top_angle_section = str(self.top_angle)
+        angle_fu = str(self.angle_fu)
+        angle_fy = str(self.angle_fy)
 
         plate_width = str(100)
         plate_length = str(240)
         weld_size = str(10)
 
-        plate_dimension = plate_length + 'X' + plate_width + 'X' + plate_thk
-        number_of_bolts = str(output_object['Bolt']['No. of Bolts'])
-        number_of_rows = str(output_object['Bolt']['No. of Row'])
-        number_of_cols = str(output_object['Bolt']['No. of Column'])
-        edge = str(int(round(output_object['Bolt']['Edge Distance (mm)'], 1)))
-        gauge = str(int(round(output_object['Bolt']['Gauge Distance (mm)'], 1)))
-        pitch = str(int(round(output_object['Bolt']['Pitch Distance (mm)'], 1)))
-        end = str(int(round(output_object['Bolt']['End Distance (mm)'], 1)))
+        plate_dimension = "240X100X12"
+        bolts_provided = str(self.bolts_provided)
+        bolts_required = str(self.bolts_required)
+
+        number_of_rows = str(self.num_rows)
+        number_of_cols = str(self.num_cols)
+        edge = str(self.edge_dist)
+        gauge = str(self.gauge)
+        pitch = str(self.pitch)
+        end = str(self.end_dist)
         weld_strength = str(500)
-        moment_demand = str(10)
+        moment_demand = str(self.moment_at_root_angle)
         gap = '20'
         # TODO replace hardcoded gap value
 
-        bolt_fu = str(output_object['Bolt']['bolt_fu'])
-        bolt_dia = str(output_object['Bolt']['bolt_dia'])
-        kb = str(output_object['Bolt']['k_b'])
-        beam_w_t = str(output_object['Bolt']['beam_w_t'])
+        bolt_fu = str(self.bolt_fu)
+        bolt_type = str(self.bolt_type)
+        bolt_dia = str(self.bolt_diameter)
+        kb = str(self.k_b)
+        beam_w_t = str(self.beam_w_t)
         web_plate_t = str(12)
-        beam_fu = str(output_object['Bolt']['beam_fu'])
-        dia_hole = str(output_object['Bolt']['hole_dia'])
+        beam_fu = str(self.beam_fu)
+        dia_hole = str(self.bolt_hole_diameter)
         web_plate_fy = str(330)
         weld_fu = str(800)
         weld_l = str(240)
-        shear_capacity = str(round(output_object['Bolt']['Shear Capacity (kN)'], 3))
-        bearing_capacity = str(round(output_object['Bolt']['Bearing Capacity (kN)'], 3))
-        moment_demand = str(10)
+        shear_capacity = str(self.bolt_shear_capacity)
+        bearing_capacity = str(self.bolt_bearing_capacity)
+        moment_demand = str(0)
 
         # Header of the pdf fetched from dialog box
         rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
@@ -348,7 +366,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('tr')
         # rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(0, "Finplate", "header0", col_span="2")
+        rstr += design_summary_row(0, "Seated Angle", "header0", col_span="2")
 
         # row = [0, "Connection Properties", " "]
         # rstr += t('tr')
@@ -367,7 +385,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(1, "Connection Title", "detail2", text_two=" Single Finplate")
+        rstr += design_summary_row(1, "Connection Title", "detail2", text_two=" Seated Angle")
 
         # row = [1, "Connection Type", "Shear Connection"]
         # rstr += t('tr')
@@ -402,7 +420,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(1, "Column Connection", "detail2", text_two="Welded")
+        rstr += design_summary_row(1, "Column Connection", "detail2", text_two="Bolted")
 
         # row = [0, "Loading (Factored Load) ", " "]
         # rstr += t('tr')
@@ -437,7 +455,14 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(beam_fu))
+        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(column_fu))
+
+        # row = [2, "Hole", "STD"]
+        # rstr += t('tr')
+        # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+        # rstr += t('td class="detail2 "') + row[2] + t('/td')
+        # rstr += t('/tr')
+        rstr += design_summary_row(2, "Hole", "detail2", text_two=str(bolt_hole_type))
 
         # #row = [1, "Beam Section", "ISMB 400"]
         # row = [1,"Beam Section",beam_sec]
@@ -460,7 +485,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
         # TODO Hole type - parameterise
-        rstr += design_summary_row(2, "Hole", "detail2", text_two="STD")
+        rstr += design_summary_row(2, "Hole", "detail2", text_two=str(bolt_hole_type))
 
         # #row = [1, "Plate Section ", "PLT 300X10X100 "]
         # row = [1, "Plate Section",plate_dimension]
@@ -468,7 +493,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(1, "Plate Section", "detail1", text_two=plate_dimension, text_two_css="detail2")
+        rstr += design_summary_row(1, "Seated Angle Section", "detail1", text_two=str(seated_angle_section), text_two_css="detail2")
 
         # # row = [2, "Thickness (mm)", "10"]
         # row = [2, "Thickness (mm)", plate_thk]
@@ -476,7 +501,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Thickness (mm)", "detail2", text_two=plate_thk)
+        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(angle_fu))
 
         # # row = [2, "Width (mm)", "10"]
         # row = [2, "Width (mm)", plate_width]
@@ -484,7 +509,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Width (mm)", "detail2", text_two=plate_width)
+        rstr += design_summary_row(2, "Hole", "detail2", text_two=str(bolt_hole_type))
 
         # # row = [2, "Depth (mm)", "300"]
         # row = [2, "Depth (mm)", plate_length]
@@ -492,28 +517,35 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Depth (mm)", "detail2", text_two=plate_length)
+        rstr += design_summary_row(1, "Top Angle Section", "detail1", text_two=str(top_angle_section),
+                                   text_two_css="detail2")
 
         # row = [2, "Hole", "STD"]
         # rstr += t('tr')
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        # TODO Hole type - parameterise
-        rstr += design_summary_row(2, "Hole", "detail2", text_two="STD")
+        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(angle_fu))
+
+        # row = [2, "Hole", "STD"]
+        # rstr += t('tr')
+        # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+        # rstr += t('td class="detail2 "') + row[2] + t('/td')
+        # rstr += t('/tr')
+        rstr += design_summary_row(2, "Hole", "detail2", text_two=bolt_hole_type)
 
         # row = [1, "Weld ", " "]
         # rstr += t('tr')
         # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(1, "Weld", "detail1", col_span="2")
+        # rstr += design_summary_row(1, "Weld", "detail1", col_span="2")
 
         # row = [2, "Type", "Double Fillet"]
         # rstr += t('tr')
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Type", "detail2", text_two="Double Fillet")
+        # rstr += design_summary_row(2, "Type", "detail2", text_two="Double Fillet")
 
         # # row = [2, "Size (mm)", "6"]
         # row = [2, "Size (mm)", weld_size]
@@ -521,7 +553,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Size (mm)", "detail2", text_two=weld_size)
+        # rstr += design_summary_row(2, "Size (mm)", "detail2", text_two=weld_size)
 
         # row = [1, "Bolts ", " "]
         # rstr += t('tr')
@@ -530,12 +562,12 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(1, "Bolts", "detail1", col_span="2")
 
         # # row = [2, "Type", "HSFG"]
-        # row = [2, "Type", boltType]
+        # row = [2, "Type", bolt_type]
         # rstr += t('tr')
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Type", "detail2", text_two=boltType)
+        rstr += design_summary_row(2, "Type", "detail2", text_two=bolt_type)
 
         # # row = [2, "Grade", "8.8"]
         # row = [2, "Grade", boltGrade]
@@ -554,12 +586,14 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(2, "Diameter (mm)", "detail2", text_two=bolt_diameter)
 
         # # row = [2, "Bolt Numbers", "3"]
-        # row = [2, "Bolt Numbers", number_of_bolts]
+        # row = [2, "Bolt Numbers", bolts_provided]
         # rstr += t('tr')
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Bolt Numbers", "detail2", text_two=number_of_bolts)
+        rstr += design_summary_row(2, "Bolts - Required", "detail2", text_two=bolts_required)
+
+        rstr += design_summary_row(2, "Bolts - Provided", "detail2", text_two=bolts_provided)
 
         # # row = [2, "Columns (Vertical Lines)", "1 "]
         # row = [2, "Columns (Vertical Lines)", number_of_cols]
@@ -567,7 +601,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Columns (Vertical Lines)", "detail2", text_two=number_of_cols)
+        rstr += design_summary_row(2, "Rows", "detail2", text_two=number_of_rows)
 
         # # row = [2, "Bolts Per Column", "3"]
         # row = [2, "Bolts Per Column", number_of_rows]
@@ -575,7 +609,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(2, "Bolts Per Columne", "detail2", text_two=number_of_rows)
+        rstr += design_summary_row(2, "Columns", "detail2", text_two=number_of_cols)
 
         # # row = [2, "Gauge (mm)", "0"]
         # row = [2, "Gauge (mm)", gauge]
@@ -621,7 +655,7 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         # rstr += t('td class="detail2 "') + row[2] + t('/td')
         # rstr += t('/tr')
-        rstr += design_summary_row(1, "Column-Beam Clearance (mm)", "detail1", text_two=gap, text_two_css="detail2")
+        rstr += design_summary_row(1, "Column-Beam Clearance (mm)", "detail1", text_two=beam_col_clear_gap, text_two_css="detail2")
 
         rstr += t('/table')
         rstr += t('h1 style="page-break-before:always"')  # page break
@@ -740,7 +774,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
         bolts = str(round(float(shear_load) / float(boltCapacity), 1))
-        row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, number_of_bolts,
+        row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, bolts_provided,
                " <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

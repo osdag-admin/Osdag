@@ -82,6 +82,16 @@ class ReportGenerator(SeatAngleCalculation):
         max_spacing (int)
         max_edge_dist (int)
 
+        company_name (string)
+        company_logo (string)
+
+        group_team_name (string)
+        designer (string)
+        project_title (string)
+        sub_title (string)
+        job_number (string)
+        method (string)
+
     """
 
     def __init__(self, sa_calc_object):
@@ -168,6 +178,16 @@ class ReportGenerator(SeatAngleCalculation):
         self.max_spacing = sa_calc_object.max_spacing
         self.max_edge_dist = sa_calc_object.max_edge_dist
 
+        self.company_name = ""
+        self.company_logo = ""
+
+        self.group_team_name = ""
+        self.designer = ""
+        self.project_title = ""
+        self.sub_title = ""
+        self.job_number = ""
+        self.method = ""
+
     def save_html(self, output_object, input_object, report_summary, file_name, folder, base,
                   base_front, base_top, base_side):
         """Create and save html report for Seated angle connection.
@@ -195,19 +215,16 @@ class ReportGenerator(SeatAngleCalculation):
         myfile.write(html_space(4) + t('style'))
         myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
         myfile.write('th,td {padding:3px}' + nl())
-        myfile.write(html_space(
-            8) + 'td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial,'
-                 ' Sans Serif; font-weight:bold}' + nl())
-        myfile.write(
-            html_space(
-                8) + 'td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
-        myfile.write(html_space(8) + 'td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}' + nl())
-        myfile.write(html_space(
-            8) + 'td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial,'
-                 ' Sans Serif; font-weight:bold}' + nl())
-        myfile.write(html_space(
-            8) + 'td.header1{background-color:#E6E6E6; font-size:20; font-family:Helvetica, Arial,'
-                 ' Sans Serif; font-weight:bold}' + nl())
+        myfile.write(html_space(8) + 'td.detail{background-color:#D5DF93; font-size:20; '
+                                     'font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
+        myfile.write(html_space(8) + 'td.detail1{font-size:20; '
+                                     'font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
+        myfile.write(html_space(8) + 'td.detail2{font-size:20;'
+                                     ' font-family:Helvetica, Arial, Sans Serif}' + nl())
+        myfile.write(html_space(8) + 'td.header0{background-color:#8fac3a; font-size:20;'
+                                     ' font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
+        myfile.write(html_space(8) + 'td.header1{background-color:#E6E6E6; font-size:20;'
+                                     ' font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
         myfile.write(html_space(8) + 'td.header2{font-size:20; width:50%}' + nl())
         myfile.write(html_space(4) + t('/style') + nl())
 
@@ -216,19 +233,19 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Project summary
         self.company_name = str(report_summary["ProfileSummary"]['CompanyName'])
-        self.companylogo = str(report_summary["ProfileSummary"]['CompanyLogo'])
+        self.company_logo = str(report_summary["ProfileSummary"]['CompanyLogo'])
 
         self.group_team_name = str(report_summary["ProfileSummary"]['Group/TeamName'])
         self.designer = str(report_summary["ProfileSummary"]['Designer'])
         self.project_title = str(report_summary['ProjectTitle'])
-        self.subtitle = str(report_summary['Subtitle'])
-        self.jobnumber = str(report_summary['JobNumber'])
+        self.sub_title = str(report_summary['Subtitle'])
+        self.job_number = str(report_summary['JobNumber'])
         self.method = str(report_summary['Method'])
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
         connectivity = str(self.connectivity)
-        shear_load = str(self.shear_force)
+        shear_force = str(self.shear_force)
         column_sec = str(self.column_section)
         column_fu = str(self.column_fu)
         beam_sec = str(self.beam_section)
@@ -317,7 +334,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(1, "Beam Connection", "detail2", text_two="Bolted")
         rstr += design_summary_row(1, "Column Connection", "detail2", text_two="Bolted")
         rstr += design_summary_row(0, "Loading (Factored Load)", "detail1")
-        rstr += design_summary_row(1, "Shear Force (kN)", "detail2", text_two=str(shear_load))
+        rstr += design_summary_row(1, "Shear Force (kN)", "detail2", text_two=str(shear_force))
         rstr += design_summary_row(0, "Components ", "detail1", col_span="2")
         rstr += design_summary_row(1, "Column Section", "detail1", text_two=str(column_sec), text_two_css="detail2")
         rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(column_fu))
@@ -409,8 +426,8 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += t('tr')
         # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-        bolts = str(round(float(shear_load) / float(boltCapacity), 1))
-        row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, bolts_provided,
+        bolts = str(round(float(shear_force) / float(boltCapacity), 1))
+        row = [0, "No. of bolts", shear_force + "/" + boltCapacity + " = " + bolts, bolts_provided,
                " <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -489,7 +506,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('/tr')
 
         rstr += t('tr')
-        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_force,
                "<i>V</i><sub>db</sub> = " + block_shear + "<br>",
                "  <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -500,9 +517,9 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += t('tr')
         # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-        minplate_thk = str(round(5 * float(shear_load) * 1000 / (float(plate_length) * float(web_plate_fy)), 2))
+        minplate_thk = str(round(5 * float(shear_force) * 1000 / (float(plate_length) * float(web_plate_fy)), 2))
         row = [0, "Plate thickness (mm)",
-               "(5*" + shear_load + "*1000)/(" + plate_length + "*" + web_plate_fy + ") = " + minplate_thk + "<br> [Owens and Cheal, 1989]",
+               "(5*" + shear_force + "*1000)/(" + plate_length + "*" + web_plate_fy + ") = " + minplate_thk + "<br> [Owens and Cheal, 1989]",
                plate_thk, "  <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -570,10 +587,10 @@ class ReportGenerator(SeatAngleCalculation):
         a = float(2 * float(effWeldLen))
         b = 2 * math.pow((float(effWeldLen)), 2)
         x = (float(moment_demand) * 1000 * 6)
-        resultant_shear = str(round(math.sqrt(math.pow((x / b), 2) + math.pow((float(shear_load) / a), 2)), 3))
+        resultant_shear = str(round(math.sqrt(math.pow((x / b), 2) + math.pow((float(shear_force) / a), 2)), 3))
         moment_demand_knmm = str(int(float(moment_demand) * 1000))
         row = [0, "Weld strength (kN/mm)",
-               " &#8730;[(" + moment_demand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_load + "/(2*" + effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear,
+               " &#8730;[(" + moment_demand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_force + "/(2*" + effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear,
                "<i>f</i><sub>v</sub>= (0.7*" + weld_size + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " + weld_strength + "<br>[cl. 10.5.7]",
                " <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -702,12 +719,12 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += t('tr') + nl()
         rstr += design_summary_row(0, "Group/Team Name", "detail", text_two=self.group_team_name, is_row=False)
-        rstr += design_summary_row(0, "Subtitle", "detail", text_two=self.subtitle, is_row=False)
+        rstr += design_summary_row(0, "Subtitle", "detail", text_two=self.sub_title, is_row=False)
         rstr += t('/tr') + nl()
 
         rstr += t('tr') + nl()
         rstr += design_summary_row(0, "Designer", "detail", text_two=self.designer, is_row=False)
-        rstr += design_summary_row(0, "Job Number", "detail", text_two=self.jobnumber, is_row=False)
+        rstr += design_summary_row(0, "Job Number", "detail", text_two=self.job_number, is_row=False)
         rstr += t('/tr') + nl()
 
         rstr += t('tr') + nl()

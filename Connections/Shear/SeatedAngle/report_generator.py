@@ -377,258 +377,70 @@ class ReportGenerator(SeatAngleCalculation):
         # TODO IMPORTANT Remove calculations from below lines of code
 
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-        row = [0, "Design Check", " "]
-        rstr += t('tr')
-        rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('/tr')
+        rstr += design_check_row("Design Check", "","","",col_span="4", text_one_css="detail")
 
-        rstr += t('tr')
-        row = [0, "Check", "Required", "Provided", "Remark"]
-        rstr += t('td class="header1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        rstr += design_check_row("Check", "Required", "Provided", "Remark", text_one_css="header1",
+                                 text_two_css="header1", text_three_css="header1", text_four_css="header1")
 
-        rstr += t('tr')
+        check_pass = "<p align=left style=color:green><b>Pass</b></p>"
+
+        # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
-        # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
-        row = [0, "Bolt shear capacity (kN)", " ",
-               "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia + ")/(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]",
-               ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        req_field = " "
+        prov_field = "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" \
+                               + bolt_dia + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
+        rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
-        rstr += t('tr')
-        # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-        row = [0, "Bolt bearing capacity (kN)", "",
-               " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" + beam_fu + ")/(1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]",
-               ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        # Bolt bearing capacity (kN)
+        prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" \
+                     + beam_fu + ")/(1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]"
+        rstr += design_check_row("Bolt bearing capacity (kN)", " ", prov_field, "")
 
-        rstr += t('tr')
-        # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-        boltCapacity = bearing_capacity if bearing_capacity < shear_capacity else shear_capacity
-        row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearing_capacity + ") = " + boltCapacity,
-               ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        # Bolt capacity (kN)
+        prov_field =  "Min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = "\
+                      + str(self.bolt_value)
+        rstr += design_check_row("Bolt capacity (kN)", " ", prov_field, "")
 
-        rstr += t('tr')
-        # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-        bolts = str(round(float(shear_force) / float(boltCapacity), 1))
-        row = [0, "No. of bolts", shear_force + "/" + boltCapacity + " = " + bolts, bolts_provided,
-               " <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        # No. of bolts
+        bolts = str(round(float(shear_force) / float(str(self.bolt_value)), 1))
+        req_field= shear_force + "/" + str(self.bolt_value) + " = " + bolts
+        rstr += design_check_row("No. of bolts", req_field, bolts_provided, check_pass)
 
-        rstr += t('tr')
-        # row =[0,"No.of column(s)","&#8804;2","1"]
-        row = [0, "No.of column(s)", " &#8804; 2", number_of_cols, ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        rstr += design_check_row("No. of columns", " ", number_of_cols, check_pass)
+        rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, check_pass)
 
-        rstr += t('tr')
-        # row =[0,"No. of bolts per column"," ","3"]
-        row = [0, "No. of bolts per column", " ", number_of_rows, ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
+        # Bolt pitch (mm)
         minPitch = str(int(2.5 * float(bolt_dia)))
         maxPitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        row = [0, "Bolt pitch (mm)",
-               " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
-               pitch, "  <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        req_field = " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + \
+                  ", 300) = " + maxPitch + "<br> [cl. 10.2.2]"
+        rstr += design_check_row("Bolt pitch (mm)",req_field, pitch, check_pass)
 
-        rstr += t('tr')
-        # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
+        # Bolt gauge (mm)
         minGauge = str(int(2.5 * float(bolt_dia)))
         maxGauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        row = [0, "Bolt gauge (mm)",
-               " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
-               gauge, ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        req_field = " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]"
+        rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, check_pass)
 
-        rstr += t('tr')
-        # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
+        # End distance (mm)
         minEnd = str(1.7 * float(dia_hole))
         maxEnd = str(12 * float(beam_w_t))
-        row = [0, "End distance (mm)",
-               " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
-               end, "  <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        req_field=" &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]"
+        rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
 
-        rstr += t('tr')
-        # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
+        # Edge distance (mm)
         minEdge = str(1.7 * float(dia_hole))
         maxEdge = str(12 * float(beam_w_t))
-        row = [0, "Edge distance (mm)",
-               " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [cl. 10.2.4]",
-               edge, " <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
+        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [cl. 10.2.4]"
+        rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
-        rstr += t('tr')
-        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_force,
-               "<i>V</i><sub>db</sub> = " + block_shear + "<br>",
-               "  <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-        minplate_thk = str(round(5 * float(shear_force) * 1000 / (float(plate_length) * float(web_plate_fy)), 2))
-        row = [0, "Plate thickness (mm)",
-               "(5*" + shear_force + "*1000)/(" + plate_length + "*" + web_plate_fy + ") = " + minplate_thk + "<br> [Owens and Cheal, 1989]",
-               plate_thk, "  <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        #     if
-        minEdge = str(0.6 * float(beam_depth))
-        if connectivity == "Beam-Beam":
-            maxEdge = str(float(beam_depth) - float(beam_flange_thickness) - float(beam_root_radius) - float(
-                col_flange_thickness) - float(
-                col_root_radius) - 5)
-            maxedgestring = beam_depth + "-" + beam_flange_thickness + "-" + beam_root_radius + "-" + col_flange_thickness + "-" + col_root_radius + "- 5"
-        else:
-            maxEdge = str(float(beam_depth) - 2 * float(beam_flange_thickness) - 2 * float(beam_root_radius) - 10)
-            maxedgestring = beam_depth + "-" + beam_flange_thickness + "-" + beam_root_radius + "-" + "10"
-
-        row = [0, "Plate height (mm)",
-               "&#8805; 0.6*" + beam_depth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge + "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]",
-               plate_length, " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
-        #        #row =[0,"Plate height (mm)","",plate_length]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        row = [0, "Plate width (mm)", "", "100", ""]
-        # row =[0,"Plate width (mm)","",plate_width]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0,"Plate moment capacity (kNm)","(2*90.5*100<sup>2</sup>)/100 = 18.1","<i>M</i><sub>d</sub> =1.2*250*<i>Z</i> = 40.9 <br>[cl. 8.2.1.2]","<p align=right style=color:green><b>Pass</b></p>"]
-        z = math.pow(float(plate_length), 2) * (float(plate_thk) / (6 * 1.1 * 1000000))
-        momentCapacity = str(round(1.2 * float(web_plate_fy) * z, 2))
-        row = [0, "Plate moment capacity (kNm)",
-               "(2*" + shear_capacity + "*" + pitch + "<sup>2</sup>)/(" + pitch + "*1000) = " + moment_demand,
-               "<i>M</i><sub>d</sub> = (1.2*" + web_plate_fy + "*<i>Z</i>)/(1000*1.1) = " + momentCapacity + "<br>[cl. 8.2.1.2]",
-               "<p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0,"Effective weld length (mm)","","300 - 2*6 = 288"]
-        effWeldLen = str(int(float(plate_length) - (2 * float(weld_thickness))))
-        row = [0, "Effective weld length (mm)", "", plate_length + "-2*" + weld_thickness + " = " + effWeldLen, ""]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0,"Weld strength (kN/mm)","&#8730;[(18100*6)/(2*288)<sup>2</sup>]<sup>2</sup> + [140/(2*288)]<sup>2</sup> <br>=0.699","<i>f</i><sub>v</sub>=(0.7*6*410)/(&#8730;3*1.25)<br>= 0.795<br>[cl. 10.5.7]"," <p align=right style=color:green><b>Pass</b></p>"]
-        a = float(2 * float(effWeldLen))
-        b = 2 * math.pow((float(effWeldLen)), 2)
-        x = (float(moment_demand) * 1000 * 6)
-        resultant_shear = str(round(math.sqrt(math.pow((x / b), 2) + math.pow((float(shear_force) / a), 2)), 3))
-        moment_demand_knmm = str(int(float(moment_demand) * 1000))
-        row = [0, "Weld strength (kN/mm)",
-               " &#8730;[(" + moment_demand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_force + "/(2*" + effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear,
-               "<i>f</i><sub>v</sub>= (0.7*" + weld_size + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " + weld_strength + "<br>[cl. 10.5.7]",
-               " <p align=left style=color:green><b>Pass</b></p>"]
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        # row =[0, "Weld thickness (mm)", "(0.699*&#8730;3*1.25)/(0.7*410)=5.27"+
-        # "<br>[cl. 10.5.7]","6", "<p align=right style=color:green><b>Pass</b></p>"]
-
-        weld_thickness = str(round((float(resultant_shear) * 1000 * (math.sqrt(3) * 1.25)) / (0.7 * float(weld_fu)), 2))
-        x = str((float(plate_thickness) * 0.8))
-        maxweld = str(max(float(weld_thickness), float(x)))
-        # maxweld = str(9) if str((float( plate_thickness)*0.8)) > str(9) else str(round((float(resultant_shear)
-        #       * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2))
-        # maxWeld = str(9) if str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7
-        #       * float(weld_fu)),2)) == 9 else str((float( plate_thickness)*0.8))
-        # row =[0,"Weld thickness (mm)","Max(("+resultant_shear+"*&#8730;3*1.25)/(0.7*"+weld_fu+")"+",
-        #       0.8*"+plate_thickness+") = "+ maxWeld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",
-        #       weld_size,"<p align=right style=color:green><b>Pass</b></p>"]
-        row = [0, "Weld thickness (mm)",
-               "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + plate_thickness +
-               "* 0.8" + ") = " + maxweld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",
-               weld_size, "<p align=left style=color:green><b>Pass</b></p>"]
-
-        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        # TODO Add other checks to the list
 
         rstr += t('/table')
         rstr += t('h1 style="page-break-before:always"')
         rstr += t('/h1')
 
         # TODO IMPORTANT Remove calculations from above lines of code
-
         # -----------------------------------------------------------------------------------
         rstr += self.design_report_header()
         # -----------------------------------------------------------------------------------
@@ -816,7 +628,7 @@ def html_space(n):
 
 
 def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
-    """Create formatted html row entry.
+    """Create formatted html row entry for design summary table.
 
     Args:
         tab_spaces (int): number of (tab) spaces
@@ -825,8 +637,8 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
 
     kwargs:
         text_two (str): Text entry
-        text_two_css (str): Key pointing to table-data css format
-        col_span (string): number of columns in table that the table data spans
+        text_two_css (str): Key pointing to table-data css class
+        col_span (str): number of columns in table that the table data spans
         is_row (boolean): key to create separate table row entry
 
     Returns (str):
@@ -843,7 +655,7 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
     elif is_row == False:
         row_string = ""
 
-    if col_span == "2":
+    if col_span != "1":
         row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css + '"') + space(
             tab_spaces) + text_one + t('/td') + nl()
     else:
@@ -855,5 +667,48 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
         row_string = row_string + t('/tr') + nl()
     elif is_row is False:
         pass
+
+    return row_string
+
+
+def design_check_row(text_one, text_two, text_three, text_four, **kwargs):
+    """Create formatted html row entry for design check table.
+
+    Args:
+        text_one (str): Detail check name
+        text_two (str): Required field
+        text_three (str): Provided field
+        text_four (str): Remark field
+
+    kwargs:
+        col_span (str): number of columns in table that the table data spans
+        text_one_css (str): Key pointing to table-data css class
+        text_two_css (str): Key pointing to table-data css class
+        text_three_css (str): Key pointing to table-data css class
+        text_four_css (str): Key pointing to table-data css class
+
+    Returns (str):
+        Formatted line of html-code.
+
+    """
+    col_span = kwargs.get('col_span', "1")
+    t1_css = kwargs.get('text_one_css', "detail1")
+    t2_css = kwargs.get('text_two_css', "detail2")
+    t3_css = kwargs.get('text_three_css', "detail2")
+    t4_css = kwargs.get('text_four_css', "detail1")
+
+    row_string = nl() + t('tr') + nl()
+
+    if col_span == "4":
+        row_string = row_string + html_space(4) + t(
+            'td colspan=' + col_span + ' class="' + t1_css + '"') + text_one + t('/td') + nl()
+    else:
+        row_string = row_string + html_space(4) + t('td class="' + t1_css + '"') + text_one + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + t2_css + '"') + text_two + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + t3_css + '"') + text_three + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + t4_css + '"') + text_four + t('/td') + nl()
+
+
+    row_string = row_string + t('/tr') + nl()
 
     return row_string

@@ -201,10 +201,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_top.clicked.connect(lambda: self.call_2d_drawing("Top"))
         self.ui.btn_side.clicked.connect(lambda: self.call_2d_drawing("Side"))
 
-        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel(True))
-        self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
-        self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
-        self.ui.chkBxEndplate.clicked.connect(self.call_3DEndplate)
+        self.ui.btn3D.clicked.connect(lambda: self.call_3d_model(True))
+        self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
+        self.ui.chkBxCol.clicked.connect(self.call_3d_column)
+        self.ui.chkBxEndplate.clicked.connect(self.call_3d_endplate)
 
         validator = QtGui.QIntValidator()
         self.ui.txtFu.setValidator(validator)
@@ -243,10 +243,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call_2d_drawing("Top"))
         self.ui.actionPan.triggered.connect(self.call_panning)
 
-        self.ui.actionShow_beam.triggered.connect(self.call_3DBeam)
-        self.ui.actionShow_column.triggered.connect(self.call_3DColumn)
-        self.ui.actionShoe_end_plate.triggered.connect(self.call_3DEndplate)
-        self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
+        self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
+        self.ui.actionShow_column.triggered.connect(self.call_3d_column)
+        self.ui.actionShoe_end_plate.triggered.connect(self.call_3d_endplate)
+        self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model(True))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # self.ui.combo_Beam.addItems(get_beamcombolist())
@@ -1060,7 +1060,7 @@ class MainController(QtGui.QMainWindow):
         vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
 
-    def validateInputsOnDesignBtn(self):
+    def validate_inputs_on_design_button(self):
 
         if self.ui.comboConnLoc.currentIndex() == 0:
             QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
@@ -1199,6 +1199,7 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
+            
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
             # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
@@ -1348,9 +1349,9 @@ class MainController(QtGui.QMainWindow):
 
         gap = sBeam_tw + plate_thick + nut_T
 
-        nutBoltArray = NutBoltArray(result_obj, nut, bolt, gap)
+        nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap)
 
-        beamwebconn = BeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nutBoltArray)
+        beamwebconn = BeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nut_bolt_array)
         beamwebconn.create_3dmodel()
 
         return beamwebconn
@@ -1421,9 +1422,9 @@ class MainController(QtGui.QMainWindow):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         gap = column_tw + plate_thick + nut_T
 
-        nutBoltArray = NutBoltArray(result_obj, nut, bolt, gap)
+        nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap)
 
-        colwebconn = ColWebBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+        colwebconn = ColWebBeamWeb(column, beam, Fweld1, plate, nut_bolt_array)
         colwebconn.create_3dmodel()
 
         return colwebconn
@@ -1498,13 +1499,13 @@ class MainController(QtGui.QMainWindow):
 
         gap = column_tw + plate_thick + nut_T
 
-        nutBoltArray = NutBoltArray(result_obj, nut, bolt, gap)
+        nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap)
 
-        colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+        colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nut_bolt_array)
         colflangeconn.create_3dmodel()
         return colflangeconn
 
-    def call_3DModel(self, flag): 
+    def call_3d_model(self, flag):
 #         self.ui.btnSvgSave.setEnabled(True)
         self.ui.btn3D.setChecked(QtCore.Qt.Checked)
         if self.ui.btn3D.isChecked():
@@ -1546,7 +1547,7 @@ class MainController(QtGui.QMainWindow):
             self.display.EraseAll()
             # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
 
-    def call_3DBeam(self):
+    def call_3d_beam(self):
         '''
         Creating and displaying 3D Beam
         '''
@@ -1559,7 +1560,7 @@ class MainController(QtGui.QMainWindow):
 
         self.display3Dmodel("Beam")
 
-    def call_3DColumn(self):
+    def call_3d_column(self):
         '''
         '''
         self.ui.chkBxCol.setChecked(QtCore.Qt.Checked)
@@ -1570,7 +1571,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
         self.display3Dmodel("Column")
 
-    def call_3DEndplate(self):
+    def call_3d_endplate(self):
         '''Displaying EndPlate in 3D
         '''
         self.ui.chkBxEndplate.setChecked(QtCore.Qt.Checked)
@@ -1582,7 +1583,7 @@ class MainController(QtGui.QMainWindow):
 
         self.display3Dmodel("Endplate")
 
-    def unchecked_allChkBox(self):
+    def unchecked_all_checkbox(self):
 
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
@@ -1592,10 +1593,10 @@ class MainController(QtGui.QMainWindow):
     def design_btnclicked(self):
         '''
         '''
-        self.validateInputsOnDesignBtn()
+        self.validate_inputs_on_design_button()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
-        self.unchecked_allChkBox()
+        self.unchecked_all_checkbox()
 
         # self.set_designlogger()
         # Getting User Inputs.
@@ -1615,7 +1616,7 @@ class MainController(QtGui.QMainWindow):
 
         # Displaying 3D Cad model
         status = self.result_obj['Bolt']['status']
-        self.call_3DModel(status)
+        self.call_3d_model(status)
         self.call_2d_drawing('All')
 
     def create_2d_cad(self, connectivity):
@@ -1669,7 +1670,7 @@ class MainController(QtGui.QMainWindow):
 
         QtGui.QMessageBox.about(self, 'Information', "File saved")
 
-    def display2DModelOriginal(self, final_model, viewName):
+    def display_2d_model_original(self, final_model, view_name):
 
         self.display, _ = self.init_display()
         self.display.EraseAll()
@@ -1678,20 +1679,20 @@ class MainController(QtGui.QMainWindow):
         self.display.DisplayShape(final_model, update=True)
         self.display.SetModeHLR()
 
-        if (viewName == "Front"):
+        if (view_name == "Front"):
             self.display.View_Front()
-        elif (viewName == "Top"):
+        elif (view_name == "Top"):
             self.display.View_Top()
-        elif (viewName == "Right"):
+        elif (view_name == "Right"):
             self.display.View_Right()
         else:
             pass
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#     def callDesired_View(self, filename, view, base_front, base_top, base_side):
+#     def call_desired_view(self, filename, view, base_front, base_top, base_side):
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    def callDesired_View(self, filename, view):
-        self. unchecked_allChkBox()
+    def call_desired_view(self, filename, view):
+        self. unchecked_all_checkbox()
 
         uiobj = self.getuser_inputs()
         result_obj = endConn(uiobj)
@@ -1724,13 +1725,13 @@ class MainController(QtGui.QMainWindow):
 
         if view == "All":
             filename = ''
-            self.callDesired_View(filename, view)
+            self.call_desired_view(filename, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
             self.display.ExportToImage(data)
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#             base1, base2, base3 = self.callDesired_View(filename, view, base_front, base_top, base_side)
+#             base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
 #             for n in range(1, 5, 1):
 #                 if (os.path.exists(data)):
 #                     data = str(self.folder) + "/images_html/3D_Model" + '(' + str(n) + ')' + ".png"
@@ -1761,7 +1762,7 @@ class MainController(QtGui.QMainWindow):
 #             sys.exit(app.exec_())
 #         return self.open_new(view)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#             base1, base2, base3 = self.callDesired_View(filename, view, base_front, base_top, base_side)
+#             base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
 #         return (base, base1, base2, base3)
 
 
@@ -1789,7 +1790,7 @@ class MainController(QtGui.QMainWindow):
 #     def save_2D_images(self, filename, view):
 #         filename = filename
 #         f = open(filename, 'w')
-#         f.write(self.callDesired_View(filename, view))
+#         f.write(self.call_desired_view(filename, view))
 #         print "saving only imagesssss", filename
 #         f.close()
 
@@ -1797,8 +1798,8 @@ class MainController(QtGui.QMainWindow):
         '''
         Closing endPlate window.
         '''
-        uiInput = self.getuser_inputs()
-        self.save_inputs(uiInput)
+        ui_input = self.getuser_inputs()
+        self.save_inputs(ui_input)
         reply = QtGui.QMessageBox.question(self, 'Message',
                                            "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
 
@@ -1825,18 +1826,18 @@ class MainController(QtGui.QMainWindow):
 
     def sample_report(self):
 
-        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
 #         counter = 0
-        for pdf_file in os.listdir(root_Path):
+        for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_Path, pdf_file))
+                os.startfile("%s/%s" % (root_path, pdf_file))
 #                 counter = counter + 1
 
     def sample_problem(self):
-        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-        for pdf_file in os.listdir(root_Path):
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_Path, pdf_file))
+                os.startfile("%s/%s" % (root_path, pdf_file))
 
 # ********************************************************************************************************************************************************
 

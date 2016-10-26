@@ -8,10 +8,10 @@ import time
 import math
 
 
-# def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filename, folder, base, base_front, base_top, base_side):
-def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filename, folder):
+# def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filename, folder, base, base_front, base_top, base_side):
+def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filename, folder):
 
-    print outObj
+    print outobj
     fileName = (filename)
     myfile = open(fileName, "w")
     myfile.write(t('! DOCTYPE html'))
@@ -71,58 +71,56 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
     column_b = str(float(dictcolumndata[QString("B")]))
 
 ###############################################################################################################################
-    connectivity = str(uiObj['Member']['Connectivity'])
-    shear_load = str(uiObj['Load']['ShearForce (kN)'])
-    column_sec = str(uiObj['Member']['ColumSection'])
-    beam_sec = str(uiObj['Member']['BeamSection'])
-    plateThick = str(uiObj['Plate']['Thickness (mm)'])
-    boltType = str(uiObj['Bolt']['Type'])
-    boltGrade = str(uiObj['Bolt']['Grade'])
-    boltDia = str(uiObj['Bolt']['Diameter (mm)'])
-    beam_fu = str(uiObj['Member']['fu (MPa)'])
-    beam_fy = str(uiObj['Member']['fy (MPa)'])
-    weldSize = str(uiObj["Weld"]['Size (mm)'])
+    connectivity = str(uiobj['Member']['Connectivity'])
+    shear_load = str(uiobj['Load']['ShearForce (kN)'])
+    column_sec = str(uiobj['Member']['ColumSection'])
+    beam_sec = str(uiobj['Member']['BeamSection'])
+    plateThick = str(uiobj['Plate']['Thickness (mm)'])
+    boltType = str(uiobj['Bolt']['Type'])
+    boltGrade = str(uiobj['Bolt']['Grade'])
+    boltDia = str(uiobj['Bolt']['Diameter (mm)'])
+    beam_fu = str(uiobj['Member']['fu (MPa)'])
+    beam_fy = str(uiobj['Member']['fy (MPa)'])
+    weldSize = str(uiobj["Weld"]['Size (mm)'])
     # 'Size (mm)'
 
-    minplatethk = str(int(round(outObj['Plate']['MinThick'], 1)))
-    blockshear = str(int(round(outObj['Plate']['blockshear'], 1)))
+    minplatethk = str(int(round(outobj['Plate']['MinThick'], 1)))
+    blockshear = str(int(round(outobj['Plate']['blockshear'], 1)))
 
-    plateWidth = str(int(round(outObj['Plate']['Width'], 1)))
-    plateMinWidth = str(int(round(outObj['Plate']['MinWidth'], 1)))
-    plateLength = str(int(round(outObj['Plate']['Height'], 1)))
-#     weldSize = str(int(round(outObj["Weld"]['Size (mm)'],1)))
+    plateWidth = str(int(round(outobj['Plate']['Width'], 1)))
+    plateMinWidth = str(int(round(outobj['Plate']['MinWidth'], 1)))
+    plateLength = str(int(round(outobj['Plate']['Height'], 1)))
+#     weldSize = str(int(round(outobj["Weld"]['Size (mm)'],1)))
 
     plateDimension = plateLength + 'X' + plateWidth + 'X' + plateThick
-    noOfBolts = str(outObj['Bolt']['numofbolts'])
-    noOfRows = str(outObj['Bolt']['numofrow'])
-    noOfCol = str(outObj['Bolt']['numofcol'])
-    edge = str(int(round(outObj['Bolt']['edge'], 1)))
-    gauge = str(int(round(outObj['Bolt']['gauge'], 1)))
-    pitch = str(int(round(outObj['Bolt']['pitch'], 1)))
-    end = str(int(round(outObj['Bolt']['enddist'], 1)))
-    weld_strength = str(round(float(outObj['Weld']['weldstrength']), 3))
-    weld_shear = str(round(float(outObj['Weld']['weldshear']), 3))
+    noOfBolts = str(outobj['Bolt']['numofbolts'])
+    noOfRows = str(outobj['Bolt']['numofrow'])
+    noOfCol = str(outobj['Bolt']['numofcol'])
+    edge = str(int(round(outobj['Bolt']['edge'], 1)))
+    gauge = str(int(round(outobj['Bolt']['gauge'], 1)))
+    pitch = str(int(round(outobj['Bolt']['pitch'], 1)))
+    end = str(int(round(outobj['Bolt']['enddist'], 1)))
+    weld_strength = str(round(float(outobj['Weld']['weldstrength']), 3))
+    weld_shear = str(round(float(outobj['Weld']['weldshear']), 3))
 
-    bolt_fu = str(outObj['Bolt']['bolt_fu'])
-    bolt_dia = str(uiObj['Bolt']['Diameter (mm)'])
-    kb = str(outObj['Bolt']['kb'])
-    t_thinner = str(outObj['Bolt']['thinner'])
+    bolt_fu = str(outobj['Bolt']['bolt_fu'])
+    bolt_dia = str(uiobj['Bolt']['Diameter (mm)'])
+    kb = str(outobj['Bolt']['kb'])
+    t_thinner = str(outobj['Bolt']['thinner'])
 
 #     kb = str(0.5)
-    dia_hole = str(outObj['Bolt']['dia_hole'])
+    dia_hole = str(outobj['Bolt']['dia_hole'])
     weld_fu = str(410)
-    weld_l = str(outObj['Weld']['weldlength'])
-    shearCapacity = str(round(outObj['Bolt']['shearcapacity'], 3))
-    bearingcapacity = str(round(outObj['Bolt']['bearingcapacity'], 4))
-    criticalShear = str(round(outObj['Bolt']['critshear'], 3))
+    weld_l = str(outobj['Weld']['weldlength'])
+    shearCapacity = str(round(outobj['Bolt']['shearcapacity'], 3))
+    bearingcapacity = str(round(outobj['Bolt']['bearingcapacity'], 4))
+    criticalShear = str(round(outobj['Bolt']['critshear'], 3))
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoEnd.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60 ''&nbsp></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoEnd.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>''&nbsp''<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
     rstr += t('/tr')
@@ -446,9 +444,9 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoEnd.png" height=60 ></object>',
+    row = [0, '<object type= "image/PNG" data= "cmpylogoEnd.png" height=60 ></object>',
            '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'
-           ' &nbsp' '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60 ''&nbsp></object>']
+           ' &nbsp' '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
     rstr += t('/tr')
@@ -728,9 +726,9 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoEnd.png" height=60 ></object>',
+    row = [0, '<object type= "image/PNG" data= "cmpylogoEnd.png" height=60 ></object>',
            '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60 ''&nbsp></object>']
+           '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
     rstr += t('/tr')
@@ -849,9 +847,9 @@ def save_html(outObj, uiObj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoEnd.png" height=60 ></object>',
+    row = [0, '<object type= "image/PNG" data= "cmpylogoEnd.png" height=60 ></object>',
            '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60 ''&nbsp></object>']
+           '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
     rstr += t('/tr')

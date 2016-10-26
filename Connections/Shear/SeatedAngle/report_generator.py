@@ -199,7 +199,8 @@ class ReportGenerator(SeatAngleCalculation):
             8) + 'td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial,'
                  ' Sans Serif; font-weight:bold}' + nl())
         myfile.write(
-            html_space(8) + 'td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
+            html_space(
+                8) + 'td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}' + nl())
         myfile.write(html_space(8) + 'td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}' + nl())
         myfile.write(html_space(
             8) + 'td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial,'
@@ -214,15 +215,15 @@ class ReportGenerator(SeatAngleCalculation):
         myfile.write(t('body') + nl())
 
         # Project summary
-        company_name = str(report_summary["ProfileSummary"]['CompanyName'])
-        companylogo = str(report_summary["ProfileSummary"]['CompanyLogo'])
+        self.company_name = str(report_summary["ProfileSummary"]['CompanyName'])
+        self.companylogo = str(report_summary["ProfileSummary"]['CompanyLogo'])
 
-        group_team_name = str(report_summary["ProfileSummary"]['Group/TeamName'])
-        designer = str(report_summary["ProfileSummary"]['Designer'])
-        project_title = str(report_summary['ProjectTitle'])
-        subtitle = str(report_summary['Subtitle'])
-        jobnumber = str(report_summary['JobNumber'])
-        method = str(report_summary['Method'])
+        self.group_team_name = str(report_summary["ProfileSummary"]['Group/TeamName'])
+        self.designer = str(report_summary["ProfileSummary"]['Designer'])
+        self.project_title = str(report_summary['ProjectTitle'])
+        self.subtitle = str(report_summary['Subtitle'])
+        self.jobnumber = str(report_summary['JobNumber'])
+        self.method = str(report_summary['Method'])
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
@@ -237,7 +238,7 @@ class ReportGenerator(SeatAngleCalculation):
         boltGrade = str(self.bolt_grade)
         bolt_diameter = str(self.bolt_diameter)
         bolt_hole_type = str(self.bolt_hole_type)
-        weld_thickness= str(10)
+        weld_thickness = str(10)
 
         beam_depth = str(self.beam_d)
         beam_flange_thickness = str(self.beam_f_t)
@@ -290,71 +291,16 @@ class ReportGenerator(SeatAngleCalculation):
         elif self.safe == False:
             design_conclusion = "Fail"
 
-        # Header of the pdf fetched from dialog box
-        rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
-        rstr += t('tr') + nl()
-        row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "css/Osdag_header.png" height=60 ''&nbsp></object>']
-        rstr += html_space(1) + t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(1) + t('td colspan="2" align= "right"') + row[2] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Company Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, company_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-
-        row = [0, 'Project Title']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, project_title]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Group/Team Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, group_team_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Subtitle']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, subtitle]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Designer']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, designer]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Job Number']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, jobnumber]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Date']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, time.strftime("%d /%m /%Y")]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Method']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, method]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-        rstr += t('/table') + nl() + " " + nl()
-
-        rstr += t('hr')
-        rstr += t('/hr') + nl() + " " + nl()
+        # -----------------------------------------------------------------------------------
+        rstr = self.design_report_header()
+        # -----------------------------------------------------------------------------------
 
         # Design conclusion
         rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ') + nl()
 
         rstr += design_summary_row(0, "Design Conclusion", "header0", col_span="2")
 
-        row = [1, "Seated Angle", "<p align=left style=color:green><b>"+design_conclusion+"</b></p>"]
+        row = [1, "Seated Angle", "<p align=left style=color:green><b>" + design_conclusion + "</b></p>"]
         rstr += t('tr')
         rstr += html_space(1) + t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail1"') + row[2] + t('/td') + nl()
@@ -379,12 +325,13 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(1, "Beam Section", "detail1", text_two=str(beam_sec), text_two_css="detail2")
         rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(beam_fu))
         rstr += design_summary_row(2, "Hole", "detail2", text_two=str(bolt_hole_type))
-        rstr += design_summary_row(1, "Seated Angle Section", "detail1", text_two=str(seated_angle_section), text_two_css="detail2")
-        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(angle_fu))
+        rstr += design_summary_row(1, "Seated Angle Section", "detail1", text_two=str(seated_angle_section),
+                                   text_two_css="detail2")
+        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(angle_fu))
         rstr += design_summary_row(2, "Hole", "detail2", text_two=str(bolt_hole_type))
         rstr += design_summary_row(1, "Top Angle Section", "detail1", text_two=str(top_angle_section),
                                    text_two_css="detail2")
-        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe "+str(angle_fu))
+        rstr += design_summary_row(2, "Material", "detail2", text_two="Fe " + str(angle_fu))
         rstr += design_summary_row(2, "Hole", "detail2", text_two=bolt_hole_type)
         rstr += design_summary_row(1, "Bolts", "detail1", col_span="2")
         rstr += design_summary_row(2, "Type", "detail2", text_two=bolt_type)
@@ -399,71 +346,15 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(2, "End Distance (mm)", "detail2", text_two=end)
         rstr += design_summary_row(2, "Edge Distance (mm)", "detail2", text_two=edge)
         rstr += design_summary_row(0, "Assembly", "detail1", col_span="2")
-        rstr += design_summary_row(1, "Column-Beam Clearance (mm)", "detail2", text_two=beam_col_clear_gap, text_two_css="detail2")
+        rstr += design_summary_row(1, "Column-Beam Clearance (mm)", "detail2", text_two=beam_col_clear_gap,
+                                   text_two_css="detail2")
 
-        rstr += t('/table')
+        rstr += " " + nl() + t('/table')
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
 
-        # --------------------------------------------------------------------------------------------------------
-        rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-        rstr += t('tr')
-        row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
-        rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
-        rstr += t('/tr' + nl())
-
-        rstr += t('tr') + nl()
-        row = [0, 'Company Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, company_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-
-        row = [0, 'Project Title']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, project_title]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        row = [0, 'Group/Team Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, group_team_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Subtitle']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, subtitle]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Designer']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, designer]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Job Number']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, jobnumber]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Date']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, time.strftime("%d /%m /%Y")]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Method']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, method]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-        rstr += t('/table') + nl() + " " + nl()
-
-        rstr += t('hr')
-        rstr += t('/hr') + nl() + " " + nl()
-
+        # -----------------------------------------------------------------------------------
+        rstr += self.design_report_header()
         # -----------------------------------------------------------------------------------
         # DESIGN CHECK
         # TODO IMPORTANT Remove calculations from below lines of code
@@ -508,7 +399,8 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('tr')
         # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
         boltCapacity = bearing_capacity if bearing_capacity < shear_capacity else shear_capacity
-        row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearing_capacity + ") = " + boltCapacity, ""]
+        row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearing_capacity + ") = " + boltCapacity,
+               ""]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -597,7 +489,8 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('/tr')
 
         rstr += t('tr')
-        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load, "<i>V</i><sub>db</sub> = " + block_shear + "<br>",
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + block_shear + "<br>",
                "  <p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -621,7 +514,8 @@ class ReportGenerator(SeatAngleCalculation):
         #     if
         minEdge = str(0.6 * float(beam_depth))
         if connectivity == "Beam-Beam":
-            maxEdge = str(float(beam_depth) - float(beam_flange_thickness) - float(beam_root_radius) - float(col_flange_thickness) - float(
+            maxEdge = str(float(beam_depth) - float(beam_flange_thickness) - float(beam_root_radius) - float(
+                col_flange_thickness) - float(
                 col_root_radius) - 5)
             maxedgestring = beam_depth + "-" + beam_flange_thickness + "-" + beam_root_radius + "-" + col_flange_thickness + "-" + col_root_radius + "- 5"
         else:
@@ -718,64 +612,9 @@ class ReportGenerator(SeatAngleCalculation):
 
         # TODO IMPORTANT Remove calculations from above lines of code
 
-        # ------------------------------------------------------------------------------------------------
-        rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-        rstr += t('tr')
-        row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
-        rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr') + nl()
-        row = [0, 'Company Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, company_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-
-        row = [0, 'Project Title']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, project_title]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        row = [0, 'Group/Team Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, group_team_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Subtitle']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, subtitle]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Designer']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, designer]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Job Number']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, jobnumber]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Date']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, time.strftime("%d /%m /%Y")]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Method']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, method]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-        rstr += t('/table') + nl() + " " + nl()
-
-        rstr += t('hr')
-        rstr += t('/hr') + nl() + " " + nl()
+        # -----------------------------------------------------------------------------------
+        rstr += self.design_report_header()
+        # -----------------------------------------------------------------------------------
 
         # Connection images (views)
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
@@ -814,73 +653,21 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('h1 style="page-break-before:always"')
         rstr += t('/h1')
 
-        # ------------------------------------------------------------------------------------------------
-        rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-        rstr += t('tr')
-        row = [0, '<object type= "image/PNG" data= "css/cmpylogoFin.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "css/Osdag_header.png" height=60></object>']
-        rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
-        rstr += t('/tr')
-
-        rstr += t('tr') + nl()
-        row = [0, 'Company Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, company_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-
-        row = [0, 'Project Title']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, project_title]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-
-        rstr += t('tr')
-        row = [0, 'Group/Team Name']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, group_team_name]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Subtitle']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, subtitle]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Designer']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, designer]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Job Number']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, jobnumber]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr') + nl()
-
-        rstr += t('tr') + nl()
-        row = [0, 'Date']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, time.strftime("%d /%m /%Y")]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, 'Method']
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        row = [0, method]
-        rstr += html_space(1) + t('td class="detail" ') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += t('/tr')
-        rstr += t('/table') + nl() + " " + nl()
+        # -----------------------------------------------------------------------------------
+        rstr += self.design_report_header()
+        # -----------------------------------------------------------------------------------
 
         rstr += t('hr')
         rstr += t('/hr') + nl() + " " + nl()
 
-        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')+nl()
+        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"') + nl()
         rstr += html_space(1) + t('''col width=30%''')
         rstr += html_space(1) + t('''col width=70%''') + nl()
 
         rstr += html_space(1) + t('tr') + nl()
         row = [0, "Additional Comments", additional_comments]
         rstr += html_space(2) + t('td class= "detail1"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(2) + t('td class= "detail2" align="justified"') + row[2] + t('/td') +nl()
+        rstr += html_space(2) + t('td class= "detail2" align="justified"') + row[2] + t('/td') + nl()
         rstr += html_space(1) + t('/tr') + nl()
 
         rstr += t('/table') + nl()
@@ -889,6 +676,49 @@ class ReportGenerator(SeatAngleCalculation):
         myfile.write(t('/body'))
         myfile.write(t('/html'))
         myfile.close()
+
+    def design_report_header(self):
+        """Create and return html code to display Report Header.
+
+        Args:
+            None
+
+        Returns:
+            rstr (str): string containing html code to table (used as Report Header)
+        """
+        rstr = nl() + " " + nl() + t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
+        rstr += t('tr') + nl()
+        row = [0, '<object type= "image/PNG" data= "css/cmpylogoSeatAngle.png" height=60 ></object>',
+               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
+               '<object type= "image/PNG" data= "css/Osdag_header.png" height=60 ''&nbsp></object>']
+        rstr += html_space(1) + t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td') + nl()
+        rstr += html_space(1) + t('td colspan="2" align= "right"') + row[2] + t('/td') + nl()
+        rstr += t('/tr') + nl()
+
+        rstr += t('tr') + nl()
+        rstr += design_summary_row(0, "Company Name", "detail", text_two=self.company_name, is_row=False)
+        rstr += design_summary_row(0, "Project Title", "detail", text_two=self.project_title, is_row=False)
+        rstr += t('/tr') + nl()
+
+        rstr += t('tr') + nl()
+        rstr += design_summary_row(0, "Group/Team Name", "detail", text_two=self.group_team_name, is_row=False)
+        rstr += design_summary_row(0, "Subtitle", "detail", text_two=self.subtitle, is_row=False)
+        rstr += t('/tr') + nl()
+
+        rstr += t('tr') + nl()
+        rstr += design_summary_row(0, "Designer", "detail", text_two=self.designer, is_row=False)
+        rstr += design_summary_row(0, "Job Number", "detail", text_two=self.jobnumber, is_row=False)
+        rstr += t('/tr') + nl()
+
+        rstr += t('tr') + nl()
+        rstr += design_summary_row(0, "Date", "detail", text_two=time.strftime("%d /%m /%Y"), is_row=False)
+        rstr += design_summary_row(0, "Method", "detail", text_two=self.method, is_row=False)
+        rstr += t('/tr')
+        rstr += t('/table') + nl() + " " + nl()
+
+        rstr += t('hr')
+        rstr += t('/hr') + nl() + " " + nl()
+        return rstr
 
 
 def space(n):
@@ -975,8 +805,12 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
         tab_spaces (int): number of (tab) spaces
         text_one (str): Text entry
         text_one_css (str): Key pointing to table-data css format
+
+    kwargs:
         text_two (str): Text entry
         text_two_css (str): Key pointing to table-data css format
+        col_span (string): number of columns in table that the table data spans
+        is_row (boolean): key to create separate table row entry
 
     Returns (str):
         Formatted line of html-code.
@@ -985,8 +819,12 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
     text_two = kwargs.get('text_two', " ")
     text_two_css = kwargs.get('text_two_css', text_one_css)
     col_span = kwargs.get('col_span', "1")
+    is_row = kwargs.get('is_row', True)
 
-    row_string = t('tr') + nl()
+    if is_row == True:
+        row_string = t('tr') + nl()
+    elif is_row == False:
+        row_string = ""
 
     if col_span == "2":
         row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css + '"') + space(
@@ -995,5 +833,10 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
         row_string = row_string + html_space(4) + t('td class="' + text_one_css + '"') + space(tab_spaces) + text_one \
                      + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + text_two_css + '"') + text_two + t('/td') + nl()
-    row_string = row_string + t('/tr') + nl()
+
+    if is_row is True:
+        row_string = row_string + t('/tr') + nl()
+    elif is_row is False:
+        pass
+
     return row_string

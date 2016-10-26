@@ -377,7 +377,7 @@ class ReportGenerator(SeatAngleCalculation):
         # TODO IMPORTANT Remove calculations from below lines of code
 
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-        rstr += design_check_row("Design Check", "","","",col_span="4", text_one_css="detail")
+        rstr += design_check_row("Design Check", "", "", "", col_span="4", text_one_css="detail")
 
         rstr += design_check_row("Check", "Required", "Provided", "Remark", text_one_css="header1",
                                  text_two_css="header1", text_three_css="header1", text_four_css="header1")
@@ -388,7 +388,7 @@ class ReportGenerator(SeatAngleCalculation):
         const = str(round(math.pi / 4 * 0.78, 4))
         req_field = " "
         prov_field = "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" \
-                               + bolt_dia + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
+                     + bolt_dia + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
@@ -397,13 +397,13 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt bearing capacity (kN)", " ", prov_field, "")
 
         # Bolt capacity (kN)
-        prov_field =  "Min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = "\
-                      + str(self.bolt_value)
+        prov_field = "Min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = " \
+                     + str(self.bolt_value)
         rstr += design_check_row("Bolt capacity (kN)", " ", prov_field, "")
 
         # No. of bolts
         bolts = str(round(float(shear_force) / float(str(self.bolt_value)), 1))
-        req_field= shear_force + "/" + str(self.bolt_value) + " = " + bolts
+        req_field = shear_force + "/" + str(self.bolt_value) + " = " + bolts
         rstr += design_check_row("No. of bolts", req_field, bolts_provided, check_pass)
 
         rstr += design_check_row("No. of columns", " ", number_of_cols, check_pass)
@@ -413,8 +413,8 @@ class ReportGenerator(SeatAngleCalculation):
         minPitch = str(int(2.5 * float(bolt_dia)))
         maxPitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
         req_field = " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + \
-                  ", 300) = " + maxPitch + "<br> [cl. 10.2.2]"
-        rstr += design_check_row("Bolt pitch (mm)",req_field, pitch, check_pass)
+                    ", 300) = " + maxPitch + "<br> [cl. 10.2.2]"
+        rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, check_pass)
 
         # Bolt gauge (mm)
         minGauge = str(int(2.5 * float(bolt_dia)))
@@ -425,7 +425,7 @@ class ReportGenerator(SeatAngleCalculation):
         # End distance (mm)
         minEnd = str(1.7 * float(dia_hole))
         maxEnd = str(12 * float(beam_w_t))
-        req_field=" &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]"
+        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]"
         rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
 
         # Edge distance (mm)
@@ -467,18 +467,18 @@ class ReportGenerator(SeatAngleCalculation):
         datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
 
         row = [0, datapng, datatop]
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        rstr += t('tr') + nl()
+        rstr += html_space(4) + t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+        rstr += html_space(4) + t('td  align="center" class=" header2"') + row[2] + t('/td') + nl()
         rstr += t('/tr' + nl())
 
         row = [0, dataside, datafront]
-        rstr += t('tr')
-        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-        rstr += t('/tr' + nl())
+        rstr += t('tr') + nl()
+        rstr += html_space(4) + t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+        rstr += html_space(4) + t('td align="center" class=" header2 "') + row[2] + t('/td') + nl()
+        rstr += t('/tr') + nl()
 
-        rstr += t('/table')
+        rstr += t('/table') + nl() + " " + nl()
         rstr += t('h1 style="page-break-before:always"')
         rstr += t('/h1')
 
@@ -707,7 +707,6 @@ def design_check_row(text_one, text_two, text_three, text_four, **kwargs):
         row_string = row_string + html_space(4) + t('td class="' + t2_css + '"') + text_two + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t3_css + '"') + text_three + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t4_css + '"') + text_four + t('/td') + nl()
-
 
     row_string = row_string + t('/tr') + nl()
 

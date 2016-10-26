@@ -493,8 +493,9 @@ class SeatAngleCalculation(object):
 
         # Determine number of bolt lines:
         self.num_rows = 1
-        self.num_cols = self.bolts_required
+        self.num_cols = max(self.bolts_required, 2)        
         self.gauge = round(length_avail / (self.num_cols - 1), 3)
+#         TODO check for zero num_cols
         if self.gauge < self.min_gauge:
             self.num_rows = 2
             self.num_cols = int((self.bolts_required + 1) / 2)
@@ -521,7 +522,7 @@ class SeatAngleCalculation(object):
             # edge_distance = (angle_l - (bolts_per_line-1)*gauge)/2
             """
             self.gauge = self.max_spacing
-            self.num_cols = int(math.ceil((length_avail / gauge) + 1))
+            self.num_cols = int(math.ceil((length_avail / self.gauge) + 1))
             self.gauge = round(length_avail / (self.num_cols - 1), 3)
 
         self.pitch = (self.num_rows-1)*(self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.angle_root_clearance)
@@ -580,6 +581,7 @@ class SeatAngleCalculation(object):
 
         self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 3)
         # print "Moment at root angle = " + str(self.moment_at_root_angle)
+        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt ISA200x150x16 
 
         self.moment_capacity_angle = round( 1.2 * self.angle_fy * self.angle_l * self.angle_t ** 2 / self.gamma_m0 /6 /1000, 3)
         # print "Moment capacity =" + str(self.moment_capacity_angle)

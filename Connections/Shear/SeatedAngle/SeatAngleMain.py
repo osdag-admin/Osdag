@@ -53,7 +53,6 @@ from ui_tutorial import Ui_Tutorial
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
-
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -827,6 +826,12 @@ class MainController(QtGui.QMainWindow):
             print"printing nutboltlist", len(nutboltlist)
             osdagDisplayShape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
             osdagDisplayShape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
 #             for nutbolt in nutboltlist:
 #                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
@@ -1092,10 +1097,23 @@ class MainController(QtGui.QMainWindow):
             self.display.DisplayShape(my_sphere5,color = 'yellow',update = True)
             
             root2 = math.sqrt(2)
-            angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.T * self.connectivity.angle.uDir + (self.connectivity.angle.T + (self.connectivity.angle.R2 + self.connectivity.angle.R2/root2))* self.connectivity.angle.vDir
+            #angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.T * self.connectivity.angle.uDir + (self.connectivity.angle.T + (self.connectivity.angle.R2 + self.connectivity.angle.R2/root2))* self.connectivity.angle.vDir
+            angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.A * self.connectivity.angle.vDir + self.connectivity.angle.T * self.connectivity.angle.uDir + self.connectivity.angle.R2*(1-1/root2) * self.connectivity.angle.uDir - self.connectivity.angle.R2/root2*self.connectivity.angle.vDir
             angleRealOrigin = getGpPt(angle_Rorigin)
             my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
             self.display.DisplayShape(my_sphere6,color = 'green',update = True)
+            
+            root2 = math.sqrt(2)
+            angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.B * self.connectivity.angle.uDir + self.connectivity.angle.T * self.connectivity.angle.vDir + self.connectivity.angle.R2*(1-1/root2) * self.connectivity.angle.vDir - self.connectivity.angle.R2/root2*self.connectivity.angle.uDir
+            angleRealOrigin = getGpPt(angle_Rorigin)
+            my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
+            self.display.DisplayShape(my_sphere6,color = 'green',update = True)
+            
+            topclip_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.B * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.vDir
+            
+            angletopRealOrigin = getGpPt(topclip_nutboltArrayOrigin)
+            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
+            self.display.DisplayShape(my_sphere7,color = 'green',update = True)
 
 
         else:

@@ -5,6 +5,7 @@ Created on 11-May-2015
 '''
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
+import math
 '''
 Created on 11-May-2015
 
@@ -91,19 +92,31 @@ class ColFlangeBeamWeb(object):
         pitchDir = -self.angle.vDir
         boltDir = -self.angle.uDir
         
-        nutboltArrayOrigin = self.angle.secOrigin 
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir  
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
+        root2 = math.sqrt(2)
+        nutboltArrayOrigin = self.angle.secOrigin  
+        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir 
+        nutboltArrayOrigin= nutboltArrayOrigin + self.angle.T * self.angle.uDir 
+        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.uDir 
+        nutboltArrayOrigin = nutboltArrayOrigin - self.angle.R2/root2*self.angle.vDir
+        ########################################################################
+        #----------------------------- nutboltArrayOrigin = self.angle.secOrigin
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
         
         bgaugeDir = self.angle.wDir
         bpitchDir = -self.angle.uDir
         bboltDir = -self.angle.vDir
         
-        bnutboltArrayOrigin = self.angle.secOrigin 
-        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir  
-        bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
+        bnutboltArrayOrigin = self.angle.secOrigin + self.angle.B * self.angle.uDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.vDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin - self.angle.R2/root2*self.angle.uDir
+        
+        #---------------------------- bnutboltArrayOrigin = self.angle.secOrigin
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.L/4 * self.angle.wDir
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
         
         topclipgaugeDir = self.topclipangle.wDir
         topclippitchDir = -self.topclipangle.vDir

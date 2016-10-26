@@ -74,7 +74,7 @@ from Svg_Window import SvgWindow
 #         self.svgWidget.setWindowTitle('2D View')
 #         self.svgWidget.show()
 #         print "viewfrom call_svgwindow", view
-#         self.btn_save.clicked.connect(lambda: self.mainController.save_2D_image_names)
+#         self.btn_save.clicked.connect(lambda: self.mainController.save_2d_image_names)
 # #         self.open_new(view)
 # #         sys.exit(app.exec_())
 
@@ -1056,8 +1056,8 @@ class MainController(QtGui.QMainWindow):
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
-        vscrollBar = self.ui.textEdit.verticalScrollBar()
-        vscrollBar.setValue(vscrollBar.maximum())
+        vscroll_bar = self.ui.textEdit.verticalScrollBar()
+        vscroll_bar.setValue(vscroll_bar.maximum())
         afile.close()
 
     def validate_inputs_on_design_button(self):
@@ -1168,7 +1168,7 @@ class MainController(QtGui.QMainWindow):
         display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
-        def centerOnScreen(self):
+        def center_on_screen(self):
                     '''Centers the window on the screen.'''
                     resolution = QtGui.QDesktopWidget().screenGeometry()
                     self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
@@ -1180,7 +1180,7 @@ class MainController(QtGui.QMainWindow):
 
         return display, start_display
 
-    def display3Dmodel(self, component):
+    def display_3d_model(self, component):
         self.display.EraseAll()
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
@@ -1199,7 +1199,7 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
-            
+
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
             # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
@@ -1216,7 +1216,7 @@ class MainController(QtGui.QMainWindow):
 
 # #################################################################################################################################################
 
-    def boltHeadThick_Calculation(self, boltDia):
+    def bolt_head_thick_calculation(self, bolt_diameter):
         '''
         This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
        bolt Head Dia
@@ -1228,10 +1228,10 @@ class MainController(QtGui.QMainWindow):
            |  |
            |  |
         '''
-        boltHeadThick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
-        return boltHeadThick[boltDia]
+        bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        return bolt_head_thick[bolt_diameter]
 
-    def boltHeadDia_Calculation(self, boltDia):
+    def bolt_head_dia_calculation(self, bolt_diameter):
         '''
         This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
        bolt Head Dia
@@ -1243,10 +1243,10 @@ class MainController(QtGui.QMainWindow):
            |  |
            |  |
         '''
-        boltHeadDia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
-        return boltHeadDia[boltDia]
+        bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+        return bolt_head_dia[bolt_diameter]
 
-    def boltLength_Calculation(self, boltDia):
+    def bolt_length_calculation(self, bolt_diameter):
         '''
         This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
 
@@ -1266,18 +1266,18 @@ class MainController(QtGui.QMainWindow):
            |__|    ___|__
 
         '''
-        boltHeadDia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+        bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
 
-        return boltHeadDia[boltDia]
+        return bolt_head_dia[bolt_diameter]
 
-    def nutThick_Calculation(self, boltDia):
+    def nut_thick_calculation(self, bolt_diameter):
         '''
         Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
         '''
-        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
-        return nutDia[boltDia]
+        nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+        return nut_dia[bolt_diameter]
 
-    def create3DBeamWebBeamWeb(self):
+    def create_3d_beam_web_beam_web(self):
         '''
         creating 3d cad model with beam web beam web
         '''
@@ -1299,7 +1299,7 @@ class MainController(QtGui.QMainWindow):
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
         column = ISection(B=pBeam_B, T=pri_beam_T, D=pri_beam_D, t=pBeam_tw,
                           R1=pBeam_R1, R2=pBeam_R2, alpha=pBeam_alpha,
-                          length=pBeam_length, notchObj=None)
+                          length=pBeam_length, notch_obj=None)
 
         ##### SECONDARY BEAM PARAMETERS ######
         dictbeamdata2 = self.fetch_beam_param()
@@ -1313,11 +1313,11 @@ class MainController(QtGui.QMainWindow):
         sBeam_R2 = float(dictbeamdata2[QString("R2")])
 
         # --Notch dimensions
-        notchObj = Notch(R1=pBeam_R1, height=(pri_beam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
+        notch_obj = Notch(R1=pBeam_R1, height=(pri_beam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         beam = ISection(B=sBeam_B, T=sBeam_T, D=sec_beam_D,
                         t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
-                        alpha=sBeam_alpha, length=500, notchObj=notchObj)
+                        alpha=sBeam_alpha, length=500, notch_obj=notch_obj)
 
         ########################### WELD,PLATE,BOLT AND NUT PARAMETERS ##########################################################
 
@@ -1327,12 +1327,12 @@ class MainController(QtGui.QMainWindow):
         plate_thick = uiobj['Plate']['Thickness (mm)']
         bolt_dia = uiobj["Bolt"]["Diameter (mm)"]
         bolt_r = bolt_dia / 2
-        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
         nut_R = bolt_R
-        bolt_T = self.boltHeadThick_Calculation(bolt_dia)
-        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        bolt_T = self.bolt_head_thick_calculation(bolt_dia)
+        bolt_Ht = self.bolt_length_calculation(bolt_dia)
         # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = 12.2  #
 
         # plate = Plate(L= 300,W =100, T = 10)
@@ -1351,12 +1351,12 @@ class MainController(QtGui.QMainWindow):
 
         nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap)
 
-        beamwebconn = BeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nut_bolt_array)
+        beamwebconn = BeamWebBeamWeb(column, beam, notch_obj, Fweld1, plate, nut_bolt_array)
         beamwebconn.create_3dmodel()
 
         return beamwebconn
 
-    def create3DColWebBeamWeb(self):
+    def create_3d_col_web_beam_web(self):
         '''
         creating 3d cad model with column web beam web
         '''
@@ -1401,12 +1401,12 @@ class MainController(QtGui.QMainWindow):
         plate_thick = uiobj['Plate']['Thickness (mm)']
         bolt_dia = uiobj["Bolt"]["Diameter (mm)"]
         bolt_r = bolt_dia / 2
-        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
         nut_R = bolt_R
-        bolt_T = self.boltHeadThick_Calculation(bolt_dia) 
-        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        bolt_T = self.bolt_head_thick_calculation(bolt_dia)
+        bolt_Ht = self.bolt_length_calculation(bolt_dia)
         # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
         nut_Ht = 12.2  # 150
 
         # plate = Plate(L= 300,W =100, T = 10)
@@ -1429,7 +1429,7 @@ class MainController(QtGui.QMainWindow):
 
         return colwebconn
 
-    def create3DColFlangeBeamWeb(self):
+    def create_3d_col_flange_beam_web(self):
         '''
         Creating 3d cad model with column flange beam web connection
         '''
@@ -1474,14 +1474,14 @@ class MainController(QtGui.QMainWindow):
         plate_thick = uiobj['Plate']['Thickness (mm)']
         bolt_dia = uiobj["Bolt"]["Diameter (mm)"]
         bolt_r = bolt_dia / 2
-        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
         # bolt_R = bolt_r + 7
         nut_R = bolt_R
-        bolt_T = self.boltHeadThick_Calculation(bolt_dia) 
+        bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         # bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
-        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        bolt_Ht = self.bolt_length_calculation(bolt_dia)
         # bolt_Ht =100.0 # minimum bolt length as per Indian Standard
-        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
         # nut_T = 12.0 # minimum nut thickness As per Indian Standard
         nut_Ht = 12.2  #
 
@@ -1516,19 +1516,19 @@ class MainController(QtGui.QMainWindow):
 
         if flag is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-                # self.create3DColWebBeamWeb()
-                self.connectivity = self.create3DColWebBeamWeb()
+                # self.create_3d_col_web_beam_web()
+                self.connectivity = self.create_3d_col_web_beam_web()
                 self.fuse_model = None
             elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DColFlangeBeamWeb()
+                self.connectivity = self.create_3d_col_flange_beam_web()
                 self.fuse_model = None
             else:
                 self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DBeamWebBeamWeb()
+                self.connectivity = self.create_3d_beam_web_beam_web()
                 self.fuse_model = None
 
-            self.display3Dmodel("Model")
+            self.display_3d_model("Model")
             # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
             # gpBeamOrigin = getGpPt(beamOrigin)
             # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
@@ -1558,7 +1558,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Beam")
+        self.display_3d_model("Beam")
 
     def call_3d_column(self):
         '''
@@ -1569,7 +1569,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.display3Dmodel("Column")
+        self.display_3d_model("Column")
 
     def call_3d_endplate(self):
         '''Displaying EndPlate in 3D
@@ -1581,7 +1581,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Endplate")
+        self.display_3d_model("Endplate")
 
     def unchecked_all_checkbox(self):
 
@@ -1631,7 +1631,7 @@ class MainController(QtGui.QMainWindow):
     # Export to IGS,STEP,STL,BREP
     def save_3d_cad_images(self):
         if self.connectivity is None:
-            self.connectivity = self.create3DColWebBeamWeb()
+            self.connectivity = self.create_3d_col_web_beam_web()
         if self.fuse_model is None:
             self.fuse_model = self.create_2d_cad(self.connectivity)
         shape = self.fuse_model
@@ -1757,8 +1757,8 @@ class MainController(QtGui.QMainWindow):
 #             return self.svgWinObj.call_svgwindow(filename, view)
 #             self.svgWidget.setWindowTitle('2D View')
 #             self.svgWidget.show()
-# #             self.btn_save.clicked.connect(self.save_2D_image_names(view))
-# #             self.save_2D_image_names(view)
+# #             self.btn_save.clicked.connect(self.save_2d_image_names(view))
+# #             self.save_2d_image_names(view)
 #             sys.exit(app.exec_())
 #         return self.open_new(view)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1767,10 +1767,10 @@ class MainController(QtGui.QMainWindow):
 
 
 #     def open_new(self, view):
-#         self.btn_save.clicked.connect(self.save_2D_image_names)
-#         return self.save_2D_image_names(view)
+#         self.btn_save.clicked.connect(self.save_2d_image_names)
+#         return self.save_2d_image_names(view)
 
-#     def save_2D_image_names(self, view):
+#     def save_2d_image_names(self, view):
 # #         view = self.go_to_open_svg(view)
 #         self.btn_save.clicked.connect(view)
 #
@@ -1787,7 +1787,7 @@ class MainController(QtGui.QMainWindow):
 #         QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 
 
-#     def save_2D_images(self, filename, view):
+#     def save_2d_image_names(self, filename, view):
 #         filename = filename
 #         f = open(filename, 'w')
 #         f.write(self.call_desired_view(filename, view))

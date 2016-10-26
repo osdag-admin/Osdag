@@ -48,7 +48,7 @@ from utilities import osdagDisplayShape
 from weld import Weld
 from drawing_2D import EndCommonData
 from PyQt4 import QtSvg
-from Svg_Window import Svg_window
+from Svg_Window import SvgWindow
 
 
 # class Svg_window(QtSvg.QSvgWidget):
@@ -103,17 +103,17 @@ class MyPopupDialog(QtGui.QDialog):
         self.ui.setupUi(self)
         self.mainController = parent
         self.setWindowTitle("Design Profile")
-        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
-        self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
-        self.accepted.connect(self.save_inputSummary)
+        self.ui.btn_browse.clicked.connect(lambda: self.get_logo_file_path(self.ui.lbl_browse))
+        self.ui.btn_saveProfile.clicked.connect(self.save_user_profile)
+        self.ui.btn_useProfile.clicked.connect(self.use_user_profile)
+        self.accepted.connect(self.save_input_summary)
 
-    def save_inputSummary(self):
-        input_summary = self.getPopUpInputs()
+    def save_input_summary(self):
+        input_summary = self.get_design_report_inputs()
         self.mainController.save_design(input_summary)
         # return input_summary
 
-    def getLogoFilePath(self, lblwidget):
+    def get_logo_file_path(self, lblwidget):
 
         self.ui.lbl_browse.clear
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QtGui.QFileDialog.DontUseNativeDialog)
@@ -127,15 +127,15 @@ class MyPopupDialog(QtGui.QDialog):
     def desired_location(self, filename):
         shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoEnd.png")
 
-    def saveUserProfile(self):
-        inputData = self.getPopUpInputs()
+    def save_user_profile(self):
+        inputData = self.get_design_report_inputs()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile", '*.txt')
 
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
 
-    def getPopUpInputs(self):
+    def get_design_report_inputs(self):
 
         input_summary = {}
         input_summary["ProfileSummary"] = {}
@@ -152,7 +152,7 @@ class MyPopupDialog(QtGui.QDialog):
 
         return input_summary
 
-    def useUserProfile(self):
+    def use_user_profile(self):
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
@@ -233,21 +233,21 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.actionCreate_design_report_2.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages_2.triggered.connect(self.save_log)
-        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
-        self.ui.actionZoom_in.triggered.connect(self.callZoomin)
-        self.ui.actionZoom_out.triggered.connect(self.callZoomout)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialog)
+        self.ui.actionZoom_in.triggered.connect(self.call_zoom_in)
+        self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
         self.ui.actionSave_3D_model.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_CAD_image.triggered.connect(self.save2DcadImages)
+        self.ui.actionSave_CAD_image.triggered.connect(self.save_2d_cad_images)
         self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
-        self.ui.actionPan.triggered.connect(self.call_Pannig)
+        self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3DBeam)
         self.ui.actionShow_column.triggered.connect(self.call_3DColumn)
         self.ui.actionShoe_end_plate.triggered.connect(self.call_3DEndplate)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
-        self.ui.actionChange_background.triggered.connect(self.showColorDialog)
+        self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # self.ui.combo_Beam.addItems(get_beamcombolist())
         # self.ui.comboColSec.addItems(get_columncombolist())
@@ -293,7 +293,7 @@ class MainController(QtGui.QMainWindow):
 
         self.connectivity = None
         self.fuse_model = None
-        self.disableViewButtons()
+        self.disable_view_buttons()
         self.resultObj = None
         self.uiObj = None
 
@@ -304,7 +304,7 @@ class MainController(QtGui.QMainWindow):
         image_path = "ResourceFiles/Osdag_header.png"
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
-    def showFontDialogue(self):
+    def show_font_dialog(self):
 
         font, ok = QtGui.QFontDialog.getFont()
         if ok:
@@ -312,7 +312,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
-    def showColorDialog(self):
+    def show_color_dialog(self):
 
         col = QtGui.QColorDialog.getColor()
         colorTup = col.getRgb()
@@ -321,19 +321,19 @@ class MainController(QtGui.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    def callZoomin(self):
+    def call_zoom_in(self):
         self.display.ZoomFactor(2)
 
-    def callZoomout(self):
+    def call_zoom_out(self):
         self.display.ZoomFactor(0.5)
 
-    def callRotation(self):
+    def call_rotation(self):
         self.display.Rotation(15, 0)
 
-    def call_Pannig(self):
+    def call_panning(self):
         self.display.Pan(50, 0)
 
-    def save2DcadImages(self):
+    def save_2d_cad_images(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
         fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
@@ -343,7 +343,7 @@ class MainController(QtGui.QMainWindow):
             self.display.ExportToImage(fName)
             QtGui.QMessageBox.about(self, 'Information', "File saved")
 
-    def disableViewButtons(self):
+    def disable_view_buttons(self):
         '''
         Disables the all buttons in toolbar
         '''
@@ -1747,8 +1747,9 @@ class MainController(QtGui.QMainWindow):
             else:
                 fileName = self.folder + "/images_html/endTop.svg"
 
-            svgfile = Svg_window()
-            return svgfile.call_svgwindow(fileName, view)
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(fileName, view, self.folder)
+            self.save_2D_image_names(view)
 #             return self.svgWinObj.call_svgwindow(fileName, view)
 #             self.svgWidget.setWindowTitle('2D View')
 #             self.svgWidget.show()
@@ -1760,25 +1761,27 @@ class MainController(QtGui.QMainWindow):
 #             base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
 #         return (base, base1, base2, base3)
 
+
 #     def open_new(self, view):
 #         self.btn_save.clicked.connect(self.save_2D_image_names)
 #         return self.save_2D_image_names(view)
 
-    def save_2D_image_names(self, view):
-#         view = self.go_to_open_svg(view)
+#     def save_2D_image_names(self, view):
+# #         view = self.go_to_open_svg(view)
 #         self.btn_save.clicked.connect(view)
+#
+#         if view == "Front":
+#             png_image_path = self.folder + "/images_html/endFront.png"
+#             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+#         elif view == "Side":
+#             png_image_path = self.folder + "/images_html/endSide.png"
+#             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+#         else:
+#             png_image_path = self.folder + "/images_html/endTop.png"
+#             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+#
+#         QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 
-        if view == "Front":
-            png_image_path = self.folder + "/images_html/endFront.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
-        elif view == "Side":
-            png_image_path = self.folder + "/images_html/endSide.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
-        else:
-            png_image_path = self.folder + "/images_html/endTop.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
-
-        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 
 #     def save_2D_images(self, fileName, view):
 #         fileName = fileName

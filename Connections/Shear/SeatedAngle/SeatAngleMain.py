@@ -823,26 +823,35 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
-            print"printing nutboltlist", len(nutboltlist)
-            osdagDisplayShape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
-            osdagDisplayShape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
-#             for nutbolt in nutboltlist:
-#                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[8], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[9], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[10], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[11], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[12], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[13], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[14], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[15], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[16], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdagDisplayShape(self.display, nutboltlist[17], color=Quantity_NOC_SADDLEBROWN, update=True)
+            for nutbolt in nutboltlist:
+                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
             osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
             osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            #osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
-            #osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
-            #nutboltlist = self.connectivity.nutBoltArray.getModels()
-            #for nutbolt in nutboltlist:
-                #osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
+            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+            nutboltlist = self.connectivity.nutBoltArray.getModels()
+            for nutbolt in nutboltlist:
+                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
 # -------------------------------------------------------------------------
 # TODO check the 3D drawing generating functions below
@@ -1058,7 +1067,7 @@ class MainController(QtGui.QMainWindow):
                 self.connectivity = self.create3DBeamWebBeamWeb()
                 self.fuse_model = None
 
-            self.display3Dmodel("SeatAngle")
+            self.display3Dmodel("Model")
             nutboltArrayOrigin = self.connectivity.angle.secOrigin 
             nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.L/4 * self.connectivity.angle.wDir  
             nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.T * self.connectivity.angle.uDir  
@@ -1115,6 +1124,12 @@ class MainController(QtGui.QMainWindow):
             my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
             self.display.DisplayShape(my_sphere7,color = 'green',update = True)
 
+            
+            topclipB_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.uDir
+            
+            angletopRealOrigin = getGpPt(topclipB_nutboltArrayOrigin)
+            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
+            self.display.DisplayShape(my_sphere7,color = 'green',update = True)
 
         else:
             self.display.EraseAll()

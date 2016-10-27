@@ -139,9 +139,9 @@ class NutBoltArray():
         for rw in  range(self.topclipbrow):
             for col in range(self.topclipbcol):
                 pos = self.topclipborigin 
-                pos = pos + self.end * self.topclipbgaugeDir
+                pos = pos + self.edge * self.topclipbgaugeDir
                 pos = pos + col * self.gauge * self.topclipbgaugeDir 
-                pos = pos + self.edge * self.topclipbpitchDir 
+                pos = pos + self.end * self.topclipbpitchDir 
                 pos = pos + rw * self.pitch * self.topclipbpitchDir
                 
                 self.topclipbpositions.append(pos)

@@ -34,17 +34,17 @@ from utilities import osdagDisplayShape
 
 from ISection import ISection
 from angle import Angle
-from filletweld import FilletWeld
+from fillet_weld import FilletWeld
 from bolt import Bolt
 from nut import Nut
-from SeatAngleCalc import SeatAngleCalculation
-from nutBoltPlacement import NutBoltArray
+from seat_angle_calc import SeatAngleCalculation
+from nut_bolt_placement import NutBoltArray
 
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+from col_web_beam_web_connectivity import ColWebBeamWeb
+from col_flange_beam_web_connectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
 
-from reportGenerator import *
+from report_generator import *
 from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
@@ -85,8 +85,8 @@ class DesignReportDialog(QtGui.QDialog):
 
     # noinspection PyPep8Naming
     def save_inputSummary(self):
-        input_summary = self.getPopUpInputs()
-        self.mainController.save_design(input_summary)
+        report_summary = self.get_report_summary()
+        self.mainController.save_design(report_summary)
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear
@@ -102,28 +102,28 @@ class DesignReportDialog(QtGui.QDialog):
         shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoFin.png")
 
     def saveUserProfile(self):
-        inputData = self.getPopUpInputs()
+        inputData = self.get_report_summary()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
                                                      '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
 
-    def getPopUpInputs(self):
-        input_summary = {}
-        input_summary["ProfileSummary"] = {}
-        input_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
-        input_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
-        input_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
-        input_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+    def get_report_summary(self):
+        report_summary = {}
+        report_summary["ProfileSummary"] = {}
+        report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+        report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+        report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+        report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
 
-        input_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
-        input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
-        input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
-        input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+        report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+        report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+        report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+        report_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
-        return input_summary
+        return report_summary
 
     def useUserProfile(self):
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
@@ -184,7 +184,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QtGui.QDoubleValidator()
-        #TODO add exhaustive validators
+        #TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -204,7 +204,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_front_view.triggered.connect(lambda:self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
-        #TODO update ui variables with appropiate names and code below
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
@@ -267,7 +266,7 @@ class MainController(QtGui.QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.saObj = SeatAngleCalculation()
+        self.sa_calc_object = SeatAngleCalculation()
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
@@ -372,6 +371,7 @@ class MainController(QtGui.QMainWindow):
                 self.ui.combo_column_section.addItems(get_beamcombolist())
 
             self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            print uiObj
             self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
 
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
@@ -474,8 +474,8 @@ class MainController(QtGui.QMainWindow):
         outObj['SeatAngle']["Moment Capacity (kN-mm)"] = float(self.ui.txt_moment_capacity.text())
         outObj['SeatAngle']["Shear Demand (kN)"] = float(self.ui.txt_seat_shear_demand.text())
         outObj['SeatAngle']["Shear Capacity (kN)"] = float(self.ui.txt_seat_shear_capacity.text())
-        # TODO confirm after checking UI: beam shear strength (mostly) vs seat shear strength(?)
-        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_seat_shear_strength.text())
+        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_beam_shear_strength.text())
+        outObj['SeatAngle']["Top Angle"] = float(self.ui.txt_top_angle.text())
 
         outObj['Bolt'] = {}
         outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
@@ -500,25 +500,24 @@ class MainController(QtGui.QMainWindow):
         self.show_design_report_dialog()
         # function name changed from createDesignReport
 
-    def save_design(self):
+    def save_design(self, report_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
+        file_name, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
                                                                    "Html Files (*.html)")
-        fileName = str(fileName)
+        file_name = str(file_name)
         base, base_front, base_top, base_side = self.call2D_Drawing("All")
         inputdict = self.uiObj
         outdict = self.resultObj
 
-        dictBeamData = self.fetchBeamPara()
-        dictColData = self.fetchColumnPara()
-        save_html(outdict, inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base,
+        report_generator_instance = ReportGenerator(self.sa_calc_object)
+        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder, base,
                   base_front, base_top, base_side)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.foler)+"/LogMessages",
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -566,8 +565,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_moment_capacity.clear()
         self.ui.txt_seat_shear_demand.clear()
         self.ui.txt_seat_shear_capacity.clear()
-        # TODO check seat OR beam shear strength
-        self.ui.txt_seat_shear_strength.clear()
+        self.ui.txt_beam_shear_strength.clear()
+        self.ui.txt_top_angle.clear()
 
         self.ui.txt_bolt_shear_capacity.clear()
         self.ui.txt_bolt_bearing_capacity.clear()
@@ -688,9 +687,11 @@ class MainController(QtGui.QMainWindow):
         angle_shear_capacity = resultObj['SeatAngle']['Shear Capacity (kN)']
         self.ui.txt_seat_shear_capacity.setText(str(angle_shear_capacity))
 
-        #TODO check seat or beam shear strength
         beam_shear_strength = resultObj['SeatAngle']['Beam Shear Strength (kN)']
-        self.ui.txt_seat_shear_strength.setText(str(beam_shear_strength))
+        self.ui.txt_beam_shear_strength.setText(str(beam_shear_strength))
+
+        top_angle = resultObj['SeatAngle']['Top Angle']
+        self.ui.txt_top_angle.setText(str(top_angle))
 
     def displaylog_totextedit(self):
         '''
@@ -861,7 +862,7 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with column web beam web
         '''
         uiObj = self.getuser_inputs()
-        resultObj = self.saObj.seat_angle_connection(uiObj)
+        resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
@@ -952,8 +953,7 @@ class MainController(QtGui.QMainWindow):
         
         '''
         uiObj = self.getuser_inputs()
-        resultObj = self.saObj.seat_angle_connection(uiObj)
-        print "printing resultobj", resultObj
+        resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
         #         fillet_length = resultObj['Plate']['height']
@@ -1191,7 +1191,7 @@ class MainController(QtGui.QMainWindow):
         self.uiObj = self.getuser_inputs()
 
         # Seated Angle Design Calculations.
-        self.resultObj = self.saObj.seat_angle_connection(self.uiObj)
+        self.resultObj = self.sa_calc_object.seat_angle_connection(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1203,7 +1203,7 @@ class MainController(QtGui.QMainWindow):
         self.displaylog_totextedit()
 
         # Displaying 3D Cad model
-        status = self.resultObj['Bolt']['status']
+        status = self.resultObj['SeatAngle']['status']
         self.call_3DModel(status)
 
     def create2Dcad(self, connectivity):
@@ -1493,7 +1493,7 @@ if __name__ == '__main__':
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # while launching from Osdag Main:
-    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
+    fh = logging.FileHandler("./seatangle.log", mode="w")
     # while launching from Seated Angle folder
     # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
@@ -1510,5 +1510,3 @@ if __name__ == '__main__':
     window = MainController(folder)
     window.show()
     sys.exit(app.exec_())
-
-#TODO : connect to osdag main window

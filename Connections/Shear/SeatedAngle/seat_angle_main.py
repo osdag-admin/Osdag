@@ -709,6 +709,76 @@ class MainController(QtGui.QMainWindow):
         vscrollBar = self.ui.textEdit.verticalScrollBar();
         vscrollBar.setValue(vscrollBar.maximum());
         afile.close()
+    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+    def boltHeadThick_Calculation(self,boltDia):
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        
+        '''
+        boltHeadThick = {5:4, 6:5, 8:6, 10:7, 12:8, 16:10, 20:12.5, 22:14, 24:15, 27:17, 30:18.7, 36:22.5 }
+        return boltHeadThick[boltDia]
+        
+        
+    def boltHeadDia_Calculation(self,boltDia):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        
+        '''
+        boltHeadDia = {5:7, 6:8, 8:10, 10:15, 12:20, 16:27, 20:34, 22:36, 24:41, 27:46, 30:50, 36:60 }
+        return boltHeadDia[boltDia]
+    
+    def boltLength_Calculation(self,boltDia):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+       
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    | 
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       | 
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__ 
+        
+        '''
+        boltHeadDia = {5:40, 6:40, 8:40, 10:40, 12:40, 16:50, 20:50, 22:50, 24:50, 27:60, 30:65, 36:75 }
+       
+        return boltHeadDia[boltDia]
+    
+    def nutThick_Calculation(self,boltDia):
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
+        nutDia = {5:5, 6:5.65, 8:7.15, 10:8.75, 12:11.3, 16:15, 20:17.95, 22:19.0, 24:21.25, 27:23, 30:25.35, 36:30.65 }
+        
+        return nutDia[boltDia]
+    
+    #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
     def get_backend(self):
         """
         loads a backend
@@ -824,24 +894,6 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
-            # osdagDisplayShape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[8], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[9], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[10], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[11], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[12], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[13], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[14], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[15], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[16], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[17], color=Quantity_NOC_SADDLEBROWN, update=True)
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
@@ -907,23 +959,37 @@ class MainController(QtGui.QMainWindow):
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
-        #         topclipangle = Angle(L = angle_l, A = 60, B = 60,T = 6, R1 =6.5, R2 = 0)
+        # TODO add topclipangle field  in user inputs(changes in .ui file)
         topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
-
-        #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-
-        #         fillet_length = resultObj['Plate']['height']
-        #         fillet_thickness =  resultObj['Weld']['thickness']
-        #         plate_width = resultObj['Plate']['width']
-        #         plate_thick = uiObj['Plate']['Thickness (mm)']
+        
+        ############################################################
         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = bolt_r + 7
+        bolt_r = bolt_dia/2
+        bolt_R = self.boltHeadDia_Calculation(bolt_dia) /2
         nut_R = bolt_R
-        bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
-        bolt_Ht = 50.0  # minimum bolt length as per Indian Standard IS 3750(1985)
-        nut_T = 12.0  # minimum nut thickness As per Indian Standard
-        nut_Ht = 12.2  #
+        bolt_T = self.boltHeadThick_Calculation(bolt_dia) 
+        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        nut_T = self.nutThick_Calculation(bolt_dia)# bolt_dia = nut_dia
+        nut_Ht = 12.2 #150
+        
+        
+        ##############################################################
+#===============================================================================
+#         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
+# 
+#         #         fillet_length = resultObj['Plate']['height']
+#         #         fillet_thickness =  resultObj['Weld']['thickness']
+#         #         plate_width = resultObj['Plate']['width']
+#         #         plate_thick = uiObj['Plate']['Thickness (mm)']
+#         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
+#         bolt_r = bolt_dia / 2
+#         bolt_R = bolt_r + 7
+#         nut_R = bolt_R
+#         bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
+#         bolt_Ht = 50.0  # minimum bolt length as per Indian Standard IS 3750(1985)
+#         nut_T = 12.0  # minimum nut thickness As per Indian Standard
+#         nut_Ht = 12.2  #
+#===============================================================================
 
         # plate = Plate(L= 300,W =100, T = 10)
         #         angle = Angle(L = angle_l, A = angle_a, B = angle_b,T = angle_t, R1 = angle_r1, R2 = angle_r2)
@@ -936,8 +1002,13 @@ class MainController(QtGui.QMainWindow):
 
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-
+        # TODO 
         gap = beam_tw + angle_t + nut_T
+        print"%%%%%%%%%%%%%%%%%%%%%%%%%%5"
+        print beam_tw
+        print angle_t
+        print nut_T
+        
 
         nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
         #         topclipnutboltArray = NutBoltArray(resultObj,nut,bolt,gap)
@@ -1005,27 +1076,37 @@ class MainController(QtGui.QMainWindow):
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
 
         topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
-
-        #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-
-        #         fillet_length = resultObj['Plate']['height']
-        #         fillet_thickness =  resultObj['Weld']['thickness']
-        #         plate_width = resultObj['Plate']['width']
-        #         plate_thick = uiObj['Plate']['Thickness (mm)']
+        
+        
         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = bolt_r + 7
+        bolt_r = bolt_dia/2
+        bolt_R = self.boltHeadDia_Calculation(bolt_dia) /2
+        #bolt_R = bolt_r + 7
         nut_R = bolt_R
-        bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
-        bolt_Ht = 50.0  # minimum bolt length as per Indian Standard
-        nut_T = 12.0  # minimum nut thickness As per Indian Standard
-        nut_Ht = 12.2  #
+        bolt_T = self.boltHeadThick_Calculation(bolt_dia) 
+        #bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
+        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        # bolt_Ht =100.0 # minimum bolt length as per Indian Standard
+        nut_T = self.nutThick_Calculation(bolt_dia)# bolt_dia = nut_dia
+        #nut_T = 12.0 # minimum nut thickness As per Indian Standard
+        nut_Ht = 12.2 #
 
-        # plate = Plate(L= 300,W =100, T = 10)
-        #         angle = Angle(L = angle_l, A = angle_a, B = angle_b,T = angle_t, R1 = angle_r1, R2 = angle_r2)
-
-        # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        #         Fweld1 = FilletWeld(L= fillet_length,b = fillet_thickness, h = fillet_thickness)
+#===============================================================================
+#         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
+# 
+#         #         fillet_length = resultObj['Plate']['height']
+#         #         fillet_thickness =  resultObj['Weld']['thickness']
+#         #         plate_width = resultObj['Plate']['width']
+#         #         plate_thick = uiObj['Plate']['Thickness (mm)']
+#         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
+#         bolt_r = bolt_dia / 2
+#         bolt_R = bolt_r + 7
+#         nut_R = bolt_R
+#         bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
+#         bolt_Ht = 50.0  # minimum bolt length as per Indian Standard
+#         nut_T = 12.0  # minimum nut thickness As per Indian Standard
+#         nut_Ht = 12.2  #
+#===============================================================================
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -1118,14 +1199,14 @@ class MainController(QtGui.QMainWindow):
             my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
             self.display.DisplayShape(my_sphere6,color = 'green',update = True)
             
-            topclip_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.B * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.vDir
+            topclip_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.B * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.L * self.connectivity.topclipangle.wDir
             
             angletopRealOrigin = getGpPt(topclip_nutboltArrayOrigin)
             my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
             self.display.DisplayShape(my_sphere7,color = 'green',update = True)
 
             
-            topclipB_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.uDir
+            topclipB_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.L * self.connectivity.topclipangle.wDir
             
             angletopRealOrigin = getGpPt(topclipB_nutboltArrayOrigin)
             my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()

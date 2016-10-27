@@ -14,6 +14,7 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.gp import gp_Pnt
 from nut_bolt_placement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
+import math
 
 
 class ColWebBeamWeb(object):
@@ -88,37 +89,72 @@ class ColWebBeamWeb(object):
         pitchDir = -self.angle.vDir
         boltDir = -self.angle.uDir
         
-        nutboltArrayOrigin = self.angle.secOrigin 
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir  
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
+        #=======================================================================
+        # nutboltArrayOrigin = self.angle.secOrigin 
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir  
+        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
+        #=======================================================================
+        
+        root2 = math.sqrt(2)
+        nutboltArrayOrigin = self.angle.secOrigin  
+        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir 
+        nutboltArrayOrigin= nutboltArrayOrigin + self.angle.T * self.angle.uDir 
+        nutboltArrayOrigin = nutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.uDir 
+        nutboltArrayOrigin = nutboltArrayOrigin - self.angle.R2/root2*self.angle.vDir
+        
         
         bgaugeDir = self.angle.wDir
         bpitchDir = -self.angle.uDir
         bboltDir = -self.angle.vDir
         
-        bnutboltArrayOrigin = self.angle.secOrigin 
-        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir  
-        bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
+        bnutboltArrayOrigin = self.angle.secOrigin + self.angle.B * self.angle.uDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.vDir 
+        bnutboltArrayOrigin = bnutboltArrayOrigin - self.angle.R2/root2*self.angle.uDir
         
-        topclipgaugeDir = self.topclipangle.wDir
-        topclippitchDir = -self.topclipangle.vDir
-        topclipboltDir = -self.topclipangle.uDir
+        #=======================================================================
+        # bnutboltArrayOrigin = self.angle.secOrigin 
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir  
+        # bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
+        #=======================================================================
         
-        topclipnutboltArrayOrigin = self.topclipangle.secOrigin 
-        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
-        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir  
-        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir
+        topclipgaugeDir = -self.topclipangle.wDir
+        topclippitchDir = -self.topclipangle.uDir
+        topclipboltDir = -self.topclipangle.vDir
         
-        topclipbgaugeDir = self.topclipangle.wDir
-        topclipbpitchDir = -self.topclipangle.uDir
-        topclipbboltDir = -self.topclipangle.vDir
+        topclipnutboltArrayOrigin = self.topclipangle.secOrigin  
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.B * self.topclipangle.uDir 
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir 
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin - self.topclipangle.R2/root2 * self.topclipangle.uDir 
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.R2*(1-1/root2)*self.topclipangle.vDir
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
         
-        topclipbnutboltArrayOrigin = self.topclipangle.secOrigin 
-        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
-        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir  
-        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
+        #=======================================================================
+        # topclipnutboltArrayOrigin = self.topclipangle.secOrigin 
+        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
+        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir  
+        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir
+        #=======================================================================
+        
+        topclipbgaugeDir = -self.topclipangle.wDir
+        topclipbpitchDir = -self.topclipangle.vDir
+        topclipbboltDir = -self.topclipangle.uDir
+        
+        topclipbnutboltArrayOrigin = self.topclipangle.secOrigin  
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir 
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir 
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin - self.topclipangle.R2/root2 * self.topclipangle.vDir 
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin+ self.topclipangle.R2*(1-1/root2)*self.topclipangle.uDir
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
+        
+        #=======================================================================
+        # topclipbnutboltArrayOrigin = self.topclipangle.secOrigin 
+        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
+        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir  
+        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
+        #=======================================================================
                   
         self.nutBoltArray.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir,bnutboltArrayOrigin,bgaugeDir,bpitchDir,bboltDir, topclipnutboltArrayOrigin, topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin,topclipbgaugeDir,topclipbpitchDir,topclipbboltDir)
       

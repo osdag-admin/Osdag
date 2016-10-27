@@ -59,14 +59,14 @@ def get_beamcombolist():
     '''(None) -> (List)
     This function returns list of Indian Standard Beam Designation.
     '''
-    comboList = []
-    beamQuery = QSqlQuery("Select Designation from Beams")
-    comboList.append("Select Designation")
-    while(beamQuery.next()):
-        comboList.append(beamQuery.value(0).toString())
-    print "printing comboList"
-    print comboList
-    return comboList
+    combo_list = []
+    beam_query = QSqlQuery("Select Designation from Beams")
+    combo_list.append("Select Designation")
+    while(beam_query.next()):
+        combo_list.append(beam_query.value(0).toString())
+    print "printing combo_list"
+    print combo_list
+    return combo_list
 
 
 def get_beamdata(sect):
@@ -75,35 +75,35 @@ def get_beamdata(sect):
     '''
     section = sect
 
-    queryStr = "Select * from Beams where Designation = '%s'" % section
+    query_str = "Select * from Beams where Designation = '%s'" % section
 
-    designQuery = QSqlQuery(queryStr)
-    print(designQuery)
+    design_query = QSqlQuery(query_str)
+    print(design_query)
 
-    print designQuery.size()
-    retDict = {}
-    record = designQuery.record()
+    print design_query.size()
+    ret_dict = {}
+    record = design_query.record()
 
-    while(designQuery.next()):
+    while(design_query.next()):
         for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            col_name = record.fieldName(i)
+            ret_dict[col_name] = design_query.value(i).toString()
 
-    # print(retDict[QString("tw")])
+    # print(ret_dict[QString("tw")])
 
-    return retDict
+    return ret_dict
 
 
 def get_columncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
     '''
-    comboList = []
-    columnQuery = QSqlQuery("SELECT Designation FROM Columns")
-    comboList.append("Select Column")
-    while(columnQuery.next()):
-        comboList.append(columnQuery.value(0).toString())
-    return comboList
+    combo_list = []
+    column_query = QSqlQuery("SELECT Designation FROM Columns")
+    combo_list.append("Select Column")
+    while(column_query.next()):
+        combo_list.append(column_query.value(0).toString())
+    return combo_list
 
 
 def get_columndata(sect):
@@ -113,20 +113,20 @@ def get_columndata(sect):
     '''
     section = sect
     # section = Ui_MainWindow.comboColSec.currentText()
-    queryStr = "Select * from Columns where Designation = '%s'" % section
+    query_str = "Select * from Columns where Designation = '%s'" % section
 
-    designQuery = QSqlQuery(queryStr)
-    print(designQuery)
+    design_query = QSqlQuery(query_str)
+    print(design_query)
 
-    print designQuery.size()
-    retDict = {}
-    record = designQuery.record()
+    print design_query.size()
+    ret_dict = {}
+    record = design_query.record()
 
-    while(designQuery.next()):
+    while(design_query.next()):
         for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            col_name = record.fieldName(i)
+            ret_dict[col_name] = design_query.value(i).toString()
 
-    return retDict
+    return ret_dict
 
 # module_setup()

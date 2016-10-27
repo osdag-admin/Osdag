@@ -988,9 +988,9 @@ class End2DCreatorFront(object):
 #         self.dataObj.draw_faint_line(ptB1,ptB2,dwg)
 
         # Gap Distance
-        gapPt = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)) 
-        ptG1 = self.ptFP + (gapPt + 30) * np.array([0, 1])
-        ptG2 = self.FC1 + (gapPt + 30) * np.array([0, 1])
+        gap_pt = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3))
+        ptG1 = self.ptFP + (gap_pt + 30) * np.array([0, 1])
+        ptG2 = self.FC1 + (gap_pt + 30) * np.array([0, 1])
         offset = self.dataObj.col_L  # 60% of the column length
         params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim":10, "arrowlen": 50}
 #         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.plate_thick) + " mm", params)
@@ -2014,8 +2014,8 @@ class End2DCreatorSide(object):
         pitch_pts = []
         pitch_pts1 = []
         for row in range(nr):
-            colList = []
-            colList1 = []
+            col_list = []
+            col_list1 = []
             for col in range(nc):
                 pt = self.BZ + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
                 pt_other = self.BR - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
@@ -2038,10 +2038,10 @@ class End2DCreatorSide(object):
 
                 dwg.add(dwg.line((blt1_o), (blt2_o)).stroke('black', width=1, linecap='square'))
                 dwg.add(dwg.line((blt3_o), (blt4_o)).stroke('black', width=1, linecap='square'))
-                colList.append(pt_other)
-                colList1.append(pt)
-            pitch_pts.append(colList)
-            pitch_pts1.append(colList1)
+                col_list.append(pt_other)
+                col_list1.append(pt)
+            pitch_pts.append(col_list)
+            pitch_pts1.append(col_list1)
 
         if nc > 1:
             gaugept1_other = np.array(pitch_pts[-1][0])
@@ -2184,8 +2184,8 @@ class End2DCreatorSide(object):
         pitch_pts = []
         pitch_pts = []
         for row in range(nr):
-            colList = []
-            colList1 = []
+            col_list = []
+            col_list1 = []
             for col in range(nc):
                 pt = self.Q + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
                 pt_other = self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
@@ -2208,10 +2208,10 @@ class End2DCreatorSide(object):
 
                 dwg.add(dwg.line((blt1_o), (blt2_o)).stroke('black', width=1, linecap='square'))
                 dwg.add(dwg.line((blt3_o), (blt4_o)).stroke('black', width=1, linecap='square'))
-                colList.append(pt_other)
-                colList1.append(pt)
-            pitch_pts.append(colList)
-            pitch_pts1.append(colList1)
+                col_list.append(pt_other)
+                col_list1.append(pt)
+            pitch_pts.append(col_list)
+            pitch_pts1.append(col_list1)
 
         if nc > 1:
             gaugept1_other = np.array(pitch_pts[-1][0])
@@ -2333,8 +2333,8 @@ class End2DCreatorSide(object):
         pitch_pts = []
         pitch_pts1 = []
         for row in range(nr):
-            colList = []
-            colList1 = []
+            col_list = []
+            col_list1 = []
             for col in range(nc):
                 pt = (self.FQ + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch *
                       np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0]))
@@ -2359,10 +2359,10 @@ class End2DCreatorSide(object):
 
                 dwg.add(dwg.line((blt1_o), (blt2_o)).stroke('black', width=1, linecap='square'))
                 dwg.add(dwg.line((blt3_o), (blt4_o)).stroke('black', width=1, linecap='square'))
-                colList.append(pt_other)
-                colList1.append(pt)
-            pitch_pts.append(colList)
-            pitch_pts1.append(colList1)
+                col_list.append(pt_other)
+                col_list1.append(pt)
+            pitch_pts.append(col_list)
+            pitch_pts1.append(col_list1)
 
         if nc > 1:
             gaugept1_other = np.array(pitch_pts[-1][0])

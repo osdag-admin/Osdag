@@ -685,7 +685,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
         max_width = str(int(140 + 2 * (int(gauge + end))))
         str_max_len = "140" + "2*(" + gauge + end + ")"
 
-        min_width = plate_minwidth
+    min_width = plate_minwidth
     row = [0, "Plate Width (mm)", "&#8805; " + min_width + ", &#8804; " + max_width + "<br>", plate_width,
            " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
     # row =[0,"Plate width (mm)","",plate_width]

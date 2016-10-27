@@ -23,15 +23,15 @@ module_setup()
 # Source: Subramanian's book, page: 348
 
 
-def netArea_calc(dia):
-    netArea = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
-    return netArea[dia]
+def net_area_calc(dia):
+    net_area = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
+    return net_area[dia]
 
 # BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
 
 
 def black_bolt_shear(dia, n, fu):
-    A = netArea_calc(dia)
+    A = net_area_calc(dia)
     root3 = math.sqrt(3);
     Vs = fu * n * A / (root3 * 1.25 * 1000)
     Vs = round(Vs, 3)
@@ -138,52 +138,52 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
 
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
     if numcol == 1:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * edge_dist
-        Atn = platethk * (edge_dist - 0.5 * dia_hole)
+        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_tension_gross = platethk * edge_dist
+        area_tension_net = platethk * (edge_dist - 0.5 * dia_hole)
         
-        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
+        Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_tension_gross * fy / 1.1)
         Tdb = min (Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         
     elif numcol == 2:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * (edge_dist + gauge)
-        Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_tension_gross = platethk * (edge_dist + gauge)
+        area_tension_net = platethk * (edge_dist + gauge - 0.5 * dia_hole)
         
-        Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
+        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
+        Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_tension_gross * fy / 1.1)
         Tdb = min (Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         
     return Tdb  
 
 
-def endConn(uiObj):
+def end_connection(ui_obj):
     global logger
-    beam_sec = uiObj['Member']['BeamSection']
-    column_sec = uiObj['Member']['ColumSection']
-    connectivity = uiObj['Member']['Connectivity']
-    beam_fu = uiObj['Member']['fu (MPa)']
-    beam_fy = uiObj['Member']['fy (MPa)']
+    beam_sec = ui_obj['Member']['BeamSection']
+    column_sec = ui_obj['Member']['ColumSection']
+    connectivity = ui_obj['Member']['Connectivity']
+    beam_fu = ui_obj['Member']['fu (MPa)']
+    beam_fy = ui_obj['Member']['fy (MPa)']
               
-    shear_load = uiObj['Load']['ShearForce (kN)']
+    shear_load = ui_obj['Load']['ShearForce (kN)']
                   
-    bolt_dia = uiObj['Bolt']['Diameter (mm)']
-    bolt_type = uiObj["Bolt"]["Type"]
-    bolt_grade = uiObj['Bolt']['Grade']
+    bolt_dia = ui_obj['Bolt']['Diameter (mm)']
+    bolt_type = ui_obj["Bolt"]["Type"]
+    bolt_grade = ui_obj['Bolt']['Grade']
               
-    end_plate_t = uiObj['Plate']['Thickness (mm)']
-    end_plate_w = uiObj['Plate']['Width (mm)']
-    end_plate_l = uiObj['Plate']['Height (mm)']
-    web_plate_fu = uiObj['Member']['fu (MPa)']
-    web_plate_fy = uiObj['Member']['fy (MPa)']
+    end_plate_t = ui_obj['Plate']['Thickness (mm)']
+    end_plate_w = ui_obj['Plate']['Width (mm)']
+    end_plate_l = ui_obj['Plate']['Height (mm)']
+    web_plate_fu = ui_obj['Member']['fu (MPa)']
+    web_plate_fy = ui_obj['Member']['fy (MPa)']
     user_height = end_plate_l 
     user_width = end_plate_w      
-    weld_t = uiObj["Weld"]['Size (mm)']
+    weld_t = ui_obj["Weld"]['Size (mm)']
     weld_fu = 410
 
     bolt_planes = 1 
@@ -617,54 +617,54 @@ def endConn(uiObj):
         logger.info(": Increase the Weld Size")
     
     # End of calculation
-    outputObj = {}
-    outputObj['Bolt'] = {}
-    outputObj['Bolt']['status'] = True
-    outputObj['Bolt']['shearcapacity'] = bolt_shear_capacity
-    outputObj['Bolt']['bearingcapacity'] = bolt_bearing_capacity
-    outputObj['Bolt']['boltcapacity'] = bolt_capacity
-    outputObj['Bolt']['numofbolts'] = int(2 * no_col * no_row)
-    outputObj['Bolt']['boltgrpcapacity'] = float(bolt_capacity * 2 * no_col * no_row)
-    outputObj['Bolt']['numofrow'] = int(no_row)
-    outputObj['Bolt']['numofcol'] = int(2 * no_col)
-    outputObj['Bolt']['pitch'] = float(pitch)
-    outputObj['Bolt']['enddist'] = float(end_dist)
-    outputObj['Bolt']['edge'] = float(edge_dist)
-    outputObj['Bolt']['gauge'] = float(gauge)
-    outputObj['Bolt']['thinner'] = float(t_thinner)
-    outputObj['Bolt']['dia_hole'] = float(dia_hole)
-    outputObj['Bolt']['bolt_fu'] = float(bolt_fu)
-    outputObj['Bolt']['bolt_fy'] = float(bolt_fy)
-    outputObj['Bolt']['critshear'] = round(crit_shear, 3)
-    outputObj['Bolt']['kb'] = float(kb)
-     
-    outputObj['Weld'] = {}
-    outputObj['Weld']['weldshear'] = Vy1
-    outputObj['Weld']['weldlength'] = weld_l
-    outputObj['Weld']['weldstrength'] = weld_strength
-     
-    outputObj['Plate'] = {}
-    outputObj['Plate']['Height'] = float(end_plate_l)
-    outputObj['Plate']['Width'] = float(end_plate_w)
-    outputObj['Plate']['MinThick'] = float(min_end_plate_t)
-    outputObj['Plate']['MinWidth'] = float(min_end_plate_w)
-    outputObj['Plate']['blockshear'] = float(Tdb)
-    outputObj['Plate']['Sectional Gauge'] = float(sectional_gauge)
+    output_obj = {}
+    output_obj['Bolt'] = {}
+    output_obj['Bolt']['status'] = True
+    output_obj['Bolt']['shearcapacity'] = bolt_shear_capacity
+    output_obj['Bolt']['bearingcapacity'] = bolt_bearing_capacity
+    output_obj['Bolt']['boltcapacity'] = bolt_capacity
+    output_obj['Bolt']['numofbolts'] = int(2 * no_col * no_row)
+    output_obj['Bolt']['boltgrpcapacity'] = float(bolt_capacity * 2 * no_col * no_row)
+    output_obj['Bolt']['numofrow'] = int(no_row)
+    output_obj['Bolt']['numofcol'] = int(2 * no_col)
+    output_obj['Bolt']['pitch'] = float(pitch)
+    output_obj['Bolt']['enddist'] = float(end_dist)
+    output_obj['Bolt']['edge'] = float(edge_dist)
+    output_obj['Bolt']['gauge'] = float(gauge)
+    output_obj['Bolt']['thinner'] = float(t_thinner)
+    output_obj['Bolt']['dia_hole'] = float(dia_hole)
+    output_obj['Bolt']['bolt_fu'] = float(bolt_fu)
+    output_obj['Bolt']['bolt_fy'] = float(bolt_fy)
+    output_obj['Bolt']['critshear'] = round(crit_shear, 3)
+    output_obj['Bolt']['kb'] = float(kb)
+
+    output_obj['Weld'] = {}
+    output_obj['Weld']['weldshear'] = Vy1
+    output_obj['Weld']['weldlength'] = weld_l
+    output_obj['Weld']['weldstrength'] = weld_strength
+
+    output_obj['Plate'] = {}
+    output_obj['Plate']['Height'] = float(end_plate_l)
+    output_obj['Plate']['Width'] = float(end_plate_w)
+    output_obj['Plate']['MinThick'] = float(min_end_plate_t)
+    output_obj['Plate']['MinWidth'] = float(min_end_plate_w)
+    output_obj['Plate']['blockshear'] = float(Tdb)
+    output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
     
-    # return outputObj
+    # return output_obj
     
     if bolts_required == 0:
-        for k in outputObj.keys():
-            for key in outputObj[k].keys():
-                outputObj[k][key] = ""
+        for k in output_obj.keys():
+            for key in output_obj[k].keys():
+                output_obj[k][key] = ""
                 
     if design_check is False:
-        for k in outputObj.keys():
-            for key in outputObj[k].keys():
-                outputObj[k][key] = ""   
+        for k in output_obj.keys():
+            for key in output_obj[k].keys():
+                output_obj[k][key] = ""
                         
-#     outputObj = {}
-    if outputObj['Bolt']['status'] is True:
+#     output_obj = {}
+    if output_obj['Bolt']['status'] is True:
         
         logger.info(": Overall endplate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
@@ -673,5 +673,4 @@ def endConn(uiObj):
         logger.error(": Design is not safe \n ")
         logger.debug(" :=========End Of design===========")
     
-    return outputObj
-
+    return output_obj

@@ -404,8 +404,10 @@ class SeatAngleCalculation(ConnectionCalculations):
         length_avail = (self.angle_l - 2 * self.edge_dist)
 
         self.num_rows = 1
-        self.num_cols = self.bolts_required
-        self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
+        self.num_cols = max(self.bolts_required, 2)
+        self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))),3)
+        # TODO check for zero num_cols
+
         if self.gauge < self.min_gauge:
             self.num_rows = 2
             self.num_cols = int((self.bolts_required + 1) / 2)
@@ -430,8 +432,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             # edge_distance = (angle_l - (bolts_per_line-1)*gauge)/2
             """
             self.gauge = int(math.ceil(self.max_spacing))
-            self.num_cols = int(math.ceil((length_avail / gauge) + 1))
-            self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
+            self.num_cols = int(math.ceil((length_avail / self.gauge) + 1))
+            self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))),3)
 
         self.bolts_provided = self.num_cols*self.num_rows
         self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)
@@ -497,6 +499,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 1)
         # logger.info(": Moment at root angle = " + str(self.moment_at_root_angle))
+        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt ISA200x150x16
 
         """
         Assumption

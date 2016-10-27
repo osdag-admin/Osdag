@@ -392,9 +392,13 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
+        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k_b * bolt_diameter * critical_thickness * <br>"\
+                    +space(3)+" <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> "\
+                    +"[Cl. 10.3.4]"
         prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" \
-                     + beam_fu + ")/(1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]"
-        rstr += design_check_row("Bolt bearing capacity (kN)", " ", prov_field, "")
+                     + beam_fu + ")/(1.25*1000)  <br>"+space(2) +" ="+ bearing_capacity + " kN"
+        # TODO incorrect value of bolt_bearing capacity
+        rstr += design_check_row("Bolt bearing capacity (kN)", req_field, prov_field, "")
 
         # Bolt capacity (kN)
         prov_field = "Min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = " \

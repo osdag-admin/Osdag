@@ -7,7 +7,6 @@ import numpy
 from ModelUtils import *
 
 
-
 class Plate(object):
     
     def __init__(self, L, W, T):        
@@ -33,7 +32,6 @@ class Plate(object):
         self.a3 = self.secOrigin + (-self.T / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
         self.a4 = self.secOrigin + (self.T / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
         self.points = [self.a1, self.a2, self.a3, self.a4]
-       
         
     def createModel(self):
         edges = makeEdgesFromPoints(self.points)
@@ -43,5 +41,4 @@ class Plate(object):
         prism = makePrismFromFace(aFace, extrudeDir)
         
         return prism
-    
-            
+

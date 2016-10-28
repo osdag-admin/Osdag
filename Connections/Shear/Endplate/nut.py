@@ -34,64 +34,63 @@ class Nut(object):
         self.T = T
         self.r1 = innerR1
         # self.r2 = outerR2
-        self.secOrigin = numpy.array([0, 0, 0])
+        self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.computeParams()
+        self.compute_params()
     
-    def place(self, secOrigin, uDir, wDir):
-        self.secOrigin = secOrigin
+    def place(self, sec_origin, uDir, wDir):
+        self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir        
-        self.computeParams()
+        self.compute_params()
         
-    def getPoint(self, theta):
+    def get_point(self, theta):
         theta = math.radians(theta)
-        point = self.secOrigin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
+        point = self.sec_origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir
         return point
     
-    def computeParams(self):
+    def compute_params(self):
         
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.getPoint(0)
-        self.a2 = self.getPoint(60)
-        self.a3 = self.getPoint(120)
-        self.a4 = self.getPoint(180)
-        self.a5 = self.getPoint(240)
-        self.a6 = self.getPoint(300)
+        self.a1 = self.get_point(0)
+        self.a2 = self.get_point(60)
+        self.a3 = self.get_point(120)
+        self.a4 = self.get_point(180)
+        self.a5 = self.get_point(240)
+        self.a6 = self.get_point(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
-       
+
+    def create_model(self):
         
-    def createModel(self):
-        
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
-        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
-        prism = makePrismFromFace(aFace, extrudeDir)
-        mkFillet = BRepFilletAPI_MakeFillet(prism)
-        anEdgeExplorer = TopExp_Explorer(prism, TopAbs_EDGE)
-        while anEdgeExplorer.More():
-            aEdge = topods.Edge(anEdgeExplorer.Current())
-            mkFillet.Add(self.T / 17. , aEdge)
-            anEdgeExplorer.Next()
+        edges = make_edges_from_points(self.points)
+        wire = make_wire_from_edges(edges)
+        aFace = make_face_from_wire(wire)
+        extrude_dir = self.T * self.wDir  # extrude_dir is a numpy array
+        prism = make_prism_from_face(aFace, extrude_dir)
+        mk_fillet = BRepFilletAPI_MakeFillet(prism)
+        an_edge_explorer = TopExp_Explorer(prism, TopAbs_EDGE)
+        while an_edge_explorer.More():
+            aEdge = topods.Edge(an_edge_explorer.Current())
+            mk_fillet.Add(self.T / 17. , aEdge)
+            an_edge_explorer.Next()
                 
-        prism = mkFillet.Shape()
-        cylOrigin = self.secOrigin
-        # cylOrigin = self.secOrigin + self.T * self.wDir
-        innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r1, self.H).Shape()
-        # outerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r2, self.H).Shape()
+        prism = mk_fillet.Shape()
+        cyl_origin = self.sec_origin
+        # cyl_origin = self.sec_origin + self.T * self.wDir
+        inner_cyl = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.wDir)), self.r1, self.H).Shape()
+        # outerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.wDir)), self.r2, self.H).Shape()
         # nutBody = BRepAlgoAPI_Fuse(prism, outerCyl).Shape()
         # my_cyl = BRepPrimAPI_MakeCylinder(9.0, 6.0).Shape()
-        # result_shape = BRepAlgoAPI_Cut(nutBody, innerCyl).Shape() 
-        result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape() 
+        # result_shape = BRepAlgoAPI_Cut(nutBody, inner_cyl).Shape()
+        result_shape = BRepAlgoAPI_Cut(prism, inner_cyl).Shape()
         
         
-#         self.secOrigin = gp_Pnt(0 , 0 , 0)
+#         self.sec_origin = gp_Pnt(0 , 0 , 0)
 #         neckNormal = gp_DZ()
 #         # Threading : Create Surfaces
 # 
-#         nutAx2_bis = gp_Ax3(self.secOrigin , neckNormal)
+#         nutAx2_bis = gp_Ax3(self.sec_origin , neckNormal)
 #         aCyl1 = Geom_CylindricalSurface(nutAx2_bis , self.T * 0.99)
 #         aCyl2 = Geom_CylindricalSurface(nutAx2_bis , self.T * 1.05)
 #         #aCyl3 = Geom_CylindricalSurface(nutAx2_bis , self.T * 1.11)

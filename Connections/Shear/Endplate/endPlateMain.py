@@ -37,7 +37,7 @@ from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 from colWebBeamWebConnectivity import ColWebBeamWeb
 from filletweld import FilletWeld
-from endPlateCalc import endConn
+from endPlateCalc import end_connection
 from model import *
 from nut import Nut 
 from nutBoltPlacement import NutBoltArray
@@ -1190,7 +1190,7 @@ class MainController(QtGui.QMainWindow):
         self.display.View_Iso()
         self.display.FitAll()
         if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.get_columnModel(), update=True)
+            osdagDisplayShape(self.display, self.connectivity.get_column_model(), update=True)
         elif component == "Beam":
             osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
             # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
@@ -1198,21 +1198,21 @@ class MainController(QtGui.QMainWindow):
             osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
+            nutboltlist = self.connectivity.nut_bolt_array.get_models()
 
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
+            # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
             osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
             osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
             osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
+            nutboltlist = self.connectivity.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
+            # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
 
 # #################################################################################################################################################
 
@@ -1282,7 +1282,7 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with beam web beam web
         '''
         uiobj = self.getuser_inputs()
-        result_obj = endConn(uiobj)
+        result_obj = end_connection(uiobj)
 
         ##### PRIMARY BEAM PARAMETERS #####
 
@@ -1361,7 +1361,7 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with column web beam web
         '''
         uiobj = self.getuser_inputs()
-        result_obj = endConn(uiobj)
+        result_obj = end_connection(uiobj)
 
         dict_beam_data = self.fetch_beam_param()
         ##################################### BEAM PARAMETERS ##################################################################
@@ -1434,7 +1434,7 @@ class MainController(QtGui.QMainWindow):
         Creating 3d cad model with column flange beam web connection
         '''
         uiobj = self.getuser_inputs()
-        result_obj = endConn(uiobj)
+        result_obj = end_connection(uiobj)
 
         dict_beam_data = self.fetch_beam_param()
         ################################## BEAM PARAMETERS ####################################################################
@@ -1603,7 +1603,7 @@ class MainController(QtGui.QMainWindow):
         self.uiobj = self.getuser_inputs()
 
         # EndPlate Design Calculations.
-        self.result_obj = endConn(self.uiobj)
+        self.result_obj = end_connection(self.uiobj)
         d = self.result_obj[self.result_obj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1695,13 +1695,13 @@ class MainController(QtGui.QMainWindow):
         self. unchecked_all_checkbox()
 
         uiobj = self.getuser_inputs()
-        result_obj = endConn(uiobj)
+        result_obj = end_connection(uiobj)
         dict_beam_data = self.fetch_beam_param()
         dict_col_data = self.fetch_column_param()
         end_common_obj = EndCommonData(uiobj, result_obj, dict_beam_data, dict_col_data, self.folder)
-        end_common_obj.saveToSvg(filename, view)
+        end_common_obj.save_to_svg(filename, view)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#         base_front, base_top, base_side = end_common_obj.saveToSvg(str(filename), view, base_front, base_top, base_side)
+#         base_front, base_top, base_side = end_common_obj.save_to_svg(str(filename), view, base_front, base_top, base_side)
 #         return (base_front, base_top, base_side)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

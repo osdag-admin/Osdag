@@ -168,7 +168,7 @@ class NutBoltArray():
         
         for index, pos in enumerate (self.bpositions):
             self.bbolts[index].place(pos, bgaugeDir, bboltDir)
-            self.bnuts[index].place((pos + self.gap * bboltDir), bgaugeDir, -bboltDir)
+            self.bnuts[index].place((pos + 44.15 * bboltDir), bgaugeDir, -bboltDir)
         
         self.topcliporigin = topcliporigin
         self.topclipgaugeDir = topclipgaugeDir

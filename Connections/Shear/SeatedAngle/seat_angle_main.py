@@ -1002,7 +1002,7 @@ class MainController(QtGui.QMainWindow):
 
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-        # TODO 
+        #
         gap = beam_tw + angle_t + nut_T
         print"%%%%%%%%%%%%%%%%%%%%%%%%%%5"
         print beam_tw
@@ -1114,7 +1114,7 @@ class MainController(QtGui.QMainWindow):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-        gap = beam_tw + angle_t + nut_T
+        gap = column_T + angle_t + nut_T
 
         nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
 

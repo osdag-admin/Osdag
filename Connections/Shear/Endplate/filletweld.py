@@ -33,12 +33,12 @@ class FilletWeld(object):
         self.points = [self.a1, self.a2, self.a3, ]
 
     def create_model(self):
-        pnt = getGpPt(self.sec_origin)
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
-        extrude_dir = self.L * (self.wDir)  # extrude_dir is a numpy array
-        prism = makePrismFromFace(aFace, extrude_dir)
+        pnt = get_gp_pt(self.sec_origin)
+        edges = make_edges_from_points(self.points)
+        wire = make_wire_from_edges(edges)
+        aFace = make_face_from_wire(wire)
+        extrude_dir = self.L * self.wDir  # extrude_dir is a numpy array
+        prism = make_prism_from_face(aFace, extrude_dir)
         my_sphere = BRepPrimAPI_MakeSphere(pnt, 5.0).Shape()
         spherebody = BRepAlgoAPI_Fuse(prism, my_sphere).Shape()
         return prism

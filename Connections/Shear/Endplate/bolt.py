@@ -59,11 +59,11 @@ class Bolt(object):
 
     def create_model(self):
         
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
+        edges = make_edges_from_points(self.points)
+        wire = make_wire_from_edges(edges)
+        aFace = make_face_from_wire(wire)
         extrude_dir = -self.T * self.shaft_dir  # extrude_dir is a numpy array
-        bolt_head = makePrismFromFace(aFace, extrude_dir)
+        bolt_head = make_prism_from_face(aFace, extrude_dir)
         mk_fillet = BRepFilletAPI_MakeFillet(bolt_head)
         an_edge_explorer = TopExp_Explorer(bolt_head, TopAbs_EDGE)
         while an_edge_explorer.More():
@@ -74,7 +74,7 @@ class Bolt(object):
         bolt_head = mk_fillet.Shape()
         cyl_origin = self.origin
 
-        bolt_cylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cyl_origin), getGpDir(self.shaft_dir)), self.r, self.H).Shape()
+        bolt_cylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.shaft_dir)), self.r, self.H).Shape()
         whole_bolt = BRepAlgoAPI_Fuse(bolt_head, bolt_cylinder).Shape()
         mk_fillet = BRepFilletAPI_MakeFillet(whole_bolt)
         

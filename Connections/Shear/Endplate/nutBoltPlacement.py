@@ -7,7 +7,7 @@ import numpy
 from bolt import Bolt
 from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from ModelUtils import getGpPt
+from ModelUtils import get_gp_pt
 
 
 class NutBoltArray():
@@ -116,7 +116,7 @@ class NutBoltArray():
         self.models.append(dbg1)
             
     def dbg_sphere(self, pt):
-        return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
+        return BRepPrimAPI_MakeSphere(get_gp_pt(pt), 0.1).Shape()
         
     def get_models(self):
         return self.models   

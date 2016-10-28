@@ -179,7 +179,6 @@ class myDialog(QtGui.QDialog):
         self.ui.mCapacity.setText(str(x['cleat']['momentcapacity']))
 
 
-
 class MainController(QtGui.QMainWindow):
 
     closed = pyqtSignal()
@@ -259,7 +258,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionShow_cleat_angle.triggered.connect(self.call_3DCleatAngle)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
-        ############################### MARCH_14 #############################
+        # ############################## MARCH_14 #############################
         # populate cleat section and secondary beam according to user input
 
         self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fillCleatSectionCombo())
@@ -1168,8 +1167,8 @@ class MainController(QtGui.QMainWindow):
             # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif component == "cleatAngle":
 
-        # osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color = 'red', update = True)
-        # osdagDisplayShape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
+            # osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color = 'red', update = True)
+            # osdagDisplayShape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
             osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
             osdagDisplayShape(self.display, self.connectivity.angleLeftModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
@@ -1295,7 +1294,7 @@ class MainController(QtGui.QMainWindow):
         uiObj = self.getuser_inputs()
         resultObj = cleatAngleConn(uiObj)
 
-        #################################### PRIMARY BEAM PARAMETERS ########################################################
+        # ################################### PRIMARY BEAM PARAMETERS ########################################################
 
         dictbeamdata = self.fetchColumnPara()
         pBeam_D = int(dictbeamdata[QString("D")])
@@ -1312,7 +1311,7 @@ class MainController(QtGui.QMainWindow):
                           R1=pBeam_R1, R2=pBeam_R2, alpha=pBeam_alpha,
                           length=pBeam_length, notchObj=None)
 
-        ##### SECONDARY BEAM PARAMETERS ######
+        # #### SECONDARY BEAM PARAMETERS ######
         dictbeamdata2 = self.fetchBeamPara()
 
         sBeam_D = int(dictbeamdata2[QString("D")])
@@ -1330,7 +1329,7 @@ class MainController(QtGui.QMainWindow):
                         t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
                         alpha=sBeam_alpha, length=500, notchObj=notchObj)
 
-        ############################################## WELD,PLATE,BOLT AND NUT PARAMETERS #######################################
+        # ############################################# WELD,PLATE,BOLT AND NUT PARAMETERS #######################################
 
         dictAngleData = self.fetchAnglePara()
         cleat_length = resultObj['cleat']['height']
@@ -1386,7 +1385,7 @@ class MainController(QtGui.QMainWindow):
         resultObj = cleatAngleConn(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
-        ################################### BEAM PARAMETERS ####################################################################
+        # ################################## BEAM PARAMETERS ####################################################################
         beam_D = int(dictbeamdata[QString("D")])
         beam_B = int(dictbeamdata[QString("B")])
         beam_tw = float(dictbeamdata[QString("tw")])
@@ -1401,7 +1400,7 @@ class MainController(QtGui.QMainWindow):
                         R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                         length=beam_length, notchObj=None)
 
-        ##################################################### COLUMN PARAMETERS #################################################
+        # #################################################### COLUMN PARAMETERS #################################################
         dictcoldata = self.fetchColumnPara()
 
         column_D = int(dictcoldata[QString("D")])
@@ -1415,7 +1414,7 @@ class MainController(QtGui.QMainWindow):
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
-        ########################################### WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
+        # ########################################## WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
         dictAngleData = self.fetchAnglePara()
         cleat_length = resultObj['cleat']['height']
 
@@ -1471,7 +1470,7 @@ class MainController(QtGui.QMainWindow):
         resultObj = cleatAngleConn(uiObj)
 
         dictbeamdata = self.fetchBeamPara()
-        ##### BEAM PARAMETERS #####
+        # #### BEAM PARAMETERS #####
         beam_D = int(dictbeamdata[QString("D")])
         beam_B = int(dictbeamdata[QString("B")])
         beam_tw = float(dictbeamdata[QString("tw")])
@@ -1486,7 +1485,7 @@ class MainController(QtGui.QMainWindow):
                         R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                         length=beam_length, notchObj=None)
 
-        ############################################### COLUMN PARAMETERS ##################################################
+        # ############################################## COLUMN PARAMETERS ##################################################
         dictcoldata = self.fetchColumnPara()
 
         column_D = int(dictcoldata[QString("D")])
@@ -1501,7 +1500,7 @@ class MainController(QtGui.QMainWindow):
         column = ISection(B=column_B, T=column_T, D=column_D,
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
 
-        ################################ Cleat,BOLT AND NUT PARAMETERS ###########################################################
+        # ############################### Cleat,BOLT AND NUT PARAMETERS ###########################################################
         dictAngleData = self.fetchAnglePara()
         cleat_length = resultObj['cleat']['height']
 
@@ -1584,7 +1583,7 @@ class MainController(QtGui.QMainWindow):
             # gpBeamOrigin = getGpPt(beamOrigin)
             # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
             # self.display.DisplayShape(my_sphere2,color = 'blue',update = True)
-            # plateOrigin =  (self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0
+            # plateOrigin =(self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0
             # * (self.connectivity.plate.vDir) + self.connectivity.plate.T * (-self.connectivity.weldLeft.uDir))
             # gpPntplateOrigin=  getGpPt(plateOrigin)
             # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()

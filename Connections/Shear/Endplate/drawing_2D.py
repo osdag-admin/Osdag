@@ -10,7 +10,7 @@ from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 from model import *
-from endPlateCalc import endConn
+from endPlateCalc import end_connection
 from cmath import sqrt
 from xml.etree.ElementTree import XML, fromstring, tostring
 import cairosvg

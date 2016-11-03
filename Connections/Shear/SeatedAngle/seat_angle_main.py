@@ -52,6 +52,7 @@ from ui_tutorial import Ui_Tutorial
 # You can delete ite
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
+from apt.auth import update
 
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -876,7 +877,6 @@ class MainController(QtGui.QMainWindow):
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        self.display.set_bg_gradient_color(255,255,255,255,255,255)
 
         loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
@@ -962,7 +962,6 @@ class MainController(QtGui.QMainWindow):
         # TODO add topclipangle field  in user inputs(changes in .ui file)
         topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
         
-        ############################################################
         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
         bolt_r = bolt_dia/2
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) /2
@@ -971,47 +970,17 @@ class MainController(QtGui.QMainWindow):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)# bolt_dia = nut_dia
         nut_Ht = 12.2 #150
-        
-        
-        ##############################################################
-#===============================================================================
-#         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-# 
-#         #         fillet_length = resultObj['Plate']['height']
-#         #         fillet_thickness =  resultObj['Weld']['thickness']
-#         #         plate_width = resultObj['Plate']['width']
-#         #         plate_thick = uiObj['Plate']['Thickness (mm)']
-#         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-#         bolt_r = bolt_dia / 2
-#         bolt_R = bolt_r + 7
-#         nut_R = bolt_R
-#         bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
-#         bolt_Ht = 50.0  # minimum bolt length as per Indian Standard IS 3750(1985)
-#         nut_T = 12.0  # minimum nut thickness As per Indian Standard
-#         nut_Ht = 12.2  #
-#===============================================================================
-
-        # plate = Plate(L= 300,W =100, T = 10)
-        #         angle = Angle(L = angle_l, A = angle_a, B = angle_b,T = angle_t, R1 = angle_r1, R2 = angle_r2)
-
-        # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        #         Fweld1 = FilletWeld(L= fillet_length,b = fillet_thickness, h = fillet_thickness)
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
 
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-        #
-        gap = beam_tw + angle_t + nut_T
-        print"%%%%%%%%%%%%%%%%%%%%%%%%%%5"
-        print beam_tw
-        print angle_t
-        print nut_T
         
+        gap = column_tw + angle_t + nut_T
+        bgap = beam_T + angle_t + nut_T
 
-        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
-        #         topclipnutboltArray = NutBoltArray(resultObj,nut,bolt,gap)
+        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap, bgap)
 
         colwebconn = ColWebBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
         colwebconn.create_3dmodel()
@@ -1091,23 +1060,6 @@ class MainController(QtGui.QMainWindow):
         #nut_T = 12.0 # minimum nut thickness As per Indian Standard
         nut_Ht = 12.2 #
 
-#===============================================================================
-#         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-# 
-#         #         fillet_length = resultObj['Plate']['height']
-#         #         fillet_thickness =  resultObj['Weld']['thickness']
-#         #         plate_width = resultObj['Plate']['width']
-#         #         plate_thick = uiObj['Plate']['Thickness (mm)']
-#         bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-#         bolt_r = bolt_dia / 2
-#         bolt_R = bolt_r + 7
-#         nut_R = bolt_R
-#         bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
-#         bolt_Ht = 50.0  # minimum bolt length as per Indian Standard
-#         nut_T = 12.0  # minimum nut thickness As per Indian Standard
-#         nut_Ht = 12.2  #
-#===============================================================================
-
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
 
@@ -1115,8 +1067,9 @@ class MainController(QtGui.QMainWindow):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         gap = column_T + angle_t + nut_T
+        bgap = beam_T + angle_t + nut_T
 
-        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
+        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap,bgap)
 
         colflangeconn = ColFlangeBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
         colflangeconn.create_3dmodel()
@@ -1211,6 +1164,17 @@ class MainController(QtGui.QMainWindow):
             angletopRealOrigin = getGpPt(topclipB_nutboltArrayOrigin)
             my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
             self.display.DisplayShape(my_sphere7,color = 'green',update = True)
+            positions = self.connectivity.nutBoltArray.positions
+            
+            for pos in positions:
+                loc = getGpPt(pos)
+                sphere = BRepPrimAPI_MakeSphere(loc,2.0).Shape()
+                self.display.DisplayShape(sphere, color = 'red',update = True)
+            clipPositions = self.connectivity.nutBoltArray.topclippositions
+            for pos in clipPositions:
+                loc = getGpPt(pos)
+                sphere = BRepPrimAPI_MakeSphere(loc,2.0).Shape()
+                self.display.DisplayShape(sphere, color = 'red',update = True)
 
         else:
             self.display.EraseAll()

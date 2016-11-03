@@ -10,7 +10,7 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
 
 class NutBoltArray():
-    def __init__(self,boltPlaceObj,nut,bolt,gap):
+    def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
@@ -36,6 +36,7 @@ class NutBoltArray():
         self.bolt = bolt
         self.nut = nut
         self.gap = gap
+        self.bgap = bgap
          
         self.bolts = []
         self.nuts = []
@@ -166,9 +167,10 @@ class NutBoltArray():
         
         self.calculatebPositions()
         
+        
         for index, pos in enumerate (self.bpositions):
             self.bbolts[index].place(pos, bgaugeDir, bboltDir)
-            self.bnuts[index].place((pos + 44.15 * bboltDir), bgaugeDir, -bboltDir)
+            self.bnuts[index].place((pos + self.bgap * bboltDir), bgaugeDir, -bboltDir)
         
         self.topcliporigin = topcliporigin
         self.topclipgaugeDir = topclipgaugeDir
@@ -179,7 +181,7 @@ class NutBoltArray():
         
         for index, pos in enumerate (self.topclippositions):
             self.topclipbolts[index].place(pos, topclipgaugeDir, topclipboltDir)
-            self.topclipnuts[index].place((pos + self.gap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
+            self.topclipnuts[index].place((pos + self.bgap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
         
         self.topclipborigin = topclipborigin
         self.topclipbgaugeDir = topclipbgaugeDir

@@ -8,7 +8,7 @@ from ModelUtils import *
 
 class Weld(object):
     
-    def __init__(self,L, W, T):        
+    def __init__(self, L, W, T):        
         self.L = L
         self.W = W 
         self.T = T
@@ -25,10 +25,10 @@ class Weld(object):
         
     def computeParams(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.secOrigin + (self.W/2.0) * self.uDir + (self.L/2.0) * self.vDir
-        self.a2 = self.secOrigin + (-self.W/2.0) * self.uDir + (self.L/2.0) * self.vDir 
-        self.a3 = self.secOrigin + (-self.W/2.0) * self.uDir + (-self.L/2.0) * self.vDir
-        self.a4 = self.secOrigin + (self.W/2.0) * self.uDir + (-self.L/2.0) * self.vDir
+        self.a1 = self.secOrigin + (self.W / 2.0) * self.uDir + (self.L / 2.0) * self.vDir
+        self.a2 = self.secOrigin + (-self.W / 2.0) * self.uDir + (self.L / 2.0) * self.vDir 
+        self.a3 = self.secOrigin + (-self.W / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
+        self.a4 = self.secOrigin + (self.W / 2.0) * self.uDir + (-self.L / 2.0) * self.vDir
         self.points = [self.a1, self.a2, self.a3, self.a4]
        
         
@@ -36,8 +36,8 @@ class Weld(object):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.T * self.wDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
         
         return prism
     

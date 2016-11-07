@@ -4,7 +4,7 @@ Created on 29-Nov-2014
 @author: deepa
 '''
 from OCC.Display.SimpleGui import init_display
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeSphere,\
+from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeSphere, \
     BRepPrimAPI_MakePrism
 from OCC.gp import gp_Pnt, gp_Dir, gp_Pln, gp_Vec
 from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeFace
@@ -52,7 +52,7 @@ def make_wire(*args):
 
 
 def points_to_bspline(pnts):
-    pts = TColgp_Array1OfPnt(0, len(pnts)-1)
+    pts = TColgp_Array1OfPnt(0, len(pnts) - 1)
     for n, i in enumerate(pnts):
         pts.SetValue(n, i)
     crv = GeomAPI_PointsToBSpline(pts)
@@ -89,6 +89,6 @@ def makeEdgesFromPoints(points):
     return edges
 
 def makePrismFromFace(aFace, eDir):
-    return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.),gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
-    #return BRepPrimAPI_MakePrism(aFace, gpDir, False).Shape()
+    return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.), gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
+    # return BRepPrimAPI_MakePrism(aFace, gpDir, False).Shape()
 

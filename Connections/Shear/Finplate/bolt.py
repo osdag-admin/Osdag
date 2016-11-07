@@ -4,15 +4,16 @@ Created on 29-Nov-2014
 @author: deepa
 '''
 import numpy
-from ModelUtils import getGpPt,getGpDir,makeEdgesFromPoints,makeWireFromEdges,makePrismFromFace,makeFaceFromWire
+from ModelUtils import getGpPt, getGpDir, makeEdgesFromPoints, makeWireFromEdges, makePrismFromFace, makeFaceFromWire
 import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
-from OCC.gp import  gp_Ax2
-from OCC.BRepAlgoAPI import  BRepAlgoAPI_Fuse
+from OCC.gp import gp_Ax2
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
+
 
 class Bolt(object):
     '''
-    
+
         a3  X-------------------+  a2
            X                   X|X
           X                   X | X
@@ -33,10 +34,10 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
                                    a6
             a5
 
-    
+
     '''
-    
-    def __init__(self,R,T,H,r):        
+
+    def __init__(self, R, T, H, r):
         self.R = R
         self.H = H
         self.T = T
@@ -51,20 +52,20 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.a4 = None
         self.a5 = None
         self.a6 = None
-        self.points = []        
-    
+        self.points = []
+
     def place(self, origin, uDir, shaftDir):
         self.origin = origin
         self.uDir = uDir
-        self.shaftDir = shaftDir        
+        self.shaftDir = shaftDir
         self.computeParams()
-        
-    def getPoint(self,theta):
+
+    def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
-    
-    def computeParams(self):        
+
+    def computeParams(self):
         self.vDir = numpy.cross(self.shaftDir, self.uDir)
         self.a1 = self.getPoint(0)
         self.a2 = self.getPoint(60)
@@ -73,23 +74,17 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.a5 = self.getPoint(240)
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
-       
-    
-        
+
     def createModel(self):
-        
+
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = -self.T * self.shaftDir # extrudeDir is a numpy array
-        boltHead =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = -self.T * self.shaftDir  # extrudeDir is a numpy array
+        boltHead = makePrismFromFace(aFace, extrudeDir)
         cylOrigin = self.origin
         boltCylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.shaftDir)), self.r, self.H).Shape()
-        
-        whole_Bolt = BRepAlgoAPI_Fuse(boltHead,boltCylinder).Shape()
-        
-        return whole_Bolt
 
-        
-    
-            
+        whole_Bolt = BRepAlgoAPI_Fuse(boltHead, boltCylinder).Shape()
+
+        return whole_Bolt

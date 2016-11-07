@@ -12,7 +12,7 @@ from ModelUtils import *
 
 class Angle(object):
     
-    def __init__(self,L, A, B, T):        
+    def __init__(self, L, A, B, T):        
         self.L = L
         self.A = A
         self.B = B 
@@ -55,8 +55,8 @@ class Angle(object):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.L * self.vDir # extrudeDir is a numpy array
-        prism =  makePrismFromFace(aFace, extrudeDir)
+        extrudeDir = self.L * self.vDir  # extrudeDir is a numpy array
+        prism = makePrismFromFace(aFace, extrudeDir)
         
         return prism
     

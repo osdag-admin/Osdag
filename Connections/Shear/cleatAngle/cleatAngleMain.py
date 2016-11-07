@@ -32,7 +32,7 @@ from ISection import ISection
 from angle import Angle
 from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from bolt import Bolt
-from cleatCalculation import cleatAngleConn
+from cleatCalculation import cleat_connection
 from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 from colWebBeamWebConnectivity import ColWebBeamWeb
 from reportGenerator import *
@@ -84,18 +84,18 @@ class MyPopupDialog(QtGui.QDialog):
         self.ui.setupUi(self)
         self.mainController = parent
         self.setWindowTitle("Design Profile")
-        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
-        self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
-        self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
-        self.accepted.connect(self.save_inputSummary)
+        self.ui.btn_browse.clicked.connect(lambda: self.get_logo_file_path(self.ui.lbl_browse))
+        self.ui.btn_saveProfile.clicked.connect(self.save_user_profile)
+        self.ui.btn_useProfile.clicked.connect(self.use_user_profile)
+        self.accepted.connect(self.save_input_summary)
 
-    def save_inputSummary(self):
-        input_summary = self.getPopUpInputs()
+    def save_input_summary(self):
+        input_summary = self.get_design_report_inputs()
 
         self.mainController.save_design(input_summary)
         # return input_summary
 
-    def getLogoFilePath(self, lblwidget):
+    def get_logo_file_path(self, lblwidget):
 
         self.ui.lbl_browse.clear
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QtGui.QFileDialog.DontUseNativeDialog)
@@ -107,8 +107,8 @@ class MyPopupDialog(QtGui.QDialog):
     def desired_location(self, filename):
         shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoCleat.png")
 
-    def saveUserProfile(self):
-        inputData = self.getPopUpInputs()
+    def save_user_profile(self):
+        inputData = self.get_design_report_inputs()
 
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile", '*.txt')
 
@@ -116,7 +116,7 @@ class MyPopupDialog(QtGui.QDialog):
         pickle.dump(inputData, infile)
         infile.close()
 
-    def getPopUpInputs(self):
+    def get_design_report_inputs(self):
 
         input_summary = {}
         input_summary["ProfileSummary"] = {}
@@ -133,7 +133,7 @@ class MyPopupDialog(QtGui.QDialog):
 
         return input_summary
 
-    def useUserProfile(self):
+    def use_user_profile(self):
         files_types = "All Files (*))"
         filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
@@ -161,7 +161,7 @@ class myDialog(QtGui.QDialog):
         # web = QWebView()
         # uiObj = self.MainController().getuser_inputs()
         uiObj = self.mainController.getuser_inputs()
-        x = cleatAngleConn(uiObj)
+        x = cleat_connection(uiObj)
         # x = MainController().outputdict()
         # x = m.outputdict()
 
@@ -207,7 +207,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
-        self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
+        self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         # self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock)) #USE WHEN ui_cleatAngle.py is used(btnOutput = toolButton)
@@ -243,32 +243,32 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_message.triggered.connect(self.save_log)
-        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
-        self.ui.actionZoom_in.triggered.connect(self.callZoomin)
-        self.ui.actionZoom_out.triggered.connect(self.callZoomout)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialog)
+        self.ui.actionZoom_in.triggered.connect(self.call_zoom_in)
+        self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
         self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_CAD_image.triggered.connect(self.save2DcadImages)
+        self.ui.actionSave_CAD_image.triggered.connect(self.save_2d_cad_images)
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.call_2d_Drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.call_2d_Drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.call_2d_Drawing("Top"))
-        self.ui.actionPan.triggered.connect(self.call_Pannig)
+        self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3DBeam)
         self.ui.actionShow_column.triggered.connect(self.call_3DColumn)
         self.ui.actionShow_cleat_angle.triggered.connect(self.call_3DCleatAngle)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
-        self.ui.actionChange_background.triggered.connect(self.showColorDialog)
+        self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
         # ############################## MARCH_14 #############################
         # populate cleat section and secondary beam according to user input
 
-        self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fillCleatSectionCombo())
-        self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkBeam_B)
-        self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
-#         self.ui.txtInputCleatHeight.currentText.connect(self.checkCleatHeight())
+        self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fill_cleatsection_combo())
+        self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
+        self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
+#         self.ui.txtInputCleatHeight.currentText.connect(self.check_cleat_height())
 #         cleatHeight = self.ui.txtInputCleatHeight.currentText()
 #         if cleatHeight != 0:
 #             self.
-        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.checkCleatHeight(self.ui.txtInputCleatHeight))
+        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight))
 
         ######################################################################################
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
@@ -276,7 +276,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
         #################################################################
-        self.ui.btn_capacity.clicked.connect(self.showButton_clicked)
+        self.ui.btn_capacity.clicked.connect(self.show_button_clicked)
         # self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
 
         #################################################################
@@ -300,7 +300,7 @@ class MainController(QtGui.QMainWindow):
 
         self.connectivity = None
         self.fuse_model = None
-        self.disableViewButtons()
+        self.disable_view_buttons()
         self.resultObj = None
         self.uiObj = None
 
@@ -311,19 +311,19 @@ class MainController(QtGui.QMainWindow):
     def store_osdagheader(self, image_path):
         shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
-    def show_capacityDialog(self):
+    def show_capacity_dialog(self):
         self.dialog = myDialog(self)
         self.dialog.show()
 
-    def showButton_clicked(self):
-        self.show_capacityDialog()
+    def show_button_clicked(self):
+        self.show_capacity_dialog()
 
-    def fetchBeamPara(self):
+    def fetch_beam_param(self):
         beam_sec = self.ui.combo_Beam.currentText()
         dictbeamdata = get_beamdata(beam_sec)
         return dictbeamdata
 
-    def fetchColumnPara(self):
+    def fetch_column_param(self):
         column_sec = self.ui.comboColSec.currentText()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -332,12 +332,12 @@ class MainController(QtGui.QMainWindow):
             dictcoldata = get_columndata(column_sec)
         return dictcoldata
 
-    def fetchAnglePara(self):
+    def fetch_angle_param(self):
         angle_sec = self.ui.comboCleatSection.currentText()
         dictangledata = get_angledata(angle_sec)
         return dictangledata
 
-    def convertColComboToBeam(self):
+    def convert_col_combo_to_beam(self):
 
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -452,7 +452,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtEdgeDist.clear()
             self.ui.outputCleatHeight.clear()
 
-    def fillCleatSectionCombo(self):
+    def fill_cleatsection_combo(self):
         '''Populates the cleat section on the basis  beam section and column section
         '''
 
@@ -461,8 +461,8 @@ class MainController(QtGui.QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web" or "Column flange-Beam web":
             loc = self.ui.comboConnLoc.currentText()
-            dictbeamdata = self.fetchBeamPara()
-            dictcoldata = self.fetchColumnPara()
+            dictbeamdata = self.fetch_beam_param()
+            dictcoldata = self.fetch_column_param()
             angleList = get_anglecombolist()
             col_R1 = float(dictcoldata[QString("R1")])
             col_D = float(dictcoldata[QString("D")])
@@ -500,14 +500,14 @@ class MainController(QtGui.QMainWindow):
         else:
             pass
 
-    def checkBeam_B(self):
+    def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
 
             column = self.ui.comboColSec.currentText()
 
-            dictBeamData = self.fetchBeamPara()
-            dictColData = self.fetchColumnPara()
+            dictBeamData = self.fetch_beam_param()
+            dictColData = self.fetch_column_param()
             column_D = float(dictColData[QString("D")])
             column_T = float(dictColData[QString("T")])
             column_R1 = float(dictColData[QString("R1")])
@@ -524,8 +524,8 @@ class MainController(QtGui.QMainWindow):
         elif loc == "Beam-Beam":
 
             primaryBeam = self.ui.comboColSec.currentText()
-            dictSBeamData = self.fetchBeamPara()
-            dictPBeamData = self.fetchColumnPara()
+            dictSBeamData = self.fetch_beam_param()
+            dictPBeamData = self.fetch_column_param()
             PBeam_D = float(dictPBeamData[QString("D")])
             PBeam_T = float(dictPBeamData[QString("T")])
             PBeamWebDepth = PBeam_D - 2.0 * (PBeam_T)
@@ -539,7 +539,7 @@ class MainController(QtGui.QMainWindow):
             else:
                 self.ui.btn_Design.setDisabled(False)
 
-    def checkCleatHeight(self, widget):
+    def check_cleat_height(self, widget):
         loc = self.ui.comboConnLoc.currentText()
         cleatHeight = widget.text()
         cleatHeight = float(cleatHeight) 
@@ -547,8 +547,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn_Design.setDisabled(False)
         else:
 
-            dictBeamData = self.fetchBeamPara()
-            dictColumnData = self.fetchColumnPara()
+            dictBeamData = self.fetch_beam_param()
+            dictColumnData = self.fetch_column_param()
             col_T = float(dictColumnData[QString('T')])
             col_R1 = float(dictColumnData[QString('R1')])
             beam_D = float(dictBeamData[QString('D')])
@@ -567,7 +567,7 @@ class MainController(QtGui.QMainWindow):
             else:
                 self.ui.btn_Design.setDisabled(False)
 
-    def showFontDialogue(self):
+    def show_font_dialog(self):
 
         font, ok = QtGui.QFontDialog.getFont()
         if ok:
@@ -575,7 +575,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
-    def showColorDialog(self):
+    def show_color_dialog(self):
 
         col = QtGui.QColorDialog.getColor()
         colorTup = col.getRgb()
@@ -584,19 +584,19 @@ class MainController(QtGui.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    def callZoomin(self):
+    def call_zoom_in(self):
         self.display.ZoomFactor(2)
 
-    def callZoomout(self):
+    def call_zoom_out(self):
         self.display.ZoomFactor(0.5)
 
-    def callRotation(self):
+    def call_rotation(self):
         self.display.Rotation(15, 0)
 
-    def call_Pannig(self):
+    def call_panning(self):
         self.display.Pan(50, 0)
 
-    def save2DcadImages(self):
+    def save_2d_cad_images(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
         fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
@@ -606,7 +606,7 @@ class MainController(QtGui.QMainWindow):
             self.display.ExportToImage(fName)
             QtGui.QMessageBox.about(self, 'Information', "File saved")
 
-    def disableViewButtons(self):
+    def disable_view_buttons(self):
         '''
         Disables the all buttons in toolbar
         '''
@@ -642,7 +642,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setEnabled(False)
         self.ui.checkBoxCleat.setEnabled(False)
 
-    def enableViewButtons(self):
+    def enable_view_buttons(self):
         '''
         Enables the all buttons in toolbar
         '''
@@ -785,7 +785,7 @@ class MainController(QtGui.QMainWindow):
         '''
 
         uiObj = self.getuser_inputs()
-        outputobj = cleatAngleConn(uiObj)
+        outputobj = cleat_connection(uiObj)
         return outputobj
 
     def show_dialog(self):
@@ -805,11 +805,11 @@ class MainController(QtGui.QMainWindow):
         # self.outdict = self.resultObj#self.outputdict()
 
         self.inputdict = self.getuser_inputs()  # self.getuser_inputss()
-        self.outdict = cleatAngleConn(self.inputdict)
-        dictBeamData = self.fetchBeamPara()
+        self.outdict = cleat_connection(self.inputdict)
+        dictBeamData = self.fetch_beam_param()
 
-        dictColData = self.fetchColumnPara()
-        dictCleatData = self.fetchAnglePara()
+        dictColData = self.fetch_column_param()
+        dictCleatData = self.fetch_angle_param()
         save_html(self.outdict, self.inputdict, dictBeamData, dictColData , dictCleatData, popup_summary, fileName, self.folder, base, base_front, base_top, base_side)
 
         # path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
@@ -1292,11 +1292,11 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with beam web beam web
         '''
         uiObj = self.getuser_inputs()
-        resultObj = cleatAngleConn(uiObj)
+        resultObj = cleat_connection(uiObj)
 
         # ################################### PRIMARY BEAM PARAMETERS ########################################################
 
-        dictbeamdata = self.fetchColumnPara()
+        dictbeamdata = self.fetch_column_param()
         pBeam_D = int(dictbeamdata[QString("D")])
         pBeam_B = int(dictbeamdata[QString("B")])
         pBeam_tw = float(dictbeamdata[QString("tw")])
@@ -1309,10 +1309,10 @@ class MainController(QtGui.QMainWindow):
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
         column = ISection(B=pBeam_B, T=pBeam_T, D=pBeam_D, t=pBeam_tw,
                           R1=pBeam_R1, R2=pBeam_R2, alpha=pBeam_alpha,
-                          length=pBeam_length, notchObj=None)
+                          length=pBeam_length, notch_obj=None)
 
         # #### SECONDARY BEAM PARAMETERS ######
-        dictbeamdata2 = self.fetchBeamPara()
+        dictbeamdata2 = self.fetch_beam_param()
 
         sBeam_D = int(dictbeamdata2[QString("D")])
         sBeam_B = int(dictbeamdata2[QString("B")])
@@ -1323,15 +1323,15 @@ class MainController(QtGui.QMainWindow):
         sBeam_R2 = float(dictbeamdata2[QString("R2")])
 
         # ---------------------------- Notch dimensions -----------------------------------------------------------------
-        notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
+        notch_obj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         beam = ISection(B=sBeam_B, T=sBeam_T, D=sBeam_D,
                         t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
-                        alpha=sBeam_alpha, length=500, notchObj=notchObj)
+                        alpha=sBeam_alpha, length=500, notch_obj=notch_obj)
 
         # ############################################# WELD,PLATE,BOLT AND NUT PARAMETERS #######################################
 
-        dictAngleData = self.fetchAnglePara()
+        dictAngleData = self.fetch_angle_param()
         cleat_length = resultObj['cleat']['height']
 
         cleat_thick = float(dictAngleData[QString("t")])
@@ -1372,7 +1372,7 @@ class MainController(QtGui.QMainWindow):
 
         nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap, cgap)
 
-        beamwebconn = BeamWebBeamWeb(column, beam, notchObj, angle, nutBoltArray)
+        beamwebconn = BeamWebBeamWeb(column, beam, notch_obj, angle, nutBoltArray)
         beamwebconn.create_3dmodel()
 
         return beamwebconn
@@ -1382,9 +1382,9 @@ class MainController(QtGui.QMainWindow):
         creating 3d cad model with column web beam web
         '''
         uiObj = self.getuser_inputs()
-        resultObj = cleatAngleConn(uiObj)
+        resultObj = cleat_connection(uiObj)
 
-        dictbeamdata = self.fetchBeamPara()
+        dictbeamdata = self.fetch_beam_param()
         # ################################## BEAM PARAMETERS ####################################################################
         beam_D = int(dictbeamdata[QString("D")])
         beam_B = int(dictbeamdata[QString("B")])
@@ -1398,10 +1398,10 @@ class MainController(QtGui.QMainWindow):
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
         beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
                         R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                        length=beam_length, notchObj=None)
+                        length=beam_length, notch_obj=None)
 
         # #################################################### COLUMN PARAMETERS #################################################
-        dictcoldata = self.fetchColumnPara()
+        dictcoldata = self.fetch_column_param()
 
         column_D = int(dictcoldata[QString("D")])
         column_B = int(dictcoldata[QString("B")])
@@ -1413,9 +1413,9 @@ class MainController(QtGui.QMainWindow):
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
-                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
+                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notch_obj=None)
         # ########################################## WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
-        dictAngleData = self.fetchAnglePara()
+        dictAngleData = self.fetch_angle_param()
         cleat_length = resultObj['cleat']['height']
 
         cleat_thick = float(dictAngleData[QString("t")])
@@ -1467,9 +1467,9 @@ class MainController(QtGui.QMainWindow):
         Creating 3d cad model with column flange beam web connection
         '''
         uiObj = self.getuser_inputs()
-        resultObj = cleatAngleConn(uiObj)
+        resultObj = cleat_connection(uiObj)
 
-        dictbeamdata = self.fetchBeamPara()
+        dictbeamdata = self.fetch_beam_param()
         # #### BEAM PARAMETERS #####
         beam_D = int(dictbeamdata[QString("D")])
         beam_B = int(dictbeamdata[QString("B")])
@@ -1483,10 +1483,10 @@ class MainController(QtGui.QMainWindow):
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
         beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
                         R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                        length=beam_length, notchObj=None)
+                        length=beam_length, notch_obj=None)
 
         # ############################################## COLUMN PARAMETERS ##################################################
-        dictcoldata = self.fetchColumnPara()
+        dictcoldata = self.fetch_column_param()
 
         column_D = int(dictcoldata[QString("D")])
         column_B = int(dictcoldata[QString("B")])
@@ -1498,10 +1498,10 @@ class MainController(QtGui.QMainWindow):
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
-                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
+                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notch_obj=None)
 
         # ############################### Cleat,BOLT AND NUT PARAMETERS ###########################################################
-        dictAngleData = self.fetchAnglePara()
+        dictAngleData = self.fetch_angle_param()
         cleat_length = resultObj['cleat']['height']
 
         cleat_thick = float(dictAngleData[QString("t")])
@@ -1634,7 +1634,7 @@ class MainController(QtGui.QMainWindow):
         '''
         self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
-        self.enableViewButtons()
+        self.enable_view_buttons()
         self. unchecked_allChkBox()
 
         # self.set_designlogger()
@@ -1643,7 +1643,7 @@ class MainController(QtGui.QMainWindow):
         self.save_inputs(self.uiObj)
 
         # FinPlate Design Calculations.
-        self.resultObj = cleatAngleConn(self.uiObj)
+        self.resultObj = cleat_connection(self.uiObj)
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1734,10 +1734,10 @@ class MainController(QtGui.QMainWindow):
         self. unchecked_allChkBox()
 
         uiObj = self.getuser_inputs()
-        resultObj = cleatAngleConn(uiObj)
-        dictbeamdata = self.fetchBeamPara()
-        dictcoldata = self.fetchColumnPara()
-        dictangledata = self.fetchAnglePara()
+        resultObj = cleat_connection(uiObj)
+        dictbeamdata = self.fetch_beam_param()
+        dictcoldata = self.fetch_column_param()
+        dictangledata = self.fetch_angle_param()
         finCommonObj = cleatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, dictangledata, self.folder)
         base_front, base_top, base_side = finCommonObj.saveToSvg(str(fileName), view, base_front, base_top, base_side)
         return (base_front, base_top, base_side)

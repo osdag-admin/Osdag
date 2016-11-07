@@ -8,30 +8,457 @@ from svgwrite import mm
 from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
+import cairosvg
 
-class Fin2DCreatorFront(object):
-    
-    def __init__(self, inputObj,ouputObj,dictBeamdata,dictColumndata):
-        
+class SeatCommonData(object):
+
+    def __init__(self, inputObj, ouputObj, dictBeamdata, dictColumndata, dictangledata, folder):
+        '''
+        Provide all the data related to Finplate connection
+        :param inputObj:
+        :type inputObj:dictionary(Input parameter dictionary)
+        :param outputObj:
+        :type ouputObj :dictionary (output parameter dictionary)
+        :param dictBeamdata :
+        :type dictBeamdata:  dictionary (Beam sectional properties)
+        :param dictColumndata :
+        :type dictBeamdata: dictionary (Column sectional properties dictionary)
+        '''
         self.beam_T = float(dictBeamdata[QString("T")])
         self.col_T = float(dictColumndata[QString("T")])
-        self.D_beam = int (dictBeamdata[QString("D")])
-        self.D_col = int (dictColumndata[QString("D")])
+        self.D_beam = int(dictBeamdata[QString("D")])
+        self.D_col = int(dictColumndata[QString("D")])
         self.col_B = int(dictColumndata[QString("B")])
+        self.beam_B = int(dictBeamdata[QString("B")])
         self.col_tw = float(dictColumndata[QString("tw")])
-        beam_R1 = float(dictBeamdata[QString("R1")])
-        plate_ht= ouputObj['Plate']['height'] 
-        plate_width = ouputObj['Plate']['width']
-        weld_len = ouputObj['Plate']['height']
-        weld_thick =  ouputObj['Weld']['thickness']
-        self.bolt_dia  = inputObj["Bolt"]["Diameter (mm)"]
-        self.connectivity =  inputObj['Member']['Connectivity']
-        self.pitch = ouputObj['Bolt']["pitch"]
-        self.gauge = ouputObj['Bolt']["gauge"]
-        self.end_dist = ouputObj['Bolt']["enddist"]
-        self.edge_dist = ouputObj['Bolt']["edge"]
-        self.no_of_rows = ouputObj['Bolt']["numofrow"] 
-        self.no_of_col = ouputObj['Bolt']["numofcol"]
+        self.beam_tw = float(dictBeamdata[QString("tw")])
+        self.col_Designation = dictColumndata[QString("Designation")]
+        self.beam_Designation = dictBeamdata[QString("Designation")]
+        self.beam_R1 = float(dictBeamdata[QString("R1")])
+        self.col_R1 = float(dictColumndata[QString("R1")])
+        
+        angle_l = ouputObj['SeatAngle']["Length (mm)"]
+        angle_a = int(dictangledata[QString("A")])
+        angle_b = int(dictangledata[QString("B")])
+        angle_t = float(dictangledata[QString("t")])
+        angle_r1 = float(dictangledata[QString("R1")])
+        angle_r2 = float(dictangledata[QString("R2")])
+
+        self.bolt_dia = inputObj["Bolt"]["Diameter (mm)"]
+        self.grade = inputObj["Bolt"]["Grade"]
+        self.connectivity = inputObj['Member']['Connectivity']
+        self.pitch = ouputObj['Bolt']["Pitch Distance (mm)"]
+        self.gauge = ouputObj['Bolt']["Gauge Distance (mm)"]
+        self.end_dist = ouputObj['Bolt']["End Distance (mm)"]
+        self.edge_dist = ouputObj['Bolt']["Edge Distance (mm)"]
+        self.no_of_rows = ouputObj['Bolt']["No. of Row"]
+        self.no_of_col = ouputObj['Bolt']["No. of Column"]
+        self.col_L = 700
+        self.beam_L = 350
+        self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else  50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
+        self.beamToBeamDist = 10
+        self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
+        self.notch_ht = self.col_T + self.col_R1
+
+        self.folder = folder
+
+    def addSMarker(self, dwg):
+        '''
+        Draws start arrow to given line  -------->
+        :param dwg :
+        :type dwg : svgwrite (obj) ( Container for all svg elements)
+        '''
+        smarker = dwg.marker(insert=(8, 3), size=(30, 30), orient="auto")
+
+        smarker.add(dwg.path(d=" M0,0 L3,3 L0,6 L8,3 L0,0", fill='black'))
+        dwg.defs.add(smarker)
+
+        return smarker
+
+    def addSectionMarker(self, dwg):
+        '''
+        Draws start arrow to given line  -------->
+        :param dwg :
+        :type dwg : svgwrite (obj) ( Container for all svg elements)
+        '''
+        sectionMarker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
+        sectionMarker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))
+        dwg.defs.add(sectionMarker)
+
+        return sectionMarker
+
+    def addEMarker(self, dwg):
+        '''
+        This routine returns end arrow  <---------
+        :param dwg :
+        :type dwg : svgwrite  ( Container for all svg elements)
+        '''
+        emarker = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
+        emarker.add(dwg.path(d=" M0,3 L8,6 L5,3 L8,0 L0,3", fill='black'))
+        dwg.defs.add(emarker)
+
+        return emarker
+
+    def drawStartArrow(self, line, s_arrow):
+        line['marker-start'] = s_arrow.get_funciri()
+
+    def drawEndArrow(self, line, e_arrow):
+        line['marker-end'] = e_arrow.get_funciri()
+
+    def drawFaintLine(self, ptOne, ptTwo, dwg):
+        '''
+        Draw faint line to show dimensions.
+        :param dwg :
+        :type dwg : svgwrite (obj)
+        :param: ptOne :
+        :type NumPy Array
+        :param ptTwo :
+        :type NumPy Array
+        '''
+        dwg.add(dwg.line(ptOne, ptTwo).stroke('#D8D8D8', width=2.5, linecap='square', opacity=0.7))
+
+    def draw_dimension_outerArrow(self, dwg, pt1, pt2, text, params):
+
+        '''
+        :param dwg :
+        :type dwg : svgwrite (obj)
+        :param: pt1 :
+        :type NumPy Array
+        :param pt2 :
+        :type NumPy Array
+        :param text :
+        :type text : String
+        :param params["offset"] :
+        :type params["offset"] : offset of the dimension line
+        :param params["textoffset"]:
+        :type params["textoffset"]: float (offset of text from dimension line)
+        :param params["lineori"]:
+        :type params ["lineori"]: String (right/left)
+        :param params["endlinedim"]:
+        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)
+        '''
+        smarker = self.addSMarker(dwg)
+        emarker = self.addEMarker(dwg)
+
+        lineVec = pt2 - pt1  # [a, b]
+        normalVec = np.array([-lineVec[1], lineVec[0]])  # [-b, a]
+        normalUnitVec = self.normalize(normalVec)
+        if(params["lineori"] == "left"):
+            normalUnitVec = -normalUnitVec
+
+        Q1 = pt1 + params["offset"] * normalUnitVec
+        Q2 = pt2 + params["offset"] * normalUnitVec
+        line = dwg.add(dwg.line(Q1, Q2).stroke('black', width=2.5, linecap='square'))
+        self.drawStartArrow(line, emarker)
+        self.drawEndArrow(line, smarker)
+
+        Q12mid = 0.5 * (Q1 + Q2)
+        txtPt = Q12mid + params["textoffset"] * normalUnitVec
+        dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
+
+        L1 = Q1 + params["endlinedim"] * normalUnitVec
+        L2 = Q1 + params["endlinedim"] * (-normalUnitVec)
+        dwg.add(dwg.line(L1, L2).stroke('black', width=2.5, linecap='square', opacity=1.0))
+        L3 = Q2 + params["endlinedim"] * normalUnitVec
+        L4 = Q2 + params["endlinedim"] * (-normalUnitVec)
+
+        dwg.add(dwg.line(L3, L4).stroke('black', width=2.5, linecap='square', opacity=1.0))
+
+    def normalize(self, vec):
+        a = vec[0]
+        b = vec[1]
+        mag = math.sqrt(a * a + b * b)
+        return vec / mag
+
+    def draw_cross_section(self, dwg, ptA, ptB, txtPt, text):
+        '''
+        :param dwg :
+        :type dwg : svgwrite (obj)
+        :param ptA :
+        :type ptA : NumPy Array
+        :param ptB :
+        :type ptB : NumPy Array
+        :param txtPt :
+        :type txtPt : NumPy Array
+        :param text :
+        :type text : String
+        '''
+        line = dwg.add(dwg.line((ptA), (ptB)).stroke('black', width=2.5, linecap='square'))
+        sec_arrow = self.addSectionMarker(dwg)
+        self.drawEndArrow(line, sec_arrow)
+        dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=52))
+
+    def draw_dimension_innerArrow(self, dwg, ptA, ptB, text, params):
+        '''
+        :param dwg :
+        :type dwg : svgwrite (obj)
+        :param: ptA :
+        :type NumPy Array
+        :param ptB :
+        :type NumPy Array
+        :param text :
+        :type text : String
+        :param params["textoffset"]:
+        :type params["textoffset"]: float (offset of text from dimension line)
+        :param params["endlinedim"]:
+        :type params'["endlindim"] : float (dimension line at the end of the outer arrow)
+        :param params["arrowlen"]:
+        :type params["arrowlen"]: float (Size of the arrow)
+        '''
+        smarker = self.addSMarker(dwg)
+        emarker = self.addEMarker(dwg)
+
+        u = ptB - ptA  # [a, b]
+        uUnit = self.normalize(u)
+
+        vUnit = np.array([-uUnit[1], uUnit[0]])  # [-b, a]
+
+        A1 = ptA + params["endlinedim"] * vUnit
+        A2 = ptA + params["endlinedim"] * (-vUnit)
+        dwg.add(dwg.line(A1, A2).stroke('black', width=2.5, linecap='square'))
+        B1 = ptB + params["endlinedim"] * vUnit
+        B2 = ptB + params["endlinedim"] * (-vUnit)
+        dwg.add(dwg.line(B1, B2).stroke('black', width=2.5, linecap='square'))
+        A3 = ptA - params["arrowlen"] * uUnit
+        B3 = ptB + params["arrowlen"] * uUnit
+
+        line = dwg.add(dwg.line(A3, ptA).stroke('black', width=2.5, linecap='square'))
+        self.drawEndArrow(line, smarker)
+        # self.drawStartArrow(line, emarker)
+        line = dwg.add(dwg.line(B3, ptB).stroke('black', width=2.5, linecap='butt'))
+        self.drawEndArrow(line, smarker)
+        # self.drawStartArrow(line, emarker)
+        if(params["lineori"] == "right"):
+            txtPt = B3 + params["textoffset"] * uUnit
+        else:
+            txtPt = A3 - (params["textoffset"] + 100) * uUnit
+
+        dwg.add(dwg.text(text, insert=(txtPt), fill='black', font_family="sans-serif", font_size=28))
+
+    def drawOrientedArrow(self, dwg, pt, theta, orientation, offset, textUp, textDown, element):
+
+        '''
+        Drawing an arrow on given direction
+        :param dwg :
+        :type dwg : svgwrite (obj)
+        :param: ptA :
+        :type NumPy Array
+        :param theta:
+        :type theta : Int
+        :param orientation :
+        :type orientation : String
+        :param offset :
+        :type offset : float
+        :param textUp :
+        :type textUp : String
+        :param textDown :
+        :type textup : String
+        '''
+        # Right Up.
+        theta = math.radians(theta)
+        charWidth = 16
+        xVec = np.array([1, 0])
+        yVec = np.array([0, 1])
+
+        p1 = pt
+        lengthA = offset / math.sin(theta)
+
+        arrowVec = None
+        if(orientation == "NE"):
+            arrowVec = np.array([-math.cos(theta), math.sin(theta)])
+        elif(orientation == "NW"):
+            arrowVec = np.array([math.cos(theta), math.sin(theta)])
+        elif(orientation == "SE"):
+            arrowVec = np.array([-math.cos(theta), -math.sin(theta)])
+        elif(orientation == "SW"):
+            arrowVec = np.array([math.cos(theta), -math.sin(theta)])
+
+        p2 = p1 - lengthA * arrowVec
+
+        text = textDown if len(textDown) > len(textUp) else textUp
+        lengthB = len(text) * charWidth
+
+        labelVec = None
+        if(orientation == "NE"):
+            labelVec = -xVec
+        elif(orientation == "NW"):
+            labelVec = xVec
+        elif(orientation == "SE"):
+            labelVec = -xVec
+        elif(orientation == "SW"):
+            labelVec = xVec
+
+        p3 = p2 + lengthB * (-labelVec)
+
+        txtOffset = 18
+        offsetVec = -yVec
+
+        txtPtUp = None
+        if(orientation == "NE"):
+            txtPtUp = p2 + 0.1 * lengthB * (-labelVec) + txtOffset * offsetVec
+            txtPtDwn = p2 - 0.1 * lengthB * (labelVec) - (txtOffset + 15) * offsetVec
+        elif(orientation == "NW"):
+            txtPtUp = p3 + 0.2 * lengthB * labelVec + txtOffset * offsetVec
+            txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec
+
+        elif(orientation == "SE"):
+            txtPtUp = p2 + 0.1 * lengthB * (-labelVec) + txtOffset * offsetVec
+            txtPtDwn = p2 - 0.1 * lengthB * (labelVec) - (txtOffset + 15) * offsetVec
+
+        elif(orientation == "SW"):
+            txtPtUp = p3 + 0.1 * lengthB * labelVec + (txtOffset) * offsetVec
+            txtPtDwn = p3 - 0.1 * lengthB * labelVec - txtOffset * offsetVec
+
+        line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
+
+        emarker = self.addEMarker(dwg)
+        self.drawStartArrow(line, emarker)
+
+        dwg.add(dwg.text(textUp, insert=(txtPtUp), fill='black', font_family="sans-serif", font_size=28))
+        dwg.add(dwg.text(textDown, insert=(txtPtDwn), fill='black', font_family="sans-serif", font_size=28))
+
+        if element == "weld":
+            if orientation == "NW":
+                self.draw_weld_Marker(dwg, 15, 7.5, line)
+            else:
+                self.draw_weld_Marker(dwg, 45, 7.5, line)
+
+    def draw_weld_Marker(self, dwg, oriX, oriY, line):
+
+        weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
+        weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+        dwg.defs.add(weldMarker)
+        self.drawEndArrow(line, weldMarker)
+
+    def saveToSvg(self, fileName, view):
+
+        '''
+        It returns the svg drawing depending upon connectivity
+        CFBW = Column Flange Beam Web
+        CWBW = Column Web Beam Web
+        BWBW = Beam Web Beam Web
+        '''
+        fin2DFront = Seat2DCreatorFront(self)
+        fin2DTop = Seat2DCreatorTop(self)
+        fin2DSide = Seat2DCreatorSide(self)
+
+        if self.connectivity == 'Column flange-Beam web':
+            if view == "Front":
+                fin2DFront.callCFBWfront(fileName)
+            elif view == "Side":
+                fin2DSide.callCFBWSide(fileName)
+            elif view == "Top":
+                fin2DTop.callCFBWTop(fileName)
+            else:
+                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fin2DFront.callCFBWfront(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+
+#                 for n in range(1, 100, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/finFrontFB" + str(n) + ".svg"
+#                         continue
+#                 fin2DFront.callCFBWfront(fileName)
+#                 base_front = os.path.basename(str(fileName))
+
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callCFBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+
+#                 for n in range(1, 100, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/finSideFB" + str(n) + ".svg"
+#                         continue
+#                 fin2DSide.callCFBWSide(fileName)
+#                 base_side = os.path.basename(str(fileName))
+
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callCFBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+#                 for n in range(1, 100, 1):
+#                     if (os.path.exists(fileName)):
+#                         fileName = str(self.folder) + "/images_html/finTopFB" + str(n) + ".svg"
+#                         continue
+#                 fin2DTop.callCFBWTop(fileName)
+#                 base_top = os.path.basename(str(fileName))
+
+        elif self.connectivity == 'Column web-Beam web':
+            if view == "Front":
+                fin2DFront.callCWBWfront(fileName)
+            elif view == "Side":
+                fin2DSide.callCWBWSide(fileName)
+            elif view == "Top":
+                fin2DTop.callCWBWTop(fileName)
+            else:
+                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fin2DFront.callCWBWfront(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callCWBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callCWBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+
+        else:
+            if view == "Front":
+                fin2DFront.callBWBWfront(fileName)
+            elif view == "Side":
+                fin2DSide.callBWBWSide(fileName)
+            elif view == "Top":
+                fin2DTop.callBWBWTop(fileName)
+            else:
+                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fin2DFront.callBWBWfront(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fin2DSide.callBWBWSide(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fin2DTop.callBWBWTop(fileName)
+                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+
+
+
+#**************************************************************
+class Seat2DCreatorTop(object):
+    
+    def __init__(self):
+        pass
+
+
+class Seat2DCreatorSide(object):
+    
+    def __init__(self):
+        pass
+           
+class Seat2DCreatorFront(object):
+    
+    def __init__(self, seatCommonObj):
+        
+        self.dataObj = seatCommonObj
+        self.beam_T = float(self.dataObj.dictBeamdata[QString("T")])
+        self.col_T = float(self.dataObj.dictColumndata[QString("T")])
+        self.D_beam = int (self.dataObj.dictBeamdata[QString("D")])
+        self.D_col = int (self.dataObj.dictColumndata[QString("D")])
+        self.col_B = int(self.dataObj.dictColumndata[QString("B")])
+        self.col_tw = float(self.dataObj.dictColumndata[QString("tw")])
+        beam_R1 = float(self.dataObj.dictBeamdata[QString("R1")])
+        plate_ht= self.dataObj.ouputObj['Plate']['height'] 
+        plate_width = self.dataObj.ouputObj['Plate']['width']
+        weld_len = self.dataObj.ouputObj['Plate']['height']
+        weld_thick =  self.dataObj.ouputObj['Weld']['thickness']
+        self.bolt_dia  = self.dataObj.inputObj["Bolt"]["Diameter (mm)"]
+        self.connectivity =  self.dataObj.inputObj['Member']['Connectivity']
+        self.pitch = self.dataObj.ouputObj['Bolt']["pitch"]
+        self.gauge = self.dataObj.ouputObj['Bolt']["gauge"]
+        self.end_dist = self.dataObj.ouputObj['Bolt']["enddist"]
+        self.edge_dist = self.dataObj.ouputObj['Bolt']["edge"]
+        self.no_of_rows = self.dataObj.ouputObj['Bolt']["numofrow"] 
+        self.no_of_col = self.dataObj.ouputObj['Bolt']["numofcol"]
         self.col_L = 1000
         self.beam_L = 500
         
@@ -221,37 +648,10 @@ class Fin2DCreatorFront(object):
         ptFB4y = ((self.col_L - self.D_beam)/2 + self.D_beam) - self.beam_T
         self.FB4 = ptFB4x, ptFB4y
         
-        
-        
-        
-     
         # points for diamension
-   
-
-    
-    
-    
-    
-    
     
     def callBWBWfront(self):
         pass
-    
-    
-    def saveToSvg(self):
-        ''' It returns the svg drawing depending upon connectivity
-        CFBW = Column Flange Beam Web
-        CWBW = Column Web Beam Web
-        BWBW = Beam Web Beam Web
-        '''
-        if self.connectivity == 'Column flange-Beam web':
-            self.callCFBWfront()
-            
-        elif self.connectivity == 'Column web-Beam web':
-            self.callCWBWfront()
-            
-        else:
-            self.callBWBWfront()
             
     def callCFBWfront(self):
         dwg = svgwrite.Drawing('seatfront.svg', profile='full')
@@ -381,117 +781,7 @@ class Fin2DCreatorFront(object):
         print"Saved"
     
     
-    #,dimelinePt1,dimelinePt2,orient,s_arrow,e_arrow            
-    def draw_dimension_outerArrow(self, dwg, pt1, pt2, text, params):    
-        '''
-        :param dwg
-        :type 
-        :param: pt1
-        :type NumPy Array
-        :param pt2
-        :type NumPy Array
-        :param text
-        :type
-        
-        params["offset"] : offset of the dimension line
-        params["textoffset"]:  offset of text from dimension line
-        params["lineori"]: "right"/"left" 
-        params["endlinedim"]:dimension line at the end of the outer arrow.       
-        '''
-        #defParams = {"offset": 10, "textoffset": 10, "lineori": "right"}defParams = {}
-        
-        
-        smarker = dwg.marker(insert=(-8,0), size=(10,10), orient="auto")
-        smarker.add(dwg.polyline([(-2.5,0), (0,3), (-8,0), (0,-3)], fill='black'))
-        emarker = dwg.marker(insert=(8,0), size=(10,10), orient="auto")
-        emarker.add(dwg.polyline([(2.5,0), (0,3), (8,0), (0,-3)], fill='black'))
-          
-        dwg.defs.add(emarker)
-        dwg.defs.add(smarker)
-
-        lineVec = pt2 - pt1 # [a, b]
-        normalVec = np.array([-lineVec[1], lineVec[0]]) # [-b, a]
-        normalUnitVec = self.normalize(normalVec)
-        if(params["lineori"] == "left"):
-            normalUnitVec = -normalUnitVec
-            
-        # Q1 = pt1 + params["offset"] * normalUnitVec
-        # Q2 = pt2 + params["offset"] * normalUnitVec
-        Q1 = pt1 + params["offset"] * normalUnitVec
-        Q2 = pt2 + params["offset"] * normalUnitVec
-        line = dwg.add(dwg.line(Q1, Q2).stroke('black', width = 2.5, linecap = 'square'))
-        line['marker-start'] = smarker.get_funciri()
-        line['marker-end'] = emarker.get_funciri()
-
-        Q12mid = 0.5 * (Q1 + Q2)
-        txtPt = Q12mid + params["textoffset"] * normalUnitVec
-        dwg.add(dwg.text(text, insert=(txtPt), fill='black',))
-        
-        L1 = Q1 + params["endlinedim"] * normalUnitVec
-        L2 = Q1 + params["endlinedim"]* (-normalUnitVec)
-        dwg.add(dwg.line(L1,L2).stroke('black',width = 2.5,linecap = 'square'))
-        L3 = Q2 + params["endlinedim"] * normalUnitVec
-        L4 = Q2 + params["endlinedim"]* (-normalUnitVec)
-        dwg.add(dwg.line(L3,L4).stroke('black',width = 2.5,linecap = 'square'))
-        
-    def normalize(self, vec):
-        a = vec[0]
-        b = vec[1]
-        mag = math.sqrt(a * a + b * b)
-        return vec / mag
     
-    def draw_dimension_innerArrow(self, dwg, ptA, ptB, text, params):
-        
-        smarker = dwg.marker(insert=(-8,0), size=(10,10), orient="auto")
-        smarker.add(dwg.polyline([(-2.5,0), (0,3), (-8,0), (0,-3)], fill='black'))
-        emarker = dwg.marker(insert=(8,0), size=(10,10), orient="auto")
-        emarker.add(dwg.polyline([(2.5,0), (0,3), (8,0), (0,-3)], fill='black'))
-          
-        dwg.defs.add(emarker)
-        dwg.defs.add(smarker)
-        
-        u = ptB - ptA # [a, b]
-        uUnit = self.normalize(u)
-        
-        vUnit = np.array([-uUnit[1], uUnit[0]]) # [-b, a]
-        
-        A1 = ptA + params["endlinedim"] * vUnit
-        A2 = ptA - params["endlinedim"]* (-vUnit)
-        dwg.add(dwg.line(A1,A2).stroke('black',width = 2.5,linecap = 'square'))
-        B1 = ptB + params["endlinedim"] * vUnit
-        B2 = ptB - params["endlinedim"]* (-vUnit)
-        dwg.add(dwg.line(B1,B2).stroke('black',width = 2.5,linecap = 'square'))
-        A3 = ptA - params["arrowlen"]* uUnit
-        B3 = ptB + params["arrowlen"]* uUnit
-        
-        line = dwg.add(dwg.line(A3, ptA).stroke('black', width = 2.5, linecap = 'square'))
-        line['marker-end'] = emarker.get_funciri()
-        line = dwg.add(dwg.line(B3, ptB).stroke('black', width = 2.5, linecap = 'square'))
-        
-        line['marker-end'] = emarker.get_funciri()
-        txtPt = A3 + params["textoffset"] * vUnit
-        dwg.add(dwg.text(text, insert=(txtPt), fill='black',))
-        
-        pass
-    
-    def drawArrow(self,line,s_arrow,e_arrow):
-        line['marker-start'] = s_arrow.get_funciri()
-        line['marker-end'] = e_arrow.get_funciri()
-
-    def drawStartArrow(self,line,s_arrow):
-        line['marker-start'] = s_arrow.get_funciri()
-
-    def drawEndArrow(self,line,e_arrow):
-        line['marker-end'] = e_arrow.get_funciri()
-        
-    def drawFaintLine(self,ptOne,ptTwo,dwg):
-        '''
-        Faint line to show dimensions.
-        '''
-        dwg.add(dwg.line(ptOne,ptTwo).stroke('acacacff',width = 2.5,linecap = 'square'))
-        
-             
-
 
     
     

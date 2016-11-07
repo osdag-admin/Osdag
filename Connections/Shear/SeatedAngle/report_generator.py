@@ -249,19 +249,15 @@ class ReportGenerator(SeatAngleCalculation):
         column_sec = str(self.column_section)
         column_fu = str(self.column_fu)
         beam_sec = str(self.beam_section)
-        plate_thk = str(12)
         beam_col_clear_gap = str(self.beam_col_clear_gap)
 
         boltGrade = str(self.bolt_grade)
         bolt_diameter = str(self.bolt_diameter)
         bolt_hole_type = str(self.bolt_hole_type)
-        weld_thickness = str(10)
 
         beam_depth = str(self.beam_d)
         beam_flange_thickness = str(self.beam_f_t)
         beam_root_radius = str(self.beam_R1)
-        plate_thickness = str(1)
-        block_shear = str(1000)
         col_flange_thickness = str(self.column_f_t)
         col_root_radius = str(self.column_R1)
 
@@ -270,11 +266,6 @@ class ReportGenerator(SeatAngleCalculation):
         angle_fu = str(self.angle_fu)
         angle_fy = str(self.angle_fy)
 
-        plate_width = str(100)
-        plate_length = str(240)
-        weld_size = str(10)
-
-        plate_dimension = "240X100X12"
         bolts_provided = str(self.bolts_provided)
         bolts_required = str(self.bolts_required)
 
@@ -284,7 +275,6 @@ class ReportGenerator(SeatAngleCalculation):
         gauge = str(self.gauge)
         pitch = str(self.pitch)
         end = str(self.end_dist)
-        weld_strength = str(500)
         moment_demand = str(self.moment_at_root_angle)
         gap = '20'
         # TODO replace hardcoded gap value
@@ -294,15 +284,10 @@ class ReportGenerator(SeatAngleCalculation):
         bolt_dia = str(self.bolt_diameter)
         kb = str(self.k_b)
         beam_w_t = str(self.beam_w_t)
-        web_plate_t = str(12)
         beam_fu = str(self.beam_fu)
         dia_hole = str(self.bolt_hole_diameter)
-        web_plate_fy = str(330)
-        weld_fu = str(800)
-        weld_l = str(240)
         shear_capacity = str(self.bolt_shear_capacity)
         bearing_capacity = str(self.bolt_bearing_capacity)
-        moment_demand = str(0)
         if self.safe == True:
             design_conclusion = "Pass"
         elif self.safe == False:
@@ -384,6 +369,9 @@ class ReportGenerator(SeatAngleCalculation):
 
         check_pass = "<p align=left style=color:green><b>Pass</b></p>"
 
+        # Bolt
+        rstr += design_check_row("Bolt", "","","",col_span="4",text_one_css="detail1")
+
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
         req_field = " "
@@ -392,7 +380,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
-        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k_b * bolt_diameter * critical_thickness * <br>"\
+        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k<sub>b</sub> * bolt_diameter * critical_thickness * <br>"\
                     +space(3)+" <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> "\
                     +"[Cl. 10.3.4]"
         prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" \
@@ -438,6 +426,20 @@ class ReportGenerator(SeatAngleCalculation):
         req_field = " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [cl. 10.2.4]"
         rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
+        # Seated angle
+        rstr += design_check_row("Seated Angle", "","","",col_span="4",text_one_css="detail1")
+
+        # Seated angle length
+        if connectivity ==  "Column flange-Beam web":
+            req_field = "= min(supported_beam_width, supporting_column_width) <br> = min(" + str(self.beam_w_f) + ", " + str(self.column_w_f)+")"
+            prov_field = str(self.angle_l)
+        elif connectivity == "Column web-Beam web":
+            req_field = "=width of supported beam <br> ="+str(self.beam_w_f)
+            prov_field = str(self.angle_l)
+        rstr += design_check_row("length", req_field, prov_field, check_pass)
+
+        # Length of oustanding leg
+        req_field = "b = R/"+sub("t", "w")+"("+sub("f","yw")+"/"+sub("&gamma","m0")+")"
         # TODO Add other checks to the list
 
         rstr += t('/table')
@@ -630,6 +632,18 @@ def html_space(n):
     """
     return " " * n
 
+def sub(string, subscript):
+    """Create html code to display subscript.
+
+    Args:
+        string (str):
+        subscript (str): string to be subscripted.
+
+    Returns:
+        (str): html code with concatenated string and subscript
+    """
+    return string+"<sub>"+subscript+"</sub>"
+
 
 def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
     """Create formatted html row entry for design summary table.
@@ -707,7 +721,7 @@ def design_check_row(text_one, text_two, text_three, text_four, **kwargs):
         row_string = row_string + html_space(4) + t(
             'td colspan=' + col_span + ' class="' + t1_css + '"') + text_one + t('/td') + nl()
     else:
-        row_string = row_string + html_space(4) + t('td class="' + t1_css + '"') + text_one + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + t1_css + '"') + space(1)+text_one + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t2_css + '"') + text_two + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t3_css + '"') + text_three + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t4_css + '"') + text_four + t('/td') + nl()

@@ -54,6 +54,7 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
     # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
+# TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 # TODO display top angle in UI - output dock
 
@@ -231,8 +232,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.custom_hole_clearance = None  # user defined hole clearance, if any
         self.beam_col_clear_gap = 5 + 5  # clearance + tolerance
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
-        self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
-        # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
+        # self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
+        self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
         self.top_angle = "ISA 100X65X8"
         # TODO specify non-arbitrary top angle section

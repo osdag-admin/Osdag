@@ -13,7 +13,6 @@ logger = None
 
 
 def module_setup():
-    
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
 
@@ -26,7 +25,7 @@ module_setup()
 
 
 def net_area_calc(dia):
-    net_area = {5:15.3, 6:22.04, 8:39.18, 10:61.23, 12:84.5, 16:157, 20:245, 22:303, 24:353, 27:459, 30:561, 36:817};
+    net_area = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
     return net_area[dia]
 
 # BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
@@ -34,7 +33,7 @@ def net_area_calc(dia):
 
 def black_bolt_shear(dia, n, fu):
     A = net_area_calc(dia)
-    root3 = math.sqrt(3);
+    root3 = math.sqrt(3)
     Vs = fu * n * A / (root3 * 1.25 * 1000)
     Vs = round(Vs, 3)
     return Vs
@@ -148,24 +147,24 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
     Tdb = 0.0
     if numcol == 1:
         area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * edge_dist
-        Atn = platethk * (edge_dist - 0.5 * dia_hole)
+        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_shear_gross = platethk * edge_dist
+        area_tension_net = platethk * (edge_dist - 0.5 * dia_hole)
         
-        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1, Tdb2)
+        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
+        Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_shear_gross * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         
     elif numcol == 2:
         area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * (edge_dist + gauge)
-        Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_shear_gross = platethk * (edge_dist + gauge)
+        area_tension_net = platethk * (edge_dist + gauge - 0.5 * dia_hole)
         
-        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
-        Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
-        Tdb = min (Tdb1, Tdb2)
+        Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
+        Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_shear_gross * fy / 1.1)
+        Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         
     return Tdb  
@@ -542,7 +541,7 @@ def cleat_connection(ui_obj):
         if shear_load != 0:
             
             crit_shear = critical_bolt_shear(shear_load, eccentricity, pitch, gauge, no_row)
-            if crit_shear > bolt_capacity :
+            if crit_shear > bolt_capacity:
                 if no_col == 1:
                     while crit_shear > bolt_capacity and cleat_length < max_cleat_length:
                         no_row = no_row + 1
@@ -731,12 +730,14 @@ def cleat_connection(ui_obj):
     if b_gauge < 90:
         
         design_check = False
-        logger.error(':Cross center distance between bolt lines in %s on either side of the supported beam is less than the specified gauge [reference-JSC:ch.4 check-1]' % (str(connection)))
+        logger.error(':Cross center distance between bolt lines in %s on either side of the supported beam is less than the specified gauge '
+                     '[reference-JSC:ch.4 check-1]' % (str(connection)))
         logger.warning(':Minimum specified cross center gauge is 90 mm')
         logger.info(':Increase the cleat leg size')
     if b_gauge > 140:
         design_check = False
-        logger.error(':Cross center distance between bolt lines in %s on either side of supported the beam is greater than the specified gauge[reference-JSC:ch.4 check-1]' % (str(connection)))
+        logger.error(':Cross center distance between bolt lines in %s on either side of supported the beam is greater than the specified gauge'
+                     '[reference-JSC:ch.4 check-1]' % (str(connection)))
         logger.warning(':Maximum specified cross center gauge is 140 mm')
         logger.info(':Decrease the cleat leg size')
         
@@ -745,13 +746,13 @@ def cleat_connection(ui_obj):
     Tdb_C = blockshear(no_row_c, no_col_c, dia_hole, beam_fy, beam_fu, end_dist_c, edge_dist_c, pitch_c, gauge_c, cleat_thk)  
     
     Tdb = min(Tdb_B, Tdb_C)
-    if Tdb_B <= shear_load or Tdb_C <= shear_load :
+    if Tdb_B <= shear_load or Tdb_C <= shear_load:
         design_check = False
         logger.error(": The block shear capacity of the cleat Angle is lass than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is %2.2f KN " % (shear_load))
         logger.info(":Block shear capacity of the cleat angle is %2.2f KN" % (Tdb))
         logger.info(": Increase the cleat angle thickness")  
-    ###############Moment Demand and Moment Capacity ##################
+    # ##############Moment Demand and Moment Capacity ##################
     moment_demand_c = 0.5 * shear_load * c_eccentricity / 1000
     moment_capacity_c = 1.2 * cleat_fy * cleat_thk * cleat_length * cleat_length / 1000000
     if moment_capacity_c < moment_demand_c:
@@ -764,78 +765,72 @@ def cleat_connection(ui_obj):
         design_check = False
         logger.error(":Moment capacity of the cleat angle leg  is less than the moment demand [cl. 8.2.1.2]")
         logger.info(":Re-design with increased plate dimensions")
-    #########################feeding output to array ###############
-    outputObj = {}
-    outputObj['Bolt'] = {}
-    outputObj['Bolt']['status'] = True
-    outputObj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-    outputObj['Bolt']['bearingcapacity'] = round(bearing_capacity_b, 3)
-    outputObj['Bolt']['bearingcapacitybeam'] = round(bearing_capacity_beam, 3)
-    outputObj['Bolt']['bearingcapacitycleat'] = round(bearing_capacity_plt, 3)
-    outputObj['Bolt']['boltcapacity'] = round(2 * bolt_capacity, 3)
-    outputObj['Bolt']['boltbearingcapacity'] = round(bolt_bearing_capacity, 3)
-    outputObj['Bolt']['externalmoment'] = round(moment_demand_b, 3)
-    outputObj['Bolt']['momentcapacity'] = round(moment_capacity_b, 3)
+    # ########################feeding output to array ###############
+    output_obj ={}
+    output_obj['Bolt'] = {}
+    output_obj['Bolt']['status'] = True
+    output_obj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
+    output_obj['Bolt']['bearingcapacity'] = round(bearing_capacity_b, 3)
+    output_obj['Bolt']['bearingcapacitybeam'] = round(bearing_capacity_beam, 3)
+    output_obj['Bolt']['bearingcapacitycleat'] = round(bearing_capacity_plt, 3)
+    output_obj['Bolt']['boltcapacity'] = round(2 * bolt_capacity, 3)
+    output_obj['Bolt']['boltbearingcapacity'] = round(bolt_bearing_capacity, 3)
+    output_obj['Bolt']['externalmoment'] = round(moment_demand_b, 3)
+    output_obj['Bolt']['momentcapacity'] = round(moment_capacity_b, 3)
 
-    outputObj['Bolt']['blockshear'] = round(Tdb_B, 3)
-    outputObj['Bolt']['critshear'] = round(critboltshear_b, 3)
-    
-    outputObj['Bolt']['numofbolts'] = no_row_b * no_col_b
-    outputObj['Bolt']['boltgrpcapacity'] = round(2 * bolt_capacity * no_row_b * no_col_b, 3)
-    outputObj['Bolt']['numofrow'] = int(no_row_b)
-    outputObj['Bolt']['numofcol'] = int(no_col_b) 
-    outputObj['Bolt']['pitch'] = int(pitch_b)
-    outputObj['Bolt']['enddist'] = int(end_dist_b)
-    outputObj['Bolt']['edge'] = int(edge_dist_b)
-    outputObj['Bolt']['gauge'] = int(gauge_b)
-    outputObj['Bolt']['thinner'] = float(t_thinner_b)
-    outputObj['Bolt']['diahole'] = float(dia_hole)
-    outputObj['Bolt']['kb'] = float(kb)
-    
-#     outputObj['Bolt']['grade'] = bolt_grade
+    output_obj['Bolt']['blockshear'] = round(Tdb_B, 3)
+    output_obj['Bolt']['critshear'] = round(critboltshear_b, 3)
 
-      
-     
-    outputObj['cleat'] = {}
-    outputObj['cleat']['numofbolts'] = 2 * no_row_c * no_col_c
-    outputObj['cleat']['height'] = int(cleat_length)
-    outputObj['cleat']['externalmoment'] = round(moment_demand_c , 3)
-    outputObj['cleat']['momentcapacity'] = round(moment_capacity_c, 3)
-    outputObj['cleat']['numofrow'] = no_row_c
-    outputObj['cleat']['numofcol'] = no_col_c
+    output_obj['Bolt']['numofbolts'] = no_row_b * no_col_b
+    output_obj['Bolt']['boltgrpcapacity'] = round(2 * bolt_capacity * no_row_b * no_col_b, 3)
+    output_obj['Bolt']['numofrow'] = int(no_row_b)
+    output_obj['Bolt']['numofcol'] = int(no_col_b)
+    output_obj['Bolt']['pitch'] = int(pitch_b)
+    output_obj['Bolt']['enddist'] = int(end_dist_b)
+    output_obj['Bolt']['edge'] = int(edge_dist_b)
+    output_obj['Bolt']['gauge'] = int(gauge_b)
+    output_obj['Bolt']['thinner'] = float(t_thinner_b)
+    output_obj['Bolt']['diahole'] = float(dia_hole)
+    output_obj['Bolt']['kb'] = float(kb)
     
-    outputObj['cleat']['pitch'] = int(pitch_c)
-    outputObj['cleat']['guage'] = int(gauge_c)
-    outputObj['cleat']['edge'] = edge_dist_c
-    outputObj['cleat']['end'] = end_dist_c
-    outputObj['cleat']['legsize'] = cleat_legsize_1
-    outputObj['cleat']['thinner'] = float(thinner)
- 
-    outputObj['cleat']['shearcapacity'] = round(bolt_shear_capacity_c, 3)
-    outputObj['cleat']['bearingcapacity'] = round(bearing_capacity_c, 3)
-    outputObj['cleat']['boltcapacity'] = round(bolt_capacity_c, 3)
-    outputObj['cleat']['bearingcapacitycolumn'] = round(bearing_capacity_column, 3)
-    outputObj['cleat']['bearingcapacitycleat'] = round(bearing_capacity_cleat_c, 3)
-    outputObj['cleat']['boltgrpcapacity'] = round(2 * bolt_capacity_c * no_row_c * no_col_c, 3)
-    outputObj['cleat']['boltbearingcapacity'] = round(bolt_bearing_capacity_c, 3)
-    outputObj['cleat']['blockshear'] = round(Tdb_C, 3)     
-    outputObj['cleat']['critshear'] = round(critboltshear_c, 3)
+#     output_obj['Bolt']['grade'] = bolt_grade
 
-          
+    output_obj['cleat'] = {}
+    output_obj['cleat']['numofbolts'] = 2 * no_row_c * no_col_c
+    output_obj['cleat']['height'] = int(cleat_length)
+    output_obj['cleat']['externalmoment'] = round(moment_demand_c , 3)
+    output_obj['cleat']['momentcapacity'] = round(moment_capacity_c, 3)
+    output_obj['cleat']['numofrow'] = no_row_c
+    output_obj['cleat']['numofcol'] = no_col_c
+
+    output_obj['cleat']['pitch'] = int(pitch_c)
+    output_obj['cleat']['guage'] = int(gauge_c)
+    output_obj['cleat']['edge'] = edge_dist_c
+    output_obj['cleat']['end'] = end_dist_c
+    output_obj['cleat']['legsize'] = cleat_legsize_1
+    output_obj['cleat']['thinner'] = float(thinner)
+
+    output_obj['cleat']['shearcapacity'] = round(bolt_shear_capacity_c, 3)
+    output_obj['cleat']['bearingcapacity'] = round(bearing_capacity_c, 3)
+    output_obj['cleat']['boltcapacity'] = round(bolt_capacity_c, 3)
+    output_obj['cleat']['bearingcapacitycolumn'] = round(bearing_capacity_column, 3)
+    output_obj['cleat']['bearingcapacitycleat'] = round(bearing_capacity_cleat_c, 3)
+    output_obj['cleat']['boltgrpcapacity'] = round(2 * bolt_capacity_c * no_row_c * no_col_c, 3)
+    output_obj['cleat']['boltbearingcapacity'] = round(bolt_bearing_capacity_c, 3)
+    output_obj['cleat']['blockshear'] = round(Tdb_C, 3)
+    output_obj['cleat']['critshear'] = round(critboltshear_c, 3)
 
     if bolts_required == 0 or bolts_required_c == 0:
-        for k in outputObj.keys():
-            for key in outputObj[k].keys():
-                outputObj[k][key] = ""
+        for k in output_obj.keys():
+            for key in output_obj[k].keys():
+                output_obj[k][key] = ""
                 
-    if design_check == False:
-        for k in outputObj.keys():
-            for key in outputObj[k].keys():
-                outputObj[k][key] = ""
-                
-    
+    if design_check is False:
+        for k in output_obj.keys():
+            for key in output_obj[k].keys():
+                output_obj[k][key] = ""
                     
-    if design_check == True:  
+    if design_check is True:
         logger.info(": Overall cleat Angle connection design is safe \n")
         logger.debug(" :=========End Of design===========")
           
@@ -843,8 +838,4 @@ def cleat_connection(ui_obj):
         logger.error(": Design is not safe \n ")
         logger.debug(" :=========End Of design===========")
      
-    return outputObj                          
-    
-
-
-
+    return output_obj

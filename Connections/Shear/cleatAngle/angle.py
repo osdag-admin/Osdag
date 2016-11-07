@@ -46,10 +46,10 @@ class Angle(object):
         
     def create_model(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
+        edges = make_edges_from_points(self.points)
+        wire = make_wire_from_edges(edges)
+        aFace = make_face_from_wire(wire)
         extrude_dir = self.L * self.vDir  # extrude_dir is a numpy array
-        prism = makePrismFromFace(aFace, extrude_dir)
+        prism = make_prism_from_face(aFace, extrude_dir)
         
         return prism

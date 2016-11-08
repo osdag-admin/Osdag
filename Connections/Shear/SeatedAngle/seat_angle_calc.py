@@ -110,7 +110,9 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
-        moment_cap_high_shear (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
+        is_shear_high (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
+        moment_high_shear_beta (float): factor for moment capacity with high shear
+        leg_moment_d (float): M_d
         outstanding_leg_shear_capacity (float)
         beam_shear_strength (float)
         bolt_shear_capacity (float)
@@ -186,6 +188,9 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.moment_at_root_angle =  0.0
         self.moment_capacity_angle =  0.0
+        self.is_shear_high = False
+        self.leg_moment_d = 0.0
+        self.moment_high_shear_beta = 0.0
         self.outstanding_leg_shear_capacity =  0.0
         self.beam_shear_strength = 0.0
         self.bolt_shear_capacity =  0.0
@@ -508,17 +513,18 @@ class SeatAngleCalculation(ConnectionCalculations):
             1) beta_b (in the equation in Cl 8.2.1.2) = 1.0 as the outstanding leg is plastic section
             2) using Z_p (plastic section modulus) for moment capacity
         """
-        leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 4) /1000
+        self.leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 4) /1000
 
         if self.shear_force <= 0.6 * self.outstanding_leg_shear_capacity:
-            self.moment_cap_high_shear = False
+            angle_moment_capacity_clause = "Cl 8.2.1.2"
+            self.is_shear_high = False
             # to avoid irreversible deformation (in case of cantilever),
-            # under serviceablitiy loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
+            # under service-ability loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
             leg_moment_d_limiting = 1.5 * (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6)  /1000
-            angle_outst_leg_mcapacity = min(leg_moment_d, leg_moment_d_limiting)
-            angle_moment_capacity_clause = "[Cl 8.2.1.2]"
+            angle_outst_leg_mcapacity = min(self.leg_moment_d, leg_moment_d_limiting)
         else:
-            self.moment_cap_high_shear = True
+            self.is_shear_high = True
+            angle_moment_capacity_clause = "Cl 8.2.1.3"
             """ Cl 8.2.1.3
             if shear force > 0.6 * shear strength of outstanding leg:
             The moment capacity of the outstanding leg is calculated as,
@@ -534,8 +540,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             """
             leg_moment_d_limiting = 1.2 * (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6) /1000
             beta_moment = ((2 * self.shear_force / self.outstanding_leg_shear_capacity) - 1) ** 2
-            angle_outst_leg_mcapacity = min((1 - beta_moment) * leg_moment_d, leg_moment_d_limiting)
-            angle_moment_capacity_clause = "[Cl 8.2.1.3]"
+            angle_outst_leg_mcapacity = min((1 - beta_moment) * self.leg_moment_d, leg_moment_d_limiting)
+            self.moment_high_shear_beta = beta_moment # for design report
 
         self.moment_capacity_angle = round(angle_outst_leg_mcapacity, 1)
         # logger.info("Moment capacity of outstanding leg = " + str(self.moment_capacity_angle))
@@ -558,10 +564,10 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.warning(": Beam design is outside the scope of this module")
 
         # End of calculation
-        #---------------------------------------------------------------------------
+        # ---------------------------------------------------------------------------
         self.sa_output()
 
-        if self.output_dict['SeatAngle']['status'] == True:
+        if self.output_dict['SeatAngle']['status'] is True:
             logger.info(": Overall seated angle connection design is safe")
             logger.debug(": =========End Of design===========")
         else:

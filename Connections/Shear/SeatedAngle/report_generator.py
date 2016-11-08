@@ -59,7 +59,8 @@ class ReportGenerator(SeatAngleCalculation):
 
         moment_cap_high_shear (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
         moment_at_root_angle (float)
-        moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
+        moment_capacity_angle (float): Moment capacity of outstanding leg of seated angle
+        leg_moment_d (float): Moment capacity of outstanding leg of seated angle with low shear
         outstanding_leg_shear_capacity (float)
         beam_shear_strength (float)
         bolt_shear_capacity (float)
@@ -151,7 +152,9 @@ class ReportGenerator(SeatAngleCalculation):
 
         self.moment_at_root_angle = sa_calc_object.moment_at_root_angle
         self.moment_capacity_angle = sa_calc_object.moment_capacity_angle
-        self.moment_cap_high_shear = sa_calc_object.moment_cap_high_shear
+        self.is_shear_high = sa_calc_object.is_shear_high
+        self.moment_high_shear_beta = sa_calc_object.moment_high_shear_beta
+        self.leg_moment_d = sa_calc_object.leg_moment_d
         self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
         self.beam_shear_strength = sa_calc_object.beam_shear_strength
         self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
@@ -460,39 +463,40 @@ class ReportGenerator(SeatAngleCalculation):
                                  check_pass)
 
         # Moment capacity of outstanding leg
-        req_field = sub("M", "d") + " &#8805 Moment at root of angle"
-        req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
-        prov_field = sub("M", "d") + "=" + sub("beta", "b") + sub("Z", "p") + sub("f", "y") + "/" + sub("gamma",
-                                                                                                        "m0")
-        if self.moment_cap_high_shear is False:
-            req_field += "<br>As V &#8804 0.6 " + sub("V", "d")
+        prov_field = sub("M", "d") + "=" + sub("beta", "b") + sub("Z", "p") + sub("f", "y")
+        prov_field += "/" + sub("gamma", "m0")
+        prov_field += "<br> = 1.0* " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*"
+        prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0) + "<br>"
+
+        if self.is_shear_high is False:
+            req_field = "As V &#8804 0.6 " + sub("V", "d")
             req_field += ",<br>[Cl 8.2.1.2] is applicable <br>"
 
-            prov_field += "<br> = 1.0* " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*" + str(
-                self.angle_fy) + "/" + str(self.gamma_m0)
-        elif self.moment_cap_high_shear is True:
+            req_field += sub("M", "d") + " &#8805 Moment at root of angle"
+            req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
+            prov_field += "<br>=" + str(self.moment_capacity_angle)
+        elif self.is_shear_high is True:
+            req_field = "As V &#8805 0.6 " + sub("V", "d")
+            req_field += ",<br>[Cl 8.2.1.3] is applicable <br>"
+
             req_field += "<br>" + sub("M", "dv") + " &#8805 Moment at root of angle"
             req_field += "<br>" + sub("M", "dv") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
 
-            req_field += "<br>As V &#8805 0.6 " + sub("V", "d")
-            req_field += ",<br>[Cl 8.2.1.3] is applicable <br>"
-
-            prov_field += "<br><br>" + sub("M", "dv") + "= min("
-            prov_field += "(1 - beta)"+sub("M","d")+", "
+            prov_field += "=" + str(round(self.leg_moment_d, 2)) + "<br>"
+            prov_field += "<br>" + sub("M", "dv") + "= min("
+            prov_field += " (1 - beta)" + sub("M", "d") + " , "
             prov_field += "1.2 " + sub("Z", "e") + sub("f", "y") + "/" + sub("gamma", "m0")
-            prov_field += ") <br>"
-            prov_field += "beta = ((2V/"+sub("V","d")+")-1)^2"
-            prov_field += "<br> = 1.0 * " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*" + str(
-                self.angle_fy) + "/" + str(self.gamma_m0)
+            prov_field += " ) <br>"
+            prov_field += space(2) + "beta = ((2V/" + sub("V", "d") + ")-1)^2 = " + str(
+                self.moment_high_shear_beta) + "<br>"
+            prov_field += "<br>" + sub("M", "dv") + " = " + str(self.moment_capacity_angle)
 
         req_field += "<br>" + "To avoid irreversible deformation under service loads,"
         req_field += "<br>" + sub("M", "d") + " &#8804 1.5" + sub("Z", "e") + sub("f", "y")
         req_field += "/" + sub("gamma", "m0") + "<br>"
-        prov_field += "<br>=" + str(self.moment_capacity_angle)
 
         rstr += design_check_row("Moment capacity of outstanding <br>" + space(1) + " leg (kN-mm)", req_field,
-                                 prov_field,
-                                 check_pass)
+                                 prov_field, check_pass)
 
         # TODO Add other checks to the list
 

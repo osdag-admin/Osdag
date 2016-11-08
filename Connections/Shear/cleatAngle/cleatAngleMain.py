@@ -46,6 +46,7 @@ from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
 from utilities import osdag_display_shape
+from Svg_Window import SvgWindow
 from OCC.Display import OCCViewer
 # from OCC.Display.backend import get_qt_modules
 from macpath import basename
@@ -799,9 +800,11 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        filename, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
+        # filename, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
+        filename = self.folder + "/images_html/Html_Report.html"
         filename = str(filename)
-        base, base_front, base_top, base_side = self.call_2d_drawing("All")
+        self.call_2d_drawing("All")
+        # base, base_front, base_top, base_side = self.call_2d_drawing("All")
         # self.outdict = self.result_obj#self.outputdict()
 
         self.inputdict = self.getuser_inputs()  # self.getuser_inputss()
@@ -810,16 +813,18 @@ class MainController(QtGui.QMainWindow):
 
         dict_column_data = self.fetch_column_param()
         dict_cleat_data = self.fetch_angle_param()
-        save_html(self.outdict, self.inputdict, dict_beam_data, dict_column_data, dict_cleat_data, popup_summary, filename, self.folder, base, base_front, base_top, base_side)
+        save_html(self.outdict, self.inputdict, dict_beam_data, dict_column_data, dict_cleat_data, popup_summary, filename, self.folder)
 
-        # path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        # config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-        # options = {
-        #             'margin-bottom': '10mm',
-        #             'footer-right': '[page]'
-        #             }
-        # pdfkit.from_file(filename,'Workspace\css\cleatreport.pdf', configuration=config, options=options)
-
+        # ########################################## Creates pdf: ####################################################################
+        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        #         pdfkit.from_file(filename, filename[:-5] + ".pdf", configuration=config, options=options)
+        pdfkit.from_file(filename, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
+                         options=options)
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -1658,6 +1663,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.result_obj['Bolt']['status']
         self.call_3d_model(status)
+        self.call_2d_drawing('All')
 
     def create_2d_cad(self, connectivity):
         ''' Returns the fuse model of cleat angle
@@ -1729,8 +1735,9 @@ class MainController(QtGui.QMainWindow):
         else:
             pass
 
-    def call_desired_view(self, filename, view, base_front, base_top, base_side):
+    # def call_desired_view(self, filename, view, base_front, base_top, base_side):
 
+    def call_desired_view(self, filename, view):
         self. unchecked_all_checkbox()
 
         ui_obj = self.getuser_inputs()
@@ -1739,44 +1746,59 @@ class MainController(QtGui.QMainWindow):
         dict_column_data = self.fetch_column_param()
         dict_angle_data = self.fetch_angle_param()
         fin_common_obj = cleatCommonData(ui_obj, result_obj, dict_beam_data, dict_column_data, dict_angle_data, self.folder)
-        base_front, base_top, base_side = fin_common_obj.save_to_svg(str(filename), view, base_front, base_top, base_side)
-        return (base_front, base_top, base_side)
+        fin_common_obj.save_to_svg(str(filename), view)
+        # base_front, base_top, base_side = fin_common_obj.save_to_svg(str(filename), view, base_front, base_top, base_side)
+        # return (base_front, base_top, base_side)
 
     def call_2d_drawing(self, view):
 
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from CleatAngle GUI.
         '''
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
-        loc = self.ui.comboConnLoc.currentText()
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#         base = ''
+#         base_front = ''
+#         base_side = ''
+#         base_top = ''
+#         loc = self.ui.comboConnLoc.currentText()
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         if view == "All":
             filename = ''
-            base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
-
+            self.call_desired_view(filename, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
-            for n in range(1, 100, 1):
-                if (os.path.exists(data)):
-                    data = str(self.folder) + "/images_html/3D_Model" + str(n) + ".png" 
-                    continue
-            base = os.path.basename(str(data))
-
             self.display.ExportToImage(data)
 
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#             base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
+#             for n in range(1, 100, 1):
+#                 if (os.path.exists(data)):
+#                     data = str(self.folder) + "/images_html/3D_Model" + str(n) + ".png"
+#                     continue
+#             base = os.path.basename(str(data))
+
         else:
-            filename = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            f = open(filename, 'w')
+            if view == "Front":
+                filename = self.folder + "/images_html/cleatFront.svg"
 
-            base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
+            elif view == "Side":
+                filename = self.folder + "/images_html/cleatSide.svg"
 
-            f.close()
-        return (base, base1, base2, base3)
+            else:
+                filename = self.folder + "/images_html/cleatTop.svg"
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+            self.save_2D_image_names(view)
+
+#       filename = QtGui.QFileDialog.getSaveFileName(self,
+#                                                  "Save SVG", str(self.folder) + '/untitled.svg',
+#                                                   "SVG files (*.svg)")
+#       f = open(filename, 'w')
+#       base1, base2, base3 = self.call_desired_view(filename, view, base_front, base_top, base_side)
+#       f.close()
+#   return (base, base1, base2, base3)
 
     def closeEvent(self, event):
         '''

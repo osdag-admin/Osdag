@@ -10,6 +10,7 @@ from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 from model import *
+import cairosvg
 
 
 class cleatCommonData(object):
@@ -136,7 +137,7 @@ class cleatCommonData(object):
     def draw_end_arrow(self, line, e_arrow):
         line['marker-end'] = e_arrow.get_funciri()
 
-    def drawFaintLine(self, pt_one, pt_two, dwg):
+    def draw_faint_line(self, pt_one, pt_two, dwg):
         '''
         Draw faint line to show dimensions.
 
@@ -350,116 +351,153 @@ class cleatCommonData(object):
         dwg.add(dwg.text(text_up, insert=(txt_pt_up), fill='black', font_family="sans-serif", font_size=28))
         dwg.add(dwg.text(text_down, insert=(txt_pt_down), fill='black', font_family="sans-serif", font_size=28))
 
-    def save_to_svg(self, filename, view, base_front, base_top, base_side):
+    # def save_to_svg(self, filename, view, base_front, base_top, base_side):
+    def save_to_svg(self, filename, view):
         '''
          It returns the svg drawing depending upon connectivity
         CFBW = Column Flange Beam Web
         CWBW = Column Web Beam Web
         BWBW = Beam Web Beam Web
         '''
-        fin_2d_front = cleat2DCreatorFront(self)
-        fin_2d_top = cleat2DCreatorTop(self)
-        fin_2d_side = cleat2DCreatorSide(self)
+        fin_2d_front = Cleat2DCreatorFront(self)
+        fin_2d_top = Cleat2DCreatorTop(self)
+        fin_2d_side = Cleat2DCreatorSide(self)
 
         if self.connectivity == 'Column flange-Beam web':
             if view == "Front":
-                fin_2d_front.callCFBWfront(filename)
+                fin_2d_front.call_CFBW_front(filename)
             elif view == "Side":
-                fin_2d_side.callCFBWSide(filename)
+                fin_2d_side.call_CFBW_side(filename)
             elif view == "Top":
-                fin_2d_top.callCFBWTop(filename)
+                fin_2d_top.call_CFBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFrontFB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatFrontFB" + str(n) + ".svg"
-                        continue
-                fin_2d_front.callCFBWfront(filename)
-                base_front = os.path.basename(str(filename))
+                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                fin_2d_front.call_CFBW_front(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
 
-                filename = str(self.folder) + '/images_html/cleatSideFB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatSideFB" + str(n) + ".svg"
-                        continue
-                fin_2d_side.callCFBWSide(filename)
-                base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatFrontFB" + str(n) + ".svg"
+                #         continue
+                # base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTopFB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatTopFB" + str(n) + ".svg"
-                        continue
-                fin_2d_top.callCFBWTop(filename)
-                base_top = os.path.basename(str(filename))
+                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                fin_2d_side.call_CFBW_side(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatSideFB" + str(n) + ".svg"
+                #         continue
+                # base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                fin_2d_top.call_CFBW_top(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatTopFB" + str(n) + ".svg"
+                #         continue
+                # base_top = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
-                fin_2d_front.callCWBWfront(filename)
+                fin_2d_front.call_CWBW_front(filename)
             elif view == "Side":
-                fin_2d_side.callCWBWSide(filename)
+                fin_2d_side.call_CWBW_side(filename)
             elif view == "Top":
-                fin_2d_top.callCWBWTop(filename)
+                fin_2d_top.call_CWBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFrontWB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatFrontWB" + str(n) + ".svg"
-                        continue
-                fin_2d_front.callCWBWfront(filename)
-                base_front = os.path.basename(str(filename))
+                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                fin_2d_front.call_CWBW_front(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
 
-                filename = str(self.folder) + '/images_html/cleatSideWB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatSideWB" + str(n) + ".svg"
-                        continue
-                fin_2d_side.callCWBWSide(filename)
-                base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatFrontWB" + str(n) + ".svg"
+                #         continue
+                # base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTopWB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatTopWB" + str(n) + ".svg"
-                        continue
-                fin_2d_top.callCWBWTop(filename)
-                base_top = os.path.basename(str(filename))
+                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                fin_2d_side.call_CWBW_side(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatSideWB" + str(n) + ".svg"
+                #         continue
+                # base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                fin_2d_top.call_CWBW_top(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatTopWB" + str(n) + ".svg"
+                #         continue
+                # base_top = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         else:
             if view == "Front":
-                fin_2d_front.callBWBWfront(filename)
+                fin_2d_front.call_BWBW_front(filename)
             elif view == "Side":
-                fin_2d_side.callBWBWSide(filename)
+                fin_2d_side.call_BWBW_side(filename)
             elif view == "Top":
-                fin_2d_top.callBWBWTop(filename)
+                fin_2d_top.call_BWBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFrontBB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatFrontBB" + str(n) + ".svg"
-                        continue
-                fin_2d_front.callBWBWfront(filename)
-                base_front = os.path.basename(str(filename))
+                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                fin_2d_front.call_BWBW_front(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
 
-                filename = str(self.folder) + '/images_html/cleatSideBB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatSideBB" + str(n) + ".svg"
-                        continue
-                fin_2d_side.callBWBWSide(filename)
-                base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatFrontBB" + str(n) + ".svg"
+                #         continue
+                # base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTopBB.svg'
-                for n in range(1, 100, 1):
-                    if (os.path.exists(filename)):
-                        filename = str(self.folder) + "/images_html/cleatTopBB" + str(n) + ".svg"
-                        continue
-                fin_2d_top.callBWBWTop(filename)
-                base_top = os.path.basename(str(filename))
-        return base_front, base_top, base_side
+                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                fin_2d_side.call_BWBW_side(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatSideBB" + str(n) + ".svg"
+                #         continue
+                # base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                fin_2d_top.call_BWBW_top(filename)
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # for n in range(1, 100, 1):
+                #     if (os.path.exists(filename)):
+                #         filename = str(self.folder) + "/images_html/cleatTopBB" + str(n) + ".svg"
+                #         continue
+                # base_top = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # return base_front, base_top, base_side
 
 
-class cleat2DCreatorFront(object):
+class Cleat2DCreatorFront(object):
 
     def __init__(self, fin_common_obj):
 
@@ -684,7 +722,7 @@ class cleat2DCreatorFront(object):
         self.BQ1 = self.BP1 + self.dataObj.cleat_thk * np.array([1, 0])
         self.BR1 = self.BP1 + self.dataObj.cleat_legsize * np.array([1, 0])
 
-    def callBWBWfront(self, filename):
+    def call_BWBW_front(self, filename):
         v_height = self.dataObj.D_col + 850
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
 #         dwg = svgwrite.Drawing(filename, size=('1200mm', '1225mm'), viewBox=('-500 -250 1500 1225'))
@@ -787,10 +825,10 @@ class cleat2DCreatorFront(object):
         # Drawing faint lines at right top and bottom corners of cleat
 #         rt1 = self.FP + self.dataObj.cleat_legsize * np.array([1,0])
         rt2 = self.BR + (self.dataObj.beam_L + 150 - self.dataObj.gauge) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.BR, rt2, dwg)
+        self.dataObj.draw_faint_line(self.BR, rt2, dwg)
 #         rb1 = rt1 + self.dataObj.cleat_ht * np.array([0,1])
         rb2 = rt2 + self.dataObj.cleat_ht * np.array([0, 1])
-        self.dataObj.drawFaintLine(self.BR1, rb2, dwg)
+        self.dataObj.draw_faint_line(self.BR1, rb2, dwg)
         # drawing inner arrow to represent cleat height
         params = {"offset": self.dataObj.beam_L, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BR, self.BR1, str(int(self.dataObj.cleat_ht)), params)
@@ -799,10 +837,10 @@ class cleat2DCreatorFront(object):
         # Drawing faint lines at bolt groups on Beam
         bt1 = np.array(pt_list[0][0])
         bt2 = bt1 + (self.dataObj.beam_L + 150) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bt1, bt2, dwg)
+        self.dataObj.draw_faint_line(bt1, bt2, dwg)
         bb1 = np.array(pt_list[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 150) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bb1, bb2, dwg)
+        self.dataObj.draw_faint_line(bb1, bb2, dwg)
         # ###### drawing outer arrow on beam bolt group to represent pitch and end distance ##########
         # pitch @ no_of_beam_bolt_row
         params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "left", "endlinedim": 10}
@@ -825,7 +863,7 @@ class cleat2DCreatorFront(object):
             offset = self.dataObj.notch_offset + 100  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC
             # Faint line on second lines of bolt
             B_up = B - offset * np.array([0, 1])
-            self.dataObj.drawFaintLine(B, B_up, dwg) 
+            self.dataObj.draw_faint_line(B, B_up, dwg)
             params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, A, B, str(int(self.dataObj.gauge)), params)
 
@@ -834,8 +872,8 @@ class cleat2DCreatorFront(object):
         BR_left = self.BR - self.dataObj.end_dist * np.array([1, 0])
         BR_left_up = BR_left - ((v_offset) + 180) * np.array([0, 1])  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC  
         BR_up = self.BR - ((v_offset) + 180) * np.array([0, 1])  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC     
-        self.dataObj.drawFaintLine(BR_left, BR_left_up, dwg) 
-        self.dataObj.drawFaintLine(self.BR, BR_up, dwg) 
+        self.dataObj.draw_faint_line(BR_left, BR_left_up, dwg)
+        self.dataObj.draw_faint_line(self.BR, BR_up, dwg)
         offset = ((v_offset) + 180)  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC     
         params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim":10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BR, BR_left, str(int(self.dataObj.end_dist)), params)
@@ -846,23 +884,23 @@ class cleat2DCreatorFront(object):
         BA_down = self.BA + v_offset * np.array([0, 1])
         BA_left = self.BA - 30 * np.array([1, 0])
         BA_left_down = BA_left + v_offset * np.array([0, 1])
-        self.dataObj.drawFaintLine(self.BA, BA_left, dwg)
-        self.dataObj.drawFaintLine(self.BC1, BA_left_down, dwg)
+        self.dataObj.draw_faint_line(self.BA, BA_left, dwg)
+        self.dataObj.draw_faint_line(self.BC1, BA_left_down, dwg)
         # #Arrow Dimension NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC  
         params = {"offset": 30, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BA, BA_down, str(int(v_offset)), params)
     # Draw Faint Line To Represent column pitch and end Distance.
-        self.dataObj.drawFaintLine(self.BP, self.BP - (length + 30 + self.dataObj.beam_tw) * np.array([1, 0]), dwg)
-        self.dataObj.drawFaintLine(np.array(pt_list_c[0]), np.array(pt_list_c[0]) - (length + 30) * np.array([1, 0]), dwg)
+        self.dataObj.draw_faint_line(self.BP, self.BP - (length + 30 + self.dataObj.beam_tw) * np.array([1, 0]), dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c[0]), np.array(pt_list_c[0]) - (length + 30) * np.array([1, 0]), dwg)
         offset = length + 30
         params = {"offset": offset, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         BP_left = self.BP - self.dataObj.col_tw * np.array([1, 0])
         self.dataObj.draw_dimension_outer_arrow(dwg, BP_left, np.array(pt_list_c[0]), str(int(self.dataObj.cedge_dist)), params)
-        self.dataObj.drawFaintLine(np.array(pt_list_c[-1]), np.array(pt_list_c[-1]) - (length + 30) * np.array([1, 0]), dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c[-1]), np.array(pt_list_c[-1]) - (length + 30) * np.array([1, 0]), dwg)
         offset = length + 30
         params = {"offset": offset, "textoffset": 150, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c[0]), np.array(pt_list_c[-1]), str(len(pt_list_c) - 1) + "@" + str(int(self.dataObj.cpitch)) + ' c/c' , params)
-        self.dataObj.drawFaintLine(self.BP1, self.BP1 - (length + 30 + self.dataObj.beam_tw) * np.array([1, 0]), dwg)
+        self.dataObj.draw_faint_line(self.BP1, self.BP1 - (length + 30 + self.dataObj.beam_tw) * np.array([1, 0]), dwg)
         offset = length + 30
         BP1_left = self.BP1 - self.dataObj.col_tw * np.array([1, 0])
         params = {"offset": offset, "textoffset": 50, "lineori": "left", "endlinedim": 10}
@@ -921,7 +959,7 @@ class cleat2DCreatorFront(object):
 #         dwg.add(dwg.path(d =" M0,3 C10,10 20,10 30,20", fill='black'))        
         dwg.save()
         
-    def callCFBWfront(self, filename):
+    def call_CFBW_front(self, filename):
         v_width = self.dataObj.D_col + 1300
         dwg = svgwrite.Drawing(filename, size=('1200mm', '1225mm'), viewBox=('-500 -350 ' + str(v_width) + ' 1450'))
         dwg.add(dwg.polyline(points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FA)], stroke='blue', fill='none', stroke_width=2.5))
@@ -1001,20 +1039,20 @@ class cleat2DCreatorFront(object):
         # Drawing faint lines at right top and bottom corners of cleat--AT BEAM
         rt1 = self.FP + self.dataObj.cleat_legsize * np.array([1, 0])
         rt2 = rt1 + (self.dataObj.beam_L + 225 - self.dataObj.gauge) * np.array([1, 0])
-        self.dataObj.drawFaintLine(rt1, rt2, dwg)
+        self.dataObj.draw_faint_line(rt1, rt2, dwg)
         rb1 = rt1 + self.dataObj.cleat_ht * np.array([0, 1])
         rb2 = rt2 + self.dataObj.cleat_ht * np.array([0, 1])
-        self.dataObj.drawFaintLine(rb1, rb2, dwg)
+        self.dataObj.draw_faint_line(rb1, rb2, dwg)
         # drawing inner arrow for the above drawn faint lines
         params = {"offset": self.dataObj.beam_L, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, rt1, rb1, str(int(self.dataObj.cleat_ht)), params)
         # Drawing faint lines at bolt groups on Beam
         bt1 = np.array(pt_list[0][0])
         bt2 = bt1 + (self.dataObj.beam_L + 225) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bt1, bt2, dwg)
+        self.dataObj.draw_faint_line(bt1, bt2, dwg)
         bb1 = np.array(pt_list[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 225) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bb1, bb2, dwg)
+        self.dataObj.draw_faint_line(bb1, bb2, dwg)
 
         # drawing inner arrow beam bolt group
         params = {"offset": self.dataObj.beam_L + 225, "textoffset": 10, "lineori": "left", "endlinedim": 10}
@@ -1041,7 +1079,7 @@ class cleat2DCreatorFront(object):
         ptBx = -30
         ptBy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) 
         pt_two = (ptBx, ptBy)
-        self.dataObj.drawFaintLine(pt_one, pt_two, dwg)
+        self.dataObj.draw_faint_line(pt_one, pt_two, dwg)
         
         # End Distance from the starting point of plate Information
 
@@ -1064,10 +1102,10 @@ class cleat2DCreatorFront(object):
         # ##Faint Lines ######
         A = self.FP + (self.dataObj.cleat_legsize) * np.array([1, 0])
         A_up = A - (self.dataObj.D_beam / 2 + self.dataObj.edge_dist - 50) * np.array([0, 1])
-        self.dataObj.drawFaintLine(A, A_up, dwg) 
+        self.dataObj.draw_faint_line(A, A_up, dwg)
         A_left = A - self.dataObj.end_dist * np.array([1, 0])
         A_left_up = A_left - (self.dataObj.D_beam / 2 + self.dataObj.edge_dist - 50) * np.array([0, 1])
-        self.dataObj.drawFaintLine(A_left, A_left_up, dwg) 
+        self.dataObj.draw_faint_line(A_left, A_left_up, dwg)
         
         # Gauge Distance when two lines of bolts present
         if self.dataObj.no_of_col > 1:
@@ -1081,8 +1119,8 @@ class cleat2DCreatorFront(object):
             FB = FA + ((self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 130) * np.array([0, -1])
             FA_left = self.FP + (self.dataObj.cleat_legsize - self.dataObj.end_dist - self.dataObj.gauge) * np.array([1, 0])
             FB_left = FA_left + ((self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 130) * np.array([0, -1])
-#             self.dataObj.drawFaintLine(FA, FB, dwg) 
-            self.dataObj.drawFaintLine(FA_left, FB_left, dwg)
+#             self.dataObj.draw_faint_line(FA, FB, dwg)
+            self.dataObj.draw_faint_line(FA_left, FB_left, dwg)
         
         # Gap Distance
         gap_pt = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3))
@@ -1095,36 +1133,36 @@ class cleat2DCreatorFront(object):
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
         ptC2 = ptC1 + 40 * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptC1, ptC2, dwg)
+        self.dataObj.draw_faint_line(ptC1, ptC2, dwg)
         
         ptD1 = self.FB1
         ptD2 = ptD1 + 240 * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptD1, ptD2, dwg)
+        self.dataObj.draw_faint_line(ptD1, ptD2, dwg)
 
         # The first line on the cleat for column
         ptA = self.FP
         ptBx = -30
         ptBy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         ptB = (ptBx, ptBy)
-        self.dataObj.drawFaintLine(ptA, ptB, dwg)
+        self.dataObj.draw_faint_line(ptA, ptB, dwg)
           
         pt1 = np.array(pt_list_c[0])
         ptBx = -30
         ptBy1 = ptBy + self.dataObj.cedge_dist
         pt2 = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt1, pt2, dwg)
+        self.dataObj.draw_faint_line(pt1, pt2, dwg)
           
         pt_one = np.array(pt_list_c[-1])
         ptBx = -30
         ptBy1 = ptBy1 + (len(pt_list_c) - 1) * self.dataObj.cpitch
         pt_two = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt_one, pt_two, dwg)
+        self.dataObj.draw_faint_line(pt_one, pt_two, dwg)
           
         pt_one = self.FU
         ptBx = -30
         ptBy1 = ptBy1 + self.dataObj.cedge_dist
         pt_two = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt_one, pt_two, dwg)
+        self.dataObj.draw_faint_line(pt_one, pt_two, dwg)
 
         # Beam Information
         beam_pt = self.FA1 + self.dataObj.D_beam * np.array([0, 1])
@@ -1182,7 +1220,7 @@ class cleat2DCreatorFront(object):
         
         dwg.save()
         
-    def callCWBWfront(self, filename):
+    def call_CWBW_front(self, filename):
         v_width = self.dataObj.col_B / 2 + self.dataObj.gap + self.dataObj.beam_L + 1000
         dwg = svgwrite.Drawing(filename, size=('1250mm', '1240mm'), viewBox=('-500 -400 ' + str(v_width) + ' 1500'))
         
@@ -1304,20 +1342,20 @@ class cleat2DCreatorFront(object):
         # Drawing faint lines at right top and bottom corners of cleat--AT BEAM
         rt1 = self.P + self.dataObj.cleat_legsize * np.array([1, 0])
         rt2 = rt1 + (self.dataObj.beam_L + 275 - self.dataObj.gauge) * np.array([1, 0])
-        self.dataObj.drawFaintLine(rt1, rt2, dwg)
+        self.dataObj.draw_faint_line(rt1, rt2, dwg)
         rb1 = rt1 + self.dataObj.cleat_ht * np.array([0, 1])
         rb2 = rt2 + self.dataObj.cleat_ht * np.array([0, 1])
-        self.dataObj.drawFaintLine(rb1, rb2, dwg)
+        self.dataObj.draw_faint_line(rb1, rb2, dwg)
         # drawing inner arrow for the above drawn faint lines
         params = {"offset": self.dataObj.beam_L, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, rt1, rb1, str(int(self.dataObj.cleat_ht)), params)
         # Drawing faint lines at bolt groups on column
         bt1 = np.array(pt_list[0][0])
         bt2 = bt1 + (self.dataObj.beam_L + 275) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bt1, bt2, dwg)
+        self.dataObj.draw_faint_line(bt1, bt2, dwg)
         bb1 = np.array(pt_list[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 275) * np.array([1, 0])
-        self.dataObj.drawFaintLine(bb1, bb2, dwg)
+        self.dataObj.draw_faint_line(bb1, bb2, dwg)
         # drawing outer arrow beam bolt group
         params = {"offset": self.dataObj.beam_L + 275, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, bt1, bb1, str(len(pt_list) - 1) + "@" + str(int(self.dataObj.pitch)) + " c/c", params)
@@ -1336,25 +1374,25 @@ class cleat2DCreatorFront(object):
         ptBx = -30
         ptBy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         ptB = (ptBx, ptBy)
-        self.dataObj.drawFaintLine(ptA, ptB, dwg)
+        self.dataObj.draw_faint_line(ptA, ptB, dwg)
         # Faint lines for column bolt group and edge distances  
         pt1 = np.array(pt_list_c[0])
         ptBx = -30
         ptBy1 = ptBy + self.dataObj.cedge_dist
         pt2 = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt1, pt2, dwg)
+        self.dataObj.draw_faint_line(pt1, pt2, dwg)
           
         pt_one = np.array(pt_list_c[-1])
         ptBx = -30
         ptBy1 = ptBy1 + (len(pt_list_c) - 1) * self.dataObj.cpitch
         pt_two = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt_one, pt_two, dwg)
+        self.dataObj.draw_faint_line(pt_one, pt_two, dwg)
           
         pt_one = self.U
         ptBx = -30
         ptBy1 = ptBy1 + self.dataObj.cedge_dist
         pt_two = (ptBx, ptBy1)
-        self.dataObj.drawFaintLine(pt_one, pt_two, dwg)
+        self.dataObj.draw_faint_line(pt_one, pt_two, dwg)
         # Outer arrow for the pitch,edge distance marking
         # Related to the above drawn faint line
         # drawing inner arrow beam bolt group
@@ -1373,15 +1411,15 @@ class cleat2DCreatorFront(object):
         rt1 = rt - (self.dataObj.beam_T + self.dataObj.beam_R1 + 130) * np.array([0, 1])
         rt_left = rt - self.dataObj.end_dist * np.array([1, 0])
         rt_left_top = rt_left - (self.dataObj.beam_T + self.dataObj.beam_R1 + 130) * np.array([0, 1]) 
-        self.dataObj.drawFaintLine(rt, rt1, dwg)
-        self.dataObj.drawFaintLine(rt_left, rt_left_top, dwg)
+        self.dataObj.draw_faint_line(rt, rt1, dwg)
+        self.dataObj.draw_faint_line(rt_left, rt_left_top, dwg)
         params = {"offset": (self.dataObj.col_B - self.dataObj.col_tw) / 2 + 60, "textoffset": 10, "lineori": "right", "endlinedim":10}
         self.dataObj.draw_dimension_outer_arrow(dwg, rt, rt_left, str(int(self.dataObj.end_dist)), params)
         # faint lines and outer arrow for beam gauge representation for double lines of bolts
         if self.dataObj.no_of_col > 1:    
             rt_left_left = rt_left - self.dataObj.gauge * np.array([1, 0])  # make center line of bolts
             rt_left_left_top = rt_left_left - (self.dataObj.beam_T + self.dataObj.beam_R1 + 130) * np.array([0, 1])
-            self.dataObj.drawFaintLine(rt_left_left, rt_left_left_top, dwg)
+            self.dataObj.draw_faint_line(rt_left_left, rt_left_left_top, dwg)
             params = {"offset": (self.dataObj.col_B - self.dataObj.col_tw) / 2 + 15, "textoffset": 10, "lineori": "right", "endlinedim":10}
             self.dataObj.draw_dimension_outer_arrow(dwg, rt_left, rt_left_left, str(int(self.dataObj.gauge)), params)
         
@@ -1394,7 +1432,7 @@ class cleat2DCreatorFront(object):
         dwg.save()
 
              
-class cleat2DCreatorTop(object):
+class Cleat2DCreatorTop(object):
     
     def __init__(self, fin_common_obj):
         
@@ -1570,7 +1608,7 @@ class cleat2DCreatorTop(object):
         self.BQ9 = self.BQ4 + self.dataObj.cleat_thk * np.array([0, -1])
         self.BQ10 = self.BQ1 + self.dataObj.cleat_legsize_1 * np.array([0, -1])
         
-    def callBWBWTop(self, filename):
+    def call_BWBW_top(self, filename):
         
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-200 -250 1200 900'))
         
@@ -1654,10 +1692,10 @@ class cleat2DCreatorTop(object):
 #                     dim_offset = self.dataObj.beam_B/2 + self.dataObj.col_T + self.dataObj.col_R1 + 100
 #                     pt1  = np.array(pt_list[1])
 #                     pt2 = pt1 - (self.dataObj.beam_B/2 + self.dataObj.col_T + self.dataObj.col_R1 + 100) * np.array([0,1])
-# #                     self.dataObj.drawFaintLine(pt1,pt2,dwg)
+# #                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
 #                     params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim":10}
 #                     self.dataObj.draw_dimension_outer_arrow(dwg,np.array(pt_list[0]),np.array(pt_list[1]),  str(int(self.dataObj.gauge)) + "mm", params)
-#                     self.dataObj.drawFaintLine(pt1,pt2,dwg)
+#                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
         if nc_c >= 1:
             for col in range (nc_c): 
                 pt_c = self.BP1 + self.dataObj.cend_dist * np.array([0, 1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.cgauge * np.array([0, 1])
@@ -1684,30 +1722,30 @@ class cleat2DCreatorTop(object):
         # Faint lines at the edge of the plate
         # above the beam part
         pt2 = self.BP1 - (self.dataObj.col_B + 200 + self.dataObj.col_T) / 2 * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.BP1, pt2, dwg)
+        self.dataObj.draw_faint_line(self.BP1, pt2, dwg)
         ptx = np.array(pt_list_c[0]) - (self.dataObj.col_B + 200) / 2 * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c[0]), ptx, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c[0]), ptx, dwg)
         pt2_left = self.BP1 - self.dataObj.col_tw * np.array([1, 0])
         params = {"offset": (self.dataObj.col_B + 200) / 2, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt2_left, np.array(pt_list_c[0]), str(int(self.dataObj.cend_dist)), params)
         # below the beam part
         pt2 = self.BQ1 - (self.dataObj.col_B + 200 + self.dataObj.col_T) / 2 * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.BQ1, pt2, dwg)
+        self.dataObj.draw_faint_line(self.BQ1, pt2, dwg)
         ptx = np.array(pt_list_c1[0]) - (self.dataObj.col_B + 200) / 2 * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c1[0]), ptx, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c1[0]), ptx, dwg)
         pt2_left = self.BQ1 - self.dataObj.col_tw * np.array([1, 0])
         params = {"offset": (self.dataObj.col_B + 200) / 2, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt2_left, np.array(pt_list_c1[0]), str(int(self.dataObj.cend_dist)), params)
         if nc_c > 1:
             pt1 = np.array(pt_list_c[1])
             pt2 = pt1 - (self.dataObj.col_B + 200) / 2 * np.array([1, 0])
-            self.dataObj.drawFaintLine(pt1, pt2, dwg)
+            self.dataObj.draw_faint_line(pt1, pt2, dwg)
             params = {"offset": (self.dataObj.col_B + 200) / 2, "textoffset": 50, "lineori": "left", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, pt1, np.array(pt_list_c[0]), str(int(self.dataObj.cgauge)), params)
         
             pt1 = np.array(pt_list_c1[1])
             pt2 = pt1 - (self.dataObj.col_B + 200) / 2 * np.array([1, 0])
-            self.dataObj.drawFaintLine(pt1, pt2, dwg)
+            self.dataObj.draw_faint_line(pt1, pt2, dwg)
             params = {"offset": (self.dataObj.col_B + 200) / 2, "textoffset": 50, "lineori": "right", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, pt1, np.array(pt_list_c1[0]), str(int(self.dataObj.cgauge)), params)
         
@@ -1717,14 +1755,14 @@ class cleat2DCreatorTop(object):
         pt2 = self.BP6
         pt3 = pt1 - dim_offset * np.array([0, 1])
         pt4 = pt2 - dim_offset * np.array([0, 1])
-        self.dataObj.drawFaintLine(pt1, pt3, dwg)
-        self.dataObj.drawFaintLine(pt2, pt4, dwg)
+        self.dataObj.draw_faint_line(pt1, pt3, dwg)
+        self.dataObj.draw_faint_line(pt2, pt4, dwg)
         params = {"offset": dim_offset, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt1, pt2, str(int(self.dataObj.end_dist)), params)
         if nc > 1:
             pt1 = np.array(pt_list[1])
             pt2 = pt1 - dim_offset * np.array([0, 1])
-            self.dataObj.drawFaintLine(pt1, pt2, dwg)
+            self.dataObj.draw_faint_line(pt1, pt2, dwg)
             params = {"offset": dim_offset + 25, "textoffset": 10, "lineori": "left", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, pt1, np.array(pt_list[0]), str(int(self.dataObj.gauge)), params)
 # ########################All Dimensional marking has been done ######################
@@ -1779,10 +1817,10 @@ class cleat2DCreatorTop(object):
         # Draw Faint Lines to representation of Gap distance 
         ptA = self.BC
         ptB = ptG1
-        self.dataObj.drawFaintLine(ptA, ptB, dwg)
+        self.dataObj.draw_faint_line(ptA, ptB, dwg)
         ptC = self.BA6
         ptD = ptC + (self.dataObj.D_col - self.dataObj.beam_B) / 2 * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptC, ptD, dwg)
+        self.dataObj.draw_faint_line(ptC, ptD, dwg)
         
         # 2D view name
         ptx = self.FA + (150) * np.array([1, 0]) + (640) * np.array([0, 1])  # 640
@@ -1793,7 +1831,7 @@ class cleat2DCreatorTop(object):
         dwg.save()
         dwg.save()
 
-    def callCFBWTop(self, filename):
+    def call_CFBW_top(self, filename):
         '''
         '''
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -250 1500 1000'))
@@ -1864,10 +1902,10 @@ class cleat2DCreatorTop(object):
                     dim_offset = self.dataObj.beam_B / 2 + self.dataObj.col_T + self.dataObj.col_R1 + 100
                     pt1 = np.array(pt_list[1])
                     pt2 = pt1 - (self.dataObj.beam_B / 2 + self.dataObj.col_T + self.dataObj.col_R1 + 100) * np.array([0, 1])
-#                     self.dataObj.drawFaintLine(pt1,pt2,dwg)
+#                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
                     params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
                     self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[1]), str(int(self.dataObj.gauge)), params)
-                    self.dataObj.drawFaintLine(pt1, pt2, dwg)
+                    self.dataObj.draw_faint_line(pt1, pt2, dwg)
         if nc_c >= 1:
             for col in range(nc_c):
                 pt_c = self.FQ4 + self.dataObj.cend_dist * np.array([0, 1]) - self.dataObj.col_T * np.array([1, 0]) + (col) * self.dataObj.cgauge * np.array([0, 1])
@@ -1900,30 +1938,30 @@ class cleat2DCreatorTop(object):
             ptb1 = ptb - (self.dataObj.D_col + 30) * np.array([1, 0])
             params = {"offset": self.dataObj.D_col + 30, "textoffset": 100, "lineori": "right", "endlinedim": 10}
 #             self.dataObj.draw_dimension_outer_arrow(dwg,np.array(pt_list_c[0]),np.array(pt_list_c[1]),  str(int(self.dataObj.gauge)) , params)
-            self.dataObj.drawFaintLine(ptb, ptb1, dwg)
+            self.dataObj.draw_faint_line(ptb, ptb1, dwg)
             self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c[0]), np.array(pt_list_c[1]), str(int(self.dataObj.cgauge)) , params)
 
             ptb = np.array(pt_list_c1[1])
             ptb1 = ptb - (self.dataObj.D_col + 30) * np.array([1, 0])
             params = {"offset": self.dataObj.D_col + 30, "textoffset": 100, "lineori": "left", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c1[0]), np.array(pt_list_c1[1]), str(int(self.dataObj.cgauge)) , params)
-            self.dataObj.drawFaintLine(ptb, ptb1, dwg)
+            self.dataObj.draw_faint_line(ptb, ptb1, dwg)
 
         # Faint lines and outer arrow for column cleat connectivity
         # Faint lines at the edge of the plate
         # above the beam part
         pt2 = self.FQ4 - (self.dataObj.D_col + 30 + self.dataObj.col_T) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.FQ4, pt2, dwg)
+        self.dataObj.draw_faint_line(self.FQ4, pt2, dwg)
         ptx = np.array(pt_list_c[0]) - (self.dataObj.D_col + 30) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c[0]), ptx, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c[0]), ptx, dwg)
         pt2_left = self.FQ4 - self.dataObj.col_T * np.array([1, 0])
         params = {"offset": self.dataObj.D_col + 30, "textoffset": 100, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt2_left, np.array(pt_list_c[0]), str(int(self.dataObj.cend_dist)), params)
         # below the beam part
         pt2 = self.FP4 - (self.dataObj.D_col + 30 + self.dataObj.col_T) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.FP4, pt2, dwg)
+        self.dataObj.draw_faint_line(self.FP4, pt2, dwg)
         ptx = np.array(pt_list_c1[0]) - (self.dataObj.D_col + 30) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c1[0]), ptx, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c1[0]), ptx, dwg)
         pt2_left = self.FP4 - self.dataObj.col_T * np.array([1, 0])
         params = {"offset": self.dataObj.D_col + 30, "textoffset": 100, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt2_left, np.array(pt_list_c1[0]), str(int(self.dataObj.cend_dist)), params)
@@ -1933,8 +1971,8 @@ class cleat2DCreatorTop(object):
         pt2 = self.FQ3
         pt3 = pt1 - dim_offset * np.array([0, 1])
         pt4 = pt2 - dim_offset * np.array([0, 1])
-        self.dataObj.drawFaintLine(pt1, pt3, dwg)
-        self.dataObj.drawFaintLine(pt2, pt4, dwg)
+        self.dataObj.draw_faint_line(pt1, pt3, dwg)
+        self.dataObj.draw_faint_line(pt2, pt4, dwg)
         params = {"offset": dim_offset, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, pt1, pt2, str(int(self.dataObj.end_dist)), params)
 # ########################All Dimensional marking has been done ######################
@@ -1989,10 +2027,10 @@ class cleat2DCreatorTop(object):
         # Draw Faint Lines to representation of Gap distance 
         ptA = self.FG
         ptB = ptG1
-        self.dataObj.drawFaintLine(ptA, ptB, dwg)
+        self.dataObj.draw_faint_line(ptA, ptB, dwg)
         ptC = self.FA4
         ptD = ptC + (self.dataObj.D_col - self.dataObj.beam_B) / 2 * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptC, ptD, dwg)
+        self.dataObj.draw_faint_line(ptC, ptD, dwg)
         
         # 2D view name
         ptx = self.FA + (250) * np.array([1, 0]) + (740) * np.array([0, 1])  # 740
@@ -2002,7 +2040,7 @@ class cleat2DCreatorTop(object):
 
         dwg.save()
     
-    def callCWBWTop(self, filename):
+    def call_CWBW_top(self, filename):
         '''
         '''
         v_width = self.dataObj.beam_L + self.dataObj.col_B / 2 + 850
@@ -2068,7 +2106,7 @@ class cleat2DCreatorTop(object):
             if nc > 1:
                 dim_offset = self.dataObj.beam_B / 2 + self.dataObj.beam_tw / 2 + self.dataObj.cleat_thk + 150
                 pt_down = np.array(pt_list[1]) + dim_offset * np.array([0, 1])
-                self.dataObj.drawFaintLine(np.array(pt_list[1]) , pt_down, dwg)
+                self.dataObj.draw_faint_line(np.array(pt_list[1]) , pt_down, dwg)
                 params = {"offset": dim_offset, "textoffset": 20, "lineori": "left", "endlinedim":10}
                 self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[1]), str(int(self.dataObj.gauge)) , params)
         if nc_c >= 1:
@@ -2097,8 +2135,8 @@ class cleat2DCreatorTop(object):
                 dim_offset = self.dataObj.beam_B / 2 + self.dataObj.col_tw + 100
                 pt_left = np.array(pt_list_c[1]) - dim_offset * np.array([1, 0])
                 pt_left_1 = np.array(pt_list_c1[1]) - dim_offset * np.array([1, 0])
-                self.dataObj.drawFaintLine(np.array(pt_list_c[1]), pt_left, dwg)
-                self.dataObj.drawFaintLine(np.array(pt_list_c1[1]), pt_left_1, dwg)
+                self.dataObj.draw_faint_line(np.array(pt_list_c[1]), pt_left, dwg)
+                self.dataObj.draw_faint_line(np.array(pt_list_c1[1]), pt_left_1, dwg)
                 params = {"offset": dim_offset, "textoffset": 50, "lineori": "right", "endlinedim": 10}
                 self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c[0]), np.array(pt_list_c[1]), str(int(self.dataObj.cgauge)) , params)
                 self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c1[1]), np.array(pt_list_c1[0]), str(int(self.dataObj.cgauge)) , params)
@@ -2106,21 +2144,21 @@ class cleat2DCreatorTop(object):
         # ##Faint lines and edge distance marking on beam connectivity
         dim_offset = self.dataObj.beam_B / 2 + self.dataObj.beam_tw / 2 + self.dataObj.cleat_thk + 200
         pt_down = np.array(pt_list[0]) + dim_offset * np.array([0, 1])
-        self.dataObj.drawFaintLine(np.array(pt_list[0]), pt_down, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list[0]), pt_down, dwg)
         pt_down = self.Q3 + dim_offset * np.array([0, 1])
-        self.dataObj.drawFaintLine(self.Q3, pt_down, dwg)
+        self.dataObj.draw_faint_line(self.Q3, pt_down, dwg)
         params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), self.Q3, str(int(self.dataObj.end_dist)), params)
         # #####Faint lines for column connectivity  edge(end) distance outer arrow
         dim_offset = self.dataObj.beam_B / 2 + self.dataObj.col_tw + 100
         pt_left = np.array(pt_list_c[0]) - dim_offset * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c[0]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c[0]), pt_left, dwg)
         pt_left = np.array(pt_list_c1[0]) - dim_offset * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pt_list_c1[0]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pt_list_c1[0]), pt_left, dwg)
         pt_left = self.Q4 - dim_offset * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.Q4, pt_left, dwg)
+        self.dataObj.draw_faint_line(self.Q4, pt_left, dwg)
         pt_left = self.P4 - dim_offset * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.P4, pt_left, dwg)
+        self.dataObj.draw_faint_line(self.P4, pt_left, dwg)
         params = {"offset": dim_offset, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         params_1 = {"offset": dim_offset, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list_c[0]), self.Q4 - self.dataObj.col_tw * np.array([1, 0]), str(int(self.dataObj.cend_dist)) , params_1)
@@ -2187,10 +2225,10 @@ class cleat2DCreatorTop(object):
         # Draw Faint Lines to representation of Gap distance #
         ptA = self.D
         ptB = ptA + (200) * np.array([0, -1]) 
-        self.dataObj.drawFaintLine(ptA, ptB, dwg)
+        self.dataObj.draw_faint_line(ptA, ptB, dwg)
         ptC = self.A1
         ptD = ptC + (200) * np.array([0, -1]) - (self.dataObj.D_col - 2 * self.dataObj.col_T - self.dataObj.beam_B) / 2 * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptC, ptD, dwg)
+        self.dataObj.draw_faint_line(ptC, ptD, dwg)
 
         # 2D view name
         ptx = self.A + (80) * np.array([1, 0]) + 800 * np.array([0, 1])  # 1090
@@ -2200,7 +2238,7 @@ class cleat2DCreatorTop(object):
         dwg.save()
 
             
-class cleat2DCreatorSide(object):
+class Cleat2DCreatorSide(object):
     def __init__(self, fin_common_obj):
         
         self.dataObj = fin_common_obj
@@ -2321,7 +2359,7 @@ class cleat2DCreatorSide(object):
         self.BY1 = self.BY + self.dataObj.cleat_ht * np.array([0, 1])
         self.BZ1 = self.BZ + self.dataObj.cleat_ht * np.array([0, 1])
         
-    def callBWBWSide(self, filename):
+    def call_BWBW_side(self, filename):
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 1500 1400'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BI), (self.BJ), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BG), (self.BH)).stroke('blue', width=2.5, linecap='square'))
@@ -2388,15 +2426,15 @@ class cleat2DCreatorSide(object):
  # #################### Faint Lines and outer arrow for suporting beam connectivity ############
         length = (self.beam_beam_length - self.dataObj.cleat_legsize_1 * 2 - self.dataObj.beam_tw) / 2  # beam_tw
         pt_right = self.BR + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.BR, pt_right, dwg)
+        self.dataObj.draw_faint_line(self.BR, pt_right, dwg)
         pt = self.BR1
         pt_right = self.BR1 + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_right, dwg)
+        self.dataObj.draw_faint_line(pt, pt_right, dwg)
         
         pt_right = np.array(pitch_pts_c1[0][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
         pt_right = np.array(pitch_pts_c1[-1][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
          
         params = {"offset": length + 20, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BR, self.BR1, str(int(self.dataObj.cleat_ht)), params)
@@ -2413,7 +2451,7 @@ class cleat2DCreatorSide(object):
         params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts_c1[-1][0]), pt_down, str(int(self.dataObj.cedge_dist)), params)
         # ###notch height###############
-        self.dataObj.drawFaintLine(self.BB, self.BB + 200 * np.array([1, 0]), dwg)
+        self.dataObj.draw_faint_line(self.BB, self.BB + 200 * np.array([1, 0]), dwg)
         pt_down = self.BB + self.dataObj.notch_offset * np.array([0, 1])
         params = {"offset": 200, "textoffset": 20, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BB, pt_down, str(int(self.dataObj.notch_offset)), params)
@@ -2424,13 +2462,13 @@ class cleat2DCreatorSide(object):
         ptY1 = self.BR1
         ptY_down = ptY + v_length * np.array([0, 1])
         ptY1_down = ptY1 + v_length * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptY, ptY_down, dwg)
-        self.dataObj.drawFaintLine(ptY1, ptY1_down, dwg)
+        self.dataObj.draw_faint_line(ptY, ptY_down, dwg)
+        self.dataObj.draw_faint_line(ptY1, ptY1_down, dwg)
         
         pt_bolt = np.array(pitch_pts_c[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
         pt_bolt_1 = np.array(pitch_pts_c1[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
         
         pt_down = np.array(pitch_pts_c[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
         params = {"offset": v_length, "textoffset": 50, "lineori": "right", "endlinedim": 20}
@@ -2443,8 +2481,8 @@ class cleat2DCreatorSide(object):
         if c_nc > 1:
             pt_bolt_down = np.array(pitch_pts_c[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
             pt_bolt_1_down = np.array(pitch_pts_c1[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
             
             pt_down = np.array(pitch_pts_c1[-1][-1]) + self.dataObj.cedge_dist * np.array([0, 1])
             pt_down_left = np.array(pitch_pts_c1[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
@@ -2474,15 +2512,15 @@ class cleat2DCreatorSide(object):
         length = self.beam_beam_length / 2 - self.dataObj.beam_tw / 2 - self.dataObj.cleat_thk  # Beam_tw
         ptQ1 = self.BY
         pt_left = ptQ1 - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(ptQ1, pt_left, dwg)
+        self.dataObj.draw_faint_line(ptQ1, pt_left, dwg)
         pt = ptQ1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_left = pt - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_left, dwg)
+        self.dataObj.draw_faint_line(pt, pt_left, dwg)
         
         pt_left = np.array(pitch_pts[0]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[0]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[0]), pt_left, dwg)
         pt_left = np.array(pitch_pts[-1]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[-1]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[-1]), pt_left, dwg)
         
         offset = length + 100
         params = {"offset": offset, "textoffset": 150, "lineori": "right", "endlinedim": 10}
@@ -2545,7 +2583,7 @@ class cleat2DCreatorSide(object):
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
-    def callCWBWSide(self, filename):
+    def call_CWBW_side(self, filename):
         '''
         '''
         v_width = self.dataObj.D_col + 500 + 500 
@@ -2612,15 +2650,15 @@ class cleat2DCreatorSide(object):
 # #################### Faint Lines and outer arrow for suporting beam connectivity ############
         length = (self.dataObj.D_col - self.dataObj.cleat_legsize_1 * 2 - self.dataObj.beam_tw) / 2
         pt_right = self.X1 + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.X1, pt_right, dwg)
+        self.dataObj.draw_faint_line(self.X1, pt_right, dwg)
         pt = self.X1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_right = self.X1 + self.dataObj.cleat_ht * np.array([0, 1]) + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_right, dwg)
+        self.dataObj.draw_faint_line(pt, pt_right, dwg)
         
         pt_right = np.array(pitch_pts_c1[0][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
         pt_right = np.array(pitch_pts_c1[-1][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
          
         params = {"offset": length + 20, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.X1, self.X1 + self.dataObj.cleat_ht * np.array([0, 1]), str(int(self.dataObj.cleat_ht)), params)
@@ -2643,13 +2681,13 @@ class cleat2DCreatorSide(object):
         ptY1 = self.X1 + self.dataObj.cleat_ht * np.array([0, 1])
         ptY_down = ptY + v_length * np.array([0, 1])
         ptY1_down = ptY1 + v_length * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptY, ptY_down, dwg)
-        self.dataObj.drawFaintLine(ptY1, ptY1_down, dwg)
+        self.dataObj.draw_faint_line(ptY, ptY_down, dwg)
+        self.dataObj.draw_faint_line(ptY1, ptY1_down, dwg)
         
         pt_bolt = np.array(pitch_pts_c[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
         pt_bolt_1 = np.array(pitch_pts_c1[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
         
         pt_down = np.array(pitch_pts_c[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
         params = {"offset": v_length, "textoffset": 35, "lineori": "right", "endlinedim": 20}
@@ -2662,8 +2700,8 @@ class cleat2DCreatorSide(object):
         if c_nc > 1:
             pt_bolt_down = np.array(pitch_pts_c[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
             pt_bolt_1_down = np.array(pitch_pts_c1[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
             
             pt_down = np.array(pitch_pts_c1[-1][-1]) + self.dataObj.cedge_dist * np.array([0, 1])
             pt_down_left = np.array(pitch_pts_c1[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
@@ -2693,15 +2731,15 @@ class cleat2DCreatorSide(object):
         length = self.dataObj.D_col / 2 - self.dataObj.beam_tw / 2 - self.dataObj.cleat_thk 
         ptQ1 = self.P - self.dataObj.cleat_thk * np.array([1, 0])
         pt_left = ptQ1 - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(ptQ1, pt_left, dwg)
+        self.dataObj.draw_faint_line(ptQ1, pt_left, dwg)
         pt = ptQ1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_left = pt - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_left, dwg)
+        self.dataObj.draw_faint_line(pt, pt_left, dwg)
         
         pt_left = np.array(pitch_pts[0]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[0]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[0]), pt_left, dwg)
         pt_left = np.array(pitch_pts[-1]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[-1]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[-1]), pt_left, dwg)
         
         offset = length + 100
         params = {"offset": offset, "textoffset": 150, "lineori": "right", "endlinedim": 10}
@@ -2764,7 +2802,7 @@ class cleat2DCreatorSide(object):
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))      
         dwg.save()
     
-    def callCFBWSide(self, filename):
+    def call_CFBW_side(self, filename):
         '''
         '''
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-350 -300 1200 1500'))
@@ -2827,15 +2865,15 @@ class cleat2DCreatorSide(object):
 # #################### Faint Lines and outer arrow for Primary beam connectivity ############
         length = (self.dataObj.col_B - self.dataObj.cleat_legsize_1 * 2 - self.dataObj.beam_tw) / 2 + 50
         pt_right = self.FX1 + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(self.FX1, pt_right, dwg)
+        self.dataObj.draw_faint_line(self.FX1, pt_right, dwg)
         pt = self.FX1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_right = self.FX1 + self.dataObj.cleat_ht * np.array([0, 1]) + (length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_right, dwg)
+        self.dataObj.draw_faint_line(pt, pt_right, dwg)
         
         pt_right = np.array(pitch_pts_c1[0][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[0][0]), pt_right, dwg)
         pt_right = np.array(pitch_pts_c1[-1][0]) + (self.dataObj.cend_dist + length + 200) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_right, dwg)
          
         params = {"offset": length + 20, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.X1, self.X1 + self.dataObj.cleat_ht * np.array([0, 1]), str(int(self.dataObj.cleat_ht)), params)
@@ -2858,13 +2896,13 @@ class cleat2DCreatorSide(object):
         ptY1 = self.FX1 + self.dataObj.cleat_ht * np.array([0, 1])
         ptY_down = ptY + v_length * np.array([0, 1])
         ptY1_down = ptY1 + v_length * np.array([0, 1])
-        self.dataObj.drawFaintLine(ptY, ptY_down, dwg)
-        self.dataObj.drawFaintLine(ptY1, ptY1_down, dwg)
+        self.dataObj.draw_faint_line(ptY, ptY_down, dwg)
+        self.dataObj.draw_faint_line(ptY1, ptY1_down, dwg)
         
         pt_bolt = np.array(pitch_pts_c[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
         pt_bolt_1 = np.array(pitch_pts_c1[-1][0]) + (v_length + 50 + self.dataObj.cedge_dist) * np.array([0, 1])
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
-        self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][0]), pt_bolt_1, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][0]), pt_bolt, dwg)
         
         pt_down = np.array(pitch_pts_c[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
         params = {"offset": v_length, "textoffset": 35, "lineori": "right", "endlinedim":20}
@@ -2877,8 +2915,8 @@ class cleat2DCreatorSide(object):
         if c_nc > 1:
             pt_bolt_down = np.array(pitch_pts_c[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
             pt_bolt_1_down = np.array(pitch_pts_c1[-1][-1]) + (v_length + 100 + self.dataObj.cedge_dist) * np.array([0, 1])
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
-            self.dataObj.drawFaintLine(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c1[-1][-1]), pt_bolt_1_down, dwg)
+            self.dataObj.draw_faint_line(np.array(pitch_pts_c[-1][-1]), pt_bolt_down, dwg)
             
             pt_down = np.array(pitch_pts_c1[-1][-1]) + self.dataObj.cedge_dist * np.array([0, 1])
             pt_down_left = np.array(pitch_pts_c1[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
@@ -2909,15 +2947,15 @@ class cleat2DCreatorSide(object):
         length = self.dataObj.col_B / 2 - self.dataObj.beam_tw / 2 - self.dataObj.cleat_thk 
         ptQ1 = self.FP - self.dataObj.cleat_thk * np.array([1, 0])
         pt_left = ptQ1 - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(ptQ1, pt_left, dwg)
+        self.dataObj.draw_faint_line(ptQ1, pt_left, dwg)
         pt = ptQ1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_left = pt - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(pt, pt_left, dwg)
+        self.dataObj.draw_faint_line(pt, pt_left, dwg)
         
         pt_left = np.array(pitch_pts[0]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[0]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[0]), pt_left, dwg)
         pt_left = np.array(pitch_pts[-1]) - (length + 100) * np.array([1, 0])
-        self.dataObj.drawFaintLine(np.array(pitch_pts[-1]), pt_left, dwg)
+        self.dataObj.draw_faint_line(np.array(pitch_pts[-1]), pt_left, dwg)
         
         offset = length + 100
         params = {"offset": offset, "textoffset": 150, "lineori": "right", "endlinedim":10}
@@ -2979,4 +3017,3 @@ class cleat2DCreatorSide(object):
         ptx2 = ptx + 350 * np.array([1, 0])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))      
         dwg.save()
-

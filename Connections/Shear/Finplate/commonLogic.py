@@ -17,7 +17,7 @@ from notch import Notch
 from ISection import ISection
 from nutBoltPlacement import NutBoltArray
 
-from utilities import osdagDisplayShape
+from utilities import osdag_display_shape
 
 import OCC.V3d
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
@@ -326,25 +326,25 @@ class CommonDesignLogic(object):
             self.display.FitAll()
 
         if self.component == "Column":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
         elif self.component == "Beam":
-            osdagDisplayShape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif self. component == "Finplate":
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif self.component == "Model":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
     # =========================================================================================
     def call_3DModel(self, flag):  # Done

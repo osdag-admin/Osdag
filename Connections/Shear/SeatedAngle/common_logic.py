@@ -377,7 +377,7 @@ class CommonDesignLogic(object):
     #=========================================================================================
     def call_saveMessages(self):  # Done
 
-        fileName = "Connections/Shear/SeatedAngle/seatangle.log"
+        fileName = "./seatangle.log"
 
         return fileName
 

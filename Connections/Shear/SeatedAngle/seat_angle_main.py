@@ -689,30 +689,17 @@ class MainController(QtGui.QMainWindow):
         
         fname = str(commLogicObj.call_saveMessages())
         afile = QtCore.QFile(fname)
-
+     
         if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
             QtGui.QMessageBox.information(None, 'info', afile.errorString())
-
+     
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
         vscrollBar = self.ui.textEdit.verticalScrollBar()
         vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
-
-        
-
-#         afile = QtCore.QFile('./seatangle.log')
-# 
-#         if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
-#             QtGui.QMessageBox.information(None, 'info', afile.errorString())
-# 
-#         stream = QtCore.QTextStream(afile)
-#         self.ui.textEdit.clear()
-#         self.ui.textEdit.setHtml(stream.readAll())
-#         vscrollBar = self.ui.textEdit.verticalScrollBar();
-#         vscrollBar.setValue(vscrollBar.maximum());
-#         afile.close()
+    
     #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     def boltHeadThick_Calculation(self,boltDia):
         '''
@@ -1057,6 +1044,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+        
     def designParameters(self):
         '''
         This routine returns the neccessary design parameters.
@@ -1333,7 +1321,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
     # while launching from Osdag Main:
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
@@ -1359,7 +1347,7 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
     # while launching from Osdag Main:
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 

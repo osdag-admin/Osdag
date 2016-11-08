@@ -35,8 +35,8 @@ class SvgWindow(object):
         print filename, 'filenameeeee'
         print view, 'viewwwwwww'
         self.folder = folder
-        self.btn_save.mouseDoubleClickEvent(lambda: self.save_2d_image_names(view))
-        # self.btn_save.clicked.connect(lambda:self.save_2D_image_names)
+        # self.btn_save.mouseDoubleClickEvent(lambda: self.save_2d_image_names(view))
+        self.btn_save.clicked.connect(lambda: self.save_2d_image_names(view))
         sys.exit(app.exec_())
 
     def save_2d_image_names(self, view):

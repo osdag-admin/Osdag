@@ -71,7 +71,7 @@ class Bolt(object):
             mk_fillet.Add(self.T / 17., aEdge)
             an_edge_explorer.Next()
 
-            bolt_head = mk_fillet.Shape()
+        bolt_head = mk_fillet.Shape()
         cyl_origin = self.origin
 
         bolt_cylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.shaft_dir)), self.r, self.H).Shape()
@@ -79,5 +79,3 @@ class Bolt(object):
         mk_fillet = BRepFilletAPI_MakeFillet(whole_bolt)
         
         return whole_bolt
-
-

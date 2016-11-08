@@ -57,6 +57,7 @@ class ReportGenerator(SeatAngleCalculation):
         safe (Boolean) : status of connection, True if safe
         output_dict (dictionary)
 
+        moment_cap_high_shear (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
         outstanding_leg_shear_capacity (float)
@@ -150,6 +151,7 @@ class ReportGenerator(SeatAngleCalculation):
 
         self.moment_at_root_angle = sa_calc_object.moment_at_root_angle
         self.moment_capacity_angle = sa_calc_object.moment_capacity_angle
+        self.moment_cap_high_shear = sa_calc_object.moment_cap_high_shear
         self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
         self.beam_shear_strength = sa_calc_object.beam_shear_strength
         self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
@@ -370,7 +372,8 @@ class ReportGenerator(SeatAngleCalculation):
         check_pass = "<p align=left style=color:green><b>Pass</b></p>"
 
         # Bolt
-        rstr += design_check_row("Bolt", "","","",col_span="4",text_one_css="detail1")
+        rstr += design_check_row("Bolt " + str(self.bolt_diameter) + "dia", "", "", "", col_span="4",
+                                 text_one_css="detail1")
 
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
@@ -380,11 +383,11 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
-        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k<sub>b</sub> * bolt_diameter * critical_thickness * <br>"\
-                    +space(3)+" <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> "\
-                    +"[Cl. 10.3.4]"
+        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k<sub>b</sub> * bolt_diameter * critical_thickness * <br>" \
+                    + space(3) + " <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> " \
+                    + "[Cl. 10.3.4]"
         prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" \
-                     + beam_fu + ")/(1.25*1000)  <br>"+space(2) +" ="+ bearing_capacity + " kN"
+                     + beam_fu + ")/(1.25*1000)  <br>" + space(2) + " =" + bearing_capacity + " kN"
         # TODO incorrect value of bolt_bearing capacity
         rstr += design_check_row("Bolt bearing capacity (kN)", req_field, prov_field, "")
 
@@ -423,23 +426,74 @@ class ReportGenerator(SeatAngleCalculation):
         # Edge distance (mm)
         minEdge = str(1.7 * float(dia_hole))
         maxEdge = str(12 * float(beam_w_t))
-        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [cl. 10.2.4]"
+        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [Cl. 10.2.4]"
         rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
         # Seated angle
-        rstr += design_check_row("Seated Angle", "","","",col_span="4",text_one_css="detail1")
+        rstr += design_check_row("Seated Angle " + str(self.angle_sec), "", "", "", col_span="4",
+                                 text_one_css="detail1")
 
         # Seated angle length
-        if connectivity ==  "Column flange-Beam web":
-            req_field = "= min(supported_beam_width, supporting_column_width) <br> = min(" + str(self.beam_w_f) + ", " + str(self.column_w_f)+")"
+        if connectivity == "Column flange-Beam web":
+            req_field = "= min(supported_beam_width, supporting_column_width) <br> = min(" + str(
+                self.beam_w_f) + ", " + str(self.column_w_f) + ")"
             prov_field = str(self.angle_l)
         elif connectivity == "Column web-Beam web":
-            req_field = "=width of supported beam <br> ="+str(self.beam_w_f)
+            req_field = "=width of supported beam <br> =" + str(self.beam_w_f)
             prov_field = str(self.angle_l)
-        rstr += design_check_row("length", req_field, prov_field, check_pass)
+        rstr += design_check_row("Length (mm)", req_field, prov_field, check_pass)
 
         # Length of oustanding leg
-        req_field = "b = R/"+sub("t", "w")+"("+sub("f","yw")+"/"+sub("&gamma","m0")+")"
+        req_field = "b = R * " + sub("gamma", "m0") + "/" + sub("t", "w") + sub("f", "yw") + "<br> [Cl. 8.7.4]"
+        prov_field = str(self.angle_B)
+        rstr += design_check_row("Outstanding leg length (mm)", req_field, prov_field, check_pass)
+
+        # For angle thickness
+        # Shear capacity of outstanding leg
+        req_field = sub("V", "dp") + " &#8805 V <br>"
+        req_field += sub("V", "dp") + " &#8805 " + str(self.shear_force) + "kN <br> [Cl. 8.4.1]"
+        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/<br> &#8730 3 *" + sub("gamma", "m0")
+        prov_field += "(" + str(self.angle_l) + "*" + str(self.angle_t) + ") * " + str(
+            self.angle_fy) + "/<br> &#8730 3 *" + str(self.gamma_m0) + "<br>=" + str(
+            self.outstanding_leg_shear_capacity)
+        rstr += design_check_row("Shear capacity of outstanding <br>" + space(1) + " leg (kN)", req_field, prov_field,
+                                 check_pass)
+
+        # Moment capacity of outstanding leg
+        req_field = sub("M", "d") + " &#8805 Moment at root of angle"
+        req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
+        prov_field = sub("M", "d") + "=" + sub("beta", "b") + sub("Z", "p") + sub("f", "y") + "/" + sub("gamma",
+                                                                                                        "m0")
+        if self.moment_cap_high_shear is False:
+            req_field += "<br>As V &#8804 0.6 " + sub("V", "d")
+            req_field += ",<br>[Cl 8.2.1.2] is applicable <br>"
+
+            prov_field += "<br> = 1.0* " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*" + str(
+                self.angle_fy) + "/" + str(self.gamma_m0)
+        elif self.moment_cap_high_shear is True:
+            req_field += "<br>" + sub("M", "dv") + " &#8805 Moment at root of angle"
+            req_field += "<br>" + sub("M", "dv") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
+
+            req_field += "<br>As V &#8805 0.6 " + sub("V", "d")
+            req_field += ",<br>[Cl 8.2.1.3] is applicable <br>"
+
+            prov_field += "<br><br>" + sub("M", "dv") + "= min("
+            prov_field += "(1 - beta)"+sub("M","d")+", "
+            prov_field += "1.2 " + sub("Z", "e") + sub("f", "y") + "/" + sub("gamma", "m0")
+            prov_field += ") <br>"
+            prov_field += "beta = ((2V/"+sub("V","d")+")-1)^2"
+            prov_field += "<br> = 1.0 * " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*" + str(
+                self.angle_fy) + "/" + str(self.gamma_m0)
+
+        req_field += "<br>" + "To avoid irreversible deformation under service loads,"
+        req_field += "<br>" + sub("M", "d") + " &#8804 1.5" + sub("Z", "e") + sub("f", "y")
+        req_field += "/" + sub("gamma", "m0") + "<br>"
+        prov_field += "<br>=" + str(self.moment_capacity_angle)
+
+        rstr += design_check_row("Moment capacity of outstanding <br>" + space(1) + " leg (kN-mm)", req_field,
+                                 prov_field,
+                                 check_pass)
+
         # TODO Add other checks to the list
 
         rstr += t('/table')
@@ -632,6 +686,7 @@ def html_space(n):
     """
     return " " * n
 
+
 def sub(string, subscript):
     """Create html code to display subscript.
 
@@ -642,7 +697,7 @@ def sub(string, subscript):
     Returns:
         (str): html code with concatenated string and subscript
     """
-    return string+"<sub>"+subscript+"</sub>"
+    return string + "<sub>" + subscript + "</sub>"
 
 
 def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
@@ -721,7 +776,7 @@ def design_check_row(text_one, text_two, text_three, text_four, **kwargs):
         row_string = row_string + html_space(4) + t(
             'td colspan=' + col_span + ' class="' + t1_css + '"') + text_one + t('/td') + nl()
     else:
-        row_string = row_string + html_space(4) + t('td class="' + t1_css + '"') + space(1)+text_one + t('/td') + nl()
+        row_string = row_string + html_space(4) + t('td class="' + t1_css + '"') + space(1) + text_one + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t2_css + '"') + text_two + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t3_css + '"') + text_three + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + t4_css + '"') + text_four + t('/td') + nl()

@@ -110,6 +110,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding lege of the seated angle
+        moment_cap_high_shear (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
         outstanding_leg_shear_capacity (float)
         beam_shear_strength (float)
         bolt_shear_capacity (float)
@@ -510,12 +511,14 @@ class SeatAngleCalculation(ConnectionCalculations):
         leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 4) /1000
 
         if self.shear_force <= 0.6 * self.outstanding_leg_shear_capacity:
+            self.moment_cap_high_shear = False
             # to avoid irreversible deformation (in case of cantilever),
             # under serviceablitiy loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
             leg_moment_d_limiting = 1.5 * (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6)  /1000
             angle_outst_leg_mcapacity = min(leg_moment_d, leg_moment_d_limiting)
             angle_moment_capacity_clause = "[Cl 8.2.1.2]"
         else:
+            self.moment_cap_high_shear = True
             """ Cl 8.2.1.3
             if shear force > 0.6 * shear strength of outstanding leg:
             The moment capacity of the outstanding leg is calculated as,

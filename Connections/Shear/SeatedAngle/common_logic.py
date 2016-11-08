@@ -303,7 +303,7 @@ class CommonDesignLogic(object):
             self.display.FitAll()
 
         if component == "Column":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
+            osdagDisplayShape(self.display, self.connectivityObj.get_columnModel(), update=True)
         elif component == "Beam":
             osdagDisplayShape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)

@@ -170,7 +170,7 @@ class ColFlangeBeamWeb(object):
     def get_beamModel(self):
         finalBeam = self.beamModel
         nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[0:(len(nutBoltlist)//2)]:
+        for bolt in nutBoltlist[0:(len(nutBoltlist))]:
             finalBeam = BRepAlgoAPI_Cut(finalBeam,bolt).Shape()
         return finalBeam
     
@@ -181,7 +181,19 @@ class ColFlangeBeamWeb(object):
 #             finalAngle = BRepAlgoAPI_Cut(finalAngle,bolt).Shape()
         return finalAngle
         
-    
+    def get_columnModel(self):
+        finalcol = self.columnModel
+        nutBoltlist = self.nutBoltArray.cfbw_boltlist()
+        print len(nutBoltlist)
+#         finalcol= BRepAlgoAPI_Cut(column,nutBoltlist[0]).Shape()
+#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[1]).Shape()
+#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[2]).Shape()
+#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[3]).Shape()
+#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[19]).Shape()
+#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[20]).Shape()
+        for bolt in nutBoltlist:
+            finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
+        return finalcol
     
     
     

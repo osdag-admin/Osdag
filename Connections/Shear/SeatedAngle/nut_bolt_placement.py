@@ -8,6 +8,7 @@ from bolt import Bolt
 from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
+from cups import modelSort
 
 class NutBoltArray():
     def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):
@@ -231,7 +232,15 @@ class NutBoltArray():
             
         dbg = self.dbgSphere(self.topclipborigin)
         self.models.append(dbg)
-            
+        
+    def cfbw_boltlist(self):
+        boltlist = []
+        for bolt in self.bolts:
+            boltlist.append(bolt.createModel())
+        for bolt in self.topclipbbolts:
+            boltlist.append(bolt.createModel())
+        return boltlist
+        
     def dbgSphere(self, pt):
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
         

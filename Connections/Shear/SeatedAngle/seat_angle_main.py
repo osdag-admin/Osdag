@@ -861,40 +861,40 @@ class MainController(QtGui.QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    def display3Dmodel(self, component):
-
-        self.display.EraseAll()
-        self.display.SetModeShaded()
-        display.DisableAntiAliasing()
-        self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-
-        loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam web":
-            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
-        else:
-            self.display.View_Iso()
-            self.display.FitAll()
-
-        if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-        elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
-                              update=True)
-        elif component == "SeatAngle":
-            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-        elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
-                              update=True)
-            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+    # def display3Dmodel(self, component):
+    # 
+    #     self.display.EraseAll()
+    #     self.display.SetModeShaded()
+    #     display.DisableAntiAliasing()
+    #     self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+    # 
+    #     loc = self.ui.combo_connectivity.currentText()
+    #     if loc == "Column flange-Beam web":
+    #         self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+    #     else:
+    #         self.display.View_Iso()
+    #         self.display.FitAll()
+    # 
+    #     if component == "Column":
+    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+    #     elif component == "Beam":
+    #         osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
+    #                           update=True)
+    #     elif component == "SeatAngle":
+    #         osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
+    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
+    #         for nutbolt in nutboltlist:
+    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+    #     elif component == "Model":
+    #         osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
+    #                           update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
+    #         osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+    #         nutboltlist = self.connectivity.nutBoltArray.getModels()
+    #         for nutbolt in nutboltlist:
+    #             osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
 
 #-------------------------------------------------------------------------------
@@ -1000,6 +1000,9 @@ class MainController(QtGui.QMainWindow):
     # 
     #     else:
     #         self.display.EraseAll()
+    
+    def call_3DModel(self, flag):
+        self.commLogicObj.call_3DModel(flag)
 
     def call_3DBeam(self):
         '''
@@ -1012,7 +1015,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Beam")
+        self.commLogicObj.display_3DModel("Beam")
 
     def call_3DColumn(self):
         '''
@@ -1023,7 +1026,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.display3Dmodel("Column")
+        self.commLogicObj.display_3DModel("Column")
 
     def call_3DSeatAngle(self):
         '''Displaying Seat Angle in 3D
@@ -1034,6 +1037,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
+        self.commLogicObj.display_3DModel("SeatAngle")
 
         # TODO uncomment display3D model after debugging
         # self.display3Dmodel("SeatAngle")
@@ -1166,86 +1170,6 @@ class MainController(QtGui.QMainWindow):
         base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
         return base, base1, base2, base3
     
-    # def call2D_Drawing(self, view):
-    #     ''' This routine saves the 2D SVG image as per the connectivity selected
-    #         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
-    #         '''
-    #     base = ''
-    # 
-    #     loc = self.ui.combo_connectivity.currentText()
-    #     if view == "All":
-    #         fileName = ''
-    #         base_front = ''
-    #         base_side = ''
-    #         base_top = ''
-    # 
-    #         base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
-    #         self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-    # 
-    #         if loc == "Column flange-Beam web":
-    # 
-    #             data = str(self.folder) + "/css/3D_ModelSeatFB.png"
-    #             for n in range(1, 100, 1):
-    #                 if (os.path.exists(data)):
-    #                     data = str(self.folder) + "/css/3D_ModelSeatFB" + str(n) + ".png"
-    #                     continue
-    #             base = os.path.basename(str(data))
-    #             print "basenameee", base
-    # 
-    #         elif loc == "Column web-Beam web":
-    #             data = str(self.folder) + "/css/3D_ModelSeatWB.png"
-    #             for n in range(1, 100, 1):
-    #                 if (os.path.exists(data)):
-    #                     data = str(self.folder) + "/css/3D_ModelSeatWB" + str(n) + ".png"
-    #                     continue
-    #             base = os.path.basename(str(data))
-    # 
-    # 
-    #         else:
-    #             data = str(self.folder) + "/css/3D_ModelSeatBB.png"
-    #             for n in range(1, 100, 1):
-    #                 if (os.path.exists(data)):
-    #                     data = str(self.folder) + "/css/3D_ModelSeatBB" + str(n) + ".png"
-    #                     continue
-    #             base = os.path.basename(str(data))
-    # 
-    #         self.display.ExportToImage(data)
-    # 
-    # 
-    #     else:
-    #         #             fileName = webbrowser.open_new(r'file:///untitled.svg')
-    # 
-    #         fileName = QtGui.QFileDialog.getSaveFileName(self,
-    #                                                      "Save SVG", str(self.folder) + '/untitled.svg',
-    #                                                      "SVG files (*.svg)")
-    #         f = open(fileName, 'w')
-    # 
-    #         self.callDesired_View(fileName, view, base_front, base_top, base_side)
-    #         # f.close() #TODO check with fin plate module
-    # 
-    #     print "basenameee", base
-    #     print "base front", base1
-    #     print "base side", base2
-    #     print "base top", base3
-    #     return (base, base1, base2, base3)
-
-    # def callDesired_View(self, fileName, view, base_front, base_top, base_side):
-    # 
-    #     self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-    #     self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-    #     self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-    #     self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-    # 
-    #     #TODO update for common logic. Won't work currently
-    #     uiObj = self.uiObj
-    #     resultObj = self.resultObj
-    #     dictbeamdata = self.fetchBeamPara()
-    #     dictcoldata = self.fetchColumnPara()
-    #     seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
-    #     base_front, base_top, base_side = seatCommonObj.saveToSvg(str(fileName), view, base_front, base_top,
-    #                                                              base_side)
-    #     return (base_front, base_top, base_side)
-    #     print"sucessfully worked"
 
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()

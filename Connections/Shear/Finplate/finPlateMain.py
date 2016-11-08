@@ -1323,7 +1323,7 @@ class MainController(QtGui.QMainWindow):
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)
-            self.save_2D_image_names(view)
+            self.save_2d_image_names(view)
 
 #             fileName = QtGui.QFileDialog.getSaveFileName(self,
 #                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -1337,7 +1337,7 @@ class MainController(QtGui.QMainWindow):
 #         base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 #         return base, base1, base2, base3
         # commLogicObj.call2D_Drawing(view,fname)
-    def save_2D_images(self,view):
+    def save_2D_images(self, view):
 
         fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                      "Save as PNG", str(self.folder) + '/untitled.png',

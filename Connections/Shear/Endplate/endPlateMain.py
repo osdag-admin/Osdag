@@ -44,7 +44,7 @@ from nutBoltPlacement import NutBoltArray
 from plate import Plate
 from notch import Notch
 from ui_endplate import Ui_MainWindow
-from utilities import osdagDisplayShape
+from utilities import osdag_display_shape
 from weld import Weld
 from drawing_2D import EndCommonData
 from PyQt4 import QtSvg
@@ -1133,7 +1133,7 @@ class MainController(QtGui.QMainWindow):
 
             if not backend_str:
                 USED_BACKEND = self.get_backend()
-            elif backend_str in [ 'pyside', 'pyqt4']:
+            elif backend_str in ['pyside', 'pyqt4']:
                 USED_BACKEND = backend_str
             else:
                 raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
@@ -1190,28 +1190,28 @@ class MainController(QtGui.QMainWindow):
         self.display.View_Iso()
         self.display.FitAll()
         if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.get_column_model(), update=True)
+            osdag_display_shape(self.display, self.connectivity.get_column_model(), update=True)
         elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            # osdag_display_shape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif component == "Endplate":
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivity.plateModel, color='blue', update=True)
             nutboltlist = self.connectivity.nut_bolt_array.get_models()
 
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
             # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivity.plateModel, color='blue', update=True)
             nutboltlist = self.connectivity.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
             # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
 
 # #################################################################################################################################################
@@ -1284,7 +1284,7 @@ class MainController(QtGui.QMainWindow):
         uiobj = self.getuser_inputs()
         result_obj = end_connection(uiobj)
 
-        ##### PRIMARY BEAM PARAMETERS #####
+# ###################### PRIMARY BEAM PARAMETERS #########################
 
         dict_beam_data = self.fetch_column_param()
         pri_beam_D = int(dict_beam_data[QString("D")])
@@ -1301,7 +1301,7 @@ class MainController(QtGui.QMainWindow):
                           R1=pBeam_R1, R2=pBeam_R2, alpha=pBeam_alpha,
                           length=pBeam_length, notch_obj=None)
 
-        ##### SECONDARY BEAM PARAMETERS ######
+# ###################### SECONDARY BEAM PARAMETERS ##########################
         dictbeamdata2 = self.fetch_beam_param()
 
         sec_beam_D = int(dictbeamdata2[QString("D")])
@@ -1319,7 +1319,7 @@ class MainController(QtGui.QMainWindow):
                         t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
                         alpha=sBeam_alpha, length=500, notch_obj=notch_obj)
 
-        ########################### WELD,PLATE,BOLT AND NUT PARAMETERS ##########################################################
+# ########################## WELD,PLATE,BOLT AND NUT PARAMETERS ##########################################################
 
         fillet_length = result_obj['Plate']['Height']
         fillet_thickness = uiobj["Weld"]['Size (mm)']
@@ -1379,7 +1379,7 @@ class MainController(QtGui.QMainWindow):
                            R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                            length=beam_length)
 
-        ############################################# COLUMN PARAMETERS ########################################################
+# ############################################ COLUMN PARAMETERS ########################################################
         dict_col_data = self.fetch_column_param()
 
         column_D = int(dict_col_data[QString("D")])
@@ -1393,7 +1393,7 @@ class MainController(QtGui.QMainWindow):
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISectionOld(B=column_B, T=column_T, D=column_D,
                              t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
-        ########################################## WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
+# ######################################### WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
 
         fillet_length = result_obj['Plate']['Height']
         fillet_thickness = uiobj["Weld"]['Size (mm)']
@@ -1437,7 +1437,7 @@ class MainController(QtGui.QMainWindow):
         result_obj = end_connection(uiobj)
 
         dict_beam_data = self.fetch_beam_param()
-        ################################## BEAM PARAMETERS ####################################################################
+# ################################# BEAM PARAMETERS ####################################################################
         beam_D = int(dict_beam_data[QString("D")])
         beam_B = int(dict_beam_data[QString("B")])
         beam_tw = float(dict_beam_data[QString("tw")])
@@ -1452,7 +1452,7 @@ class MainController(QtGui.QMainWindow):
                            R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                            length=beam_length)
 
-        ##### COLUMN PARAMETERS ######
+# ##################### COLUMN PARAMETERS ####################################
         dict_col_data = self.fetch_column_param()
 
         column_D = int(dict_col_data[QString("D")])
@@ -1466,7 +1466,7 @@ class MainController(QtGui.QMainWindow):
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISectionOld(B=column_B, T=column_T, D=column_D,
                              t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
-        ########################### WELD,PLATE,BOLT AND NUT PARAMETERS #########################################################
+# ########################## WELD,PLATE,BOLT AND NUT PARAMETERS #########################################################
 
         fillet_length = result_obj['Plate']['Height']
         fillet_thickness = uiobj["Weld"]['Size (mm)']

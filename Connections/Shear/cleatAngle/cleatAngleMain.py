@@ -1790,7 +1790,7 @@ class MainController(QtGui.QMainWindow):
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)
-            self.save_2D_image_names(view)
+            self.save_2d_image_names(view)
 
 #       filename = QtGui.QFileDialog.getSaveFileName(self,
 #                                                  "Save SVG", str(self.folder) + '/untitled.svg',

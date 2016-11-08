@@ -72,7 +72,7 @@ class Nut(object):
         an_edge_explorer = TopExp_Explorer(prism, TopAbs_EDGE)
         while an_edge_explorer.More():
             aEdge = topods.Edge(an_edge_explorer.Current())
-            mk_fillet.Add(self.T / 17. , aEdge)
+            mk_fillet.Add(self.T / 17., aEdge)
             an_edge_explorer.Next()
                 
         prism = mk_fillet.Shape()
@@ -146,4 +146,3 @@ class Nut(object):
 #         final_shape = BRepAlgoAPI_Cut(result_shape, myThreading).Shape()
         
         return result_shape
-

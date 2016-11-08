@@ -7,8 +7,8 @@ import sys
 from PyQt4 import QtGui
 from ui_OsdagMainPage import Ui_MainWindow
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
-from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
-from Connections.Shear.Endplate.endPlateMain import launchEndPlateController
+from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
+from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os.path
 
 
@@ -74,11 +74,11 @@ class OsdagMainWindow(QtGui.QMainWindow):
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         elif self.ui.rdbtn_cleat.isChecked():
-            launchCleatAngleController(self, folder)
+            launch_cleatangle_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         elif self.ui.rdbtn_endplate.isChecked():
-            launchEndPlateController(self, folder)
+            launch_endplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
             # QtGui.QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
 

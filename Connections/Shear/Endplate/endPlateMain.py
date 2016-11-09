@@ -764,7 +764,7 @@ class MainController(QtGui.QMainWindow):
     def save_inputs(self, uiobj):
         '''(Dictionary)--> None
         '''
-        input_file = QtCore.QFile('saveINPUT.txt')
+        input_file = QtCore.QFile('Connections/Shear/Endplate/saveINPUT.txt')
         if not input_file.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (input_file, file.errorString()))
@@ -774,7 +774,7 @@ class MainController(QtGui.QMainWindow):
     def get_prevstate(self):
         '''
         '''
-        filename = 'saveINPUT.txt'
+        filename = 'Connections/Shear/Endplate/saveINPUT.txt'
 
         if os.path.isfile(filename):
             file_object = open(filename, 'r')

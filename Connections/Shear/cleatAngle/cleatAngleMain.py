@@ -46,6 +46,7 @@ from ui_summary_popup import Ui_Dialog
 from utilities import osdagDisplayShape
 
 from OCC.Display import OCCViewer
+
 # from OCC.Display.backend import get_qt_modules
 from macpath import basename
 # from OCC.Display.backend import get_backend
@@ -1937,7 +1938,8 @@ if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     module_setup()
 #     web = QWebView()
-    window = MainController()
+    folder = None
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())
 

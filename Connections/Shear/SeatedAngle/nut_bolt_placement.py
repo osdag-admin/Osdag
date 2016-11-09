@@ -8,9 +8,10 @@ from bolt import Bolt
 from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
+from cups import modelSort
 
 class NutBoltArray():
-    def __init__(self,boltPlaceObj,nut,bolt,gap):
+    def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
@@ -36,6 +37,7 @@ class NutBoltArray():
         self.bolt = bolt
         self.nut = nut
         self.gap = gap
+        self.bgap = bgap
          
         self.bolts = []
         self.nuts = []
@@ -166,9 +168,10 @@ class NutBoltArray():
         
         self.calculatebPositions()
         
+        
         for index, pos in enumerate (self.bpositions):
             self.bbolts[index].place(pos, bgaugeDir, bboltDir)
-            self.bnuts[index].place((pos + self.gap * bboltDir), bgaugeDir, -bboltDir)
+            self.bnuts[index].place((pos + self.bgap * bboltDir), bgaugeDir, -bboltDir)
         
         self.topcliporigin = topcliporigin
         self.topclipgaugeDir = topclipgaugeDir
@@ -179,7 +182,7 @@ class NutBoltArray():
         
         for index, pos in enumerate (self.topclippositions):
             self.topclipbolts[index].place(pos, topclipgaugeDir, topclipboltDir)
-            self.topclipnuts[index].place((pos + self.gap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
+            self.topclipnuts[index].place((pos + self.bgap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
         
         self.topclipborigin = topclipborigin
         self.topclipbgaugeDir = topclipbgaugeDir
@@ -229,7 +232,24 @@ class NutBoltArray():
             
         dbg = self.dbgSphere(self.topclipborigin)
         self.models.append(dbg)
-            
+        
+    
+    def get_beam_bolts(self):
+        boltlist = []
+        for bolt in self.bbolts:
+            boltlist.append(bolt.createModel())
+        for bolt in self.topclipbolts:
+            boltlist.append(bolt.createModel())
+        return boltlist
+    
+    def get_column_bolts(self):
+        boltlist = []
+        for bolt in self.bolts:
+            boltlist.append(bolt.createModel())
+        for bolt in self.topclipbbolts:
+            boltlist.append(bolt.createModel())
+        return boltlist
+        
     def dbgSphere(self, pt):
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
         

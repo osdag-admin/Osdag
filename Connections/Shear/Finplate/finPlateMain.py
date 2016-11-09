@@ -1405,7 +1405,8 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     module_setup()
-    window = MainController()
+    folder = None
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())
 

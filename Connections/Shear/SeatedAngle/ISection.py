@@ -38,7 +38,7 @@ class ISection(object):
              |<-------------------------------->| 
                                                     
     '''  
-    def __init__(self, B, T, D, t, R1, R2, alpha, length):        
+    def __init__(self, B, T, D, t, R1, R2, alpha, length,notchObj):        
         self.B = B
         self.T = T 
         self.D = D
@@ -47,6 +47,7 @@ class ISection(object):
         self.R2 = R2
         self.alpha = alpha
         self.length = length
+        self.notchObj = notchObj
         self.secOrigin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])

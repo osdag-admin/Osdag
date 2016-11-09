@@ -17,7 +17,6 @@ import cairosvg
 
 
 class EndCommonData(object):
-
     def __init__(self, input_obj, ouput_obj, dict_beam_data, dict_column_data, folder):
         '''
         Provide all the data related to EndPlate connection
@@ -172,7 +171,7 @@ class EndCommonData(object):
         line_vector = pt2 - pt1  # [a, b]
         normal_vector = np.array([-line_vector[1], line_vector[0]])  # [-b, a]
         normal_unit_vector = self.normalize(normal_vector)
-        if(params["lineori"] == "left"):
+        if (params["lineori"] == "left"):
             normal_unit_vector = -normal_unit_vector
 
         # Q1 = pt1 + params["offset"] * normal_unit_vector
@@ -296,13 +295,13 @@ class EndCommonData(object):
         lengthA = offset / math.sin(theta)
 
         arrow_vector = None
-        if(orientation == "NE"):
+        if (orientation == "NE"):
             arrow_vector = np.array([-math.cos(theta), math.sin(theta)])
-        elif(orientation == "NW"):
+        elif (orientation == "NW"):
             arrow_vector = np.array([math.cos(theta), math.sin(theta)])
-        elif(orientation == "SE"):
+        elif (orientation == "SE"):
             arrow_vector = np.array([-math.cos(theta), -math.sin(theta)])
-        elif(orientation == "SW"):
+        elif (orientation == "SW"):
             arrow_vector = np.array([math.cos(theta), -math.sin(theta)])
 
         p2 = p1 - lengthA * arrow_vector
@@ -311,13 +310,13 @@ class EndCommonData(object):
         lengthB = len(text) * char_width
 
         label_vector = None
-        if(orientation == "NE"):
+        if (orientation == "NE"):
             label_vector = -x_vector
-        elif(orientation == "NW"):
+        elif (orientation == "NW"):
             label_vector = x_vector
-        elif(orientation == "SE"):
+        elif (orientation == "SE"):
             label_vector = -x_vector
-        elif(orientation == "SW"):
+        elif (orientation == "SW"):
             label_vector = x_vector
 
         p3 = p2 + lengthB * (-label_vector)
@@ -326,16 +325,16 @@ class EndCommonData(object):
         offset_vector = -y_vector
 
         txt_pt_up = None
-        if(orientation == "NE"):
+        if (orientation == "NE"):
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
             txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - (txt_offset + 15) * offset_vector
-        elif(orientation == "NW"):
+        elif (orientation == "NW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + txt_offset * offset_vector
             txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
-        elif(orientation == "SE"):
+        elif (orientation == "SE"):
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
             txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - txt_offset * offset_vector
-        elif(orientation == "SW"):
+        elif (orientation == "SW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + (txt_offset) * offset_vector
             txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
 
@@ -362,9 +361,9 @@ class EndCommonData(object):
         dwg.defs.add(weld_marker)
         self.draw_end_arrow(line, weld_marker)
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#     def save_to_svg(self, filename, view, base_front, base_top, base_side):
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    #     def save_to_svg(self, filename, view, base_front, base_top, base_side):
+    # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     def save_to_svg(self, filename, view):
         '''
@@ -390,36 +389,36 @@ class EndCommonData(object):
                 end_2d_front.call_CFBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endFront.png')
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endFrontFB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 end_2d_front.callCFBWfront(filename)
-#                 base_front = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endFrontFB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 end_2d_front.callCFBWfront(filename)
+                #                 base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endSide.svg'
                 end_2d_side.call_CFBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endSide.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endSideFB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_side = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endSideFB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endTop.svg'
                 end_2d_top.call_CFBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endTop.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/finTopFB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_top = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            #                 for n in range(1, 5, 1):
+            #                     if (os.path.exists(filename)):
+            #                         filename = str(self.folder) + "/images_html/finTopFB" + '(' + str(n) + ')' + ".svg"
+            #                         continue
+            #                 base_top = os.path.basename(str(filename))
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -432,35 +431,35 @@ class EndCommonData(object):
                 filename = str(self.folder) + '/images_html/endFront.svg'
                 end_2d_front.call_CWBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endFront.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endFrontWB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_front = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endFrontWB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endSide.svg'
                 end_2d_side.call_CWBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endSide.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endSideWB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_side = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endSideWB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endTop.svg'
                 end_2d_top.call_CWBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endTop.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endTopWB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_top = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            #                 for n in range(1, 5, 1):
+            #                     if (os.path.exists(filename)):
+            #                         filename = str(self.folder) + "/images_html/endTopWB" + '(' + str(n) + ')' + ".svg"
+            #                         continue
+            #                 base_top = os.path.basename(str(filename))
+            # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         else:
             if view == "Front":
@@ -473,28 +472,30 @@ class EndCommonData(object):
                 filename = str(self.folder) + '/images_html/endFront.svg'
                 end_2d_front.call_BWBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, writ_to=str(self.folder) + '/images_html/endFront.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endFrontBB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_front = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endFrontBB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 base_front = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endSide.svg'
                 end_2d_side.call_BWBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endSide.png')
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#                 for n in range(1, 5, 1):
-#                     if (os.path.exists(filename)):
-#                         filename = str(self.folder) + "/images_html/endSideBB" + '(' + str(n) + ')' + ".svg"
-#                         continue
-#                 base_side = os.path.basename(str(filename))
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                #                 for n in range(1, 5, 1):
+                #                     if (os.path.exists(filename)):
+                #                         filename = str(self.folder) + "/images_html/endSideBB" + '(' + str(n) + ')' + ".svg"
+                #                         continue
+                #                 base_side = os.path.basename(str(filename))
+                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = str(self.folder) + '/images_html/endTop.svg'
                 end_2d_top.call_BWBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endTop.png')
+
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #                 for n in range(1, 5, 1):
 #                     if (os.path.exists(filename)):
@@ -507,7 +508,6 @@ class EndCommonData(object):
 
 
 class End2DCreatorFront(object):
-
     def __init__(self, fin_common_obj):
 
         self.dataObj = fin_common_obj
@@ -694,7 +694,7 @@ class End2DCreatorFront(object):
         ptFB4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB4 = ptFB4x, ptFB4y
 
-# ######################################## POINTS FOR BEAM BEAM CONNECTION ####################################################
+        # ######################################## POINTS FOR BEAM BEAM CONNECTION ####################################################
 
         # for primary beam
         self.BA = (0, 0)
@@ -750,8 +750,8 @@ class End2DCreatorFront(object):
         pt2 = self.BA5 - self.dataObj.col_R1 * np.array([1, 0])
         dwg.add(dwg.polyline(points=[pt1, self.BA1, self.BA2, self.BB2, self.BB1, self.BB4, self.BC2, self.BC1, pt2], stroke='blue',
                              fill='none', stroke_width=2.5))
-#         dwg.add(dwg.polyline(points = [(self.BC1),(self.BA5),(self.BA1),(self.BA2),(self.BB2),(self.BB1),(self.BB4),(self.BC2),(self.BC1)],stroke = 'blue',
-#                 fill = 'none',stroke_width = 2.5))
+        #         dwg.add(dwg.polyline(points = [(self.BC1),(self.BA5),(self.BA1),(self.BA2),(self.BB2),(self.BB1),(self.BB4),(self.BC2),(self.BC1)],stroke = 'blue',
+        #                 fill = 'none',stroke_width = 2.5))
         dwg.add(dwg.line(self.BA4, self.BA3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.BB4, self.BB3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.rect(insert=self.BP, size=(self.dataObj.plate_thick, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
@@ -782,9 +782,8 @@ class End2DCreatorFront(object):
         pt_list = []
 
         for i in range(1, (nr + 1)):
-
             pt = self.BP - self.dataObj.col_tw * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1]) + \
-                (i - 1) * self.dataObj.pitch * np.array([0, 1])
+                 (i - 1) * self.dataObj.pitch * np.array([0, 1])
 
             pt1 = pt - bolt_r * np.array([0, 1])
             rect_length = (self.dataObj.col_tw + self.dataObj.plate_thick)
@@ -802,7 +801,8 @@ class End2DCreatorFront(object):
             if len(row) > 0:
                 pitch_pts.append(row[0])
         params = {"offset": self.dataObj.col_B / 2 - self.dataObj.col_tw / 2 + 50, "textoffset": 150, "lineori": "right", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pitch_pts) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]),
+                                                str(len(pitch_pts) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
 
         # Distance between Beam Flange and Plate
         BA_down = self.BA + (self.dataObj.notch_offset) * np.array([0, 1])
@@ -835,7 +835,6 @@ class End2DCreatorFront(object):
 
         pt_three = np.array(pt_list[-1]) - (self.dataObj.col_B - self.dataObj.col_tw + 100) / 2 * np.array([1, 0])
         self.dataObj.draw_faint_line(np.array(pt_list[-1]), pt_three, dwg)
-
 
         # Beam Information
         beam_pt = self.BA2 + self.dataObj.D_beam / 2 * np.array([0, 1])
@@ -929,9 +928,8 @@ class End2DCreatorFront(object):
         pt_list = []
 
         for i in range(1, (nr + 1)):
-
             pt = self.FP - self.dataObj.col_T * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1]) + \
-                (i - 1) * self.dataObj.pitch * np.array([0, 1])
+                 (i - 1) * self.dataObj.pitch * np.array([0, 1])
 
             pt1 = pt - bolt_r * np.array([0, 1])
             rect_length = (self.dataObj.col_T + self.dataObj.plate_thick)
@@ -950,7 +948,7 @@ class End2DCreatorFront(object):
                 pitch_pts.append(row[0])
         params = {"offset": self.dataObj.D_col + self.dataObj.plate_thick + 50, "textoffset": 150, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pitch_pts) - 1) + u' \u0040' +
-                                               str(int(self.dataObj.pitch)) + "c/c", params)
+                                                str(int(self.dataObj.pitch)) + "c/c", params)
 
         # Distance between Beam Flange and Plate
 
@@ -975,34 +973,35 @@ class End2DCreatorFront(object):
 
         # Edge Distance information
         pt1A = self.ptFP + self.dataObj.edge_dist * np.array([1, 0]) + \
-                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1])
+               (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1])
         pt1B = self.ptFP + self.dataObj.edge_dist * np.array([1, 0]) + \
-               (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1])
+               (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array(
+            [1, 0]) + self.dataObj.end_dist * np.array([0, 1])
         offset = self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 3
-        params = {"offset": self.dataObj.D_col + self.dataObj.edge_dist , "textoffset": 20, "lineori": "left", "endlinedim": 10}
-#         self.dataObj.draw_dimension_outer_arrow(dwg, pt1A, pt1B, str(int(self.dataObj.edge_dist)) + " mm" , params)
+        params = {"offset": self.dataObj.D_col + self.dataObj.edge_dist, "textoffset": 20, "lineori": "left", "endlinedim": 10}
+        #         self.dataObj.draw_dimension_outer_arrow(dwg, pt1A, pt1B, str(int(self.dataObj.edge_dist)) + " mm" , params)
         # Faint line for Edge distance dimension
         ptB1 = self.ptFP + self.dataObj.edge_dist * np.array([1, 0]) + \
-                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array([1, 0])
+               (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array([1, 0])
         ptB2 = ptB1 + ((self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 115) * np.array([0, -1])
-#         self.dataObj.draw_faint_line(ptB1,ptB2,dwg)
+        #         self.dataObj.draw_faint_line(ptB1,ptB2,dwg)
 
         # Gap Distance
         gap_pt = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3))
         ptG1 = self.ptFP + (gap_pt + 30) * np.array([0, 1])
         ptG2 = self.FC1 + (gap_pt + 30) * np.array([0, 1])
         offset = self.dataObj.col_L  # 60% of the column length
-        params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim":10, "arrowlen": 50}
-#         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.plate_thick) + " mm", params)
+        params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
+        #         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.plate_thick) + " mm", params)
 
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
         ptC2 = ptC1 + 40 * np.array([0, 1])
-#         self.dataObj.draw_faint_line(ptC1,ptC2,dwg)
+        #         self.dataObj.draw_faint_line(ptC1,ptC2,dwg)
 
         ptD1 = self.FB1
         ptD2 = ptD1 + 240 * np.array([0, 1])
-#         self.dataObj.draw_faint_line(ptD1,ptD2,dwg)
+        #         self.dataObj.draw_faint_line(ptD1,ptD2,dwg)
 
         # ##### Draws faint line to show dimensions #########
         # Faint lines for gauge and edge distances
@@ -1110,9 +1109,8 @@ class End2DCreatorFront(object):
         pt_list = []
 
         for i in range(1, (nr + 1)):
-
             pt = self.ptP - self.dataObj.col_tw * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1]) + \
-                (i - 1) * self.dataObj.pitch * np.array([0, 1])
+                 (i - 1) * self.dataObj.pitch * np.array([0, 1])
 
             pt1 = pt - bolt_r * np.array([0, 1])
             rect_length = (self.dataObj.col_tw + self.dataObj.plate_thick)
@@ -1134,7 +1132,7 @@ class End2DCreatorFront(object):
         params = {"offset": (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.edge_dist + 80, "textoffset": 150,
                   "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pitch_pts) - 1) + u' \u0040' +
-                                               str(int(self.dataObj.pitch)) + "c/c", params)
+                                                str(int(self.dataObj.pitch)) + "c/c", params)
 
         # End Distance from the starting point of plate Information
         edgePt = self.P - self.dataObj.col_tw * np.array([1, 0])
@@ -1143,7 +1141,8 @@ class End2DCreatorFront(object):
 
         # Distance between Beam Flange and Plate
         offset = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_thick + 50
-        params = {"offset": (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_thick + 80, "textoffset": 50, "lineori": "right", "endlinedim":10}
+        params = {"offset": (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_thick + 80, "textoffset": 50, "lineori": "right",
+                  "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.A1, self.C1, str(int(self.dataObj.beam_T + self.dataObj.beam_R1 + 3)), params)
 
         # Draw Faint line for dimensions
@@ -1169,17 +1168,17 @@ class End2DCreatorFront(object):
         # Gap Distance
         # Draw Faint Lines to representation of Gap distance #
         dist1 = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam)
-#         ptA = self.B1
-#         ptB = self.B1 + (dist1 + 100)* np.array([0,1])
-#         self.dataObj.draw_faint_line(ptA,ptB,dwg)
-#         ptC = self.G
-#         ptD = ptC + (100)*np.array([0,1])
-#         self.dataObj.draw_faint_line(ptC,ptD,dwg)
-#         ptG1 = self.B1 + (dist1 + 50)* np.array([0,1])
-#         ptG2 = self.B1 + self.dataObj.gap * np.array([-1,0]) + (dist1 + 50)* np.array([0,1])
-#         offset = 1
-#         params = {"offset": offset, "textoffset": 120, "lineori": "right", "endlinedim":10,"arrowlen":50}
-#         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
+        #         ptA = self.B1
+        #         ptB = self.B1 + (dist1 + 100)* np.array([0,1])
+        #         self.dataObj.draw_faint_line(ptA,ptB,dwg)
+        #         ptC = self.G
+        #         ptD = ptC + (100)*np.array([0,1])
+        #         self.dataObj.draw_faint_line(ptC,ptD,dwg)
+        #         ptG1 = self.B1 + (dist1 + 50)* np.array([0,1])
+        #         ptG2 = self.B1 + self.dataObj.gap * np.array([-1,0]) + (dist1 + 50)* np.array([0,1])
+        #         offset = 1
+        #         params = {"offset": offset, "textoffset": 120, "lineori": "right", "endlinedim":10,"arrowlen":50}
+        #         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
 
         # Edge Distance Information
         ptA = self.ptP + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0])
@@ -1241,7 +1240,6 @@ class End2DCreatorFront(object):
 
 
 class End2DCreatorTop(object):
-
     def __init__(self, fin_common_obj):
 
         self.dataObj = fin_common_obj
@@ -1272,26 +1270,26 @@ class End2DCreatorTop(object):
         self.P = self.W - self.dataObj.plate_thick * np.array([1, 0])
         self.X = self.P + (self.dataObj.plate_width) * np.array([0, 1])
         self.A6 = self.P1 + (self.dataObj.beam_L) * np.array([1, 0])
-#         self.P2 = self.P + (self.dataObj.plate_thick) * np.array([1,0])
-#         self.P4 = self.P1 + (self.dataObj.plate_thick)* np.array([0,1])
-#         self.P3 = self.P2 + (self.dataObj.plate_thick)* np.array([0,1])
-#         self.P5 = self.A7 - self.dataObj.plate_thick * np.array([1,0])
+        #         self.P2 = self.P + (self.dataObj.plate_thick) * np.array([1,0])
+        #         self.P4 = self.P1 + (self.dataObj.plate_thick)* np.array([0,1])
+        #         self.P3 = self.P2 + (self.dataObj.plate_thick)* np.array([0,1])
+        #         self.P5 = self.A7 - self.dataObj.plate_thick * np.array([1,0])
 
         # Weld Triangle
         self.ptP = self.A7 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
         self.ptO = self.ptP + self.dataObj.weld_thick * np.array([1, 0])
-#         self.ptO = self.O  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptO = self.O  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
         self.ptR = self.ptP + self.dataObj.weld_thick * np.array([0, -1])
-#         self.ptR = self.R + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptR = self.R + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
 
         self.ptX = self.P1 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
         self.ptY = self.ptX + (self.dataObj.weld_thick) * np.array([0, 1])
-#         self.ptY = self.Y + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptY = self.Y + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
         self.ptZ = self.ptX + (self.dataObj.weld_thick) * np.array([1, 0])
-#         self.ptZ = self.Z + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptZ = self.Z + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
 
 
-# ########################### CFBW connectivity points #######################################################################
+        # ########################### CFBW connectivity points #######################################################################
         self.FA = np.array([0, 0])
         self.FB = self.FA + self.dataObj.col_T * np.array([1, 0])
         self.FC = self.FB + (self.dataObj.col_B - self.dataObj.col_tw) / 2 * np.array([0, 1])
@@ -1321,18 +1319,18 @@ class End2DCreatorTop(object):
 
         self.ptFPW = self.FA7 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
         self.ptFQ = self.ptFPW + self.dataObj.weld_thick * np.array([1, 0])
-#         self.ptFQ = self.FQ  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptFQ = self.FQ  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
         self.ptFR = self.ptFPW + self.dataObj.weld_thick * np.array([0, -1])
-#         self.ptFR = self.FR + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptFR = self.FR + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
 
         self.ptFX = self.FP1 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
         self.ptFY = self.ptFX + (self.dataObj.weld_thick) * np.array([0, 1])
-#         self.ptFY = self.FY + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptFY = self.FY + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
         self.ptFZ = self.ptFX + (self.dataObj.weld_thick) * np.array([1, 0])
-#         self.ptFZ = self.FZ + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptFZ = self.FZ + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
 
 
-# ###################################### Beam- Beam ############################################################
+        # ###################################### Beam- Beam ############################################################
 
         # Points for Beam - Beam connection
         self.beam_beam_length = self.dataObj.beam_B + 200
@@ -1367,22 +1365,22 @@ class End2DCreatorTop(object):
         self.BA15 = self.BA2 + (self.dataObj.beam_B + self.dataObj.beam_tw) / 2 * np.array([0, 1])
         self.BA16 = self.BA1 + (self.dataObj.beam_B + self.dataObj.beam_tw) / 2 * np.array([0, 1])
 
-# Weld Triangle
+        # Weld Triangle
 
         self.ptBW = self.BA9 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
         self.ptBX = self.ptBW + self.dataObj.weld_thick * np.array([1, 0])
-#         self.ptFQ = self.FQ  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptFQ = self.FQ  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
         self.ptBY = self.ptBW + self.dataObj.weld_thick * np.array([0, -1])
-#         self.ptFR = self.FR + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
+        #         self.ptFR = self.FR + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
 
         self.ptBW1 = self.BA16 + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
         self.ptBX1 = self.ptBW1 + (self.dataObj.weld_thick) * np.array([0, 1])
-#         self.ptFY = self.FY + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptFY = self.FY + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
         self.ptBY1 = self.ptBW1 + (self.dataObj.weld_thick) * np.array([1, 0])
-#         self.ptFZ = self.FZ + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
+        #         self.ptFZ = self.FZ + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
 
 
-# ################################# for end plate #####################################################################
+        # ################################# for end plate #####################################################################
         self.BP1 = self.BG + (self.beam_beam_length - self.dataObj.plate_width) / 2 * np.array([0, 1])
         self.BP4 = self.BP1 + (self.dataObj.plate_width) * np.array([0, 1])
 
@@ -1417,9 +1415,9 @@ class End2DCreatorTop(object):
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BE), (self.BF)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.BG), (self.BH)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-#         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
 
-#         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
 
         dwg.add(dwg.polyline(points=[(self.BA2), (self.BA1), (self.BA8), (self.BA7)], stroke='red', fill='none',
                              stroke_width=2.5).dasharray(dasharray=([5, 5])))
@@ -1443,18 +1441,17 @@ class End2DCreatorTop(object):
         dwg.add(dwg.rect(insert=(self.BP1), size=(self.dataObj.plate_thick, self.dataObj.plate_width), fill='none', stroke='red',
                          stroke_width=2.5).dasharray(dasharray=([5, 5])))
 
-
-#         dwg.add(dwg.line((self.BH1),(self.BG1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-#         dwg.add(dwg.line((self.BE1),(self.BF1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-#         dwg.add(dwg.polyline(points=[(self.BJ1),(self.BI1),(self.BL1),(self.BK1),(self.BA)], stroke='red', fill='none',
-#                                                                                         stroke_width=2.5).dasharray(dasharray = ([5,5])))
-#         dwg.add(dwg.line((self.BP4),(self.BP5)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.line((self.BP9),(self.BG1)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.line((self.BQ9),(self.BE1)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.line((self.BQ4),(self.BQ5)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.polyline(points=[(self.BP9),(self.BP10),(self.BP1),(self.BP2),(self.BP3),(self.BP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-#         dwg.add(dwg.polyline(points=[(self.BQ9),(self.BQ10),(self.BQ1),(self.BQ2),(self.BQ3),(self.BQ4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-#         dwg.add(dwg.line((self.BP10 + self.dataObj.gap * np.array([1,0])),(self.BQ10 + self.dataObj.gap * np.array([1,0]))).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BH1),(self.BG1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BE1),(self.BF1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.polyline(points=[(self.BJ1),(self.BI1),(self.BL1),(self.BK1),(self.BA)], stroke='red', fill='none',
+        #                                                                                         stroke_width=2.5).dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BP4),(self.BP5)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.line((self.BP9),(self.BG1)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.line((self.BQ9),(self.BE1)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.line((self.BQ4),(self.BQ5)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.polyline(points=[(self.BP9),(self.BP10),(self.BP1),(self.BP2),(self.BP3),(self.BP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.polyline(points=[(self.BQ9),(self.BQ10),(self.BQ1),(self.BQ2),(self.BQ3),(self.BQ4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.BP10 + self.dataObj.gap * np.array([1,0])),(self.BQ10 + self.dataObj.gap * np.array([1,0]))).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
 
         nc = self.dataObj.no_of_col / 2
         bolt_r = self.dataObj.bolt_dia / 2
@@ -1463,7 +1460,8 @@ class End2DCreatorTop(object):
 
         if nc >= 1:
             for col in range(nc):
-                pt = self.BP1 - self.dataObj.col_tw * np.array([1, 0]) + self.dataObj.edge_dist * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([0, 1])
+                pt = self.BP1 - self.dataObj.col_tw * np.array([1, 0]) + self.dataObj.edge_dist * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array(
+                    [0, 1])
                 pt1 = pt - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_tw + self.dataObj.plate_thick
@@ -1472,7 +1470,8 @@ class End2DCreatorTop(object):
                 B2 = pt + (rect_length + 10) * np.array([1, 0])
                 dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
 
-                pt_ref = self.BP4 - self.dataObj.col_tw * np.array([1, 0]) - self.dataObj.edge_dist * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array([0, 1])
+                pt_ref = self.BP4 - self.dataObj.col_tw * np.array([1, 0]) - self.dataObj.edge_dist * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array(
+                    [0, 1])
                 pt_ref1 = pt_ref - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_tw + self.dataObj.plate_thick
@@ -1496,11 +1495,11 @@ class End2DCreatorTop(object):
                     self.dataObj.draw_faint_line(np.array(pt_list[-1]), ptblt2, dwg)
                     self.dataObj.draw_faint_line(np.array(pt_list1[-1]), ptblt2_ref, dwg)
 
-        # Draw Faint line to represent edge distance
-#         ptB = self.FP + (self.dataObj.col_T) * np.array([-1,0])
-#         ptC = ptB + (bltdimoffset) * np.array([-1,0])
-# #         self.dataObj.draw_faint_line(ptB,ptC,dwg)
-#         ptL = np.array(pt_list[-1])
+                    # Draw Faint line to represent edge distance
+                #         ptB = self.FP + (self.dataObj.col_T) * np.array([-1,0])
+                #         ptC = ptB + (bltdimoffset) * np.array([-1,0])
+                # #         self.dataObj.draw_faint_line(ptB,ptC,dwg)
+                #         ptL = np.array(pt_list[-1])
 
         # Faint Lines for bolts
         ptblt1 = np.array(pt_list[0]) + (self.dataObj.col_B / 2 + 50) * np.array([-1, 0])
@@ -1563,8 +1562,8 @@ class End2DCreatorTop(object):
         text_up = "          z " + str(int(self.dataObj.weld_thick)) + " mm"
         text_down = ""  # u"\u25C1"
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NE", offset, text_up, text_down, element="weld")
-#         weldarrow = weld_pt + offset*np.array([0,-1]) + 18*np.array([-1,0])
-#         self.dataObj.draw_weld_arrow(weldarrow , dwg)
+        #         weldarrow = weld_pt + offset*np.array([0,-1]) + 18*np.array([-1,0])
+        #         self.dataObj.draw_weld_arrow(weldarrow , dwg)
 
         # 2D view name
         ptx = self.BA + 150 * np.array([1, 0]) + 740 * np.array([0, 1])
@@ -1607,9 +1606,9 @@ class End2DCreatorTop(object):
         dwg.add(dwg.rect(insert=(self.FA1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.FP), size=(self.dataObj.plate_thick, self.dataObj.plate_width), fill='none', stroke='blue', stroke_width=2.5))
 
-#         dwg.add(dwg.line((self.FP),(self.FP6)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.line((self.FX),(self.FP4)).stroke('blue',width = 2.5,linecap = 'square'))
-#         dwg.add(dwg.polyline(points=[(self.FP1),(self.FP2),(self.FP3),(self.FP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
+        #         dwg.add(dwg.line((self.FP),(self.FP6)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.line((self.FX),(self.FP4)).stroke('blue',width = 2.5,linecap = 'square'))
+        #         dwg.add(dwg.polyline(points=[(self.FP1),(self.FP2),(self.FP3),(self.FP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
         dwg.add(dwg.line((self.FA7), (self.FA8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.FP1), (self.FA6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.polyline([(self.ptFPW), (self.ptFQ), (self.ptFR), (self.ptFPW)], fill='black', stroke_width=2.5, stroke='black'))
@@ -1622,7 +1621,8 @@ class End2DCreatorTop(object):
 
         if nc >= 1:
             for col in range(nc):
-                pt = self.FP + (self.dataObj.edge_dist) * np.array([0, 1]) - self.dataObj.col_T * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array([0, 1])
+                pt = self.FP + (self.dataObj.edge_dist) * np.array([0, 1]) - self.dataObj.col_T * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array(
+                    [0, 1])
                 pt1 = pt - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_T + self.dataObj.plate_thick
@@ -1631,7 +1631,9 @@ class End2DCreatorTop(object):
                 B2 = pt + (rect_length + 10) * np.array([1, 0])
                 dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
 
-                pt_ref = self.FP2 + (self.dataObj.edge_dist) * np.array([0, -1]) - self.dataObj.col_T * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array([0, -1])
+                pt_ref = self.FP2 + (self.dataObj.edge_dist) * np.array([0, -1]) - self.dataObj.col_T * np.array([1, 0]) + (
+                                                                                                                           col) * self.dataObj.gauge * np.array(
+                    [0, -1])
                 pt_ref1 = pt_ref - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_T + self.dataObj.plate_thick
@@ -1716,8 +1718,8 @@ class End2DCreatorTop(object):
         text_up = "          z " + str(int(self.dataObj.weld_thick))
         text_down = ""  # u"\u25C1"
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NW", offset, text_up, text_down, element="weld")
-#         weldarrow = weld_pt + offset*np.array([0,-1]) + 18*np.array([-1,0])
-#         self.dataObj.draw_weld_arrow(weldarrow , dwg)
+        #         weldarrow = weld_pt + offset*np.array([0,-1]) + 18*np.array([-1,0])
+        #         self.dataObj.draw_weld_arrow(weldarrow , dwg)
 
         # 2D view name
         ptx = self.FA + 150 * np.array([1, 0]) + 640 * np.array([0, 1])
@@ -1755,7 +1757,9 @@ class End2DCreatorTop(object):
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
-        dwg.add(dwg.polyline(points=[(self.A), (self.B), (self.C), (self.D), (self.E), (self.F), (self.G), (self.H), (self.I), (self.J), (self.K), (self.L), (self.A)], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(
+            points=[(self.A), (self.B), (self.C), (self.D), (self.E), (self.F), (self.G), (self.H), (self.I), (self.J), (self.K), (self.L), (self.A)],
+            stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.A7), (self.A8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.P1), (self.A6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
@@ -1770,7 +1774,8 @@ class End2DCreatorTop(object):
 
         if nc >= 1:
             for col in range(nc):
-                pt = self.P + (self.dataObj.edge_dist) * np.array([0, 1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array([0, 1])
+                pt = self.P + (self.dataObj.edge_dist) * np.array([0, 1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array(
+                    [0, 1])
                 pt1 = pt - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_tw + self.dataObj.plate_thick
@@ -1779,7 +1784,8 @@ class End2DCreatorTop(object):
                 B2 = pt + (rect_length + 10) * np.array([1, 0])
                 dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
 
-                pt_ref = self.X + (self.dataObj.edge_dist) * np.array([0, -1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array([0, -1])
+                pt_ref = self.X + (self.dataObj.edge_dist) * np.array([0, -1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.gauge * np.array(
+                    [0, -1])
                 pt_ref1 = pt_ref - bolt_r * np.array([0, 1])
                 rect_width = self.dataObj.bolt_dia
                 rect_length = self.dataObj.col_tw + self.dataObj.plate_thick
@@ -1793,7 +1799,6 @@ class End2DCreatorTop(object):
                 bltdimoffset = self.dataObj.D_col / 2 + 50
 
                 if len(pt_list) > 1:
-
                     ptblt2 = np.array(pt_list[-1]) + (self.dataObj.col_B / 2 + 50) * np.array([-1, 0])
 
                     ptblt2_ref = np.array(pt_list1[-1]) + (self.dataObj.col_B / 2 + 50) * np.array([-1, 0])
@@ -1803,7 +1808,6 @@ class End2DCreatorTop(object):
                     self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list1[0]), np.array(pt_list1[1]), str(int(self.dataObj.gauge)), params_ref)
                     self.dataObj.draw_faint_line(np.array(pt_list[-1]), ptblt2, dwg)
                     self.dataObj.draw_faint_line(np.array(pt_list1[-1]), ptblt2_ref, dwg)
-
 
         # Draw Faint line to represent edge distance
         ptB = self.P + self.dataObj.col_tw * np.array([-1, 0])
@@ -1889,7 +1893,8 @@ class End2DCreatorSide(object):
         self.D = self.A + self.dataObj.D_col * np.array([1, 0])
         self.H = self.C + self.dataObj.col_L * np.array([0, 1])
         self.G = self.B + self.dataObj.col_L * np.array([0, 1])
-        self.A1 = self.A + (self.dataObj.D_col / 2 - self.dataObj.beam_B / 2) * np.array((1, 0)) + ((self.dataObj.col_L - self.dataObj.D_beam) / 2) * np.array([0, 1])
+        self.A1 = self.A + (self.dataObj.D_col / 2 - self.dataObj.beam_B / 2) * np.array((1, 0)) + ((self.dataObj.col_L - self.dataObj.D_beam) / 2) * np.array(
+            [0, 1])
         self.A2 = self.A1 + self.dataObj.beam_B * np.array([1, 0])
         self.A3 = self.A2 + self.dataObj.beam_T * np.array([0, 1])
         self.A12 = self.A1 + self.dataObj.beam_T * np.array([0, 1])
@@ -1915,7 +1920,9 @@ class End2DCreatorSide(object):
         self.ptMid1 = self.ptMid + ((self.dataObj.col_L - self.dataObj.D_beam) / 2) * np.array([0, 1])
         self.FC = self.FB + self.dataObj.col_L * np.array([0, 1])
         self.FD = self.FA + self.dataObj.col_L * np.array([0, 1])
-        self.FA1 = self.FA + (self.dataObj.col_B / 2 - self.dataObj.beam_B / 2) * np.array((1, 0)) + ((self.dataObj.col_L - self.dataObj.D_beam) / 2) * np.array([0, 1])
+        self.FA1 = self.FA + (self.dataObj.col_B / 2 - self.dataObj.beam_B / 2) * np.array((1, 0)) + (
+                                                                                                     (self.dataObj.col_L - self.dataObj.D_beam) / 2) * np.array(
+            [0, 1])
         self.FA2 = self.FA1 + self.dataObj.beam_B * np.array([1, 0])
         self.FA3 = self.FA2 + self.dataObj.beam_T * np.array([0, 1])
         self.FA12 = self.FA1 + self.dataObj.beam_T * np.array([0, 1])
@@ -1927,11 +1934,11 @@ class End2DCreatorSide(object):
         self.FA8 = self.FA1 + self.dataObj.D_beam * np.array([0, 1])
         self.FA9 = self.FA1 + (self.dataObj.D_beam - self.dataObj.beam_T) * np.array([0, 1])
         self.FA10 = self.FA11 + (self.dataObj.D_beam - (2 * self.dataObj.beam_T)) * np.array([0, 1])
-#         self.FP = self.FA11 + (self.dataObj.beam_R1 + 3) * np.array([0,1])
-#         self.FQ = self.FP + self.dataObj.plate_thick * np.array([-1,0])
-#         self.FX = self.FQ + self.dataObj.weld_thick * np.array([-1,0])
-#         self.FR = self.FP + self.dataObj.plate_ht * np.array([0,1])
-#         self.FY = self.FX + self.dataObj.plate_ht * np.array([0,1])
+        #         self.FP = self.FA11 + (self.dataObj.beam_R1 + 3) * np.array([0,1])
+        #         self.FQ = self.FP + self.dataObj.plate_thick * np.array([-1,0])
+        #         self.FX = self.FQ + self.dataObj.weld_thick * np.array([-1,0])
+        #         self.FR = self.FP + self.dataObj.plate_ht * np.array([0,1])
+        #         self.FY = self.FX + self.dataObj.plate_ht * np.array([0,1])
         self.FP = self.FA11 + (self.dataObj.beam_R1 + self.dataObj.beam_T + 3) * np.array([0, 1]) + self.dataObj.beam_tw / 2 * np.array([1, 0])
         self.FQ = self.FP + self.dataObj.plate_width / 2 * np.array([-1, 0])
         self.FX = self.FP + (self.dataObj.weld_thick + self.dataObj.beam_tw / 2 + 2.5) * np.array([-1, 0])
@@ -1939,8 +1946,7 @@ class End2DCreatorSide(object):
         self.FQ1 = self.FP + self.dataObj.plate_width / 2 * np.array([1, 0])
         self.FX1 = self.FP + (self.dataObj.beam_tw / 2 + 2.5) * np.array([1, 0])
 
-
-# #### Points for Beam-Beam connection #####
+        # #### Points for Beam-Beam connection #####
 
         self.beam_beam_length = self.dataObj.beam_B + 200  # #beam_B
 
@@ -2017,8 +2023,11 @@ class End2DCreatorSide(object):
             col_list = []
             col_list1 = []
             for col in range(nc):
-                pt = self.BZ + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
-                pt_other = self.BR - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
+                pt = self.BZ + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array(
+                    [0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
+                pt_other = self.BR - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (
+                                                                                                                              row) * self.dataObj.pitch * np.array(
+                    [0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
 
                 dwg.add(dwg.circle(center=(pt), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
                 dwg.add(dwg.circle(center=(pt_other), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
@@ -2061,7 +2070,8 @@ class End2DCreatorSide(object):
 
             gaugept1 = np.array(pitch_pts1[-1][0])
             gaugept2 = np.array(pitch_pts1[-1][1])
-            params = {"offset": self.dataObj.D_col - self.dataObj.notch_offset - self.dataObj.plate_ht + self.dataObj.edge_dist + 50, "textoffset": 50, "lineori": "left", "endlinedim":10}
+            params = {"offset": self.dataObj.D_col - self.dataObj.notch_offset - self.dataObj.plate_ht + self.dataObj.edge_dist + 50, "textoffset": 50,
+                      "lineori": "left", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, gaugept2, gaugept1, str(int(self.dataObj.gauge)), params)
             faintpt1 = gaugept1
             faintpt1_1 = gaugept1 + (self.dataObj.D_col - self.dataObj.notch_offset - self.dataObj.plate_ht + self.dataObj.edge_dist + 50) * np.array([0, 1])
@@ -2077,14 +2087,15 @@ class End2DCreatorSide(object):
 
         # End and Pitch Distance Information
         params = {"offset": self.beam_beam_length / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) +
-                                               "c/c", params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]),
+                                                str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) +
+                                                "c/c", params)
         params = {"offset": self.beam_beam_length / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BR - self.dataObj.edge_dist * np.array([1, 0]),
-                                               np.array(pt_list[0]), str(int(self.dataObj.end_dist)), params)
+                                                np.array(pt_list[0]), str(int(self.dataObj.end_dist)), params)
         params = {"offset": self.beam_beam_length / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[-1]), self.BR - self.dataObj.edge_dist * np.array([1, 0]) +
-                                               self.dataObj.plate_ht * np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
+                                                self.dataObj.plate_ht * np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
 
         # notch dist
         ptN1 = self.BR - self.dataObj.edge_dist * np.array([1, 0])
@@ -2095,7 +2106,7 @@ class End2DCreatorSide(object):
         pt10 = pt9 + (self.beam_beam_length - self.dataObj.plate_width) / 2 * np.array([1, 0])
         self.dataObj.draw_faint_line(pt9, pt10, dwg)
 
-# Draw Faint Line
+        # Draw Faint Line
         pt1 = self.BR
         pt2 = pt1 + (self.beam_beam_length / 2) * np.array([1, 0])
         self.dataObj.draw_faint_line(pt1, pt2, dwg)
@@ -2182,13 +2193,16 @@ class End2DCreatorSide(object):
 
         bolt_r = self.dataObj.bolt_dia / 2
         pitch_pts = []
-        pitch_pts = []
+        pitch_pts1 = []
         for row in range(nr):
             col_list = []
             col_list1 = []
             for col in range(nc):
-                pt = self.Q + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
-                pt_other = self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array([0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
+                pt = self.Q + self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (row) * self.dataObj.pitch * np.array(
+                    [0, 1]) + (col) * self.dataObj.gauge * np.array([1, 0])
+                pt_other = self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + (self.dataObj.end_dist) * np.array([0, 1]) + (
+                                                                                                                              row) * self.dataObj.pitch * np.array(
+                    [0, 1]) - (col) * self.dataObj.gauge * np.array([1, 0])
 
                 dwg.add(dwg.circle(center=(pt), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
                 dwg.add(dwg.circle(center=(pt_other), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
@@ -2226,6 +2240,7 @@ class End2DCreatorSide(object):
             self.dataObj.draw_faint_line(faintpt1_other, faintpt1_other1, dwg)
             self.dataObj.draw_faint_line(faintpt2_other, faintpt2_other1, dwg)
 
+            gaugept1 = np.array()
             gaugept1 = np.array(pitch_pts1[-1][0])
             gaugept2 = np.array(pitch_pts1[-1][1])
             params = {"offset": self.dataObj.col_L / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
@@ -2244,12 +2259,14 @@ class End2DCreatorSide(object):
 
         # End and Pitch Distance Information
         params = {"offset": self.dataObj.D_col / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]),
+                                                str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
         params = {"offset": self.dataObj.D_col / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, self.Q1 - self.dataObj.edge_dist * np.array([1, 0]), np.array(pt_list[0]), str(int(self.dataObj.end_dist)), params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, self.Q1 - self.dataObj.edge_dist * np.array([1, 0]), np.array(pt_list[0]), str(int(self.dataObj.end_dist)),
+                                                params)
         params = {"offset": self.dataObj.D_col / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[-1]), self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + self.dataObj.plate_ht *
-                                               np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
+                                                np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
 
         # Draw Faint Line
         pt1 = self.Q1
@@ -2317,7 +2334,9 @@ class End2DCreatorSide(object):
     def call_CFBW_side(self, filename):
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-100 -100 1000 1200'))
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(
+            points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11),
+                    (self.FA12), (self.FA1)], stroke='blue', fill='none', stroke_width=2.5))
 
         # Diagonal Hatching for WELD
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
@@ -2326,7 +2345,8 @@ class End2DCreatorSide(object):
 
         dwg.add(dwg.rect(insert=(self.FQ), size=(self.dataObj.plate_width, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
 
-        dwg.add(dwg.rect(insert=(self.FX1), size=(self.dataObj.weld_thick, self.dataObj.weld_len), fill="url(#diagonalHatch)", stroke='white', stroke_width=2.5))
+        dwg.add(
+            dwg.rect(insert=(self.FX1), size=(self.dataObj.weld_thick, self.dataObj.weld_len), fill="url(#diagonalHatch)", stroke='white', stroke_width=2.5))
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col / 2
         bolt_r = self.dataObj.bolt_dia / 2
@@ -2395,12 +2415,14 @@ class End2DCreatorSide(object):
 
         # End and Pitch Distance Information
         params = {"offset": self.dataObj.col_B / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]), str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[-1]),
+                                                str(len(pt_list) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + "c/c", params)
         params = {"offset": self.dataObj.col_B / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outer_arrow(dwg, self.Q1 - self.dataObj.edge_dist * np.array([1, 0]), np.array(pt_list[0]), str(int(self.dataObj.end_dist)), params)
+        self.dataObj.draw_dimension_outer_arrow(dwg, self.Q1 - self.dataObj.edge_dist * np.array([1, 0]), np.array(pt_list[0]), str(int(self.dataObj.end_dist)),
+                                                params)
         params = {"offset": self.dataObj.col_B / 2 + 30, "textoffset": 50, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[-1]), self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + self.dataObj.plate_ht *
-                                               np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
+                                                np.array([0, 1]), str(int(self.dataObj.end_dist)), params)
         print "points for end dist:", np.array(pt_list[-1]), self.Q1 - self.dataObj.edge_dist * np.array([1, 0]) + self.dataObj.plate_ht * np.array([0, 1])
 
         # Draw Faint Line

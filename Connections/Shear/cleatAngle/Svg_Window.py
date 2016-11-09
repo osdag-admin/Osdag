@@ -35,8 +35,7 @@ class SvgWindow(object):
         print filename, 'filenameeeee'
         print view, 'viewwwwwww'
         self.folder = folder
-        self.btn_save.mouseDoubleClickEvent(lambda: self.save_2d_image_names(view))
-        # self.btn_save.clicked.connect(lambda:self.save_2d_image_names)
+        self.btn_save.clicked.connect(lambda:self.save_2d_image_names(view))
         sys.exit(app.exec_())
 
     def save_2d_image_names(self, view):
@@ -45,15 +44,15 @@ class SvgWindow(object):
 
         if view == "Front":
             png_image_path = self.folder + "/images_html/endFront.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         elif view == "Side":
             png_image_path = self.folder + "/images_html/endSide.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         else:
             png_image_path = self.folder + "/images_html/endTop.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
 
-        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
+        QtGui.QMessageBox.about(None, 'Information', "Image Saved")
 
             # sys.exit()
 # def main():

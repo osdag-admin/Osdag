@@ -1395,8 +1395,8 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
-        base_front, base_top, base_side = seatCommonObj.saveToSvg(str(fileName), view, base_front, base_top,
-                                                                 base_side)
+        base_front, base_top, base_side = seatCommonObj.save_to_svg(str(fileName), view, base_front, base_top,
+                                                                    base_side)
         return (base_front, base_top, base_side)
         print"sucessfully worked"
 

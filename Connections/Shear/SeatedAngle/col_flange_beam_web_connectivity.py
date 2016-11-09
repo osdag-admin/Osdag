@@ -157,9 +157,6 @@ class ColFlangeBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        #+ self.nutBoltArray.getnutboltModels()
-        # return [self.columnModel,self.plateModel, self.weldModelLeft,self.weldModelRight,
-        #         self.beamModel] + self.nutBoltArray.getModels()
         return [self.columnModel,self.beamModel,self.angleModel,self.topclipangleModel] + self.nutBoltArray.getModels() 
              
     def get_nutboltmodels(self):
@@ -168,29 +165,22 @@ class ColFlangeBeamWeb(object):
         #return self.nutBoltArray.getboltModels() 
          
     def get_beamModel(self):
-        finalBeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[0:(len(nutBoltlist))]:
-            finalBeam = BRepAlgoAPI_Cut(finalBeam,bolt).Shape()
-        return finalBeam
+        
+        finalbeam = self.beamModel
+        nutBoltlist = self.nutBoltArray.get_beam_bolts()
+        print len(nutBoltlist)
+        for bolt in nutBoltlist:
+            finalbeam = BRepAlgoAPI_Cut(finalbeam,bolt).Shape()
+        return finalbeam
     
     def get_angleModel(self):
         finalAngle = self.angleModel
-#         nutBoltlist = self.nutBoltArray.getModels()
-#         for bolt in nutBoltlist[0:(len(nutBoltlist)//2)]:
-#             finalAngle = BRepAlgoAPI_Cut(finalAngle,bolt).Shape()
         return finalAngle
         
     def get_columnModel(self):
         finalcol = self.columnModel
-        nutBoltlist = self.nutBoltArray.cfbw_boltlist()
+        nutBoltlist = self.nutBoltArray.get_column_bolts()
         print len(nutBoltlist)
-#         finalcol= BRepAlgoAPI_Cut(column,nutBoltlist[0]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[1]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[2]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[3]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[19]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[20]).Shape()
         for bolt in nutBoltlist:
             finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
         return finalcol

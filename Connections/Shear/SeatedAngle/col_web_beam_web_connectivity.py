@@ -24,25 +24,17 @@ class ColWebBeamWeb(object):
         self.beam = beam
         self.angle = angle
         self.topclipangle = topclipangle
-#         self.weldLeft = Fweld
-#         self.weldRight = copy.deepcopy(Fweld)
-#         self.plate = plate
         self.nutBoltArray = nutBoltArray
         self.columnModel = None
         self.beamModel = None
         self.angleModel= None
         self.topclipangleModel = None
-#         self.weldModelLeft = None
-#         self.weldModelRight = None
-#         self.plateModel = None
         self.clearDist = 20.0 # This distance between edge of the column web/flange and beam cross section
         
     def create_3dmodel(self):
         self.creatColumGeometry()
         self.createBeamGeometry()
         self.createAngleGeometry()
-#         self.createPlateGeometry()
-#         self.createFilletWeldGeometry()
         self.createNutBoltArray()
         
         # Call for createModel
@@ -50,9 +42,6 @@ class ColWebBeamWeb(object):
         self.beamModel = self.beam.createModel()
         self.angleModel = self.angle.createModel()
         self.topclipangleModel = self.topclipangle.createModel()
-#         self.plateModel = self.plate.createModel()
-#         self.weldModelLeft = self.weldLeft.createModel()
-#         self.weldModelRight = self.weldRight.createModel()
         self.nutboltArrayModels = self.nutBoltArray.createModel()
         
     def creatColumGeometry(self):
@@ -69,7 +58,6 @@ class ColWebBeamWeb(object):
         self.beam.place(origin2, uDir, wDir)
         
     def createAngleGeometry(self):
-#         angleOrigin =((self.column.secOrigin + self.column.D/2) * (-self.column.vDir)) + ((self.column.length/2-self.beam.D/2) * self.column.wDir)+(self.angle.L/2 * (-self.column.uDir))
         angleOrigin =((self.column.secOrigin)*self.column.vDir)+((self.column.length/2-self.beam.D/2) * self.column.wDir)+(self.angle.L/2 * (-self.column.vDir))
 
         wDir = numpy.array([0.0, 1.0, 0.0])
@@ -161,37 +149,29 @@ class ColWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        #+ self.nutBoltArray.getnutboltModels()
         return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nutBoltArray.getModels()
         
                 
     def get_nutboltmodels(self):
         return self.nutBoltArray.getModels()
-        #return self.nutBoltArray.getboltModels()      
     
     def get_beamModel(self):
-        finalBeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[0:(len(nutBoltlist)//2)]:
-            finalBeam = BRepAlgoAPI_Cut(finalBeam,bolt).Shape()
-        return finalBeam
+        finalbeam = self.beamModel
+        nutBoltlist = self.nutBoltArray.get_beam_bolts()
+        for bolt in nutBoltlist:
+            finalbeam = BRepAlgoAPI_Cut(finalbeam,bolt).Shape()
+        return finalbeam
     
     def get_angleModel(self):
         finalAngle = self.angleModel
         return finalAngle
     
     def get_columnModel(self):
-        column = self.columnModel
-        nutBoltlist = self.nutBoltArray.models
-        print len(nutBoltlist)
+        finalcol = self.columnModel
+        nutBoltlist = self.nutBoltArray.get_column_bolts()
         for bolt in nutBoltlist:
-            finalcol= BRepAlgoAPI_Cut(column,bolt).Shape()
-#         finalcol= BRepAlgoAPI_Cut(column,nutBoltlist[0]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[1]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[2]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[3]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[19]).Shape()
-#         finalcol= BRepAlgoAPI_Cut(finalcol,nutBoltlist[20]).Shape()
+            finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
         return finalcol
+
                 
                 

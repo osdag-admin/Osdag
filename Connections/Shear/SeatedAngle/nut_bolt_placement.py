@@ -233,7 +233,16 @@ class NutBoltArray():
         dbg = self.dbgSphere(self.topclipborigin)
         self.models.append(dbg)
         
-    def cfbw_boltlist(self):
+    
+    def get_beam_bolts(self):
+        boltlist = []
+        for bolt in self.bbolts:
+            boltlist.append(bolt.createModel())
+        for bolt in self.topclipbolts:
+            boltlist.append(bolt.createModel())
+        return boltlist
+    
+    def get_column_bolts(self):
         boltlist = []
         for bolt in self.bolts:
             boltlist.append(bolt.createModel())

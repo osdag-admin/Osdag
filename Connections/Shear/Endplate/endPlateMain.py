@@ -28,6 +28,7 @@ import pdfkit
 import shutil
 from ui_summary_popup import *
 from reportGenerator import *
+from ui_design_preferences import Ui_ShearDesignPreferences
 from ISection import ISection
 from ISectionOld import ISectionOld
 from bolt import Bolt
@@ -46,6 +47,127 @@ from ui_endplate import Ui_MainWindow
 from utilities import osdagDisplayShape
 from weld import  Weld
 from drawing_2D import EndCommonData
+
+class DesignPreferences(QtGui.QDialog):
+
+    def __init__(self, parent=None):
+
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_ShearDesignPreferences()
+        self.ui.setupUi(self)
+        self.main_controller = parent
+        self.saved = None
+        self.set_default_para()
+        self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+
+    def save_designPref_para(self):
+        '''
+        This routine is responsible for saving all design preferences selected by the user
+        '''
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            designPref["weld"]["safety_factor"] = float(1.5)
+
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text().isEmpty():
+
+            designPref["detailing"]["gap"] = int(20)
+        else:
+            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+
+        self.saved = True
+
+        QtGui.QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return designPref
+
+        #self.main_controller.call_designPref(designPref)
+
+    def set_default_para(self):
+        '''
+        '''
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        bolt_grade = float(uiObj["Bolt"]["Grade"])
+        clearance = str(self.get_clearance(boltDia))
+        bolt_fu = str(self.get_boltFu(bolt_grade))
+
+        self.ui.combo_boltHoleType.setCurrentIndex(0)
+        self.ui.txt_boltHoleClearance.setText(clearance)
+        self.ui.txt_boltFu.setText(bolt_fu)
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        self.ui.combo_weldType.setCurrentIndex(0)
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        designPref["weld"]["safety_factor"] = float(1.25)
+
+        self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+        self.ui.txt_detailingGap.setText(str(20))
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        designPref["detailing"]["gap"] = int(20)
+        self.saved = False
+
+        return designPref
+
+    def set_bolthole_clernce(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        clearance = self.get_clearance(boltDia)
+        self.ui.txt_boltHoleClearance.setText(str(clearance))
+
+    def set_boltFu(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltGrade = float(uiObj["Bolt"]["Grade"])
+        boltfu = str(self.get_boltFu(boltGrade))
+        self.ui.txt_boltFu.setText(boltfu)
+
+    def get_clearance(self, boltDia):
+
+        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+
+        if self.ui.combo_boltHoleType.currentText() == "Standard":
+            clearance = standard_clrnce[boltDia]
+        else:
+            clearance = overhead_clrnce[boltDia]
+        
+        return clearance
+
+    def get_boltFu(self, boltGrade):
+        '''
+        This routine returns ultimate strength of bolt depending upon grade of bolt chosen
+        '''
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
+        return boltFu[boltGrade]
+
 
 class MyPopupDialog(QtGui.QDialog):
     
@@ -138,7 +260,7 @@ class MainController(QtGui.QMainWindow):
         self.folder = folder
         
         self.gradeType = {'Please Select Type':'',
-                         'HSFG': [8.8, 10.8],
+                         'HSFG': [8.8, 10.9],
                          'Black Bolt':[3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)

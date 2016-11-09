@@ -9,11 +9,6 @@ import shutil
 
 
 class SvgWindow(object):
-#     def __init__(self, parent=None):
-#     def __init__(self):
-#         QtGui.QApplication.__init__(self)
-#         self.mainController = parent
-#         self.call_svgwindow(filename, view)
 
     def call_svgwindow(self, filename, view, folder):
         # app = QtGui.QApplication(sys.argv)
@@ -35,8 +30,8 @@ class SvgWindow(object):
         print filename, 'filenameeeee'
         print view, 'viewwwwwww'
         self.folder = folder
-        self.btn_save.clicked.connect(lambda:self.save_2d_image_names(view))
-        sys.exit(app.exec_())
+        self.btn_save.clicked.connect(lambda: self.save_2d_image_names(view))
+        # sys.exit(app.exec_())
 
     def save_2d_image_names(self, view):
         #         view = self.go_to_open_svg(view)
@@ -54,11 +49,11 @@ class SvgWindow(object):
 
         QtGui.QMessageBox.about(None, 'Information', "Image Saved")
 
-            # sys.exit()
-# def main():
-#     app = QtGui.QApplication(sys.argv)
-#     ex = Svg_window()
-#     sys.exit(app.exec_())
-#         
-# if __name__ == '__main__':
-#     main()
+
+def main():
+    app = QtGui.QApplication(sys.argv)
+    ex = SvgWindow()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()

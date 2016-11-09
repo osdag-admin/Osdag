@@ -9,16 +9,16 @@ import shutil
 
 
 class SvgWindow(object):
-#     def __init__(self, parent=None):
-#     def __init__(self):
-#         QtGui.QApplication.__init__(self)
-#         self.mainController = parent
-#         self.call_svgwindow(filename, view)
+    #     def __init__(self, parent=None):
+    #     def __init__(self):
+    #         QtGui.QApplication.__init__(self)
+    #         self.mainController = parent
+    #         self.call_svgwindow(filename, view)
 
     def call_svgwindow(self, filename, view, folder):
         # app = QtGui.QApplication(sys.argv)
         self.svgWidget = QtSvg.QSvgWidget(filename)
-    #             svgWidget.setGeometry(50, 50, 759, 668)
+        #             svgWidget.setGeometry(50, 50, 759, 668)
         self.svgWidget.setFixedSize(900, 800)
         self.btn_save = QtGui.QPushButton('Save as PNG', self.svgWidget)
         self.btn_save.setToolTip('Saves 2D Image as PNG')
@@ -37,7 +37,7 @@ class SvgWindow(object):
         self.folder = folder
         # self.btn_save.mouseDoubleClickEvent(lambda: self.save_2d_image_names(view))
         self.btn_save.clicked.connect(lambda: self.save_2d_image_names(view))
-        sys.exit(app.exec_())
+        # sys.exit(app.exec_())
 
     def save_2d_image_names(self, view):
         #         view = self.go_to_open_svg(view)
@@ -55,11 +55,12 @@ class SvgWindow(object):
 
         QtGui.QMessageBox.about(None, 'Information', "Image Saved")
 
-            # sys.exit()
-# def main():
-#     app = QtGui.QApplication(sys.argv)
-#     ex = Svg_window()
-#     sys.exit(app.exec_())
-#         
-# if __name__ == '__main__':
-#     main()
+
+def main():
+    app = QtGui.QApplication(sys.argv)
+    ex = SvgWindow()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()

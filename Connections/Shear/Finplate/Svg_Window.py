@@ -43,13 +43,13 @@ class SvgWindow(object):
         # self.btn_save.clicked.connect(view)
 
         if view == "Front":
-            png_image_path = self.folder + "/images_html/endFront.png"
+            png_image_path = self.folder + "/images_html/finFront.png"
             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         elif view == "Side":
-            png_image_path = self.folder + "/images_html/endSide.png"
+            png_image_path = self.folder + "/images_html/finSide.png"
             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         else:
-            png_image_path = self.folder + "/images_html/endTop.png"
+            png_image_path = self.folder + "/images_html/finTop.png"
             shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
 
         QtGui.QMessageBox.about(None, 'Information', "Image Saved")

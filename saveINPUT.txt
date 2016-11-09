@@ -2,7 +2,7 @@
 S'Member'
 p1
 (dp2
-S'ColumSection'
+S'ColumnSection'
 p3
 S'ISSC 200'
 p4

@@ -8,7 +8,7 @@ from svgwrite import mm
 from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
-import cairosvg
+# import cairosvg
 
 class SeatCommonData(object):
 

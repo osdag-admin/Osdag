@@ -50,9 +50,9 @@ from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
 # You can delete ite
-from ModelUtils import getGpPt
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from apt.auth import update
+# from ModelUtils import getGpPt
+# from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
+# from apt.auth import update
 from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
 
 class MyTutorials(QtGui.QDialog):

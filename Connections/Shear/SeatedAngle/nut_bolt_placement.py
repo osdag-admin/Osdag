@@ -8,7 +8,7 @@ from bolt import Bolt
 from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
-from cups import modelSort
+#from cups import modelSort
 
 class NutBoltArray():
     def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):

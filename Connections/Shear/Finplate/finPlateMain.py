@@ -10,7 +10,7 @@ from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
-from ui_design_preferences import Ui_DesignPreferences
+from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -20,22 +20,17 @@ from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
-#from reportGenerator import *
-#from ModelUtils import getGpPt
-##### Testing imports
-#import OCC.V3d
 import pdfkit
 import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
-
 
 class DesignPreferences(QtGui.QDialog):
 
     def __init__(self, parent=None):
 
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_DesignPreferences()
+        self.ui = Ui_ShearDesignPreferences()
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
@@ -106,7 +101,7 @@ class DesignPreferences(QtGui.QDialog):
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
-        designPref["weld"]["safety_factor"] = float(1.2)
+        designPref["weld"]["safety_factor"] = float(1.25)
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -133,13 +128,14 @@ class DesignPreferences(QtGui.QDialog):
 
     def get_clearance(self, boltDia):
 
-        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3}
-        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8}
+        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
             clearance = standard_clrnce[boltDia]
         else:
             clearance = overhead_clrnce[boltDia]
+        
         return clearance
 
     def get_boltFu(self, boltGrade):
@@ -148,6 +144,7 @@ class DesignPreferences(QtGui.QDialog):
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
         return boltFu[boltGrade]
+
 
 
 class MyTutorials(QtGui.QDialog):
@@ -256,7 +253,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.8],
+        self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.9],
                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
@@ -743,10 +740,7 @@ class MainController(QtGui.QMainWindow):
         Args:
             :param uiObj: User inputs
             :type uiObj:Dictionary
-
-
         '''
-
         inputFile = QtCore.QFile('Connections/Shear/Finplate/saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
             QtGui.QMessageBox.warning(self, "Application",

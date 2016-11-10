@@ -57,6 +57,8 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 # TODO display top angle in UI - output dock
+# TODO change connectivity to Column Flange to Beam FLANGE
+# TODO change connectivity to Column Web to Beam FLANGE
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -414,6 +416,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.num_cols = max(self.bolts_required, 2)
         self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))),3)
         # TODO check for zero num_cols
+        # TODO verify gauge for: bolt should not pass through column web in beam to column flange connectivity
+        # TODO verify gauge for: bolt should not pass through beam web in any connectivity
 
         if self.gauge < self.min_gauge:
             self.num_rows = 2

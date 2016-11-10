@@ -53,6 +53,9 @@ from ui_tutorial import Ui_Tutorial
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
+# TODO change connectivity to Column Flange to Beam FLANGE
+# TODO change connectivity to Column Web to Beam FLANGE
+
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)

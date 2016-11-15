@@ -1392,7 +1392,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        #TODO update for common logic. Won't work currently
         uiObj = self.uiObj
         resultObj = self.resultObj
         dictbeamdata = self.fetchBeamPara()

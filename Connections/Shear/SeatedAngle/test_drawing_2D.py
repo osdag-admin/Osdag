@@ -12,6 +12,7 @@ from drawing_2D import SeatCommonData, Seat2DCreatorFront, Seat2DCreatorSide, Se
 
 is_test_for_all = False
 
+
 class TestSeatCommonData(unittest.TestCase, SeatCommonData):
     """Test SeatCommonData Class functions.
 
@@ -76,6 +77,8 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
         """
         output_dict = create_sample_ui_output()
         input_dict = create_sample_ui_input()
+        model_beam_data = model.get_beamdata(input_dict["Member"]["BeamSection"])
+        model_column_data = model.get_columndata(input_dict["Member"]["ColumnSection"])
         file_name = "test_image"
         folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
         base = "3D_ModelFinFB.png"
@@ -83,31 +86,9 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
         base_top = "finSideFB.svg"
         base_side = "finTopFB.svg"
 
-        report_generator_instance = ReportGenerator(self.sa_calc_obj)
-        report_generator_instance.save_html(output_dict, input_dict, report_summary, folder_location+file_name,
-                                            folder_location, base,
-                                            base_front, base_top, base_side)
+        seat_common_instance = SeatCommonData(input_dict, output_dict, model_beam_data, model_column_data, folder_location)
+        # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "Front")
+        # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "Side")
+        # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "Top")
+        # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "All")
 
-
-def create_sample_report_summary():
-    """Create and return hardcoded sample report_summary (dict).
-
-    Args:
-        None
-
-    Returns:
-        report_summary (dict): Structural Engineer details for design report
-    """
-    report_summary = {}
-    report_summary["ProfileSummary"] = {}
-    report_summary["ProfileSummary"]["CompanyName"] = "FOSSEE"
-    report_summary["ProfileSummary"]["CompanyLogo"] = "IIT Bombay"
-    report_summary["ProfileSummary"]["Group/TeamName"] = "Osdag"
-    report_summary["ProfileSummary"]["Designer"] = "Jayant Patil"
-
-    report_summary["ProjectTitle"] = "Connection modules development"
-    report_summary["Subtitle"] = "Seated angle connection"
-    report_summary["JobNumber"] = "SA001"
-    report_summary["AdditionalComments"] = "Add more comments here."
-    report_summary["Method"] = "Limit State Design (No Earthquake Load)"
-    return report_summary

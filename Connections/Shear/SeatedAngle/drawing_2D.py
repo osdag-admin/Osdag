@@ -343,63 +343,67 @@ class SeatCommonData(object):
             None
 
         Note:
-            CFBW = Column Flange Beam Web
-            CWBW = Column Web Beam Web
-            BWBW = Beam Web Beam Web
+            CFBF = Column Flange Beam Flange
+            CWBF = Column Web Beam Flange
         '''
-        fin2DFront = Fin2DCreatorFront(self)
-        fin2DTop = Fin2DCreatorTop(self)
-        fin2DSide = Fin2DCreatorSide(self)
+        seat2DFront = Seat2DCreatorFront(self)
+        seat2DTop = Seat2DCreatorTop(self)
+        seat2DSide = Seat2DCreatorSide(self)
 
-        if self.connectivity == 'Column flange-Beam web':
+        if self.connectivity == 'Column flange-Beam flange':
             if view == "Front":
-                fin2DFront.callCFBWfront(file_name)
+                seat2DFront.callCFBFfront(file_name)
             elif view == "Side":
-                fin2DSide.callCFBWSide(file_name)
+                seat2DSide.callCFBFSide(file_name)
             elif view == "Top":
-                fin2DTop.callCFBWTop(file_name)
+                seat2DTop.callCFBFTop(file_name)
             else:
-                file_name = str(self.folder) + '/images_html/finFront.svg'
-                fin2DFront.callCFBWfront(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finFront.png')
+                file_name = str(self.folder) + '/images_html/seatFront.svg'
+                seat2DFront.callCFBFfront(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatFront.png')
 
-                file_name = str(self.folder) + '/images_html/finSide.svg'
-                fin2DSide.callCFBWSide(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finSide.png')
+                file_name = str(self.folder) + '/images_html/seatSide.svg'
+                seat2DSide.callCFBFSide(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatSide.png')
 
-                file_name = str(self.folder) + '/images_html/finTop.svg'
-                fin2DTop.callCFBWTop(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finTop.png')
+                file_name = str(self.folder) + '/images_html/seatTop.svg'
+                seat2DSide.callCFBFTop(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatTop.png')
 
-        elif self.connectivity == 'Column web-Beam web':
+        elif self.connectivity == 'Column web-Beam flange':
             if view == "Front":
-                fin2DFront.callCWBWfront(file_name)
+                seat2DFront.callCWBFfront(file_name)
             elif view == "Side":
-                fin2DSide.callCWBWSide(file_name)
+                seat2DSide.callCWBFSide(file_name)
             elif view == "Top":
-                fin2DTop.callCWBWTop(file_name)
+                seat2DSide.callCWBFTop(file_name)
             else:
-                file_name = str(self.folder) + '/images_html/finFront.svg'
-                fin2DFront.callCWBWfront(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finFront.png')
+                file_name = str(self.folder) + '/images_html/seatFront.svg'
+                seat2DFront.callCWBFfront(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatFront.png')
 
-                file_name = str(self.folder) + '/images_html/finSide.svg'
-                fin2DSide.callCWBWSide(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finSide.png')
+                file_name = str(self.folder) + '/images_html/seatSide.svg'
+                seat2DSide.callCWBFSide(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatSide.png')
 
-                file_name = str(self.folder) + '/images_html/finTop.svg'
-                fin2DTop.callCWBWTop(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/finTop.png')
+                file_name = str(self.folder) + '/images_html/seatTop.svg'
+                seat2DSide.callCWBFTop(file_name)
+                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatTop.png')
 
                 #         return base_front, base_top, base_side
 
 
 class Seat2DCreatorFront(object):
+    """Contains functions for generating the front view of the seated angle connection.
+        Attributes:
+
+
+    """
     def __init__(self, seat_common_object):
 
         self.data_object = seat_common_object
         # ------------------------------------------------------------------------------
-        #              COLUMN WEB BEAM WEB CONNECTIVITY (FRONT VIEW)
+        #              COLUMN WEB BEAM FLANGE CONNECTIVITY (FRONT VIEW)
         # ------------------------------------------------------------------------------
 
         self.A2 = (self.data_object.col_width, (self.data_object.col_length - self.data_object.beam_depth) / 2)
@@ -425,7 +429,7 @@ class Seat2DCreatorFront(object):
         ptGy = self.data_object.col_length
         self.G = np.array([ptGx, ptGy])
 
-        # Draw rectangle for finPlate PRSU
+        # Draw rectangle for seatPlate PRSU
         ptPx = (self.data_object.col_width + self.data_object.col_web_thk) / 2
         ptPy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (
             self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)
@@ -493,7 +497,7 @@ class Seat2DCreatorFront(object):
         self.P1 = (ptP1x, ptP1y)
 
         # =======================================================================
-        #              COLUMN FLANGE BEAM WEB CONNECTIVITY (FRONT VIEW)
+        #              COLUMN FLANGE BEAM FLANGE CONNECTIVITY (FRONT VIEW)
         # =======================================================================
         fromPlate_pt = self.data_object.col_depth + self.data_object.gap  # 20 mm clear distance between colume and beam
         ptFAx = 0
@@ -593,46 +597,7 @@ class Seat2DCreatorFront(object):
                       self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.beam_depth) - self.data_object.beam_flange_thk
         self.FB4 = ptFB4x, ptFB4y
 
-        # =======================================================================
-        #                BEAM-BEAM CONNECTIVITY (FRONT VIEW)
-        # =======================================================================
-        self.BA = np.array([0, 0])
-        self.BB = self.BA + self.data_object.col_width * np.array([1, 0])
-        self.BC = self.BB + (self.data_object.col_flange_thk) * np.array([0, 1])
-        self.BD = self.BA + (self.data_object.col_width + self.data_object.col_web_thk) / 2 * np.array([1, 0]) + (
-                                                                                                                     self.data_object.col_flange_thk) * np.array(
-            [0, 1])
-        self.BE = self.BD + (self.data_object.col_depth - 2.0 * (self.data_object.col_flange_thk)) * np.array([0, 1])
-        self.BF = self.BB + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([0, 1])
-        self.BG = self.BB + (self.data_object.col_depth) * np.array([0, 1])
-        self.BH = self.BA + (self.data_object.col_depth) * np.array([0, 1])
-        self.BI = self.BA + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([0, 1])
-        self.BJ = self.BE - (self.data_object.col_web_thk) * np.array([1, 0])
-        self.BK = self.BD - (self.data_object.col_web_thk) * np.array([1, 0])
-        self.BL = self.BA + (self.data_object.col_flange_thk) * np.array([0, 1])
-        self.BP = self.BD + self.data_object.col_R1 * np.array([0, 1])
-        self.BS = self.BP + self.data_object.plate_ht * np.array([0, 1])
-        self.Bx = self.BP + 12 * np.array([1,
-                                           0])  # To represent weld in 2D, Osdag uses 12 mm thickness of weld instead of actual size produced by Osdag.
-        self.BQ = self.BP + self.data_object.plate_width * np.array([1, 0])
-        self.BO = self.BP + self.data_object.plateEdge_dist * np.array([1, 0])
-        self.BA5 = self.BP + self.data_object.gap * np.array([1, 0])
-        self.BB5 = self.BA5 + self.data_object.plate_ht * np.array([0, 1])
-        self.BA1 = self.BB + 10 * np.array(
-            [1, 0])  # 10 mm is minimum distance between two beams in Beam-Beam connectivity.
-        self.BA4 = self.BA1 + self.data_object.beam_flange_thk * np.array([0, 1])
-        self.BA6 = self.BA1 + self.data_object.notch_ht * np.array([0, 1])
-        self.BA2 = self.BA1 + (self.data_object.beam_length - self.data_object.notch_L) * np.array([1, 0])
-        self.BA3 = self.BA4 + (self.data_object.beam_length - self.data_object.notch_L) * np.array([1, 0])
-        self.BB2 = self.BA2 + self.data_object.beam_depth * np.array([0, 1])
-        self.BB3 = self.BB2 + self.data_object.beam_flange_thk * np.array([0, -1])
-        self.BB1 = self.BB2 + (self.data_object.beam_length + 10) * np.array([-1, 0])
-        self.BB4 = self.BB1 + self.data_object.beam_flange_thk * np.array([0, -1])
-        self.B1 = self.BA5 + 80 * np.array([0, 1])
-        self.BC2 = self.BA6 + self.data_object.col_R1 * np.array([-1, 0])
-        self.BC1 = self.BA6 + self.data_object.col_R1 * np.array([0, -1])
-
-    def callCFBWfront(self, file_name):
+    def callCFBFfront(self, file_name):
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-340 -350 1200 1300'))
 
         dwg.add(dwg.polyline(points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FA)], stroke='blue', fill='none',
@@ -805,7 +770,7 @@ class Seat2DCreatorFront(object):
         ptD2 = ptD1 + 70 * np.array([0, 1])
         self.data_object.draw_faint_line(ptD1, ptD2, dwg)
 
-        ###### Draws faint line to show dimensions #########
+        # Draws faint line to show dimensions
         # Faint lines for gauge and edge distances
         ptA1 = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + \
                (self.data_object.no_of_col - 1) * self.data_object.gauge * np.array([1, 0])
@@ -905,9 +870,9 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-        print"########### Column Flange Beam Web Saved ############"
+        print"########### Column Flange Beam Flange Saved ############"
 
-    def callCWBWfront(self, file_name):
+    def callCWBFfront(self, file_name):
 
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-410 -350 1250 1280'))
 
@@ -1173,7 +1138,7 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-        print"########### Column Web Beam Web Saved ############"
+        print"########### Column Web Beam Flange Saved ############"
 
 
 class Seat2DCreatorTop(object):
@@ -1181,7 +1146,7 @@ class Seat2DCreatorTop(object):
 
         self.data_object = seat_common_object
         # =======================================================================
-        #          COLUMN WEB BEAM WEB CONNECTIVITY (TOP VIEW)
+        #          COLUMN WEB BEAM FLANGE CONNECTIVITY (TOP VIEW)
         # =======================================================================
         self.A = np.array([0, 0])
         self.B = np.array([0, 0]) + (self.data_object.col_width) * np.array([1, 0])
@@ -1228,7 +1193,7 @@ class Seat2DCreatorTop(object):
         self.ptZ = self.Z + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
 
         # =======================================================================
-        #            COLUMN FLANGE BEAM WEB CONNECTIVITY (TOP VIEW)
+        #            COLUMN FLANGE BEAM FLANGE CONNECTIVITY (TOP VIEW)
         # =======================================================================
         self.FA = np.array([0, 0])
         self.FB = self.FA + self.data_object.col_flange_thk * np.array([1, 0])
@@ -1271,57 +1236,7 @@ class Seat2DCreatorTop(object):
         self.FZ = self.FX + (self.data_object.weld_thick) * np.array([1, 0])
         self.ptFZ = self.FZ + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
 
-        # =======================================================================
-        #              BEAM-BEAM CONNECTIVITY (TOP VIEW)
-        # =======================================================================
-        self.BA = np.array([0, 0])
-        self.BB = self.BA + self.data_object.col_width * np.array([1, 0])
-        self.BC = self.BB + self.data_object.col_length * np.array([0, 1])
-        self.BD = self.BA + self.data_object.col_length * np.array([0, 1])
-        self.BE = self.BA + ((self.data_object.col_width - self.data_object.col_web_thk) / 2.0) * np.array([1, 0])
-        self.BF = self.BE + self.data_object.col_web_thk * np.array([1, 0])
-        self.BH = self.BE + self.data_object.col_length * np.array([0, 1])
-        self.BG = self.BH + self.data_object.col_web_thk * np.array([1, 0])
-        beamLocY_DIR = (self.data_object.col_length - self.data_object.beam_width) / 2.0
-        beamLocX_DIR = (self.data_object.col_width + self.data_object.col_web_thk) / 2.0 + self.data_object.gap
-        self.BA1 = self.BF + self.data_object.gap * np.array([1, 0]) + beamLocY_DIR * np.array([0, 1])
-        self.BA8 = self.BA1 + self.data_object.beam_width * np.array([0, 1])
-        self.BA2 = self.BA1 + (self.data_object.col_width / 2.0 - (
-            (self.data_object.col_web_thk / 2.0) + self.data_object.gap)) * np.array([1, 0])
-        self.BA7 = self.BA2 + self.data_object.beam_width * np.array([0, 1])
-        self.BA3 = self.BA2 + self.data_object.beamToBeamDist * np.array([1, 0])
-        self.BA6 = self.BA3 + self.data_object.beam_width * np.array([0, 1])
-        self.BA4 = self.BA1 + self.data_object.beam_length * np.array([1, 0])
-        self.BA5 = self.BA4 + self.data_object.beam_width * np.array([0, 1])
-        self.BB0 = self.BA1 + ((self.data_object.beam_width - self.data_object.beam_web_thk) / 2.0) * np.array([0, 1])
-        self.BBB = self.BB0 + self.data_object.gap * np.array([-1, 0])
-        self.BB1 = self.BA2 + ((self.data_object.beam_width - self.data_object.beam_web_thk) / 2.0) * np.array([0, 1])
-        self.BB2 = self.BA3 + ((self.data_object.beam_width - self.data_object.beam_web_thk) / 2.0) * np.array([0, 1])
-        self.BB5 = self.BB2 + self.data_object.beam_web_thk * np.array([0, 1])
-        self.BS = self.BB5 + self.data_object.plate_thick * np.array([0, 1])
-        self.BB3 = self.BA4 + (self.data_object.beam_width - self.data_object.beam_web_thk) / 2.0 * np.array([0, 1])
-        self.BB4 = self.BB3 + self.data_object.beam_web_thk * np.array([0, 1])
-        self.BP1 = self.BB1 + self.data_object.beam_web_thk * np.array([0, 1])
-        self.BT = self.BP1 + self.data_object.plate_thick * np.array([0, 1])
-        self.BP0 = self.BB0 + self.data_object.beam_web_thk * np.array([0, 1])
-        self.BP = self.BP0 + self.data_object.gap * np.array([-1, 0])
-        self.BQ = self.BP + self.data_object.weld_thick * np.array([1, 0])
-        self.BR = self.BP + self.data_object.weld_thick * np.array([0, -1])
-        self.BP2 = self.BP + self.data_object.plate_width * np.array([1, 0])
-        self.BP3 = self.BP2 + self.data_object.plate_thick * np.array([0, 1])
-        self.BX = self.BP + self.data_object.plate_thick * np.array([0, 1])
-        self.BZ = self.BX + self.data_object.weld_thick * np.array([1, 0])
-        self.BY = self.BX + self.data_object.weld_thick * np.array([0, 1])
-        self.weldBP = self.BP + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-        self.weldBQ = self.BQ + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-        self.weldBR = self.BR + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-        self.weldBX = self.BX + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-        self.weldBY = self.BY + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-        self.weldBZ = self.BZ + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-
-    def callCFBWTop(self, file_name):
-        '''
-        '''
+    def callCFBFTop(self, file_name):
         vb_width = str(int(self.data_object.col_depth) + 750)
         vb_ht = str(800)
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-50 -250 ' + vb_width + ' ' + vb_ht))
@@ -1337,7 +1252,7 @@ class Seat2DCreatorTop(object):
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
-        ############ C-C section #################
+        #  C-C section
         ptSecA = self.FA4 + ((self.data_object.gap + self.data_object.col_depth) * np.array([-1, 0])) + 230 * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txtpt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
@@ -1473,11 +1388,9 @@ class Seat2DCreatorTop(object):
         ptx = self.FG + 270 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
-        print"$$$$$$$$$ Saved Column Flange Beam Web Top $$$$$$$$$$$$"
+        print"$$$$$$$$$ Saved Column Flange Beam Flange Top $$$$$$$$$$$$"
 
-    def callCWBWTop(self, file_name):
-        '''
-        '''
+    def callCWBFTop(self, file_name):
         vb_ht = str(float(self.data_object.col_depth) + 750)
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-50 -300 850 ' + vb_ht))
 
@@ -1637,8 +1550,7 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
 
         dwg.save()
-        print"$$$$$$$$$ Saved Column Web Beam Web Top $$$$$$$$$$$"
-
+        print"$$$$$$$$$ Saved Column Web Beam Flange Top $$$$$$$$$$$"
 
 
 class Seat2DCreatorSide(object):
@@ -1646,7 +1558,7 @@ class Seat2DCreatorSide(object):
 
         self.data_object = seat_common_object
         # =======================================================================
-        # # CWBW Side Connectivity Points
+        # # COLUMN WEB BEAM FLANGE Side Connectivity Points
         # =======================================================================
         self.A = np.array([0, 0])
         self.B = self.A + self.data_object.col_flange_thk * np.array([1, 0])
@@ -1678,7 +1590,7 @@ class Seat2DCreatorSide(object):
         self.Y = self.R + (self.data_object.plate_thick + self.data_object.weld_thick) * np.array([-1, 0])
 
         # =======================================================================
-        #                 CFBW Side Connectivity Points
+        # COLUMN FLANGE BEAM FLANGE Side Connectivity Points
         # =======================================================================
         self.FA = np.array([0, 0])
         self.FB = self.FA + self.data_object.col_width * np.array([1, 0])
@@ -1707,42 +1619,7 @@ class Seat2DCreatorSide(object):
         self.FR = self.FP + self.data_object.plate_ht * np.array([0, 1])
         self.FY = self.FX + self.data_object.plate_ht * np.array([0, 1])
 
-        # =======================================================================
-        # BWBW Side Connectivity Points
-        # =======================================================================
-
-        self.BA1 = np.array([0, 0])
-        self.BA2 = self.BA1 + self.data_object.col_length * np.array([1, 0])
-        self.BA3 = self.BA2 + self.data_object.col_flange_thk * np.array([0, 1])
-        self.BA4 = self.BA2 + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([0, 1])
-        self.BA5 = self.BA2 + self.data_object.col_depth * np.array([0, 1])
-        self.BA6 = self.BA5 + self.data_object.col_length * np.array([-1, 0])
-        self.BA7 = self.BA4 + self.data_object.col_length * np.array([-1, 0])
-        self.BA8 = self.BA1 + self.data_object.col_flange_thk * np.array([0, 1])
-        beamStartPt = (self.data_object.col_length - self.data_object.beam_width) / 2.0
-        self.BA = self.BA1 + beamStartPt * np.array([1, 0])
-        self.BB = self.BA + self.data_object.beam_width * np.array([1, 0])
-        self.BC = self.BB + (self.data_object.beam_flange_thk) * np.array([0, 1])
-        self.BD = self.BA + (self.data_object.beam_width + self.data_object.beam_web_thk) / 2 * np.array([1, 0]) + (
-                                                                                                               self.data_object.beam_flange_thk) * np.array(
-            [0, 1])
-        self.BE = self.BD + (self.data_object.beam_depth - 2.0 * (self.data_object.beam_flange_thk)) * np.array([0, 1])
-        self.BF = self.BB + (self.data_object.beam_depth - self.data_object.beam_flange_thk) * np.array([0, 1])
-        self.BG = self.BB + (self.data_object.beam_depth) * np.array([0, 1])
-        self.BH = self.BA + (self.data_object.beam_depth) * np.array([0, 1])
-        self.BI = self.BA + (self.data_object.beam_depth - self.data_object.beam_flange_thk) * np.array([0, 1])
-        self.BJ = self.BE - (self.data_object.beam_web_thk) * np.array([1, 0])
-        self.BK = self.BD - (self.data_object.beam_web_thk) * np.array([1, 0])
-        self.BL = self.BA + (self.data_object.beam_flange_thk) * np.array([0, 1])
-        self.BP = self.BK + self.data_object.beam_R1 * np.array([0, 1])
-        self.BP1 = self.BP + self.data_object.end_dist * np.array([0, 1])
-        self.BS = self.BP + self.data_object.plate_ht * np.array([0, 1])
-        self.BQ = self.BP + self.data_object.plate_thick * np.array([-1, 0])
-        self.BX = self.BQ + 8 * np.array([-1, 0])
-
-    def callCWBWSide(self, file_name):
-        '''
-        '''
+    def callCWBFSide(self, file_name):
         vb_width = str(float(3.5 * self.data_object.col_depth))
         vb_ht = str(float(1.4 * self.data_object.col_length))
 
@@ -1861,11 +1738,9 @@ class Seat2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-        print "********* Column Web Beam Web Side Saved ***********"
+        print "********* Column Web Beam Flange Side Saved ***********"
 
-    def callCFBWSide(self, file_name):
-        '''
-        '''
+    def callCFBFSide(self, file_name):
         vb_width = str(float(3.5 * self.data_object.col_depth))
         vb_ht = str(float(1.4 * self.data_object.col_length))
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-10 -100 ' + vb_width + ' ' + vb_ht))
@@ -1985,4 +1860,4 @@ class Seat2DCreatorSide(object):
         dwg.fit()
         dwg.save()
 
-        print "********** Column Flange Beam Web Side Saved  *************"
+        print "********** Column Flange Beam Flange Side Saved  *************"

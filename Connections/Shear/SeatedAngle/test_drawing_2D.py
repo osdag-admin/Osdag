@@ -1,26 +1,26 @@
-'''
-Created on Oct 25, 2016
-
-@author: Jayant Patil
-'''
+import unittest
 import sys
 import model
 from PyQt4 import QtGui
-from report_generator import ReportGenerator
 from seat_angle_calc import SeatAngleCalculation
 from test_seat_angle_calc import create_sample_ui_input
 from test_seat_angle_calc import create_sample_ui_output
-import unittest
+import svgwrite
+from PyQt4.QtCore import QString
+import cairosvg
+from drawing_2D import SeatCommonData, Seat2DCreatorFront, Seat2DCreatorSide, Seat2DCreatorTop
 
-class TestReportGenerator(unittest.TestCase, ReportGenerator):
-    """Test ReportGenerator Class functions.
+is_test_for_all = False
+
+class TestSeatCommonData(unittest.TestCase, SeatCommonData):
+    """Test SeatCommonData Class functions.
 
     Attributes:
         (inherited)
 
     Note:
-        Currently, does not automatically check the output report.
-        Need to do it manually.
+        Currently, can not automatically check and verify the accuracy of the output drawings.
+        This needs to be done manually.
     """
 
     def setUp(self):
@@ -37,7 +37,6 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         self.sa_calc_obj = SeatAngleCalculation()
         sa_sample_ui_input = create_sample_ui_input()
         self.sa_calc_obj.seat_angle_connection(sa_sample_ui_input )
-        self.report_summary = create_sample_report_summary()
 
     def test_print_sample_ui_input_output(self):
         """Print sample UI input and sample UI output dictionaries.
@@ -51,8 +50,8 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         # print create_sample_ui_input()
         # print create_sample_ui_output()
 
-    def test_save_html_report(self):
-        """Save html report with dummy images in the views section.
+    def test_save_drawing_common(self):
+        """Check common functions in drawing.
 
         Args:
             None
@@ -60,10 +59,10 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         Returns:
             None
         """
-        self.save_design_hardcoded(self.report_summary)
+        pass
 
-    def save_design_hardcoded(self, report_summary):
-        """Save html design report at hardcoded location.
+    def save_images_hardcoded(self, file_name, view):
+        """Save svg images at hardcoded location.
 
         Args:
             report_summary (dict): Structural Engineer details for design report
@@ -77,7 +76,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         """
         output_dict = create_sample_ui_output()
         input_dict = create_sample_ui_input()
-        file_name = "design_report.html"
+        file_name = "test_image"
         folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
         base = "3D_ModelFinFB.png"
         base_front = "finFrontFB.svg"

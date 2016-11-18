@@ -44,13 +44,13 @@ class BeamWebBeamWeb(object):
         self.create_fillet_weld_geometry()
         self.create_nut_bolt_array()
         
-        # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
-        self.plateModel = self.plate.createModel()
-        self.weldModelLeft = self.weldLeft.createModel()
-        self.weldModelRight = self.weldRight.createModel()
-        self.nutboltArrayModels = self.nut_bolt_array.createModel()
+        # Call for create_model
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.plateModel = self.plate.create_model()
+        self.weldModelLeft = self.weldLeft.create_model()
+        self.weldModelRight = self.weldRight.create_model()
+        self.nutboltArrayModels = self.nut_bolt_array.create_model()
         
     def create_column_geometry(self):
         column_origin = numpy.array([0, 0, 0])

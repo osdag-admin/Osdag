@@ -37,6 +37,7 @@ class DesignPreferences(QtGui.QDialog):
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
         #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
@@ -144,7 +145,9 @@ class DesignPreferences(QtGui.QDialog):
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
         return boltFu[boltGrade]
-
+    
+    def close_designPref(self):
+        self.close()
 
 
 class MyTutorials(QtGui.QDialog):
@@ -355,7 +358,8 @@ class MainController(QtGui.QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-
+        
+        self.connection = "Finplate"
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()

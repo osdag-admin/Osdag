@@ -6,6 +6,8 @@ comment
 '''
 from OCC import IGESControl
 from OCC import VERSION, BRepTools
+from ui_aboutosdag import Ui_HelpOsdag
+from ui_tutorial import Ui_Tutorial
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 # from OCC.Display.qtDisplay import qtViewer3d
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
@@ -47,6 +49,7 @@ from ui_endplate import Ui_MainWindow
 from utilities import osdagDisplayShape
 from weld import  Weld
 from drawing_2D import EndCommonData
+from Connections.Shear.Endplate.common_logic import CommonDesignLogic
 
 class DesignPreferences(QtGui.QDialog):
 
@@ -60,6 +63,7 @@ class DesignPreferences(QtGui.QDialog):
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
         #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
@@ -168,7 +172,23 @@ class DesignPreferences(QtGui.QDialog):
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
         return boltFu[boltGrade]
 
+    def close_designPref(self):
+        self.close()
 
+class MyTutorials(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+class MyAboutOsdag(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_HelpOsdag()
+        self.ui.setupUi(self)
+        self.mainController = parent
+                        
 class MyPopupDialog(QtGui.QDialog):
     
     def __init__(self, parent=None):
@@ -337,12 +357,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda:self.populateWeldThickCombo())
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.checkPlateHeight(self.ui.txtPlateLen))
         
-#         self.ui.combo_Beam.currentIndexChanged[str].connect(self.fillPlateThickCombo)
-#         self.ui.comboColSec.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-#         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-#         self.ui.comboPlateThick_2.currentIndexChanged[str].connect(self.populateWeldThickCombo)
-        
-        
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
@@ -359,9 +373,8 @@ class MainController(QtGui.QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name 
         self.display, _ = self.init_display(backend_str=backend_name())        
-#         self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
-        # self.ui.btnSvgSave.clicked.connect(lambda:self.saveTopng(self.display))
         
+        self.connection = "Endplate"
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
@@ -370,11 +383,122 @@ class MainController(QtGui.QMainWindow):
     
     
     def osdag_header(self):
-        image_path = "../OsdagLIVE/ResourceFiles/Osdag_header.png"
+        image_path = "ResourceFiles/Osdag_header.png"
         self.store_osdagheader(image_path)
-        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
     
-        
+    def store_osdagheader(self, image_path):
+        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+
+    def fetchBeamPara(self):
+        beam_sec = self.ui.combo_Beam.currentText()
+        dictbeamdata = get_beamdata(beam_sec)
+        return dictbeamdata
+
+    def fetchColumnPara(self):
+
+        column_sec = self.ui.comboColSec.currentText()
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Beam-Beam":
+            dictcoldata = get_beamdata(column_sec)
+        else:
+            dictcoldata = get_columndata(column_sec)
+        return dictcoldata
+    
+    
+    
+    def convertColComboToBeam(self):
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Beam-Beam":
+            self.ui.lbl_beam.setText(" Secondary beam *")
+            self.ui.lbl_column.setText("Primary beam *")
+
+            self.ui.chkBxBeam.setText("SBeam")
+            self.ui.chkBxBeam.setToolTip("Secondary  beam")
+            self.ui.chkBxCol.setText("PBeam")
+            self.ui.chkBxCol.setToolTip("Primary beam")
+
+            self.ui.comboColSec.clear()
+            self.ui.comboColSec.addItems(get_beamcombolist())
+            self.ui.combo_Beam.setCurrentIndex(0)
+            self.ui.comboColSec.setCurrentIndex(0)
+
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+            self.ui.comboWldSize.setItemText(0, "Select weld thickness")
+            self.ui.comboWldSize.setCurrentIndex((0))
+
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtExtMomnt.clear()
+            self.ui.txtMomntCapacity.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+
+        elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+
+            self.ui.lbl_column.setText("Column Section *")
+            self.ui.lbl_beam.setText("Beam section *")
+            self.ui.chkBxBeam.setText("Beam")
+            self.ui.chkBxBeam.setToolTip("Beam only")
+            self.ui.chkBxCol.setText("Column")
+            self.ui.chkBxCol.setToolTip("Column only")
+            self.ui.comboColSec.clear()
+            self.ui.comboColSec.addItems(get_columncombolist())
+            self.ui.combo_Beam.setCurrentIndex(0)
+            self.ui.comboColSec.setCurrentIndex(0)
+
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+            self.ui.comboWldSize.setItemText(0, "Select weld thickness")
+            self.ui.comboWldSize.setCurrentIndex((0))
+
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtExtMomnt.clear()
+            self.ui.txtMomntCapacity.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+            
     def showFontDialogue(self):
         
         font, ok = QtGui.QFontDialog.getFont()
@@ -382,7 +506,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.inputDock.setFont(font)
             self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
-    
+            
     def showColorDialog(self):
       
         col = QtGui.QColorDialog.getColor()
@@ -400,6 +524,7 @@ class MainController(QtGui.QMainWindow):
         
     def callRotation(self):
         self.display.Rotation(15, 0)
+        
     def call_Pannig(self):
         self.display.Pan(50, 0)
     
@@ -428,22 +553,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setEnabled(False)
         self.ui.chkBxEndplate.setEnabled(False)
         self.ui.menubar.setEnabled(False)
-        
-#         self.ui.actionSave_3D_model.setEnabled(False)
-#         self.ui.actionSave_CAD_image.setEnabled(False)
-#         self.ui.actionSave_front_view.setEnabled(False)
-#         self.ui.actionSave_top_view.setEnabled(False)
-#         self.ui.actionSave_side_view.setEnabled(False)
-#         self.ui.actionZoom_in.setEnabled(False)
-#         self.ui.actionZoom_out.setEnabled(False)
-#         self.ui.actionRotate_3D_model.setEnabled(False)
-#         self.ui.actionShow_beam.setEnabled(False)
-#         self.ui.actionShow_column.setEnabled(False)
-#         self.ui.actionShoe_end_plate.setEnabled(False)
-#         self.ui.actionShow_all.setEnabled(False)
-#         self.ui.actionCreate_design_report_2.setEnabled(False)
-#         self.ui.actionSave_log_messages_2.setEnabled(False)
-#         self.ui.actionSave_design.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
         self.ui.btn_CreateDesign.setEnabled(False)
 
@@ -461,22 +570,6 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxEndplate.setEnabled(True)
         self.ui.menubar.setEnabled(True)
-        
-#         self.ui.actionSave_3D_model.setEnabled(True)
-#         self.ui.actionSave_CAD_image.setEnabled(True)
-#         self.ui.actionSave_front_view.setEnabled(True)
-#         self.ui.actionSave_top_view.setEnabled(True)
-#         self.ui.actionSave_side_view.setEnabled(True)
-#         self.ui.actionZoom_in.setEnabled(True)
-#         self.ui.actionZoom_out.setEnabled(True)
-#         self.ui.actionRotate_3D_model.setEnabled(True)
-#         self.ui.actionShow_beam.setEnabled(True)
-#         self.ui.actionShow_column.setEnabled(True)
-#         self.ui.actionShoe_end_plate.setEnabled(True)
-#         self.ui.actionShow_all.setEnabled(True)
-#         self.ui.actionCreate_design_report_2.setEnabled(True)
-#         self.ui.actionSave_log_messages_2.setEnabled(True)
-#         self.ui.actionSave_design.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
         self.ui.btn_CreateDesign.setEnabled(True)
         
@@ -591,122 +684,108 @@ class MainController(QtGui.QMainWindow):
             for element in newlist[:]:
                 self.ui.comboWldSize.addItem(str(element))
     
-    def fetchBeamPara(self):
-        beam_sec = self.ui.combo_Beam.currentText()
-        dictbeamdata = get_beamdata(beam_sec)
-        return dictbeamdata
     
-    def fetchColumnPara(self):
-        column_sec = self.ui.comboColSec.currentText()
-        loc = self.ui.comboConnLoc.currentText()
-        if loc == "Beam-Beam":
-            dictcoldata = get_beamdata(column_sec)
-        else:
-            dictcoldata = get_columndata(column_sec)
-        return dictcoldata
-    
-    
-    def convertColComboToBeam(self):
-        
-        loc = self.ui.comboConnLoc.currentText()
-        if loc == "Beam-Beam":
-            self.ui.label_9.setText(" Secondary beam *")
-            self.ui.label_3.setText("Primary beam *")
-            
-            self.ui.chkBxBeam.setText("SBeam")
-            self.ui.chkBxBeam.setToolTip("Secondary  beam")
-            self.ui.chkBxCol.setText("PBeam")
-            self.ui.chkBxCol.setToolTip("Primary beam")
-            
-            self.ui.comboColSec.clear()
-            # self.ui.comboColSec.setObjectName("comboSecondaryBeam")
-            # self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
-            self.ui.comboColSec.addItems(get_beamcombolist())
-            
-# ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-#             self.ui.comboConnLoc.setCurrentIndex((0))            
-            self.ui.comboDaimeter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
-            
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
-            
-#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
-            
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
-            self.ui.txtWeldStrng_5.clear()
-    
-        elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-            
-            self.ui.label_3.setText("Column Section *")
-            self.ui.label_9.setText("Beam section *")
-            
-            self.ui.chkBxBeam.setText("Beam")
-            self.ui.chkBxBeam.setToolTip("Beam only")
-            self.ui.chkBxCol.setText("Column")
-            self.ui.chkBxCol.setToolTip("Column only")
-            
-            self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_columncombolist())
-            
-            self.ui.combo_Beam.setCurrentIndex(0)
-            self.ui.comboColSec.setCurrentIndex(0)
-# ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-#             self.ui.comboConnLoc.setCurrentIndex((0))            
-            self.ui.comboDaimeter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
-            
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
-            
-#----------------------------------------------Output ----------------------------------------------------------------------------------------------------
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
-            
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
-            self.ui.txtWeldStrng_5.clear()
+#     def convertColComboToBeam(self):
+#         
+#         loc = self.ui.comboConnLoc.currentText()
+#         if loc == "Beam-Beam":
+#             self.ui.label_9.setText(" Secondary beam *")
+#             self.ui.label_3.setText("Primary beam *")
+#             
+#             self.ui.chkBxBeam.setText("SBeam")
+#             self.ui.chkBxBeam.setToolTip("Secondary  beam")
+#             self.ui.chkBxCol.setText("PBeam")
+#             self.ui.chkBxCol.setToolTip("Primary beam")
+#             
+#             self.ui.comboColSec.clear()
+#             # self.ui.comboColSec.setObjectName("comboSecondaryBeam")
+#             # self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
+#             self.ui.comboColSec.addItems(get_beamcombolist())
+#             
+# # ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
+#             self.ui.combo_Beam.setCurrentIndex((0))
+#             self.ui.comboColSec.setCurrentIndex((0))
+# #             self.ui.comboConnLoc.setCurrentIndex((0))            
+#             self.ui.comboDaimeter.setCurrentIndex(0)
+#             self.ui.comboType.setCurrentIndex((0))
+#             self.ui.comboGrade.setCurrentIndex((0))
+#             self.ui.comboPlateThick_2.setCurrentIndex((0))
+#             self.ui.comboWldSize.setCurrentIndex((0))
+#             
+#             self.ui.txtFu.clear()
+#             self.ui.txtFy.clear()
+#             self.ui.txtShear.clear()
+#             self.ui.txtPlateLen.clear()
+#             self.ui.txtPlateWidth.clear()
+#             
+# #----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+#             self.ui.txtShrCapacity.clear()
+#             self.ui.txtbearCapacity.clear()
+#             self.ui.txtBoltCapacity.clear()
+#             self.ui.txtNoBolts.clear()
+#             self.ui.txtboltgrpcapacity.clear()
+#             self.ui.txt_row.clear()
+#             self.ui.txt_col.clear()
+#             self.ui.txtPitch.clear()
+#             self.ui.txtGuage.clear()
+#             self.ui.txtEndDist.clear()
+#             self.ui.txtEdgeDist.clear()
+#             
+#             self.ui.txtplate_ht.clear()
+#             self.ui.txtplate_width.clear()
+#             self.ui.txtResltShr.clear()
+#             self.ui.txtWeldStrng.clear()
+#             self.ui.txtWeldStrng_5.clear()
+#     
+#         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+#             
+#             self.ui.label_3.setText("Column Section *")
+#             self.ui.label_9.setText("Beam section *")
+#             
+#             self.ui.chkBxBeam.setText("Beam")
+#             self.ui.chkBxBeam.setToolTip("Beam only")
+#             self.ui.chkBxCol.setText("Column")
+#             self.ui.chkBxCol.setToolTip("Column only")
+#             
+#             self.ui.comboColSec.clear()
+#             self.ui.comboColSec.addItems(get_columncombolist())
+#             
+#             self.ui.combo_Beam.setCurrentIndex(0)
+#             self.ui.comboColSec.setCurrentIndex(0)
+# # ------------------------------------------------- user Inputs-----------------------------------------------------------------------------------------
+#             self.ui.combo_Beam.setCurrentIndex((0))
+#             self.ui.comboColSec.setCurrentIndex((0))
+# #             self.ui.comboConnLoc.setCurrentIndex((0))            
+#             self.ui.comboDaimeter.setCurrentIndex(0)
+#             self.ui.comboType.setCurrentIndex((0))
+#             self.ui.comboGrade.setCurrentIndex((0))
+#             self.ui.comboPlateThick_2.setCurrentIndex((0))
+#             self.ui.comboWldSize.setCurrentIndex((0))
+#             
+#             self.ui.txtFu.clear()
+#             self.ui.txtFy.clear()
+#             self.ui.txtShear.clear()
+#             self.ui.txtPlateLen.clear()
+#             self.ui.txtPlateWidth.clear()
+#             
+# #----------------------------------------------Output ----------------------------------------------------------------------------------------------------
+#             self.ui.txtShrCapacity.clear()
+#             self.ui.txtbearCapacity.clear()
+#             self.ui.txtBoltCapacity.clear()
+#             self.ui.txtNoBolts.clear()
+#             self.ui.txtboltgrpcapacity.clear()
+#             self.ui.txt_row.clear()
+#             self.ui.txt_col.clear()
+#             self.ui.txtPitch.clear()
+#             self.ui.txtGuage.clear()
+#             self.ui.txtEndDist.clear()
+#             self.ui.txtEdgeDist.clear()
+#             
+#             self.ui.txtplate_ht.clear()
+#             self.ui.txtplate_width.clear()
+#             self.ui.txtResltShr.clear()
+#             self.ui.txtWeldStrng.clear()
+#             self.ui.txtWeldStrng_5.clear()
     
             
     def checkBeam_B(self):
@@ -745,11 +824,15 @@ class MainController(QtGui.QMainWindow):
             else:
                 self.ui.btn_Design.setDisabled(False)
     
-    
-    
-    
     def retrieve_prevstate(self):
+        '''
+        This routine is responsible for maintaining previous session's  data
+        '''
         uiObj = self.get_prevstate()
+        self.setDictToUserInputs(uiObj)
+    
+    
+    def setDictToUserInputs(self,uiObj):
         if(uiObj != None):
             
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
@@ -788,7 +871,7 @@ class MainController(QtGui.QMainWindow):
             
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
 
-#         
+         
     def setimage_connection(self):
         '''
         Setting image to connctivity.
@@ -915,10 +998,29 @@ class MainController(QtGui.QMainWindow):
         
         self.show_dialog()
         
+    def call_end2D_drawing(self, view):  # call2D_Drawing(self,view)
+
+        ''' This routine saves the 2D SVG image as per the connectivity selected
+        SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
+        '''
+        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
+        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+        if view != 'All':
+            fileName = QtGui.QFileDialog.getSaveFileName(self,
+                                                         "Save SVG", str(self.folder) + '/untitled.svg',
+                                                         "SVG files (*.svg)")
+            fname = str(fileName)
+        else:
+            fname = ''
+        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+    
     def save_design(self, popup_summary):
-        
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
-        fileName = str(fileName)
+        fileName = self.folder+"/images_html/Html_Report"
+        self.call_end2D_drawing("All")
         base, base_front, base_top, base_side = self.call2D_Drawing("All")
         self.outdict = self.resultObj  # self.outputdict()
         self.inputdict = self.uiObj  # self.getuser_inputs()
@@ -1706,7 +1808,35 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
+    
+    def call_designPref(self, designPref):
+        self.uiObj = self.getuser_inputs()
         
+        print"printing designpreferences",self.uiObj
+        print designPref
+    def designParameters(self):
+        '''
+        This routine returns the neccessary design parameters.
+        '''
+        self.uiObj = self.getuser_inputs()
+        if self.designPrefDialog.saved is not True:
+            design_pref = self.designPrefDialog.set_default_para()
+        else:
+            design_pref = self.designPrefDialog.save_designPref_para()
+        self.uiObj.update(design_pref)
+        print "printing designprefernces from endPlate", self.uiObj
+
+        dictbeamdata = self.fetchBeamPara()
+        dictcoldata = self.fetchColumnPara()
+        loc = str(self.ui.comboConnLoc.currentText())
+        component = "Model"
+        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
+        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        bolt_T = self.boltHeadThick_Calculation(bolt_dia)
+        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        return [self.uiObj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+
     def design_btnclicked(self):
         '''
         '''
@@ -1735,6 +1865,25 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['Bolt']['status']
         self.call_3DModel(status)
+        
+        self.alist = self.designParameters()
+
+        self.validateInputsOnDesignBtn()
+        self.ui.outputDock.setFixedSize(310, 710)
+        self.enableViewButtons()
+        self. unchecked_allChkBox()
+
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,self.connection)
+
+        self.resultObj = self.commLogicObj.call_finCalculation()
+        d = self.resultObj[self.resultObj.keys()[0]]
+        if len(str(d[d.keys()[0]])) == 0:
+            self.ui.btn_CreateDesign.setEnabled(False)
+        self.display_output(self.resultObj)
+        self.displaylog_totextedit(self.commLogicObj)
+        status = self.resultObj['Bolt']['status']
+
+        self.commLogicObj.call_3DModel(status)
 
         
         

@@ -39,13 +39,13 @@ class ColWebBeamWeb(object):
         self.create_fillet_weld_geometry()
         self.create_nut_bolt_array()
         
-        # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
-        self.plateModel = self.plate.createModel()
-        self.weldModelLeft = self.weldLeft.createModel()
-        self.weldModelRight = self.weldRight.createModel()
-        self.nutboltArrayModels = self.nut_bolt_array.createModel()
+        # Call for create_model
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.plateModel = self.plate.create_model()
+        self.weldModelLeft = self.weldLeft.create_model()
+        self.weldModelRight = self.weldRight.create_model()
+        self.nutboltArrayModels = self.nut_bolt_array.create_model()
         
     def create_column_geometry(self):
         column_origin = numpy.array([0, 0, 0])
@@ -56,7 +56,7 @@ class ColWebBeamWeb(object):
     def create_beam_geometry(self):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
-        origin2 = self.column.secOrigin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * self.column.uDir) 
+        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
         
     def create_butt_weld(self):
@@ -64,7 +64,7 @@ class ColWebBeamWeb(object):
         # plateThickness = 10
         # uDir3 = numpy.array([0, 1.0, 0])
         # wDir3 = numpy.array([1.0, 0, 0.0])
-        # origin3 = (self.column.secOrigin + 
+        # origin3 = (self.column.sec_origin +
         #            self.column.t/2.0 * self.column.uDir + 
         #            self.column.length/2.0 * self.column.wDir +
         #            self.beam.t/2.0 * (-self.beam.uDir)+
@@ -73,7 +73,7 @@ class ColWebBeamWeb(object):
         # self.weld.place(origin3, uDir3, wDir3)
         
     def create_plate_geometry(self):
-        plate_origin = self.beam.secOrigin + (self.plate.W / 2) * (-self.beam.uDir) + (self.plate.T / 2) * (-self.beam.wDir) + (self.beam.D / 2 - self.beam.T - self.beam.R1 - 5 - self.plate.L / 2) * (self.beam.vDir)
+        plate_origin = self.beam.sec_origin + (self.plate.W / 2) * (-self.beam.uDir) + (self.plate.T / 2) * (-self.beam.wDir) + (self.beam.D / 2 - self.beam.T - self.beam.R1 - 5 - self.plate.L / 2) * (self.beam.vDir)
         uDir = numpy.array([1.0, 0.0, 0])
         wDir = numpy.array([0, 1.0, 0.0])
         self.plate.place(plate_origin, uDir, wDir)
@@ -81,7 +81,7 @@ class ColWebBeamWeb(object):
     def create_fillet_weld_geometry(self):
         uDir = numpy.array([1.0, 0.0, 0])
         wDir = numpy.array([0.0, 0.0, 1.0])
-        fillet_weld1_origin = (self.plate.secOrigin + (self.plate.T / 2.0 * self.plate.uDir) + (self.plate.W / 2 + self.beam.t / 2) * self.plate.wDir + self.plate.L / 2 * self.plate.vDir)
+        fillet_weld1_origin = (self.plate.sec_origin + (self.plate.T / 2.0 * self.plate.uDir) + (self.plate.W / 2 + self.beam.t / 2) * self.plate.wDir + self.plate.L / 2 * self.plate.vDir)
         self.weldLeft.place(fillet_weld1_origin, uDir, wDir)
          
         uDir1 = numpy.array([0.0, -1.0, 0])
@@ -90,11 +90,11 @@ class ColWebBeamWeb(object):
         self.weldRight.place(fillet_weld2_origin, uDir1, wDir1)
         
     def create_nut_bolt_array(self):
-        # nut_bolt_array_origin = self.plate.secOrigin
+        # nut_bolt_array_origin = self.plate.sec_origin
         # nut_bolt_array_origin -= self.plate.T/2.0 * self.plate.uDir
         # nut_bolt_array_origin += self.plate.L/2.0 * self.plate.vDir
 
-        nut_bolt_array_origin = self.plate.secOrigin
+        nut_bolt_array_origin = self.plate.sec_origin
         nut_bolt_array_origin = nut_bolt_array_origin + self.plate.T / 2.0 * self.plate.uDir
         nut_bolt_array_origin = nut_bolt_array_origin + (self.plate.L / 2.0) * self.plate.vDir
 

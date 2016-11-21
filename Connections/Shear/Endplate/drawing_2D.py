@@ -471,7 +471,7 @@ class EndCommonData(object):
             else:
                 filename = str(self.folder) + '/images_html/endFront.svg'
                 end_2d_front.call_BWBW_front(filename)
-                cairosvg.svg2png(file_obj=filename, writ_to=str(self.folder) + '/images_html/endFront.png')
+                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/endFront.png')
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 #                 for n in range(1, 5, 1):
                 #                     if (os.path.exists(filename)):

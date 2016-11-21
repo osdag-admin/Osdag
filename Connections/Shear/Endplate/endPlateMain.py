@@ -1754,7 +1754,7 @@ class MainController(QtGui.QMainWindow):
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)
-            self.save_2d_image_names(view)
+            # self.save_2d_image_names(view)
 #             return self.svgWinObj.call_svgwindow(filename, view)
 #             self.svgWidget.setWindowTitle('2D View')
 #             self.svgWidget.show()

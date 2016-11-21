@@ -69,7 +69,7 @@ class Notch(object):
         edge = make_edge(get_gp_pt(self.b), get_gp_pt(self.c2))
         edges.append(edge)
         # join points c2 and c1
-        cirl2 = gp_Circ(gp_Ax2(get_gp_pt(self.o2), get_gp_pt(self.wDir)), self.R1)
+        cirl2 = gp_Circ(gp_Ax2(get_gp_pt(self.o2), get_gp_dir(self.wDir)), self.R1)
         edge = make_edge(cirl2, get_gp_pt(self.c1), get_gp_pt(self.c2))
         edges.append(edge)
         # Join points c1 and d

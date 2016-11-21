@@ -1198,7 +1198,7 @@ class MainController(QtGui.QMainWindow):
             osdag_display_shape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdag_display_shape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nut_bolt_array.get_models()
+            nutboltlist = self.connectivity.nut_bolt_array.get_model()
 
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -1209,7 +1209,8 @@ class MainController(QtGui.QMainWindow):
             osdag_display_shape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivity.weldModelRight, color='red', update=True)
             osdag_display_shape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nut_bolt_array.get_models()
+            nutboltlist = self.connectivity.nut_bolt_array.get_model()
+
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
             # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)

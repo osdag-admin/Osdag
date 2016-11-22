@@ -10,10 +10,10 @@ import pdfkit
 # import os.path
 # import pickle
 from numpy.core.defchararray import rstrip
-from PyQt4.Qt import QString 
+from PyQt4.Qt import QString
 
 
-def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data, reportsummary, filename, folder, base, base_front, base_top, base_side):
+def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data, reportsummary, filename, folder):
     print output_obj
     filename = filename
     myfile = open(filename, 'w')
@@ -21,8 +21,8 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     myfile.write(t('html'))
     myfile.write(t('head'))
     myfile.write(t('link type="text/css" rel="stylesheet"'))
-        
-# ###########################   mystyle.css is written here  ##############################################################################
+
+    # ###########################   mystyle.css is written here  ##############################################################################
     myfile.write(t('style'))
     myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
     myfile.write('th,td {padding:3px}')
@@ -39,15 +39,15 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # Provides only font-size 20 and width of the images box
     myfile.write('td.header2{font-size:20; width:50%}')
     myfile.write(t('/style'))
-##############################################################################################################################################
+    ##############################################################################################################################################
 
     myfile.write(t('/head'))
     myfile.write(t('body'))
-    
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# DATA PARAMS
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Project summary data
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # DATA PARAMS
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Project summary data
     companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
     companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
     groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -58,113 +58,112 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     method = str(reportsummary['Method'])
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# FinPlate Main Data
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # FinPlate Main Data
     beam_sec = str(uiobj['Member']['BeamSection'])
     column_sec = str(uiobj['Member']['ColumSection'])
     connectivity = str(uiobj['Member']['Connectivity'])
     beam_fu = str(uiobj['Member']['fu (MPa)'])
     beam_fy = str(uiobj['Member']['fy (MPa)'])
-              
+
     shear_load = str(uiobj['Load']['ShearForce (kN)'])
-                  
+
     bolt_dia = str(uiobj['Bolt']['Diameter (mm)'])
     bolt_type = str(uiobj["Bolt"]["Type"])
     bolt_grade = str(uiobj['Bolt']['Grade'])
-    
+
     bolt_fu = int(float(bolt_grade)) * 100
     bolt_fy = (float(bolt_grade) - int(float(bolt_grade))) * bolt_fu
-    
+
     bolt_fu = str(bolt_fu)
     bolt_fy = str(bolt_fy)
-   
+
     cleat_length = str(uiobj['cleat']['Height (mm)'])
     cleat_fu = str(uiobj['Member']['fu (MPa)'])
     cleat_fy = str(uiobj['Member']['fy (MPa)'])
     cleat_sec = str(uiobj['cleat']['section'])
-    
-#     dict_beam_data  = get_beamdata(beam_sec)
+
+    #     dict_beam_data  = get_beamdata(beam_sec)
     beam_tw = str(float(dict_beam_data[QString("tw")]))
     beam_f_t = str(float(dict_beam_data[QString("T")]))
     beam_d = str(float(dict_beam_data[QString("D")]))
     beam_R1 = str(float(dict_beam_data[QString("R1")]))
     beam_B = str(float(dict_beam_data[QString("B")]))
     beam_D = str(float(dict_beam_data[QString("D")]))
-       
-#      dictcolumndata = get_columndata(column_sec)
+
+    #      dictcolumndata = get_columndata(column_sec)
     column_w_t = str(float(dict_col_data[QString("tw")]))
     column_f_t = str(float(dict_col_data[QString("T")]))
     column_R1 = str(float(dict_col_data[QString("R1")]))
     column_D = str(float(dict_col_data[QString("D")]))
     column_B = str(float(dict_col_data[QString("B")]))
 
-   
-#     dict_cleat_data = get_angledata(cleat_sec)
+    #     dict_cleat_data = get_angledata(cleat_sec)
     cleat_legsize = str(int(dict_cleat_data[QString("A")]))
     cleat_legsize_1 = str(int(dict_cleat_data[QString("B")]))
     cleat_thk = str(int(dict_cleat_data[QString("t")]))
 
-# 'Size (mm)'
-#     weld_Thick = str(uiobj['Weld']['Size (mm)'])
-#     
-#     beamdepth = str(int(round(outObj['Plate']['beamdepth'],1)))
-#     beamflangethk = str(int(round(outObj['Plate']['beamflangethk'],1)))
-#     beamrootradius = str(int(round(outObj['Plate']['beamrootradius'],1)))
-#     platethk = str(int(round(outObj['Plate']['platethk'],1)))
-#     blockshear = str(int(round(outObj['Plate']['blockshear'],1)))
-#     colflangethk = str(int(round(outObj['Plate']["colflangethk"],1)))
-#     colrootradius = str(int(round(outObj['Plate']['colrootradius'])))
-#     
-#     plateWidth = str(int(round(outObj['Plate']['width'],1)))
-#     plateLength = str(int(round(outObj['Plate']['height'],1)))
-#     weldSize = str(int(round(outObj['Weld']['thickness'],1)))   
-#     plateDimension = plateLength +'X'+ plateWidth + 'X'+ plateThick
-    
-# #########################Output###########################
-#     
-#     noOfBolts = str(outObj['Bolt']['numofbolts'])
-#     noOfRows = str(outObj['Bolt']['numofrow'])
-#     noOfCol = str(outObj['Bolt']['numofcol'])
-#     edge = str(int(round(outObj['Bolt']['edge'],1)))
-#     gauge = str(int(round(outObj['Bolt']['gauge'],1)))
-#     pitch = str(int(round(outObj['Bolt']['pitch'],1)))
-#     end = str(int(round(outObj['Bolt']['enddist'],1)))
-#     weld_strength = str(round(float(outObj['Weld']['weldstrength']/1000),3))
-#     moment_demand = str(outObj['Plate']['externalmoment'])
-#     
-#     beam_tw = str(float(dict_beam_data["tw"]))
-# 
-#     bolt_fu = str(outObj['Bolt']['bolt_fu'])
-#     bolt_dia = str(outObj['Bolt']['bolt_dia'] )
-#     kb = str(outObj['Bolt']['k_b'])
-#     beam_w_t = str(outObj['Bolt']['beam_w_t'] )
-#     web_plate_t = str(outObj['Bolt']['web_plate_t'])
-#     beam_fu = str(outObj['Bolt']['beam_fu'])
-#     dia_hole = str(outObj['Bolt']['dia_hole'])
-#     web_plate_fy = str(outObj['Plate']['web_plate_fy'])
-#     weld_fu = str(outObj['Weld']['weld_fu'] )
-#     weld_l = str(outObj['Weld']['effectiveWeldlength'])
-#     shearCapacity = str(round(outObj['Bolt']['shearcapacity'],3))
-#     bearingcapacity = str(round(outObj['Bolt']['bearingcapacity'],4))
-#     momentDemand = str(outObj['Plate']['externalmoment'])
-#     
-#     gap = '20'
-    
-# #################output beam part ###########
-#     kb = "0.5"
+    # 'Size (mm)'
+    #     weld_Thick = str(uiobj['Weld']['Size (mm)'])
+    #
+    #     beamdepth = str(int(round(outObj['Plate']['beamdepth'],1)))
+    #     beamflangethk = str(int(round(outObj['Plate']['beamflangethk'],1)))
+    #     beamrootradius = str(int(round(outObj['Plate']['beamrootradius'],1)))
+    #     platethk = str(int(round(outObj['Plate']['platethk'],1)))
+    #     blockshear = str(int(round(outObj['Plate']['blockshear'],1)))
+    #     colflangethk = str(int(round(outObj['Plate']["colflangethk"],1)))
+    #     colrootradius = str(int(round(outObj['Plate']['colrootradius'])))
+    #
+    #     plateWidth = str(int(round(outObj['Plate']['width'],1)))
+    #     plateLength = str(int(round(outObj['Plate']['height'],1)))
+    #     weldSize = str(int(round(outObj['Weld']['thickness'],1)))
+    #     plateDimension = plateLength +'X'+ plateWidth + 'X'+ plateThick
+
+    # #########################Output###########################
+    #
+    #     noOfBolts = str(outObj['Bolt']['numofbolts'])
+    #     noOfRows = str(outObj['Bolt']['numofrow'])
+    #     noOfCol = str(outObj['Bolt']['numofcol'])
+    #     edge = str(int(round(outObj['Bolt']['edge'],1)))
+    #     gauge = str(int(round(outObj['Bolt']['gauge'],1)))
+    #     pitch = str(int(round(outObj['Bolt']['pitch'],1)))
+    #     end = str(int(round(outObj['Bolt']['enddist'],1)))
+    #     weld_strength = str(round(float(outObj['Weld']['weldstrength']/1000),3))
+    #     moment_demand = str(outObj['Plate']['externalmoment'])
+    #
+    #     beam_tw = str(float(dict_beam_data["tw"]))
+    #
+    #     bolt_fu = str(outObj['Bolt']['bolt_fu'])
+    #     bolt_dia = str(outObj['Bolt']['bolt_dia'] )
+    #     kb = str(outObj['Bolt']['k_b'])
+    #     beam_w_t = str(outObj['Bolt']['beam_w_t'] )
+    #     web_plate_t = str(outObj['Bolt']['web_plate_t'])
+    #     beam_fu = str(outObj['Bolt']['beam_fu'])
+    #     dia_hole = str(outObj['Bolt']['dia_hole'])
+    #     web_plate_fy = str(outObj['Plate']['web_plate_fy'])
+    #     weld_fu = str(outObj['Weld']['weld_fu'] )
+    #     weld_l = str(outObj['Weld']['effectiveWeldlength'])
+    #     shearCapacity = str(round(outObj['Bolt']['shearcapacity'],3))
+    #     bearingcapacity = str(round(outObj['Bolt']['bearingcapacity'],4))
+    #     momentDemand = str(outObj['Plate']['externalmoment'])
+    #
+    #     gap = '20'
+
+    # #################output beam part ###########
+    #     kb = "0.5"
     kb = str(output_obj['Bolt']['kb'])
     shear_capacity_b = str(output_obj['Bolt']['shearcapacity'])
     bearingcapacity_b = str(output_obj['Bolt']['bearingcapacity'])
     boltbearingcapacity_b = str(output_obj['Bolt']['boltbearingcapacity'])
     bearingcapacitybeam_b = str(output_obj['Bolt']['bearingcapacitybeam'])
     bearingcapacitycleat_b = str(output_obj['Bolt']['bearingcapacitycleat'])
-    
+
     moment_demand_b = str(output_obj['Bolt']['externalmoment'])
     moment_capacity_b = str(output_obj['Bolt']['momentcapacity'])
-    
+
     blockshear_b = str(output_obj['Bolt']['blockshear'])
     critboltshear_b = str(output_obj['Bolt']['critshear'])
-     
+
     bolt_capacity_b = str(output_obj['Bolt']['boltcapacity'])
     no_of_bolts_b = str(output_obj['Bolt']['numofbolts'])
     no_of_rows_b = str(output_obj['Bolt']['numofrow'])
@@ -176,7 +175,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     gauge_b = str(output_obj['Bolt']['gauge'])
     bolt_grp_capacity_b = str(output_obj['Bolt']['boltgrpcapacity'])
     thinner_b = str(output_obj['Bolt']['thinner'])
-# ################# output column part ###########
+    # ################# output column part ###########
     shear_capacity_c = str(output_obj['cleat']['shearcapacity'])
     bearingcapacity_c = str(output_obj['cleat']['bearingcapacity'])
     boltbearingcapacity_c = str(output_obj['cleat']['boltbearingcapacity'])
@@ -185,7 +184,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     blockshear_c = str(output_obj['cleat']['blockshear'])
     critboltshear_c = str(output_obj['cleat']['critshear'])
-    
+
     moment_demand_c = str(output_obj['cleat']['externalmoment'])
     moment_capacity_c = str(output_obj['cleat']['momentcapacity'])
 
@@ -201,9 +200,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     bolt_grp_capacity_c = str(output_obj['cleat']['boltgrpcapacity'])
     thinner_c = str(output_obj['cleat']['thinner'])
     gap = '20'
-    
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
@@ -224,7 +223,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, projecttitle]
     rstr += t('td float="right" class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -235,7 +234,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, subtitle]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -258,92 +257,92 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-    
-    rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
-#     rstr += t('hr')
-#     rstr += t('/hr')    
-    rstr += t('/hr')    
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Design Conclusion
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Conclusion
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     row = [0, "Design Conclusion", "IS800:2007/Limit state design"]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-      
+
     row = [1, "Cleat Angle", "Pass"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, "Cleat Angle", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, "Connection Properties", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, "Connection ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     row = [1, "Connection Title", " Double Angle Web Cleat"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [1, "Connection Type", "Shear Connection"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, "Connection Category ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Connectivity", "Column Web Beam Web"]
     row = [1, "Connectivity", connectivity]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [1, "Beam Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
- 
-#     row = [1, "Beam Connection", "Bolted"]
-#     rstr += t('tr')
-#     rstr += t('td class="header2"') + space(row[0]) + row[1] + t('/td')
-#     rstr += t('td class="header2 "') + row[2] + t('/td')
-#     rstr += t('/tr')
-     
-# 
+
+    #     row = [1, "Beam Connection", "Bolted"]
+    #     rstr += t('tr')
+    #     rstr += t('td class="header2"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td class="header2 "') + row[2] + t('/td')
+    #     rstr += t('/tr')
+
+    #
     row = [1, "Column Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, "Loading (Factored Load) ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Shear Force (kN)", "140"]
     row = [1, "Shear Force (kN)", shear_load]
     rstr += t('tr')
@@ -355,217 +354,217 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Column Section", "ISSC 200"]
     row = [1, "Column Section", column_sec]
-     
+
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [2, "Material", "Fe " + beam_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Beam Section", "ISMB 400"]
     row = [1, "Beam Section", beam_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [2, "Material", "Fe " + beam_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [2, "Hole", "STD"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Cleat Section ", "ISA 300X10X100 "]
     row = [1, "Cleat Section", cleat_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Thickness (mm)", "10"]
     row = [2, "Thickness (mm)", cleat_thk]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
-#     row = [2, "Cleat Leg Size A (mm)", 50]
+
+    #     row = [2, "Cleat Leg Size A (mm)", 50]
     row = [2, "Cleat Leg Size B (mm)", cleat_legsize]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
-#     row = [2, "Cleat Leg Size B (mm)", 50]
+
+    #     row = [2, "Cleat Leg Size B (mm)", 50]
     row = [2, "Cleat Leg Size A (mm)", cleat_legsize_1]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [2, "Hole", "STD"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [1, "Bolts on Beam", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Type", "HSFG"]
     row = [2, "Type", bolt_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Grade", "8.8"]
     row = [2, "Grade", bolt_grade]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Diameter (mm)", "20"]
     row = [2, "Diameter (mm)", bolt_dia]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Bolt Numbers", "3"]
     row = [2, "Bolt Numbers", no_of_bolts_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Columns (Vertical Lines)", "1 "]
     row = [2, "Columns (Vertical Lines)", no_of_col_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Bolts Per Column", "3"]
     row = [2, "Bolts Per Column", no_of_rows_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Gauge (mm)", "0"]
     row = [2, "Gauge (mm)", gauge_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Pitch (mm)", "100"]
     row = [2, "Pitch (mm)", pitch_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "End Distance (mm)", "50"]
     row = [2, "End Distance (mm)", end_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Edge Distance (mm)", "50"]
     row = [2, "Edge Distance (mm)", edge_b]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     row = [1, "Bolts on Column", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     # row = [2, "Type", "HSFG"]
     row = [2, "Type", bolt_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Grade", "8.8"]
     row = [2, "Grade", bolt_grade]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     # row = [2, "Diameter (mm)", "20"]
     row = [2, "Diameter (mm)", bolt_dia]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Bolt Numbers", "3"]
     row = [2, "Bolt Numbers", no_of_bolts_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Columns (Vertical Lines)", "1 "]
     row = [2, "Columns (Vertical Lines)", no_of_col_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Bolts Per Column", "3"]
     row = [2, "Bolts Per Column", no_of_rows_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Gauge (mm)", "0"]
     row = [2, "Gauge (mm)", gauge_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Pitch (mm)", "100"]
     row = [2, "Pitch (mm)", pitch_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "End Distance (mm)", "50"]
     row = [2, "End Distance (mm)", end_c]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [2, "Edge Distance (mm)", "50"]
     row = [2, "Edge Distance (mm)", edge_c]
     rstr += t('tr')
@@ -576,21 +575,21 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     # row = [1, "Column-Beam Clearance (mm)", "20"]
     row = [1, "Column-Beam Clearance (mm)", gap]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
@@ -611,7 +610,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, projecttitle]
     rstr += t('td float="right" class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -622,7 +621,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, subtitle]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -645,28 +644,28 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-    
-    rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
-#     rstr += t('hr')
-#     rstr += t('/hr')    
-    rstr += t('/hr')    
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Design Check
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Check
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     if connectivity == "Beam-Beam":
         check_name_b = "Design Check: Secondary Beam Connectivity"
     else:
         check_name_b = "Design Check: Beam Connectivity"
-        
+
     row = [0, check_name_b, " "]
     rstr += t('tr')
     rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     row = [0, "Check", "Required", "Provided", "Remark"]
     rstr += t('td class="header1"') + space(row[0]) + row[1] + t('/td')
@@ -674,7 +673,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
@@ -685,7 +684,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_b + "*" + bolt_fu +
@@ -695,7 +694,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Bearing capacity of beam web (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bearing capacity of beam web (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu +
@@ -705,7 +704,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
@@ -715,7 +714,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     bearcapacity = str(min(float(boltbearingcapacity_b), float(bearingcapacitybeam_b), float(bearingcapacitycleat_b)))
@@ -726,7 +725,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-         
+
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity_b + ", " + bearcapacity + ") = " + bolt_capacity_b, ""]
@@ -735,7 +734,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Critical Bolt Shear (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     row = [0, "Critical bolt shear (kN)", "&#8804; " + bolt_capacity_b, critboltshear_b, "<p align=left style=color:green><b>Pass</b></p>"]
@@ -744,18 +743,18 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-#     bolts = str(round(float(shear_load)/float(bolt_capacity_b),1))
-#     row =[0,"No. of bolts", shear_load + "/" + bolt_capacity_b + " = " + bolts, no_of_bolts_b, " <p align=left style=color:green><b>Pass</b></p>"]
+    #     bolts = str(round(float(shear_load)/float(bolt_capacity_b),1))
+    #     row =[0,"No. of bolts", shear_load + "/" + bolt_capacity_b + " = " + bolts, no_of_bolts_b, " <p align=left style=color:green><b>Pass</b></p>"]
     row = [0, "No. of bolts", "", no_of_bolts_b, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
     row = [0, "No.of column(s)", " &#8804; 2", no_of_col_b, ""]
@@ -764,7 +763,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"No. of bolts per column"," ","3"]
     row = [0, "No. of bolts per column", " ", no_of_rows_b, ""]
@@ -773,7 +772,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
     min_pitch = str(int(2.5 * float(bolt_dia)))
@@ -785,10 +784,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
-    
+
     min_gauge = str(int(2.5 * float(bolt_dia)))
     max_gauge = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
     row = [0, "Bolt gauge (mm)", " &#8805 ;2.5*" + bolt_dia + " = " + min_gauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + max_gauge +
@@ -798,7 +797,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
     min_end = str(1.7 * float(dia_hole))
@@ -810,7 +809,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
     min_edge = str(1.7 * float(dia_hole))
@@ -822,7 +821,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load, "<i>V</i><sub>db</sub> = " + blockshear_b + "<br> [cl. 6.4.1]",
            "<p align=left style=color:green><b>Pass</b></p>"]
@@ -831,7 +830,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     if connectivity == "Beam-Beam":
         max_len = str(float(beam_D) - float(column_R1) - float(column_f_t) - float(beam_f_t) - float(beam_R1) - 5)
@@ -847,11 +846,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"cleat moment capacity (kNm)","(2*90.5*100<sup>2</sup>)/100 = 18.1","<i>M</i><sub>d</sub> =1.2*250*<i>Z</i> = 40.9 <br>[cl. 8.2.1.2]","<p align=right style=color:green><b>Pass</b></p>"]
-#     z = math.pow(float(cleat_length),2)* (float(cleat_thk)/(6 *1.1* 1000000))
-#     momentCapacity = str(round(1.2 * float(web_plate_fy)* z,2))
+    #     z = math.pow(float(cleat_length),2)* (float(cleat_thk)/(6 *1.1* 1000000))
+    #     momentCapacity = str(round(1.2 * float(web_plate_fy)* z,2))
     row = [0, "Cleat moment capacity (kNm)", "(2*" + shear_capacity_b + "*" + pitch_b + "<sup>2</sup>)/(" + pitch_b + "*1000) = " + moment_demand_b,
            "<i>M</i><sub>d</sub> = (1.2*" + cleat_fy + "*<i>Z</i>)/(1000*1.1) = " + moment_capacity_b + "<br>[cl. 8.2.1.2]",
            "<p align=left style=color:green><b>Pass</b></p>"]
@@ -864,10 +863,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
-    
-    
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
@@ -888,7 +886,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, projecttitle]
     rstr += t('td float="right" class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -899,7 +897,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, subtitle]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -922,16 +920,16 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-    
-    rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
-#     rstr += t('hr')
-#     rstr += t('/hr')    
-    rstr += t('/hr')    
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Design Check
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Check
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     if connectivity == "Beam-Beam":
@@ -943,7 +941,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('tr')
     rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     row = [0, "Check", "Required", "Provided", "Remark"]
     rstr += t('td class="header1"') + space(row[0]) + row[1] + t('/td')
@@ -951,7 +949,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
@@ -962,7 +960,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_c + "*" +
@@ -972,7 +970,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     thk = 0.0
     str_con = " "
     if connectivity == "Column falange-Beam web":
@@ -984,7 +982,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     else:
         thk = str(column_w_t)
         str_con = "Bearing capacity of beam web (kN)"
-           
+
     rstr += t('tr')
     # row =[0,"Bearing capacity of beam web (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, str_con, "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thk + "*" + beam_fu + ")/(1.25*1000)  = " + bearingcapacitycolumn_c +
@@ -995,7 +993,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
     rstr += t('tr')
-    
+
     # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
            ")/(1.25*1000)  = " + bearingcapacitycleat_c + "<br> [cl. 10.3.4]", ""]
@@ -1004,7 +1002,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
     row = [0, "Bearing capacity (kN)", "", "Min (" + boltbearingcapacity_c + ", " + bearingcapacitycolumn_c + ", " + bearingcapacitycleat_c + ") = " +
@@ -1014,7 +1012,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-         
+
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity_c + ", " + bearingcapacitycleat_c + ") = " + bolt_capacity_c, ""]
@@ -1023,7 +1021,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     # row =[0,"Critical Bolt Shear (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     row = [0, "Critical bolt shear (kN)", "&#8804; " + bolt_capacity_c, critboltshear_c, "<p align=left style=color:green><b>Pass</b></p>"]
@@ -1032,27 +1030,27 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-    
-#     rstr += t('tr')
-#     #row =[0,"Critical Bolt Shear (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-#     row =[0,"Critical Bolt Shear (kN)","&#8804;" + bolt_capacity_c , critboltshear_c , "<p align=right style=color:green><b>Pass</b></p>"]
-#     rstr += t('td class="header2_col1"') + space(row[0]) + row[1] + t('/td')
-#     rstr += t('td class="header2"') + space(row[0]) + row[2] + t('/td')
-#     rstr += t('td class="header2"') + space(row[0]) + row[3] + t('/td')
-#     rstr += t('td class="header2"') + space(row[0]) + row[4] + t('/td')
-#     rstr += t('/tr')
-     
+
+    #     rstr += t('tr')
+    #     #row =[0,"Critical Bolt Shear (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
+    #     row =[0,"Critical Bolt Shear (kN)","&#8804;" + bolt_capacity_c , critboltshear_c , "<p align=right style=color:green><b>Pass</b></p>"]
+    #     rstr += t('td class="header2_col1"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td class="header2"') + space(row[0]) + row[2] + t('/td')
+    #     rstr += t('td class="header2"') + space(row[0]) + row[3] + t('/td')
+    #     rstr += t('td class="header2"') + space(row[0]) + row[4] + t('/td')
+    #     rstr += t('/tr')
+
     rstr += t('tr')
     # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-#     bolts = str(round(float(shear_load)/float(bolt_capacity_c),1))
-#     row =[0,"No. of bolts", shear_load + "/" + bolt_capacity_c + " = " + bolts, no_of_bolts_c, " <p align=left style=color:green><b>Pass</b></p>"]
+    #     bolts = str(round(float(shear_load)/float(bolt_capacity_c),1))
+    #     row =[0,"No. of bolts", shear_load + "/" + bolt_capacity_c + " = " + bolts, no_of_bolts_c, " <p align=left style=color:green><b>Pass</b></p>"]
     row = [0, "No. of bolts", "", no_of_bolts_c, ""]
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
     row = [0, "No.of column(s) per angle", " &#8804; 2", no_of_col_c, ""]
@@ -1061,7 +1059,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"No. of bolts per column"," ","3"]
     row = [0, "No. of bolts per column per angle", " ", no_of_rows_c, ""]
@@ -1070,7 +1068,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
     min_pitch = str(int(2.5 * float(bolt_dia)))
@@ -1082,7 +1080,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
     min_gauge = str(int(2.5 * float(bolt_dia)))
@@ -1094,7 +1092,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
     min_end = str(1.7 * float(dia_hole))
@@ -1106,7 +1104,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
     min_edge = str(1.7 * float(dia_hole))
@@ -1118,7 +1116,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     row = [0, "Block shear capacity (kN)", " &#8805;" + shear_load, "<i>V</i><sub>db</sub> = " + blockshear_c + "<br> [cl. 6.4.1]",
            "<p align=left style=color:green><b>Pass</b></p>"]
@@ -1127,7 +1125,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-     
+
     rstr += t('tr')
     if connectivity == "Beam-Beam":
         max_len = str(float(beam_D) - float(column_R1) - float(column_f_t) - float(beam_f_t) - float(beam_R1) - 5)
@@ -1146,8 +1144,8 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"cleat moment capacity (kNm)","(2*90.5*100<sup>2</sup>)/100 = 18.1","<i>M</i><sub>d</sub> =1.2*250*<i>Z</i> = 40.9 <br>[cl. 8.2.1.2]","<p align=right style=color:green><b>Pass</b></p>"]
-#     z = math.pow(float(cleat_length),2)* (float(cleat_thk)/(6 *1.1* 1000000))
-#     momentCapacity = str(round(1.2 * float(beam_fy)* z/1.1,2))
+    #     z = math.pow(float(cleat_length),2)* (float(cleat_thk)/(6 *1.1* 1000000))
+    #     momentCapacity = str(round(1.2 * float(beam_fy)* z/1.1,2))
     row = [0, "Cleat moment capacity (kNm)", "(2*" + shear_capacity_c + "*" + pitch_c + "<sup>2</sup>)/(" + pitch_c + "*1000) = " + moment_demand_c,
            "<i>M</i><sub>d</sub> = (1.2*" + cleat_fy + "*<i>Z</i>)/(1000*1.1) = " + moment_capacity_c + "<br>[cl. 8.2.1.2]",
            "<p align=left style=color:green><b>Pass</b></p>"]
@@ -1156,14 +1154,14 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-        
+
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
@@ -1184,7 +1182,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, projecttitle]
     rstr += t('td float="right" class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -1195,7 +1193,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, subtitle]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -1218,18 +1216,18 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-    
+
     rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
-#     rstr += t('hr')
-#     rstr += t('/hr')    
-    rstr += t('/hr')    
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Diagram
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Diagram
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
@@ -1238,38 +1236,38 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td colspan="2" class="detail"') + space(row[0]) + row[1] + t('/td')
     # rstr += t('td class=" viewtbl "') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
-    png = folder + "/images_html/" + base
+    png = folder + "/images_html/3D_Model.png"
     datapng = '<object type="image/PNG" data= %s width ="400"></object">' % png
-    
-    side = folder + "/images_html/" + base_side
-    dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
-    
-    top = folder + "/images_html/" + base_top
-    datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
-    
-    front = folder + "/images_html/" + base_front
-    datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
+
+    side = folder + "/images_html/cleatSide.png"
+    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+
+    top = folder + "/images_html/cleatTop.png"
+    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+
+    front = folder + "/images_html/cleatFront.png"
+    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
     row = [0, datapng, datatop]
     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
     rstr += t('/tr')
-     
+
     row = [0, dataside, datafront]
     rstr += t('tr')
     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
@@ -1290,7 +1288,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, projecttitle]
     rstr += t('td float="right" class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Group/Team Name']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -1301,7 +1299,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     row = [0, subtitle]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('tr')
     row = [0, 'Designer']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
@@ -1324,37 +1322,36 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
-    
+
     rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
-#     rstr += t('hr')
-#     rstr += t('/hr')    
-    rstr += t('/hr')    
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
 
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-# *************************************************************************************************************************
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Additional comments
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Additional comments
 
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('''col width=30%''')
     rstr += t('''col width=70%''')
-    
+
     rstr += t('tr')
     row = [0, "Additional Comments", addtionalcomments]
     rstr += t('td class= "detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class= "detail2" align="justified"') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
     rstr += t('/table')
 
     myfile.write(rstr)
     myfile.write(t('/body'))
     myfile.write(t('/html'))
     myfile.close()
-    
+
 
 def space(n):
     rstr = "&nbsp;" * 4 * n

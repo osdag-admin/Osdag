@@ -2214,7 +2214,7 @@ class Cleat2DCreatorTop(object):
         offset = self.dataObj.D_col * 3 / 4 + 50
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
         text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
-        self.dataObj.v(dwg, weld_pt, theta, "NE", offset, text_up, text_down)
+        self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NE", offset, text_up, text_down)
         
         # Gap Informatoin
         ptG1 = self.D + 100 * np.array([0, -1])

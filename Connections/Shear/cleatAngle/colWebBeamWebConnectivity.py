@@ -36,12 +36,12 @@ class ColWebBeamWeb(object):
         self.create_angle_geometry()
         self.create_nut_bolt_array()
         
-        # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
-        self.angleModel = self.angle.createModel()
-        self.angleLeftModel = self.angleLeft.createModel()
-        self.nutboltArrayModels = self.nut_bolt_array.createModel()
+        # Call for create_model
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.angleModel = self.angle.create_model()
+        self.angleLeftModel = self.angleLeft.create_model()
+        self.nutboltArrayModels = self.nut_bolt_array.create_model()
         
     def create_column_geometry(self):
         column_origin = numpy.array([0, 0, 0])
@@ -52,25 +52,25 @@ class ColWebBeamWeb(object):
     def create_beam_geometry(self):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
-        origin2 = self.column.secOrigin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.clearDist *
+        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.clearDist *
                                                                                                                                   self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
 
     def create_angle_geometry(self):
-        angle0_origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5) * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
+        angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5) * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
                          self.clearDist * (-self.beam.wDir))
         uDir0 = numpy.array([1.0, 0, 0])
         wDir0 = numpy.array([0, 1, 0])
         self.angle.place(angle0_origin, uDir0, wDir0)
 
-        angle1_origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5 - self.angle.L) * self.beam.vDir -
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5 - self.angle.L) * self.beam.vDir -
                          (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
         uDir1 = numpy.array([1.0, 0.0, 0])
         wDir1 = numpy.array([0, -1.0, 0])
         self.angleLeft.place(angle1_origin, uDir1, wDir1)
         
     def create_nut_bolt_array(self):
-        nut_bolt_array_origin = self.angleLeft.secOrigin
+        nut_bolt_array_origin = self.angleLeft.sec_origin
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.wDir
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.uDir
 
@@ -78,7 +78,7 @@ class ColWebBeamWeb(object):
         pitch_dir = self.angleLeft.vDir
         bolt_dir = -self.angleLeft.wDir
         #####################################################################################
-        c_nutbolt_array_origin = self.angle.secOrigin
+        c_nutbolt_array_origin = self.angle.sec_origin
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.uDir
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.wDir
 
@@ -86,7 +86,7 @@ class ColWebBeamWeb(object):
         c_pitch_dir = self.angle.vDir
         c_bolt_dir = -self.angle.uDir
 
-        c_nutbolt_array_origin1 = self.angleLeft.secOrigin
+        c_nutbolt_array_origin1 = self.angleLeft.sec_origin
         c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.uDir
         c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.wDir
         c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + (self.angle.L * self.angle.vDir)

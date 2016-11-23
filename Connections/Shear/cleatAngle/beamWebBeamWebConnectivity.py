@@ -41,13 +41,13 @@ class BeamWebBeamWeb(object):
         self.create_nut_bolt_array()
 #         self.createNotchGeometry()
         
-        # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
-        self.angleModel = self.angle.createModel()
-        self.angleLeftModel = self.angleLeft.createModel()
-        self.nutboltArrayModels = self.nut_bolt_array.createModel()
-#         self.notchModel = self.notch.createModel()
+        # Call for create_model
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.angleModel = self.angle.create_model()
+        self.angleLeftModel = self.angleLeft.create_model()
+        self.nutboltArrayModels = self.nut_bolt_array.create_model()
+#         self.notchModel = self.notch.create_model()
 #         return self.beamModel
     
 #     def create_column_geometry(self):
@@ -60,7 +60,7 @@ class BeamWebBeamWeb(object):
 #         uDir = numpy.array([0, 1.0, 0])
 #         wDir = numpy.array([1.0, 0, 0.0])
 #         shiftOrigin = (self.column.D/2 - self.beam.D/2)
-#         origin2 = self.column.secOrigin + (-shiftOrigin) * self.column.vDir + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir) 
+#         origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir)
 #         self.beam.place(origin2, uDir, wDir)
         
     def create_column_geometry(self):
@@ -71,30 +71,30 @@ class BeamWebBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
          
     def create_beam_geometry(self):
-        beam_origin = ((self.column.secOrigin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + ((self.column.t / 2 + 20) * self.column.uDir) + (self.column.length / 2 * (self.column.wDir))
+        beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + ((self.column.t / 2 + 20) * self.column.uDir) + (self.column.length / 2 * (self.column.wDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam.place(beam_origin, uDir, wDir)
         
 #     def createNotchGeometry(self):
-#         notchOrigin = (self.beam.secOrigin)*(self.beam.wDir)
+#         notchOrigin = (self.beam.sec_origin)*(self.beam.wDir)
 #         uDir = numpy.array([-1.0, 0.0, 0])
 #         wDir = numpy.array([0.0, 1.0, 0.0])
 #         self.notch.place(notchOrigin,uDir,wDir)
     
     def create_angle_geometry(self):
-        angle0_origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.notch.height - self.angle.L) * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
+        angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L) * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
         uDir0 = numpy.array([1.0, 0.0, 0])
         wDir0 = numpy.array([0.0, -1.0, 0])
         self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
-        angle1_origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.notch.height) * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height) * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
         uDir1 = numpy.array([1.0, 0.0, 0])
         wDir1 = numpy.array([0.0, 1.0, 0])
         self.angle.place(angle1_origin, uDir1, wDir1)
 
     def create_nut_bolt_array(self):
-        nut_bolt_array_origin = self.angleLeft.secOrigin
+        nut_bolt_array_origin = self.angleLeft.sec_origin
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.wDir
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.uDir
 
@@ -102,7 +102,7 @@ class BeamWebBeamWeb(object):
         pitch_dir = self.angleLeft.vDir
         bolt_dir = -self.angleLeft.wDir
 
-        c_nutbolt_array_origin = self.angle.secOrigin
+        c_nutbolt_array_origin = self.angle.sec_origin
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.uDir
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.wDir
 
@@ -110,7 +110,7 @@ class BeamWebBeamWeb(object):
         c_pitch_dir = self.angle.vDir
         c_bolt_dir = -self.angle.uDir
 
-        c_nutbolt_array_origin1 = self.angleLeft.secOrigin
+        c_nutbolt_array_origin1 = self.angleLeft.sec_origin
         c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.uDir
         c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.wDir
         c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + (self.angle.L * self.angle.vDir)
@@ -125,23 +125,23 @@ class BeamWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        return [self.columnModel, self.beamModel, self.angleModel] + self.nut_bolt_array.getModels()
+        return [self.columnModel, self.beamModel, self.angleModel] + self.nut_bolt_array.get_model()
              
     def get_nutboltmodels(self):
         
-        return self.nut_bolt_array.getModels()
+        return self.nut_bolt_array.get_model()
         # return self.nut_bolt_array.getboltModels()
          
     def get_beam_model(self):
         final_beam = self.beamModel
-        nut_bolt_list = self.nut_bolt_array.getModels()
+        nut_bolt_list = self.nut_bolt_array.get_model()
         for bolt in nut_bolt_list[0:(len(nut_bolt_list) // 2)]:
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam
 
     def get_column_model(self):
         final_beam = self.columnModel
-        nut_bolt_list = self.nut_bolt_array.getModels()
+        nut_bolt_list = self.nut_bolt_array.get_model()
         for bolt in nut_bolt_list[:]:
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam

@@ -763,7 +763,9 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.FA2 + (520 * np.array([0, -1]))
+        # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
+        ptSecC = self.FA2 + (472 * np.array([0, -1]))
+
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -887,6 +889,7 @@ class Fin2DCreatorFront(object):
         pt = self.FA + 10 * np.array([1, 0])  # np.array([ptx,pty])
         theta = 30
         offset = 40  # self.dataObj.col_L /7
+
         textUp = "Column " + self.dataObj.col_Designation
         textDown = ""
         element = ""

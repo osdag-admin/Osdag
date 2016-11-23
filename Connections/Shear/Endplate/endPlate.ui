@@ -355,16 +355,6 @@
         <bool>true</bool>
        </property>
       </widget>
-      <zorder>btnInput</zorder>
-      <zorder>btnOutput</zorder>
-      <zorder>btn3D</zorder>
-      <zorder>chkBxBeam</zorder>
-      <zorder>chkBxCol</zorder>
-      <zorder>chkBxEndplate</zorder>
-      <zorder>btn_front</zorder>
-      <zorder>btn_top</zorder>
-      <zorder>btn_side</zorder>
-      <zorder>splitter</zorder>
      </widget>
     </item>
     <item>
@@ -457,7 +447,7 @@
      <x>0</x>
      <y>0</y>
      <width>1403</width>
-     <height>26</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -728,7 +718,7 @@ QMenu::item:selected {
       <string>000.0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="lbl_column">
      <property name="geometry">
       <rect>
        <x>6</x>
@@ -1126,7 +1116,7 @@ QMenu::item:selected {
       <string>Type *</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboDaimeter">
+    <widget class="QComboBox" name="comboDiameter">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -3323,7 +3313,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="lbl_beam">
      <property name="geometry">
       <rect>
        <x>6</x>
@@ -4081,7 +4071,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weld Length(mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtWeldStrng_5">
+    <widget class="QLineEdit" name="txtWeld_length">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -4409,7 +4399,7 @@ QMenu::item:selected {
   <tabstop>txtFu</tabstop>
   <tabstop>txtFy</tabstop>
   <tabstop>txtShear</tabstop>
-  <tabstop>comboDaimeter</tabstop>
+  <tabstop>comboDiameter</tabstop>
   <tabstop>comboType</tabstop>
   <tabstop>comboGrade</tabstop>
   <tabstop>comboPlateThick_2</tabstop>
@@ -4493,7 +4483,7 @@ QMenu::item:selected {
   <tabstop>txtplate_ht</tabstop>
   <tabstop>txtplate_width</tabstop>
   <tabstop>txtboltgrpcapacity</tabstop>
-  <tabstop>txtWeldStrng_5</tabstop>
+  <tabstop>txtWeld_length</tabstop>
   <tabstop>txtShrCapacity_4</tabstop>
   <tabstop>txtEdgeDist_2</tabstop>
   <tabstop>txtPlateThick_2</tabstop>

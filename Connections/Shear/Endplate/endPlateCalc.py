@@ -645,8 +645,8 @@ def endConn(uiObj):
     outputObj['Weld']['weldstrength'] = weld_strength
      
     outputObj['Plate'] = {}
-    outputObj['Plate']['Height'] = float(end_plate_l)
-    outputObj['Plate']['Width'] = float(end_plate_w)
+    outputObj['Plate']['height'] = float(end_plate_l)
+    outputObj['Plate']['width'] = float(end_plate_w)
     outputObj['Plate']['MinThick'] = float(min_end_plate_t)
     outputObj['Plate']['MinWidth'] = float(min_end_plate_w)
     outputObj['Plate']['blockshear'] = float(Tdb)

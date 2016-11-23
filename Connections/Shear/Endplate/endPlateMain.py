@@ -49,7 +49,7 @@ from ui_endplate import Ui_MainWindow
 from utilities import osdagDisplayShape
 from weld import  Weld
 from drawing_2D import EndCommonData
-from Connections.Shear.Endplate.common_logic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
 
 class DesignPreferences(QtGui.QDialog):
 
@@ -60,7 +60,7 @@ class DesignPreferences(QtGui.QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
-        self.set_default_para()
+        #self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
@@ -291,7 +291,7 @@ class MainController(QtGui.QMainWindow):
         ###################
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
         ############
-        self.retrieve_prevstate()
+        #self.retrieve_prevstate()
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         
@@ -364,7 +364,7 @@ class MainController(QtGui.QMainWindow):
         
         
         # Saving and Restoring the endPlate window state.
-        # self.retrieve_prevstate()
+        self.retrieve_prevstate()
         
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         
@@ -380,6 +380,7 @@ class MainController(QtGui.QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
+        self.designPrefDialog = DesignPreferences(self)
     
     
     def osdag_header(self):
@@ -494,8 +495,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtEdgeDist.clear()
             self.ui.txtplate_ht.clear()
             self.ui.txtplate_width.clear()
-            self.ui.txtExtMomnt.clear()
-            self.ui.txtMomntCapacity.clear()
+            #--------------------------------------- self.ui.txtExtMomnt.clear()
+            #---------------------------------- self.ui.txtMomntCapacity.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
             
@@ -660,7 +661,8 @@ class MainController(QtGui.QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
             
             plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = int(plate_thickness)
+            #-------------------------------- plate_thick = int(plate_thickness)
+            plate_thick = plate_thickness.toFloat()
         
             if plate_thick <= 10:
                 
@@ -756,7 +758,7 @@ class MainController(QtGui.QMainWindow):
 #             self.ui.combo_Beam.setCurrentIndex((0))
 #             self.ui.comboColSec.setCurrentIndex((0))
 # #             self.ui.comboConnLoc.setCurrentIndex((0))            
-#             self.ui.comboDaimeter.setCurrentIndex(0)
+#             self.ui.comboDiameter.setCurrentIndex(0)
 #             self.ui.comboType.setCurrentIndex((0))
 #             self.ui.comboGrade.setCurrentIndex((0))
 #             self.ui.comboPlateThick_2.setCurrentIndex((0))
@@ -852,7 +854,7 @@ class MainController(QtGui.QMainWindow):
             
             self.ui.txtShear.setText(str(uiObj['Load']['ShearForce (kN)']))
             
-            self.ui.comboDaimeter.setCurrentIndex(self.ui.comboDaimeter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
             comboTypeIndex = self.ui.comboType.findText(str(uiObj['Bolt']['Type']))
             self.ui.comboType.setCurrentIndex(comboTypeIndex)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
@@ -908,7 +910,7 @@ class MainController(QtGui.QMainWindow):
         '''
         uiObj = {}
         uiObj["Bolt"] = {}
-        uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDaimeter.currentText().toInt()[0]
+        uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
         uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())                                                                                                                                                                                                                                                              
         uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
         
@@ -1019,24 +1021,21 @@ class MainController(QtGui.QMainWindow):
         commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
     
     def save_design(self, popup_summary):
+        
         fileName = self.folder+"/images_html/Html_Report"
         self.call_end2D_drawing("All")
-        base, base_front, base_top, base_side = self.call2D_Drawing("All")
-        self.outdict = self.resultObj  # self.outputdict()
-        self.inputdict = self.uiObj  # self.getuser_inputs()
-        dictBeamData = self.fetchBeamPara()
-        dictColData = self.fetchColumnPara()
-        save_html(self.outdict, self.inputdict, dictBeamData, dictColData, popup_summary, fileName, self.folder, base, base_front, base_top, base_side)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+        commLogicObj.call_designReport(fileName, popup_summary)
       
-      # Creates pdf:  
-#         path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-#         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-#         options = {
-#                     'margin-bottom': '10mm',
-#                     'footer-right': '[page]'
-#                     }
-#         pdfkit.from_file(fileName,"Workspace/css/EndPlateReport.pdf", configuration=config, options=options)
-#         
+        path_wkhtmltopdf = '/home/deepa/Osdag_softwares/wkhtmltox/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf = path_wkhtmltopdf)
+        options = {
+                    'margin-bottom': '10mm',
+                    'footer-right': '[page]'
+                    }
+        pdfkit.from_file(fileName, str(QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder), "PDF(*.pdf)")), configuration=config, options=options)
+         
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
         
     def save_log(self):
@@ -1059,10 +1058,6 @@ class MainController(QtGui.QMainWindow):
         outf << self.ui.textEdit.toPlainText()
         QtGui.QApplication.restoreOverrideCursor()
 
-        # self.setCurrentFile(fileName);
-        
-        # QtGui.QMessageBox.about(self,'Information',"File saved")
-       
     
     ################
 #     def save_yaml(self,outObj,uiObj):
@@ -1100,14 +1095,16 @@ class MainController(QtGui.QMainWindow):
         
         self.ui.txtShear.clear()
         
-        self.ui.comboDaimeter.setCurrentIndex(0)
+        self.ui.comboDiameter.setCurrentIndex(0)
         self.ui.comboType.setCurrentIndex((0))
         self.ui.comboGrade.setCurrentIndex((0))
         
+        self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
         self.ui.comboPlateThick_2.setCurrentIndex((0))
         self.ui.txtPlateLen.clear()
         self.ui.txtPlateWidth.clear()
         
+        self.ui.comboWldSize.setItemText(0, "Select weld thickness")
         self.ui.comboWldSize.setCurrentIndex((0))
         
         #----Output
@@ -1239,23 +1236,23 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtResltShr.setText(str(weld_shear))
         
         weld_length = resultObj['Weld']['weldlength']
-        self.ui.txtWeldStrng_5.setText(str(weld_length))
+        self.ui.txtWeld_length.setText(str(weld_length))
          
         
         # Newly included fields
-        plate_ht = resultObj['Plate']['Height'] 
+        plate_ht = resultObj['Plate']['height'] 
         self.ui.txtplate_ht.setText(str(plate_ht))
         
-        plate_width = resultObj['Plate']['Width'] 
+        plate_width = resultObj['Plate']['width'] 
         self.ui.txtplate_width.setText(str(plate_width))
     
    
-    def displaylog_totextedit(self):
+    def displaylog_totextedit(self,commLogicObj):
         '''
         This method displaying Design messages(log messages)to textedit widget.
         '''
-        
-        afile = QtCore.QFile('Connections/Shear/Endplate/fin.log')
+        fname = str(commLogicObj.call_saveMessages())
+        afile = QtCore.QFile(fname)
         
         if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
             QtGui.QMessageBox.information(None, 'info', afile.errorString())
@@ -1293,7 +1290,7 @@ class MainController(QtGui.QMainWindow):
         elif self.ui.txtShear.text().isEmpty() or  float(str(self.ui.txtShear.text())) == 0:
             QtGui.QMessageBox.about(self, "Information", "Please select Factored shear load")
             
-        elif self.ui.comboDaimeter.currentIndex() == 0 :
+        elif self.ui.comboDiameter.currentIndex() == 0 :
             QtGui.QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
             
         elif self.ui.comboType.currentIndex() == 0 :
@@ -1388,39 +1385,39 @@ class MainController(QtGui.QMainWindow):
           
         return display, start_display
     
-    def display3Dmodel(self, component):
-        self.display.EraseAll()
-        self.display.SetModeShaded()
-        display.DisableAntiAliasing()
-        # self.display.set_bg_gradient_color(23,1,32,23,1,32)
-        self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        self.display.View_Front()
-        self.display.View_Iso()
-        self.display.FitAll()
-        if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.get_columnModel(), update=True)
-        elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
-        elif component == "Endplate" :
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
-        elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivity.nutBoltArray.getModels()
-            for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
-        
+    #-------------------------------------- def display3Dmodel(self, component):
+        #----------------------------------------------- self.display.EraseAll()
+        #------------------------------------------ self.display.SetModeShaded()
+        #----------------------------------------- display.DisableAntiAliasing()
+        #----------------- # self.display.set_bg_gradient_color(23,1,32,23,1,32)
+        #-------- self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        #--------------------------------------------- self.display.View_Front()
+        #----------------------------------------------- self.display.View_Iso()
+        #------------------------------------------------- self.display.FitAll()
+        #--------------------------------------------- if component == "Column":
+            # osdagDisplayShape(self.display, self.connectivity.get_columnModel(), update=True)
+        #--------------------------------------------- elif component == "Beam":
+            # osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            # # osdagDisplayShape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
+        #---------------------------------------- elif component == "Endplate" :
+            # osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+            # osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+            # osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+            #---------- nutboltlist = self.connectivity.nutBoltArray.getModels()
+            #--------------------------------------- for nutbolt in nutboltlist:
+                # osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            # # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
+        #-------------------------------------------- elif component == "Model":
+            # osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+            # osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            # osdagDisplayShape(self.display, self.connectivity.weldModelLeft, color='red', update=True)
+            # osdagDisplayShape(self.display, self.connectivity.weldModelRight, color='red', update=True)
+            # osdagDisplayShape(self.display, self.connectivity.plateModel, color='blue', update=True)
+            #---------- nutboltlist = self.connectivity.nutBoltArray.getModels()
+            #--------------------------------------- for nutbolt in nutboltlist:
+                # osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            # # self.display.DisplayShape(self.connectivity.nutBoltArray.getModels(), color = Quantity_NOC_SADDLEBROWN, update=True)
+#------------------------------------------------------------------------------ 
 
 
 ##################################################################################################################################################
@@ -1647,124 +1644,124 @@ class MainController(QtGui.QMainWindow):
         
         return  colwebconn
         
-    def create3DColFlangeBeamWeb(self):
-        '''
-        Creating 3d cad model with column flange beam web connection
-        
-        '''
-        uiObj = self.getuser_inputs()
-        resultObj = endConn(uiObj)
-        
-        dictbeamdata = self.fetchBeamPara()
-        ##### BEAM PARAMETERS #####
-        beam_D = int(dictbeamdata[QString("D")])
-        beam_B = int(dictbeamdata[QString("B")])
-        beam_tw = float(dictbeamdata[QString("tw")])
-        beam_T = float(dictbeamdata[QString("T")])
-        beam_alpha = float(dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(dictbeamdata[QString("R1")])
-        beam_R2 = float(dictbeamdata[QString("R2")])
-        beam_length = 500.0  # This parameter as per view of 3D cad model
-        
-        # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-        beam = ISectionOld(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
-                        R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                        length=beam_length)
-        
-        ##### COLUMN PARAMETERS ######
-        dictcoldata = self.fetchColumnPara()
-        
-        column_D = int(dictcoldata[QString("D")])
-        column_B = int(dictcoldata[QString("B")])
-        column_tw = float(dictcoldata[QString("tw")])
-        column_T = float(dictcoldata[QString("T")])
-        column_alpha = float(dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(dictcoldata[QString("R1")])
-        column_R2 = float(dictcoldata[QString("R2")])
-        
-        # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        column = ISectionOld(B=column_B, T=column_T, D=column_D,
-                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
-        #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-        
-        fillet_length = resultObj['Plate']['Height']
-        fillet_thickness = uiObj["Weld"]['Size (mm)']
-        plate_width = resultObj['Plate']['Width']
-        plate_thick = uiObj['Plate']['Thickness (mm)']
-        bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
-        # bolt_R = bolt_r + 7
-        nut_R = bolt_R
-        bolt_T = self.boltHeadThick_Calculation(bolt_dia) 
-        # bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
-        bolt_Ht = self.boltLength_Calculation(bolt_dia)
-        # bolt_Ht =100.0 # minimum bolt length as per Indian Standard
-        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        # nut_T = 12.0 # minimum nut thickness As per Indian Standard
-        nut_Ht = 12.2  #
-        
-        # plate = Plate(L= 300,W =100, T = 10)
-        plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
-        
-        # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
-
-        # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
-        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
-         
-        # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
-        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-        
-        gap = column_tw + plate_thick + nut_T
-        
-        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
-        
-        colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
-        colflangeconn.create_3dmodel()
-        return colflangeconn
+    #--------------------------------------- def create3DColFlangeBeamWeb(self):
+        #------------------------------------------------------------------- '''
+        #---------- Creating 3d cad model with column flange beam web connection
+#------------------------------------------------------------------------------ 
+        #------------------------------------------------------------------- '''
+        #----------------------------------------- uiObj = self.getuser_inputs()
+        #-------------------------------------------- resultObj = endConn(uiObj)
+#------------------------------------------------------------------------------ 
+        #----------------------------------- dictbeamdata = self.fetchBeamPara()
+        #------------------------------------------- ##### BEAM PARAMETERS #####
+        #------------------------------ beam_D = int(dictbeamdata[QString("D")])
+        #------------------------------ beam_B = int(dictbeamdata[QString("B")])
+        #-------------------------- beam_tw = float(dictbeamdata[QString("tw")])
+        #---------------------------- beam_T = float(dictbeamdata[QString("T")])
+        #-------------- beam_alpha = float(dictbeamdata[QString("FlangeSlope")])
+        #-------------------------- beam_R1 = float(dictbeamdata[QString("R1")])
+        #-------------------------- beam_R2 = float(dictbeamdata[QString("R2")])
+        #----- beam_length = 500.0  # This parameter as per view of 3D cad model
+#------------------------------------------------------------------------------ 
+        # # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
+        #----------- beam = ISectionOld(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
+                        #------------- R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                        #----------------------------------- length=beam_length)
+#------------------------------------------------------------------------------ 
+        #---------------------------------------- ##### COLUMN PARAMETERS ######
+        #---------------------------------- dictcoldata = self.fetchColumnPara()
+#------------------------------------------------------------------------------ 
+        #----------------------------- column_D = int(dictcoldata[QString("D")])
+        #----------------------------- column_B = int(dictcoldata[QString("B")])
+        #------------------------- column_tw = float(dictcoldata[QString("tw")])
+        #--------------------------- column_T = float(dictcoldata[QString("T")])
+        #------------- column_alpha = float(dictcoldata[QString("FlangeSlope")])
+        #------------------------- column_R1 = float(dictcoldata[QString("R1")])
+        #------------------------- column_R2 = float(dictcoldata[QString("R2")])
+#------------------------------------------------------------------------------ 
+        # # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
+        #-------------- column = ISectionOld(B=column_B, T=column_T, D=column_D,
+                           # t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
+        #------------------------- #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
+#------------------------------------------------------------------------------ 
+        #-------------------------- fillet_length = resultObj['Plate']['Height']
+        #------------------------- fillet_thickness = uiObj["Weld"]['Size (mm)']
+        #----------------------------- plate_width = resultObj['Plate']['Width']
+        #------------------------ plate_thick = uiObj['Plate']['Thickness (mm)']
+        #----------------------------- bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
+        #------------------------------------------------- bolt_r = bolt_dia / 2
+        #------------------- bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        #------------------------------------------------- # bolt_R = bolt_r + 7
+        #-------------------------------------------------------- nut_R = bolt_R
+        #--------------------- bolt_T = self.boltHeadThick_Calculation(bolt_dia)
+        #------- # bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
+        #----------------------- bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        #--------- # bolt_Ht =100.0 # minimum bolt length as per Indian Standard
+        #----- nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        #--------- # nut_T = 12.0 # minimum nut thickness As per Indian Standard
+        #------------------------------------------------------ nut_Ht = 12.2  #
+#------------------------------------------------------------------------------ 
+        #-------------------------------- # plate = Plate(L= 300,W =100, T = 10)
+        #---------- plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
+#------------------------------------------------------------------------------ 
+        #---------------------------- # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
+        # Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
+#------------------------------------------------------------------------------ 
+        #-------------- # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
+        #------------------ bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
+#------------------------------------------------------------------------------ 
+        # # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
+        #---------------- nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+#------------------------------------------------------------------------------ 
+        #--------------------------------- gap = column_tw + plate_thick + nut_T
+#------------------------------------------------------------------------------ 
+        #---------------- nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
+#------------------------------------------------------------------------------ 
+        # colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+        #---------------------------------------- colflangeconn.create_3dmodel()
+        #-------------------------------------------------- return colflangeconn
         
     
-    def call_3DModel(self, flag): 
-#         self.ui.btnSvgSave.setEnabled(True)
-        self.ui.btn3D.setChecked(QtCore.Qt.Checked)
-        if self.ui.btn3D.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
-            self.ui.mytabWidget.setCurrentIndex(0)
-            
-        if flag == True:
-            if self.ui.comboConnLoc.currentText() == "Column web-Beam web":    
-                # self.create3DColWebBeamWeb()
-                self.connectivity = self.create3DColWebBeamWeb()
-                self.fuse_model = None
-            elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DColFlangeBeamWeb()
-                self.fuse_model = None
-            else:
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DBeamWebBeamWeb()
-                self.fuse_model = None
-
-            self.display3Dmodel("Model")
-            # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
-            # gpBeamOrigin = getGpPt(beamOrigin)
-            # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-            # self.display.DisplayShape(my_sphere2,color = 'red',update = True)
-            # beamOrigin = self.connectivity.beam.secOrigin 
-            # gpBeamOrigin = getGpPt(beamOrigin)
-            # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-            # self.display.DisplayShape(my_sphere2,color = 'blue',update = True)
-            # plateOrigin =  (self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0 * (self.connectivity.plate.vDir) + self.connectivity.plate.T * (-self.connectivity.weldLeft.uDir))
-            # gpPntplateOrigin=  getGpPt(plateOrigin)
-            # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
-            # self.display.DisplayShape(my_sphere,update=True)
-            
-        else:
-            self.display.EraseAll()
-#             self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)       
+    #--------------------------------------------- def call_3DModel(self, flag):
+#--------------------------------- #         self.ui.btnSvgSave.setEnabled(True)
+        #--------------------------- self.ui.btn3D.setChecked(QtCore.Qt.Checked)
+        #----------------------------------------- if self.ui.btn3D.isChecked():
+            #----------------- self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
+            #------------------ self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
+            #------------- self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
+            #---------------------------- self.ui.mytabWidget.setCurrentIndex(0)
+#------------------------------------------------------------------------------ 
+        #------------------------------------------------------ if flag == True:
+            #--- if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
+                #-------------------------------- # self.create3DColWebBeamWeb()
+                #-------------- self.connectivity = self.create3DColWebBeamWeb()
+                #---------------------------------------- self.fuse_model = None
+            # elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
+                #------------------------ self.ui.mytabWidget.setCurrentIndex(0)
+                #----------- self.connectivity = self.create3DColFlangeBeamWeb()
+                #---------------------------------------- self.fuse_model = None
+            #------------------------------------------------------------- else:
+                #------------------------ self.ui.mytabWidget.setCurrentIndex(0)
+                #------------- self.connectivity = self.create3DBeamWebBeamWeb()
+                #---------------------------------------- self.fuse_model = None
+#------------------------------------------------------------------------------ 
+            #-------------------------------------- self.display3Dmodel("Model")
+            # # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
+            #------------------------------ # gpBeamOrigin = getGpPt(beamOrigin)
+            #----- # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
+            # # self.display.DisplayShape(my_sphere2,color = 'red',update = True)
+            #------------------- # beamOrigin = self.connectivity.beam.secOrigin
+            #------------------------------ # gpBeamOrigin = getGpPt(beamOrigin)
+            #----- # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
+            # # self.display.DisplayShape(my_sphere2,color = 'blue',update = True)
+            # # plateOrigin =  (self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0 * (self.connectivity.plate.vDir) + self.connectivity.plate.T * (-self.connectivity.weldLeft.uDir))
+            #------------------------- # gpPntplateOrigin=  getGpPt(plateOrigin)
+            #-- # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
+            #---------------- # self.display.DisplayShape(my_sphere,update=True)
+#------------------------------------------------------------------------------ 
+        #----------------------------------------------------------------- else:
+            #------------------------------------------- self.display.EraseAll()
+# #             self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
    
     def call_3DBeam(self):
         '''
@@ -1840,31 +1837,31 @@ class MainController(QtGui.QMainWindow):
     def design_btnclicked(self):
         '''
         '''
-        self.validateInputsOnDesignBtn()
-        self.ui.outputDock.setFixedSize(310, 710)
-        self.enableViewButtons()
-        self.unchecked_allChkBox()
-        
-        # self.set_designlogger()
-        # Getting User Inputs.
-        self.uiObj = self.getuser_inputs()
-        
-        # EndPlate Design Calculations. 
-        self.resultObj = endConn(self.uiObj)
-        d = self.resultObj[self.resultObj.keys()[0]]
-        if len(str(d[d.keys()[0]])) == 0:
-            self.ui.btn_CreateDesign.setEnabled(False)   
-        
-        
-        # Displaying Design Calculations To Output Window
-        self.display_output(self.resultObj)
-        
-        # Displaying Messages related to EndPlate Design.
-        self.displaylog_totextedit()
-
-        # Displaying 3D Cad model
-        status = self.resultObj['Bolt']['status']
-        self.call_3DModel(status)
+        #-------------------------------------- self.validateInputsOnDesignBtn()
+        #----------------------------- self.ui.outputDock.setFixedSize(310, 710)
+        #---------------------------------------------- self.enableViewButtons()
+        #-------------------------------------------- self.unchecked_allChkBox()
+#------------------------------------------------------------------------------ 
+        #--------------------------------------------- # self.set_designlogger()
+        #------------------------------------------------ # Getting User Inputs.
+        #------------------------------------ self.uiObj = self.getuser_inputs()
+#------------------------------------------------------------------------------ 
+        #--------------------------------------- # EndPlate Design Calculations.
+        #---------------------------------- self.resultObj = endConn(self.uiObj)
+        #-------------------------- d = self.resultObj[self.resultObj.keys()[0]]
+        #------------------------------------- if len(str(d[d.keys()[0]])) == 0:
+            #------------------------ self.ui.btn_CreateDesign.setEnabled(False)
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        #--------------------- # Displaying Design Calculations To Output Window
+        #----------------------------------- self.display_output(self.resultObj)
+#------------------------------------------------------------------------------ 
+        #--------------------- # Displaying Messages related to EndPlate Design.
+        #------------------------------------------ self.displaylog_totextedit()
+#------------------------------------------------------------------------------ 
+        #--------------------------------------------- # Displaying 3D Cad model
+        #----------------------------- status = self.resultObj['Bolt']['status']
+        #--------------------------------------------- self.call_3DModel(status)
         
         self.alist = self.designParameters()
 
@@ -1872,8 +1869,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
+        connection = "Endplate"
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,self.connection)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,connection)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1886,7 +1884,8 @@ class MainController(QtGui.QMainWindow):
         self.commLogicObj.call_3DModel(status)
 
         
-        
+    #--------------------------------------------- def call_3DModel(self, flag):
+        #---------------------------------- self.commLogicObj.call_3DModel(flag)
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of endplate
         '''

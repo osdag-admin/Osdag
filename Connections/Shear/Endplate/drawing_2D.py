@@ -890,7 +890,8 @@ class End2DCreatorFront(object):
 
     def call_CFBW_front(self, filename):
         v_width = self.dataObj.D_col + 1000
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-340 -280 ' + str(v_width) + ' 1225'))
+        # dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-340 -280 ' + str(v_width) + ' 1225'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-340 -350 ' + str(v_width) + ' 1300'))
 
         # Cross section A-A
         ptSecA = self.FA + (250 * np.array([0, -1]))
@@ -992,7 +993,7 @@ class End2DCreatorFront(object):
         ptG2 = self.FC1 + (gap_pt + 30) * np.array([0, 1])
         offset = self.dataObj.col_L  # 60% of the column length
         params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
-        #         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.plate_thick) + " mm", params)
+        # self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.plate_thick) + " mm", params)
 
         # Draw Faint line for Gap Distance
         ptC1 = self.FC

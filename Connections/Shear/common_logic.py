@@ -164,11 +164,19 @@ class CommonDesignLogic(object):
 
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+        
+        if self.connection == "Finplat":#finBeamWebBeamWeb/endBeamWebBeamWeb
+            gap = sBeam_tw + plate_thick + nut_T
+            nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
+            beamwebconn = finBeamWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
+        elif self.connection == "Endplate":
+            gap = sBeam_tw + plate_thick + nut_T
+            nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
+            beamwebconn = endBeamWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
+        #---------------------------------- gap = sBeam_tw + plate_thick + nut_T
 
-        gap = sBeam_tw + plate_thick + nut_T
-
-        nutBoltArray = NutBoltArray(self.  resultObj, nut, bolt, gap)
-        beamwebconn = BeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray)
+        #--------- nutBoltArray = NutBoltArray(self.  resultObj, nut, bolt, gap)
+        # beamwebconn = BeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray)
         beamwebconn.create_3dmodel()
 
         return beamwebconn
@@ -244,18 +252,21 @@ class CommonDesignLogic(object):
         # nut =Nut(R = 17, T = 17.95,  H = 12.2, innerR1 = 10.0)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         
-        if self.connection == "Finplat":
+        if self.connection == "Finplat":#finColWebBeamWeb
             gap = beam_tw + plate_thick + nut_T
+            nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
+            colwebconn = finColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         elif self.connection == "Endplate":
             gap = column_tw + plate_thick + nut_T
+            nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
+            colwebconn = endColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         
 
-        nutBoltArray = NutBoltArray(self.resultObj, nut, bolt, gap)
-
-        colwebconn = ColWebBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+        #----------- nutBoltArray = NutBoltArray(self.resultObj, nut, bolt, gap)
         colwebconn.create_3dmodel()
 
         return colwebconn
+    
     #=========================================================================================
 
     def create3DColFlangeBeamWeb(self):
@@ -265,10 +276,11 @@ class CommonDesignLogic(object):
         '''
         # self.dictbeamdata  = self.fetchBeamPara()
         # self.resultObj = self.call_finCalculation()
-        fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.resultObj['Weld']['thickness']
-        plate_width = self.resultObj['Plate']['width']
-        plate_thick = self.uiObj['Plate']['Thickness (mm)']
+        #--------------------- fillet_length = self.resultObj['Plate']['height']
+        
+        #---------------- fillet_thickness = self.resultObj['Weld']['thickness']
+        #------------------------ plate_width = self.resultObj['Plate']['width']
+        #------------------- plate_thick = self.uiObj['Plate']['Thickness (mm)']
         ##### BEAM PARAMETERS #####
         beam_D = int(self.dictbeamdata[QString("D")])
         beam_B = int(self.dictbeamdata[QString("B")])
@@ -300,7 +312,8 @@ class CommonDesignLogic(object):
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.resultObj['Weld']['thickness']
+        fillet_thickness = self.uiObj['Weld']['Size (mm)']
+        #---------------- fillet_thickness = self.resultObj['Weld']['thickness']
         plate_width = self.resultObj['Plate']['width']
         plate_thick = self.uiObj['Plate']['Thickness (mm)']
         bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
@@ -334,17 +347,13 @@ class CommonDesignLogic(object):
         
         if self.connection == "Finplate":
             gap = beam_tw + plate_thick + nut_T
+            nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)#finColFlangeBeamWeb
+            colflangeconn = finColFlangeBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         elif self.connection == "Endplate":
             gap = column_T + plate_thick + nut_T
-        if self.connection == "Finplate":
-            nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
-            colflangeconn = finColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
-        else:
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
-            colflangeconn = endColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
-        #nutBoltArray = NutBoltArray(self.resultObj, nut, bolt, gap)
+            colflangeconn = endColFlangeBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
 
-        #colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
         colflangeconn.create_3dmodel()
         return colflangeconn
     #=========================================================================================

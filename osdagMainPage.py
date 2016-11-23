@@ -7,8 +7,8 @@ import sys
 from PyQt4 import QtGui
 from ui_OsdagMainPage import Ui_MainWindow
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
-from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
-from Connections.Shear.Endplate.endPlateMain import launchEndPlateController
+from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
+from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os.path
 
 
@@ -18,12 +18,12 @@ class OsdagMainWindow(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        listItems = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
+        list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
 
-        self.ui.myStackedWidget.setCurrentIndex(listItems['Osdagpage'])
-        self.ui.btn_connection.clicked.connect(lambda: self.changePage(listItems['connectionpage'], listItems['Osdagpage']))
-        self.ui.myListWidget.currentItemChanged.connect(self.changePage)
-        self.ui.btn_start.clicked.connect(self.showConnection)
+        self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
+        self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
+        self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
+        self.ui.btn_start.clicked.connect(self.show_desgin_connection)
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
@@ -31,7 +31,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
         self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
 
-    def disableDesignButtons(self):
+    def disable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(False)
         self.ui.btn_compression.setEnabled(False)
         self.ui.btn_connection.setEnabled(False)
@@ -41,7 +41,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
         self.ui.btn_tension.setEnabled(False)
         self.ui.btn_help.setEnabled(False)
 
-    def enableDesignButtons(self):
+    def enable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(True)
         self.ui.btn_compression.setEnabled(True)
         self.ui.btn_connection.setEnabled(True)
@@ -51,15 +51,16 @@ class OsdagMainWindow(QtGui.QMainWindow):
         self.ui.btn_tension.setEnabled(True)
         self.ui.btn_help.setEnabled(True)
 
-    def changePage(self, current, previous):
+    def change_desgin_page(self, current, previous):
         if not current:
             current = previous
 
         self.ui.myStackedWidget.setCurrentIndex(current)
 
-    def showConnection(self):
+    def show_desgin_connection(self):
 
-        folder = str(QtGui.QFileDialog.getSaveFileName(self, "Select Workspace Directory", "../../Osdag_Workspace", "File folder"))
+        folder = QtGui.QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..', '..', 'Osdag_workspace'), 'All Files (*)')
+        folder = str(folder)
         if not os.path.exists(folder):
             os.makedirs(folder, 0755)
 
@@ -73,11 +74,11 @@ class OsdagMainWindow(QtGui.QMainWindow):
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         elif self.ui.rdbtn_cleat.isChecked():
-            launchCleatAngleController(self, folder)
+            launch_cleatangle_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         elif self.ui.rdbtn_endplate.isChecked():
-            launchEndPlateController(self, folder)
+            launch_endplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
             # QtGui.QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
 
@@ -89,12 +90,12 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
     def unavailable(self):
         QtGui.QMessageBox.about(self, "INFO", "This module is not available in this version.")
-        # self.ui.btn_beamCol.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
-        # self.ui.btn_compression.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
-        # self.ui.btn_flexural.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
-        # self.ui.btn_gantry.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
-        # self.ui.btn_plate.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
-        # self.ui.btn_tension.clicked.connect(lambda:self.changePage(listItems['Osdagpage'], listItems['tensionpage']))
+        # self.ui.btn_beamCol.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
+        # self.ui.btn_compression.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
+        # self.ui.btn_flexural.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
+        # self.ui.btn_gantry.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
+        # self.ui.btn_plate.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
+        # self.ui.btn_tension.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
 
 
 if __name__ == '__main__':

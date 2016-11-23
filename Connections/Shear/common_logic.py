@@ -165,7 +165,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         
-        if self.connection == "Finplat":#finBeamWebBeamWeb/endBeamWebBeamWeb
+        if self.connection == "Finplate":#finBeamWebBeamWeb/endBeamWebBeamWeb
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
             beamwebconn = finBeamWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)

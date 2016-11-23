@@ -15,6 +15,10 @@ from model import *
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import os.path
+from utilities import osdag_display_shape
+from colWebBeamWebConnectivity import ColWebBeamWeb
+from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from OCC import IGESControl
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
@@ -24,6 +28,11 @@ import pdfkit
 import shutil
 import webbrowser
 from commonLogic import CommonDesignLogic
+from fileinput import filename
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4 import QtSvg
+from Svg_Window import SvgWindow
 
 class DesignPreferences(QtGui.QDialog):
 
@@ -229,7 +238,7 @@ class MyPopupDialog(QtGui.QDialog):
 
     def useUserProfile(self):
 
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", "All Files (*)")
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -296,7 +305,7 @@ class MainController(QtGui.QMainWindow):
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         # File Menu
 
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callFin2D_Drawing("Front"))
@@ -320,14 +329,13 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionFinplate_2.triggered.connect(self.call_3DFinplate)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
         self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo("comboPlateThick_2"))
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
@@ -343,6 +351,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+
 
 # ************************************** Osdag logo for html********************************************************************
         self.ui.btn_Design.clicked.connect(self.osdag_header)
@@ -607,7 +616,7 @@ class MainController(QtGui.QMainWindow):
                     column_tf = float(dictcoldata[QString("T")])
                     thickerPart = column_tf > plate_thick[0] and column_tf or plate_thick[0]
 
-            elif self.ui.comboConnLoc.currentText() == "Column web-Beam web": 
+            elif self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 if self.ui.comboColSec.currentText() == "Select section":
                     self.ui.comboWldSize.clear()
                     return
@@ -803,36 +812,23 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        #fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
-        fileName = self.folder + "/images_html/Html_Report"
-        #fileName = str(fileName + ".html")
+        fileName = self.folder + "/images_html/Html_Report.html"
+        fileName = str(fileName)
         self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)  #, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
 
-        path_wkhtmltopdf = '/home/deepa/Osdag_softwares/wkhtmltox/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+        # Creates pdf
+        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
-                    'margin-bottom': '10mm',
-                    'footer-right': '[page]'
-                    }
-        ##########################
-        #path_wkthmltopdf = r'/home/deepa/Downloads/wkhtmltox/bin/wkhtmltopdf'
-        # config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-        # options = {
-        #             'margin-bottom': '10mm',
-        #             'footer-right': '[page]'
-        #             }
-        # pdfkit.from_file(fileName, 'output/finplate/Report/finplaterepoRT.pdf', configuration=config, options=options)
-        # #         pdfkit.from_file(fileName,'output/finplate/'+base+'.pdf',configuration=config, options=options)
-        ##########################
-
-        pdfkit.from_file(fileName, str(QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder), "PDF(*.pdf)")), configuration=config, options=options)
+                   'margin-bottom': '10mm',
+                   'footer-right': '[page]'
+        }
+        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
-
-    # # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     def save_log(self):
 
@@ -1328,8 +1324,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
-
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder) 
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+                                              self.alist[7], self.alist[8], self.display, self.folder)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1340,8 +1336,7 @@ class MainController(QtGui.QMainWindow):
         status = self.resultObj['Bolt']['status']
 
         self.commLogicObj.call_3DModel(status)
-
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        self.callFin2D_Drawing("All")
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
@@ -1420,15 +1415,36 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                         self.alist[8], self.display, self.folder)
         if view != 'All':
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            fname = str(fileName)
+            # fileName = ''
+
+#           app2 = QtGui.QApplication(sys.argv)
+            if view == "Front":
+                filename = self.folder + "/images_html/finFront.svg"
+
+            elif view == "Side":
+                filename = self.folder + "/images_html/finSide.svg"
+
+            else:
+                filename = self.folder + "/images_html/finTop.svg"
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+
         else:
             fname = ''
-        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+
+    def save_2D_images(self, view):
+
+        fileName = QtGui.QFileDialog.getSaveFileName(self,
+                                                     "Save as PNG", str(self.folder) + '/untitled.png',
+                                                     "PNG files (*.png)")
+        f = open(self.callFin2D_Drawing(view), 'w')
+        f.close()
+        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 
     def closeEvent(self, event):
         '''
@@ -1445,7 +1461,7 @@ class MainController(QtGui.QMainWindow):
         else:
             event.ignore()
 
-# ********************************* Help Action *********************************************************************************************
+# Help Action
 
     def about_osdag(self):
         dialog = MyAboutOsdag(self)
@@ -1462,11 +1478,19 @@ class MainController(QtGui.QMainWindow):
         self.tutorials()
 
     def sample_report(self):
-        url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder', 'Sample_Report', 'The_PyQt4_tutorial.pdf')
-        webbrowser.open_new(r'file:///' + url)
+
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+#         counter = 0
+        for pdf_file in os.listdir(root_Path):
+            if pdf_file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
+#                 counter = counter + 1
 
     def sample_problem(self):
-        webbrowser.open_new(r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
+        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_Path):
+            if pdf_file.endswith('.pdf'):
+                os.startfile("%s/%s" % (root_Path, pdf_file))
 
     def design_preferences(self):
         self.designPrefDialog.show()
@@ -1476,9 +1500,6 @@ class MainController(QtGui.QMainWindow):
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()
-
-
-# ********************************************************************************************************************************************************
 
 
 def set_osdaglogger():
@@ -1507,8 +1528,6 @@ def set_osdaglogger():
     </div>''')
     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
     fh.setFormatter(formatter)
-
-    # add handler to logger object
     logger.addHandler(fh)
 
 

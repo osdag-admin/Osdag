@@ -47,46 +47,43 @@ class ISectionOld(object):
         self.R2 = R2
         self.alpha = alpha
         self.length = length
-        self.secOrigin = numpy.array([0, 0, 0])
+        self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         
-        self.computeParams()
+        self.compute_params()
     
-    def place(self, secOrigin, uDir, wDir):
-        self.secOrigin = secOrigin
+    def place(self, sec_origin, uDir, wDir):
+        self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir        
-        self.computeParams()
+        self.compute_params()
         
-    def computeParams(self):
+    def compute_params(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.secOrigin + (self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
-        self.b1 = self.secOrigin + (self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir   
-        self.c1 = self.secOrigin + (self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
-        self.a2 = self.secOrigin + (-self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
-        self.b2 = self.secOrigin + (-self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir   
-        self.c2 = self.secOrigin + (-self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
-        self.a3 = self.secOrigin + (-self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
-        self.b3 = self.secOrigin + (-self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir   
-        self.c3 = self.secOrigin + (-self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
-        self.a4 = self.secOrigin + (self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
-        self.b4 = self.secOrigin + (self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir   
-        self.c4 = self.secOrigin + (self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
+        self.a1 = self.sec_origin + (self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.b1 = self.sec_origin + (self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.c1 = self.sec_origin + (self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
+        self.a2 = self.sec_origin + (-self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.b2 = self.sec_origin + (-self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
+        self.c2 = self.sec_origin + (-self.B / 2.0) * self.uDir + (self.D / 2.0) * self.vDir
+        self.a3 = self.sec_origin + (-self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.b3 = self.sec_origin + (-self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.c3 = self.sec_origin + (-self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
+        self.a4 = self.sec_origin + (self.t / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.b4 = self.sec_origin + (self.B / 2.0) * self.uDir + -((self.D / 2.0) - self.T) * self.vDir
+        self.c4 = self.sec_origin + (self.B / 2.0) * self.uDir + -(self.D / 2.0) * self.vDir
         self.points = [self.a1, self.b1, self.c1,
                        self.c2, self.b2, self.a2,
                        self.a3, self.b3, self.c3,
                        self.c4, self.b4, self.a4]
         # self.points = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]  
         
-    def createModel(self):
-        edges = makeEdgesFromPoints(self.points)
-        wire = makeWireFromEdges(edges)
-        aFace = makeFaceFromWire(wire)
-        extrudeDir = self.length * self.wDir  # extrudeDir is a numpy array
-        prism = makePrismFromFace(aFace, extrudeDir)
+    def create_model(self):
+        edges = make_edges_from_points(self.points)
+        wire = make_wire_from_edges(edges)
+        aFace = make_face_from_wire(wire)
+        extrude_dir = self.length * self.wDir  # extrude_dir is a numpy array
+        prism = make_prism_from_face(aFace, extrude_dir)
         
         return prism
-    
-        
-        

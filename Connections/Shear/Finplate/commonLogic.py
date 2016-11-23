@@ -17,7 +17,7 @@ from notch import Notch
 from ISection import ISection
 from nutBoltPlacement import NutBoltArray
 
-from utilities import osdagDisplayShape
+from utilities import osdag_display_shape
 
 import OCC.V3d
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
@@ -25,26 +25,26 @@ from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from Connections.Shear.Finplate.drawing_2D import FinCommonData
 from reportGenerator import save_html
 import json
+import sys
 
 
 class CommonDesignLogic(object):
-    #--------------------------------------------- def __init__(self, **kwargs):
-        #-------------------------------------------- self.uiObj = kwargs[uiObj]
-        #------------------------------ self.dictbeamdata = kwargs[dictbeamdata]
-        #-------------------------------- self.dictcoldata = kwargs[dictcoldata]
-        #------------------------------------------------ self.loc = kwargs[loc]
-        #------------------------------------ self.component = kwargs[component]
-        #------------------------------------------ self.bolt_R = kwargs[bolt_R]
-        #------------------------------------------ self.bolt_T = kwargs[bolt_T]
-        #---------------------------------------- self.bolt_Ht = kwargs[bolt_Ht]
-        #-------------------------------------------- self.nut_T = kwargs[nut_T]
-        #----------------------------------------- self.display =kwargs[display]
-        #--------------------------- self.resultObj = self.call_finCalculation()
-        #------------------------------------------- self.connectivityObj = None
-
-
     def __init__(self, uiObj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T, display, folder):
+    # --------------------------------------------- def __init__(self, **kwargs):
+        # -------------------------------------------- self.uiObj = kwargs[uiObj]
+        # ------------------------------ self.dictbeamdata = kwargs[dictbeamdata]
+        # -------------------------------- self.dictcoldata = kwargs[dictcoldata]
+        # ------------------------------------------------ self.loc = kwargs[loc]
+        # ------------------------------------ self.component = kwargs[component]
+        # ------------------------------------------ self.bolt_R = kwargs[bolt_R]
+        # ------------------------------------------ self.bolt_T = kwargs[bolt_T]
+        # ---------------------------------------- self.bolt_Ht = kwargs[bolt_Ht]
+        # -------------------------------------------- self.nut_T = kwargs[nut_T]
+        # ----------------------------------------- self.display =kwargs[display]
+        # --------------------------- self.resultObj = self.call_finCalculation()
+        # ------------------------------------------- self.connectivityObj = None
 
+    
         self.uiObj = uiObj
         self.dictbeamdata = dictbeamdata
         self.dictcoldata = dictcoldata
@@ -63,13 +63,13 @@ class CommonDesignLogic(object):
 #         self.base2 = base2
 #         self.base3 = base3
 
-    #============================= FinCalculation ===========================================
+    # ============================= FinCalculation ===========================================
 
     def call_finCalculation(self):  # Done
         outputs = finConn(self.uiObj)
         return outputs
 
-    #=========================================================================================
+    # =========================================================================================
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):
@@ -143,7 +143,7 @@ class CommonDesignLogic(object):
 
         return beamwebconn
 
-    #=========================================================================================
+    # =========================================================================================
 
     def create3DColWebBeamWeb(self):
         '''
@@ -182,7 +182,7 @@ class CommonDesignLogic(object):
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
-                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
+                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
@@ -222,7 +222,7 @@ class CommonDesignLogic(object):
         colwebconn.create_3dmodel()
 
         return colwebconn
-    #=========================================================================================
+    # =========================================================================================
 
     def create3DColFlangeBeamWeb(self):
         '''
@@ -305,7 +305,7 @@ class CommonDesignLogic(object):
         colflangeconn = ColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
         colflangeconn.create_3dmodel()
         return colflangeconn
-    #=========================================================================================
+    # =========================================================================================
 
     def display_3DModel(self, component):
         self.component = component
@@ -326,27 +326,27 @@ class CommonDesignLogic(object):
             self.display.FitAll()
 
         if self.component == "Column":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
         elif self.component == "Beam":
-            osdagDisplayShape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif self. component == "Finplate":
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif self.component == "Model":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-    #=========================================================================================
+    # =========================================================================================
     def call_3DModel(self, flag):  # Done
 
         if flag is True:
@@ -364,13 +364,13 @@ class CommonDesignLogic(object):
 
         else:
             self.display.EraseAll()
-    #=========================================================================================
+    # =========================================================================================
 
     def call_saveOutputs(self):  # Done
 
         return self.call_finCalculation(self.uiObj)
 
-    #=========================================================================================
+    # =========================================================================================
 
     def call2D_Drawing(self, view, fileName, loc, folder):
         ''' This routine saves the 2D SVG image as per the connectivity selected
@@ -382,53 +382,42 @@ class CommonDesignLogic(object):
 #         base_top = ''
         if view == "All":
             ''
-
             self.callDesired_View(fileName, view, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-
             data = str(folder) + "/images_html/3D_Model.png"
-#             for n in range(1, 100, 1):
-#                 if (os.path.exists(data)):
-#                     data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
-#                     continue
-#             base = os.path.basename(str(data))
-
             self.display.ExportToImage(data)
 
         else:
-
-            f = open(fileName, 'w')
-
             self.callDesired_View(fileName, view, folder)
-            f.close()
-
-    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    def callDesired_View(self, fileName, view, folder):
+            data = str(folder) + "/"
+            self.display.ExportToImage(data)
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    def callDesired_View(self, fileName, view, folder): #,base_front, base_top, base_side):
 
         finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
         finCommonObj.saveToSvg(str(fileName), view)
 
-    #=========================================================================================
+    # =========================================================================================
     def call_saveMessages(self):  # Done
 
         fileName = "Connections/Shear/Finplate/fin.log"
 
         return fileName
 
-    #=========================================================================================
+    # =========================================================================================
     def call_designReport(self, htmlfilename, profileSummary):
 
         fileName = str(htmlfilename)
 
         if not os.path.isfile(fileName):
-            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder) #, self.base, self.base1, self.base2, self.base3)
 
-    #=========================================================================================
+    # =========================================================================================
 
     def load_userProfile(self):
         pass
 
-    #=========================================================================================
+    # =========================================================================================
     def save_userProfile(self, profile_summary, fileName):
         filename = str(fileName)
 
@@ -437,6 +426,6 @@ class CommonDesignLogic(object):
         infile.close()
         pass
 
-    #=========================================================================================
+    # =========================================================================================
     def save_CADimages(self):  # png,jpg and tiff
         pass

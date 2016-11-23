@@ -58,37 +58,42 @@ def points_to_bspline(pnts):
     crv = GeomAPI_PointsToBSpline(pts)
     return crv.Curve()
 
-def makeWireFromEdges(edges):
+
+def make_wire_from_edges(edges):
     wire = None
     for edge in edges:
-        if wire :
+        if wire:
             wire = make_wire(wire, edge)
         else:
             wire = make_wire(edge)
     return wire
 
-def makeFaceFromWire(wire):
+
+def make_face_from_wire(wire):
     return BRepBuilderAPI_MakeFace(wire).Face()
 
-def getGpPt(point):
+
+def get_gp_pt(point):
     return gp_Pnt(point[0], point[1], point[2])
 
-def getGpDir(direction):
+
+def get_gp_dir(direction):
     return gp_Dir(direction[0], direction[1], direction[2])
 
-def makeEdgesFromPoints(points):
+
+def make_edges_from_points(points):
     edges = []
     num = len(points)
     for i in range(num - 1):
-        edge = make_edge(getGpPt(points[i]), getGpPt(points[i + 1]))
+        edge = make_edge(get_gp_pt(points[i]), get_gp_pt(points[i + 1]))
         edges.append(edge)
-    
-    cycleEdge = make_edge(getGpPt(points[num - 1]), getGpPt(points[0]))
-    edges.append(cycleEdge)
+
+    cycle_edge = make_edge(get_gp_pt(points[num - 1]), get_gp_pt(points[0]))
+    edges.append(cycle_edge)
     
     return edges
 
-def makePrismFromFace(aFace, eDir):
+
+def make_prism_from_face(aFace, eDir):
     return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.), gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
     # return BRepPrimAPI_MakePrism(aFace, gpDir, False).Shape()
-

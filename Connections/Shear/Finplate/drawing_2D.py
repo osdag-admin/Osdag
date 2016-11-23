@@ -7,7 +7,7 @@ import svgwrite
 from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
-from __builtin__ import str
+import os.path
 import cairosvg
 
 
@@ -58,7 +58,7 @@ class FinCommonData(object):
         self.col_L = 700
         self.beam_L = 350
         self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
-        self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else  50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
+        self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else 50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
         self.beamToBeamDist = 10
         self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
         self.notch_ht = self.col_T + self.col_R1
@@ -369,33 +369,14 @@ class FinCommonData(object):
                 fin2DFront.callCFBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
 
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finFrontFB" + str(n) + ".svg"
-#                         continue
-#                 fin2DFront.callCFBWfront(fileName)
-#                 base_front = os.path.basename(str(fileName))
-
                 fileName = str(self.folder) + '/images_html/finSide.svg'
                 fin2DSide.callCFBWSide(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
 
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finSideFB" + str(n) + ".svg"
-#                         continue
-#                 fin2DSide.callCFBWSide(fileName)
-#                 base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/finTop.svg'
                 fin2DTop.callCFBWTop(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finTopFB" + str(n) + ".svg"
-#                         continue
-#                 fin2DTop.callCFBWTop(fileName)
-#                 base_top = os.path.basename(str(fileName))
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -408,32 +389,14 @@ class FinCommonData(object):
                 fileName = str(self.folder) + '/images_html/finFront.svg'
                 fin2DFront.callCWBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/FinFrontWB" + str(n) + ".svg"
-#                         continue
-#                 fin2DFront.callCWBWfront(fileName)
-#                 base_front = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/finSide.svg'
                 fin2DSide.callCWBWSide(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/FinSideWB" + str(n) + ".svg"
-#                         continue
-#                 fin2DSide.callCWBWSide(fileName)
-#                 base_side = os.path.basename(str(fileName))
 
                 fileName = str(self.folder) + '/images_html/finTop.svg'
                 fin2DTop.callCWBWTop(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/FinTopWB" + str(n) + ".svg"
-#                         continue
-#                 fin2DTop.callCWBWTop(fileName)
-#                 base_top = os.path.basename(str(fileName))
 
         else:
             if view == "Front":
@@ -446,32 +409,15 @@ class FinCommonData(object):
                 fileName = str(self.folder) + '/images_html/finFront.svg'
                 fin2DFront.callBWBWfront(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finFrontBB" + str(n) + ".svg"
-#                         continue
-#                 fin2DFront.callBWBWfront(fileName)
-#                 base_front = os.path.basename(str(fileName))
+
                 fileName = str(self.folder) + '/images_html/finSide.svg'
                 fin2DSide.callBWBWSide(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finSideBB" + str(n) + ".svg"
-#                         continue
-#                 fin2DSide.callBWBWSide(fileName)
-#                 base_side = os.path.basename(str(fileName))
+
                 fileName = str(self.folder) + '/images_html/finTop.svg'
                 fin2DTop.callBWBWTop(fileName)
                 cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
-#                 for n in range(1, 100, 1):
-#                     if (os.path.exists(fileName)):
-#                         fileName = str(self.folder) + "/images_html/finTopBB" + str(n) + ".svg"
-#                         continue
-#                 fin2DTop.callBWBWTop(fileName)
-#                 base_top = os.path.basename(str(fileName))
 
-#         return base_front, base_top, base_side 
 
 
 class Fin2DCreatorFront(object):
@@ -479,9 +425,8 @@ class Fin2DCreatorFront(object):
     def __init__(self, finCommonObj):
 
         self.dataObj = finCommonObj
-        #------------------------------------------------------------------------------ 
+        # ------------------------------------------------------------------------------
         #              COLUMN WEB BEAM WEB CONNECTIVITY (FRONT VIEW)
-        #------------------------------------------------------------------------------ 
 
         self.A2 = (self.dataObj.col_B, (self.dataObj.col_L - self.dataObj.D_beam) / 2)
         self.B = (self.dataObj.col_B, 0)
@@ -567,9 +512,8 @@ class Fin2DCreatorFront(object):
         ptP1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + (self.dataObj.col_tw + self.dataObj.beam_R1 + 3) + self.dataObj.end_dist)
         self.P1 = (ptP1x, ptP1y)
 
-        #=======================================================================
         #              COLUMN FLANGE BEAM WEB CONNECTIVITY (FRONT VIEW)
-        #=======================================================================
+        # =======================================================================
         fromPlate_pt = self.dataObj.D_col + self.dataObj.gap  # 20 mm clear distance between colume and beam
         ptFAx = 0
         ptFAy = 0
@@ -612,9 +556,8 @@ class Fin2DCreatorFront(object):
         ptFUy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + self.dataObj.plate_ht
         self.FU = (ptFUx, ptFUy)
 
-
         # FC1
-        ptFC1x = fromPlate_pt 
+        ptFC1x = fromPlate_pt
         ptFC1y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.FC1 = np.array([ptFC1x, ptFC1y])
 
@@ -648,7 +591,6 @@ class Fin2DCreatorFront(object):
         ptFB3y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB3 = (ptFB3x, ptFB3y)
 
-
         # FB2
         ptFB2x = fromPlate_pt + self.dataObj.beam_L
         ptFB2y = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam
@@ -664,9 +606,9 @@ class Fin2DCreatorFront(object):
         ptFB4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam) - self.dataObj.beam_T
         self.FB4 = ptFB4x, ptFB4y
 
-        #=======================================================================
+        # =======================================================================
         #                BEAM-BEAM CONNECTIVITY (FRONT VIEW)
-        #=======================================================================
+        # =======================================================================
         self.BA = np.array([0, 0])
         self.BB = self.BA + self.dataObj.col_B * np.array([1, 0])
         self.BC = self.BB + (self.dataObj.col_T) * np.array([0, 1])
@@ -742,8 +684,9 @@ class Fin2DCreatorFront(object):
         for row in ptList:
             if len(row) > 0:
                 pitchPts.append(row[0])
-        params = {"offset": self.dataObj.D_col + self.dataObj.plateEdge_dist + 50, "textoffset": 235, "lineori": "right", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + " mm c/c", params)     
+        params = {"offset": self.dataObj.D_col + self.dataObj.plateEdge_dist + 50, "textoffset": 235, "lineori": "right", "endlinedim": 10}
+        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' +
+                                               str(int(self.dataObj.pitch)) + " mm c/c", params)
 
         # Cross section A-A
         ptSecA = self.FA + (320 * np.array([0, -1]))
@@ -751,7 +694,9 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
+        # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
         ptSecC = self.FA2 + (472 * np.array([0, -1]))
+
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -760,9 +705,9 @@ class Fin2DCreatorFront(object):
 
         # Distance between Beam Flange and Plate
 
-        params = {"offset": self.dataObj.D_col + self.dataObj.gap + 50, "textoffset": 125, "lineori": "right", "endlinedim":10}
+        params = {"offset": self.dataObj.D_col + self.dataObj.gap + 50, "textoffset": 125, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outerArrow(dwg, self.FA1, self.FC1, str(int(self.dataObj.beam_T + self.dataObj.beam_R1 + 3)) + " mm", params)
-        # Draw Faint Line To Represent Distance Between Beam Flange and Plate.
+            # Draw Faint Line To Represent Distance Between Beam Flange and Plate.
         ptOne = self.FA1
         ptBx = -30
         ptBy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2)
@@ -780,8 +725,9 @@ class Fin2DCreatorFront(object):
         edgPt1x = edgPtx
         edgPt1y = edgPty + self.dataObj.plate_ht
         edgPt1 = (edgPt1x, edgPt1y)
-        params = {"offset": self.dataObj.D_col + self.dataObj.plateEdge_dist + 50, "textoffset": 125, "lineori": "right", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[len(pitchPts) - 1]), np.array([edgPt1x, edgPt1y]), str(int(self.dataObj.end_dist)) + " mm", params)   
+
+        params = {"offset": self.dataObj.D_col + self.dataObj.plateEdge_dist + 50, "textoffset": 125, "lineori": "right", "endlinedim": 10}
+        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[len(pitchPts) - 1]), np.array([edgPt1x, edgPt1y]), str(int(self.dataObj.end_dist)) + " mm", params)
 
         # Edge Distance information
         pt1A = self.ptFP + self.dataObj.plateEdge_dist * np.array([1, 0]) + \
@@ -806,7 +752,7 @@ class Fin2DCreatorFront(object):
                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1])
             offset = (self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 130
             params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim":10}
-            self.dataObj.draw_dimension_outerArrow(dwg, A, B, str(int(self.dataObj.gauge)) + " mm" , params)  
+            self.dataObj.draw_dimension_outerArrow(dwg, A, B, str(int(self.dataObj.gauge)) + " mm" , params)
             FA = self.FP + self.dataObj.plateEdge_dist * np.array([1, 0])
             FB = self.FP + self.dataObj.plateEdge_dist * np.array([1, 0]) + ((self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 70) * np.array([0, -1])
             self.dataObj.drawFaintLine(FA, FB, dwg) 
@@ -874,6 +820,7 @@ class Fin2DCreatorFront(object):
         pt = self.FA + 10 * np.array([1, 0])  # np.array([ptx,pty])
         theta = 30
         offset = 40  # self.dataObj.col_L /7
+
         textUp = "Column " + self.dataObj.col_Designation
         textDown = ""
         element = ""
@@ -926,7 +873,7 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.A3 + (472 * np.array([0, -1]))
+        ptSecC = self.A3 + (520 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -2121,6 +2068,7 @@ class Fin2DCreatorSide(object):
         vb_width = str(float(3.5 * self.dataObj.D_col))
         vb_ht = str(float(1.4 * self.dataObj.col_L))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -100 ' + vb_width + ' ' + vb_ht))
+
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 
@@ -2251,7 +2199,11 @@ class Fin2DCreatorSide(object):
             rect_ht = self.dataObj.beam_tw + self.dataObj.plate_thick
             dwg.add(dwg.rect(insert=(bltPt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
             bltPt3 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.plate_thick * np.array([-1, 0])
+<<<<<<< HEAD
             bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0])
+=======
+            bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0]) 
+>>>>>>> cnvntionlname
             dwg.add(dwg.line((bltPt1), (bltPt2)).stroke('black', width=1.5, linecap='square'))
             dwg.add(dwg.line((bltPt3), (bltPt4)).stroke('black', width=1.5, linecap='square'))
             pitchPts.append(pt)
@@ -2325,3 +2277,4 @@ class Fin2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.fit()
         dwg.save()
+                

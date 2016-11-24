@@ -755,7 +755,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.combo_Beam.setCurrentIndex((0))
             self.ui.comboColSec.setCurrentIndex((0))
 #             self.ui.comboConnLoc.setCurrentIndex((0))
-            self.ui.comboDaimeter.setCurrentIndex(0)
+            self.ui.comboDiameter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
             self.ui.comboPlateThick_2.setCurrentIndex((0))
@@ -784,7 +784,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtplate_width.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
-            self.ui.txtWeldStrng_5.clear()
+            self.ui.txtWeld_length.clear()
 
     def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()

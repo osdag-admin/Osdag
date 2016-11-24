@@ -58,14 +58,14 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.origin = origin
         self.uDir = uDir
         self.shaftDir = shaftDir
-        self.computeParams()
+        self.compute_params()
 
     def getPoint(self, theta):
         theta = math.radians(theta)
         point = self.origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
 
-    def computeParams(self):
+    def compute_params(self):
         self.vDir = numpy.cross(self.shaftDir, self.uDir)
         self.a1 = self.getPoint(0)
         self.a2 = self.getPoint(60)
@@ -75,7 +75,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
 
-    def createModel(self):
+    def create_model(self):
 
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)

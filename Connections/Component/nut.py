@@ -43,23 +43,23 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.T = T
         self.r1 = innerR1
         # self.r2 = outerR2
-        self.secOrigin = numpy.array([0, 0, 0])
+        self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.computeParams()
+        self.compute_params()
 
-    def place(self, secOrigin, uDir, wDir):
-        self.secOrigin = secOrigin
+    def place(self, sec_origin, uDir, wDir):
+        self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        self.computeParams()
+        self.compute_params()
 
     def getPoint(self, theta):
         theta = math.radians(theta)
-        point = self.secOrigin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
+        point = self.sec_origin + (self.R * math.cos(theta)) * self.uDir + (self.R * math.sin(theta)) * self.vDir 
         return point
 
-    def computeParams(self):
+    def compute_params(self):
 
         self.vDir = numpy.cross(self.wDir, self.uDir)
         self.a1 = self.getPoint(0)
@@ -70,7 +70,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
 
-    def createModel(self):
+    def create_model(self):
 
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
@@ -78,7 +78,7 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
 
-        cylOrigin = self.secOrigin
+        cylOrigin = self.sec_origin
         innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(getGpPt(cylOrigin), getGpDir(self.wDir)), self.r1, self.H).Shape()
 
         result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape()

@@ -18,31 +18,31 @@ class Notch(object):
         self.height = height
         self.width = width
         self.length = length
-        self.secOrigin = numpy.array([0, 0, 0])
+        self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0.0, 1.0])
 
-        self.computeParams()
+        self.compute_params()
 
-    def place(self, secOrigin, uDir, wDir):
-        self.secOrigin = secOrigin
+    def place(self, sec_origin, uDir, wDir):
+        self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        self.computeParams()
+        self.compute_params()
 
-    def computeParams(self):
+    def compute_params(self):
 
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a = self.secOrigin + (self.width / 2.0) * self.uDir
+        self.a = self.sec_origin + (self.width / 2.0) * self.uDir
         self.b1 = self.a + (self.height - self.R1) * (-self.vDir)
         self.o1 = self.b1 + self.R1 * (-self.uDir)
-        self.b = self.secOrigin + (self.width / 2.0) * self.uDir + self.height * (-self.vDir)
+        self.b = self.sec_origin + (self.width / 2.0) * self.uDir + self.height * (-self.vDir)
         self.b2 = self.b + self.R1 * (-self.uDir)
 
-        self.d = self.secOrigin + (-self.width / 2.0) * self.uDir 
+        self.d = self.sec_origin + (-self.width / 2.0) * self.uDir 
         self.c1 = self.d + (self.height - self.R1) * (-self.vDir)
         self.o2 = self.c1 + self.R1 * self.uDir
-        self.c = self.secOrigin + (self.width / 2.0) * (-self.uDir) + self.height * (-self.vDir)
+        self.c = self.sec_origin + (self.width / 2.0) * (-self.uDir) + self.height * (-self.vDir)
         self.c2 = self.c + self.R1 * (self.uDir)
 
         self.points = [self.a, self.b1, self.o1, self.b, self.b2, self.d, self.c1, self.o2, self.c, self.c2]
@@ -75,7 +75,7 @@ class Notch(object):
 
         return edges
 
-    def createModel(self):
+    def create_model(self):
         edges = self.createEdges()
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)

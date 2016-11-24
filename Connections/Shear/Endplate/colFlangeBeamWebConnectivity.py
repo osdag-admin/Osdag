@@ -55,6 +55,7 @@ class ColFlangeBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
         
     def create_beam_geometry(self):
+        
         beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * (-self.column.vDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])

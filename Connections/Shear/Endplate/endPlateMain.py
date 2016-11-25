@@ -6,8 +6,6 @@ comment
 '''
 from OCC import IGESControl
 from OCC import VERSION, BRepTools
-from ui_aboutosdag import Ui_HelpOsdag
-from ui_tutorial import Ui_Tutorial
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 # from OCC.Display.qtDisplay import qtViewer3d
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
@@ -22,6 +20,7 @@ from PyQt4.QtCore import QString, pyqtSignal
 from PyQt4.QtWebKit import *
 from PyQt4.Qt import QPrinter, QDialog
 import os.path
+import subprocess
 import pickle
 import svgwrite
 # import yaml
@@ -373,7 +372,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the create design report
 
 # ************************************ Help button *******************************************************************************
-        self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
+        self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Report.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
@@ -2007,17 +2006,23 @@ class MainController(QtGui.QMainWindow):
     def sample_report(self):
 
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-#         counter = 0
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_path, pdf_file))
-#                 counter = counter + 1
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_path, pdf_file))
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
 # ********************************************************************************************************************************************************
 

@@ -355,6 +355,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populate_weld_thick_combo())
+        self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
+        self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -376,7 +378,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Report.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
-
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
         # Initialising the qtviewer
 
         from osdagMainSettings import backend_name
@@ -2025,6 +2027,14 @@ class MainController(QtGui.QMainWindow):
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
 # ********************************************************************************************************************************************************
+    def design_preferences(self):
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearace(self):
+        self.designPrefDialog.set_bolthole_clernce()
+
+    def call_boltFu(self):
+        self.designPrefDialog.set_boltFu()
 
 
 def set_osdaglogger():

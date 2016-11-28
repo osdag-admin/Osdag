@@ -60,6 +60,7 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
         Returns:
             None
         """
+        self.save_images_hardcoded("test_image","sideView")
         pass
 
     def save_images_hardcoded(self, file_name, view):
@@ -77,15 +78,14 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
         """
         output_dict = create_sample_ui_output()
         input_dict = create_sample_ui_input()
+        model.module_setup()
         model_beam_data = model.get_beamdata(input_dict["Member"]["BeamSection"])
         model_column_data = model.get_columndata(input_dict["Member"]["ColumnSection"])
-        file_name = "test_image"
         folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
         base = "3D_ModelFinFB.png"
         base_front = "finFrontFB.svg"
         base_top = "finSideFB.svg"
         base_side = "finTopFB.svg"
-
         seat_common_instance = SeatCommonData(input_dict, output_dict, model_beam_data, model_column_data, folder_location)
         # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "Front")
         # base_front, base_top, base_side = seat_common_instance.save_to_svg(str(file_name), "Side")

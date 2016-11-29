@@ -332,7 +332,7 @@ class cleatCommonData(object):
             txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - (txt_offset + 15) * offset_vector
         elif (orientation == "NW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + txt_offset * offset_vector
-            txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
+            txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
         elif (orientation == "SE"):
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
             txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - txt_offset * offset_vector

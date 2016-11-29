@@ -110,20 +110,18 @@ class ColFlangeBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        # + self.nut_bolt_array.getnutboltModels()
-        # return [self.columnModel,self.plateModel, self.weldModelLeft,self.weldModelRight,
-        # + self.nut_bolt_array.getnutboltModels()
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nut_bolt_array.get_models()
              
     def get_nutboltmodels(self):
-        
         return self.nut_bolt_array.get_models()
-        # return self.nut_bolt_array.getboltModels()
-         
+    
+    def get_beamModel(self):
+        return self.beamModel
+    
     def get_column_model(self):
-        final_beam = self.columnModel
-        nut_bolt_list = self.nut_bolt_array.get_models()
-        for bolt in nut_bolt_list[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
-        return final_beam
+        final_column = self.columnModel
+        bolt_list = self.nut_bolt_array.get_boltlist()
+        for bolt in bolt_list[:]:
+            final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()
+        return final_column

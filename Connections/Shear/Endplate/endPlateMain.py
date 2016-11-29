@@ -79,7 +79,7 @@ class DesignPreferences(QtGui.QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
-        #self.set_default_para()
+        self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
@@ -99,11 +99,12 @@ class DesignPreferences(QtGui.QDialog):
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
+        
         if weldType == "Shop weld":
             designPref["weld"]["safety_factor"] = float(1.25)
         else:
             designPref["weld"]["safety_factor"] = float(1.5)
-
+        designPref["weld"]["weld_fu"] = str(self.ui.txt_weldFu.text())
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -273,6 +274,7 @@ class MainController(QtGui.QMainWindow):
     def __init__(self, folder):
 
         QtGui.QMainWindow.__init__(self)
+        
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -281,6 +283,8 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
         self.folder = folder
+        
+        
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
@@ -289,10 +293,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.comboType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        self.retrieve_prevstate()
         ###################
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         ############
-        #self.retrieve_prevstate()
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
@@ -364,7 +368,8 @@ class MainController(QtGui.QMainWindow):
 
         # Saving and Restoring the endPlate window state.
 
-        self.retrieve_prevstate()
+        #self.retrieve_prevstate()
+        self.designPrefDialog = DesignPreferences(self)
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
@@ -1704,7 +1709,10 @@ class MainController(QtGui.QMainWindow):
 #         else:
 #             self.display.EraseAll()
 #             # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
-
+    
+    def call_3d_model(self, flag):
+        self.commLogicObj.call_3DModel(flag)
+        
     def call_3d_beam(self):
         '''
         Creating and displaying 3D Beam
@@ -1716,7 +1724,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display_3d_model("Beam")
+        self.commLogicObj.display_3DModel("Beam")
 
     def call_3d_column(self):
         '''
@@ -1727,7 +1735,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.display_3d_model("Column")
+        self.commLogicObj.display_3DModel("Column")
 
     def call_3d_endplate(self):
         '''Displaying EndPlate in 3D
@@ -1739,7 +1747,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display_3d_model("Endplate")
+        self.commLogicObj.display_3DModel("Endplate")
 
     def unchecked_all_checkbox(self):
 

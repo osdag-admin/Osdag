@@ -12,7 +12,7 @@ from ModelUtils import *
 import copy
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
+#from nutBoltPlacement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
@@ -121,7 +121,8 @@ class ColFlangeBeamWeb(object):
     
     def get_column_model(self):
         final_column = self.columnModel
-        bolt_list = self.nut_bolt_array.get_boltlist()
+        print"printing nutBoltarray from endplate/colFlamgeBeamWebConnectivity",self.nut_bolt_array
+        bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:
             final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()
         return final_column

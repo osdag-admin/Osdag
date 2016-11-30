@@ -3,9 +3,8 @@ Created on 07-Jun-2015
 
 @author: deepa
 '''
-import numpy
-from bolt import Bolt
-from nut import Nut
+from Connections.Component.bolt import Bolt
+from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import get_gp_pt
 
@@ -120,3 +119,11 @@ class NutBoltArray():
         
     def get_models(self):
         return self.models   
+    
+    def get_bolt_list(self):
+        boltlist = []
+        for bolt in self.bolts:
+            boltlist.append(bolt.create_model())
+        for bolt in self.bolts1:
+            boltlist.append(bolt.create_model())
+        return boltlist

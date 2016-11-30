@@ -1747,7 +1747,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Endplate")
+        self.commLogicObj.display_3DModel("Plate")
 
     def unchecked_all_checkbox(self):
 

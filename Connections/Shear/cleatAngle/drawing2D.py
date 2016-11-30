@@ -335,10 +335,10 @@ class cleatCommonData(object):
             txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
         elif (orientation == "SE"):
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
-            txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - txt_offset * offset_vector
+            txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - (txt_offset + 15) * offset_vector
         elif (orientation == "SW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + (txt_offset) * offset_vector
-            txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
+            txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
 
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
 

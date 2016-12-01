@@ -104,7 +104,8 @@ class cleatCommonData(object):
 
         '''
         section_marker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
-        section_marker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))
+
+        section_marker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))    #makes arrow
         dwg.defs.add(section_marker)
 
         return section_marker
@@ -176,7 +177,7 @@ class cleatCommonData(object):
         line_vector = pt2 - pt1  # [a, b]
         normal_vector = np.array([-line_vector[1], line_vector[0]])  # [-b, a]
         normal_unit_vector = self.normalize(normal_vector)
-        if (params["lineori"] == "left"):
+        if params["lineori"] == "left":
             normal_unit_vector = -normal_unit_vector
 
         # Q1 = pt1 + params["offset"] * normal_unit_vector
@@ -220,7 +221,7 @@ class cleatCommonData(object):
         '''
         line = dwg.add(dwg.line((ptA), (ptB)).stroke('black', width=2.5, linecap='square'))
         sec_arrow = self.add_section_maker(dwg)
-        self.draw_end_arrow(line, sec_arrow)
+        self.draw_end_arrow(line, sec_arrow)                  # adds arrow to the line
         dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=52))
 
     def draw_dimension_inner_arrow(self, dwg, ptA, ptB, text, params):

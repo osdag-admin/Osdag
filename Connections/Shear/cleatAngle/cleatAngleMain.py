@@ -822,7 +822,6 @@ class MainController(QtGui.QMainWindow):
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        #         pdfkit.from_file(filename, filename[:-5] + ".pdf", configuration=config, options=options)
         pdfkit.from_file(filename, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
                          options=options)
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")

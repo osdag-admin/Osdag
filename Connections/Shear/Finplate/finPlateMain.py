@@ -27,7 +27,8 @@ from OCC.StlAPI import StlAPI_Writer
 import pdfkit
 import shutil
 import webbrowser
-from commonLogic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
+#from commonLogic import CommonDesignLogic
 from fileinput import filename
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -1325,7 +1326,7 @@ class MainController(QtGui.QMainWindow):
         self.enableViewButtons()
         self. unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.display, self.folder)
+                                              self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1417,6 +1418,8 @@ class MainController(QtGui.QMainWindow):
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
                                          self.alist[8], self.display, self.folder)
+        
+
         if view != 'All':
             # fileName = ''
 

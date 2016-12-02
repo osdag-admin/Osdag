@@ -457,7 +457,7 @@ class Fin2DCreatorFront(object):
         self.P = (ptPx, ptPy)
         self.ptP = np.array([ptPx, ptPy])
 
-        self.U = self.ptP + (self.dataObj.plate_ht) * np.array([0, 1])
+        self.U = self.ptP + ((self.dataObj.plate_ht) * np.array([0, 1]))
 
         ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_width
         ptRy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
@@ -2199,11 +2199,7 @@ class Fin2DCreatorSide(object):
             rect_ht = self.dataObj.beam_tw + self.dataObj.plate_thick
             dwg.add(dwg.rect(insert=(bltPt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
             bltPt3 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.plate_thick * np.array([-1, 0])
-<<<<<<< HEAD
             bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0])
-=======
-            bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0]) 
->>>>>>> cnvntionlname
             dwg.add(dwg.line((bltPt1), (bltPt2)).stroke('black', width=1.5, linecap='square'))
             dwg.add(dwg.line((bltPt3), (bltPt4)).stroke('black', width=1.5, linecap='square'))
             pitchPts.append(pt)

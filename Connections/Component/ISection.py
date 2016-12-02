@@ -6,7 +6,8 @@ Created on 29-Nov-2014
 import numpy
 from ModelUtils import *
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
-from notch import Notch
+#from notch import Notch
+from Connections.Component.notch import Notch
 
 
 class ISection(object):
@@ -100,7 +101,7 @@ class ISection(object):
 
             self.notchObj.place(origin2, uDir, wDir)
 
-            notchModel = self.notchObj.createModel()
+            notchModel = self.notchObj.create_model()
             prism = BRepAlgoAPI_Cut(prism, notchModel).Shape()
 
         return prism

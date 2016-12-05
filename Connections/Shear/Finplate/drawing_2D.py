@@ -642,7 +642,7 @@ class Fin2DCreatorFront(object):
         self.BC1 = self.BA6 + self.dataObj.col_R1 * np.array([0, -1])
 
     def callCFBWfront(self, fileName):
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-340 -350 1200 1300'))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-350 -380 1200 1300'))
 
         dwg.add(dwg.polyline(points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.FE), (self.FH)).stroke('blue', width=2.5, linecap='square'))
@@ -689,14 +689,13 @@ class Fin2DCreatorFront(object):
                                                str(int(self.dataObj.pitch)) + " mm c/c", params)
 
         # Cross section A-A
-        ptSecA = self.FA + (320 * np.array([0, -1]))
+        ptSecA = self.FA + (270 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
         # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
         ptSecC = self.FA2 + (472 * np.array([0, -1]))
-
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -868,12 +867,12 @@ class Fin2DCreatorFront(object):
 
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-410 -350 1250 1280'))
 
-        ptSecA = self.A + (320 * np.array([0, -1]))
+        ptSecA = self.A + (270 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.A3 + (520 * np.array([0, -1]))
+        ptSecC = self.A3 + (472 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -1957,10 +1956,10 @@ class Fin2DCreatorSide(object):
     def callCWBWSide(self, fileName):
         '''
         '''
-        vb_width = str(float(3.5 * self.dataObj.D_col))
+        vb_width = str(3 * self.dataObj.D_col)
         vb_ht = str(float(1.4 * self.dataObj.col_L))
 
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -100 ' + vb_width + ' ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -100 ' + vb_width + ' ' + vb_ht))
         dwg.add(dwg.rect(insert=(self.A), size=(self.dataObj.D_col, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.C), (self.H)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.B), (self.G)).stroke('blue', width=2.5, linecap='square'))
@@ -2065,9 +2064,9 @@ class Fin2DCreatorSide(object):
     def callCFBWSide(self, fileName):
         '''
         '''
-        vb_width = str(float(3.5 * self.dataObj.D_col))
+        vb_width = str(float(4 * self.dataObj.D_col))
         vb_ht = str(float(1.4 * self.dataObj.col_L))
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -100 ' + vb_width + ' ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-40 -100 ' + vb_width + ' ' + vb_ht))
 
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
@@ -2171,9 +2170,12 @@ class Fin2DCreatorSide(object):
         print "********** Column Flange Beam Web Side Saved  *************"
 
     def callBWBWSide(self, fileName):
-        vb_width = str(float(1.6 * self.dataObj.col_L))
-        vb_ht = str(float(1.7 * self.dataObj.D_col))
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-10 -200 ' + vb_width + ' ' + vb_ht))
+        vb_width =  str(800 + self.dataObj.col_L)
+        # vb_width = str(float(1.7 * self.dataObj.col_L))
+        vb_ht = str(400+ self.dataObj.D_col)
+        # vb_ht = str(float(2 * self.dataObj.D_col))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -210 ' + vb_width + ' ' + vb_ht))
+        print dwg, "printing dwg valuessssss"
 
         dwg.add(dwg.polyline(points=[(self.BA1), (self.BA2), (self.BA5), (self.BA6), (self.BA1)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BA8), (self.BA3)).stroke('blue', width=2.5, linecap='square'))
@@ -2225,8 +2227,8 @@ class Fin2DCreatorSide(object):
 
         # Column Information
         beam_pt = self.BA5
-        theta = 30
-        offset = 50
+        theta = 75
+        offset = 120
         textUp = "Beam " + self.dataObj.col_Designation
         textDown = ""
         element = ""
@@ -2252,7 +2254,7 @@ class Fin2DCreatorSide(object):
 
         # Bolt Information
         boltPt = self.BS + self.dataObj.end_dist * np.array([0, -1])
-        theta = 35
+        theta = 30
         offset = self.dataObj.col_L / 3.0
 
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"

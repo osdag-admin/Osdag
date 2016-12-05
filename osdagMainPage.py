@@ -59,10 +59,10 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
     def show_desgin_connection(self):
 
-        folder = QtGui.QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..', '..', 'Osdag_workspace'), 'All Files (*)')
+        folder = QtGui.QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..','OsdagWorkspace', 'Osdag_workspace'), 'All Files (*)')
         folder = str(folder)
         if not os.path.exists(folder):
-            os.makedirs(folder, 0755)
+            os.mkdir(folder)
 
         root_path = folder
         images_html_folder = ['images_html']

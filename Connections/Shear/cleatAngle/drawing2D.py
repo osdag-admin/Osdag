@@ -338,7 +338,7 @@ class cleatCommonData(object):
             txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - txt_offset * offset_vector
         elif (orientation == "SW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + (txt_offset) * offset_vector
-            txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
+            txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 10) * offset_vector
 
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
 
@@ -530,7 +530,7 @@ class Cleat2DCreatorFront(object):
         self.P = (ptPx, ptPy)
         self.ptP = np.array([ptPx, ptPy])
 
-        self.U = self.ptP + (self.dataObj.cleat_ht) * np.array([0, 1])
+        self.U = self.ptP + (self.dataObj.cleat_ht * np.array([0, 1]))
 
         ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.cleat_legsize
         ptRy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)

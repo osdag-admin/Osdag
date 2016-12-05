@@ -15,6 +15,7 @@ from model import *
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 import os.path
+import subprocess
 from utilities import osdag_display_shape
 from colWebBeamWebConnectivity import ColWebBeamWeb
 from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
@@ -27,7 +28,8 @@ from OCC.StlAPI import StlAPI_Writer
 import pdfkit
 import shutil
 import webbrowser
-from commonLogic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
+#from commonLogic import CommonDesignLogic
 from fileinput import filename
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -816,11 +818,15 @@ class MainController(QtGui.QMainWindow):
         fileName = str(fileName)
         self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)  #, base, base1, base2, base3)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)  #, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
-        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        if sys.platform == "nt":
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
                    'margin-bottom': '10mm',
@@ -1325,7 +1331,7 @@ class MainController(QtGui.QMainWindow):
         self.enableViewButtons()
         self. unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.display, self.folder)
+                                              self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
@@ -1416,7 +1422,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                         self.alist[8], self.display, self.folder)
+                                         self.alist[8], self.display, self.folder, self.connection)
+        
+
         if view != 'All':
             # fileName = ''
 
@@ -1479,18 +1487,24 @@ class MainController(QtGui.QMainWindow):
 
     def sample_report(self):
 
-        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-#         counter = 0
-        for pdf_file in os.listdir(root_Path):
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_Path, pdf_file))
-#                 counter = counter + 1
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        root_Path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-        for pdf_file in os.listdir(root_Path):
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
+        for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_Path, pdf_file))
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def design_preferences(self):
         self.designPrefDialog.show()

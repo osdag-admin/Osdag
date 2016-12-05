@@ -457,7 +457,7 @@ class Fin2DCreatorFront(object):
         self.P = (ptPx, ptPy)
         self.ptP = np.array([ptPx, ptPy])
 
-        self.U = self.ptP + (self.dataObj.plate_ht) * np.array([0, 1])
+        self.U = self.ptP + ((self.dataObj.plate_ht) * np.array([0, 1]))
 
         ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_width
         ptRy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
@@ -1559,7 +1559,7 @@ class Fin2DCreatorTop(object):
         '''
         '''
         vb_ht = str(float(self.dataObj.D_col) + 750)
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -300 850 ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -300 900 ' + vb_ht))
 
         dwg.add(dwg.polyline(points=[(self.A), (self.B), (self.C), (self.D), (self.E), (self.F), (self.G), (self.H), (self.I), (self.J), (self.K), (self.L), (self.A)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
@@ -1959,7 +1959,7 @@ class Fin2DCreatorSide(object):
         vb_width = str(3 * self.dataObj.D_col)
         vb_ht = str(float(1.4 * self.dataObj.col_L))
 
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -100 ' + vb_width + ' ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-40 -100 ' + vb_width + ' ' + vb_ht))
         dwg.add(dwg.rect(insert=(self.A), size=(self.dataObj.D_col, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.C), (self.H)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.B), (self.G)).stroke('blue', width=2.5, linecap='square'))
@@ -2201,7 +2201,6 @@ class Fin2DCreatorSide(object):
             rect_ht = self.dataObj.beam_tw + self.dataObj.plate_thick
             dwg.add(dwg.rect(insert=(bltPt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
             bltPt3 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.plate_thick * np.array([-1, 0])
-            bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0])
             bltPt4 = pt + self.dataObj.bolt_dia / 2 * np.array([0, 1]) + self.dataObj.beam_tw * np.array([1, 0])
             dwg.add(dwg.line((bltPt1), (bltPt2)).stroke('black', width=1.5, linecap='square'))
             dwg.add(dwg.line((bltPt3), (bltPt4)).stroke('black', width=1.5, linecap='square'))

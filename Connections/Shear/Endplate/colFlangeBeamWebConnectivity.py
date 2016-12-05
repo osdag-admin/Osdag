@@ -12,7 +12,7 @@ from ModelUtils import *
 import copy
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
+#from nutBoltPlacement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
@@ -55,6 +55,7 @@ class ColFlangeBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
         
     def create_beam_geometry(self):
+        
         beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * (-self.column.vDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])
@@ -109,20 +110,19 @@ class ColFlangeBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        # + self.nut_bolt_array.getnutboltModels()
-        # return [self.columnModel,self.plateModel, self.weldModelLeft,self.weldModelRight,
-        # + self.nut_bolt_array.getnutboltModels()
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nut_bolt_array.get_models()
              
     def get_nutboltmodels(self):
-        
         return self.nut_bolt_array.get_models()
-        # return self.nut_bolt_array.getboltModels()
-         
+    
+    def get_beamModel(self):
+        return self.beamModel
+    
     def get_column_model(self):
-        final_beam = self.columnModel
-        nut_bolt_list = self.nut_bolt_array.get_models()
-        for bolt in nut_bolt_list[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
-        return final_beam
+        final_column = self.columnModel
+        print"printing nutBoltarray from endplate/colFlamgeBeamWebConnectivity",self.nut_bolt_array
+        bolt_list = self.nut_bolt_array.get_bolt_list()
+        for bolt in bolt_list[:]:
+            final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()
+        return final_column

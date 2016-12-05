@@ -337,7 +337,7 @@ class CommonDesignLogic(object):
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif self.component == "Model":
-            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+            #osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
             osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
@@ -392,7 +392,7 @@ class CommonDesignLogic(object):
             data = str(folder) + "/"
             self.display.ExportToImage(data)
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    def callDesired_View(self, fileName, view, folder): #,base_front, base_top, base_side):
+    def callDesired_View(self, fileName, view, folder): 
 
         finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
         finCommonObj.saveToSvg(str(fileName), view)

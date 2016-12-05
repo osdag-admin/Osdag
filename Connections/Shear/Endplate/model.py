@@ -18,8 +18,6 @@ def set_databaseconnection():
     Setting connection with SQLite
     '''
     filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Osdag')
-#     filepath = "D:\EclipseWorkspace\OsdagWorkshop\Database\Osdag"
-
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
     # db.open()
@@ -64,8 +62,6 @@ def get_beamcombolist():
     combo_list.append("Select Designation")
     while(beam_query.next()):
         combo_list.append(beam_query.value(0).toString())
-    print "printing combo_list"
-    print combo_list
     return combo_list
 
 
@@ -78,9 +74,6 @@ def get_beamdata(sect):
     query_str = "Select * from Beams where Designation = '%s'" % section
 
     design_query = QSqlQuery(query_str)
-    print(design_query)
-
-    print design_query.size()
     ret_dict = {}
     record = design_query.record()
 
@@ -116,9 +109,7 @@ def get_columndata(sect):
     query_str = "Select * from Columns where Designation = '%s'" % section
 
     design_query = QSqlQuery(query_str)
-    print(design_query)
 
-    print design_query.size()
     ret_dict = {}
     record = design_query.record()
 

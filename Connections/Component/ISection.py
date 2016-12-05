@@ -6,7 +6,8 @@ Created on 29-Nov-2014
 import numpy
 from ModelUtils import *
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
-from notch import Notch
+#from notch import Notch
+from Connections.Component.notch import Notch
 
 
 class ISection(object):
@@ -56,15 +57,15 @@ class ISection(object):
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
 
-        self.computeParams()
+        self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        self.computeParams()
+        self.compute_params()
 
-    def computeParams(self):
+    def compute_params(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
         self.a1 = self.sec_origin + (self.t / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir
         self.b1 = self.sec_origin + (self.B / 2.0) * self.uDir + ((self.D / 2.0) - self.T) * self.vDir

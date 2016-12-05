@@ -16,15 +16,15 @@ class FilletWeld(object):
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
-        self.computeParams()
+        self.compute_params()
 
     def place(self, sec_origin, uDir, wDir):
         self.sec_origin = sec_origin
         self.uDir = uDir
         self.wDir = wDir
-        self.computeParams()
+        self.compute_params()
 
-    def computeParams(self):
+    def compute_params(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
         self.a1 = self.sec_origin
         self.a2 = self.sec_origin + self.b * self.uDir

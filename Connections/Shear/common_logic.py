@@ -130,18 +130,18 @@ class CommonDesignLogic(object):
         sBeam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
         sBeam_R1 = float(self.dictbeamdata[QString("R1")])
         sBeam_R2 = float(self.dictbeamdata[QString("R2")])
+        cleardist = float(self.uiObj['detailing']['gap'])
+        plate_thk = float(self.uiObj['Plate']['Thickness (mm)'])
 
-        # --Notch dimensions
-        notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
-        # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        beam = ISection(B=sBeam_B, T=sBeam_T, D=sBeam_D,
-                        t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
-                        alpha=sBeam_alpha, length=500, notchObj=notchObj)
+        width1 =(pBeam_B/2.0 -(pBeam_tw/2.0 + cleardist)+10)
+        width2 =(pBeam_B/2.0 -(pBeam_tw/2.0 + plate_thk)+10)
+        print 'printing width of the notch', width1
+        print 'printing width of the notch', width2
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.resultObj['Weld']['thickness']
+        fillet_thickness = self.uiObj["Weld"]['Size (mm)']
         plate_width = self.resultObj['Plate']['width']
         plate_thick = self.uiObj['Plate']['Thickness (mm)']
         bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
@@ -153,6 +153,16 @@ class CommonDesignLogic(object):
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
 
+        # --Notch dimensions
+        if self.connection == "Finplate":
+            notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 20)) / 2.0 + 10), length=sBeam_B)
+        else:
+            notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=(pBeam_B/2.0 - (pBeam_tw/2.0 + plate_thk) + 10), length=sBeam_B)
+            
+        # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
+        beam = ISection(B=sBeam_B, T=sBeam_T, D=sBeam_D,
+                        t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
+                        alpha=sBeam_alpha, length=500, notchObj=notchObj)
         # plate = Plate(L= 300,W =100, T = 10)
         plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
 
@@ -168,15 +178,12 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":#finBeamWebBeamWeb/endBeamWebBeamWeb
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
-            beamwebconn = finBeamWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
+            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate,nutBoltArray)
         elif self.connection == "Endplate":
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
-            beamwebconn = endBeamWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
-        #---------------------------------- gap = sBeam_tw + plate_thick + nut_T
+            beamwebconn = endBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate,nutBoltArray)
 
-        #--------- nutBoltArray = NutBoltArray(self.  resultObj, nut, bolt, gap)
-        # beamwebconn = BeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray)
         beamwebconn.create_3dmodel()
 
         return beamwebconn
@@ -224,7 +231,7 @@ class CommonDesignLogic(object):
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.resultObj['Weld']['thickness']
+        fillet_thickness = self.uiObj['Weld']['Size (mm)']
         plate_width = self.resultObj['Plate']['width']
         plate_thick = self.uiObj['Plate']['Thickness (mm)']
         bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
@@ -252,7 +259,7 @@ class CommonDesignLogic(object):
         # nut =Nut(R = 17, T = 17.95,  H = 12.2, innerR1 = 10.0)
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         
-        if self.connection == "Finplat":#finColWebBeamWeb
+        if self.connection == "Finplate":#finColWebBeamWeb
             gap = beam_tw + plate_thick + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
             colwebconn = finColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
@@ -261,8 +268,6 @@ class CommonDesignLogic(object):
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
             colwebconn = endColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         
-
-        #----------- nutBoltArray = NutBoltArray(self.resultObj, nut, bolt, gap)
         colwebconn.create_3dmodel()
 
         return colwebconn
@@ -353,12 +358,13 @@ class CommonDesignLogic(object):
             gap = column_T + plate_thick + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
             colflangeconn = endColFlangeBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
-
+        
         colflangeconn.create_3dmodel()
         return colflangeconn
     #=========================================================================================
 
     def display_3DModel(self, component):
+        print "self.connecvityObj=",self.connectivityObj
         self.component = component
 
         self.display.EraseAll()
@@ -370,21 +376,21 @@ class CommonDesignLogic(object):
         # self.display.set_bg_gradient_color(23,1,32,150,150,170)
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
-        if self.loc == "Column flange-Beam web":
+        if self.loc == "Column flange-Beam web" and self.connection =="Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
         else:
             self.display.View_Iso()
             self.display.FitAll()
 
         if self.component == "Column":
-            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.get_column_model(), update=True)
         elif self.component == "Beam":
             osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-        elif self. component == "Finplate":
+        elif self.component == "Plate":
             osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif self.component == "Model":
@@ -393,7 +399,7 @@ class CommonDesignLogic(object):
             osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 

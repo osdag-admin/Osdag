@@ -7,6 +7,7 @@ comment
 from getpass import getuser
 import os.path
 import pickle
+import subprocess
 
 from OCC import IGESControl
 from OCC import VERSION, BRepTools
@@ -816,7 +817,10 @@ class MainController(QtGui.QMainWindow):
         save_html(self.outdict, self.inputdict, dict_beam_data, dict_column_data, dict_cleat_data, popup_summary, filename, self.folder)
 
         # ########################################## Creates pdf: ####################################################################
-        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        if sys.platform == "nt":
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
             'margin-bottom': '10mm',
@@ -1553,6 +1557,9 @@ class MainController(QtGui.QMainWindow):
         colflangeconn = ColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
         colflangeconn.create_3dmodel()
         return colflangeconn
+    
+#     def call_3d_model(self, flag):
+#         self.commLogicObj.call_3DModel(flag)
 
     def call_3d_model(self, flag):
         # self.ui.btnSvgSave.setEnabled(True)
@@ -1562,7 +1569,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
             self.ui.checkBoxCleat.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-
+ 
         if flag is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 # self.create_3d_col_web_beam_web()
@@ -1572,12 +1579,12 @@ class MainController(QtGui.QMainWindow):
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create_3d_col_flange_beam_web()
                 self.fuse_model = None
-
+ 
             else:
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create_3d_beam_web_beam_web()
                 self.fuse_model = None
-
+ 
             self.display_3d_model("Model")
             # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
             # gpBeamOrigin = getGpPt(beamOrigin)
@@ -1592,7 +1599,7 @@ class MainController(QtGui.QMainWindow):
             # gpPntplateOrigin=  getGpPt(plateOrigin)
             # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
             # self.display.DisplayShape(my_sphere,update=True)
-
+ 
         else:
             self.display.EraseAll()
             # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
@@ -1832,17 +1839,23 @@ class MainController(QtGui.QMainWindow):
     def sample_report(self):
 
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-#         counter = 0
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_path, pdf_file))
-#                 counter = counter + 1
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                os.startfile("%s/%s" % (root_path, pdf_file))
+                if sys.platform =="nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
 # ********************************************************************************************************************************************************
 

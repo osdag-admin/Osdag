@@ -8,7 +8,6 @@ import time
 import math
 
 
-# def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filename, folder, base, base_front, base_top, base_side):
 def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filename, folder):
 
     print outobj

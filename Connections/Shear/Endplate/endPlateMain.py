@@ -1018,8 +1018,11 @@ class MainController(QtGui.QMainWindow):
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
         commLogicObj.call_designReport(filename, popup_summary)
-      
-        path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        
+        if sys.platform == "nt":
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
                    'margin-bottom': '10mm',

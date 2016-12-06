@@ -43,10 +43,10 @@ class EndCommonData(object):
         self.beam_Designation = dict_beam_data[QString("Designation")]
         self.beam_R1 = float(dict_beam_data[QString("R1")])
         self.col_R1 = float(dict_column_data[QString("R1")])
-        self.plate_ht = ouput_obj['Plate']['Height']
+        self.plate_ht = ouput_obj['Plate']['height']
         self.plate_thick = input_obj['Plate']["Thickness (mm)"]
         self.bolt_grade = input_obj['Bolt']['Grade']
-        self.plate_width = ouput_obj['Plate']['Width']
+        self.plate_width = ouput_obj['Plate']['width']
         self.weld_len = ouput_obj['Weld']['weldlength']
         self.weld_thick = input_obj['Weld']['Size (mm)']
         self.bolt_dia = input_obj["Bolt"]["Diameter (mm)"]

@@ -300,9 +300,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
-        self.ui.btn_front.clicked.connect(lambda: self.call_2d_drawing("Front"))
-        self.ui.btn_top.clicked.connect(lambda: self.call_2d_drawing("Top"))
-        self.ui.btn_side.clicked.connect(lambda: self.call_2d_drawing("Side"))
+        self.ui.btn_front.clicked.connect(lambda: self.callend2D_Drawing("Front"))
+        self.ui.btn_top.clicked.connect(lambda: self.callend2D_Drawing("Top"))
+        self.ui.btn_side.clicked.connect(lambda: self.callend2D_Drawing("Side"))
 
         self.ui.btn3D.clicked.connect(lambda: self.call_3d_model(True))
         self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
@@ -341,9 +341,9 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
         self.ui.actionSave_3D_model.triggered.connect(self.save_3d_cad_images)
         self.ui.actionSave_CAD_image.triggered.connect(self.save_2d_cad_images)
-        self.ui.actionSave_front_view.triggered.connect(lambda: self.call_2d_drawing("Front"))
-        self.ui.actionSave_side_view.triggered.connect(lambda: self.call_2d_drawing("Side"))
-        self.ui.actionSave_top_view.triggered.connect(lambda: self.call_2d_drawing("Top"))
+        self.ui.actionSave_front_view.triggered.connect(lambda: self.callend2D_Drawing("Front"))
+        self.ui.actionSave_side_view.triggered.connect(lambda: self.callend2D_Drawing("Side"))
+        self.ui.actionSave_top_view.triggered.connect(lambda: self.callend2D_Drawing("Top"))
         self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
@@ -1817,6 +1817,7 @@ class MainController(QtGui.QMainWindow):
         status = self.result_obj['Bolt']['status']
 
         self.commLogicObj.call_3DModel(status)
+        self.callend2D_Drawing("All")
         
     def create_2d_cad(self, connectivity):
         ''' Returns the fuse model of endplate
@@ -1903,6 +1904,37 @@ class MainController(QtGui.QMainWindow):
 #         base_front, base_top, base_side = end_common_obj.save_to_svg(str(filename), view, base_front, base_top, base_side)
 #         return (base_front, base_top, base_side)
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    def callend2D_Drawing(self, view):  # call2D_Drawing(self,view)
+
+        ''' This routine saves the 2D SVG image as per the connectivity selected
+        SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
+        '''
+        self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
+        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+
+#         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+#                                          self.alist[8], self.display, self.folder, self.connection)
+        
+
+        if view != 'All':
+
+            if view == "Front":
+                filename = self.folder + "/images_html/endFront.svg"
+
+            elif view == "Side":
+                filename = self.folder + "/images_html/endSide.svg"
+
+            else:
+                filename = self.folder + "/images_html/endTop.svg"
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+
+        else:
+            fname = ''
+            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 
     def call_2d_drawing(self, view):
 

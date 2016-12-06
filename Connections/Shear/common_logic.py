@@ -3,6 +3,7 @@ Created on 18-Nov-2016
 
 @author: deepa
 '''
+from Connections.Shear.Endplate.drawing_2D import EndCommonData
 '''
 Created on 14-Jul-2016
 
@@ -433,10 +434,6 @@ class CommonDesignLogic(object):
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-#         base = ''
-#         base_front = ''
-#         base_side = ''
-#         base_top = ''
         if view == "All":
             ''
 
@@ -444,11 +441,6 @@ class CommonDesignLogic(object):
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
             data = str(folder) + "/images_html/3D_Model.png"
-#             for n in range(1, 100, 1):
-#                 if (os.path.exists(data)):
-#                     data = str(folder) + "/images_html/3D_ModelFinFB" + str(n) + ".png"
-#                     continue
-#             base = os.path.basename(str(data))
 
             self.display.ExportToImage(data)
 
@@ -461,16 +453,21 @@ class CommonDesignLogic(object):
 
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
+        if self.connection =="Finplate":
+            
 
-        finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
-        finCommonObj.saveToSvg(str(fileName), view)
+            finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
+            finCommonObj.saveToSvg(str(fileName), view)
+        else:
+            endCommonObj = EndCommonData (self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
+            endCommonObj.save_to_svg(str(fileName), view)
 
     #=========================================================================================
     def call_saveMessages(self): # Done
         if self.connection =="Finplate":
             fileName = "Connections/Shear/Finplate/fin.log"
         else:
-            fileName = "Connections/Shear/Endplate/fin.log"
+            fileName = "Connections/Shear/Endplate/end.log"
 
         return fileName
 

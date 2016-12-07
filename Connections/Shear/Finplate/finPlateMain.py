@@ -274,9 +274,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.comboType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        self.retrieve_prevstate()
-
+        
+        #self.retrieve_prevstate()
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
+        self.retrieve_prevstate()
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))

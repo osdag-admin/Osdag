@@ -269,7 +269,7 @@ background-color: #abc250 ;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -504,6 +504,9 @@ border-bottom-right-radius: 0px ;
                   <bold>true</bold>
                  </font>
                 </property>
+                <property name="toolTip">
+                 <string>Shift+F</string>
+                </property>
                 <property name="text">
                  <string>Finplate</string>
                 </property>
@@ -574,6 +577,9 @@ border-bottom-right-radius: 0px ;
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="toolTip">
+                 <string>Shift+C</string>
                 </property>
                 <property name="text">
                  <string>Cleat Angle</string>
@@ -662,6 +668,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
                   <bold>true</bold>
                  </font>
                 </property>
+                <property name="toolTip">
+                 <string>Shift+E</string>
+                </property>
                 <property name="text">
                  <string>Endplate</string>
                 </property>
@@ -728,6 +737,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="toolTip">
+                 <string>Shift+S</string>
                 </property>
                 <property name="text">
                  <string>Seated Angle</string>
@@ -836,6 +848,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
               <property name="focusPolicy">
                <enum>Qt::TabFocus</enum>
               </property>
+              <property name="toolTip">
+               <string>Ctrl+S</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">QPushButton::hover
 {
@@ -851,6 +866,9 @@ color:#ffffff;
               </property>
               <property name="text">
                <string>Start</string>
+              </property>
+              <property name="shortcut">
+               <string>Ctrl+S</string>
               </property>
               <property name="checkable">
                <bool>false</bool>
@@ -943,6 +961,9 @@ color:#ffffff;
     <property name="contextMenuPolicy">
      <enum>Qt::ActionsContextMenu</enum>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+C</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -959,6 +980,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Connection</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+C</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -984,6 +1008,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+T</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1000,6 +1027,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Tension Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+T</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1022,6 +1052,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+M</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1038,6 +1071,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Compression Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+M</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1060,6 +1096,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+F</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1075,6 +1114,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Flexural Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+F</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1097,6 +1139,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+B</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1112,6 +1157,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Beam-Column</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+B</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1134,6 +1182,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+P</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1149,6 +1200,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Plate Girder</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+P</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1171,6 +1225,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+G</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1186,6 +1243,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Gantry Girder</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+G</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>

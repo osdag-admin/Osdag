@@ -6,11 +6,38 @@ Created on 31-Mar-2016
 import sys
 from PyQt4 import QtGui
 from ui_OsdagMainPage import Ui_MainWindow
+from ui_tutorial import Ui_Tutorial
+from ui_aboutosdag import Ui_AboutOsdag
+from ui_ask_a_question import Ui_AskQuestion
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os.path
+import subprocess
+from PyQt4.QtCore import SIGNAL
 
+
+class MyTutorials(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.osdagmainwindow = parent
+
+
+class MyAboutOsdag(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AboutOsdag()
+        self.ui.setupUi(self)
+        self.osdagmainwindow = parent
+
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.osdagmainwindow = parent
 
 class OsdagMainWindow(QtGui.QMainWindow):
 
@@ -30,6 +57,26 @@ class OsdagMainWindow(QtGui.QMainWindow):
         self.ui.btn_gantry.clicked.connect(self.unavailable)
         self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
+
+        self.ui.comboBox_help.setCurrentIndex(0)
+        self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
+
+    def selection_change(self):
+        loc = self.ui.comboBox_help.currentText()
+        if loc == "Sample Reports":
+            self.sample_report()
+        elif loc == "Sample Problems":
+            self.sample_problem()
+        elif loc == "Video Tutorials":
+            self.open_tutorials()
+        elif loc == "About Osdag":
+            self.about_osdag()
+        elif loc == "Ask Us a Question":
+            self.ask_question()
+        elif loc == "FAQ":
+            pass
+
+
 
     def disable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(False)
@@ -87,6 +134,52 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
         else:
             QtGui.QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
+    # ********************************* Help Action *********************************************************************************************
+
+    def about_osdag(self):
+        dialog = MyAboutOsdag(self)
+        dialog.show()
+
+    def open_osdag(self):
+        self.about_osdag()
+
+    def tutorials(self):
+        dialog = MyTutorials(self)
+        dialog.show()
+
+    def open_tutorials(self):
+        self.tutorials()
+
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
+
+    def sample_report(self):
+
+        root_path = os.path.join(os.path.dirname(__file__), 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == ("win32" or "win64"):
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+
+    def sample_problem(self):
+        root_path = os.path.join(os.path.dirname(__file__), 'Sample_Folder', 'Sample_Problems')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == ("win32" or "win64"):
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+
+
 
     def unavailable(self):
         QtGui.QMessageBox.about(self, "INFO", "This module is not available in this version.")

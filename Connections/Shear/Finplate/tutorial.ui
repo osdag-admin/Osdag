@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Tutorials</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ResourceFiles/icons.qrc">

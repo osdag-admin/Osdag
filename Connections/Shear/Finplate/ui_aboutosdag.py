@@ -22,7 +22,7 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_HelpOsdag(object):
+class Ui_AboutOsdag(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(487, 310)
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
     Dialog = QtGui.QDialog()
-    ui = Ui_HelpOsdag()
+    ui = Ui_AboutOsdag()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

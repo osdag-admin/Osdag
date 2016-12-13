@@ -28,8 +28,9 @@ import icons_rc
 import pdfkit
 import shutil
 from ui_summary_popup import *
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from ISection import ISection
@@ -54,6 +55,14 @@ from PyQt4 import QtSvg
 from Svg_Window import SvgWindow
 
 
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -65,7 +74,7 @@ class MyTutorials(QtGui.QDialog):
 class MyAboutOsdag(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -383,6 +392,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Report.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
+
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
         # Initialising the qtviewer
 
@@ -996,12 +1007,13 @@ class MainController(QtGui.QMainWindow):
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+                                         self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         if view != 'All':
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -1016,7 +1028,7 @@ class MainController(QtGui.QMainWindow):
         filename = str(filename)
         self.call_end2D_drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         commLogicObj.call_designReport(filename, popup_summary)
         
         if sys.platform == "nt":
@@ -2022,6 +2034,13 @@ class MainController(QtGui.QMainWindow):
 
     def open_tutorials(self):
         self.tutorials()
+
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
 
     def sample_report(self):
 

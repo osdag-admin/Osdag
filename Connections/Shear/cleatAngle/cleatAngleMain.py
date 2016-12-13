@@ -44,8 +44,9 @@ from nut import Nut
 from nutBoltPlacement import NutBoltArray
 from ui_popUpWindow import Ui_Capacitydetals
 from ui_summary_popup import Ui_Dialog
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 from utilities import osdag_display_shape
 from Svg_Window import SvgWindow
 from OCC.Display import OCCViewer
@@ -61,6 +62,14 @@ from macpath import basename
 # Developed by aravind
 
 
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -72,7 +81,7 @@ class MyTutorials(QtGui.QDialog):
 class MyAboutOsdag(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -295,6 +304,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
@@ -1835,6 +1845,13 @@ class MainController(QtGui.QMainWindow):
 
     def open_tutorials(self):
         self.tutorials()
+
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
 
     def sample_report(self):
 

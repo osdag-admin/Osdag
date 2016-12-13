@@ -51,8 +51,9 @@ import OCC.V3d
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from Connections.Shear.Finplate.drawing_2D import FinCommonData
-from Connections.Shear.Finplate.reportGenerator import save_html
-from Connections.Shear.Endplate.reportGenerator import save_html
+from Connections.Shear.Endplate.drawing_2D import EndCommonData
+from Connections.Shear.Finplate.reportGenerator import save_html as fin_save_html
+from Connections.Shear.Endplate.reportGenerator import save_html as end_save_html
 #----------------------------------------- from reportGenerator import save_html
 import json
 
@@ -462,8 +463,12 @@ class CommonDesignLogic(object):
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
 
-        finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
-        finCommonObj.saveToSvg(str(fileName), view)
+        if self.connection == "Finplate":
+            finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
+            finCommonObj.saveToSvg(str(fileName), view)
+        else:
+            endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
+            endCommonObj.save_to_svg(str(fileName), view)
 
     #=========================================================================================
     def call_saveMessages(self): # Done
@@ -479,8 +484,14 @@ class CommonDesignLogic(object):
 
         fileName = str(htmlfilename)
 
+
+
         if not os.path.isfile(fileName):
-            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+            if self.connection == "Finplate":
+                fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+            else:
+                end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+
 
     #=========================================================================================
 

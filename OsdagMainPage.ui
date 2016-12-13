@@ -878,7 +878,13 @@ color:#ffffff;
        <font>
         <family>Arial</family>
         <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+        <kerning>true</kerning>
        </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">QComboBox::hover
@@ -891,7 +897,12 @@ QComboBox
 {
 background-color: #925a5b;
 color:#ffffff;
-}</string>
+}
+
+</string>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
       </property>
       <item>
        <property name="text">

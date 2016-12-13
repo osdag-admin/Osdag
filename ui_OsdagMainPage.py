@@ -381,7 +381,11 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        font.setKerning(True)
         self.comboBox_help.setFont(font)
+        self.comboBox_help.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.comboBox_help.setStyleSheet(_fromUtf8("QComboBox::hover\n"
 "{\n"
 "   background-color: #d97f7f;\n"
@@ -392,7 +396,10 @@ class Ui_MainWindow(object):
 "{\n"
 "background-color: #925a5b;\n"
 "color:#ffffff;\n"
-"}"))
+"}\n"
+"\n"
+""))
+        self.comboBox_help.setFrame(True)
         self.comboBox_help.setObjectName(_fromUtf8("comboBox_help"))
         self.comboBox_help.addItem(_fromUtf8(""))
         self.comboBox_help.addItem(_fromUtf8(""))

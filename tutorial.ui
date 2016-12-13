@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Tutorials</string>
   </property>
   <property name="windowIcon">
    <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
@@ -53,7 +53,7 @@ p, li { white-space: pre-wrap; }
  </widget>
  <resources>
   <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
-  <include location="ResourceFiles/icons.qrc"/>
+  <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
  </resources>
  <connections/>
 </ui>

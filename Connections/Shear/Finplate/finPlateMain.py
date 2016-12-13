@@ -97,11 +97,11 @@ class DesignPreferences(QtGui.QDialog):
         uiObj = self.main_controller.getuser_inputs()
         boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = float(uiObj["Bolt"]["Grade"])
-        clearance = str(self.get_clearance(boltDia))
+        #clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        self.ui.txt_boltHoleClearance.setText(clearance)
+        #self.ui.txt_boltHoleClearance.setText(clearance)
         self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
@@ -274,10 +274,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.comboType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        
-        #self.retrieve_prevstate()
-        self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
         self.retrieve_prevstate()
+        
+        self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
+        #self.retrieve_prevstate()
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -405,6 +405,10 @@ class MainController(QtGui.QMainWindow):
     def convertColComboToBeam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
+            #--------------------------------------- self.ui.comboColSec.clear()
+            #---------------------------------------- self.ui.combo_Beam.clear()
+            #---------------------------- self.ui.comboColSec.setCurrentIndex(0)
+            #----------------------------- self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.lbl_beam.setText(" Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
 
@@ -412,18 +416,20 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
-
+            self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_beamcombolist())
             self.ui.combo_Beam.setCurrentIndex(0)
-            self.ui.comboColSec.setCurrentIndex(0)
 
             self.ui.txtFu.clear()
             self.ui.txtFy.clear()
             self.ui.txtShear.clear()
-
+            
+            self.ui.comboDiameter.blockSignals(True)
             self.ui.comboDiameter.setCurrentIndex(0)
+            #self.ui.comboType.blockSignals(True)
             self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.blockSignals(True)
             self.ui.comboGrade.setCurrentIndex((0))
             self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
             self.ui.comboPlateThick_2.setCurrentIndex((0))
@@ -823,10 +829,10 @@ class MainController(QtGui.QMainWindow):
         commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
-        if sys.platform == "nt":
+        if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
 
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
@@ -1127,8 +1133,15 @@ class MainController(QtGui.QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
                 self.enableViewButtons()
         elif loc == "Beam-Beam":
+            print "columIndex",self.ui.comboColSec.currentIndex()
+            print "BeamIndex",self.ui.combo_Beam.currentIndex()
+            
+            if self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
+                return
+            
             dictSBeamData = self.fetchBeamPara()
             dictPBeamData = self.fetchColumnPara()
+            
             PBeam_D = float(dictPBeamData[QString("D")])
             PBeam_T = float(dictPBeamData[QString("T")])
             PBeamWebDepth = PBeam_D - 2.0 * (PBeam_T)
@@ -1281,7 +1294,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Finplate")
+        self.commLogicObj.display_3DModel("Plate")
 
     def unchecked_allChkBox(self):
         '''

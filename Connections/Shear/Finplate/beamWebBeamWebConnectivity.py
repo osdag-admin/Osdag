@@ -72,7 +72,7 @@ class BeamWebBeamWeb(object):
                        (self.beam.D / 2 - self.notch.height) * self.beam.vDir +
                        self.beam.t / 2 * (-self.beam.uDir) +
                        self.plate.L / 2 * (-self.beam.vDir) +
-                       self.plate.T / 2.0 * (-self.beam.uDir) +
+                       self.plate.T / 2 * (-self.beam.uDir) +
                        self.clearDist * (-self.beam.wDir))
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
@@ -116,3 +116,6 @@ class BeamWebBeamWeb(object):
         for bolt in nutBoltlist[0:(len(nutBoltlist) // 2)]:
             finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
         return finalBeam
+    
+    def get_column_model(self):
+        return self.columnModel

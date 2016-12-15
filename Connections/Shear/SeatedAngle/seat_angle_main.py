@@ -8,6 +8,7 @@ Updated 23-Aug-2016
 
 import os.path
 import sys
+import subprocess
 
 from PyQt4.QtCore import pyqtSignal
 from PyQt4 import QtCore
@@ -49,12 +50,22 @@ from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 A
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 # You can delete ite
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
 # TODO change connectivity to Column Flange to Beam FLANGE
 # TODO change connectivity to Column Web to Beam FLANGE
+
+
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
 
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -252,11 +263,10 @@ class MainController(QtGui.QMainWindow):
 
         # Help button
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
-        # TODO update UI for actionSample_Tutorials
-        # self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
+        self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Reports.triggered.connect(self.sample_report)
-        # TODO update UI actionSample_Problems
         self.ui.actionSampe_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         from osdagMainSettings import backend_name
 
@@ -1414,25 +1424,50 @@ class MainController(QtGui.QMainWindow):
         else:
             event.ignore()
 
-    # Following functions are trimmed in Seated angle module
-        # about_osdag(), MyAboutOsdag(), tutorials(), MyTutorials(), open_tutorials()
-    # open_osdag() also calls about_osdag()
+    # ********************************* Help Action *********************************************************************************************
+    def about_osdag(self):
+        dialog = MyAboutOsdag(self)
+        dialog.show()
+
     def open_osdag(self):
-        # dialog=MyAboutOsdag(self)
-        # dialog.show()
-        pass
+        self.about_osdag()
+
+    def tutorials(self):
+        dialog = MyTutorials(self)
+        dialog.show()
+
+    def open_tutorials(self):
+        self.tutorials()
+
+    def ask_questions(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_questions()
+
 
     def sample_report(self):
-        #TODO: update path below
-        # url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder',
-        #                    'Sample_Report', 'The_PyQt4_tutorial.pdf')
-        # webbrowser.open_new(r'file:///' + url)
-        pass
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == "nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        # webbrowser.open_new(
-        #     r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
-        pass
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == "nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+
+    # ********************************************************************************************************************************************************
 
 def set_osdaglogger():
     global logger

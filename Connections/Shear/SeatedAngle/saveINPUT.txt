@@ -45,7 +45,7 @@ p22
 F8.8
 sS'Diameter (mm)'
 p23
-I12
+I16
 sS'Type'
 p24
 S'HSFG'

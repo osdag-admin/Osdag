@@ -1,0 +1,24 @@
+
+      <div  class="LOG INFO">
+          <span class="DATE">Thu, 15 Dec 2016 15:50:52</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Overall seated angle connection design is safe</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Thu, 15 Dec 2016 15:50:52</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">: =========End Of design===========</span>
+      </div>
+
+      <div  class="LOG INFO">
+          <span class="DATE">Thu, 15 Dec 2016 15:50:53</span>
+          <span class="LEVEL">INFO</span>
+          <span class="MSG">: Overall seated angle connection design is safe</span>
+      </div>
+
+      <div  class="LOG DEBUG">
+          <span class="DATE">Thu, 15 Dec 2016 15:50:53</span>
+          <span class="LEVEL">DEBUG</span>
+          <span class="MSG">: =========End Of design===========</span>
+      </div>

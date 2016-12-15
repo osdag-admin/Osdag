@@ -193,8 +193,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.job_number = ""
         self.method = ""
 
-    def save_html(self, output_object, input_object, report_summary, file_name, folder, base,
-                  base_front, base_top, base_side):
+    def save_html(self, output_object, input_object, report_summary, file_name, folder):
         """Create and save html report for Seated angle connection.
 
         Args:

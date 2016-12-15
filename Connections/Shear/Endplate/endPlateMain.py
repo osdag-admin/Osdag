@@ -1021,7 +1021,7 @@ class MainController(QtGui.QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
-        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
         
     def save_design(self, popup_summary):
         filename = self.folder + "/images_html/Html_Report.html"
@@ -1031,7 +1031,7 @@ class MainController(QtGui.QMainWindow):
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         commLogicObj.call_designReport(filename, popup_summary)
         
-        if sys.platform == "nt":
+        if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
@@ -2047,7 +2047,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
@@ -2057,7 +2057,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"

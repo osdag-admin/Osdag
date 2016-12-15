@@ -1507,7 +1507,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
@@ -1517,7 +1517,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform ==("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"

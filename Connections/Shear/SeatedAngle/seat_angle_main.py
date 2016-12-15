@@ -9,6 +9,7 @@ Updated 23-Aug-2016
 import os.path
 import sys
 import subprocess
+import pdfkit
 
 from PyQt4.QtCore import pyqtSignal
 from PyQt4 import QtCore
@@ -44,7 +45,8 @@ from nut_bolt_placement import NutBoltArray
 from col_web_beam_web_connectivity import ColWebBeamWeb
 from col_flange_beam_web_connectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
-
+from svg_window import SvgWindow
+from drawing_2D import SeatCommonData
 from report_generator import *
 from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
@@ -284,8 +286,6 @@ class MainController(QtGui.QMainWindow):
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
         image_path = os.path.dirname(os.path.abspath(__file__))+os.path+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
-        print str(image_path)
-        print str(os.path.join("images_html","Osdag_header.png"))
         shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html","Osdag_header.png"))
 
     # noinspection PyPep8Naming
@@ -514,17 +514,27 @@ class MainController(QtGui.QMainWindow):
         # function name changed from createDesignReport
 
     def save_design(self, report_summary):
-
-        file_name, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
-                                                                   "Html Files (*.html)")
-        file_name = str(file_name)
-        base, base_front, base_top, base_side = self.call2D_Drawing("All")
+        filename = self.folder + "/images_html/Html_Report.html"
+        file_name = str(filename)
+        self.call2D_Drawing("All")
         inputdict = self.uiObj
         outdict = self.resultObj
 
         report_generator_instance = ReportGenerator(self.sa_calc_object)
-        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder, base,
-                  base_front, base_top, base_side)
+        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder)
+
+        # Creates PDF
+        if sys.platform == ("win32" or "win64"):
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        pdfkit.from_file(filename, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
+                         options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1336,66 +1346,31 @@ class MainController(QtGui.QMainWindow):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
             '''
-        base = ''
 
-        loc = self.ui.combo_connectivity.currentText()
         if view == "All":
             fileName = ''
-            base_front = ''
-            base_side = ''
-            base_top = ''
 
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-
-            if loc == "Column flange-Beam web":
-
-                data = str(self.folder) + "/css/3D_ModelSeatFB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatFB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-                print "basenameee", base
-
-            elif loc == "Column web-Beam web":
-                data = str(self.folder) + "/css/3D_ModelSeatWB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatWB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-
-            else:
-                data = str(self.folder) + "/css/3D_ModelSeatBB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatBB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
+            data = str(self.folder) + "/images_html/3D_Model.png"
+            base = os.path.basename(str(data))
             self.display.ExportToImage(data)
 
 
         else:
-            #             fileName = webbrowser.open_new(r'file:///untitled.svg')
+            if view == "Front":
+                filename = self.folder + "/images_html/seatFront.svg"
 
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            f = open(fileName, 'w')
+            elif view == "Side":
+                filename = self.folder + "/images_html/seatSide.svg"
 
-            self.callDesired_View(fileName, view, base_front, base_top, base_side)
-            # f.close() #TODO check with fin plate module
+            else:
+                filename = self.folder + "/images_html/seatTop.svg"
 
-        print "basenameee", base
-        print "base front", base1
-        print "base side", base2
-        print "base top", base3
-        return (base, base1, base2, base3)
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
 
-    def callDesired_View(self, fileName, view, base_front, base_top, base_side):
+    def callDesired_View(self, fileName, view):
 
         self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
@@ -1407,10 +1382,7 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
-        base_front, base_top, base_side = seatCommonObj.save_to_svg(str(fileName), view, base_front, base_top,
-                                                                    base_side)
-        return (base_front, base_top, base_side)
-        print"sucessfully worked"
+        seatCommonObj.save_to_svg(str(fileName), view)
 
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()

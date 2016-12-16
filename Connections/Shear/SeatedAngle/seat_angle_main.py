@@ -182,6 +182,7 @@ class MainController(QtGui.QMainWindow):
         # comboConnLoc renamed to combo_connectivity
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
+        self.ui.combo_connectivity.currentIndexChanged[str].connect(self.convert_col_comboto_beam)
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -372,6 +373,70 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.menubar.setEnabled(True)
 
+    def convert_col_comboto_beam(self):
+        loc = self.ui.combo_connectivity.currentText()
+        if loc == "Column flange-Beam flange":
+            self.ui.combo_beam_section.setCurrentIndex(0)
+            self.ui.combo_column_section.setCurrentIndex(0)
+            self.ui.combo_bolt_diameter.setCurrentIndex(0)
+            self.ui.combo_angle_section.setCurrentIndex(0)
+            self.ui.combo_bolt_type.setCurrentIndex(0)
+            self.ui.combo_bolt_grade.setCurrentIndex(0)
+            self.ui.txt_fu.clear()
+            self.ui.txt_fy.clear()
+            self.ui.txt_shear_force()
+            self.ui.txt_angle_thickness()
+
+            self.ui.txt_bolt_shear_capacity.clear()
+            self.ui.txt_bolt_bearing_capacity.clear()
+            self.ui.txt_bolt_capacity.clear()
+            self.ui.txt_no_bolts.clear()
+            self.ui.txt_bolt_group_capacity.clear()
+            self.ui.txt_bolt_rows.clear()
+            self.ui.txt_bolt_cols.clear()
+            self.ui.txt_bolt_pitch.clear()
+            self.ui.txt_bolt_gauge.clear()
+            self.ui.txt_end_distance.clear()
+            self.ui.txt_edge_distance.clear()
+            self.ui.txt_seat_length.clear()
+            self.ui.txt_moment_capacity.clear()
+            self.ui.txt_moment_demand.clear()
+            self.ui.txt_seat_shear_capacity.clear()
+            self.ui.txt_seat_shear_demand.clear()
+            self.ui.txt_beam_shear_strength.clear()
+            self.ui.txt_top_angle.clear()
+
+        else:
+            self.ui.combo_beam_section.setCurrentIndex(0)
+            self.ui.combo_column_section.setCurrentIndex(0)
+            self.ui.combo_bolt_diameter.setCurrentIndex(0)
+            self.ui.combo_angle_section.setCurrentIndex(0)
+            self.ui.combo_bolt_type.setCurrentIndex(0)
+            self.ui.combo_bolt_grade.setCurrentIndex(0)
+            self.ui.txt_fu.clear()
+            self.ui.txt_fy.clear()
+            self.ui.txt_shear_force.clear()
+            self.ui.txt_angle_thickness.clear()
+
+            self.ui.txt_bolt_shear_capacity.clear()
+            self.ui.txt_bolt_bearing_capacity.clear()
+            self.ui.txt_bolt_capacity.clear()
+            self.ui.txt_no_bolts.clear()
+            self.ui.txt_bolt_group_capacity.clear()
+            self.ui.txt_bolt_rows.clear()
+            self.ui.txt_bolt_cols.clear()
+            self.ui.txt_bolt_pitch.clear()
+            self.ui.txt_bolt_gauge.clear()
+            self.ui.txt_end_distance.clear()
+            self.ui.txt_edge_distance.clear()
+            self.ui.txt_seat_length.clear()
+            self.ui.txt_moment_capacity.clear()
+            self.ui.txt_moment_demand.clear()
+            self.ui.txt_seat_shear_capacity.clear()
+            self.ui.txt_seat_shear_demand.clear()
+            self.ui.txt_beam_shear_strength.clear()
+            self.ui.txt_top_angle.clear()
+
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
         if (uiObj is not None):
@@ -408,13 +473,13 @@ class MainController(QtGui.QMainWindow):
         '''
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam web":
+        if loc == "Column flange-Beam flange":
             pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             # self.ui.lbl_connectivity.show()
-        elif (loc == "Column web-Beam web"):
+        elif (loc == "Column web-Beam flange"):
             picmap = QtGui.QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
@@ -773,7 +838,7 @@ class MainController(QtGui.QMainWindow):
             from osdagMainSettings import backend_name
             if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
         else:
             global display, start_display, app, _, USED_BACKEND
 
@@ -793,8 +858,6 @@ class MainController(QtGui.QMainWindow):
 
         from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
 
         self.setWindowTitle("Osdag Seated Angle Connection")
         self.ui.mytabWidget.resize(size[0], size[1])
@@ -837,7 +900,7 @@ class MainController(QtGui.QMainWindow):
         self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam web":
+        if loc == "Column flange-Beam flange":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
         else:
             self.display.View_Iso()
@@ -1081,20 +1144,21 @@ class MainController(QtGui.QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
 
         if flag == True:
-            if self.ui.combo_connectivity.currentText() == "Column web-Beam web":
+            if self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
                 # self.create3DColWebBeamWeb()
                 self.connectivity = self.create3DColWebBeamWeb()
                 self.fuse_model = None
 
-            elif self.ui.combo_connectivity.currentText() == "Column flange-Beam web":
+            else:
+                # self.ui.combo_connectivity.currentText() == "Column flange-Beam flange":
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create3DColFlangeBeamWeb()
                 self.fuse_model = None
 
-            else:
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DBeamWebBeamWeb()
-                self.fuse_model = None
+            # else:
+            #     self.ui.mytabWidget.setCurrentIndex(0)
+            #     self.connectivity = self.create3DBeamWebBeamWeb()
+            #     self.fuse_model = None
 
             self.display3Dmodel("Model")
             nutboltArrayOrigin = self.connectivity.angle.secOrigin
@@ -1356,7 +1420,7 @@ class MainController(QtGui.QMainWindow):
     def call2D_Drawing(self, view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
-            '''
+        '''
 
         if view == "All":
             fileName = ''

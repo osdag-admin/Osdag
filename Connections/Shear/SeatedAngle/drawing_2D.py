@@ -399,6 +399,7 @@ class Seat2DCreatorFront(object):
 
 
     """
+
     def __init__(self, seat_common_object):
 
         self.data_object = seat_common_object
@@ -490,19 +491,19 @@ class Seat2DCreatorFront(object):
         self.A2 = np.array([self.data_object.col_width, (self.data_object.col_length - self.data_object.beam_depth) / 2])
         self.B2 = np.array([self.data_object.col_width, (self.data_object.beam_depth + self.data_object.col_length) / 2])
 
-        ptEx = self.data_object.col_width/2 - self.data_object.col_web_thk / 2
+        ptEx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         ptEy = 0.0
         self.E = np.array([ptEx, ptEy])
 
-        ptFx = self.data_object.col_width/2 + self.data_object.col_web_thk / 2
+        ptFx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
         ptFy = 0
         self.F = np.array([ptFx, ptFy])
 
-        ptGx = self.data_object.col_width/2 + self.data_object.col_web_thk / 2
+        ptGx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
         ptGy = self.data_object.col_length
         self.G = np.array([ptGx, ptGy])
 
-        ptHx = self.data_object.col_width/2 - self.data_object.col_web_thk / 2
+        ptHx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         ptHy = self.data_object.col_length
         self.H = np.array([ptHx, ptHy])
 
@@ -746,7 +747,7 @@ class Seat2DCreatorFront(object):
         ptBx = -30
         ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (
             self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3) + (
-               self.data_object.plate_ht - self.data_object.end_dist)
+                   self.data_object.plate_ht - self.data_object.end_dist)
         ptTwo = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptOne, ptTwo, dwg)
 
@@ -896,9 +897,9 @@ class Seat2DCreatorFront(object):
             if len(row) > 0:
                 pitchPts.append(row[0])
         txtOffset = (
-                    self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80
+                        self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80
         params = {"offset": (
-                            self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
+                                self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
                   "textoffset": txtOffset, "lineori": "right", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),
                                                     str(len(pitchPts) - 1) + u' \u0040' + str(
@@ -910,7 +911,7 @@ class Seat2DCreatorFront(object):
             self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)
         edgPt = (edgPtx, edgPty)
         params = {"offset": (
-                            self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
+                                self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
                   "textoffset": 120, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array([edgPtx, edgPty]),
                                                     str(int(self.data_object.end_dist)) + " mm", params)
@@ -941,7 +942,7 @@ class Seat2DCreatorFront(object):
         ptBx = -60
         ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (
             self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3) + (
-               self.data_object.plate_ht - self.data_object.end_dist)
+                   self.data_object.plate_ht - self.data_object.end_dist)
         ptB = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptA, ptB, dwg)
 
@@ -957,7 +958,7 @@ class Seat2DCreatorFront(object):
         edgPt1y = edgPty + self.data_object.plate_ht
         edgPt1 = (edgPt1x, edgPt1y)
         params = {"offset": (
-                            self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
+                                self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist + 80,
                   "textoffset": 120, "lineori": "right", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[len(pitchPts) - 1]),
                                                     np.array([edgPt1x, edgPt1y]),
@@ -1009,7 +1010,7 @@ class Seat2DCreatorFront(object):
             [1, 0])
         ptB = ptA + self.data_object.edge_dist * np.array([1, 0])
         offsetDist = -(
-        self.data_object.end_dist + self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3 + dist1 + 120)
+            self.data_object.end_dist + self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3 + dist1 + 120)
         params = {"offset": offsetDist, "textoffset": 35, "lineori": "right", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, ptA, ptB, str(int(self.data_object.edge_dist)) + " mm", params)
         # Draw Faint line for Edge distance
@@ -1101,7 +1102,7 @@ class Seat2DCreatorTop(object):
         self.B = np.array([0, 0]) + (self.data_object.col_width) * np.array([1, 0])
         self.C = self.B + (self.data_object.col_flange_thk) * np.array([0, 1])
         self.D = self.A + (self.data_object.col_width + self.data_object.col_web_thk) / 2 * np.array([1, 0]) + (
-                                                                                                           self.data_object.col_flange_thk) * np.array(
+                                                                                                                   self.data_object.col_flange_thk) * np.array(
             [0, 1])
         self.E = self.A + (self.data_object.col_width + self.data_object.col_web_thk) / 2 * np.array([1, 0]) + (
                                                                                                                    self.data_object.col_depth - self.data_object.col_flange_thk) * np.array(
@@ -1616,7 +1617,7 @@ class Seat2DCreatorSide(object):
         params = {"offset": self.data_object.col_depth / 2 + 30, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),
                                                     str(len(pitchPts) - 1) + u' \u0040' + str(
-                                                    int(self.data_object.pitch)) + " mm c/c", params)
+                                                        int(self.data_object.pitch)) + " mm c/c", params)
         params = {"offset": self.data_object.col_depth / 2 + 30, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, self.P, np.array(pitchPts[0]),
                                                     str(int(self.data_object.end_dist)) + " mm ", params)
@@ -1737,7 +1738,7 @@ class Seat2DCreatorSide(object):
         params = {"offset": self.data_object.col_width / 2 + 30, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),
                                                     str(len(pitchPts) - 1) + u' \u0040' + str(
-                                                    int(self.data_object.pitch)) + "mm c/c", params)
+                                                        int(self.data_object.pitch)) + "mm c/c", params)
         params = {"offset": self.data_object.col_width / 2 + 30, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, self.FP, np.array(pitchPts[0]),
                                                     str(int(self.data_object.end_dist)) + " mm ", params)

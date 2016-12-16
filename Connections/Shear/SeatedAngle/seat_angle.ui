@@ -761,12 +761,12 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>Column flange-Beam web</string>
+       <string>Column flange-Beam flange</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Column web-Beam web</string>
+       <string>Column web-Beam flange</string>
       </property>
      </item>
     </widget>

@@ -48,17 +48,10 @@ from Connections.connection_calculations import ConnectionCalculations
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 # TODO add input validation to select only angles which can accomodate 2 lines of bolts
-# TODO check if a clause exists on minimum angle thickness
-# TODO check reduction factors for bolt group capacity
-# TODO area of bolts for smaller bolt diameters
-    # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
-# TODO display top angle in UI - output dock
-# TODO change connectivity to Column Flange to Beam FLANGE
-# TODO change connectivity to Column Web to Beam FLANGE
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.

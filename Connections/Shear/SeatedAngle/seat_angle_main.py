@@ -8,6 +8,8 @@ Updated 23-Aug-2016
 
 import os.path
 import sys
+import subprocess
+import pdfkit
 
 from PyQt4.QtCore import pyqtSignal
 from PyQt4 import QtCore
@@ -43,18 +45,30 @@ from nut_bolt_placement import NutBoltArray
 from col_web_beam_web_connectivity import ColWebBeamWeb
 from col_flange_beam_web_connectivity import ColFlangeBeamWeb
 # from beamWebBeamWebConnectivity import BeamWebBeamWeb
-
+from svg_window import SvgWindow
+from drawing_2D import SeatCommonData
 from report_generator import *
-from ui_seat_angle import Ui_MainWindow # ui_seat_angle is the revised ui (~23 Aug 2016)
+from ui_seat_angle import Ui_MainWindow  # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 # You can delete ite
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
+
 # TODO change connectivity to Column Flange to Beam FLANGE
 # TODO change connectivity to Column Web to Beam FLANGE
+
+
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
 
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
@@ -75,6 +89,7 @@ class MyAboutOsdag(QtGui.QDialog):
 # below class was previously MyPopupDialog in the other modules
 class DesignReportDialog(QtGui.QDialog):
     print "Design Report - Dseign Profile dialog box"
+
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
@@ -143,7 +158,6 @@ class DesignReportDialog(QtGui.QDialog):
 
 
 class MainController(QtGui.QMainWindow):
-
     closed = pyqtSignal()
 
     def __init__(self, folder):
@@ -159,15 +173,16 @@ class MainController(QtGui.QMainWindow):
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.grade_type = {'Please Select Type': '',
-                          'HSFG': [8.8, 10.8],
-                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                           'HSFG': [8.8, 10.8],
+                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.combo_bolt_type.setCurrentIndex(0)
 
-        #comboConnLoc renamed to combo_connectivity
+        # comboConnLoc renamed to combo_connectivity
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
+        self.ui.combo_connectivity.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -187,7 +202,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QtGui.QDoubleValidator()
-        #TODO add input validations
+        # TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -204,7 +219,7 @@ class MainController(QtGui.QMainWindow):
         # Menu Bar
         # File Menu
 
-        self.ui.actionSave_front_view.triggered.connect(lambda:self.call2D_Drawing("Front"))
+        self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
@@ -252,11 +267,10 @@ class MainController(QtGui.QMainWindow):
 
         # Help button
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
-        # TODO update UI for actionSample_Tutorials
-        # self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
+        self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Reports.triggered.connect(self.sample_report)
-        # TODO update UI actionSample_Problems
         self.ui.actionSampe_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         from osdagMainSettings import backend_name
 
@@ -273,10 +287,8 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = os.path.dirname(os.path.abspath(__file__))+os.path+os.path.join("..","..","..","ResourceFiles","Osdag_header.png")
-        print str(image_path)
-        print str(os.path.join("images_html","Osdag_header.png"))
-        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html","Osdag_header.png"))
+        image_path = os.path.dirname(os.path.abspath(__file__)) + os.path + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
 
     # noinspection PyPep8Naming
     def fetchBeamPara(self):
@@ -292,13 +304,12 @@ class MainController(QtGui.QMainWindow):
         else:
             dictcoldata = get_columndata(column_sec)
         return dictcoldata
-    
+
     def fetchAnglePara(self):
         angle_sec = self.ui.combo_angle_section.currentText()
         dictangledata = get_angledata(angle_sec)
         return dictangledata
 
-    
     def showFontDialogue(self):
 
         font, ok = QtGui.QFontDialog.getFont()
@@ -362,6 +373,70 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.menubar.setEnabled(True)
 
+    def convert_col_combo_to_beam(self):
+        loc = self.ui.combo_connectivity.currentText()
+        if loc == "Column flange-Beam flange":
+            self.ui.combo_beam_section.setCurrentIndex(0)
+            self.ui.combo_column_section.setCurrentIndex(0)
+            self.ui.combo_bolt_diameter.setCurrentIndex(0)
+            self.ui.combo_angle_section.setCurrentIndex(0)
+            self.ui.combo_bolt_type.setCurrentIndex(0)
+            self.ui.combo_bolt_grade.setCurrentIndex(0)
+            self.ui.txt_fu.clear()
+            self.ui.txt_fy.clear()
+            self.ui.txt_shear_force.clear()
+            self.ui.txt_angle_thickness.clear()
+
+            self.ui.txt_bolt_shear_capacity.clear()
+            self.ui.txt_bolt_bearing_capacity.clear()
+            self.ui.txt_bolt_capacity.clear()
+            self.ui.txt_no_bolts.clear()
+            self.ui.txt_bolt_group_capacity.clear()
+            self.ui.txt_bolt_rows.clear()
+            self.ui.txt_bolt_cols.clear()
+            self.ui.txt_bolt_pitch.clear()
+            self.ui.txt_bolt_gauge.clear()
+            self.ui.txt_end_distance.clear()
+            self.ui.txt_edge_distance.clear()
+            self.ui.txt_seat_length.clear()
+            self.ui.txt_moment_capacity.clear()
+            self.ui.txt_moment_demand.clear()
+            self.ui.txt_seat_shear_capacity.clear()
+            self.ui.txt_seat_shear_demand.clear()
+            self.ui.txt_beam_shear_strength.clear()
+            self.ui.txt_top_angle.clear()
+
+        else:
+            self.ui.combo_beam_section.setCurrentIndex(0)
+            self.ui.combo_column_section.setCurrentIndex(0)
+            self.ui.combo_bolt_diameter.setCurrentIndex(0)
+            self.ui.combo_angle_section.setCurrentIndex(0)
+            self.ui.combo_bolt_type.setCurrentIndex(0)
+            self.ui.combo_bolt_grade.setCurrentIndex(0)
+            self.ui.txt_fu.clear()
+            self.ui.txt_fy.clear()
+            self.ui.txt_shear_force.clear()
+            self.ui.txt_angle_thickness.clear()
+
+            self.ui.txt_bolt_shear_capacity.clear()
+            self.ui.txt_bolt_bearing_capacity.clear()
+            self.ui.txt_bolt_capacity.clear()
+            self.ui.txt_no_bolts.clear()
+            self.ui.txt_bolt_group_capacity.clear()
+            self.ui.txt_bolt_rows.clear()
+            self.ui.txt_bolt_cols.clear()
+            self.ui.txt_bolt_pitch.clear()
+            self.ui.txt_bolt_gauge.clear()
+            self.ui.txt_end_distance.clear()
+            self.ui.txt_edge_distance.clear()
+            self.ui.txt_seat_length.clear()
+            self.ui.txt_moment_capacity.clear()
+            self.ui.txt_moment_demand.clear()
+            self.ui.txt_seat_shear_capacity.clear()
+            self.ui.txt_seat_shear_demand.clear()
+            self.ui.txt_beam_shear_strength.clear()
+            self.ui.txt_top_angle.clear()
+
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
         if (uiObj is not None):
@@ -398,13 +473,13 @@ class MainController(QtGui.QMainWindow):
         '''
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam web":
+        if loc == "Column flange-Beam flange":
             pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             # self.ui.lbl_connectivity.show()
-        elif (loc == "Column web-Beam web"):
+        elif (loc == "Column web-Beam flange"):
             picmap = QtGui.QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
@@ -439,7 +514,7 @@ class MainController(QtGui.QMainWindow):
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
         uiObj['Angle']['Thickness'] = str(self.ui.txt_angle_thickness.text())
-        #TODO delete angle - thickness input from UI
+        # TODO delete angle - thickness input from UI
 
         return uiObj
 
@@ -457,7 +532,10 @@ class MainController(QtGui.QMainWindow):
     def get_prevstate(self):
         '''
         '''
-        fileName = 'saveINPUT.txt'
+        if __name__ == '__main__':
+            fileName = 'saveINPUT.txt'
+        else:
+            fileName = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
 
         if os.path.isfile(fileName):
             fileObject = open(fileName, 'r')
@@ -504,23 +582,33 @@ class MainController(QtGui.QMainWindow):
         # function name changed from createDesignReport
 
     def save_design(self, report_summary):
-
-        file_name, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
-                                                                   "Html Files (*.html)")
-        file_name = str(file_name)
-        base, base_front, base_top, base_side = self.call2D_Drawing("All")
+        filename = self.folder + "/images_html/Html_Report.html"
+        file_name = str(filename)
+        self.call2D_Drawing("All")
         inputdict = self.uiObj
         outdict = self.resultObj
 
         report_generator_instance = ReportGenerator(self.sa_calc_object)
-        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder, base,
-                  base_front, base_top, base_side)
+        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder)
+
+        # Creates PDF
+        if sys.platform == ("win32" or "win64"):
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        pdfkit.from_file(filename, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
+                         options=options)
 
         QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
+        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -712,6 +800,7 @@ class MainController(QtGui.QMainWindow):
         vscrollBar = self.ui.textEdit.verticalScrollBar();
         vscrollBar.setValue(vscrollBar.maximum());
         afile.close()
+
     def get_backend(self):
         """
         loads a backend
@@ -719,11 +808,11 @@ class MainController(QtGui.QMainWindow):
         since python comes with Tk included, but that PySide or PyQt4
         is much preferred
         """
-#         try:
-#             from PySide import QtCore, QtGui
-#             return 'pyside'
-#         except:
-#             pass
+        #         try:
+        #             from PySide import QtCore, QtGui
+        #             return 'pyside'
+        #         except:
+        #             pass
         try:
             from PyQt4 import QtCore, QtGui
             return 'pyqt4'
@@ -749,13 +838,13 @@ class MainController(QtGui.QMainWindow):
             from osdagMainSettings import backend_name
             if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
-        #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
         else:
             global display, start_display, app, _, USED_BACKEND
 
             if not backend_str:
                 USED_BACKEND = self.get_backend()
-            elif backend_str in [ 'pyside', 'pyqt4']:
+            elif backend_str in ['pyside', 'pyqt4']:
                 USED_BACKEND = backend_str
             else:
                 raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
@@ -769,8 +858,6 @@ class MainController(QtGui.QMainWindow):
 
         from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
-        #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-
 
         self.setWindowTitle("Osdag Seated Angle Connection")
         self.ui.mytabWidget.resize(size[0], size[1])
@@ -788,6 +875,7 @@ class MainController(QtGui.QMainWindow):
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                       (resolution.height() / 2) - (self.frameSize().height() / 2))
+
         def start_display():
 
             self.ui.modelTab.raise_()
@@ -809,10 +897,10 @@ class MainController(QtGui.QMainWindow):
         self.display.SetModeShaded()
         display.DisableAntiAliasing()
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        self.display.set_bg_gradient_color(255,255,255,255,255,255)
+        self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam web":
+        if loc == "Column flange-Beam flange":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
         else:
             self.display.View_Iso()
@@ -857,8 +945,8 @@ class MainController(QtGui.QMainWindow):
             for nutbolt in nutboltlist:
                 osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-# -------------------------------------------------------------------------
-# TODO check the 3D drawing generating functions below
+            # -------------------------------------------------------------------------
+            # TODO check the 3D drawing generating functions below
 
     def create3DColWebBeamWeb(self):
         '''
@@ -1001,7 +1089,7 @@ class MainController(QtGui.QMainWindow):
         angle_b = int(dictangledata[QString("B")])
         angle_t = float(dictangledata[QString("t")])
         angle_r1 = float(dictangledata[QString("R1")])
-        
+
         angle_r2 = (dictangledata[QString("R2")]).toFloat()
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
@@ -1043,8 +1131,9 @@ class MainController(QtGui.QMainWindow):
         colflangeconn = ColFlangeBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
         colflangeconn.create_3dmodel()
         return colflangeconn
-# TODO check 3D drawing generating functions above
-#-------------------------------------------------------------------------------
+
+    # TODO check 3D drawing generating functions above
+    # -------------------------------------------------------------------------------
     def call_3DModel(self, flag):
         # self.ui.btnSvgSave.setEnabled(True)
         self.ui.btn3D.setChecked(QtCore.Qt.Checked)
@@ -1055,84 +1144,90 @@ class MainController(QtGui.QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
 
         if flag == True:
-            if self.ui.combo_connectivity.currentText() == "Column web-Beam web":
+            if self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
                 # self.create3DColWebBeamWeb()
                 self.connectivity = self.create3DColWebBeamWeb()
                 self.fuse_model = None
 
-            elif self.ui.combo_connectivity.currentText() == "Column flange-Beam web":
+            else:
+                # self.ui.combo_connectivity.currentText() == "Column flange-Beam flange":
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create3DColFlangeBeamWeb()
                 self.fuse_model = None
 
-            else:
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DBeamWebBeamWeb()
-                self.fuse_model = None
+            # else:
+            #     self.ui.mytabWidget.setCurrentIndex(0)
+            #     self.connectivity = self.create3DBeamWebBeamWeb()
+            #     self.fuse_model = None
 
             self.display3Dmodel("Model")
-            nutboltArrayOrigin = self.connectivity.angle.secOrigin 
-            nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.L/4 * self.connectivity.angle.wDir  
-            nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.T * self.connectivity.angle.uDir  
+            nutboltArrayOrigin = self.connectivity.angle.secOrigin
+            nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.L / 4 * self.connectivity.angle.wDir
+            nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.T * self.connectivity.angle.uDir
             nutboltArrayOrigin = nutboltArrayOrigin + self.connectivity.angle.A * self.connectivity.angle.vDir
             firstnutboltArrayOrigin = getGpPt(nutboltArrayOrigin)
-            my_sphere1 = BRepPrimAPI_MakeSphere(firstnutboltArrayOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere1,color = 'red',update = True)
-            
-            bnutboltArrayOrigin = self.connectivity.angle.secOrigin 
-            bnutboltArrayOrigin = bnutboltArrayOrigin + self.connectivity.angle.L/4 * self.connectivity.angle.wDir  
-            bnutboltArrayOrigin = bnutboltArrayOrigin + self.connectivity.angle.T * self.connectivity.angle.vDir  
+            my_sphere1 = BRepPrimAPI_MakeSphere(firstnutboltArrayOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere1, color='red', update=True)
+
+            bnutboltArrayOrigin = self.connectivity.angle.secOrigin
+            bnutboltArrayOrigin = bnutboltArrayOrigin + self.connectivity.angle.L / 4 * self.connectivity.angle.wDir
+            bnutboltArrayOrigin = bnutboltArrayOrigin + self.connectivity.angle.T * self.connectivity.angle.vDir
             bnutboltArrayOrigin = bnutboltArrayOrigin + (self.connectivity.angle.B) * self.connectivity.angle.uDir
             secondtnutboltArrayOrigin = getGpPt(bnutboltArrayOrigin)
-            my_sphere2 = BRepPrimAPI_MakeSphere(secondtnutboltArrayOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere2,color = 'red',update = True)
-            
-            topclipnutboltArrayOrigin = self.connectivity.topclipangle.secOrigin 
-            topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.connectivity.topclipangle.L/4 * self.connectivity.topclipangle.wDir  
-            topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir  
+            my_sphere2 = BRepPrimAPI_MakeSphere(secondtnutboltArrayOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere2, color='red', update=True)
+
+            topclipnutboltArrayOrigin = self.connectivity.topclipangle.secOrigin
+            topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.connectivity.topclipangle.L / 4 * self.connectivity.topclipangle.wDir
+            topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir
             topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir
             thirdtopclipnutboltArrayOrigin = getGpPt(topclipnutboltArrayOrigin)
-            my_sphere3 = BRepPrimAPI_MakeSphere(thirdtopclipnutboltArrayOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere3,color = 'red',update = True)
-            
-            topclipbnutboltArrayOrigin = self.connectivity.topclipangle.secOrigin 
-            topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.connectivity.topclipangle.L/4 * self.connectivity.topclipangle.wDir  
-            topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir  
+            my_sphere3 = BRepPrimAPI_MakeSphere(thirdtopclipnutboltArrayOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere3, color='red', update=True)
+
+            topclipbnutboltArrayOrigin = self.connectivity.topclipangle.secOrigin
+            topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.connectivity.topclipangle.L / 4 * self.connectivity.topclipangle.wDir
+            topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir
             topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.connectivity.topclipangle.B) * self.connectivity.topclipangle.uDir
             fourthtopclipbnutboltArrayOrigin = getGpPt(topclipbnutboltArrayOrigin)
-            my_sphere4 = BRepPrimAPI_MakeSphere(fourthtopclipbnutboltArrayOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere4,color = 'red',update = True)
-            
-            angle_origin =((self.connectivity.column.secOrigin + self.connectivity.column.D/2) * (-self.connectivity.column.vDir)) + ((self.connectivity.column.length/2-self.connectivity.beam.D/2) * self.connectivity.column.wDir)+(self.connectivity.angle.L/2 * (-self.connectivity.column.uDir))
-            angleRealOrigin = getGpPt(angle_origin)
-            my_sphere5 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere5,color = 'yellow',update = True)
-            
-            root2 = math.sqrt(2)
-            #angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.T * self.connectivity.angle.uDir + (self.connectivity.angle.T + (self.connectivity.angle.R2 + self.connectivity.angle.R2/root2))* self.connectivity.angle.vDir
-            angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.A * self.connectivity.angle.vDir + self.connectivity.angle.T * self.connectivity.angle.uDir + self.connectivity.angle.R2*(1-1/root2) * self.connectivity.angle.uDir - self.connectivity.angle.R2/root2*self.connectivity.angle.vDir
-            angleRealOrigin = getGpPt(angle_Rorigin)
-            my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere6,color = 'green',update = True)
-            
-            root2 = math.sqrt(2)
-            angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.B * self.connectivity.angle.uDir + self.connectivity.angle.T * self.connectivity.angle.vDir + self.connectivity.angle.R2*(1-1/root2) * self.connectivity.angle.vDir - self.connectivity.angle.R2/root2*self.connectivity.angle.uDir
-            angleRealOrigin = getGpPt(angle_Rorigin)
-            my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere6,color = 'green',update = True)
-            
-            topclip_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.B * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.vDir
-            
-            angletopRealOrigin = getGpPt(topclip_nutboltArrayOrigin)
-            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere7,color = 'green',update = True)
+            my_sphere4 = BRepPrimAPI_MakeSphere(fourthtopclipbnutboltArrayOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere4, color='red', update=True)
 
-            
-            topclipB_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin  + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir -self.connectivity.topclipangle.R2/root2 * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.R2*(1-1/root2)*self.connectivity.topclipangle.uDir
-            
+            angle_origin = ((self.connectivity.column.secOrigin + self.connectivity.column.D / 2) * (-self.connectivity.column.vDir)) + (
+            (self.connectivity.column.length / 2 - self.connectivity.beam.D / 2) * self.connectivity.column.wDir) + (
+                           self.connectivity.angle.L / 2 * (-self.connectivity.column.uDir))
+            angleRealOrigin = getGpPt(angle_origin)
+            my_sphere5 = BRepPrimAPI_MakeSphere(angleRealOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere5, color='yellow', update=True)
+
+            root2 = math.sqrt(2)
+            # angle_Rorigin =self.connectivity.angle.secOrigin  + self.connectivity.angle.T * self.connectivity.angle.uDir + (self.connectivity.angle.T + (self.connectivity.angle.R2 + self.connectivity.angle.R2/root2))* self.connectivity.angle.vDir
+            angle_Rorigin = self.connectivity.angle.secOrigin + self.connectivity.angle.A * self.connectivity.angle.vDir + self.connectivity.angle.T * self.connectivity.angle.uDir + self.connectivity.angle.R2 * (
+            1 - 1 / root2) * self.connectivity.angle.uDir - self.connectivity.angle.R2 / root2 * self.connectivity.angle.vDir
+            angleRealOrigin = getGpPt(angle_Rorigin)
+            my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere6, color='green', update=True)
+
+            root2 = math.sqrt(2)
+            angle_Rorigin = self.connectivity.angle.secOrigin + self.connectivity.angle.B * self.connectivity.angle.uDir + self.connectivity.angle.T * self.connectivity.angle.vDir + self.connectivity.angle.R2 * (
+            1 - 1 / root2) * self.connectivity.angle.vDir - self.connectivity.angle.R2 / root2 * self.connectivity.angle.uDir
+            angleRealOrigin = getGpPt(angle_Rorigin)
+            my_sphere6 = BRepPrimAPI_MakeSphere(angleRealOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere6, color='green', update=True)
+
+            topclip_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin + self.connectivity.topclipangle.B * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.vDir - self.connectivity.topclipangle.R2 / root2 * self.connectivity.topclipangle.uDir + self.connectivity.topclipangle.R2 * (
+            1 - 1 / root2) * self.connectivity.topclipangle.vDir
+
+            angletopRealOrigin = getGpPt(topclip_nutboltArrayOrigin)
+            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere7, color='green', update=True)
+
+            topclipB_nutboltArrayOrigin = self.connectivity.topclipangle.secOrigin + self.connectivity.topclipangle.A * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.T * self.connectivity.topclipangle.uDir - self.connectivity.topclipangle.R2 / root2 * self.connectivity.topclipangle.vDir + self.connectivity.topclipangle.R2 * (
+            1 - 1 / root2) * self.connectivity.topclipangle.uDir
+
             angletopRealOrigin = getGpPt(topclipB_nutboltArrayOrigin)
-            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin,2.5).Shape()
-            self.display.DisplayShape(my_sphere7,color = 'green',update = True)
+            my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin, 2.5).Shape()
+            self.display.DisplayShape(my_sphere7, color='green', update=True)
 
         else:
             self.display.EraseAll()
@@ -1171,8 +1266,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        # TODO uncomment display3D model after debugging
-        # self.display3Dmodel("SeatAngle")
+            # TODO uncomment display3D model after debugging
+            # self.display3Dmodel("SeatAngle")
 
     def unchecked_allChkBox(self):
 
@@ -1186,6 +1281,9 @@ class MainController(QtGui.QMainWindow):
         '''
         # TODO input validation
         # self.validateInputsOnDesignBtn()
+        if self.ui.combo_connectivity.currentIndex() == 0:
+            QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
+
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
@@ -1325,67 +1423,32 @@ class MainController(QtGui.QMainWindow):
     def call2D_Drawing(self, view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
-            '''
-        base = ''
+        '''
 
-        loc = self.ui.combo_connectivity.currentText()
         if view == "All":
             fileName = ''
-            base_front = ''
-            base_side = ''
-            base_top = ''
 
-            base1, base2, base3 = self.callDesired_View(fileName, view, base_front, base_top, base_side)
+            self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-
-            if loc == "Column flange-Beam web":
-
-                data = str(self.folder) + "/css/3D_ModelSeatFB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatFB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-                print "basenameee", base
-
-            elif loc == "Column web-Beam web":
-                data = str(self.folder) + "/css/3D_ModelSeatWB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatWB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
-
-            else:
-                data = str(self.folder) + "/css/3D_ModelSeatBB.png"
-                for n in range(1, 100, 1):
-                    if (os.path.exists(data)):
-                        data = str(self.folder) + "/css/3D_ModelSeatBB" + str(n) + ".png"
-                        continue
-                base = os.path.basename(str(data))
-
+            data = str(self.folder) + "/images_html/3D_Model.png"
+            base = os.path.basename(str(data))
             self.display.ExportToImage(data)
 
 
         else:
-            #             fileName = webbrowser.open_new(r'file:///untitled.svg')
+            if view == "Front":
+                filename = self.folder + "/images_html/seatFront.svg"
 
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            f = open(fileName, 'w')
+            elif view == "Side":
+                filename = self.folder + "/images_html/seatSide.svg"
 
-            self.callDesired_View(fileName, view, base_front, base_top, base_side)
-            # f.close() #TODO check with fin plate module
+            else:
+                filename = self.folder + "/images_html/seatTop.svg"
 
-        print "basenameee", base
-        print "base front", base1
-        print "base side", base2
-        print "base top", base3
-        return (base, base1, base2, base3)
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
 
-    def callDesired_View(self, fileName, view, base_front, base_top, base_side):
+    def callDesired_View(self, fileName, view):
 
         self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
@@ -1397,10 +1460,7 @@ class MainController(QtGui.QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
-        base_front, base_top, base_side = seatCommonObj.save_to_svg(str(fileName), view, base_front, base_top,
-                                                                    base_side)
-        return (base_front, base_top, base_side)
-        print"sucessfully worked"
+        seatCommonObj.save_to_svg(str(fileName), view)
 
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()
@@ -1414,25 +1474,50 @@ class MainController(QtGui.QMainWindow):
         else:
             event.ignore()
 
-    # Following functions are trimmed in Seated angle module
-        # about_osdag(), MyAboutOsdag(), tutorials(), MyTutorials(), open_tutorials()
-    # open_osdag() also calls about_osdag()
+    # ********************************* Help Action *********************************************************************************************
+    def about_osdag(self):
+        dialog = MyAboutOsdag(self)
+        dialog.show()
+
     def open_osdag(self):
-        # dialog=MyAboutOsdag(self)
-        # dialog.show()
-        pass
+        self.about_osdag()
+
+    def tutorials(self):
+        dialog = MyTutorials(self)
+        dialog.show()
+
+    def open_tutorials(self):
+        self.tutorials()
+
+    def ask_questions(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_questions()
 
     def sample_report(self):
-        #TODO: update path below
-        # url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder',
-        #                    'Sample_Report', 'The_PyQt4_tutorial.pdf')
-        # webbrowser.open_new(r'file:///' + url)
-        pass
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == "nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        # webbrowser.open_new(
-        #     r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
-        pass
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == "nt":
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+
+                    # ********************************************************************************************************************************************************
+
 
 def set_osdaglogger():
     global logger
@@ -1448,7 +1533,12 @@ def set_osdaglogger():
     # while launching from Osdag Main:
     # fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="a")
     # while launching from Seated angle folder
-    fh = logging.FileHandler("./seatangle.log", mode="a")
+    # fh = logging.FileHandler("./seatangle.log", mode="a")
+
+    if __name__ == '__main__':
+        fh = logging.FileHandler("./seatangle.log", mode="a")
+    else:
+        fh = logging.FileHandler(os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log"), mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1464,13 +1554,14 @@ def set_osdaglogger():
 
     logger.addHandler(fh)
 
+
 def launchSeatedAngleController(osdagMainWindow, folder):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # while launching from Osdag Main:
     fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
-    #while launching from Seated Angle folder
+    # while launching from Seated Angle folder
     # fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
@@ -1487,6 +1578,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
 
     window.show()
     window.closed.connect(osdagMainWindow.show)
+
 
 if __name__ == '__main__':
     # launchSeatAngleController(None)

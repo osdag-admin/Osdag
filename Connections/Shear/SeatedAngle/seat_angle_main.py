@@ -384,8 +384,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.combo_bolt_grade.setCurrentIndex(0)
             self.ui.txt_fu.clear()
             self.ui.txt_fy.clear()
-            self.ui.txt_shear_force()
-            self.ui.txt_angle_thickness()
+            self.ui.txt_shear_force.clear()
+            self.ui.txt_angle_thickness.clear()
 
             self.ui.txt_bolt_shear_capacity.clear()
             self.ui.txt_bolt_bearing_capacity.clear()
@@ -1281,6 +1281,9 @@ class MainController(QtGui.QMainWindow):
         '''
         # TODO input validation
         # self.validateInputsOnDesignBtn()
+        if self.ui.combo_connectivity.currentIndex() == 0:
+            QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
+
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()

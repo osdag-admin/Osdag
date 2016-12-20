@@ -205,6 +205,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.end_dist = 1
         self.edge_dist = 1
         self.pitch = 1
+        self.gauge_two_bolt = 1
         self.gauge = 1
         self.max_spacing = 1
         self.max_edge_dist = 1
@@ -236,7 +237,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
-        self.top_angle = "ISA 100X65X8"
+        self.top_angle = input_dict['Angle']['TopAngleSection']
         # TODO specify non-arbitrary top angle section
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
@@ -332,6 +333,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "No. of Column": int(self.num_cols),
             "Pitch Distance (mm)": self.pitch,
             "Gauge Distance (mm)": self.gauge,
+            "Gauge Two Bolt (mm)": self.gauge_two_bolt,
             "End Distance (mm)": self.min_end_dist,
             "Edge Distance (mm)": self.min_edge_dist,
 
@@ -405,6 +407,9 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)
+        
+        # Determine gauge for two bolts
+        self.gauge_two_bolt = length_avail
 
         self.num_rows = 1
         self.num_cols = max(self.bolts_required, 2)

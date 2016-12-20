@@ -78,6 +78,7 @@ class NutBoltArray():
     def initBoltPlaceParams(self,boltPlaceObj):
         self.pitch = boltPlaceObj['Bolt']["Pitch Distance (mm)"]
         self.gauge = boltPlaceObj['Bolt']["Gauge Distance (mm)"]
+        self.gauge_two_bolt = boltPlaceObj['Bolt']["Gauge Two Bolt (mm)"]
         #self.gauge = 30
         self.edge = boltPlaceObj['Bolt']["Edge Distance (mm)"]
         self.end = boltPlaceObj['Bolt']["End Distance (mm)"]
@@ -114,7 +115,7 @@ class NutBoltArray():
             for col in range(self.bcol):
                 pos = self.borigin 
                 pos = pos + self.end * self.bgaugeDir
-                pos = pos + col * self.gauge * self.bgaugeDir 
+                pos = pos + col * self.gauge_two_bolt * self.bgaugeDir 
                 pos = pos + self.edge * self.bpitchDir 
                 pos = pos + rw * self.pitch * self.bpitchDir
                 
@@ -127,7 +128,7 @@ class NutBoltArray():
             for col in range(self.topclipcol):
                 pos = self.topcliporigin 
                 pos = pos + self.end * self.topclipgaugeDir
-                pos = pos + col * self.gauge * self.topclipgaugeDir 
+                pos = pos + col * self.gauge_two_bolt * self.topclipgaugeDir 
                 pos = pos + self.edge * self.topclippitchDir 
                 pos = pos + rw * self.pitch * self.topclippitchDir
                 
@@ -140,7 +141,7 @@ class NutBoltArray():
             for col in range(self.topclipbcol):
                 pos = self.topclipborigin 
                 pos = pos + self.edge * self.topclipbgaugeDir
-                pos = pos + col * self.gauge * self.topclipbgaugeDir 
+                pos = pos + col * self.gauge_two_bolt * self.topclipbgaugeDir 
                 pos = pos + self.end * self.topclipbpitchDir 
                 pos = pos + rw * self.pitch * self.topclipbpitchDir
                 

@@ -169,6 +169,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.combo_beam_section.addItems(get_beamcombolist())
         self.ui.combo_column_section.addItems(get_columncombolist())
         self.ui.combo_angle_section.addItems(get_anglecombolist())
+        self.ui.combo_topangle_section.addItems(get_anglecombolist())
 
         self.ui.inputDock.setFixedSize(310, 710)
 
@@ -465,7 +466,8 @@ class MainController(QtGui.QMainWindow):
             self.ui.combo_bolt_grade.setCurrentIndex(combo_grade_index)
             combo_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
             self.ui.combo_angle_section.setCurrentIndex(combo_angle_index)
-            self.ui.txt_angle_thickness.setText(str(uiObj['Angle']['Thickness']))
+            combo_topangle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
+            self.ui.combo_topangle_section.setCurrentIndex(combo_topangle_index)
 
     def setimage_connection(self):
         '''
@@ -513,8 +515,8 @@ class MainController(QtGui.QMainWindow):
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
-        uiObj['Angle']['Thickness'] = str(self.ui.txt_angle_thickness.text())
-        # TODO delete angle - thickness input from UI
+        uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
+
 
         return uiObj
 

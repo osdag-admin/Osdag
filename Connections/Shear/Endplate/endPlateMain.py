@@ -996,12 +996,12 @@ class MainController(QtGui.QMainWindow):
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxEndplate.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         if view != 'All':
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -1016,7 +1016,7 @@ class MainController(QtGui.QMainWindow):
         filename = str(filename)
         self.call_end2D_drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         commLogicObj.call_designReport(filename, popup_summary)
         
         if sys.platform == "nt":

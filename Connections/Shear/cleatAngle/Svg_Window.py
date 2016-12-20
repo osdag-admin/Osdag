@@ -3,7 +3,7 @@ Created on Oct 20, 2016
 
 @author: USER
 '''
-from PyQt4 import QtSvg, QtGui
+from PyQt4 import QtSvg, QtGui,QtCore
 import sys
 import shutil
 
@@ -30,7 +30,7 @@ class SvgWindow(object):
         self.gridlayout.addLayout(self.horizontallayout, 1, 1, 1, 1)
         spaceritem2 = QtGui.QSpacerItem(260, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridlayout.addItem(spaceritem2, 1, 2, 1, 1)
-        self.svgWidget.setFixedSize(1100, 900)
+        self.svgWidget.setFixedSize(1000, 800)
 
         # spaceritem1 = QtGui.QSpacerItem(18, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         # self.horizontallayout.addItem(spaceritem1)
@@ -51,7 +51,8 @@ class SvgWindow(object):
         myfont.setFamily("Arial")
         self.btn_save_png.setFont(myfont)
         self.btn_save_svg.setFont(myfont)
-        self.svgWidget.setWindowTitle('2D View')
+        self.svgWidget.setWindowTitle("2D View")
+        self.svgWidget.setWindowModified(True)
         self.svgWidget.show()
 
         self.btn_save_png.clicked.connect(lambda: self.save_2d_image_png_names(view))

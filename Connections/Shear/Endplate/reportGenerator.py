@@ -86,9 +86,9 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     minplatethk = str(int(round(outobj['Plate']['MinThick'], 1)))
     blockshear = str(int(round(outobj['Plate']['blockshear'], 1)))
 
-    plate_width = str(int(round(outobj['Plate']['Width'], 1)))
+    plate_width = str(int(round(outobj['Plate']['width'], 1)))
     plate_minwidth = str(int(round(outobj['Plate']['MinWidth'], 1)))
-    plate_length = str(int(round(outobj['Plate']['Height'], 1)))
+    plate_length = str(int(round(outobj['Plate']['height'], 1)))
 #     weld_size = str(int(round(outobj["Weld"]['Size (mm)'],1)))
 
     plate_dimension = plate_length + 'X' + plate_width + 'X' + plate_thickness

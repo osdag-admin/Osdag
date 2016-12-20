@@ -62,7 +62,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
         folder = QtGui.QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..','OsdagWorkspace', 'Osdag_workspace'), 'All Files (*)')
         folder = str(folder)
         if not os.path.exists(folder):
-            os.mkdir(folder)
+            os.mkdir(folder, 0755)
 
         root_path = folder
         images_html_folder = ['images_html']

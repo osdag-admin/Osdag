@@ -52,8 +52,9 @@ import OCC.V3d
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from Connections.Shear.Finplate.drawing_2D import FinCommonData
-from Connections.Shear.Finplate.reportGenerator import save_html
-from Connections.Shear.Endplate.reportGenerator import save_html
+from Connections.Shear.Endplate.drawing_2D import EndCommonData
+from Connections.Shear.Finplate.reportGenerator import save_html as fin_save_html
+from Connections.Shear.Endplate.reportGenerator import save_html as end_save_html
 #----------------------------------------- from reportGenerator import save_html
 import json
 
@@ -179,7 +180,8 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":#finBeamWebBeamWeb/endBeamWebBeamWeb
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
-            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate,nutBoltArray)
+            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, plate, Fweld1,nutBoltArray)
+            #column, beam, notch, plate, Fweld, nut_bolt_array
         elif self.connection == "Endplate":
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
@@ -365,7 +367,7 @@ class CommonDesignLogic(object):
     #=========================================================================================
 
     def display_3DModel(self, component):
-        print "self.connecvityObj=",self.connectivityObj
+        
         self.component = component
 
         self.display.EraseAll()
@@ -374,7 +376,7 @@ class CommonDesignLogic(object):
 
         self.display.DisableAntiAliasing()
 
-        # self.display.set_bg_gradient_color(23,1,32,150,150,170)
+#         self.display.set_bg_gradient_color(23,1,32,150,150,170)
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
         if self.loc == "Column flange-Beam web" and self.connection =="Finplate":
@@ -430,7 +432,7 @@ class CommonDesignLogic(object):
 
     #=========================================================================================
 
-    def call2D_Drawing(self, view, fileName, loc, folder):
+    def call2D_Drawing(self, view, fileName, loc, folder): #Rename function with call_view_images()
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
@@ -441,8 +443,12 @@ class CommonDesignLogic(object):
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
             data = str(folder) + "/images_html/3D_Model.png"
-
+            
             self.display.ExportToImage(data)
+            
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            self.display.View_Iso()
+            self.display.FitAll()
 
         else:
 
@@ -454,8 +460,6 @@ class CommonDesignLogic(object):
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
         if self.connection =="Finplate":
-            
-
             finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             finCommonObj.saveToSvg(str(fileName), view)
         else:
@@ -477,8 +481,11 @@ class CommonDesignLogic(object):
         fileName = str(htmlfilename)
 
         if not os.path.isfile(fileName):
-            save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
-
+            if self.connection == "Finplate":
+                fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+            else:
+                end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary, htmlfilename, self.folder)
+                
     #=========================================================================================
 
     def load_userProfile(self):

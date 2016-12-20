@@ -367,16 +367,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -441,7 +432,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3075,12 +3066,12 @@ QMenu::item:selected {
       <string>Angle section *</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_txtanglethickness">
+    <widget class="QLabel" name="lbl_topanglesection">
      <property name="geometry">
       <rect>
        <x>6</x>
        <y>490</y>
-       <width>151</width>
+       <width>131</width>
        <height>25</height>
       </rect>
      </property>
@@ -3093,25 +3084,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Thickness (mm)*</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_angle_thickness">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>490</y>
-       <width>160</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
+      <string>Top angle section </string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -3165,6 +3138,30 @@ QMenu::item:selected {
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QComboBox" name="combo_topangle_section">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>490</y>
+       <width>160</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QComboBox { combobox-popup: 0; }</string>
+     </property>
+     <property name="maxVisibleItems">
+      <number>5</number>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -4318,7 +4315,6 @@ QMenu::item:selected {
   <tabstop>combo_bolt_type</tabstop>
   <tabstop>combo_bolt_grade</tabstop>
   <tabstop>combo_angle_section</tabstop>
-  <tabstop>txt_angle_thickness</tabstop>
   <tabstop>btn_Design</tabstop>
   <tabstop>btn_Reset</tabstop>
   <tabstop>btn_SaveMessages</tabstop>

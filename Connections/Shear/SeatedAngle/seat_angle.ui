@@ -367,16 +367,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -597,8 +588,7 @@ QMenu::item:selected {
     </property>
     <property name="title">
      <string>Help</string>
-    </property>
-    <addaction name="actionOsdag_Manual"/>
+    </property>    
     <addaction name="actionSample_Reports"/>
     <addaction name="actionSampe_Problems"/>
     <addaction name="actionVideo_Tutorials"/>
@@ -771,12 +761,12 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>Column flange-Beam web</string>
+       <string>Column flange-Beam flange</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Column web-Beam web</string>
+       <string>Column web-Beam flange</string>
       </property>
      </item>
     </widget>
@@ -3114,57 +3104,57 @@ QMenu::item:selected {
       </font>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QPushButton" name="btn_Reset">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>540</y>
-       <width>195</width>
-       <height>41</height>
+        <x>41</x>
+       <y>570</y>
+       <width>93</width>
+       <height>33</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="btn_Reset">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Reset Inputs</string>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-        <property name="shortcut">
-         <string>Alt+R</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_Design">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Design Connection</string>
-        </property>
-        <property name="text">
-         <string>Design</string>
-        </property>
-        <property name="shortcut">
-         <string>Alt+D</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Reset Inputs</string>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+     <property name="shortcut">
+      <string>Alt+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Design">
+     <property name="geometry">
+      <rect>
+       <x>141</x>
+       <y>570</y>
+       <width>93</width>
+       <height>33</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Design Connection</string>
+     </property>
+     <property name="text">
+      <string>Design</string>
+     </property>
+     <property name="shortcut">
+      <string>Alt+D</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -3946,39 +3936,7 @@ QMenu::item:selected {
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beam shear strength (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>610</y>
-       <width>192</width>
-       <height>69</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QPushButton" name="btn_SaveMessages">
-        <property name="toolTip">
-         <string>Save Log Messages</string>
-        </property>
-        <property name="text">
-         <string>Save messages</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_CreateDesign">
-        <property name="toolTip">
-         <string>Create Design Report</string>
-        </property>
-        <property name="text">
-         <string>Create design report</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    </widget>    
     <widget class="QLineEdit" name="txt_top_angle">
      <property name="geometry">
       <rect>
@@ -4018,6 +3976,38 @@ QMenu::item:selected {
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Top Angle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_SaveMessages">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>613</y>
+       <width>190</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Save Log Messages</string>
+     </property>
+     <property name="text">
+      <string>Save messages</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_CreateDesign">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>650</y>
+       <width>190</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Create Design Report</string>
+     </property>
+     <property name="text">
+      <string>Create design report</string>
      </property>
     </widget>
    </widget>

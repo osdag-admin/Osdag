@@ -396,11 +396,12 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.sa_params(input_dict)
         self.bolt_design(self.bolt_diameter)
 
-        if self.connectivity == "Column web-Beam web":
+        if self.connectivity == "Column web-Beam flange":
             limiting_angle_length = self.column_d - 2*self.column_f_t - 2*self.column_R1 - self.root_clearance
             self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
-        elif self.connectivity == "Column flange-Beam web":
+        elif self.connectivity == "Column flange-Beam flange":
             self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
+            print self.beam_w_f
 
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)

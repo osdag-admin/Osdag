@@ -1433,9 +1433,7 @@ class MainController(QtGui.QMainWindow):
             self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
-            base = os.path.basename(str(data))
             self.display.ExportToImage(data)
-
 
         else:
             if view == "Front":

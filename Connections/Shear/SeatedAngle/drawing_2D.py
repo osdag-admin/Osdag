@@ -53,11 +53,37 @@ class SeatCommonData(object):
         self.no_of_col = output_dict['Bolt']["No. of Column"]
         self.col_length = 700
         self.beam_length = 350
-        self.gap = 10  # Clear distance between column and beam
+        self.gap = 20  # Clear distance between column and beam
         self.notch_L = (self.col_width - (self.col_web_thk + 40)) / 2.0
         self.notch_ht = self.col_flange_thk + self.col_R1
 
         self.folder = folder
+        print self.beam_flange_thk, "beam_flange_thk"
+        print self.col_flange_thk, "col_flange_thk"
+        print self.beam_depth,"beam_depth"
+        print self.col_depth ,"col_depth"
+        print self.col_width ,"col_width"
+        print self.beam_width ,"beam_width"
+        print self.col_web_thk ,"col_web_thk"
+        print self.beam_web_thk ,"beam_web_thk"
+        print self.col_designation ,"col_designation"
+        print self.beam_designation ,"beam_designation"
+        print self.beam_R1 ,"beam_R1"
+        print self.col_R1 ,"col_R1"
+        print self.bolt_dia,"bolt_dia"
+        print self.grade ,"grade"
+        print self.connectivity ,"connectivity"
+        print self.pitch ,"pitch"
+        print self.gauge ,"gauge"
+        print self.end_dist ,"end_dist"
+        print self.edge_dist ,"edge_dist"
+        print self.no_of_rows ,"no_of_rows"
+        print self.no_of_col ,"no_of_col"
+        print self.col_length,"col_length"
+        print self.beam_length,"beam_length"
+        print self.notch_L,"notch_L"
+        print self.notch_ht,"notch_ht"
+
 
     def add_start_marker(self, dwg):
         '''Draw start arrow to given line.  -------->

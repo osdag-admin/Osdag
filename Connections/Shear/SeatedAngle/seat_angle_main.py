@@ -264,7 +264,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
         # Osdag logo for html
-        # self.ui.btn_Design.clicked.connect(self.osdag_header)
+        self.ui.btn_Design.clicked.connect(self.osdag_header)
 
         # Help button
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
@@ -288,8 +288,10 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = os.path.dirname(os.path.abspath(__file__)) + os.path + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
-        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
+        # image_path = os.path.dirname(os.path.abspath(__file__)) + os.path + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
+        # shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
+        image_path = os.path.join("ResourceFiles", "Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
     # noinspection PyPep8Naming
     def fetchBeamPara(self):
@@ -1308,6 +1310,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['SeatAngle']['status']
         self.call_3DModel(status)
+        self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of finplate
@@ -1434,6 +1437,7 @@ class MainController(QtGui.QMainWindow):
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
             data = str(self.folder) + "/images_html/3D_Model.png"
             self.display.ExportToImage(data)
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
         else:
             if view == "Front":

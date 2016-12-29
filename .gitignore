@@ -1,0 +1,6 @@
+*.pyo
+~*
+output/*
+*.xml
+*.txt
+*.pyc

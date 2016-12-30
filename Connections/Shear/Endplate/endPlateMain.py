@@ -5,25 +5,21 @@ comment
 @author: deepa
 '''
 from OCC import IGESControl
-from OCC import VERSION, BRepTools
+from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-# from OCC.Display.qtDisplay import qtViewer3d
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
+# from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.Interface import Interface_Static_SetCVal
-from OCC.Quantity import Quantity_NOC_RED, Quantity_NOC_BLUE1, Quantity_NOC_SADDLEBROWN
+# from OCC.Quantity import Quantity_NOC_RED, Quantity_NOC_BLUE1, Quantity_NOC_SADDLEBROWN
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.StlAPI import StlAPI_Writer
-from OCC.TopoDS import topods, TopoDS_Shape
+# from OCC.TopoDS import topods, TopoDS_Shape
 from OCC.gp import gp_Pnt
-from PyQt4.QtCore import QString, pyqtSignal
-from PyQt4.QtWebKit import *
-from PyQt4.Qt import QPrinter, QDialog
+from PyQt4.QtCore import pyqtSignal
 import os.path
 import subprocess
 import pickle
-import svgwrite
-# import yaml
+#import svgwrite
 import icons_rc
 import pdfkit
 import shutil
@@ -33,12 +29,12 @@ from ui_tutorial import Ui_Tutorial
 from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from ISection import ISection
-from ISectionOld import ISectionOld
+# from ISectionOld import ISectionOld
 from bolt import Bolt
 from beamWebBeamWebConnectivity import BeamWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from filletweld import FilletWeld
+# from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
+# from colWebBeamWebConnectivity import ColWebBeamWeb
+# from filletweld import FilletWeld
 from endPlateCalc import end_connection
 from model import *
 from nut import Nut 
@@ -711,7 +707,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.combo_Beam.setCurrentIndex((0))
             self.ui.comboColSec.setCurrentIndex((0))
 #             self.ui.comboConnLoc.setCurrentIndex((0))
-            self.ui.comboDaimeter.setCurrentIndex(0)
+            self.ui.comboDiameter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
             self.ui.comboPlateThick_2.setCurrentIndex((0))
@@ -740,7 +736,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtplate_width.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
-            self.ui.txtWeldStrng_5.clear()
+            #self.ui.txtWeltxtWeldStrng_5.clear()
  
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
  
@@ -795,7 +791,6 @@ class MainController(QtGui.QMainWindow):
     def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
-            column = self.ui.comboColSec.currentText()
 
             dict_beam_data = self.fetch_beam_param()
             dict_col_data = self.fetch_column_param()
@@ -1308,11 +1303,11 @@ class MainController(QtGui.QMainWindow):
             # Qt based simple GUI
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.qtDisplay
-                    from OCC.Display.qtDisplay import qtViewer3d
+                    import OCC.Display.pyqt4Display
+                    from OCC.Display.pyqt4Display import qtViewer3d
                     from PyQt4 import QtCore, QtGui, QtOpenGL
 
-        from OCC.Display.qtDisplay import qtViewer3d
+        from OCC.Display.pyqt4Display import qtViewer3d
 
         self.ui.modelTab = qtViewer3d(self)
 
@@ -2098,7 +2093,7 @@ def set_osdaglogger():
     logger.setLevel(logging.DEBUG)
 
     # create the logging file handler
-    fh = logging.FileHandler("Connections/Shear/Endplate/fin.log", mode="a")
+    fh = logging.FileHandler("Connections/Shear/Endplate/end.log", mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -2120,7 +2115,7 @@ def launch_endplate_controller(osdag_main_window, folder):
     set_osdaglogger()
     raw_logger = logging.getLogger("raw")
     raw_logger.setLevel(logging.INFO)
-    fh = logging.FileHandler("Connections/Shear/Endplate/fin.log", mode="w")
+    fh = logging.FileHandler("Connections/Shear/Endplate/end.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     raw_logger.addHandler(fh)

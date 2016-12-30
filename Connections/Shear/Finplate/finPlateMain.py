@@ -1070,10 +1070,10 @@ class MainController(QtGui.QMainWindow):
             # Qt based simple GUI
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.qtDisplay
+                    import OCC.Display.pyqt4Display
                     from PyQt4 import QtCore, QtGui, QtOpenGL
 
-        from OCC.Display.qtDisplay import qtViewer3d
+        from OCC.Display.pyqt4Display import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))

@@ -20,17 +20,25 @@ import icons_rc
 import pdfkit
 import shutil
 from ui_summary_popup import *
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from endPlateCalc import end_connection
 from model import *
-from nut import Nut 
 from ui_endplate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
 from Svg_Window import SvgWindow
+
+
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class MyTutorials(QtGui.QDialog):
@@ -44,7 +52,7 @@ class MyTutorials(QtGui.QDialog):
 class MyAboutOsdag(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -359,6 +367,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Report.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
+
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
         # Initialising the qtviewer
 
@@ -862,7 +872,8 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+                                         self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         if view != 'All':
             fileName = QtGui.QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -870,7 +881,7 @@ class MainController(QtGui.QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
-        commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
         
     def save_design(self, popup_summary):
         filename = self.folder + "/images_html/Html_Report.html"
@@ -880,7 +891,7 @@ class MainController(QtGui.QMainWindow):
                                          self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
         commLogicObj.call_designReport(filename, popup_summary)
         
-        if sys.platform == "nt":
+        if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
@@ -1533,12 +1544,19 @@ class MainController(QtGui.QMainWindow):
     def open_tutorials(self):
         self.tutorials()
 
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
+
     def sample_report(self):
 
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
@@ -1548,7 +1566,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"

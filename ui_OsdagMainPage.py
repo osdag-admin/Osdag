@@ -35,48 +35,6 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.gridLayout = QtGui.QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.btn_help = QtGui.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("Arial"))
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btn_help.setFont(font)
-        self.btn_help.setStyleSheet(_fromUtf8("QPushButton::hover\n"
-"{\n"
-"   background-color: #d97f7f;\n"
-"   color:#000000 ;\n"
-"}\n"
-"\n"
-"QPushButton\n"
-"{\n"
-"background-color: #925a5b;\n"
-"color:#ffffff;\n"
-"}"))
-        self.btn_help.setAutoDefault(True)
-        self.btn_help.setObjectName(_fromUtf8("btn_help"))
-        self.gridLayout.addWidget(self.btn_help, 1, 1, 1, 1)
-        self.btn_openfile = QtGui.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("Arial"))
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btn_openfile.setFont(font)
-        self.btn_openfile.setStyleSheet(_fromUtf8("QPushButton::hover\n"
-"{\n"
-"   background-color: #d97f7f;\n"
-"   color:#000000 ;\n"
-"}\n"
-"\n"
-"QPushButton\n"
-"{\n"
-"background-color: #925a5b;\n"
-"color:#ffffff;\n"
-"}"))
-        self.btn_openfile.setAutoDefault(True)
-        self.btn_openfile.setObjectName(_fromUtf8("btn_openfile"))
-        self.gridLayout.addWidget(self.btn_openfile, 1, 0, 1, 1)
         self.myListWidget = QtGui.QListWidget(self.centralwidget)
         self.myListWidget.setMinimumSize(QtCore.QSize(300, 0))
         palette = QtGui.QPalette()
@@ -419,6 +377,59 @@ class Ui_MainWindow(object):
         self.page.setObjectName(_fromUtf8("page"))
         self.myStackedWidget.addWidget(self.page)
         self.gridLayout.addWidget(self.myStackedWidget, 0, 2, 1, 1)
+        self.comboBox_help = QtGui.QComboBox(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        font.setKerning(True)
+        self.comboBox_help.setFont(font)
+        self.comboBox_help.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.comboBox_help.setStyleSheet(_fromUtf8("QComboBox::hover\n"
+"{\n"
+"   background-color: #d97f7f;\n"
+"   color:#000000 ;\n"
+"}\n"
+"\n"
+"QComboBox\n"
+"{\n"
+"background-color: #925a5b;\n"
+"color:#ffffff;\n"
+"}\n"
+"\n"
+""))
+        self.comboBox_help.setFrame(True)
+        self.comboBox_help.setObjectName(_fromUtf8("comboBox_help"))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.comboBox_help.addItem(_fromUtf8(""))
+        self.gridLayout.addWidget(self.comboBox_help, 1, 1, 1, 1)
+        self.btn_openfile = QtGui.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        self.btn_openfile.setFont(font)
+        self.btn_openfile.setStyleSheet(_fromUtf8("QPushButton::hover\n"
+"{\n"
+"   background-color: #d97f7f;\n"
+"   color:#000000 ;\n"
+"}\n"
+"\n"
+"QPushButton\n"
+"{\n"
+"background-color: #925a5b;\n"
+"color:#ffffff;\n"
+"}"))
+        self.btn_openfile.setAutoDefault(True)
+        self.btn_openfile.setObjectName(_fromUtf8("btn_openfile"))
+        self.gridLayout.addWidget(self.btn_openfile, 1, 0, 1, 1)
         self.btn_connection = QtGui.QPushButton(self.centralwidget)
         self.btn_connection.setGeometry(QtCore.QRect(60, 120, 200, 35))
         font = QtGui.QFont()
@@ -575,8 +586,6 @@ class Ui_MainWindow(object):
         self.btn_gantry.setObjectName(_fromUtf8("btn_gantry"))
         self.myListWidget.raise_()
         self.myStackedWidget.raise_()
-        self.btn_openfile.raise_()
-        self.btn_help.raise_()
         self.btn_connection.raise_()
         self.btn_tension.raise_()
         self.btn_compression.raise_()
@@ -584,6 +593,8 @@ class Ui_MainWindow(object):
         self.btn_beamCol.raise_()
         self.btn_plate.raise_()
         self.btn_gantry.raise_()
+        self.comboBox_help.raise_()
+        self.btn_openfile.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1410, 26))
@@ -597,7 +608,7 @@ class Ui_MainWindow(object):
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
         self.retranslateUi(MainWindow)
-        self.myStackedWidget.setCurrentIndex(0)
+        self.myStackedWidget.setCurrentIndex(1)
         self.mytabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.btn_connection, self.btn_tension)
@@ -606,9 +617,7 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.btn_flexural, self.btn_beamCol)
         MainWindow.setTabOrder(self.btn_beamCol, self.btn_plate)
         MainWindow.setTabOrder(self.btn_plate, self.btn_gantry)
-        MainWindow.setTabOrder(self.btn_gantry, self.btn_openfile)
-        MainWindow.setTabOrder(self.btn_openfile, self.btn_help)
-        MainWindow.setTabOrder(self.btn_help, self.rdbtn_seat)
+        MainWindow.setTabOrder(self.btn_gantry, self.rdbtn_seat)
         MainWindow.setTabOrder(self.rdbtn_seat, self.rdbtn_finplate)
         MainWindow.setTabOrder(self.rdbtn_finplate, self.rdbtn_cleat)
         MainWindow.setTabOrder(self.rdbtn_cleat, self.rdbtn_endplate)
@@ -616,33 +625,59 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "Osdag", None))
-        self.btn_help.setText(_translate("MainWindow", "Help", None))
-        self.btn_openfile.setText(_translate("MainWindow", "Open file", None))
         __sortingEnabled = self.myListWidget.isSortingEnabled()
         self.myListWidget.setSortingEnabled(False)
         item = self.myListWidget.item(0)
         item.setText(_translate("MainWindow", " Design :", None))
         self.myListWidget.setSortingEnabled(__sortingEnabled)
         self.mytabWidget.setToolTip(_translate("MainWindow", "<html><head/><body><p><a href=\"#\">Shear Connection</a></p></body></html>", None))
+        self.label_2.setToolTip(_translate("MainWindow", "Shift+F", None))
         self.label_2.setText(_translate("MainWindow", "Finplate", None))
         self.rdbtn_finplate.setShortcut(_translate("MainWindow", "Shift+F", None))
+        self.label_3.setToolTip(_translate("MainWindow", "Shift+C", None))
         self.label_3.setText(_translate("MainWindow", "Cleat Angle", None))
         self.rdbtn_cleat.setShortcut(_translate("MainWindow", "Shift+C", None))
+        self.label_4.setToolTip(_translate("MainWindow", "Shift+E", None))
         self.label_4.setText(_translate("MainWindow", "Endplate", None))
         self.rdbtn_endplate.setShortcut(_translate("MainWindow", "Shift+E", None))
+        self.label_5.setToolTip(_translate("MainWindow", "Shift+S", None))
         self.label_5.setText(_translate("MainWindow", "Seated Angle", None))
         self.rdbtn_seat.setShortcut(_translate("MainWindow", "Shift+S", None))
+        self.btn_start.setToolTip(_translate("MainWindow", "Ctrl+S", None))
         self.btn_start.setText(_translate("MainWindow", "Start", None))
+        self.btn_start.setShortcut(_translate("MainWindow", "Ctrl+S", None))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab1_shearconnection), _translate("MainWindow", "Shear Connection", None))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab2_momentconnection), _translate("MainWindow", "Moment Connection", None))
         self.label.setText(_translate("MainWindow", "Coming Soon ...", None))
+        self.comboBox_help.setItemText(0, _translate("MainWindow", "Help", None))
+        self.comboBox_help.setItemText(1, _translate("MainWindow", "Sample Reports", None))
+        self.comboBox_help.setItemText(2, _translate("MainWindow", "Sample Problems", None))
+        self.comboBox_help.setItemText(3, _translate("MainWindow", "Video Tutorials", None))
+        self.comboBox_help.setItemText(4, _translate("MainWindow", "FAQ", None))
+        self.comboBox_help.setItemText(5, _translate("MainWindow", "Ask Us a Question", None))
+        self.comboBox_help.setItemText(6, _translate("MainWindow", "About Osdag", None))
+        self.btn_openfile.setText(_translate("MainWindow", "Open file", None))
+        self.btn_connection.setToolTip(_translate("MainWindow", "Ctrl+Shift+C", None))
         self.btn_connection.setText(_translate("MainWindow", "Connection", None))
+        self.btn_connection.setShortcut(_translate("MainWindow", "Ctrl+Shift+C", None))
+        self.btn_tension.setToolTip(_translate("MainWindow", "Ctrl+Shift+T", None))
         self.btn_tension.setText(_translate("MainWindow", "Tension Member", None))
+        self.btn_tension.setShortcut(_translate("MainWindow", "Ctrl+Shift+T", None))
+        self.btn_compression.setToolTip(_translate("MainWindow", "Ctrl+Shift+M", None))
         self.btn_compression.setText(_translate("MainWindow", "Compression Member", None))
+        self.btn_compression.setShortcut(_translate("MainWindow", "Ctrl+Shift+M", None))
+        self.btn_flexural.setToolTip(_translate("MainWindow", "Ctrl+Shift+F", None))
         self.btn_flexural.setText(_translate("MainWindow", "Flexural Member", None))
+        self.btn_flexural.setShortcut(_translate("MainWindow", "Ctrl+Shift+F", None))
+        self.btn_beamCol.setToolTip(_translate("MainWindow", "Ctrl+Shift+B", None))
         self.btn_beamCol.setText(_translate("MainWindow", "Beam-Column", None))
+        self.btn_beamCol.setShortcut(_translate("MainWindow", "Ctrl+Shift+B", None))
+        self.btn_plate.setToolTip(_translate("MainWindow", "Ctrl+Shift+P", None))
         self.btn_plate.setText(_translate("MainWindow", "Plate Girder", None))
+        self.btn_plate.setShortcut(_translate("MainWindow", "Ctrl+Shift+P", None))
+        self.btn_gantry.setToolTip(_translate("MainWindow", "Ctrl+Shift+G", None))
         self.btn_gantry.setText(_translate("MainWindow", "Gantry Girder", None))
+        self.btn_gantry.setShortcut(_translate("MainWindow", "Ctrl+Shift+G", None))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar", None))
 
 import osdagMainPageIcons_rc

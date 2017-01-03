@@ -55,7 +55,7 @@ class Ui_Tutorial(object):
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Visit:</span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://osdag.fossee.in/\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in/</span></a></p></body></html>", None))
 
-import icons_rc
+import osdagMainPageIcons_rc
 
 if __name__ == "__main__":
     import sys

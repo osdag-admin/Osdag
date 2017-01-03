@@ -458,11 +458,13 @@ class CommonDesignLogic(object):
 
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
-        if self.connection =="Finplate":
+
+
+        if self.connection == "Finplate":
             finCommonObj = FinCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             finCommonObj.saveToSvg(str(fileName), view)
         else:
-            endCommonObj = EndCommonData (self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
+            endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             endCommonObj.save_to_svg(str(fileName), view)
 
     #=========================================================================================
@@ -478,6 +480,8 @@ class CommonDesignLogic(object):
     def call_designReport(self, htmlfilename, profileSummary):
 
         fileName = str(htmlfilename)
+
+
 
         if not os.path.isfile(fileName):
             if self.connection == "Finplate":

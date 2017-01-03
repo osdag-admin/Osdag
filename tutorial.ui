@@ -14,7 +14,7 @@
    <string>Tutorials</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="ResourceFiles/icons.qrc">
+   <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
     <normaloff>:/newPrefix/images/Osdag.png</normaloff>:/newPrefix/images/Osdag.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -30,7 +30,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="ResourceFiles/icons.qrc">:/newPrefix/images/click_image.png</pixmap>
+      <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/click_image.png</pixmap>
      </property>
     </widget>
    </item>
@@ -52,7 +52,8 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="ResourceFiles/icons.qrc"/>
+  <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
+  <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
  </resources>
  <connections/>
 </ui>

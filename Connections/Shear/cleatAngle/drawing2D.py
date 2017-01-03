@@ -75,6 +75,44 @@ class cleatCommonData(object):
 
         self.folder = folder
 
+        print self.beam_T, "beam_T"
+        print self.col_T, "col_T"
+        print self.D_beam, "D_beam"
+        print self.D_col, "D_col"
+        print self.col_B, "col_B"
+        print self.beam_B, "beam_B"
+        print self.col_tw, "col_tw"
+        print self.beam_tw, "beam_tw"
+        print self.col_Designation, "col_Designation"
+        print self.beam_Designation, "beam_Designation"
+        print self.beam_R1, "beam_R1"
+        print self.col_R1, "col_R1"
+        print self.cleat_ht, "cleat_ht"
+        print self.cleat_legsize, "cleat_legsize"
+        print self.cleat_legsize_1, "cleat_legsize_1"
+        print self.cleat_thk, "cleat_thk"
+        print self.bolt_dia, "bolt_dia"
+        print self.bolt_type, "bolt_type"
+        print self.bolt_grade, "bolt_grade"
+        print  self.connectivity, "connectivity"
+        print  self.pitch, "pitch"
+        print  self.gauge, "gauge"
+        print self.end_dist, "end_dist"
+        print  self.edge_dist, "edge_dist"
+        print self.no_of_rows, "no_of_rows"
+        print self.no_of_col, "no_of_col"
+        print self.no_of_crows, "no_of_crows"
+        print self.no_of_ccol, "no_of_ccol"
+        print self.cpitch, "cpitch"
+        print self.cgauge, "cgauge"
+        print self.cedge_dist, "cedge_dist"
+        print self.cend_dist, "cend_dist"
+        print self.col_L, "col_L"
+        print self.beam_L, "beam_L"
+        print self.gap, "gap"
+        print self.notch_L, "notch_L"
+        print self.notch_offset, "notch_offset"
+
     def add_s_marker(self, dwg):
         '''
         Draws start arrow to given line  -------->
@@ -104,7 +142,8 @@ class cleatCommonData(object):
 
         '''
         section_marker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
-        section_marker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))
+
+        section_marker.add(dwg.path(d="M 0 0 L 10 5 L 0 10 z", fill='blue', stroke='black'))    #makes arrow
         dwg.defs.add(section_marker)
 
         return section_marker
@@ -176,7 +215,7 @@ class cleatCommonData(object):
         line_vector = pt2 - pt1  # [a, b]
         normal_vector = np.array([-line_vector[1], line_vector[0]])  # [-b, a]
         normal_unit_vector = self.normalize(normal_vector)
-        if (params["lineori"] == "left"):
+        if params["lineori"] == "left":
             normal_unit_vector = -normal_unit_vector
 
         # Q1 = pt1 + params["offset"] * normal_unit_vector
@@ -220,7 +259,7 @@ class cleatCommonData(object):
         '''
         line = dwg.add(dwg.line((ptA), (ptB)).stroke('black', width=2.5, linecap='square'))
         sec_arrow = self.add_section_maker(dwg)
-        self.draw_end_arrow(line, sec_arrow)
+        self.draw_end_arrow(line, sec_arrow)                  # adds arrow to the line
         dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=52))
 
     def draw_dimension_inner_arrow(self, dwg, ptA, ptB, text, params):
@@ -335,7 +374,7 @@ class cleatCommonData(object):
             txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
         elif (orientation == "SE"):
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
-            txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - txt_offset * offset_vector
+            txt_pt_down = p2 - 0.1 * lengthB * (label_vector) - (txt_offset + 15) * offset_vector
         elif (orientation == "SW"):
             txt_pt_up = p3 + 0.1 * lengthB * label_vector + (txt_offset) * offset_vector
             txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 10) * offset_vector

@@ -8,8 +8,9 @@ from PyQt4.QtCore import QString, pyqtSignal
 from OCC import VERSION, BRepTools
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
 import pickle
@@ -161,6 +162,14 @@ class DesignPreferences(QtGui.QDialog):
         self.close()
 
 
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
 class MyTutorials(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -172,7 +181,7 @@ class MyTutorials(QtGui.QDialog):
 class MyAboutOsdag(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -364,6 +373,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
 
@@ -1499,12 +1509,19 @@ class MainController(QtGui.QMainWindow):
     def open_tutorials(self):
         self.tutorials()
 
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
+
     def sample_report(self):
 
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
@@ -1514,7 +1531,7 @@ class MainController(QtGui.QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform =="nt":
+                if sys.platform ==("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"

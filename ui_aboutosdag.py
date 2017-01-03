@@ -57,13 +57,13 @@ class Ui_AboutOsdag(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">(c) Copyright Eclipse contributors and others 2014.</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">All rights reserved.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">Authors: Osdag Team </span><a href=\"http://osdag.fossee.in\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">Authors: Osdag Team </span><a href=\"http://osdag.fossee.in/team\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in/team</span></a></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">Visit </span><a href=\"http://osdag.fossee.in\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in</span></a></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">This product includes software developed by the</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt;\">----------------------------------------------------</span></p></body></html>", None))
 
-import icons_rc
+import osdagMainPageIcons_rc
 
 if __name__ == "__main__":
     import sys

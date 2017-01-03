@@ -16,7 +16,6 @@ from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb a
 #from colWebBeamWebConnectivity import ColWebBeamWeb
 from Connections.Shear.Finplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as finBeamWebBeamWeb
 from Connections.Shear.Endplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as endBeamWebBeamWeb
-#from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from Connections.Shear.Finplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as finColFlangeBeamWeb
 from Connections.Shear.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as endColFlangeBeamWeb
 #from colFlangeBeamWebConnectivity import ColFlangeBeamWeb

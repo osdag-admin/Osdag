@@ -388,7 +388,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txt_fu.clear()
             self.ui.txt_fy.clear()
             self.ui.txt_shear_force.clear()
-            self.ui.txt_angle_thickness.clear()
+            self.ui.combo_topangle_section.setCurrentIndex(0)
 
             self.ui.txt_bolt_shear_capacity.clear()
             self.ui.txt_bolt_bearing_capacity.clear()
@@ -419,7 +419,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txt_fu.clear()
             self.ui.txt_fy.clear()
             self.ui.txt_shear_force.clear()
-            self.ui.txt_angle_thickness.clear()
+            self.ui.combo_topangle_section.setCurrentIndex(0)
 
             self.ui.txt_bolt_shear_capacity.clear()
             self.ui.txt_bolt_bearing_capacity.clear()
@@ -1310,7 +1310,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['SeatAngle']['status']
         self.call_3DModel(status)
-        self.call2D_Drawing("All")
+        # self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of finplate

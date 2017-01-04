@@ -296,22 +296,28 @@ class MainController(QtGui.QMainWindow):
     # noinspection PyPep8Naming
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_beam_section.currentText()
-        dictbeamdata = get_beamdata(beam_sec)
-        return dictbeamdata
+        dict_beam_data = get_beamdata(beam_sec)
+        return dict_beam_data
 
     def fetchColumnPara(self):
         column_sec = self.ui.combo_column_section.currentText()
         loc = self.ui.combo_connectivity.currentText()
         if loc == "Beam-Beam":
-            dictcoldata = get_beamdata(column_sec)
+            dict_col_data = get_beamdata(column_sec)
         else:
-            dictcoldata = get_columndata(column_sec)
-        return dictcoldata
+            dict_col_data = get_columndata(column_sec)
+        return dict_col_data
 
-    def fetchAnglePara(self):
+    def fetch_angle_para(self):
         angle_sec = self.ui.combo_angle_section.currentText()
-        dictangledata = get_angledata(angle_sec)
-        return dictangledata
+        dict_angle_data = get_angledata(angle_sec)
+        return dict_angle_data
+    
+    def fetch_top_angle_para(self):
+        angle_sec = self.ui.combo_topangle_section.currentText()
+        dict_top_angle = get_angledata(angle_sec)
+        return dict_top_angle
+        
 
     def showFontDialogue(self):
 
@@ -959,15 +965,15 @@ class MainController(QtGui.QMainWindow):
         uiObj = self.getuser_inputs()
         resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
 
-        dictbeamdata = self.fetchBeamPara()
+        dict_beam_data = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
-        beam_D = int(dictbeamdata[QString("D")])
-        beam_B = int(dictbeamdata[QString("B")])
-        beam_tw = float(dictbeamdata[QString("tw")])
-        beam_T = float(dictbeamdata[QString("T")])
-        beam_alpha = float(dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(dictbeamdata[QString("R1")])
-        beam_R2 = float(dictbeamdata[QString("R2")])
+        beam_D = int(dict_beam_data[QString("D")])
+        beam_B = int(dict_beam_data[QString("B")])
+        beam_tw = float(dict_beam_data[QString("tw")])
+        beam_T = float(dict_beam_data[QString("T")])
+        beam_alpha = float(dict_beam_data[QString("FlangeSlope")])
+        beam_R1 = float(dict_beam_data[QString("R1")])
+        beam_R2 = float(dict_beam_data[QString("R2")])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -976,29 +982,29 @@ class MainController(QtGui.QMainWindow):
                         length=beam_length)
 
         ##### COLUMN PARAMETERS ######
-        dictcoldata = self.fetchColumnPara()
+        dict_col_data = self.fetchColumnPara()
 
-        column_D = int(dictcoldata[QString("D")])
-        column_B = int(dictcoldata[QString("B")])
-        column_tw = float(dictcoldata[QString("tw")])
-        column_T = float(dictcoldata[QString("T")])
-        column_alpha = float(dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(dictcoldata[QString("R1")])
-        column_R2 = float(dictcoldata[QString("R2")])
+        column_D = int(dict_col_data[QString("D")])
+        column_B = int(dict_col_data[QString("B")])
+        column_tw = float(dict_col_data[QString("tw")])
+        column_T = float(dict_col_data[QString("T")])
+        column_alpha = float(dict_col_data[QString("FlangeSlope")])
+        column_R1 = float(dict_col_data[QString("R1")])
+        column_R2 = float(dict_col_data[QString("R2")])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
 
         ##### ANGLE PARAMETERS ######
-        dictangledata = self.fetchAnglePara()
+        dict_angle_data = self.fetch_angle_para()
 
         angle_l = resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(dictangledata[QString("A")])
-        angle_b = int(dictangledata[QString("B")])
-        angle_t = float(dictangledata[QString("t")])
-        angle_r1 = float(dictangledata[QString("R1")])
-        angle_r2 = float(dictangledata[QString("R2")])
+        angle_a = int(dict_angle_data[QString("A")])
+        angle_b = int(dict_angle_data[QString("B")])
+        angle_t = float(dict_angle_data[QString("t")])
+        angle_r1 = float(dict_angle_data[QString("R1")])
+        angle_r2 = float(dict_angle_data[QString("R2")])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
@@ -1050,19 +1056,19 @@ class MainController(QtGui.QMainWindow):
         uiObj = self.getuser_inputs()
         resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
 
-        dictbeamdata = self.fetchBeamPara()
+        dict_beam_data = self.fetchBeamPara()
         #         fillet_length = resultObj['Plate']['height']
         #         fillet_thickness =  resultObj['Weld']['thickness']
         #         plate_width = resultObj['Plate']['width']
         #         plate_thick = uiObj['Plate']['Thickness (mm)']
         ##### BEAM PARAMETERS #####
-        beam_D = int(dictbeamdata[QString("D")])
-        beam_B = int(dictbeamdata[QString("B")])
-        beam_tw = float(dictbeamdata[QString("tw")])
-        beam_T = float(dictbeamdata[QString("T")])
-        beam_alpha = float(dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(dictbeamdata[QString("R1")])
-        beam_R2 = float(dictbeamdata[QString("R2")])
+        beam_D = int(dict_beam_data[QString("D")])
+        beam_B = int(dict_beam_data[QString("B")])
+        beam_tw = float(dict_beam_data[QString("tw")])
+        beam_T = float(dict_beam_data[QString("T")])
+        beam_alpha = float(dict_beam_data[QString("FlangeSlope")])
+        beam_R1 = float(dict_beam_data[QString("R1")])
+        beam_R2 = float(dict_beam_data[QString("R2")])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -1071,30 +1077,30 @@ class MainController(QtGui.QMainWindow):
                         length=beam_length)
 
         ##### COLUMN PARAMETERS ######
-        dictcoldata = self.fetchColumnPara()
+        dict_col_data = self.fetchColumnPara()
 
-        column_D = int(dictcoldata[QString("D")])
-        column_B = int(dictcoldata[QString("B")])
-        column_tw = float(dictcoldata[QString("tw")])
-        column_T = float(dictcoldata[QString("T")])
-        column_alpha = float(dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(dictcoldata[QString("R1")])
-        column_R2 = float(dictcoldata[QString("R2")])
+        column_D = int(dict_col_data[QString("D")])
+        column_B = int(dict_col_data[QString("B")])
+        column_tw = float(dict_col_data[QString("tw")])
+        column_T = float(dict_col_data[QString("T")])
+        column_alpha = float(dict_col_data[QString("FlangeSlope")])
+        column_R1 = float(dict_col_data[QString("R1")])
+        column_R2 = float(dict_col_data[QString("R2")])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
 
         ##### ANGLE PARAMETERS ######
-        dictangledata = self.fetchAnglePara()
+        dict_angle_data = self.fetch_angle_para()
 
         angle_l = resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(dictangledata[QString("A")])
-        angle_b = int(dictangledata[QString("B")])
-        angle_t = float(dictangledata[QString("t")])
-        angle_r1 = float(dictangledata[QString("R1")])
+        angle_a = int(dict_angle_data[QString("A")])
+        angle_b = int(dict_angle_data[QString("B")])
+        angle_t = float(dict_angle_data[QString("t")])
+        angle_r1 = float(dict_angle_data[QString("R1")])
 
-        angle_r2 = (dictangledata[QString("R2")]).toFloat()
+        angle_r2 = (dict_angle_data[QString("R2")]).toFloat()
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
@@ -1461,9 +1467,11 @@ class MainController(QtGui.QMainWindow):
 
         uiObj = self.uiObj
         resultObj = self.resultObj
-        dictbeamdata = self.fetchBeamPara()
-        dictcoldata = self.fetchColumnPara()
-        seatCommonObj = SeatCommonData(uiObj, resultObj, dictbeamdata, dictcoldata, self.folder)
+        dict_beam_data = self.fetchBeamPara()
+        dict_col_data = self.fetchColumnPara()
+        dict_angle_data = self.fetch_angle_para()
+        dict_top_angle = self.fetch_top_angle_para()
+        seatCommonObj = SeatCommonData(uiObj, resultObj, dict_beam_data, dict_col_data, dict_angle_data, dict_top_angle, self.folder)
         seatCommonObj.save_to_svg(str(fileName), view)
 
     def closeEvent(self, event):

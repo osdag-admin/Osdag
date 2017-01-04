@@ -12,6 +12,7 @@ from ui_ask_a_question import Ui_AskQuestion
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
+import os
 import os.path
 import subprocess
 from PyQt4.QtCore import SIGNAL

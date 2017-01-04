@@ -147,17 +147,17 @@ def get_angledata(sect):
     queryStr = "Select * from angles where Designation = '%s'" % section
 
     designQuery = QSqlQuery(queryStr)
-    # print(designQuery)
-    #
-    # print designQuery.size()
+    print(designQuery)
+
+    print designQuery.size()
     retDict = {}
     record = designQuery.record()
 
     # TODO rework angle section name 
     while (designQuery.next()):
         for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            angle_name = record.fieldName(i)
+            retDict[angle_name] = designQuery.value(i).toString()
 
     # print(retDict[QString("tw")])
 

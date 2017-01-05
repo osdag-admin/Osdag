@@ -16,7 +16,7 @@ class SeatCommonData(object):
 
     """
 
-    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, folder):
+    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, top_angle_data, folder):
         """Initialise seated angle connection's geometric properties as class attributes.
 
         Args:
@@ -26,6 +26,7 @@ class SeatCommonData(object):
             column_data (dictionary): geometric properties of column
             folder (str): path to save the generated images
             angle_data (dictionary):
+            top_angle_data (dictionary):
 
         Returns:
             None
@@ -59,9 +60,18 @@ class SeatCommonData(object):
         self.notch_ht = self.col_flange_thk + self.col_R1
 
         # ================  seat angle  ==============================
-        self.seat_legsize_vertical = int(angle_data[QString("A")])
-        self.seat_legsize_horizontal = int(angle_data[QString("B")])
-        self.seat_thickness = int(angle_data[QString("t")])
+        self.seat_angle_legsize_vertical = int(angle_data[QString("A")])
+        self.seat_angle_legsize_horizontal = int(angle_data[QString("B")])
+        self.seat_angle_thickness = int(angle_data[QString("t")])
+        self.seat_angle_R1 = int(angle_data[QString("R1")])
+        self.seat_angle_R2 = int(angle_data[QString("R2")])
+
+        # ================  top angle  ================================
+        self.top_angle_legsize_vertical = int(top_angle_data[QString("A")])
+        self.top_angle_legsize_horizontal = int(top_angle_data[QString("B")])
+        self.top_angle_thickness = int(top_angle_data[QString("t")])
+        self.top_angle_R1 = int(top_angle_data[QString("R1")])
+        self.top_angle_R2 = int(top_angle_data[QString("R2")])
 
         self.folder = folder
 

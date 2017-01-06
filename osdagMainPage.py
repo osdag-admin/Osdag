@@ -4,7 +4,9 @@ Created on 31-Mar-2016
 @author: deepa
 '''
 import sys
-from PyQt4 import QtGui
+# from PyQt4 import QtGui
+
+from PyQt5.QtWidgets import QMainWindow, QAction, QDialog,QMessageBox, QFileDialog, QApplication
 from ui_OsdagMainPage import Ui_MainWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
@@ -15,35 +17,35 @@ from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os
 import os.path
 import subprocess
-from PyQt4.QtCore import SIGNAL
+# from PyQt4.QtCore import SIGNAL
 
 
-class MyTutorials(QtGui.QDialog):
+class MyTutorials(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_Tutorial()
         self.ui.setupUi(self)
         self.osdagmainwindow = parent
 
 
-class MyAboutOsdag(QtGui.QDialog):
+class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.osdagmainwindow = parent
 
-class MyAskQuestion(QtGui.QDialog):
+class MyAskQuestion(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_AskQuestion()
         self.ui.setupUi(self)
         self.osdagmainwindow = parent
 
-class OsdagMainWindow(QtGui.QMainWindow):
+class OsdagMainWindow(QMainWindow):
 
     def __init__(self):
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
@@ -107,7 +109,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
     def show_desgin_connection(self):
 
-        folder = QtGui.QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..', 'Osdag_workspace'), 'All Files (*)')
+        folder = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..', 'Osdag_workspace'), 'All Files (*)')
         folder = str(folder)
         if not os.path.exists(folder):
             os.mkdir(folder, 0755)
@@ -128,13 +130,13 @@ class OsdagMainWindow(QtGui.QMainWindow):
         elif self.ui.rdbtn_endplate.isChecked():
             launch_endplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
-            # QtGui.QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
+            # QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
 
         elif self.ui.rdbtn_seat.isChecked():
-            QtGui.QMessageBox.about(self, "INFO", "Seated connection design is coming soon!")
+            QMessageBox.about(self, "INFO", "Seated connection design is coming soon!")
 
         else:
-            QtGui.QMessageBox.about(self, "INFO", "Please select appropriate connection")
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     # ********************************* Help Action *********************************************************************************************
 
@@ -183,7 +185,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
 
     def unavailable(self):
-        QtGui.QMessageBox.about(self, "INFO", "This module is not available in this version.")
+        QMessageBox.about(self, "INFO", "This module is not available in this version.")
         # self.ui.btn_beamCol.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_compression.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_flexural.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
@@ -193,7 +195,7 @@ class OsdagMainWindow(QtGui.QMainWindow):
 
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()
     sys.exit(app.exec_())

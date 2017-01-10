@@ -48,15 +48,12 @@ from Connections.connection_calculations import ConnectionCalculations
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 # TODO add input validation to select only angles which can accomodate 2 lines of bolts
-# TODO check if a clause exists on minimum angle thickness
 # TODO check reduction factors for bolt group capacity
-# TODO area of bolts for smaller bolt diameters
-    # 5, 6, 8, 10 - bolt_hole_clearance() and bolt_shear() need to be updated
+# TODO remove smaller bolt diameters from possible inputs
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
-# TODO display top angle in UI - output dock
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -242,7 +239,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
         self.top_angle = "ISA 100X65X8"
-        # TODO specify non-arbitrary top angle section
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
@@ -333,6 +329,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Capacity of Bolt (kN)": self.bolt_value,
             "Bolt group capacity (kN)": self.bolt_group_capacity,
             "No. of Bolts": self.bolts_provided,
+            "No. of Bolts Required": self.bolts_required,
             "No. of Row": int(self.num_rows),
             "No. of Column": int(self.num_cols),
             "Pitch Distance (mm)": self.pitch,

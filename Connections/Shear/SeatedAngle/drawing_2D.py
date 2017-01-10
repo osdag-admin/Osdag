@@ -56,8 +56,8 @@ class SeatCommonData(object):
         self.col_length = 700
         self.beam_length = 350
         self.gap = 20  # Clear distance between column and beam
-        self.notch_L = (self.col_width - (self.col_web_thk + 40)) / 2.0
-        self.notch_ht = self.col_flange_thk + self.col_R1
+        # self.notch_L = (self.col_width - (self.col_web_thk + 40)) / 2.0
+        # self.notch_ht = self.col_flange_thk + self.col_R1
 
         # ================  seat angle  ==============================
         self.seat_angle_legsize_vertical = int(angle_data[QString("A")])
@@ -65,6 +65,7 @@ class SeatCommonData(object):
         self.seat_angle_thickness = int(angle_data[QString("t")])
         self.seat_angle_R1 = int(angle_data[QString("R1")])
         self.seat_angle_R2 = int(angle_data[QString("R2")])
+        self.seat_angle_length = int(angle_data[QString("l")])
 
         # ================  top angle  ================================
         self.top_angle_legsize_vertical = int(top_angle_data[QString("A")])
@@ -72,6 +73,7 @@ class SeatCommonData(object):
         self.top_angle_thickness = int(top_angle_data[QString("t")])
         self.top_angle_R1 = int(top_angle_data[QString("R1")])
         self.top_angle_R2 = int(top_angle_data[QString("R2")])
+        self.top_angle_length = int(top_angle_data[QString("l")])
 
         self.folder = folder
 
@@ -600,44 +602,79 @@ class Seat2DCreatorFront(object):
             self.data_object.col_web_thk + self.data_object.beam_R1 + 3) + self.data_object.end_dist)
         self.P1 = (ptP1x, ptP1y)
 
-        # ================  Seat Angle  ============================
+        # ============================  Top Angle  ===================================
         ptSC5x = self.data_object.col_depth
-        ptSC5y = (self.data_object.col_length - self.data_object.beam_depth)/2
+        ptSC5y = (self.data_object.col_length - self.data_object.beam_depth) / 2
         self.SC5 = (ptSC5x, ptSC5y)
 
+        ptSC1x = self.data_object.col_depth
+        ptSC1y = ptSC5y + self.data_object.top_angle_legsize_vertical
+        self.SC1 = (ptSC1x, ptSC1y)
+
+        ptSC4x = self.data_object.col_depth + self.data_object.top_angle_legsize_horizontal
+        ptSC4y = (self.data_object.col_length - self.data_object.beam_depth) / 2
+        self.SC4 = (ptSC4x, ptSC4y)
+
+        ptSC2x = self.data_object.col_depth + self.data_object.top_angle_thickness
+        ptSC2y = ptSC5y + self.data_object.top_angle_legsize_vertical
+        self.SC2 = (ptSC2x, ptSC2y)
+
+        ptSC3x = self.data_object.col_depth + self.data_object.top_angle_legsize_horizontal
+        ptSC3y = (self.data_object.col_length - self.data_object.beam_depth) / 2 - self.data_object.top_angle_thickness
+        self.SC3 = (ptSC3x, ptSC3y)
+
+        # ============================  Seat Angle  ===================================
         ptSD5x = self.data_object.col_depth
         ptSD5y = (self.data_object.col_length + self.data_object.beam_depth)/2
         self.SD5 = (ptSD5x, ptSD5y)
 
+        ptSD1x = self.data_object.col_depth
+        ptSD1y = ptSD5y + self.data_object.seat_angle_legsize_vertical
+        self.SD1 = (ptSD1x, ptSD1y)
 
+        ptSD4x = self.data_object.col_depth + self.data_object.seat_angle_legsize_horizontal
+        ptSD4y = (self.data_object.col_length + self.data_object.beam_depth)/2
+        self.SD4 = (ptSD4x, ptSD4y)
+
+        ptSD2x = self.data_object.col_depth + self.data_object.seat_angle_thickness
+        ptSD2y = ptSD5y + self.data_object.seat_angle_legsize_vertical
+        self.SD2 = (ptSD2x, ptSD2y)
+
+        ptSD3x = self.data_object.col_depth + self.data_object.top_angle_legsize_horizontal
+        ptSD3y = (self.data_object.col_length + self.data_object.beam_depth)/2 + self.data_object.seat_angle_thickness
+        self.D3 = (ptSD3x, ptSD3y)
+
+        # ============================================================================
 
     def call_CFBF_front(self, file_name):
+
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-340 -350 1200 1300'))
+        dwg.add(dwg.polyline(points=[(self.SA), (self.SB), (self.SC), (self.SD), (self.SA)], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line((self.SE), (self.SH)).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.line((self.SF), (self.SG)).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.polyline(points =[self.SA1, self.SA2, self.SB2, self.SB1], stroke = 'blue', fill = 'none', stroke_width =2.5))
+        dwg.add(dwg.line(self.SA4, self.SA3).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.SB4, self.SB3).stroke('blue', width=2.5, linecap='square'))
+        # =================================================  old coding  =====================================================
+        # dwg.add(dwg.polyline(points=[(self.FC1), (self.FA1), (self.FA2), (self.FB2), (self.FB1), (self.FC2)], stroke='blue',
+        #                  fill='none', stroke_width=2.5))
+        # dwg.add(dwg.line((self.FC1), (self.FC2)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        # dwg.add(dwg.line((self.FA4), (self.FA3)).stroke('blue', width=2.5, linecap='square'))
+        # dwg.add(dwg.line((self.FB4), (self.FB3)).stroke('blue', width=2.5, linecap='square'))
 
-        dwg.add(dwg.polyline(points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FA)], stroke='blue', fill='none',
-                             stroke_width=2.5))
-        dwg.add(dwg.line((self.FE), (self.FH)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.line((self.FF), (self.FG)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(
-            dwg.polyline(points=[(self.FC1), (self.FA1), (self.FA2), (self.FB2), (self.FB1), (self.FC2)], stroke='blue',
-                         fill='none', stroke_width=2.5))
-        dwg.add(
-            dwg.line((self.FC1), (self.FC2)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.line((self.FA4), (self.FA3)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.line((self.FB4), (self.FB3)).stroke('blue', width=2.5, linecap='square'))
 
-        # Weld hatching to represent WELD.
-        pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse",
-                                           patternTransform="rotate(45 2 2)"))
-        pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(
-            dwg.rect(insert=(self.FP), size=(12, self.data_object.plate_ht), fill="url(#diagonalHatch)", stroke='white',
-                     stroke_width=2.0))
-
-        dwg.add(dwg.rect(insert=(self.FP), size=(self.data_object.plate_width, self.data_object.plate_ht), fill='none',
-                         stroke='blue', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.FP), size=(self.data_object.plate_width, self.data_object.plate_ht), fill='none',
-                         stroke='blue', stroke_width=2.5))
+        # # Weld hatching to represent WELD.
+        # pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse",
+        #                                    patternTransform="rotate(45 2 2)"))
+        # pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))
+        # dwg.add(dwg.rect(insert=(self.FP), size=(12, self.data_object.plate_ht), fill="url(#diagonalHatch)", stroke='white',
+        #              stroke_width=2.0))
+        #
+        # dwg.add(dwg.rect(insert=(self.FP), size=(self.data_object.plate_width, self.data_object.plate_ht), fill='none',
+        #                  stroke='blue', stroke_width=2.5))
+        # dwg.add(dwg.rect(insert=(self.FP), size=(self.data_object.plate_width, self.data_object.plate_ht), fill='none',
+        #                  stroke='blue', stroke_width=2.5))
+        # =================================================================================================================
 
         nr = self.data_object.no_of_rows
         nc = self.data_object.no_of_col
@@ -647,21 +684,16 @@ class Seat2DCreatorFront(object):
         for i in range(1, (nr + 1)):
             colList = []
             for j in range(1, (nc + 1)):
-                pt = self.ptFP + self.data_object.plateEdge_dist * np.array(
-                    [1, 0]) + self.data_object.end_dist * np.array(
-                    [0, 1]) + \
-                     (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge * np.array(
-                    [1, 0])
+                pt = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + \
+                     self.data_object.end_dist * np.array([0, 1]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + \
+                     (j - 1) * self.data_object.gauge * np.array([1, 0])
                 dwg.add(dwg.circle(center=(pt), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
                 ptC = pt - (bolt_r + 4) * np.array([1, 0])
                 PtD = pt + (bolt_r + 4) * np.array([1, 0])
                 dwg.add(dwg.line((ptC), (PtD)).stroke('red', width=2.0, linecap='square'))
-                ptE = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + (
-                                                                                           j - 1) * self.data_object.gauge * np.array(
-                    [1, 0])
+                ptE = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + (j - 1) * self.data_object.gauge * np.array([1, 0])
                 ptF = ptE + self.data_object.plate_ht * np.array([0, 1])
-                dwg.add(dwg.line((ptE), (ptF)).stroke('blue', width=1.5, linecap='square').dasharray(
-                    dasharray=([20, 5, 1, 5])))
+                dwg.add(dwg.line((ptE), (ptF)).stroke('blue', width=1.5, linecap='square').dasharray(dasharray=([20, 5, 1, 5])))
                 colList.append(pt)
             ptList.append(colList)
 
@@ -676,31 +708,42 @@ class Seat2DCreatorFront(object):
                                                         int(self.data_object.pitch)) + " mm c/c", params)
 
         # Cross section A-A
-        ptSecA = self.FA + (320 * np.array([0, -1]))
-        ptSecB = ptSecA + (50 * np.array([0, 1]))
+        ptSecA = self.SA + (320 * np.array([0, -1]))
+        ptSecB = self.SA + (50 * np.array([0, 1]))
         txt_pt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = self.FA2 + (472 * np.array([0, -1]))
+        ptSecC = ptSecA + (self.data_object.beam_depth + self.data_object.beam_length) * np.array([0, 1])
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txt_pt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+        dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))  # #666666 is red color
 
-        dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
+        # ptSecA = self.FA + (320 * np.array([0, -1]))
+        # ptSecB = ptSecA + (50 * np.array([0, 1]))
+        # txt_pt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
+        # txt = "A"
+        # self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
+        # ptSecC = self.FA2 + (472 * np.array([0, -1]))
+        # ptSecD = ptSecC + (50 * np.array([0, 1]))
+        # txt_pt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
+        # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+        # dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
+        # ==================================================   DOES NOTHING AFTER BEING COMMENTED OUT  ============================= ??????????????
         # Distance between Beam Flange and Plate
-
         params = {"offset": self.data_object.col_depth + self.data_object.gap + 50, "textoffset": 125,
                   "lineori": "right",
                   "endlinedim": 10}
-        self.data_object.draw_dimension_outer_arrow(dwg, self.FA1, self.FC1, str(
-            int(self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)) + " mm", params)
+        self.data_object.draw_dimension_outer_arrow(dwg, self.FA1, self.FC1,
+                                                    str(int(self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)) + " mm", params)
         # Draw Faint Line To Represent Distance Between Beam Flange and Plate.
         ptOne = self.FA1
         ptBx = -30
         ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
         ptTwo = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptOne, ptTwo, dwg)
+        # ========================================================================================================================== ?????????????????
 
         # End Distance from the starting point of plate Information
         edgPtx = (self.data_object.col_depth) + self.data_object.plateEdge_dist

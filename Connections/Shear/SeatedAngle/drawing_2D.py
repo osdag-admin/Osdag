@@ -167,7 +167,7 @@ class SeatCommonData(object):
         Return:
             None
         '''
-        dwg.add(dwg.line(ptOne, ptTwo).stroke('#D8D8D8', width=2.5, linecap='square', opacity=0.7))
+        dwg.add(dwg.line(ptOne, ptTwo).stroke('#D8D8D8', width=2.5, linecap='square', opacity=0.7))          # #D8D8D8 = grey color
 
     def draw_dimension_outer_arrow(self, dwg, pt1, pt2, text, params):
         '''Draw outer arrow of dimension line.
@@ -491,116 +491,50 @@ class Seat2DCreatorFront(object):
         ptSDy = self.data_object.col_length
         self.SD = np.array([ptSDx, ptSDy])
 
+        ptSPx = self.data_object.col_depth
+        ptSPy = (self.data_object.col_length - self.data_object.beam_depth)/2 + self.data_object.beam_flange_thk
+        self.SP = np.array([ptSPx, ptSPy])
+
         # =================  Beam plotting  ===================================
-        # FA1
+        # SA1
         ptSA1x = beam_start_X
         ptSA1y = (self.data_object.col_length - self.data_object.beam_depth) / 2
         self.SA1 = np.array([ptSA1x, ptSA1y])
 
-        # FA2
+        # SA2
         ptSA2x = ptSA1x + self.data_object.beam_length
         ptSA2y = ptSA1y
         self.SA2 = np.array([ptSA2x, ptSA2y])
 
-        # FA3
+        # SA3
         ptSA3x = ptSA1x + self.data_object.beam_length
         ptSA3y = ptSA1y + self.data_object.beam_flange_thk
         self.SA3 = np.array([ptSA3x, ptSA3y])
 
-        # FA4
+        # SA4
         ptSA4x = ptSA1x
         ptSA4y = ptSA1y + self.data_object.beam_flange_thk
         self.SA4 = np.array([ptSA4x, ptSA4y])
 
-        # FB1
+        # SB1
         ptSB1x = ptSA1x
         ptSB1y = ptSA1y + self.data_object.beam_depth
         self.SB1 = np.array([ptSB1x, ptSB1y])
 
-        # FB2
+        # SB2
         ptSB2x = ptSA1x + self.data_object.beam_length
         ptSB2y = ptSA1y + self.data_object.beam_depth
         self.SB2 = np.array([ptSB2x, ptSB2y])
 
-        # FB3
+        # SB3
         ptSB3x = ptSA1x + self.data_object.beam_length
         ptSB3y = ptSA1y + self.data_object.beam_depth - self.data_object.beam_flange_thk
         self.SB3 = np.array([ptSB3x, ptSB3y])
 
-        # FB4
+        # SB4
         ptSB4x = ptSA1x
         ptSB4y = ptSA1y + self.data_object.beam_depth - self.data_object.beam_flange_thk
         self.SB4 = np.array([ptSB4x, ptSB4y])
-
-        # ------------------------------------------------------------------------------
-        #              COLUMN WEB BEAM FLANGE CONNECTIVITY (FRONT VIEW)
-        # ------------------------------------------------------------------------------
-        # =================  Column plotting  ===================================
-
-        self.A = np.array([0, 0])
-        self.B = np.array([self.data_object.col_width, 0])
-        self.C = np.array([self.data_object.col_width, self.data_object.col_length])
-        self.D = np.array([0, self.data_object.col_length])
-        self.A2 = np.array(
-            [self.data_object.col_width, (self.data_object.col_length - self.data_object.beam_depth) / 2])
-        self.B2 = np.array(
-            [self.data_object.col_width, (self.data_object.beam_depth + self.data_object.col_length) / 2])
-
-        ptEx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
-        ptEy = 0.0
-        self.E = np.array([ptEx, ptEy])
-
-        ptFx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
-        ptFy = 0
-        self.F = np.array([ptFx, ptFy])
-
-        ptGx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
-        ptGy = self.data_object.col_length
-        self.G = np.array([ptGx, ptGy])
-
-        ptHx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
-        ptHy = self.data_object.col_length
-        self.H = np.array([ptHx, ptHy])
-
-        ptA1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap)
-        ptA1y = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
-        self.A1 = np.array([ptA1x, ptA1y])
-
-        ptA3x = ((
-                     self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap) + self.data_object.beam_length
-        ptA3y = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
-        self.A3 = (ptA3x, ptA3y)
-
-        ptB3x = ((
-                     self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap) + self.data_object.beam_length
-        ptB3y = ((self.data_object.col_length + self.data_object.beam_depth) / 2)
-        self.B3 = (ptB3x, ptB3y)
-
-        ptB1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap)
-        ptB1y = ((self.data_object.col_length + self.data_object.beam_depth) / 2)
-        # self.B1 = np.array([ptB1x,ptB1y])
-        self.ptB1 = np.array([ptB1x, ptB1y])
-
-        ptA5x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20)
-        ptA5y = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + self.data_object.beam_flange_thk
-        self.A5 = ptA5x, ptA5y
-
-        ptA4x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20) + self.data_object.beam_length
-        ptA4y = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + self.data_object.beam_flange_thk
-        self.A4 = (ptA4x, ptA4y)
-
-        ptB4x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20) + self.data_object.beam_length
-        ptB4y = ((self.data_object.col_length + self.data_object.beam_depth) / 2) - self.data_object.beam_flange_thk
-        self.B4 = (ptB4x, ptB4y)
-
-        ptBx5 = ((self.data_object.col_width + self.data_object.col_web_thk) / 2) + 20
-        ptBy5 = ((self.data_object.col_length + self.data_object.beam_depth) / 2) - self.data_object.beam_flange_thk
-        self.B5 = (ptBx5, ptBy5)
-
-        ptP1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist)
-        ptP1y = ((self.data_object.col_length - self.data_object.beam_depth) / 2 + (
-            self.data_object.col_web_thk + self.data_object.beam_R1 + 3) + self.data_object.end_dist)
-        self.P1 = (ptP1x, ptP1y)
 
         # ============================  Top Angle  ===================================
         ptSC5x = self.data_object.col_depth
@@ -643,8 +577,76 @@ class Seat2DCreatorFront(object):
         ptSD3x = self.data_object.col_depth + self.data_object.top_angle_legsize_horizontal
         ptSD3y = (self.data_object.col_length + self.data_object.beam_depth)/2 + self.data_object.seat_angle_thickness
         self.D3 = (ptSD3x, ptSD3y)
-
         # ============================================================================
+
+        # # ------------------------------------------------------------------------------
+        # #              COLUMN WEB BEAM FLANGE CONNECTIVITY (FRONT VIEW)
+        # # ------------------------------------------------------------------------------
+        # # =================  Column plotting  ===================================
+        #
+        # self.A = np.array([0, 0])
+        # self.B = np.array([self.data_object.col_width, 0])
+        # self.C = np.array([self.data_object.col_width, self.data_object.col_length])
+        # self.D = np.array([0, self.data_object.col_length])
+        # self.A2 = np.array([self.data_object.col_width, (self.data_object.col_length - self.data_object.beam_depth) / 2])
+        # self.B2 = np.array([self.data_object.col_width, (self.data_object.beam_depth + self.data_object.col_length) / 2])
+        #
+        # ptEx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
+        # ptEy = 0.0
+        # self.E = np.array([ptEx, ptEy])
+        #
+        # ptFx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
+        # ptFy = 0
+        # self.F = np.array([ptFx, ptFy])
+        #
+        # ptGx = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
+        # ptGy = self.data_object.col_length
+        # self.G = np.array([ptGx, ptGy])
+        #
+        # ptHx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
+        # ptHy = self.data_object.col_length
+        # self.H = np.array([ptHx, ptHy])
+        #
+        # ptA1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap)
+        # ptA1y = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
+        # self.A1 = np.array([ptA1x, ptA1y])
+        #
+        # ptA3x = ((
+        #              self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap) + self.data_object.beam_length
+        # ptA3y = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
+        # self.A3 = (ptA3x, ptA3y)
+        #
+        # ptB3x = ((
+        #              self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap) + self.data_object.beam_length
+        # ptB3y = ((self.data_object.col_length + self.data_object.beam_depth) / 2)
+        # self.B3 = (ptB3x, ptB3y)
+        #
+        # ptB1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap)
+        # ptB1y = ((self.data_object.col_length + self.data_object.beam_depth) / 2)
+        # # self.B1 = np.array([ptB1x,ptB1y])
+        # self.ptB1 = np.array([ptB1x, ptB1y])
+        #
+        # ptA5x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20)
+        # ptA5y = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + self.data_object.beam_flange_thk
+        # self.A5 = ptA5x, ptA5y
+        #
+        # ptA4x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20) + self.data_object.beam_length
+        # ptA4y = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + self.data_object.beam_flange_thk
+        # self.A4 = (ptA4x, ptA4y)
+        #
+        # ptB4x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + 20) + self.data_object.beam_length
+        # ptB4y = ((self.data_object.col_length + self.data_object.beam_depth) / 2) - self.data_object.beam_flange_thk
+        # self.B4 = (ptB4x, ptB4y)
+        #
+        # ptBx5 = ((self.data_object.col_width + self.data_object.col_web_thk) / 2) + 20
+        # ptBy5 = ((self.data_object.col_length + self.data_object.beam_depth) / 2) - self.data_object.beam_flange_thk
+        # self.B5 = (ptBx5, ptBy5)
+        #
+        # ptP1x = ((self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.plateEdge_dist)
+        # ptP1y = ((self.data_object.col_length - self.data_object.beam_depth) / 2 + (
+        #     self.data_object.col_web_thk + self.data_object.beam_R1 + 3) + self.data_object.end_dist)
+        # self.P1 = (ptP1x, ptP1y)
+        # # ------------------------------------------------------------------------------------------------------------
 
     def call_CFBF_front(self, file_name):
 
@@ -730,7 +732,7 @@ class Seat2DCreatorFront(object):
         # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         # dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
-        # ==================================================   DOES NOTHING AFTER BEING COMMENTED OUT  ============================= ??????????????
+        # ???????????????????????????????????????????  DOES NOTHING AFTER BEING COMMENTED OUT  ??????????????????????????????????????
         # Distance between Beam Flange and Plate
         params = {"offset": self.data_object.col_depth + self.data_object.gap + 50, "textoffset": 125,
                   "lineori": "right",
@@ -743,7 +745,29 @@ class Seat2DCreatorFront(object):
         ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
         ptTwo = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptOne, ptTwo, dwg)
-        # ========================================================================================================================== ?????????????????
+        # ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
+
+        # ===============================  Label Gap Distance  ===============================
+        gap_pt = self.data_object.col_length - ((self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.beam_flange_thk)
+        # ------------------------  here "gap_pt" represents labelling of [ ___  ___20 ] & "30" represents move 'gap_pt'vertically  ------------------------
+        ptG1 = self.SP + (gap_pt + 30) * np.array([0, 1])
+        ptG2 = self.SA4 + (gap_pt + 30) * np.array([0, 1])
+        offset = self.data_object.col_length  # 60% of the column length
+        params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 50}
+        self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
+
+        # ===============================  Faint line showing Gap Distance  ===============================
+        # ------------------------  here "40" represents length of the faint line vertically(left)  ------------------------
+        ptLC1 = self.SC
+        ptLC2 = ptLC1 + 40 * np.array([0, 1])
+        self.data_object.draw_faint_line(ptLC1, ptLC2, dwg)
+
+        # ------------------------  here "40" represents length of the faint line vertically(right)  ------------------------
+        ptD1 = self.SB1
+        ptD2 = ptD1 + 70 * np.array([0, 1])
+        self.data_object.draw_faint_line(ptD1, ptD2, dwg)
+
+
 
         # End Distance from the starting point of plate Information
         edgPtx = (self.data_object.col_depth) + self.data_object.plateEdge_dist
@@ -809,23 +833,7 @@ class Seat2DCreatorFront(object):
                 [0, -1])
             self.data_object.draw_faint_line(FA, FB, dwg)
 
-        # Gap Distance
-        gapPt = self.data_object.col_length - ((self.data_object.col_length - self.data_object.beam_depth) / 2 + (
-            self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3))
-        ptG1 = self.ptFP + (gapPt + 30) * np.array([0, 1])
-        ptG2 = self.FC1 + (gapPt + 30) * np.array([0, 1])
-        offset = self.data_object.col_length  # 60% of the column length
-        params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 50}
-        self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
 
-        # Draw Faint line for Gap Distance
-        ptC1 = self.FC
-        ptC2 = ptC1 + 20 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptC1, ptC2, dwg)
-
-        ptD1 = self.FB1
-        ptD2 = ptD1 + 70 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptD1, ptD2, dwg)
 
         # Draws faint line to show dimensions
         # Faint lines for gauge and edge distances

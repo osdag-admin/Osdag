@@ -758,14 +758,65 @@ class Seat2DCreatorFront(object):
 
         # ===============================  Faint line showing Gap Distance  ===============================
         # ------------------------  here "40" represents length of the faint line vertically(left)  ------------------------
-        ptLC1 = self.SC
-        ptLC2 = ptLC1 + 40 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptLC1, ptLC2, dwg)
+        ptLG1 = self.SC
+        ptLG2 = ptLG1 + 40 * np.array([0, 1])
+        self.data_object.draw_faint_line(ptLG1, ptLG2, dwg)
 
         # ------------------------  here "40" represents length of the faint line vertically(right)  ------------------------
-        ptD1 = self.SB1
-        ptD2 = ptD1 + 70 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptD1, ptD2, dwg)
+        ptRG1 = self.SB1
+        ptRG2 = ptRG1 + 70 * np.array([0, 1])
+        self.data_object.draw_faint_line(ptRG1, ptRG2, dwg)
+
+        # ===============================   Beam Information   ===============================
+        beam_pt = self.SA1 + self.data_object.beam_length / 2 * np.array([0, 1])
+        theta = 45
+        offset = self.data_object.beam_length / 2
+        text_up = "Beam " + self.data_object.beam_designation
+        text_down = ""
+        element = ""
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+
+        # ===============================   Column Designation  ===============================
+        pt_x = self.data_object.col_depth / 2
+        pt_y = 0
+        pt = np.array([pt_x, pt_y])
+        theta = 30
+        offset = self.data_object.col_length / 10
+        text_up = "Column " + self.data_object.col_designation
+        text_down = ""
+        element = ""
+        self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down, element)
+
+        # ===============================   Seat angle information  ===============================
+        seat_angle_pt_x = self.data_object.col_depth + self.data_object.gap + self.data_object.beam_length / 4
+        seat_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.seat_angle_thickness
+        seat_angle_pt = np.array([seat_angle_pt_x, seat_angle_pt_y])
+        theta = 45
+        offset = (self.data_object.D_beam - self.data_object.beam_T - self.data_object.cleat_ht) + 50
+        text_up = "ISA." + str(int(self.data_object.seat_angle_legsize_vertical)) + "X" + str(int(self.data_object.seat_angle_legsize_horizontal)) +\
+                  "X" + str(int(self.data_object.seat_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, seat_angle_pt, theta, "SE", offset, text_up, text_down)
+
+        # ===============================   Top angle information  ===============================
+        top_angle_pt_x = self.data_object.col_depth + self.data_object.gap + self.data_object.beam_length / 4
+        top_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.top_angle_thickness
+        top_angle_pt = np.array([top_angle_pt_x, top_angle_pt_y])
+        theta = 45
+        offset = (self.data_object.D_beam - self.data_object.beam_T - self.data_object.cleat_ht) + 50
+        text_up = "ISA." + str(int(self.data_object.top_angle_legsize_vertical)) + "X" + str(int(self.data_object.top_angle_legsize_horizontal)) +\
+                  "X" + str(int(self.data_object.top_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, top_angle_pt, theta, "NE", offset, text_up, text_down)
+
+        # =================================    2D view name   ==================================
+        ptx = self.SA + (self.data_object.col_length / 5) * np.array([0, 1]) + 50 * np.array([-1, 0])
+        dwg.add(dwg.text('Front view (Sec C-C)', insert = (ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.save()
+        print"########### Column Flange Beam Flange Saved ############"
+
+
+
 
 
 
@@ -846,15 +897,13 @@ class Seat2DCreatorFront(object):
 
         ptA = self.FP
         ptBx = -30
-        ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (
-            self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)
+        ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3)
         ptB = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptA, ptB, dwg)
 
         pt1 = np.array(pitchPts[0]) - 20 * np.array([1, 0])
         ptBx = -30
-        ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (
-            self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3) + self.data_object.end_dist
+        ptBy = ((self.data_object.col_length - self.data_object.beam_depth) / 2) + (self.data_object.beam_flange_thk + self.data_object.beam_R1 + 3) + self.data_object.end_dist
         pt2 = (ptBx, ptBy)
         self.data_object.draw_faint_line(pt1, pt2, dwg)
 
@@ -873,25 +922,6 @@ class Seat2DCreatorFront(object):
         ptTwo = (ptBx, ptBy)
         self.data_object.draw_faint_line(ptOne, ptTwo, dwg)
 
-        # Beam Information
-        beam_pt = self.FA2 + self.data_object.beam_depth / 2 * np.array([0, 1])
-        theta = 1
-        offset = 0.0
-        text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down, element)
-
-        # Column Designation
-        ptx = self.data_object.col_depth / 2
-        pty = 0
-        pt = self.FA + 10 * np.array([1, 0])  # np.array([ptx,pty])
-        theta = 30
-        offset = 40  # self.data_object.col_length /7
-        text_up = "Column " + self.data_object.col_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down, element)
 
         # Weld Information
         #         weldPtx = (self.data_object.col_depth)
@@ -930,12 +960,7 @@ class Seat2DCreatorFront(object):
         element = ""
         self.data_object.draw_oriented_arrow(dwg, pltPt, theta, "SE", offset, text_up, text_down, element)
 
-        # 2D view name
-        ptx = self.FG + (self.data_object.col_length / 5) * np.array([0, 1]) + 50 * np.array([-1, 0])
-        dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
-        dwg.save()
-        print"########### Column Flange Beam Flange Saved ############"
 
     def call_CWBF_front(self, file_name):
 

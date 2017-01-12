@@ -4,8 +4,20 @@ comment
 
 @author: deepa
 '''
-from PyQt4.QtCore import QString, pyqtSignal
+# from PyQt4.QtCore import QString, pyqtSignal
+from PyQt5.QtCore import QFile,pyqtSignal, QStringListModel, QTextStream, Qt, QIODevice
+# from PyQt5.QtCore import
+# from PyQt5.QtCore import
 from OCC import VERSION, BRepTools
+# from PyQt5.QtCore import
+from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+# from PyQt5.QtGui import
+# from PyQt5.QtGui import
+# from PyQt5.QtWidgets import
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
+# from PyQt5.QtWidgets import
+# from PyQt5.QtWidgets import
+
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
@@ -30,18 +42,19 @@ import pdfkit
 import shutil
 import webbrowser
 from Connections.Shear.common_logic import CommonDesignLogic
-#from commonLogic import CommonDesignLogic
+# from commonLogic import CommonDesignLogic
 from fileinput import filename
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4 import QtSvg
+# from PyQt4.QtCore import *
+
+# from PyQt4.QtGui import *
+from PyQt5 import QtSvg
 from Svg_Window import SvgWindow
 
-class DesignPreferences(QtGui.QDialog):
 
+class DesignPreferences(QDialog):
     def __init__(self, parent=None):
 
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_ShearDesignPreferences()
         self.ui.setupUi(self)
         self.main_controller = parent
@@ -50,7 +63,7 @@ class DesignPreferences(QtGui.QDialog):
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        # self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
     def save_designPref_para(self):
@@ -86,11 +99,11 @@ class DesignPreferences(QtGui.QDialog):
 
         self.saved = True
 
-        QtGui.QMessageBox.about(self, 'Information', "Preferences saved")
+        QMessageBox.about(self, 'Information', "Preferences saved")
 
         return designPref
 
-        #self.main_controller.call_designPref(designPref)
+        # self.main_controller.call_designPref(designPref)
 
     def set_default_para(self):
         '''
@@ -98,11 +111,11 @@ class DesignPreferences(QtGui.QDialog):
         uiObj = self.main_controller.getuser_inputs()
         boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = float(uiObj["Bolt"]["Grade"])
-        #clearance = str(self.get_clearance(boltDia))
+        # clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        #self.ui.txt_boltHoleClearance.setText(clearance)
+        # self.ui.txt_boltHoleClearance.setText(clearance)
         self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
@@ -148,48 +161,48 @@ class DesignPreferences(QtGui.QDialog):
             clearance = standard_clrnce[boltDia]
         else:
             clearance = overhead_clrnce[boltDia]
-        
+
         return clearance
 
     def get_boltFu(self, boltGrade):
         '''
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
-        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+                  12.9: 1220}
         return boltFu[boltGrade]
-    
+
     def close_designPref(self):
         self.close()
 
 
-class MyAskQuestion(QtGui.QDialog):
+class MyAskQuestion(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_AskQuestion()
         self.ui.setupUi(self)
         self.mainController = parent
 
 
-class MyTutorials(QtGui.QDialog):
+class MyTutorials(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_Tutorial()
         self.ui.setupUi(self)
         self.mainController = parent
 
 
-class MyAboutOsdag(QtGui.QDialog):
+class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
 
-class MyPopupDialog(QtGui.QDialog):
-
+class MyPopupDialog(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.mainController = parent
@@ -206,10 +219,10 @@ class MyPopupDialog(QtGui.QDialog):
     def getLogoFilePath(self, lblwidget):
 
         self.ui.lbl_browse.clear
-        filename = QtGui.QFileDialog.getOpenFileName(
+        filename = QFileDialog.getOpenFileName(
             self, 'Open File', " ",
             'Images (*.png *.svg*.jpg)',
-            None, QtGui.QFileDialog.DontUseNativeDialog)
+            None, QFileDialog.DontUseNativeDialog)
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
@@ -225,8 +238,8 @@ class MyPopupDialog(QtGui.QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files',
-                                                     str(self. mainController.foldloader) + "/Profile", '*.txt')
+        filename = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                     str(self.mainController.foldloader) + "/Profile", '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -249,7 +262,8 @@ class MyPopupDialog(QtGui.QDialog):
 
     def useUserProfile(self):
 
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
+        filename = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+                                                     '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -262,12 +276,11 @@ class MyPopupDialog(QtGui.QDialog):
             pass
 
 
-class MainController(QtGui.QMainWindow):
-
+class MainController(QMainWindow):
     closed = pyqtSignal()
 
     def __init__(self, folder):
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
@@ -284,9 +297,9 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.retrieve_prevstate()
-        
+
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convertColComboToBeam)
-        #self.retrieve_prevstate()
+        # self.retrieve_prevstate()
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -297,11 +310,11 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxFinplate.clicked.connect(self.call_3DFinplate)
 
-        validator = QtGui.QIntValidator()
+        validator = QIntValidator()
         self.ui.txtFu.setValidator(validator)
         self.ui.txtFy.setValidator(validator)
 
-        dbl_validator = QtGui.QDoubleValidator()
+        dbl_validator = QDoubleValidator()
         self.ui.txtPlateLen.setValidator(dbl_validator)
         self.ui.txtPlateLen.setMaxLength(7)
         self.ui.txtPlateWidth.setValidator(dbl_validator)
@@ -311,11 +324,13 @@ class MainController(QtGui.QMainWindow):
 
         minfuVal = 290
         maxfuVal = 590
-        self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, minfuVal, maxfuVal))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, minfuVal, maxfuVal))
 
         minfyVal = 165
         maxfyVal = 450
-        self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         # File Menu
@@ -325,7 +340,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callFin2D_Drawing("Top"))
         self.ui.actionfinPlate_quit.setShortcut('Ctrl+Q')
         self.ui.actionfinPlate_quit.setStatusTip('Exit application')
-        self.ui.actionfinPlate_quit.triggered.connect(QtGui.qApp.quit)
+        self.ui.actionfinPlate_quit.triggered.connect(qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -347,7 +362,8 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
-        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo("comboPlateThick_2"))
+        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
+            lambda: self.populateWeldThickCombo("comboPlateThick_2"))
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
@@ -364,11 +380,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
-
-# ************************************** Osdag logo for html********************************************************************
+        # ************************************** Osdag logo for html********************************************************************
         self.ui.btn_Design.clicked.connect(self.osdag_header)
 
-# ************************************ Help button *******************************************************************************
+        # ************************************ Help button *******************************************************************************
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
@@ -380,7 +395,7 @@ class MainController(QtGui.QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-        
+
         self.connection = "Finplate"
         self.connectivity = None
         self.fuse_model = None
@@ -415,10 +430,10 @@ class MainController(QtGui.QMainWindow):
     def convertColComboToBeam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
-            #--------------------------------------- self.ui.comboColSec.clear()
-            #---------------------------------------- self.ui.combo_Beam.clear()
-            #---------------------------- self.ui.comboColSec.setCurrentIndex(0)
-            #----------------------------- self.ui.combo_Beam.setCurrentIndex(0)
+            # --------------------------------------- self.ui.comboColSec.clear()
+            # ---------------------------------------- self.ui.combo_Beam.clear()
+            # ---------------------------- self.ui.comboColSec.setCurrentIndex(0)
+            # ----------------------------- self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.lbl_beam.setText(" Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
 
@@ -434,10 +449,10 @@ class MainController(QtGui.QMainWindow):
             self.ui.txtFu.clear()
             self.ui.txtFy.clear()
             self.ui.txtShear.clear()
-            
+
             self.ui.comboDiameter.blockSignals(True)
             self.ui.comboDiameter.setCurrentIndex(0)
-            #self.ui.comboType.blockSignals(True)
+            # self.ui.comboType.blockSignals(True)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.blockSignals(True)
             self.ui.comboGrade.setCurrentIndex((0))
@@ -513,7 +528,7 @@ class MainController(QtGui.QMainWindow):
 
     def showFontDialogue(self):
 
-        font, ok = QtGui.QFontDialog.getFont()
+        font, ok = QFontDialog.getFont()
         if ok:
             self.ui.inputDock.setFont(font)
             self.ui.outputDock.setFont(font)
@@ -534,13 +549,13 @@ class MainController(QtGui.QMainWindow):
     def save_cadImages(self):
 
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
             self.display.ExportToImage(fName)
-            QtGui.QMessageBox.about(self, 'Information', "File saved")
+            QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
         '''
@@ -672,7 +687,7 @@ class MainController(QtGui.QMainWindow):
 
     def setDictToUserInputs(self, uiObj):
 
-        if(uiObj is not None):
+        if (uiObj is not None):
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
@@ -720,13 +735,13 @@ class MainController(QtGui.QMainWindow):
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             # self.ui.lbl_connectivity.show()
-        elif(loc == "Column web-Beam web"):
-            picmap = QtGui.QPixmap(":/newPrefix/images/colW3.png")
+        elif (loc == "Column web-Beam web"):
+            picmap = QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
         else:
-            picmap = QtGui.QPixmap(":/newPrefix/images/b-b.png")
+            picmap = QPixmap(":/newPrefix/images/b-b.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
@@ -773,9 +788,9 @@ class MainController(QtGui.QMainWindow):
             :param uiObj: User inputs
             :type uiObj:Dictionary
         '''
-        inputFile = QtCore.QFile('Connections/Shear/Finplate/saveINPUT.txt')
-        if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "Application",
+        inputFile = QFile('Connections/Shear/Finplate/saveINPUT.txt')
+        if not inputFile.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         pickle.dump(uiObj, inputFile)
 
@@ -834,8 +849,10 @@ class MainController(QtGui.QMainWindow):
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callFin2D_Drawing("All")
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)  #, base, base1, base2, base3)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+                                         self.alist[5],
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,
+                                         self.connection)  # , base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
@@ -846,32 +863,36 @@ class MainController(QtGui.QMainWindow):
 
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
-                   'margin-bottom': '10mm',
-                   'footer-right': '[page]'
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
         }
-        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
+        pdfkit.from_file(fileName,
+                         str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")),
+                         configuration=config, options=options)
 
-        QtGui.QMessageBox.about(self, 'Information', "Report Saved")
+        QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/LogMessages", "Text files (*.txt)")
+        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As",
+                                                                   str(self.folder) + "/LogMessages",
+                                                                   "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
     def save_file(self, fileName):
         '''(file open for writing)-> boolean
         '''
-        fname = QtCore.QFile(fileName)
+        fname = QFile(fileName)
 
-        if not fname.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "Application",
+        if not fname.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
-        outf = QtCore.QTextStream(fname)
-        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+        outf = QTextStream(fname)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         outf << self.ui.textEdit.toPlainText()
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
 
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
@@ -924,7 +945,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.txtWeldStrng.clear()
         self.ui.textEdit.clear()
 
-        #------ Erase Display
+        # ------ Erase Display
         self.display.EraseAll()
 
     def dockbtn_clicked(self, widget):
@@ -935,7 +956,7 @@ class MainController(QtGui.QMainWindow):
         '''
 
         flag = widget.isHidden()
-        if(flag):
+        if (flag):
 
             widget.show()
         else:
@@ -961,15 +982,15 @@ class MainController(QtGui.QMainWindow):
         '''
         textStr = widget.text()
         val = int(textStr)
-        if(val < minVal or val > maxVal):
-            QtGui.QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s [cl 2.2.4.2]' % (minVal, maxVal))
+        if (val < minVal or val > maxVal):
+            QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s [cl 2.2.4.2]' % (minVal, maxVal))
             widget.clear()
             widget.setFocus()
-            palette = QtGui.QPalette()
-            palette.setColor(QtGui.QPalette.Foreground, QtCore.Qt.red)
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
             lblwidget.setPalette(palette)
         else:
-            palette = QtGui.QPalette()
+            palette = QPalette()
             lblwidget.setPalette(palette)
 
     def display_output(self, outputObj):
@@ -1042,12 +1063,12 @@ class MainController(QtGui.QMainWindow):
         This method displaying Design messages(log messages)to textedit widget.
         '''
         fname = str(commLogicObj.call_saveMessages())
-        afile = QtCore.QFile(fname)
+        afile = QFile(fname)
 
-        if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
-            QtGui.QMessageBox.information(None, 'info', afile.errorString())
+        if not afile.open(QIODevice.ReadOnly):  # ReadOnly
+            QMessageBox.information(None, 'info', afile.errorString())
 
-        stream = QtCore.QTextStream(afile)
+        stream = QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
         vscrollBar = self.ui.textEdit.verticalScrollBar()
@@ -1064,14 +1085,14 @@ class MainController(QtGui.QMainWindow):
             lodedbkend = get_loaded_backend()
             from OCC.Display.backend import get_backend, have_backend
             from osdagMainSettings import backend_name
-            if(not have_backend() and backend_name() == "pyqt4"):
+            if (not have_backend() and backend_name() == "pyqt4"):
                 get_backend("qt-pyqt4")
         else:
             global display, start_display, app, _, USED_BACKEND
 
             if not backend_str:
                 USED_BACKEND = self.get_backend()
-            elif backend_str in [ 'pyside', 'pyqt4']:
+            elif backend_str in ['pyside', 'pyqt4']:
                 USED_BACKEND = backend_str
             else:
                 raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
@@ -1080,10 +1101,12 @@ class MainController(QtGui.QMainWindow):
             # Qt based simple GUI
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.pyqt4Display
-                    from PyQt4 import QtCore, QtGui, QtOpenGL
+                    import OCC.Display.qtDisplay
+                    # from PyQt4 import QtCore, QtGui, QtOpenGL
+                    from PyQt5 import QtCore, QtGui, QtOpenGL
 
-        from OCC.Display.pyqt4Display import qtViewer3d
+        # from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import  qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
@@ -1101,10 +1124,10 @@ class MainController(QtGui.QMainWindow):
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
-                    '''Centers the window on the screen.'''
-                    resolution = QtGui.QDesktopWidget().screenGeometry()
-                    self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                              (resolution.height() / 2) - (self.frameSize().height() / 2))
+            '''Centers the window on the screen.'''
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                      (resolution.height() / 2) - (self.frameSize().height() / 2))
 
         def start_display():
             self.ui.modelTab.raise_()
@@ -1113,7 +1136,7 @@ class MainController(QtGui.QMainWindow):
 
     def showColorDialog(self):
 
-        col = QtGui.QColorDialog.getColor()
+        col = QColorDialog.getColor()
         colorTup = col.getRgb()
         r = colorTup[0]
         g = colorTup[1]
@@ -1138,20 +1161,21 @@ class MainController(QtGui.QMainWindow):
             if columnWebDepth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
                 self.disableViewButtons()
-                QtGui.QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                QMessageBox.about(self, 'Information',
+                                        "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
                 self.enableViewButtons()
         elif loc == "Beam-Beam":
-            print "columIndex",self.ui.comboColSec.currentIndex()
-            print "BeamIndex",self.ui.combo_Beam.currentIndex()
-            
+            print "columIndex", self.ui.comboColSec.currentIndex()
+            print "BeamIndex", self.ui.combo_Beam.currentIndex()
+
             if self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
                 return
-            
+
             dictSBeamData = self.fetchBeamPara()
             dictPBeamData = self.fetchColumnPara()
-            
+
             PBeam_D = float(dictPBeamData[QString("D")])
             PBeam_T = float(dictPBeamData[QString("T")])
             PBeamWebDepth = PBeam_D - 2.0 * (PBeam_T)
@@ -1160,41 +1184,42 @@ class MainController(QtGui.QMainWindow):
 
             if PBeamWebDepth <= SBeam_D:
                 self.ui.btn_Design.setDisabled(True)
-                QtGui.QMessageBox.about(self, 'Information', "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                QtGui.QMessageBox.about(self, 'Information',
+                                        "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
 
     def validateInputsOnDesignBtn(self):
 
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.about(self, "Information", "Please select connectivity")
         state = self.setimage_connection()
         if state is True:
-            if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web" :
+            if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QtGui.QMessageBox.about(self, "Information", "Please select column section")
+                    QMessageBox.about(self, "Information", "Please select column section")
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QtGui.QMessageBox.about(self, "Information", "Please select beam section")
+                    QMessageBox.about(self, "Information", "Please select beam section")
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QtGui.QMessageBox.about(self, "Information", "Please select Primary beam  section")
+                    QMessageBox.about(self, "Information", "Please select Primary beam  section")
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QtGui.QMessageBox.about(self, "Information", "Please select Secondary beam  section")
+                    QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
         if self.ui.txtFu.text().isEmpty() or float(self.ui.txtFu.text()) == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
+            QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
         elif self.ui.txtFy.text().isEmpty() or float(self.ui.txtFy.text()) == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
+            QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
         elif self.ui.txtShear.text().isEmpty() or float(str(self.ui.txtShear.text())) == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select Factored shear load")
+            QMessageBox.about(self, "Information", "Please select Factored shear load")
 
         elif self.ui.comboDiameter.currentIndex() == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
+            QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
 
         elif self.ui.comboType.currentIndex() == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select Type of  bolt")
+            QMessageBox.about(self, "Information", "Please select Type of  bolt")
 
     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     def boltHeadThick_Calculation(self, boltDia):
@@ -1260,7 +1285,8 @@ class MainController(QtGui.QMainWindow):
         '''
         Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
         '''
-        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
+                  36: 30.65}
 
         return nutDia[boltDia]
 
@@ -1273,11 +1299,11 @@ class MainController(QtGui.QMainWindow):
         '''
         Creating and displaying 3D Beam
         '''
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxBeam.setChecked(Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
         self.commLogicObj.display_3DModel("Beam")
@@ -1285,11 +1311,11 @@ class MainController(QtGui.QMainWindow):
     def call_3DColumn(self):
         '''
         '''
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxCol.setChecked(Qt.Checked)
         if self.ui.chkBxCol.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
         self.commLogicObj.display_3DModel("Column")
 
@@ -1297,12 +1323,12 @@ class MainController(QtGui.QMainWindow):
         '''
         Displaying FinPlate in 3D
         '''
-        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxFinplate.setChecked(Qt.Checked)
         if self.ui.chkBxFinplate.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
 
         self.commLogicObj.display_3DModel("Plate")
 
@@ -1311,10 +1337,10 @@ class MainController(QtGui.QMainWindow):
         This routine is responsible for unchecking all checkboxes in GUI
         '''
 
-        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
+        self.ui.btn3D.setChecked(Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(Qt.Unchecked)
+        self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
 
     def call_designPref(self, designPref):
         self.uiObj = self.getuser_inputs()
@@ -1353,8 +1379,9 @@ class MainController(QtGui.QMainWindow):
         self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
-        self. unchecked_allChkBox()
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+        self.unchecked_allChkBox()
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+                                              self.alist[5], self.alist[6],
                                               self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
@@ -1402,7 +1429,7 @@ class MainController(QtGui.QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
@@ -1426,33 +1453,33 @@ class MainController(QtGui.QMainWindow):
             step_writer.Transfer(shape, STEPControl_AsIs)
             status = step_writer.Write(fName)
 
-            assert(status == IFSelect_RetDone)
+            assert (status == IFSelect_RetDone)
 
         else:
             stl_writer = StlAPI_Writer()
             stl_writer.SetASCIIMode(True)
             stl_writer.Write(shape, fName)
 
-        QtGui.QMessageBox.about(self, 'Information', "File saved")
+        QMessageBox.about(self, 'Information', "File saved")
 
     def callFin2D_Drawing(self, view):  # call2D_Drawing(self,view)
 
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-        self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(Qt.Unchecked)
+        self.ui.btn3D.setChecked(Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+                                         self.alist[5], self.alist[6], self.alist[7],
                                          self.alist[8], self.display, self.folder, self.connection)
-        
 
         if view != 'All':
             # fileName = ''
 
-#           app2 = QtGui.QApplication(sys.argv)
+            #           app2 = QtGui.QApplication(sys.argv)
             if view == "Front":
                 filename = self.folder + "/images_html/finFront.svg"
 
@@ -1471,12 +1498,12 @@ class MainController(QtGui.QMainWindow):
 
     def save_2D_images(self, view):
 
-        fileName = QtGui.QFileDialog.getSaveFileName(self,
+        fileName = QFileDialog.getSaveFileName(self,
                                                      "Save as PNG", str(self.folder) + '/untitled.png',
                                                      "PNG files (*.png)")
         f = open(self.callFin2D_Drawing(view), 'w')
         f.close()
-        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
+        QMessageBox.about(self, 'Information', "Image Saved")
 
     def closeEvent(self, event):
         '''
@@ -1484,16 +1511,16 @@ class MainController(QtGui.QMainWindow):
         '''
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
-        reply = QtGui.QMessageBox.question(self, 'Message',
-                                           "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        reply = QMessageBox.question(self, 'Message',
+                                           "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             self.closed.emit()
             event.accept()
         else:
             event.ignore()
 
-# Help Action
+        # Help Action
 
     def about_osdag(self):
         dialog = MyAboutOsdag(self)
@@ -1524,17 +1551,17 @@ class MainController(QtGui.QMainWindow):
                 if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
             if pdf_file.endswith('.pdf'):
-                if sys.platform ==("win32" or "win64"):
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, pdf_file))
                 else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    opener = "open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def design_preferences(self):
@@ -1548,7 +1575,6 @@ class MainController(QtGui.QMainWindow):
 
 
 def set_osdaglogger():
-
     global logger
     if logger is None:
 
@@ -1595,7 +1621,6 @@ def launchFinPlateController(osdagMainWindow, folder):
 
 
 if __name__ == '__main__':
-
     # linking css to log file to display colour logs.
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
@@ -1606,7 +1631,7 @@ if __name__ == '__main__':
     rawLogger.addHandler(fh)
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
 
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     module_setup()
     window = MainController()
     window.show()

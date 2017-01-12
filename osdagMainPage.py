@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QDialog,QMessageBox, QFileDial
 from ui_OsdagMainPage import Ui_MainWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
-from ui_ask_a_question import Ui_AskQuestion
+from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller

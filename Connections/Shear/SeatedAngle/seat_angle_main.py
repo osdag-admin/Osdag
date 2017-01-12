@@ -472,10 +472,10 @@ class MainController(QtGui.QMainWindow):
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
             combo_grade_index = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
             self.ui.combo_bolt_grade.setCurrentIndex(combo_grade_index)
-            combo_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
-            self.ui.combo_angle_section.setCurrentIndex(combo_angle_index)
-            combo_topangle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
-            self.ui.combo_topangle_section.setCurrentIndex(combo_topangle_index)
+            combo_seat_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
+            self.ui.combo_angle_section.setCurrentIndex(combo_seat_angle_index)
+            combo_top_angle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
+            self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
 
     def setimage_connection(self):
         '''
@@ -1316,7 +1316,7 @@ class MainController(QtGui.QMainWindow):
         # Displaying 3D Cad model
         status = self.resultObj['SeatAngle']['status']
         self.call_3DModel(status)
-        # self.call2D_Drawing("All")
+        self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of finplate

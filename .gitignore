@@ -1,11 +1,9 @@
-<<<<<<< HEAD
-*.log
-=======
 
->>>>>>> clean2Ddrawing
+*.log
 *.pyo
 ~*
 output/*
 *.xml
 *.txt
 *.pyc
+.idea/

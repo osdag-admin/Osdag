@@ -4,51 +4,30 @@ comment
 
 @author: deepa
 '''
-# from PyQt4.QtCore import QString, pyqtSignal
-from PyQt5.QtCore import QFile,pyqtSignal, QStringListModel, QTextStream, Qt, QIODevice
-# from PyQt5.QtCore import
-# from PyQt5.QtCore import
-from OCC import VERSION, BRepTools
-# from PyQt5.QtCore import
+from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
-# from PyQt5.QtGui import
-# from PyQt5.QtGui import
-# from PyQt5.QtWidgets import
 from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
-# from PyQt5.QtWidgets import
-# from PyQt5.QtWidgets import
-
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
-from ui_ask_a_question import Ui_AskQuestion
+from ui_ask_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
-import pickle
+from Connections.Shear.common_logic import CommonDesignLogic
+from Svg_Window import SvgWindow
+from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-import os.path
-import subprocess
-from utilities import osdag_display_shape
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
-from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from OCC import IGESControl
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
 import pdfkit
+import subprocess
+import os.path
+import pickle
 import shutil
-import webbrowser
-from Connections.Shear.common_logic import CommonDesignLogic
-# from commonLogic import CommonDesignLogic
-from fileinput import filename
-# from PyQt4.QtCore import *
-
-# from PyQt4.QtGui import *
-from PyQt5 import QtSvg
-from Svg_Window import SvgWindow
 
 
 class DesignPreferences(QDialog):
@@ -600,7 +579,7 @@ class MainController(QMainWindow):
             return
         else:
             dictbeamdata = self.fetchBeamPara()
-            beam_tw = float(dictbeamdata[QString("tw")])
+            beam_tw = float(dictbeamdata["tw"])
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
@@ -635,7 +614,7 @@ class MainController(QMainWindow):
             newlist = []
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
             dictbeamdata = self.fetchBeamPara()
-            beam_tw = float(dictbeamdata[QString("tw")])
+            beam_tw = float(dictbeamdata["tw"])
             dictcoldata = self.fetchColumnPara()
             # column_tf = float(dictcoldata[QString("T")])
             # column_tw = float(dictcoldata[QString("tw")])
@@ -647,7 +626,7 @@ class MainController(QMainWindow):
                     self.ui.comboWldSize.clear()
                     return
                 else:
-                    column_tf = float(dictcoldata[QString("T")])
+                    column_tf = float(dictcoldata["T"])
                     thickerPart = column_tf > plate_thick[0] and column_tf or plate_thick[0]
 
             elif self.ui.comboConnLoc.currentText() == "Column web-Beam web":
@@ -655,10 +634,10 @@ class MainController(QMainWindow):
                     self.ui.comboWldSize.clear()
                     return
                 else:
-                    column_tw = float(dictcoldata[QString("tw")])
+                    column_tw = float(dictcoldata["tw"])
                     thickerPart = column_tw > plate_thick[0] and column_tw or plate_thick[0]
             else:
-                PBeam_tw = float(dictcoldata[QString("tw")])
+                PBeam_tw = float(dictcoldata["tw"])
                 thickerPart = PBeam_tw > plate_thick[0] and PBeam_tw or plate_thick[0]
 
             if thickerPart in range(0, 11):
@@ -730,7 +709,7 @@ class MainController(QMainWindow):
         self.ui.lbl_connectivity.show()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column flange-Beam web":
-            pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
+            pixmap = QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
@@ -1152,11 +1131,11 @@ class MainController(QMainWindow):
             column = self.ui.comboColSec.currentText()
             dictBeamData = self.fetchBeamPara()
             dictColData = self.fetchColumnPara()
-            column_D = float(dictColData[QString("D")])
-            column_T = float(dictColData[QString("T")])
-            column_R1 = float(dictColData[QString("R1")])
+            column_D = float(dictColData["D"])
+            column_T = float(dictColData["T"])
+            column_R1 = float(dictColData["R1"])
             columnWebDepth = column_D - (2.0 * (column_T) + 2.0 * (10))
-            beam_B = float(dictBeamData[QString("B")])
+            beam_B = float(dictBeamData["B"])
 
             if columnWebDepth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
@@ -1176,15 +1155,15 @@ class MainController(QMainWindow):
             dictSBeamData = self.fetchBeamPara()
             dictPBeamData = self.fetchColumnPara()
 
-            PBeam_D = float(dictPBeamData[QString("D")])
-            PBeam_T = float(dictPBeamData[QString("T")])
+            PBeam_D = float(dictPBeamData["D"])
+            PBeam_T = float(dictPBeamData["T"])
             PBeamWebDepth = PBeam_D - 2.0 * (PBeam_T)
 
-            SBeam_D = float(dictSBeamData[QString("D")])
+            SBeam_D = float(dictSBeamData["D"])
 
             if PBeamWebDepth <= SBeam_D:
                 self.ui.btn_Design.setDisabled(True)
-                QtGui.QMessageBox.about(self, 'Information',
+                QMessageBox.about(self, 'Information',
                                         "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)

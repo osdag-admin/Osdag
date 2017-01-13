@@ -3,10 +3,10 @@ Created on 24-Aug-2015
 
 @author: deepa
 '''
+# from PyQt4.QtCore import QString
 import svgwrite
 import cmath
 import math
-from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 from model import *
@@ -14,6 +14,7 @@ from endPlateCalc import end_connection
 from cmath import sqrt
 from xml.etree.ElementTree import XML, fromstring, tostring
 import cairosvg
+
 
 
 class EndCommonData(object):
@@ -31,18 +32,18 @@ class EndCommonData(object):
         :type dict_beam_data: dictionary (Column sectional properties dictionary)
 
         '''
-        self.beam_T = float(dict_beam_data[QString("T")])
-        self.col_T = float(dict_column_data[QString("T")])
-        self.D_beam = int(dict_beam_data[QString("D")])
-        self.D_col = int(dict_column_data[QString("D")])
-        self.col_B = int(dict_column_data[QString("B")])
-        self.beam_B = int(dict_beam_data[QString("B")])
-        self.col_tw = float(dict_column_data[QString("tw")])
-        self.beam_tw = float(dict_beam_data[QString("tw")])
-        self.col_Designation = dict_column_data[QString("Designation")]
-        self.beam_Designation = dict_beam_data[QString("Designation")]
-        self.beam_R1 = float(dict_beam_data[QString("R1")])
-        self.col_R1 = float(dict_column_data[QString("R1")])
+        self.beam_T = float(dict_beam_data["T"])
+        self.col_T = float(dict_column_data["T"])
+        self.D_beam = int(dict_beam_data["D"])
+        self.D_col = int(dict_column_data["D"])
+        self.col_B = int(dict_column_data["B"])
+        self.beam_B = int(dict_beam_data["B"])
+        self.col_tw = float(dict_column_data["tw"])
+        self.beam_tw = float(dict_beam_data["tw"])
+        self.col_Designation = dict_column_data["Designation"]
+        self.beam_Designation = dict_beam_data["Designation"]
+        self.beam_R1 = float(dict_beam_data["R1"])
+        self.col_R1 = float(dict_column_data["R1"])
         self.plate_ht = ouput_obj['Plate']['height']
         self.plate_thick = input_obj['Plate']["Thickness (mm)"]
         self.bolt_grade = input_obj['Bolt']['Grade']

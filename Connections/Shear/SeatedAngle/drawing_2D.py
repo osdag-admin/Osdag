@@ -1298,89 +1298,32 @@ class Seat2DCreatorTop(object):
 
         self.data_object = seat_common_object
         # --------------------------------------------------------------------------------------------------------------
-        #          COLUMN WEB BEAM FLANGE CONNECTIVITY (TOP VIEW)
-        # --------------------------------------------------------------------------------------------------------------
-        self.A = np.array([0, 0])
-        self.B = np.array([0, 0]) + (self.data_object.col_width) * np.array([1, 0])
-        self.C = self.B + (self.data_object.col_flange_thk) * np.array([0, 1])
-        self.D = self.A + (self.data_object.col_width + self.data_object.col_web_thk) / 2 * np.array([1, 0]) + (
-                                                                                                                   self.data_object.col_flange_thk) * np.array(
-            [0, 1])
-        self.E = self.A + (self.data_object.col_width + self.data_object.col_web_thk) / 2 * np.array([1, 0]) + (
-                                                                                                                   self.data_object.col_depth - self.data_object.col_flange_thk) * np.array(
-            [0, 1])
-        self.F = self.B + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([0, 1])
-        self.G = self.B + (self.data_object.col_depth) * np.array([0, 1])
-        self.H = self.A + (self.data_object.col_depth) * np.array([0, 1])
-        self.I = self.A + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([0, 1])
-        self.J = self.E - (self.data_object.col_web_thk) * np.array([1, 0])
-        self.K = self.D - (self.data_object.col_web_thk) * np.array([1, 0])
-        self.L = self.A + (self.data_object.col_flange_thk) * np.array([0, 1])
-        self.A1 = self.A + ((
-                            self.data_object.col_width + self.data_object.col_web_thk) / 2 + self.data_object.gap) * np.array(
-            [1, 0]) + ((self.data_object.col_flange_thk) + (10)) * np.array([0, 1])
-        self.A4 = self.A1 + self.data_object.beam_width * np.array([0, 1])
-        self.A7 = self.A1 + (self.data_object.beam_width - self.data_object.beam_web_thk) / 2 * np.array([0, 1])
-        self.A5 = self.A7 - 20 * np.array([1, 0])
-        self.A8 = self.A7 + (self.data_object.beam_length) * np.array([1, 0])
-        self.P1 = self.A1 + (self.data_object.beam_width + self.data_object.beam_web_thk) / 2 * np.array([0, 1])
-        self.A6 = self.P1 + (self.data_object.beam_length) * np.array([1, 0])
-        self.P = self.P1 - 20 * np.array([1, 0])
-        self.P2 = self.P + (self.data_object.plate_width) * np.array([1, 0])
-        self.P4 = self.P1 + (self.data_object.plate_thick) * np.array([0, 1])
-        self.P3 = self.P2 + (self.data_object.plate_thick) * np.array([0, 1])
-
-        # Weld Triangle
-
-        self.ptP = self.P + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-        self.O = self.P + self.data_object.weld_thick * np.array([1, 0])
-        self.ptO = self.O + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-        self.R = self.P + self.data_object.weld_thick * np.array([0, -1])
-        self.ptR = self.R + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, -1])
-
-        self.X = self.P + (self.data_object.plate_thick) * np.array([0, 1])
-        self.ptX = self.X + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-        self.Y = self.X + (self.data_object.weld_thick) * np.array([0, 1])
-        self.ptY = self.Y + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-        self.Z = self.X + (self.data_object.weld_thick) * np.array([1, 0])
-        self.ptZ = self.Z + 2.5 * np.array([1, 0]) + 2.5 * np.array([0, 1])
-
-        # --------------------------------------------------------------------------------------------------------------
         #                           COLUMN FLANGE BEAM FLANGE (TOP VIEW)
         # --------------------------------------------------------------------------------------------------------------
         # ========================  Column plotting  ===================================
 
         self.SA = np.array([0, 0])
-
         self.SB = self.SA + self.data_object.col_flange_thk * np.array([1, 0])
 
         ptSCx = self.SB
         ptSCy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         self.SC = np.array([ptSCx, ptSCy])
-        # self.SC = self.SB + (self.data_object.col_width - self.data_object.col_web_thk) / 2 * np.array([0, 1])
 
         ptSDx = self.data_object.col_depth - self.data_object.col_flange_thk
         ptSDy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         self.SD = np.array([ptSDx, ptSDy])
-        # self.SD = self.SC + (self.data_object.col_depth - 2 * (self.data_object.col_flange_thk)) * np.array([1, 0])
 
         self.SE = self.SA + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([1, 0])
-
         self.SF = self.SA + self.data_object.col_depth * np.array([1, 0])
-
         self.SG = self.SF + self.data_object.col_width * np.array([0, 1])
-
         self.SH = self.SG + self.data_object.col_flange_thk * np.array([-1, 0])
 
         ptSIx = self.data_object.col_depth - self.data_object.col_flange_thk
         ptSIy = self.data_object.col_width / 2 + self.data_object.col_web_thk / 2
         self.SI = np.array([ptSIx, ptSIy])
-        # self.FI = self.FD + self.data_object.col_web_thk * np.array([0, 1])
 
         self.SJ = self.SC + self.data_object.col_web_thk * np.array([0, 1])
-
         self.SK = self.SB + self.data_object.col_width * np.array([0, 1])
-
         self.SL = self.SK + self.data_object.col_flange_thk * np.array([-1, 0])
 
         # ========================  Beam plotting  ===================================
@@ -1426,6 +1369,81 @@ class Seat2DCreatorTop(object):
         ptSA6y = self.data_object.angle_length
         self.SA6 = np.array([ptSA6x, ptSA6y])
 
+        # --------------------------------------------------------------------------------------------------------------
+        #          COLUMN WEB BEAM FLANGE CONNECTIVITY (TOP VIEW)
+        # --------------------------------------------------------------------------------------------------------------
+        # ========================  Column plotting  ===================================
+        self.SWA = np.array([0, 0])
+        self.SWB = self.SWA + self.data_object.col_flange_thk * np.array([1, 0])
+
+        ptSWCx = self.SWB
+        ptSWCy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
+        self.SWC = np.array([ptSWCx, ptSWCy])
+
+        ptSWDx = self.data_object.col_depth - self.data_object.col_flange_thk
+        ptSWDy = ptSWCy
+        self.SWD = np.array([ptSWDx, ptSWDy])
+
+        self.SWE = self.SWA + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([1, 0])
+        self.SWF = self.SWE + self.data_object.col_flange_thk * np.array([1, 0])
+        self.SWG = self.SWF + self.data_object.col_width * np.array([0, 1])
+        self.SWH = self.SWG + self.data_object.col_flange_thk * np.array([0, 1])
+
+        ptSWIx = ptSWDx
+        ptSWIy = ptSWDy + self.data_object.col_web_thk
+        self.SWI = np.array([ptSWIx, ptSWIy])
+
+        ptSWJx = ptSWCx
+        ptSWJy = ptSWCy + self.data_object.col_web_thk
+        self.SWJ = np.array([ptSWJx, ptSWJy])
+
+        self.SWK = self.SWB + self.data_object.col_width
+        self.SWL = self.SWA + self.data_object.col_width
+
+        # ========================  Beam plotting  ===================================
+
+        ptSWB1x = (self.data_object.col_width / 2) + (self.data_object.col_web_thk / 2) + self.data_object.gap
+        ptSWB1y = (self.data_object.col_depth - self.data_object.beam_width) / 2
+        self.SWB = np.array([ptSWB1x, ptSWB1y])
+
+        ptSWB2x = ptSWB1x + self.data_object.beam_length
+        ptSWB2y = ptSWB1y
+        self.SWB = np.array([ptSWB2x, ptSWB2y])
+
+        ptSWB3x = ptSWB2x
+        ptSWB3y = ptSWB2y + self.data_object.beam_width
+        self.SWB = np.array([ptSWB3x, ptSWB3y])
+
+        ptSWB4x = ptSWB1x
+        ptSWB4y = ptSWB1y + self.data_object.beam_width
+        self.SWB = np.array([ptSWB4x, ptSWB4y])
+
+        # ========================  Top Angle plotting  ===================================
+
+        ptSWA1x = (self.data_object.col_width / 2) + (self.data_object.col_web_thk / 2)
+        ptSWA1y = (self.data_object.col_depth - self.data_object.beam_width) / 2
+        self.SWA1 = np.array([ptSWA1x, ptSWA1y])
+
+        ptSWA2x = ptSWA1x + self.data_object.top_angle_thickness
+        ptSWA2y = ptSWA1y
+        self.SWA2 = np.array([ptSWA2x, ptSWA2y])
+
+        ptSWA3x = ptSWA1x + self.data_object.top_angle_legsize_horizontal
+        ptSWA3y = ptSWA1y
+        self.SWA3 = np.array([ptSWA3x, ptSWA3y])
+
+        ptSWA4x = ptSWA3x
+        ptSWA4y = self.data_object.angle_length
+        self.SWA4 = np.array([ptSWA4x, ptSWA4y])
+
+        ptSWA5x = ptSWA1x
+        ptSWA5y = self.data_object.angle_length
+        self.SWA5 = np.array([ptSWA5x, ptSWA5y])
+
+        ptSWA6x = ptSWA1x
+        ptSWA6y = self.data_object.angle_length
+        self.SWA6 = np.array([ptSWA6x, ptSWA6y])
+        # ------------------------------------------------------------------------------------------------------------
 
     def call_CFBF_top(self, file_name):
         vb_width = str(int(self.data_object.col_depth) + 750)
@@ -1997,6 +2015,7 @@ class Seat2DCreatorSide(object):
         ptSWB8y = (self.data_object.seat_angle_legsize_vertical - self.data_object.seat_angle_thickness)
         self.SWB8 = np.array([ptSWB8x, ptSWB8y])
 
+    # ------------------------------------------------------------------------------------------------------------
 
     def call_CWBF_side(self, file_name):
         vb_width = str(float(3.5 * self.data_object.col_depth))

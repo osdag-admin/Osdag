@@ -6,7 +6,7 @@ Created on 31-Mar-2016
 import sys
 # from PyQt4 import QtGui
 
-from PyQt5.QtWidgets import QMainWindow, QAction, QDialog,QMessageBox, QFileDialog, QApplication
+from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from ui_OsdagMainPage import Ui_MainWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag

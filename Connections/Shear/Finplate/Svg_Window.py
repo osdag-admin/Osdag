@@ -3,9 +3,13 @@ Created on Oct 20, 2016
 
 @author: USER
 '''
-from PyQt4 import QtSvg, QtGui, QtCore
+from PyQt5 import QtSvg
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QApplication, QFileDialog, QSpacerItem, QSizePolicy, QPushButton, \
+     QMessageBox, QHBoxLayout, QFrame, QLabel,QGridLayout
 import sys
 import shutil
+
 
 
 class SvgWindow(object):
@@ -15,37 +19,37 @@ class SvgWindow(object):
         self.svgWidget = QtSvg.QSvgWidget()
         # self.svgWidget.renderer().load(filename)
 
-        self.label = QtGui.QLabel(self.svgWidget)
-        self.label.setFrameShape(QtGui.QFrame.Box)
-        self.label.setFrameShadow(QtGui.QFrame.Plain)
-        self.label.setPixmap(QtGui.QPixmap(filename))
+        self.label = QLabel(self.svgWidget)
+        self.label.setFrameShape(QFrame.Box)
+        self.label.setFrameShadow(QFrame.Plain)
+        self.label.setPixmap(QPixmap(filename))
         self.label.setScaledContents(True)
 
-        self.gridlayout = QtGui.QGridLayout(self.svgWidget)
+        self.gridlayout = QGridLayout(self.svgWidget)
         self.gridlayout.addWidget(self.label, 0, 0, 1, 3)
-        spaceritem = QtGui.QSpacerItem(260,20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spaceritem = QSpacerItem(260,20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.gridlayout.addItem(spaceritem, 1, 0, 1, 1)
 
-        self.horizontallayout = QtGui.QHBoxLayout()
+        self.horizontallayout = QHBoxLayout()
         self.gridlayout.addLayout(self.horizontallayout, 1, 1, 1, 1)
-        spaceritem2 = QtGui.QSpacerItem(260, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        spaceritem2 = QSpacerItem(260, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.gridlayout.addItem(spaceritem2, 1, 2, 1, 1)
         self.svgWidget.setFixedSize(1000, 800)
 
-        # spaceritem1 = QtGui.QSpacerItem(18, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        # spaceritem1 = QSpacerItem(18, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         # self.horizontallayout.addItem(spaceritem1)
 
-        self.btn_save_png = QtGui.QPushButton('Save as PNG', self.svgWidget)
+        self.btn_save_png = QPushButton('Save as PNG', self.svgWidget)
         self.btn_save_png.setToolTip('Saves 2D Image as PNG')
         self.btn_save_png.resize(self.btn_save_png.sizeHint())
-        self.btn_save_svg = QtGui.QPushButton('Save as SVG', self.svgWidget)
+        self.btn_save_svg = QPushButton('Save as SVG', self.svgWidget)
         self.btn_save_svg.setToolTip('Saves 2D Image as SVG')
         self.btn_save_svg.resize(self.btn_save_svg.sizeHint())
 
         self.horizontallayout.addWidget(self.btn_save_png)
         self.horizontallayout.addWidget(self.btn_save_svg)
 
-        myfont = QtGui.QFont()
+        myfont = QFont()
         myfont.setBold(True)
         myfont.setPointSize(10)
         myfont.setFamily("Arial")
@@ -63,15 +67,15 @@ class SvgWindow(object):
 
         if view == "Front":
             png_image_path = self.folder + "/images_html/finFront.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         elif view == "Side":
             png_image_path = self.folder + "/images_html/finSide.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         else:
             png_image_path = self.folder + "/images_html/finTop.png"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
 
-        QtGui.QMessageBox.about(None, 'Information', "Image Saved")
+        QMessageBox.about(None, 'Information', "Image Saved")
 
     def save_2d_image_svg_names(self, view):
         #         view = self.go_to_open_svg(view)
@@ -79,19 +83,19 @@ class SvgWindow(object):
 
         if view == "Front":
             png_image_path = self.folder + "/images_html/finFront.svg"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
         elif view == "Side":
             png_image_path = self.folder + "/images_html/finSide.svg"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
         else:
             png_image_path = self.folder + "/images_html/finTop.svg"
-            shutil.copyfile(png_image_path, str(QtGui.QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
+            shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
 
-        QtGui.QMessageBox.about(None, 'Information', "Image Saved")
+        QMessageBox.about(None, 'Information', "Image Saved")
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     ex = SvgWindow()
     sys.exit(app.exec_())
 

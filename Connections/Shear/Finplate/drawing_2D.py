@@ -4,7 +4,7 @@ Created on 24-Aug-2015
 @author: deepa
 '''
 import svgwrite
-from PyQt4.QtCore import QString
+from PyQt5 import QtCore
 import numpy as np
 from numpy import math
 import os.path
@@ -27,18 +27,18 @@ class FinCommonData(object):
         :type dictBeamdata: dictionary (Column sectional properties dictionary)
 
         '''
-        self.beam_T = float(dictBeamdata[QString("T")])
-        self.col_T = float(dictColumndata[QString("T")])
-        self.D_beam = int(dictBeamdata[QString("D")])
-        self.D_col = int(dictColumndata[QString("D")])
-        self.col_B = int(dictColumndata[QString("B")])
-        self.beam_B = int(dictBeamdata[QString("B")])
-        self.col_tw = float(dictColumndata[QString("tw")])
-        self.beam_tw = float(dictBeamdata[QString("tw")])
-        self.col_Designation = dictColumndata[QString("Designation")]
-        self.beam_Designation = dictBeamdata[QString("Designation")]
-        self.beam_R1 = float(dictBeamdata[QString("R1")])
-        self.col_R1 = float(dictColumndata[QString("R1")])
+        self.beam_T = float(dictBeamdata["T"])
+        self.col_T = float(dictColumndata["T"])
+        self.D_beam = int(dictBeamdata["D"])
+        self.D_col = int(dictColumndata["D"])
+        self.col_B = int(dictColumndata["B"])
+        self.beam_B = int(dictBeamdata["B"])
+        self.col_tw = float(dictColumndata["tw"])
+        self.beam_tw = float(dictBeamdata["tw"])
+        self.col_Designation = dictColumndata["Designation"]
+        self.beam_Designation = dictBeamdata["Designation"]
+        self.beam_R1 = float(dictBeamdata["R1"])
+        self.col_R1 = float(dictColumndata["R1"])
         self.plate_ht = ouputObj['Plate']['height']
         self.plate_thick = inputObj['Plate']["Thickness (mm)"]
 

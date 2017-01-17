@@ -835,9 +835,22 @@ class Seat2DCreatorFront(object):
         theta = 45
         offset = self.data_object.beam_length / 2
         text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""
-        element = ""
+        text_down = ""       # text_down shows empty
+        element = ""         # elements shows empty
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+
+        # ===============================   Draw faint line for Beam Information   ===============================
+        pt_B1 = self.SA1
+        pt_B2x = -30
+        pt_B2y = (self.data_object.col_length - self.data_object.beam_depth) / 2
+        pt_B2 = (pt_B2x, pt_B2y)
+        self.data_object.draw_faint_line(pt_B1, pt_B2, dwg)
+
+        pt_B3 = self.SB1
+        pt_B4x = -30
+        pt_B4y = ((self.data_object.col_length - self.data_object.beam_depth) / 2)
+        pt_B4 = (pt_B4x, pt_B4y)
+        self.data_object.draw_faint_line(pt_B3, pt_B4, dwg)
 
         # ===============================   Column Designation  ===============================
         pt_x = self.data_object.col_depth / 2
@@ -907,8 +920,6 @@ class Seat2DCreatorFront(object):
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
         text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
         self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
-
-        
 
         # =================================    2D view name   ==================================
         ptx = self.SA + (self.data_object.col_length / 5) * np.array([0, 1]) + 50 * np.array([-1, 0])
@@ -1031,8 +1042,6 @@ class Seat2DCreatorFront(object):
         text_down = ""  # u"\u25C1"
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, weldPt, theta, "NW", offset, text_up, text_down, element)
-
-
 
         # Bolt Information
         bltPtx = self.FP + self.data_object.plateEdge_dist * np.array([1, 0]) + self.data_object.end_dist * np.array(

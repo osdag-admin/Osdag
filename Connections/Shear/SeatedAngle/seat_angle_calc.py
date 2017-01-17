@@ -196,8 +196,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolts_required = 1
         self.num_rows = 1
         self.num_cols = 1
-        self.pitch = 1
-        self.gauge = 1
         self.min_end_dist = 1
         self.min_edge_dist = 1
         self.min_pitch = 1

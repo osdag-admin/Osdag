@@ -10,7 +10,7 @@ Created on 14-Jul-2016
 @author: deepa
 '''
 import os
-from PyQt4.QtCore import QString
+# from PyQt4.QtCore import QString
 from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
 #from colWebBeamWebConnectivity import ColWebBeamWeb
@@ -108,13 +108,13 @@ class CommonDesignLogic(object):
 
         '''
         ##### PRIMARY BEAM PARAMETERS #####
-        pBeam_D = int(self.dictcoldata[QString("D")])
-        pBeam_B = int(self.dictcoldata[QString("B")])
-        pBeam_tw = float(self.dictcoldata[QString("tw")])
-        pBeam_T = float(self.dictcoldata[QString("T")])
-        pBeam_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        pBeam_R1 = float(self.dictcoldata[QString("R1")])
-        pBeam_R2 = float(self.dictcoldata[QString("R2")])
+        pBeam_D = int(self.dictcoldata["D"])
+        pBeam_B = int(self.dictcoldata["B"])
+        pBeam_tw = float(self.dictcoldata["tw"])
+        pBeam_T = float(self.dictcoldata["T"])
+        pBeam_alpha = float(self.dictcoldata["FlangeSlope"])
+        pBeam_R1 = float(self.dictcoldata["R1"])
+        pBeam_R2 = float(self.dictcoldata["R2"])
         pBeam_length = 800.0  # This parameter as per view of 3D cad model
 
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -124,13 +124,13 @@ class CommonDesignLogic(object):
 
         ##### SECONDARY BEAM PARAMETERS ######
 
-        sBeam_D = int(self.dictbeamdata[QString("D")])
-        sBeam_B = int(self.dictbeamdata[QString("B")])
-        sBeam_tw = float(self.dictbeamdata[QString("tw")])
-        sBeam_T = float(self.dictbeamdata[QString("T")])
-        sBeam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        sBeam_R1 = float(self.dictbeamdata[QString("R1")])
-        sBeam_R2 = float(self.dictbeamdata[QString("R2")])
+        sBeam_D = int(self.dictbeamdata["D"])
+        sBeam_B = int(self.dictbeamdata["B"])
+        sBeam_tw = float(self.dictbeamdata["tw"])
+        sBeam_T = float(self.dictbeamdata["T"])
+        sBeam_alpha = float(self.dictbeamdata["FlangeSlope"])
+        sBeam_R1 = float(self.dictbeamdata["R1"])
+        sBeam_R2 = float(self.dictbeamdata["R2"])
         cleardist = float(self.uiObj['detailing']['gap'])
         plate_thk = float(self.uiObj['Plate']['Thickness (mm)'])
 
@@ -202,13 +202,13 @@ class CommonDesignLogic(object):
 
         # self.dictbeamdata  = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
-        beam_D = int(self.dictbeamdata[QString("D")])
-        beam_B = int(self.dictbeamdata[QString("B")])
-        beam_tw = float(self.dictbeamdata[QString("tw")])
-        beam_T = float(self.dictbeamdata[QString("T")])
-        beam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(self.dictbeamdata[QString("R1")])
-        beam_R2 = float(self.dictbeamdata[QString("R2")])
+        beam_D = int(self.dictbeamdata["D"])
+        beam_B = int(self.dictbeamdata["B"])
+        beam_tw = float(self.dictbeamdata["tw"])
+        beam_T = float(self.dictbeamdata["T"])
+        beam_alpha = float(self.dictbeamdata["FlangeSlope"])
+        beam_R1 = float(self.dictbeamdata["R1"])
+        beam_R2 = float(self.dictbeamdata["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -219,13 +219,13 @@ class CommonDesignLogic(object):
         ##### COLUMN PARAMETERS ######
         # self.dictcoldata = self.fetchColumnPara()
 
-        column_D = int(self.dictcoldata[QString("D")])
-        column_B = int(self.dictcoldata[QString("B")])
-        column_tw = float(self.dictcoldata[QString("tw")])
-        column_T = float(self.dictcoldata[QString("T")])
-        column_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(self.dictcoldata[QString("R1")])
-        column_R2 = float(self.dictcoldata[QString("R2")])
+        column_D = int(self.dictcoldata["D"])
+        column_B = int(self.dictcoldata["B"])
+        column_tw = float(self.dictcoldata["tw"])
+        column_T = float(self.dictcoldata["T"])
+        column_alpha = float(self.dictcoldata["FlangeSlope"])
+        column_R1 = float(self.dictcoldata["R1"])
+        column_R2 = float(self.dictcoldata["R2"])
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
@@ -289,13 +289,13 @@ class CommonDesignLogic(object):
         #------------------------ plate_width = self.resultObj['Plate']['width']
         #------------------- plate_thick = self.uiObj['Plate']['Thickness (mm)']
         ##### BEAM PARAMETERS #####
-        beam_D = int(self.dictbeamdata[QString("D")])
-        beam_B = int(self.dictbeamdata[QString("B")])
-        beam_tw = float(self.dictbeamdata[QString("tw")])
-        beam_T = float(self.dictbeamdata[QString("T")])
-        beam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(self.dictbeamdata[QString("R1")])
-        beam_R2 = float(self.dictbeamdata[QString("R2")])
+        beam_D = int(self.dictbeamdata["D"])
+        beam_B = int(self.dictbeamdata["B"])
+        beam_tw = float(self.dictbeamdata["tw"])
+        beam_T = float(self.dictbeamdata["T"])
+        beam_alpha = float(self.dictbeamdata["FlangeSlope"])
+        beam_R1 = float(self.dictbeamdata["R1"])
+        beam_R2 = float(self.dictbeamdata["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -304,13 +304,13 @@ class CommonDesignLogic(object):
 
         ##### COLUMN PARAMETERS ######
 
-        column_D = int(self.dictcoldata[QString("D")])
-        column_B = int(self.dictcoldata[QString("B")])
-        column_tw = float(self.dictcoldata[QString("tw")])
-        column_T = float(self.dictcoldata[QString("T")])
-        column_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(self.dictcoldata[QString("R1")])
-        column_R2 = float(self.dictcoldata[QString("R2")])
+        column_D = int(self.dictcoldata["D"])
+        column_B = int(self.dictcoldata["B"])
+        column_tw = float(self.dictcoldata["tw"])
+        column_T = float(self.dictcoldata["T"])
+        column_alpha = float(self.dictcoldata["FlangeSlope"])
+        column_R1 = float(self.dictcoldata["R1"])
+        column_R2 = float(self.dictcoldata["R2"])
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,

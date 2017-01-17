@@ -4,13 +4,10 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 import sys
-# from PyQt4 import QtGui, QtCore
-# from PyQt4.QtSql import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, qApp
 import logging
 import os
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
-
 
 # logging.basicConfig(filename = 'finlog.html',filemode = 'w',level = logging.DEBUG)
 

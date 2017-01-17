@@ -4,20 +4,11 @@ Created on Dec 10, 2015
 @author: deepa
 '''
 from __builtin__ import str
-from PyQt4 import QtGui
-
-'''
-Created on Dec 10, 2015
-
-@author: deepa
-'''
 import time
 import math
 import os
 from os.path import exists
 import pickle
-from PyQt4.QtCore import QString
-# import mystyle.css
 
 
 
@@ -102,7 +93,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     weld_strength = str(round(float(outObj['Weld']['weldstrength'] / 1000), 3))
     moment_demand = str(outObj['Plate']['externalmoment'])
     gap = '20'
-    beam_tw = str(float(dictBeamData[QString("tw")]))
+    beam_tw = str(float(dictBeamData["tw"]))
 
     bolt_fu = str(outObj['Bolt']['bolt_fu'])
     bolt_dia = str(outObj['Bolt']['bolt_dia'])

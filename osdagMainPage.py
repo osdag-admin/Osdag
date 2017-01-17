@@ -17,7 +17,6 @@ from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os
 import os.path
 import subprocess
-# from PyQt4.QtCore import SIGNAL
 
 
 class MyTutorials(QDialog):

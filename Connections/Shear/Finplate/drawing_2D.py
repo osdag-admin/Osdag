@@ -7,7 +7,6 @@ import svgwrite
 from PyQt5 import QtCore
 import numpy as np
 from numpy import math
-import os.path
 import cairosvg
 
 

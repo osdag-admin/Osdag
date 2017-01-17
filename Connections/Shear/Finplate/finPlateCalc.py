@@ -5,22 +5,10 @@ Created on 17-Mar-2016
 '''
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
-
-"""
-ZetCode PyQt4 tutorial 
-
-In this example, we create a simple
-window in PyQt4.
-
-author: Jan Bodnar
-website: zetcode.com 
-last edited: October 2011
-"""
-
 import sys
-from PyQt4 import QtGui
+# from PyQt4 import QtGui
 from model import *
-from PyQt4.Qt import QString
+# from PyQt4.Qt import QString
 import math
 import logging
 flag = 1
@@ -185,12 +173,12 @@ def finConn(uiObj):
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_columndata(column_sec)
     
-    beam_w_t = float(dictbeamdata[QString("tw")])
-    beam_f_t = float(dictbeamdata[QString("T")])
-    beam_d = float(dictbeamdata[QString("D")])
-    beam_R1 = float(dictbeamdata[QString("R1")])
-    PBeam_T = float(dictcolumndata[QString("T")])
-    PBeam_R1 = float(dictcolumndata[QString("R1")])
+    beam_w_t = float(dictbeamdata["tw"])
+    beam_f_t = float(dictbeamdata["T"])
+    beam_d = float(dictbeamdata["D"])
+    beam_R1 = float(dictbeamdata["R1"])
+    PBeam_T = float(dictcolumndata["T"])
+    PBeam_R1 = float(dictcolumndata["R1"])
 
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
@@ -282,7 +270,7 @@ def finConn(uiObj):
          
         bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
         if shear_load != 0:
-#                 bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
+       # bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
 
             bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1; 
         else:

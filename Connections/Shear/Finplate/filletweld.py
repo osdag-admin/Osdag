@@ -4,7 +4,8 @@ Created on 27-May-2015
 @author: deepa
 '''
 import numpy
-from ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+from ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, \
+                       makeFaceFromWire, makePrismFromFace
 
 
 class FilletWeld(object):

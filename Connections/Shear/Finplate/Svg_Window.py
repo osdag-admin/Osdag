@@ -6,7 +6,7 @@ Created on Oct 20, 2016
 from PyQt5 import QtSvg
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtWidgets import QApplication, QFileDialog, QSpacerItem, QSizePolicy, QPushButton, \
-     QMessageBox, QHBoxLayout, QFrame, QLabel,QGridLayout
+                            QMessageBox, QHBoxLayout, QFrame, QLabel,QGridLayout
 import sys
 import shutil
 

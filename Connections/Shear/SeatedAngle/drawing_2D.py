@@ -819,16 +819,16 @@ class Seat2DCreatorFront(object):
         params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 50}
         self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
 
-        # ===============================  Faint line showing Gap Distance  ===============================
+        # ===============================  Draw Faint line for Gap Distance  ===============================
         # ------------------------  here "40" represents length of the faint line vertically(left)  ------------------------
-        ptLG1 = self.SC
-        ptLG2 = ptLG1 + 40 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptLG1, ptLG2, dwg)
+        pt_L_G1x = self.SC
+        pt_L_G1y = pt_L_G1x + 40 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_L_G1x, pt_L_G1y, dwg)
 
-        # ------------------------  here "40" represents length of the faint line vertically(right)  ------------------------
-        ptRG1 = self.SB1
-        ptRG2 = ptRG1 + 70 * np.array([0, 1])
-        self.data_object.draw_faint_line(ptRG1, ptRG2, dwg)
+        # ------------------------  here "70" represents length of the faint line vertically(right)  ------------------------
+        pt_R_G2x = self.SB1
+        pt_R_G2y = pt_R_G2x + 70 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
 
         # ===============================   Beam Information   ===============================
         beam_pt = self.SA1 + self.data_object.beam_length / 2 * np.array([0, 1])
@@ -907,6 +907,8 @@ class Seat2DCreatorFront(object):
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
         text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
         self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
+
+        
 
         # =================================    2D view name   ==================================
         ptx = self.SA + (self.data_object.col_length / 5) * np.array([0, 1]) + 50 * np.array([-1, 0])

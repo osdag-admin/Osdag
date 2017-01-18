@@ -861,7 +861,7 @@ class Seat2DCreatorFront(object):
         seat_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.seat_angle_thickness
         seat_angle_pt = np.array([seat_angle_pt_x, seat_angle_pt_y])
         theta = 45
-        offset = (self.data_object.D_beam - self.data_object.beam_T - self.data_object.cleat_ht) + 50
+        offset = 50
         text_up = "ISA." + str(int(self.data_object.seat_angle_legsize_vertical)) + "X" + str(int(self.data_object.seat_angle_legsize_horizontal)) +\
                   "X" + str(int(self.data_object.seat_angle_thickness))
         text_down = ""
@@ -872,7 +872,7 @@ class Seat2DCreatorFront(object):
         top_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.top_angle_thickness
         top_angle_pt = np.array([top_angle_pt_x, top_angle_pt_y])
         theta = 45
-        offset = (self.data_object.D_beam - self.data_object.beam_T - self.data_object.cleat_ht) + 50
+        offset = 50
         text_up = "ISA." + str(int(self.data_object.top_angle_legsize_vertical)) + "X" + str(int(self.data_object.top_angle_legsize_horizontal)) +\
                   "X" + str(int(self.data_object.top_angle_thickness))
         text_down = ""
@@ -1075,7 +1075,6 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.line(self.SWA5, self.SWA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line(self.SWB6, self.SWB1).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
 
-
         # ===============================  Cross section A-A  ===============================================
         ptSecA = self.SWA + (320 * np.array([0, -1]))
         ptSecB = self.SWA + (50 * np.array([0, 1]))
@@ -1167,6 +1166,64 @@ class Seat2DCreatorFront(object):
         text_down = ""
         element = ""
         self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down, element)
+
+        # ===============================   Seat angle information  ===============================
+        seat_angle_pt_x = self.data_object.col_depth + self.data_object.gap + self.data_object.beam_length / 4
+        seat_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.seat_angle_thickness
+        seat_angle_pt = np.array([seat_angle_pt_x, seat_angle_pt_y])
+        theta = 45
+        offset = 50
+        text_up = "ISA." + str(int(self.data_object.seat_angle_legsize_vertical)) + "X" + str(int(self.data_object.seat_angle_legsize_horizontal)) +\
+                  "X" + str(int(self.data_object.seat_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, seat_angle_pt, theta, "SE", offset, text_up, text_down)
+
+        # ===============================   Top angle information  ===============================
+        top_angle_pt_x = self.data_object.col_width / 2 + self.data_object.col_flange_thk / 2 + self.data_object.gap + self.data_object.beam_length / 4
+        top_angle_pt_y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.top_angle_thickness
+        top_angle_pt = np.array([top_angle_pt_x, top_angle_pt_y])
+        theta = 45
+        offset = 50
+        text_up = "ISA." + str(int(self.data_object.top_angle_legsize_vertical)) + "X" + str(int(self.data_object.top_angle_legsize_horizontal)) +\
+                  "X" + str(int(self.data_object.top_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, top_angle_pt, theta, "NE", offset, text_up, text_down)
+
+        # ===============================   Bolts - Top angle Beam part information  ===============================
+        no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt_x = np.array(pt_list[0][0])
+        theta = 45
+        offset = (self.data_object.beam_depth * 3) / 8
+        text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
+
+        # ===============================   Bolts - Top angle Column part information  ===============================
+        no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt_x = np.array(pt_list_col[-1])
+        theta = 45
+        offset = (self.data_object.col_width * 3) / 8
+        text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
+
+        # ===============================   Bolts - Seat angle Beam part information  ===============================
+        no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt_x = np.array(pt_list[0][0])
+        theta = 45
+        offset = (self.data_object.beam_depth * 3) / 8
+        text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
+
+        # ===============================   Bolts - Seat angle Column part information  ===============================
+        no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt_x = np.array(pt_list_col[-1])
+        theta = 45
+        offset = (self.data_object.col_width * 3) / 8
+        text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
 
 
 

@@ -1536,52 +1536,42 @@ class Seat2DCreatorTop(object):
         # ------------------------------------------------------------------------------------------------------------
 
     def call_CFBF_top(self, file_name):
-        vb_width = str(int(self.data_object.col_depth) + 750)
-        vb_ht = str(800)
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-50 -250 ' + vb_width + ' ' + vb_ht))
+        # vb_width = str(int(self.data_object.col_depth) + 750)
+        # vb_ht = str(800)
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-400 -250 1500 1020'))
+        dwg.add(dwg.polyline(points=[self.SA, self.SB, self.SC, self.SD, self.SE, self.SF, self.SG, self.SH, self.SI, self.SJ, self.SK,
+                                     self.SL, self.SA], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
+        dwg.add(dwg.line(self.SB1, self.SB4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.polyline(points=[self.SA1, self.SA2, self.SA3, self.SA4, self.SA5, self.SA6,
+                                     self.SA1], stroke='blue',fill='#E0E0E0', stroke_width=2.5))
 
-        ptSecA = self.FF + ((230 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0]))
-        ptSecB = ptSecA + (50 * np.array([-1, 0]))
-        txt_pt = ptSecB + (80 * np.array([-1, 0])) + (20 * np.array([0, 1]))
+        # ===============================  Cross section B-B  ===============================================
+
+        ptSecA = self.SF + (230 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0])
+        ptSecB = ptSecA + 50 * np.array([-1, 0])
+        txt_pt = ptSecB + 80 * np.array([-1, 0]) + (20 * np.array([0, 1]))
         txt = "B"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = self.FG + ((230 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0]))
+        ptSecC = self.SG + (230 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([-1, 0]))
         txt_pt = ptSecD + (80 * np.array([-1, 0])) + (20 * np.array([0, 1]))
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
+        dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
-        #  C-C section
-        ptSecA = self.FA4 + ((self.data_object.gap + self.data_object.col_depth) * np.array([-1, 0])) + 230 * np.array(
-            [0, 1])
+        #  ===============================  C-C section  ====================================================
+        ptSecA = self.SL + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 3) / 8 * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         txt = "C"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = self.FA3 + (230 * np.array([0, 1])) + 100 * np.array([1, 0])
+        ptSecC = ptSecA + (self.data_object.col_depth + self.data_object.gap + self.data_object.beam_length + 100)  * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, -1]))
         txt_pt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
-        dwg.add(dwg.polyline(
-            points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FE), (self.FF), (self.FG), (self.FH), (self.FI),
-                    (self.FJ), (self.FK), (self.FL), (self.FA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
-        dwg.add(
-            dwg.rect(insert=(self.FA1), size=(self.data_object.beam_length, self.data_object.beam_width), fill='none',
-                     stroke='blue', stroke_width=2.5))
-        dwg.add(dwg.line((self.FP), (self.FP1)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.line((self.FX), (self.FP4)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.polyline(points=[(self.FP1), (self.FP2), (self.FP3), (self.FP4)], stroke='red', fill='none',
-                             stroke_width=2.5).dasharray(dasharray=([5, 5])))
-        dwg.add(
-            dwg.line((self.FA7), (self.FA8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        dwg.add(
-            dwg.line((self.FP1), (self.FA6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.polyline([(self.ptFP), (self.ptFQ), (self.ptFR), (self.ptFP)], fill='black', stroke_width=2.5,
-                             stroke='black'))
-        dwg.add(dwg.polyline([(self.ptFX), (self.ptFY), (self.ptFZ), (self.ptFX)], fill='black', stroke_width=2.5,
-                             stroke='black'))
+
 
         nc = self.data_object.no_of_col
         bolt_r = self.data_object.bolt_dia / 2

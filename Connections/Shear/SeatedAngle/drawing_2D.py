@@ -1225,6 +1225,13 @@ class Seat2DCreatorFront(object):
         text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
         self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
 
+        # ======================================   2D view name  =======================================
+        ptx = self.SWA + np.array([1, 0]) + 1010 * np.array([0, 1])
+        dwg.add(dwg.text('Front view (Sec C-C) (All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.save()
+        print"########### Column Web Beam Flange Saved ############"
+
+
 
 
         # End Distance from the starting point of plate Information
@@ -1365,37 +1372,6 @@ class Seat2DCreatorFront(object):
         element = ""
         self.data_object.draw_oriented_arrow(dwg, pltPt, theta, "SE", offset, text_up, text_down, element)
 
-        # Column Designation
-
-        pt = self.D + 20 * np.array([0, -1])
-        theta = 1
-        offset = 1
-        text_up = "Column " + self.data_object.col_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down, element)
-
-        # Bolt Information
-        bltPtx = self.ptP + self.data_object.plateEdge_dist * np.array([1, 0]) + self.data_object.end_dist * np.array(
-            [0, 1]) + (self.data_object.no_of_col - 1) * self.data_object.gauge * np.array([1, 0])
-        theta = 45
-        offset = (self.data_object.beam_depth * 3) / 8
-        text_up = str(self.data_object.no_of_rows) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, bltPtx, theta, "NE", offset, text_up, text_down, element)
-
-        # Beam Information
-        beam_pt = self.ptB1 + (self.data_object.beam_length) * np.array(
-            [1, 0]) + self.data_object.beam_depth / 2 * np.array(
-            [0, -1])
-        theta = 1
-        offset = 0.0
-        text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down, element)
-
         # Weld Information
         weldPt = self.ptP + 6 * np.array([1, 0]) + self.data_object.end_dist / 2 * np.array([0, 1])
         theta = 45
@@ -1405,12 +1381,6 @@ class Seat2DCreatorFront(object):
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, weldPt, theta, "NW", offset, text_up, text_down, element)
 
-        # 2D view name
-        ptx = self.H + (self.data_object.col_length / 3.5) * np.array([0, 1]) + 30 * np.array([-1, 0])
-        dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-
-        dwg.save()
-        print"########### Column Web Beam Flange Saved ############"
 
 
 class Seat2DCreatorTop(object):

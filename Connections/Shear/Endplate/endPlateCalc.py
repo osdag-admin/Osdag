@@ -5,7 +5,6 @@ import math
 import sys;
 
 from model import *
-from PyQt4.Qt import QString
 import logging
 flag = 1
 logger = None
@@ -188,25 +187,25 @@ def end_connection(ui_obj):
 
     bolt_planes = 1 
     dictbeamdata = get_beamdata(beam_sec)
-    beam_w_t = float(dictbeamdata[QString("tw")])
-    beam_f_t = float(dictbeamdata[QString("T")])
-    beam_d = float(dictbeamdata[QString("D")])
-    beam_R1 = float(dictbeamdata[QString("R1")])
+    beam_w_t = float(dictbeamdata["tw"])
+    beam_f_t = float(dictbeamdata["T"])
+    beam_d = float(dictbeamdata["D"])
+    beam_R1 = float(dictbeamdata["R1"])
 
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web":
         dictcolumndata = get_columndata(column_sec)
-        column_w_t = float(dictcolumndata[QString("tw")])
-        column_f_t = float(dictcolumndata[QString("T")])
-        column_R1 = float(dictcolumndata[QString("R1")])
-        column_d = float(dictcolumndata[QString("D")])
-        column_b = float(dictcolumndata[QString("B")])
+        column_w_t = float(dictcolumndata["tw"])
+        column_f_t = float(dictcolumndata["T"])
+        column_R1 = float(dictcolumndata["R1"])
+        column_d = float(dictcolumndata["D"])
+        column_b = float(dictcolumndata["B"])
     else:
         dictcolumndata = get_beamdata(column_sec)
-        column_w_t = float(dictcolumndata[QString("tw")])
-        column_f_t = float(dictcolumndata[QString("T")])
-        column_R1 = float(dictcolumndata[QString("R1")])
-        column_d = float(dictcolumndata[QString("D")])
-        column_b = float(dictcolumndata[QString("B")])
+        column_w_t = float(dictcolumndata["tw"])
+        column_f_t = float(dictcolumndata["T"])
+        column_R1 = float(dictcolumndata["R1"])
+        column_d = float(dictcolumndata["D"])
+        column_b = float(dictcolumndata["B"])
     
     design_check = True
 

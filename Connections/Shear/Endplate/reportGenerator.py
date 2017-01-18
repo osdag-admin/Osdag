@@ -3,7 +3,6 @@ Created on Dec 10, 2015
 @author: deepa
 '''
 from __builtin__ import str
-from PyQt4.QtCore import QString
 import time
 import math
 
@@ -57,17 +56,17 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # EndPlate Main Data
 
-    beam_tw = str(float(dictbeamdata[QString("tw")]))
-    beam_f_t = str(float(dictbeamdata[QString("T")]))
-    beam_d = str(float(dictbeamdata[QString("D")]))
-    beam_R1 = str(float(dictbeamdata[QString("R1")]))
-    beam_b = str(float(dictbeamdata[QString("B")]))
+    beam_tw = str(float(dictbeamdata["tw"]))
+    beam_f_t = str(float(dictbeamdata["T"]))
+    beam_d = str(float(dictbeamdata["D"]))
+    beam_R1 = str(float(dictbeamdata["R1"]))
+    beam_b = str(float(dictbeamdata["B"]))
 
-    column_w_t = str(float(dictcolumndata[QString("tw")]))
-    column_f_t = str(float(dictcolumndata[QString("T")]))
-    column_R1 = str(float(dictcolumndata[QString("R1")]))
-    column_d = str(float(dictcolumndata[QString("D")]))
-    column_b = str(float(dictcolumndata[QString("B")]))
+    column_w_t = str(float(dictcolumndata["tw"]))
+    column_f_t = str(float(dictcolumndata["T"]))
+    column_R1 = str(float(dictcolumndata["R1"]))
+    column_d = str(float(dictcolumndata["D"]))
+    column_b = str(float(dictcolumndata["B"]))
 
 ###############################################################################################################################
     connectivity = str(uiobj['Member']['Connectivity'])

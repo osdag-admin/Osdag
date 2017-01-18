@@ -59,6 +59,18 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # FinPlate Main Data
+    beam_tw = str(float(dictBeamData["tw"]))
+    beam_f_t = str(float(dictBeamData["T"]))
+    beam_d = str(float(dictBeamData["D"]))
+    beam_R1 = str(float(dictBeamData["R1"]))
+    beam_b = str(float(dictBeamData["B"]))
+
+    column_w_t = str(float(dictColData["tw"]))
+    column_f_t = str(float(dictColData["T"]))
+    column_R1 = str(float(dictColData["R1"]))
+    column_d = str(float(dictColData["D"]))
+    column_b = str(float(dictColData["B"]))
+
     connectivity = str(uiObj['Member']['Connectivity'])
     shear_load = str(uiObj['Load']['ShearForce (kN)'])
     column_sec = str(uiObj['Member']['ColumSection'])

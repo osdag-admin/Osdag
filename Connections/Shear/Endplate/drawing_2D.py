@@ -5,15 +5,11 @@ Created on 24-Aug-2015
 '''
 # from PyQt4.QtCore import QString
 import svgwrite
-import cmath
-import math
 import numpy as np
 from numpy import math
-from model import *
-from endPlateCalc import end_connection
 from cmath import sqrt
-from xml.etree.ElementTree import XML, fromstring, tostring
 import cairosvg
+
 
 
 

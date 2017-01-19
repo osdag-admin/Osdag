@@ -4,8 +4,8 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 import sys
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtSql import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtWidgets import QMessageBox, qApp
 import logging
 import os
 
@@ -30,13 +30,13 @@ def set_databaseconnection():
     # db.open()
     if not db.open():
         
-        QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
-                                   QtGui.qApp.tr("Unable to establish a database connection.\n"
+        QMessageBox.critical(None, qApp.tr("Cannot open database"),
+                                   qApp.tr("Unable to establish a database connection.\n"
                                                  "This example needs SQLite support. Please read "
                                                  "the Qt SQL driver documentation for information "
                                                  "how to build it.\n\n"
                                                  "Click Cancel to exit."),
-                                   QtGui.QMessageBox.Cancel)
+                                   QMessageBox.Cancel)
         return False   
 
 

@@ -6,7 +6,6 @@ Created on 25-Mar-2016
 
 import math
 from model import *
-from PyQt4.Qt import QString
 import logging
 flag = 1
 logger = None
@@ -190,32 +189,32 @@ def cleat_connection(ui_obj):
     cleat_sec = ui_obj['cleat']['section']
               
     dictbeamdata = get_beamdata(beam_sec)
-    beam_w_t = float(dictbeamdata[QString("tw")])
-    beam_f_t = float(dictbeamdata[QString("T")])
-    beam_d = float(dictbeamdata[QString("D")])
-    beam_R1 = float(dictbeamdata[QString("R1")])
-    beam_B = float(dictbeamdata[QString("B")])
-    beam_D = float(dictbeamdata[QString("D")])
+    beam_w_t = float(dictbeamdata["tw"])
+    beam_f_t = float(dictbeamdata["T"])
+    beam_d = float(dictbeamdata["D"])
+    beam_R1 = float(dictbeamdata["R1"])
+    beam_B = float(dictbeamdata["B"])
+    beam_D = float(dictbeamdata["D"])
        
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web": 
         dictcolumndata = get_columndata(column_sec)
-        column_w_t = float(dictcolumndata[QString("tw")])
-        column_f_t = float(dictcolumndata[QString("T")])
-        column_R1 = float(dictcolumndata[QString("R1")])
-        column_D = float(dictcolumndata[QString("D")])
-        column_B = float(dictcolumndata[QString("B")])
+        column_w_t = float(dictcolumndata["tw"])
+        column_f_t = float(dictcolumndata["T"])
+        column_R1 = float(dictcolumndata["R1"])
+        column_D = float(dictcolumndata["D"])
+        column_B = float(dictcolumndata["B"])
     else:
         dictcolumndata = get_beamdata(column_sec)
-        column_w_t = float(dictcolumndata[QString("tw")])
-        column_f_t = float(dictcolumndata[QString("T")])
-        column_R1 = float(dictcolumndata[QString("R1")])
-        column_D = float(dictcolumndata[QString("D")])
-        column_B = float(dictcolumndata[QString("B")])
+        column_w_t = float(dictcolumndata["tw"])
+        column_f_t = float(dictcolumndata["T"])
+        column_R1 = float(dictcolumndata["R1"])
+        column_D = float(dictcolumndata["D"])
+        column_B = float(dictcolumndata["B"])
 
     dict_cleat_data = get_angledata(cleat_sec)
-    cleat_legsize = int(dict_cleat_data[QString("A")])
-    cleat_legsize_1 = int(dict_cleat_data[QString("B")])
-    cleat_thk = int(dict_cleat_data[QString("t")])
+    cleat_legsize = int(dict_cleat_data["A"])
+    cleat_legsize_1 = int(dict_cleat_data["B"])
+    cleat_thk = int(dict_cleat_data["t"])
 # ####################Calculation Begins########################
     pitch = 0.0
     gauge = 0.0

@@ -41,7 +41,7 @@ from ui_popUpWindow import Ui_Capacitydetals
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
-from ui_ask_a_question import Ui_AskQuestion
+from ui_ask_question import Ui_AskQuestion
 from utilities import osdag_display_shape
 from Svg_Window import SvgWindow
 

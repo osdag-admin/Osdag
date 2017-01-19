@@ -11,8 +11,6 @@ Created on 11-May-2015
 @author: deepa
 '''
 
-from bolt import Bolt
-from nut import Nut 
 import copy
 import numpy
 

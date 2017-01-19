@@ -10,11 +10,7 @@ Created on 11-May-2015
 '''
 
 import numpy
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-
 import copy
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from OCC.gp import gp_Pnt
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
@@ -31,7 +27,6 @@ class BeamWebBeamWeb(object):
         self.beamModel = None
         self.angleModel = None
         self.angleLeftModel = None
-#         self.notchModel = None
         self.clearDist = 20.0  # This distance between edge of the column web/flange and beam cross section
         
     def create_3dmodel(self):
@@ -39,8 +34,7 @@ class BeamWebBeamWeb(object):
         self.create_beam_geometry()
         self.create_angle_geometry()
         self.create_nut_bolt_array()
-#         self.createNotchGeometry()
-        
+
         # Call for create_model
         self.columnModel = self.column.create_model()
         self.beamModel = self.beam.create_model()

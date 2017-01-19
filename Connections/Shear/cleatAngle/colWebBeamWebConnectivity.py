@@ -5,14 +5,7 @@ Created on 11-May-2015
 '''
 
 import numpy
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-from bolt import Bolt
-from nut import Nut 
-from ModelUtils import *
 import copy
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 

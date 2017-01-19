@@ -3,14 +3,8 @@ Created on 16-Mar-2016
 
 @author: reshma
 '''
-import sys
 import time
 import math
-import pdfkit
-# import os.path
-# import pickle
-from numpy.core.defchararray import rstrip
-from PyQt4.Qt import QString
 
 
 def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data, reportsummary, filename, folder):
@@ -84,24 +78,24 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     cleat_sec = str(uiobj['cleat']['section'])
 
     #     dict_beam_data  = get_beamdata(beam_sec)
-    beam_tw = str(float(dict_beam_data[QString("tw")]))
-    beam_f_t = str(float(dict_beam_data[QString("T")]))
-    beam_d = str(float(dict_beam_data[QString("D")]))
-    beam_R1 = str(float(dict_beam_data[QString("R1")]))
-    beam_B = str(float(dict_beam_data[QString("B")]))
-    beam_D = str(float(dict_beam_data[QString("D")]))
+    beam_tw = str(float(dict_beam_data["tw"]))
+    beam_f_t = str(float(dict_beam_data["T"]))
+    beam_d = str(float(dict_beam_data["D"]))
+    beam_R1 = str(float(dict_beam_data["R1"]))
+    beam_B = str(float(dict_beam_data["B"]))
+    beam_D = str(float(dict_beam_data["D"]))
 
     #      dictcolumndata = get_columndata(column_sec)
-    column_w_t = str(float(dict_col_data[QString("tw")]))
-    column_f_t = str(float(dict_col_data[QString("T")]))
-    column_R1 = str(float(dict_col_data[QString("R1")]))
-    column_D = str(float(dict_col_data[QString("D")]))
-    column_B = str(float(dict_col_data[QString("B")]))
+    column_w_t = str(float(dict_col_data["tw"]))
+    column_f_t = str(float(dict_col_data["T"]))
+    column_R1 = str(float(dict_col_data["R1"]))
+    column_D = str(float(dict_col_data["D"]))
+    column_B = str(float(dict_col_data["B"]))
 
     #     dict_cleat_data = get_angledata(cleat_sec)
-    cleat_legsize = str(int(dict_cleat_data[QString("A")]))
-    cleat_legsize_1 = str(int(dict_cleat_data[QString("B")]))
-    cleat_thk = str(int(dict_cleat_data[QString("t")]))
+    cleat_legsize = str(int(dict_cleat_data["A"]))
+    cleat_legsize_1 = str(int(dict_cleat_data["B"]))
+    cleat_thk = str(int(dict_cleat_data["t"]))
 
     # 'Size (mm)'
     #     weld_Thick = str(uiobj['Weld']['Size (mm)'])

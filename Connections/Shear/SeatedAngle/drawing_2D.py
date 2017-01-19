@@ -1572,7 +1572,6 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
 
-
         nc = self.data_object.no_of_col
         bolt_r = self.data_object.bolt_dia / 2
         ptList = []
@@ -1600,6 +1599,49 @@ class Seat2DCreatorTop(object):
                     self.data_object.draw_dimension_outer_arrow(dwg, np.array(ptList[0]), np.array(ptList[1]),
                                                                 str(int(self.data_object.gauge)) + " mm", params)
 
+        # ===============================  Beam Information  ========================================
+        beam_pt = self.SB1 + (self.data_object.beam_length / 2) * np.array([1, 0])
+        theta = 45
+        offset = 80
+        text_up = "Beam " + self.data_object.beam_designation
+        text_down = ""
+        element = ""
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+
+        # =================================  Column Information  ========================================
+
+        ptSecA = self.SA1 + (self.data_object.col_depth / 2) * np.array([1, 0])
+        ptSecB = ptSecA + (120 * np.array([0, 1]))
+        txt_pt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
+        line = dwg.add(dwg.line(ptSecA, ptSecB).stroke('black', width=2.5, linecap='square'))
+        start_arrow = self.data_object.add_end_marker(dwg)
+        self.data_object.draw_start_arrow(line, start_arrow)
+        text = "Column " + self.data_object.col_designation
+        dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=28))
+
+        # ====================================  Label Gap Distance  =======================================
+        ptG1 = self.SG + 50 * np.array([0, -1])
+        ptG2 = self.SB4 + 20 * np.array([1, 0])
+        offset = 1
+        params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
+        self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
+        # ===============================  Draw Faint line for Gap Distance  ===============================
+        pt_L_G1x = self.SG
+        pt_L_G1y = ptG1  + 40 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_L_G1x, pt_L_G1y, dwg)
+
+        pt_R_G2x = self.SB4
+        pt_R_G2y = ptG2 + 70 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
+
+        # ================================  2D view name  ==============================================
+        ptx = self.SK + 270 * np.array([0, 1])
+        dwg.add(dwg.text('Top view (Sec A-A) (All distances are in "mm")', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+        dwg.save()
+        print"########### Saved Column Flange Beam Flange Top ########### "
+
+
+
         # Draw Faint line to represent edge distance
         ptB = self.FP5 + self.data_object.plateEdge_dist * np.array([1, 0]) + (col) * self.data_object.gauge * np.array(
             [1, 0]) + self.data_object.edge_dist * np.array([1, 0])
@@ -1614,26 +1656,6 @@ class Seat2DCreatorTop(object):
         offset = self.data_object.beam_width / 2 + self.data_object.col_flange_thk + self.data_object.col_R1 + 100
         params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim": 10}
         self.data_object.draw_dimension_outer_arrow(dwg, ptx, ptY, str(int(self.data_object.edge_dist)) + " mm", params)
-
-        # Beam Information
-        beam_pt = self.FA1 + (self.data_object.beam_length / 2) * np.array([1, 0])
-        theta = 55
-        offset = 80
-        text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
-
-        # Column Information
-
-        ptSecA = self.FJ + ((self.data_object.col_depth / 2.5) * np.array([1, 0]))
-        ptSecB = ptSecA + (120 * np.array([0, 1]))
-        txt_pt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
-        line = dwg.add(dwg.line((ptSecA), (ptSecB)).stroke('black', width=2.5, linecap='square'))
-        start_arrow = self.data_object.add_end_marker(dwg)
-        self.data_object.draw_start_arrow(line, start_arrow)
-        text = "Column " + self.data_object.col_designation
-        dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=28))
 
         # Plate  Information
         plt_pt = self.FP3
@@ -1666,25 +1688,7 @@ class Seat2DCreatorTop(object):
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, weldPt, theta, "SE", offset, text_up, text_down, element)
 
-        # Gap Informatoin
-        ptG1 = self.FF + 50 * np.array([0, -1])
-        ptG2 = ptG1 + 20 * np.array([1, 0])
-        offset = 1
-        params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
-        self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
-        # Draw Faint Lines to representation of Gap distance #
-        ptA = self.FF
-        ptB = ptG1
-        self.data_object.draw_faint_line(ptA, ptB, dwg)
-        ptC = self.FA1
-        ptD = ptG2
-        self.data_object.draw_faint_line(ptC, ptD, dwg)
 
-        # 2D view name
-        ptx = self.FG + 270 * np.array([0, 1])
-        dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        dwg.save()
-        print"$$$$$$$$$ Saved Column Flange Beam Flange Top $$$$$$$$$$$$"
 
     def call_CWBF_top(self, file_name):
         vb_ht = str(float(self.data_object.col_depth) + 750)

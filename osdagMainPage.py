@@ -108,7 +108,10 @@ class OsdagMainWindow(QMainWindow):
 
     def show_desgin_connection(self):
 
-        folder = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..', '..', 'Osdag_workspace'), 'All Files (*)')
+        options = QFileDialog.Options()
+        folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
+
+        #folder = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','..', 'Osdag_workspace'), 'All Files (*)')
         folder = str(folder)
         if not os.path.exists(folder):
             os.mkdir(folder, 0755)

@@ -736,7 +736,7 @@ class MainController(QMainWindow):
         '''
         uiObj = {}
         uiObj["Bolt"] = {}
-        uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
+        uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText()
         uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())
         uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
@@ -1056,6 +1056,11 @@ class MainController(QMainWindow):
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
         if os.name == 'nt':
 
             global display, start_display, app, _
@@ -1064,25 +1069,28 @@ class MainController(QMainWindow):
             lodedbkend = get_loaded_backend()
             from OCC.Display.backend import get_backend, have_backend
             from osdagMainSettings import backend_name
-            if (not have_backend() and backend_name() == "pyqt4"):
-                get_backend("qt-pyqt4")
+            if (not have_backend() and backend_name() == "pyqt5"):
+                get_backend("qt-pyqt5")
         else:
             global display, start_display, app, _, USED_BACKEND
+            if 'qt' in used_backend:
+                from OCC.Display.qtDisplay import qtViewer3d
+                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-            if not backend_str:
-                USED_BACKEND = self.get_backend()
-            elif backend_str in ['pyside', 'pyqt4']:
-                USED_BACKEND = backend_str
-            else:
-                raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-                sys.exit(1)
-
-            # Qt based simple GUI
-            if USED_BACKEND in ['pyqt4', 'pyside']:
-                if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.qtDisplay
-                    # from PyQt4 import QtCore, QtGui, QtOpenGL
-                    from PyQt5 import QtCore, QtGui, QtOpenGL
+            # if not backend_str:
+            #     USED_BACKEND = self.get_backend()
+            # elif backend_str in ['pyside', 'pyqt5']:
+            #     USED_BACKEND = backend_str
+            # else:
+            #     raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
+            #     sys.exit(1)
+            #
+            # # Qt based simple GUI
+            # if USED_BACKEND in ['pyqt5', 'pyside']:
+            #     if USED_BACKEND == 'pyqt5':
+            #         import OCC.Display.qtDisplay
+            #         # from PyQt4 import QtCore, QtGui, QtOpenGL
+            #         from PyQt5 import QtCore, QtGui, QtOpenGL
 
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import  qtViewer3d

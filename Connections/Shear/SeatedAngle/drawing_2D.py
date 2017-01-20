@@ -1494,19 +1494,19 @@ class Seat2DCreatorTop(object):
 
         ptSWB1x = (self.data_object.col_width / 2) + (self.data_object.col_web_thk / 2) + self.data_object.gap
         ptSWB1y = (self.data_object.col_depth - self.data_object.beam_width) / 2
-        self.SWB = np.array([ptSWB1x, ptSWB1y])
+        self.SWB1 = np.array([ptSWB1x, ptSWB1y])
 
         ptSWB2x = ptSWB1x + self.data_object.beam_length
         ptSWB2y = ptSWB1y
-        self.SWB = np.array([ptSWB2x, ptSWB2y])
+        self.SWB2 = np.array([ptSWB2x, ptSWB2y])
 
         ptSWB3x = ptSWB2x
         ptSWB3y = ptSWB2y + self.data_object.beam_width
-        self.SWB = np.array([ptSWB3x, ptSWB3y])
+        self.SWB3 = np.array([ptSWB3x, ptSWB3y])
 
         ptSWB4x = ptSWB1x
         ptSWB4y = ptSWB1y + self.data_object.beam_width
-        self.SWB = np.array([ptSWB4x, ptSWB4y])
+        self.SWB4 = np.array([ptSWB4x, ptSWB4y])
 
         # ========================  Top Angle plotting  ===================================
 
@@ -1610,7 +1610,7 @@ class Seat2DCreatorTop(object):
 
         # =================================  Column Information  ========================================
 
-        ptSecA = self.SA1 + (self.data_object.col_depth / 2) * np.array([1, 0])
+        ptSecA = self.SA + (self.data_object.col_flange_thk / 2) * np.array([1, 0])
         ptSecB = ptSecA + (120 * np.array([0, 1]))
         txt_pt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
         line = dwg.add(dwg.line(ptSecA, ptSecB).stroke('black', width=2.5, linecap='square'))
@@ -1743,30 +1743,49 @@ class Seat2DCreatorTop(object):
                     self.data_object.draw_dimension_outer_arrow(dwg, np.array(ptList[0]), np.array(ptList[1]),
                                                                 str(int(self.data_object.gauge)) + "mm", params)
 
-        # Cross section B-B and C-C
-        ptSecA = self.B + (20 * np.array([0, -1])) + (500 * np.array([1, 0]))
-        ptSecB = ptSecA + (50 * np.array([-1, 0]))
-        txt_pt = ptSecB + (70 * np.array([-1, 0])) + (20 * np.array([0, 1]))
-        txt = "B"
-        self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = self.G + (20 * np.array([0, 1])) + (500 * np.array([1, 0]))
-        ptSecD = ptSecC + (50 * np.array([-1, 0]))
-        txt_pt = ptSecD + (70 * np.array([-1, 0])) + (20 * np.array([0, 1]))
-        self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+        # ===============================  Beam Information  ========================================
+        beam_pt = self.SWB1 + (self.data_object.beam_length / 2) * np.array([1, 0])
+        theta = 45
+        offset = 80
+        text_up = "Beam " + self.data_object.beam_designation
+        text_down = ""
+        element = ""
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
 
-        dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
+        # =================================  Column Information  ========================================
 
-        ptSecA = self.I + (07 * np.array([0, -1])) + (0 * np.array([-1, 0]))
-        ptSecB = ptSecA + (50 * np.array([0, -1]))
-        txt_pt = ptSecB + (50 * np.array([0, -1])) + (15 * np.array([-1, 0]))
-        txt = "C"
-        self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = ptSecA + (530 * np.array([1, 0]))
-        ptSecD = ptSecC + (50 * np.array([0, -1]))
-        txt_pt = ptSecD + (50 * np.array([0, -1])) + (25 * np.array([-1, 0]))
-        self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+        ptSecA = self.SF + (self.data_object.col_width / 2) * np.array([1, 0])
+        ptSecB = ptSecA + (120 * np.array([0, 1]))
+        txt_pt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
+        line = dwg.add(dwg.line(ptSecA, ptSecB).stroke('black', width=2.5, linecap='square'))
+        start_arrow = self.data_object.add_end_marker(dwg)
+        self.data_object.draw_start_arrow(line, start_arrow)
+        text = "Column " + self.data_object.col_designation
+        dwg.add(dwg.text(text, insert=txt_pt, fill='black', font_family="sans-serif", font_size=28))
 
-        dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
+        # ====================================  Label Gap Distance  =======================================
+        ptG1 = self.SWJ + 50 * np.array([0, -1])
+        ptG2 = self.SWB4 + 20 * np.array([1, 0])
+        offset = 1
+        params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
+        self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
+
+        # ===============================  Draw Faint line for Gap Distance  ===============================
+        pt_L_G1x = self.SWJ
+        pt_L_G1y = ptG1 + 40 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_L_G1x, pt_L_G1y, dwg)
+
+        pt_R_G2x = self.SWB4
+        pt_R_G2y = ptG2 + 70 * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
+
+        # ================================  2D view name  ==============================================
+        ptx = self.SK + 270 * np.array([0, 1])
+        dwg.add(dwg.text('Top view (Sec A-A) (All distances are in "mm")', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+        dwg.save()
+        print"########### Saved Column Flange Beam Flange Top ########### "
+
+
 
         # Draw Faint line to represent edge distance
         ptB = self.A5 + self.data_object.plateEdge_dist * np.array([1, 0]) + (
@@ -1799,24 +1818,6 @@ class Seat2DCreatorTop(object):
                     self.data_object.beam_width / 2 + self.data_object.col_flange_thk + self.data_object.col_R1 + 50) * np.array(
             [0, -1])
         self.data_object.draw_faint_line(ptK, ptM, dwg)
-
-        # Beam Information
-        beam_pt = self.A1 + self.data_object.beam_length / 2 * np.array([1, 0])
-        theta = 60
-        offset = 100
-        text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
-
-        # column  Information
-        col_pt = self.H
-        theta = 70
-        offset = 270
-        text_up = "Column " + self.data_object.col_designation
-        text_down = " "
-        element = ""
-        self.data_object.draw_oriented_arrow(dwg, col_pt, theta, "SE", offset, text_up, text_down, element)
 
         # Plate  Information
         plt_pt = self.P3

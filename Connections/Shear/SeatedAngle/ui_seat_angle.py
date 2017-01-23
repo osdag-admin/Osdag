@@ -551,10 +551,6 @@ class Ui_MainWindow(object):
         self.combo_bolt_diameter.addItem(_fromUtf8(""))
         self.combo_bolt_diameter.addItem(_fromUtf8(""))
         self.combo_bolt_diameter.addItem(_fromUtf8(""))
-        self.combo_bolt_diameter.addItem(_fromUtf8(""))
-        self.combo_bolt_diameter.addItem(_fromUtf8(""))
-        self.combo_bolt_diameter.addItem(_fromUtf8(""))
-        self.combo_bolt_diameter.addItem(_fromUtf8(""))
         self.outputFrame_2 = QtGui.QFrame(self.dockWidgetContents)
         self.outputFrame_2.setGeometry(QtCore.QRect(988, 620, 320, 690))
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
@@ -1798,16 +1794,12 @@ class Ui_MainWindow(object):
         self.lbl_comboDiameter.setText(_translate("MainWindow", "<html><head/><body><p>Diameter (mm) <span style=\" color:#555500;\">*</span></p></body></html>", None))
         self.lbl_comboType.setText(_translate("MainWindow", "Type *", None))
         self.combo_bolt_diameter.setItemText(0, _translate("MainWindow", "Diameter of Bolt", None))
-        self.combo_bolt_diameter.setItemText(1, _translate("MainWindow", "5", None))
-        self.combo_bolt_diameter.setItemText(2, _translate("MainWindow", "6", None))
-        self.combo_bolt_diameter.setItemText(3, _translate("MainWindow", "8", None))
-        self.combo_bolt_diameter.setItemText(4, _translate("MainWindow", "10", None))
-        self.combo_bolt_diameter.setItemText(5, _translate("MainWindow", "12", None))
-        self.combo_bolt_diameter.setItemText(6, _translate("MainWindow", "16", None))
-        self.combo_bolt_diameter.setItemText(7, _translate("MainWindow", "20", None))
-        self.combo_bolt_diameter.setItemText(8, _translate("MainWindow", "24", None))
-        self.combo_bolt_diameter.setItemText(9, _translate("MainWindow", "30", None))
-        self.combo_bolt_diameter.setItemText(10, _translate("MainWindow", "36", None))
+        self.combo_bolt_diameter.setItemText(1, _translate("MainWindow", "12", None))
+        self.combo_bolt_diameter.setItemText(2, _translate("MainWindow", "16", None))
+        self.combo_bolt_diameter.setItemText(3, _translate("MainWindow", "20", None))
+        self.combo_bolt_diameter.setItemText(4, _translate("MainWindow", "24", None))
+        self.combo_bolt_diameter.setItemText(5, _translate("MainWindow", "30", None))
+        self.combo_bolt_diameter.setItemText(6, _translate("MainWindow", "36", None))
         self.label_44.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600; font-style:italic;\">Bolt</span></p></body></html>", None))
         self.label_45.setText(_translate("MainWindow", "Shear Capacity (kN)", None))
         self.label_46.setText(_translate("MainWindow", "<html><head/><body><p>Bearing Capacity (kN)</p></body></html>", None))
@@ -1973,3 +1965,13 @@ class Ui_MainWindow(object):
         self.actionQuit_seat_angle_design.setText(_translate("MainWindow", "Quit", None))
 
 import icons_rc
+
+if __name__ == "__main__":
+    import sys
+    app = QtGui.QApplication(sys.argv)
+    MainWindow = QtGui.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+

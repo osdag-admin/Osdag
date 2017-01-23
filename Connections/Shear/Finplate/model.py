@@ -81,7 +81,7 @@ def get_beamdata(sect):
     while(designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            retDict[colName] = designQuery.value(i)
 
     # print(retDict[QString("tw")])
 
@@ -119,7 +119,7 @@ def get_columndata(sect):
     while(designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            retDict[colName] = designQuery.value(i)
 
     return retDict
 

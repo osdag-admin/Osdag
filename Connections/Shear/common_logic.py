@@ -141,11 +141,11 @@ class CommonDesignLogic(object):
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
-        fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.uiObj["Weld"]['Size (mm)']
-        plate_width = self.resultObj['Plate']['width']
-        plate_thick = self.uiObj['Plate']['Thickness (mm)']
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
+        fillet_length = float(self.resultObj['Plate']['height'])
+        fillet_thickness = float(self.uiObj["Weld"]['Size (mm)'])
+        plate_width = float(self.resultObj['Plate']['width'])
+        plate_thick = float(self.uiObj['Plate']['Thickness (mm)'])
+        bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
         bolt_r = bolt_dia / 2
         bolt_R = self.bolt_R
         nut_R = bolt_R

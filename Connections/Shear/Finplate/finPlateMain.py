@@ -741,22 +741,22 @@ class MainController(QMainWindow):
         uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
         uiObj["Weld"] = {}
-        uiObj["Weld"]['Size (mm)'] = self.ui.comboWldSize.currentText().toInt()[0]
+        uiObj["Weld"]['Size (mm)'] = self.ui.comboWldSize.currentText()
 
         uiObj['Member'] = {}
         uiObj['Member']['BeamSection'] = str(self.ui.combo_Beam.currentText())
         uiObj['Member']['ColumSection'] = str(self.ui.comboColSec.currentText())
         uiObj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
-        uiObj['Member']['fu (MPa)'] = self.ui.txtFu.text().toInt()[0]
-        uiObj['Member']['fy (MPa)'] = self.ui.txtFy.text().toInt()[0]
+        uiObj['Member']['fu (MPa)'] = self.ui.txtFu.text()
+        uiObj['Member']['fy (MPa)'] = self.ui.txtFy.text()
 
         uiObj['Plate'] = {}
-        uiObj['Plate']['Thickness (mm)'] = self.ui.comboPlateThick_2.currentText().toInt()[0]
-        uiObj['Plate']['Height (mm)'] = self.ui.txtPlateLen.text().toInt()[0]  # changes the label length to height 
-        uiObj['Plate']['Width (mm)'] = self.ui.txtPlateWidth.text().toInt()[0]
+        uiObj['Plate']['Thickness (mm)'] = self.ui.comboPlateThick_2.currentText()
+        uiObj['Plate']['Height (mm)'] = self.ui.txtPlateLen.text()  # changes the label length to height
+        uiObj['Plate']['Width (mm)'] = self.ui.txtPlateWidth.text()
 
         uiObj['Load'] = {}
-        uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text().toInt()[0]
+        uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
 
         return uiObj
 
@@ -838,22 +838,24 @@ class MainController(QMainWindow):
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
+            #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf = path_wkthmltopdf)
 
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        pdfkit.from_file(fileName,
-                         str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")),
-                         configuration=config, options=options)
+        file_tup = (QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)"))
+        pref_file = str(file_tup[0])
+        print "#################",file
+        pdfkit.from_file(fileName,pref_file,configuration=config, options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As",
+        fileName, pat = QFileDialog.getSaveFileName(self, "Save File As",
                                                                    str(self.folder) + "/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
@@ -1193,13 +1195,13 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text().isEmpty() or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text()== ' ' < 0 or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
-        elif self.ui.txtFy.text().isEmpty() or float(self.ui.txtFy.text()) == 0:
+        elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
-        elif self.ui.txtShear.text().isEmpty() or float(str(self.ui.txtShear.text())) == 0:
+        elif self.ui.txtShear.text() == ' ' or float(str(self.ui.txtShear.text())) == 0:
             QMessageBox.about(self, "Information", "Please select Factored shear load")
 
         elif self.ui.comboDiameter.currentIndex() == 0:
@@ -1351,7 +1353,7 @@ class MainController(QMainWindow):
         dictcoldata = self.fetchColumnPara()
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
+        bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)

@@ -122,22 +122,22 @@ def finConn(uiObj):
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumSection']
     connectivity = uiObj['Member']['Connectivity']
-    beam_fu = uiObj['Member']['fu (MPa)']
-    beam_fy = uiObj['Member']['fy (MPa)']
+    beam_fu = float(uiObj['Member']['fu (MPa)'])
+    beam_fy = float(uiObj['Member']['fy (MPa)'])
 
-    shear_load = uiObj['Load']['ShearForce (kN)']
+    shear_load = float(uiObj['Load']['ShearForce (kN)'])
 
-    bolt_dia = uiObj['Bolt']['Diameter (mm)']
+    bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
     bolt_type = uiObj["Bolt"]["Type"]
-    bolt_grade = uiObj['Bolt']['Grade']
+    bolt_grade = float(uiObj['Bolt']['Grade'])
 
-    web_plate_t = uiObj['Plate']['Thickness (mm)']
-    web_plate_w = uiObj['Plate']['Width (mm)']
-    web_plate_l = uiObj['Plate']['Height (mm)']
-    web_plate_fu = uiObj['Member']['fu (MPa)']
-    web_plate_fy = uiObj['Member']['fy (MPa)']
+    web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
+    web_plate_w = float(uiObj['Plate']['Width (mm)'])
+    web_plate_l = float(uiObj['Plate']['Height (mm)'])
+    web_plate_fu = float(uiObj['Member']['fu (MPa)'])
+    web_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
-    weld_t = uiObj["Weld"]['Size (mm)']
+    weld_t = float(uiObj["Weld"]['Size (mm)'])
 
 #####################################################################################
 
@@ -263,10 +263,10 @@ def finConn(uiObj):
         kb = round(kb, 3)
          
         # Bolt capacity calculation
-        t_thinner = min(beam_w_t.real, web_plate_t.real);
+        t_thinner = min(beam_w_t, web_plate_t);
         bolt_planes = 1
-        bolt_shear_capacity = bolt_shear(bolt_dia, bolt_planes, bolt_fu).real;
-        bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, beam_fu, kb).real;
+        bolt_shear_capacity = bolt_shear(bolt_dia, bolt_planes, bolt_fu);
+        bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, beam_fu, kb);
          
         bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
         if shear_load != 0:

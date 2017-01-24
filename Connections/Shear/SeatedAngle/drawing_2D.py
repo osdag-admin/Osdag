@@ -1395,32 +1395,54 @@ class Seat2DCreatorTop(object):
         #          COLUMN WEB BEAM FLANGE CONNECTIVITY (TOP VIEW)
         # --------------------------------------------------------------------------------------------------------------
         # ========================  Column plotting  ===================================
-        self.SWA = np.array([0, 0])
-        self.SWB = self.SWA + self.data_object.col_flange_thk * np.array([1, 0])
 
-        ptSWCx = self.SWB
-        ptSWCy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
+        ptSWAx = 0
+        ptSWAy = 0
+        self.SWA = np.array([ptSWAx, ptSWAy])
+
+        ptSWBx = 0
+        ptSWBy = ptSWAy + self.data_object.col_flange_thk
+        self.SWB = np.array([ptSWBx, ptSWBy])
+
+        ptSWCx = ptSWBx + self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
+        ptSWCy = ptSWBy
         self.SWC = np.array([ptSWCx, ptSWCy])
 
-        ptSWDx = self.data_object.col_depth - self.data_object.col_flange_thk
-        ptSWDy = ptSWCy
+        ptSWDx = ptSWCx
+        ptSWDy = (self.data_object.col_depth - self.data_object.col_flange_thk)
         self.SWD = np.array([ptSWDx, ptSWDy])
 
-        self.SWE = self.SWA + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([1, 0])
-        self.SWF = self.SWE + self.data_object.col_flange_thk * np.array([1, 0])
-        self.SWG = self.SWF + self.data_object.col_width * np.array([0, 1])
-        self.SWH = self.SWG + self.data_object.col_flange_thk * np.array([0, 1])
+        ptSWEx = ptSWBx
+        ptSWEy = ptSWDy
+        self.SWE = np.array([ptSWEx, ptSWEy])
 
-        ptSWIx = ptSWDx
-        ptSWIy = ptSWDy + self.data_object.col_web_thk
+        ptSWFx = ptSWEx
+        ptSWFy = (self.data_object.col_depth + self.data_object.col_flange_thk)
+        self.SWF = np.array([ptSWFx, ptSWFy])
+
+        ptSWGx = ptSWFx + self.data_object.col_width
+        ptSWGy = ptSWFy
+        self.SWG = np.array([ptSWGx, ptSWGy])
+
+        ptSWHx = ptSWGx
+        ptSWHy = ptSWDy
+        self.SWH = np.array([ptSWHx, ptSWHy])
+
+        ptSWIx = ptSWDx + self.data_object.col_web_thk
+        ptSWIy = ptSWDy
         self.SWI = np.array([ptSWIx, ptSWIy])
 
-        ptSWJx = ptSWCx
-        ptSWJy = ptSWCy + self.data_object.col_web_thk
+        ptSWJx = ptSWIx
+        ptSWJy = ptSWCy
         self.SWJ = np.array([ptSWJx, ptSWJy])
 
-        self.SWK = self.SWB + self.data_object.col_width
-        self.SWL = self.SWA + self.data_object.col_width
+        ptSWKx = ptSWBx + self.data_object.col_width
+        ptSWKy = ptSWBy
+        self.SWK = np.array([ptSWKx, ptSWKy])
+
+        ptSWLx = ptSWAx + self.data_object.col_width
+        ptSWLy = 0
+        self.SWL = np.array([ptSWLx, ptSWLy])
 
         # ========================  Beam plotting  ===================================
 
@@ -1619,12 +1641,12 @@ class Seat2DCreatorTop(object):
         # vb_ht = str(float(self.data_object.col_depth) + 750)
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-50 -300 1500 1020'))
 
-        dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWE, self.SWF, self.SWG, self.SWH, self.SWI,
-                                     self.SWJ, self.SWK, self.SWL, self.SWA], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWE, self.SWF, self.SWG, self.SWH, self.SWI, self.SWJ, self.SWK, self.SWL,
+                                     self.SWA], stroke='blue', fill='none', stroke_width=2.5))
+
         dwg.add(dwg.line(self.SB1, self.SB4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWA3, self.SWA4, self.SWA5, self.SWA6, self.SWA1], stroke='blue',
-                             fill='none', stoke_width=2.5))
+        # dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWA3, self.SWA4, self.SWA5, self.SWA6, self.SWA1], stroke='blue', fill='none', stoke_width=2.5))
 
         # ===============================  Cross section B-B  ===============================================
 
@@ -1685,7 +1707,7 @@ class Seat2DCreatorTop(object):
         text_up = "Beam " + self.data_object.beam_designation
         text_down = ""
         element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         # =================================  Column Information  ========================================
 

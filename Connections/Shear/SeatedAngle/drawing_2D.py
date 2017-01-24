@@ -1973,17 +1973,28 @@ class Seat2DCreatorSide(object):
         ptSWA10y = ptSWA9y
         self.SWA10 = np.array([ptSWA10x, ptSWA10y])
 
-        # ============================  Top Angle  ===================================
+        ptSWPx = self.data_object.beam_width / 2
+        ptSWPy = (self.data_object.col_length - self.data_object.beam_depth) / 2
+        self.SWP = (ptSWPx, ptSWPy)
 
-        ptSWB1x = (self.data_object.col_depth - self.data_object.beam_width) / 2
-        ptSWB1y = (self.data_object.top_angle_legsize_vertical - self.data_object.top_angle_thickness)
+        ptSWQx = self.data_object.angle_length / 2
+        ptSWQy = ptSWPy
+        self.SWQ = (ptSWQx, ptSWQy)
+
+        # ============================  Top Angle  ===================================
+        ptSWB6x = (self.data_object.col_depth - self.data_object.angle_length) / 2
+        ptSWB6y = ptSWQy
+        self.SWB6 = (ptSWB6x, ptSWB6y)
+
+        ptSWB1x = ptSWB6x
+        ptSWB1y = ptSWQy - self.data_object.top_angle_thickness
         self.SWB1 = np.array([ptSWB1x, ptSWB1y])
 
-        ptSWB2x = ptSWB1x
-        ptSWB2y = (self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.top_angle_legsize_vertical
+        ptSWB2x = ptSWB6x
+        ptSWB2y = ptSWQy - self.data_object.top_angle_legsize_vertical
         self.SWB2 = np.array([ptSWB2x, ptSWB2y])
 
-        ptSWB3x = ptSWB1x + self.data_object.angle_length
+        ptSWB3x = ptSWB6x + self.data_object.angle_length
         ptSWB3y = ptSWB2y
         self.SWB3 = np.array([ptSWB3x, ptSWB3y])
 
@@ -1991,23 +2002,34 @@ class Seat2DCreatorSide(object):
         ptSWB4y = ptSWB1y
         self.SWB4 = np.array([ptSWB4x, ptSWB4y])
 
+        ptSWB5x = ptSWB6x + self.data_object.angle_length
+        ptSWB5y = ptSWB6y
+        self.SWB5 = (ptSWB5x, ptSWB5y)
+
         # ============================  Seat Angle  ===================================
+        ptSWB11x = ptSWB6x
+        ptSWB11y = ptSWQy + self.data_object.beam_depth
+        self.SWB11 = (ptSWB11x, ptSWB11y)
 
-        ptSWB5x = ptSWB3x
-        ptSWB5y = (self.data_object.seat_angle_legsize_vertical - self.data_object.seat_angle_thickness)
-        self.SWB5 = np.array([ptSWB5x, ptSWB5y])
+        ptSWB10x = ptSWB11x
+        ptSWB10y = ptSWB11y + self.data_object.seat_angle_thickness
+        self.SWB10 = np.array([ptSWB10x, ptSWB10y])
 
-        ptSWB6x = ptSWB3x
-        ptSWB6y = (self.data_object.col_length + self.data_object.beam_depth) / 2 + self.data_object.seat_angle_legsize_vertical
-        self.SWB6 = np.array([ptSWB6x, ptSWB6y])
+        ptSWB9x = ptSWB11x
+        ptSWB9y = ptSWB11y + self.data_object.seat_angle_legsize_vertical
+        self.SWB9 = np.array([ptSWB9x, ptSWB9y])
 
-        ptSWB7x = ptSWB1x
-        ptSWB7y = ptSWB6y
+        ptSWB8x = ptSWB9x + self.data_object.angle_length
+        ptSWB8y = ptSWB9y
+        self.SWB8 = np.array([ptSWB8x, ptSWB8y])
+
+        ptSWB7x = ptSWB10x + self.data_object.angle_length
+        ptSWB7y = ptSWB10y
         self.SWB7 = np.array([ptSWB7x, ptSWB7y])
 
-        ptSWB8x = ptSWB1x
-        ptSWB8y = (self.data_object.seat_angle_legsize_vertical - self.data_object.seat_angle_thickness)
-        self.SWB8 = np.array([ptSWB8x, ptSWB8y])
+        ptSWB12x = ptSWB11x + self.data_object.angle_length
+        ptSWB12y = ptSWB11y
+        self.SWB12 = (ptSWB12x, ptSWB12y)
 
     # ------------------------------------------------------------------------------------------------------------
 
@@ -2015,15 +2037,16 @@ class Seat2DCreatorSide(object):
         # vb_width = str(float(3.5 * self.data_object.col_depth))
         # vb_ht = str(float(1.4 * self.data_object.col_length))
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-410 -350 1200 1500'))
-        # dwg.add(dwg.rect(insert=self.SWA, size=(self.data_object.col_depth, self.data_object.col_length), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWA], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SWE, self.SWH).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.SWF, self.SWG).stroke('blue', width=2.5, linecap='square'))
 
         dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWA3, self.SWA4, self.SWA5, self.SWA6, self.SWA7, self.SWA8, self.SWA9, self.SWA10,
                                      self.SWA11, self.SWA12, self.SWA1], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.SWB1, self.SWB2, self.SWB3, self.SWB4, self.SWB1], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.SWB5, self.SWB6, self.SWB7, self.SWB8, self.SWB5], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SWB6, self.SWB2, self.SWB3, self.SWB5, self.SWB6], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.SWB1, self.SWB4).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.polyline(points=[self.SWB12, self.SWB8, self.SWB9, self.SWB11, self.SWB12], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.SWB10, self.SWB7).stroke('blue', width=2.5, linecap='square'))
 
         # ===============================  Beam Information  ========================================
         beam_pt = self.SWA4 + (self.data_object.beam_width / 2 + 50) * np.array([1, 0])

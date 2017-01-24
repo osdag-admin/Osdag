@@ -4,8 +4,6 @@ Created on 31-Mar-2016
 @author: deepa
 '''
 import sys
-# from PyQt4 import QtGui
-
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from ui_OsdagMainPage import Ui_MainWindow
 from ui_tutorial import Ui_Tutorial
@@ -188,6 +186,7 @@ class OsdagMainWindow(QMainWindow):
 
     def unavailable(self):
         QMessageBox.about(self, "INFO", "This module is not available in this version.")
+        # Following code should maintain for future coding.
         # self.ui.btn_beamCol.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_compression.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_flexural.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))

@@ -90,7 +90,6 @@ class DesignPreferences(QDialog):
         uiObj = self.main_controller.getuser_inputs()
         boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = float(uiObj["Bolt"]["Grade"])
-        # clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
@@ -409,10 +408,6 @@ class MainController(QMainWindow):
     def convertColComboToBeam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
-            # --------------------------------------- self.ui.comboColSec.clear()
-            # ---------------------------------------- self.ui.combo_Beam.clear()
-            # ---------------------------- self.ui.comboColSec.setCurrentIndex(0)
-            # ----------------------------- self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.lbl_beam.setText(" Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
 
@@ -528,7 +523,7 @@ class MainController(QMainWindow):
     def save_cadImages(self):
 
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
@@ -583,7 +578,6 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
-            # newlist = ['Select plate thickness']
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -846,10 +840,9 @@ class MainController(QMainWindow):
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        file_tup = (QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)"))
-        pref_file = str(file_tup[0])
-        print "#################",file
-        pdfkit.from_file(fileName,pref_file,configuration=config, options=options)
+        file_type = "PDF (*.pdf)"
+        fname,_ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        pdfkit.from_file(fileName,fname,configuration=config, options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
 
@@ -1074,25 +1067,11 @@ class MainController(QMainWindow):
             if (not have_backend() and backend_name() == "pyqt5"):
                 get_backend("qt-pyqt5")
         else:
+
             global display, start_display, app, _, USED_BACKEND
             if 'qt' in used_backend:
                 from OCC.Display.qtDisplay import qtViewer3d
                 QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-            # if not backend_str:
-            #     USED_BACKEND = self.get_backend()
-            # elif backend_str in ['pyside', 'pyqt5']:
-            #     USED_BACKEND = backend_str
-            # else:
-            #     raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-            #     sys.exit(1)
-            #
-            # # Qt based simple GUI
-            # if USED_BACKEND in ['pyqt5', 'pyside']:
-            #     if USED_BACKEND == 'pyqt5':
-            #         import OCC.Display.qtDisplay
-            #         # from PyQt4 import QtCore, QtGui, QtOpenGL
-            #         from PyQt5 import QtCore, QtGui, QtOpenGL
 
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import  qtViewer3d
@@ -1136,7 +1115,6 @@ class MainController(QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
             if self.ui.comboColSec.currentIndex() == 0:
-                # QtGui.QMessageBox.about(self,"Information", "Please select column section")
                 return
             column = self.ui.comboColSec.currentText()
             dictBeamData = self.fetchBeamPara()
@@ -1393,11 +1371,11 @@ class MainController(QMainWindow):
         elif self.commLogicObj.component == "Column":
             final_model = self.commLogicObj.connectivityObj.columnModel
 
-        elif self.commLogicObj.component == "Finplate":
+        elif self.commLogicObj.component == "Plate":
             cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
                        self.commLogicObj.connectivityObj.weldModelRight,
-                       self.commLogicObj.connectivityObj.plateModel,
-                       self.commLogicObj.connectivityObj.nutBoltArray.getModels()]
+                       self.commLogicObj.connectivityObj.plateModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            print"cad parts for Plate",cadlist
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
@@ -1418,9 +1396,12 @@ class MainController(QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        print "igs filename:", fileName
         fName = str(fileName)
+        print "igs fName:", fileName
+
         file_extension = fName.split(".")[-1]
 
         if file_extension == 'igs':
@@ -1449,6 +1430,8 @@ class MainController(QMainWindow):
             stl_writer.SetASCIIMode(True)
             stl_writer.Write(shape, fName)
 
+        self.fuse_model = None
+
         QMessageBox.about(self, 'Information', "File saved")
 
     def callFin2D_Drawing(self, view):  # call2D_Drawing(self,view)
@@ -1466,9 +1449,7 @@ class MainController(QMainWindow):
                                          self.alist[8], self.display, self.folder, self.connection)
 
         if view != 'All':
-            # fileName = ''
 
-            #           app2 = QtGui.QApplication(sys.argv)
             if view == "Front":
                 filename = self.folder + "/images_html/finFront.svg"
 
@@ -1485,14 +1466,14 @@ class MainController(QMainWindow):
             fname = ''
             commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 
-    def save_2D_images(self, view):
-
-        fileName = QFileDialog.getSaveFileName(self,
-                                                     "Save as PNG", str(self.folder) + '/untitled.png',
-                                                     "PNG files (*.png)")
-        f = open(self.callFin2D_Drawing(view), 'w')
-        f.close()
-        QMessageBox.about(self, 'Information', "Image Saved")
+    # def save_2D_images(self, view):
+    #
+    #     fileName = QFileDialog.getSaveFileName(self,
+    #                                                  "Save as PNG", str(self.folder) + '/untitled.png',
+    #                                                  "PNG files (*.png)")
+    #     f = open(self.callFin2D_Drawing(view), 'w')
+    #     f.close()
+    #     QMessageBox.about(self, 'Information', "Image Saved")
 
     def closeEvent(self, event):
         '''

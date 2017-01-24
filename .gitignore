@@ -1,9 +1,9 @@
 
-*.log
+**/*.log
 *.pyo
 ~*
 output/*
 *.xml
-*.txt
+**/*.txt
 *.pyc
 .idea/

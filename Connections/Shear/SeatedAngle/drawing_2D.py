@@ -1934,12 +1934,16 @@ class Seat2DCreatorSide(object):
         self.SWA2 = np.array([ptSWA2x, ptSWA2y])
 
         ptSWA3x = ptSA2x
-        ptSWA3y = self.data_object.beam_flange_thk
+        ptSWA3y = ptSWA2y + self.data_object.beam_flange_thk
         self.SWA3 = np.array([ptSWA3x, ptSWA3y])
 
         ptSWA12x = ptSWA1x
-        ptSWA12y = self.data_object.beam_flange_thk
+        ptSWA12y = ptSWA1y+ self.data_object.beam_flange_thk
         self.SWA12 = np.array([ptSWA12x, ptSWA12y])
+
+        ptSWA4x = ptSWA12x + (self.data_object.beam_width / 2 + self.data_object.beam_web_thk / 2)
+        ptSWA4y = ptSWA3y
+        self.SWA4 = np.array([ptSWA4x, ptSWA4y])
 
         ptSWA8x = ptSWA1x
         ptSWA8y = (self.data_object.col_length + self.data_object.beam_depth) / 2
@@ -1957,20 +1961,16 @@ class Seat2DCreatorSide(object):
         ptSWA6y = ptSWA7y - self.data_object.beam_flange_thk
         self.SWA6 = np.array([ptSWA6x, ptSWA6y])
 
-        ptSWA5x = self.data_object.beam_width / 2 + self.data_object.beam_web_thk / 2
-        ptSWA5y = (self.data_object.col_length + self.data_object.beam_depth) / 2
+        ptSWA5x = ptSWA4x
+        ptSWA5y = ptSWA6y
         self.SWA5 = np.array([ptSWA5x, ptSWA5y])
 
-        ptSWA4x = self.data_object.beam_width / 2 + self.data_object.beam_web_thk / 2
-        ptSWA4y = (self.data_object.col_length - self.data_object.beam_depth) / 2
-        self.SWA4 = np.array([ptSWA4x, ptSWA4y])
-
-        ptSWA11x = self.data_object.beam_width / 2 - self.data_object.beam_web_thk / 2
-        ptSWA11y = (self.data_object.col_length - self.data_object.beam_depth) / 2
+        ptSWA11x = ptSWA12x + (self.data_object.beam_width / 2 - self.data_object.beam_web_thk / 2)
+        ptSWA11y = ptSWA12y
         self.SWA11 = np.array([ptSWA11x, ptSWA11y])
 
         ptSWA10x = ptSWA11x
-        ptSWA10y = (self.data_object.col_length + self.data_object.beam_depth) / 2
+        ptSWA10y = ptSWA9y
         self.SWA10 = np.array([ptSWA10x, ptSWA10y])
 
         # ============================  Top Angle  ===================================

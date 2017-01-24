@@ -54,8 +54,8 @@ class SeatCommonData(object):
         self.no_of_rows = output_dict['Bolt']["No. of Row"]
         self.no_of_col = output_dict['Bolt']["No. of Column"]
         self.angle_length = output_dict['SeatAngle']['Length (mm)']
-        self.col_length = 700
-        self.beam_length = 350
+        self.col_length = 1000
+        self.beam_length = 500
         self.gap = 20  # Clear distance between column and beam
         # self.notch_L = (self.col_width - (self.col_web_thk + 40)) / 2.0
         # self.notch_ht = self.col_flange_thk + self.col_R1
@@ -1033,7 +1033,7 @@ class Seat2DCreatorFront(object):
 
     def call_CWBF_front(self, file_name):
 
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-410 -350 1200 1300'))
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-410 -350 1300 1600'))
         dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWA], stroke='blue', fill='none', stroke_width=2.5))
         # ------------------------  here "[5,5]" represents hatching of line  ------------------------
         dwg.add(dwg.line(self.SWE, self.SWH).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
@@ -1189,7 +1189,7 @@ class Seat2DCreatorFront(object):
         # self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
 
         # ======================================   2D view name  =======================================
-        ptx = self.SWA + np.array([1, 0]) + 910 * np.array([0, 1])
+        ptx = self.SWA + np.array([1, 0]) + 1100 * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C) (All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
         print"########### Column Web Beam Flange Saved ############"
@@ -2049,7 +2049,7 @@ class Seat2DCreatorSide(object):
         dwg.add(dwg.line(self.SWB10, self.SWB7).stroke('blue', width=2.5, linecap='square'))
 
         # ===============================  Beam Information  ========================================
-        beam_pt = self.SWA4 + (self.data_object.beam_width / 2 + 50) * np.array([1, 0])
+        beam_pt = self.SWA4 + 50 * np.array([1, 0])
         theta = 45
         offset = 80
         text_up = "Beam " + self.data_object.beam_designation
@@ -2066,7 +2066,31 @@ class Seat2DCreatorSide(object):
         element = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down)
 
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # ====================================  Top Angle Information  =========================================
+        beam_pt = self.SWB3
+        theta = 45
+        offset = 40
+        text_up = "ISA " + str(int(self.data_object.top_angle_legsize_vertical)) + 'x' + str(int(self.data_object.top_angle_legsize_horizontal)) + 'x' + \
+                  str(int(self.data_object.top_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
+
+        # ====================================  Seat Angle Information  =========================================
+        beam_pt = self.SWB8
+        theta = 45
+        offset = 40
+        text_up = "ISA " + str(int(self.data_object.seat_angle_legsize_vertical)) + 'x' + str(int(self.data_object.seat_angle_legsize_horizontal)) + 'x' + \
+                  str(int(self.data_object.seat_angle_thickness))
+        text_down = ""
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
+
+        # ======================================  2D view name  ================================================
+        ptx = self.SWH + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])
+        dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+        dwg.save()
+        print "================================= Column Web Beam Flange Side Saved =========================="
+
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 #         nr = self.data_object.no_of_rows
 #         pitchPts = []
@@ -2095,29 +2119,6 @@ class Seat2DCreatorSide(object):
 #             pitchPts.append(pt)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-        # ====================================  Top Angle Information  =========================================
-        beam_pt = self.SWB2
-        theta = 45
-        offset = 0
-        text_up = "ISA " + str(int(self.data_object.top_angle_legsize_vertical)) + 'x' + str(int(self.data_object.top_angle_legsize_horizontal)) + 'x' + \
-                  str(int(self.data_object.top_angle_thickness))
-        text_down = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down)
-
-        # ====================================  Seat Angle Information  =========================================
-        beam_pt = self.SWB6
-        theta = 45
-        offset = 0
-        text_up = "ISA " + str(int(self.data_object.seat_angle_legsize_vertical)) + 'x' + str(int(self.data_object.seat_angle_legsize_horizontal)) + 'x' + \
-                  str(int(self.data_object.seat_angle_thickness))
-        text_down = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
-
-        # ======================================  2D view name  ================================================
-        ptx = self.SWH + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])
-        dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
-        dwg.save()
-        print "================================= Column Web Beam Flange Side Saved =========================="
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #         # Diagonal Hatching for WELD

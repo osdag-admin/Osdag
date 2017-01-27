@@ -375,6 +375,7 @@ class CommonDesignLogic(object):
 
         self.display.DisableAntiAliasing()
 
+
 #         self.display.set_bg_gradient_color(23,1,32,150,150,170)
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 

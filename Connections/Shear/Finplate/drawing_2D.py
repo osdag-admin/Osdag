@@ -38,6 +38,7 @@ class FinCommonData(object):
         self.beam_Designation = dictBeamdata["Designation"]
         self.beam_R1 = float(dictBeamdata["R1"])
         self.col_R1 = float(dictColumndata["R1"])
+
         self.plate_ht = float(ouputObj['Plate']['height'])
         self.plate_thick = float(inputObj['Plate']["Thickness (mm)"])
 
@@ -860,7 +861,6 @@ class Fin2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-        print"########### Column Flange Beam Web Saved ############"
 
     def callCWBWfront(self, fileName):
 
@@ -1070,7 +1070,6 @@ class Fin2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-        print"########### Column Web Beam Web Saved ############"
 
     def callBWBWfront(self, fileName):
 
@@ -1115,7 +1114,6 @@ class Fin2DCreatorFront(object):
         txtOffset = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plateEdge_dist + 100
         params = {"offset": (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plateEdge_dist + 40, "textoffset": txtOffset, "lineori": "right", "endlinedim":10}
         self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' + str(int(self.dataObj. pitch)) + " mm c/c", params)    
-        # print ptList[0][0],ptList[0][1]
 
         # Sectional arrow
         ptSecA = self.BA + (320 * np.array([0, -1])) + 10 * np.array([-1, 0])
@@ -1146,7 +1144,6 @@ class Fin2DCreatorFront(object):
         offset = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap + 50
         params = {"offset":(self.dataObj.col_B + self.dataObj.col_tw) / 2 + 40, "textoffset": 125, "lineori": "left", "endlinedim":10}
         self.dataObj.draw_dimension_outerArrow(dwg, self.BP, ptBP, str(int(self.dataObj.notch_L)) + " mm", params)
-        print self.dataObj.notch_L
 
         # Draw Faint line for dimensions
         ptNotch1 = self.BP
@@ -1552,7 +1549,6 @@ class Fin2DCreatorTop(object):
         ptx = self.FG + 270 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30)) 
         dwg.save()
-        print"$$$$$$$$$ Saved Column Flange Beam Web Top $$$$$$$$$$$$"
 
     def callCWBWTop(self, fileName):
         '''
@@ -1699,7 +1695,6 @@ class Fin2DCreatorTop(object):
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32)) 
 
         dwg.save()
-        print"$$$$$$$$$ Saved Column Web Beam Web Top $$$$$$$$$$$"
 
     def callBWBWTop(self, fileName):
         vb_ht = str(float(1.8 * self.dataObj.col_L))
@@ -1852,7 +1847,6 @@ class Fin2DCreatorTop(object):
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32)) 
 
         dwg.save()
-        print"$$$$$$$$$ Saved Column Web Beam Web Top $$$$$$$$$$$"
 
         dwg.save()
 
@@ -2058,7 +2052,6 @@ class Fin2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30)) 
 
         dwg.save()
-        print "********* Column Web Beam Web Side Saved ***********"
 
     def callCFBWSide(self, fileName):
         '''
@@ -2166,7 +2159,6 @@ class Fin2DCreatorSide(object):
         dwg.fit()
         dwg.save()
 
-        print "********** Column Flange Beam Web Side Saved  *************"
 
     def callBWBWSide(self, fileName):
         vb_width =  str(800 + self.dataObj.col_L)
@@ -2174,7 +2166,6 @@ class Fin2DCreatorSide(object):
         vb_ht = str(400+ self.dataObj.D_col)
         # vb_ht = str(float(2 * self.dataObj.D_col))
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-50 -210 ' + vb_width + ' ' + vb_ht))
-        print dwg, "printing dwg valuessssss"
 
         dwg.add(dwg.polyline(points=[(self.BA1), (self.BA2), (self.BA5), (self.BA6), (self.BA1)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BA8), (self.BA3)).stroke('blue', width=2.5, linecap='square'))

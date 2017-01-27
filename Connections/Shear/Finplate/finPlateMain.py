@@ -120,17 +120,26 @@ class DesignPreferences(QDialog):
 
     def set_bolthole_clernce(self):
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        clearance = self.get_clearance(boltDia)
-        self.ui.txt_boltHoleClearance.setText(str(clearance))
+        print "uiobj from bolt_hole_clearance",uiObj
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        print "#######", boltDia
+        if boltDia != "Diameter of Bolt":
+            clearance = self.get_clearance(boltDia)
+            self.ui.txt_boltHoleClearance.setText(str(clearance))
+        else:
+            pass
+
+
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
-        boltGrade = float(uiObj["Bolt"]["Grade"])
+        boltGrade = str(uiObj["Bolt"]["Grade"])
         boltfu = str(self.get_boltFu(boltGrade))
         self.ui.txt_boltFu.setText(boltfu)
 
     def get_clearance(self, boltDia):
+
+
 
         standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
         overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
@@ -148,7 +157,9 @@ class DesignPreferences(QDialog):
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
                   12.9: 1220}
-        return boltFu[boltGrade]
+        print"&&&&&&&&&&&", boltGrade
+        boltGrd = float(boltGrade)
+        return boltFu[boltGrd]
 
     def close_designPref(self):
         self.close()
@@ -731,7 +742,7 @@ class MainController(QMainWindow):
         uiObj = {}
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText()
-        uiObj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())
+        uiObj["Bolt"]["Grade"] = (self.ui.comboGrade.currentText())
         uiObj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
         uiObj["Weld"] = {}
@@ -1134,8 +1145,6 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
                 self.enableViewButtons()
         elif loc == "Beam-Beam":
-            print "columIndex", self.ui.comboColSec.currentIndex()
-            print "BeamIndex", self.ui.combo_Beam.currentIndex()
 
             if self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
                 return
@@ -1312,8 +1321,6 @@ class MainController(QMainWindow):
     def call_designPref(self, designPref):
         self.uiObj = self.getuser_inputs()
         self.uiObj
-        print"printing designpreferences"
-        print designPref
 
     def designParameters(self):
         '''
@@ -1325,7 +1332,6 @@ class MainController(QMainWindow):
         else:
             design_pref = self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
-        print "printing designprefernces", self.uiObj
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
@@ -1341,6 +1347,15 @@ class MainController(QMainWindow):
     def design_btnclicked(self):
         '''
         '''
+        # from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
+        #
+        # my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
+        #
+        # self.display.DisplayShape(my_box, update=True)
+        #
+
+
+        self.display.EraseAll()
         self.alist = self.designParameters()
 
         self.validateInputsOnDesignBtn()
@@ -1352,15 +1367,19 @@ class MainController(QMainWindow):
                                               self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.call_finCalculation()
-        d = self.resultObj[self.resultObj.keys()[0]]
-        if len(str(d[d.keys()[0]])) == 0:
-            self.ui.btn_CreateDesign.setEnabled(False)
-        self.display_output(self.resultObj)
-        self.displaylog_totextedit(self.commLogicObj)
-        status = self.resultObj['Bolt']['status']
+        alist = self.resultObj.values()
 
-        self.commLogicObj.call_3DModel(status)
-        self.callFin2D_Drawing("All")
+        isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+        if isempty[0] == True:
+            status = self.resultObj['Bolt']['status']
+            self.commLogicObj.call_3DModel(status)
+            self.callFin2D_Drawing("All")
+
+        self.displaylog_totextedit(self.commLogicObj)
+        self.display_output(self.resultObj)
+
+
+
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
@@ -1375,7 +1394,6 @@ class MainController(QMainWindow):
             cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
                        self.commLogicObj.connectivityObj.weldModelRight,
                        self.commLogicObj.connectivityObj.plateModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
-            print"cad parts for Plate",cadlist
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
@@ -1398,9 +1416,7 @@ class MainController(QMainWindow):
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
         fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
-        print "igs filename:", fileName
         fName = str(fileName)
-        print "igs fName:", fileName
 
         file_extension = fName.split(".")[-1]
 
@@ -1447,7 +1463,6 @@ class MainController(QMainWindow):
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
                                          self.alist[5], self.alist[6], self.alist[7],
                                          self.alist[8], self.display, self.folder, self.connection)
-
         if view != 'All':
 
             if view == "Front":

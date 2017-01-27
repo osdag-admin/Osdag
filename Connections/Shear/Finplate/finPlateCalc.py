@@ -1025,7 +1025,7 @@ def finConn(uiObj):
                     for key in outputObj[k].keys():
                         outputObj[k][key] = ""
     
-#   Delete dictionary for unsafe design for user defined plate height    
+#   Delete dictionary for unsafe design for user defined plate height    (BUG)
     else:
         if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
             for k in outputObj.keys():
@@ -1059,6 +1059,7 @@ def finConn(uiObj):
     else:
         logger.error(": Design is not safe \n ")
         logger.debug(" :=========End Of design===========")
+
     
     return outputObj
 

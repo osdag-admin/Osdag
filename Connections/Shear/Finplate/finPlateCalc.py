@@ -33,18 +33,18 @@ def netArea_calc(dia):
 
 def bolt_shear(dia, n, fu):
     A = netArea_calc(dia)
-    root3 = math.sqrt(3);
-    Vs = fu * n * A / (root3 * 1.25 * 1000);
-    Vs = round(Vs.real, 3);
+    root3 = math.sqrt(3)
+    Vs = fu * n * A / (root3 * 1.25 * 1000)
+    Vs = round(Vs.real, 3)
     return Vs
 
 # BOLT: determination of bearing capacity 
 
 
 def bolt_bearing(dia, t, kb, fu):
-    Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000);
-    Vb = round(Vb.real, 3);
-    return Vb;
+    Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000)
+    Vb = round(Vb.real, 3)
+    return Vb
  
 
 # PLATE HEIGHT: minimum height of fin plate
@@ -58,7 +58,7 @@ def fin_min_h(beam_d):
 
 
 def fin_min_thk(shear_load, bolt_fy, web_plate_l):
-    min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l);
+    min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l)
     return min_plate_thk;
 
 # PLATE THICKNESS: maximum thickness of fin plate
@@ -66,8 +66,8 @@ def fin_min_thk(shear_load, bolt_fy, web_plate_l):
 
 
 def fin_max_thk(beam_d):
-    max_plate_thk = 0.5 * beam_d;
-    return max_plate_thk;
+    max_plate_thk = 0.5 * beam_d
+    return max_plate_thk
 
 # Function for block shear capacity calculation
 
@@ -132,8 +132,8 @@ def finConn(uiObj):
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
-    web_plate_w = float(uiObj['Plate']['Width (mm)'])
-    web_plate_l = float(uiObj['Plate']['Height (mm)'])
+    web_plate_w = (uiObj['Plate']['Width (mm)'])
+    web_plate_l = (uiObj['Plate']['Height (mm)'])
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
@@ -570,7 +570,7 @@ def finConn(uiObj):
             return boltParam
     
     # Call function for bolt design output
-    boltParameters = boltDesign(web_plate_l); 
+    boltParameters = boltDesign(web_plate_l)
     
     # Check for long joint connections
     length_joint = (boltParameters['numofrow'] - 1) * boltParameters['pitch']

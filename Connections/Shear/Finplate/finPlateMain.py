@@ -88,7 +88,7 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        #boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = float(uiObj["Bolt"]["Grade"])
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
@@ -124,7 +124,7 @@ class DesignPreferences(QDialog):
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         print "#######", boltDia
         if boltDia != "Diameter of Bolt":
-            clearance = self.get_clearance(boltDia)
+            clearance = self.get_clearance(int(boltDia))
             self.ui.txt_boltHoleClearance.setText(str(clearance))
         else:
             pass
@@ -134,12 +134,14 @@ class DesignPreferences(QDialog):
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
-        boltfu = str(self.get_boltFu(boltGrade))
-        self.ui.txt_boltFu.setText(boltfu)
+        if boltGrade != '':
+            boltfu = str(self.get_boltFu(boltGrade))
+            self.ui.txt_boltFu.setText(boltfu)
+        else:
+            pass
 
     def get_clearance(self, boltDia):
-
-
+        print "************",boltDia
 
         standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
         overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
@@ -624,7 +626,7 @@ class MainController(QMainWindow):
             # column_tf = float(dictcoldata[QString("T")])
             # column_tw = float(dictcoldata[QString("tw")])
             plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = plate_thickness.toFloat()
+            plate_thick = float(plate_thickness)
 
             if self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentText() == "Select section":
@@ -632,7 +634,7 @@ class MainController(QMainWindow):
                     return
                 else:
                     column_tf = float(dictcoldata["T"])
-                    thickerPart = column_tf > plate_thick[0] and column_tf or plate_thick[0]
+                    thickerPart = column_tf > plate_thick and column_tf or plate_thick
 
             elif self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 if self.ui.comboColSec.currentText() == "Select section":
@@ -640,10 +642,10 @@ class MainController(QMainWindow):
                     return
                 else:
                     column_tw = float(dictcoldata["tw"])
-                    thickerPart = column_tw > plate_thick[0] and column_tw or plate_thick[0]
+                    thickerPart = column_tw > plate_thick and column_tw or plate_thick
             else:
                 PBeam_tw = float(dictcoldata["tw"])
-                thickerPart = PBeam_tw > plate_thick[0] and PBeam_tw or plate_thick[0]
+                thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
 
             if thickerPart in range(0, 11):
                 weld_index = weldlist.index(3)
@@ -952,13 +954,16 @@ class MainController(QMainWindow):
         '''(Number) -> None
         '''
         items = self.gradeType[str(index)]
+        if items != '':
 
-        self.ui.comboGrade.clear()
-        strItems = []
-        for val in items:
-            strItems.append(str(val))
+            self.ui.comboGrade.clear()
+            strItems = []
+            for val in items:
+                strItems.append(str(val))
 
-        self.ui.comboGrade.addItems(strItems)
+            self.ui.comboGrade.addItems(strItems)
+        else:
+            pass
 
     def check_range(self, widget, lblwidget, minVal, maxVal):
 

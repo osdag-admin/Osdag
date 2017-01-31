@@ -954,7 +954,7 @@ class MainController(QMainWindow):
         '''(Number) -> None
         '''
         items = self.gradeType[str(index)]
-        if items != '':
+        if items != 0:
 
             self.ui.comboGrade.clear()
             strItems = []

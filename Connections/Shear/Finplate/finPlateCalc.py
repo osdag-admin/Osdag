@@ -132,8 +132,14 @@ def finConn(uiObj):
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
-    web_plate_w = (uiObj['Plate']['Width (mm)'])
-    web_plate_l = (uiObj['Plate']['Height (mm)'])
+    web_plate_w = str(uiObj['Plate']['Width (mm)'])
+    if web_plate_w == '':
+        web_plate_w  = 0
+
+    web_plate_l = str(uiObj['Plate']['Height (mm)'])
+    if web_plate_l == '':
+        web_plate_l = 0
+
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
 

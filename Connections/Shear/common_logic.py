@@ -134,10 +134,10 @@ class CommonDesignLogic(object):
         cleardist = float(self.uiObj['detailing']['gap'])
         plate_thk = float(self.uiObj['Plate']['Thickness (mm)'])
 
-        width1 =(pBeam_B/2.0 -(pBeam_tw/2.0 + cleardist)+10)
-        width2 =(pBeam_B/2.0 -(pBeam_tw/2.0 + plate_thk)+10)
-        print 'printing width of the notch', width1
-        print 'printing width of the notch', width2
+        # width1 =(pBeam_B/2.0 -(pBeam_tw/2.0 + cleardist)+10)
+        # width2 =(pBeam_B/2.0 -(pBeam_tw/2.0 + plate_thk)+10)
+        # print 'printing width of the notch', width1
+        # print 'printing width of the notch', width2
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
@@ -319,12 +319,12 @@ class CommonDesignLogic(object):
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.uiObj['Weld']['Size (mm)']
+        fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
         #---------------- fillet_thickness = self.resultObj['Weld']['thickness']
         plate_width = self.resultObj['Plate']['width']
-        plate_thick = self.uiObj['Plate']['Thickness (mm)']
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
+        plate_thick = str(self.uiObj['Plate']['Thickness (mm)'])
+        bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
+        bolt_r = (float(bolt_dia) / 2)
         # bolt_R = self.boltHeadDia_Calculation(bolt_dia) /2
         bolt_R = self.bolt_R
         # bolt_R = bolt_r + 7
@@ -341,10 +341,10 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  #
 
         # plate = Plate(L= 300,W =100, T = 10)
-        plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
+        plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
 
         # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
+        Fweld1 = FilletWeld(L=fillet_length, b=int(fillet_thickness), h=int(fillet_thickness))
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -353,11 +353,11 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         
         if self.connection == "Finplate":
-            gap = beam_tw + plate_thick + nut_T
+            gap = beam_tw + int(plate_thick) + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)#finColFlangeBeamWeb
             colflangeconn = finColFlangeBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         elif self.connection == "Endplate":
-            gap = column_T + plate_thick + nut_T
+            gap = column_T + int(plate_thick) + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
             colflangeconn = endColFlangeBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         
@@ -370,8 +370,8 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
-
-        self.display.SetModeShaded()
+        #self.display.View_Iso()
+        self.display.FitAll()
 
         self.display.DisableAntiAliasing()
 
@@ -379,8 +379,10 @@ class CommonDesignLogic(object):
 #         self.display.set_bg_gradient_color(23,1,32,150,150,170)
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
-        if self.loc == "Column flange-Beam web" and self.connection =="Finplate":
+        if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+            #self.display.View.SetProj(OCC.V3d.V3d_Xneg)
+
         else:
             self.display.View_Iso()
             self.display.FitAll()

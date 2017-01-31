@@ -331,7 +331,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -399,7 +408,7 @@
      <x>0</x>
      <y>0</y>
      <width>1328</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -1235,6 +1244,12 @@ QMenu::item:selected {
        <weight>50</weight>
        <bold>false</bold>
       </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_len_2">
@@ -3113,6 +3128,9 @@ QMenu::item:selected {
        <weight>50</weight>
        <bold>false</bold>
       </font>
+     </property>
+     <property name="placeholderText">
+      <string>0</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_Reset">

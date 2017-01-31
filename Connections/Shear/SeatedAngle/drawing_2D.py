@@ -831,7 +831,7 @@ class Seat2DCreatorFront(object):
         text_up = "Beam " + self.data_object.beam_designation
         text_down = ""       # text_down shows empty
         element = ""         # elements shows empty
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         # ===============================   Draw faint line for Beam Information   ===============================
         pt_B1 = self.SA1
@@ -855,7 +855,7 @@ class Seat2DCreatorFront(object):
         text_up = "Column " + self.data_object.col_designation
         text_down = ""
         element = ""
-        self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down)
 
         # ===============================   Seat angle information  ===============================
         seat_angle_pt_x = self.data_object.col_depth + self.data_object.gap + self.data_object.beam_length / 4
@@ -1324,10 +1324,15 @@ class Seat2DCreatorTop(object):
         # --------------------------------------------------------------------------------------------------------------
         # ========================  Column plotting  ===================================
 
-        self.SA = np.array([0, 0])
-        self.SB = self.SA + self.data_object.col_flange_thk * np.array([1, 0])
+        ptSAx = 0
+        ptSAy = 0
+        self.SA = np.array([ptSAx, ptSAy])
 
-        ptSCx = self.SB
+        ptSBx = ptSAx
+        ptSBy = self.data_object.col_flange_thk
+        self.SB = np.array([ptSBx, ptSBy])
+
+        ptSCx = ptSBx
         ptSCy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         self.SC = np.array([ptSCx, ptSCy])
 
@@ -1335,9 +1340,18 @@ class Seat2DCreatorTop(object):
         ptSDy = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         self.SD = np.array([ptSDx, ptSDy])
 
-        self.SE = self.SA + (self.data_object.col_depth - self.data_object.col_flange_thk) * np.array([1, 0])
-        self.SF = self.SA + self.data_object.col_depth * np.array([1, 0])
-        self.SG = self.SF + self.data_object.col_width * np.array([0, 1])
+        ptSEx = ptSAx
+        ptSEy = (self.data_object.col_depth - self.data_object.col_flange_thk)
+        self.SE = np.array([ptSEx, ptSEy])
+
+        ptSFx = ptSAx
+        ptSFy = self.data_object.col_depth
+        self.SF = np.array([ptSFx, ptSFy])
+
+        ptSGx = self.data_object.col_width
+        ptSGy = ptSFy
+        self.SG = np.array([ptSGx, ptSGy])
+
         self.SH = self.SG + self.data_object.col_flange_thk * np.array([-1, 0])
 
         ptSIx = self.data_object.col_depth - self.data_object.col_flange_thk
@@ -1417,7 +1431,7 @@ class Seat2DCreatorTop(object):
         self.SWE = np.array([ptSWEx, ptSWEy])
 
         ptSWFx = ptSWEx
-        ptSWFy = (self.data_object.col_depth + self.data_object.col_flange_thk)
+        ptSWFy = ptSWEy + self.data_object.col_flange_thk
         self.SWF = np.array([ptSWFx, ptSWFy])
 
         ptSWGx = ptSWFx + self.data_object.col_width
@@ -1444,9 +1458,17 @@ class Seat2DCreatorTop(object):
         ptSWLy = 0
         self.SWL = np.array([ptSWLx, ptSWLy])
 
+        ptSWPx = (self.data_object.col_width + self.data_object.col_web_thk) / 2
+        ptSWPy = self.data_object.col_depth / 2
+        self.SWP = np.array([ptSWPx, ptSWPy])
+
+        ptSWQx = ptSWPx
+        ptSWQy = self.data_object.angle_length / 2
+        self.SWQ = np.array([ptSWQx, ptSWQy])
+
         # ========================  Beam plotting  ===================================
 
-        ptSWB1x = (self.data_object.col_width / 2) + (self.data_object.col_web_thk / 2) + self.data_object.gap
+        ptSWB1x = ptSWPx + self.data_object.gap
         ptSWB1y = (self.data_object.col_depth - self.data_object.beam_width) / 2
         self.SWB1 = np.array([ptSWB1x, ptSWB1y])
 
@@ -1462,10 +1484,18 @@ class Seat2DCreatorTop(object):
         ptSWB4y = ptSWB1y + self.data_object.beam_width
         self.SWB4 = np.array([ptSWB4x, ptSWB4y])
 
+        ptSWB6x = ptSWB1x
+        ptSWB6y = ptSWB1y + (self.data_object.beam_width - self.data_object.angle_length) / 2
+        self.SWB6 = np.array([ptSWB6x, ptSWB6y])
+
+        ptSWB5x = ptSWB1x
+        ptSWB5y = ptSWB1y + (self.data_object.beam_width + self.data_object.angle_length) / 2
+        self.SWB5 = np.array([ptSWB5x, ptSWB5y])
+
         # ========================  Top Angle plotting  ===================================
 
-        ptSWA1x = (self.data_object.col_width / 2) + (self.data_object.col_web_thk / 2)
-        ptSWA1y = (self.data_object.col_depth - self.data_object.beam_width) / 2
+        ptSWA1x = ptSWQx
+        ptSWA1y = (self.data_object.col_depth - self.data_object.angle_length ) / 2
         self.SWA1 = np.array([ptSWA1x, ptSWA1y])
 
         ptSWA2x = ptSWA1x + self.data_object.top_angle_thickness
@@ -1477,15 +1507,15 @@ class Seat2DCreatorTop(object):
         self.SWA3 = np.array([ptSWA3x, ptSWA3y])
 
         ptSWA4x = ptSWA3x
-        ptSWA4y = self.data_object.angle_length
+        ptSWA4y = ptSWA3y + self.data_object.angle_length
         self.SWA4 = np.array([ptSWA4x, ptSWA4y])
 
-        ptSWA5x = ptSWA1x
-        ptSWA5y = self.data_object.angle_length
+        ptSWA5x = ptSWA2x
+        ptSWA5y = ptSWA2y + self.data_object.angle_length
         self.SWA5 = np.array([ptSWA5x, ptSWA5y])
 
         ptSWA6x = ptSWA1x
-        ptSWA6y = self.data_object.angle_length
+        ptSWA6y = ptSWA1y + self.data_object.angle_length
         self.SWA6 = np.array([ptSWA6x, ptSWA6y])
         # ------------------------------------------------------------------------------------------------------------
 
@@ -1496,7 +1526,9 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.polyline(points=[self.SA, self.SB, self.SC, self.SD, self.SE, self.SF, self.SG, self.SH, self.SI, self.SJ, self.SK,
                                      self.SL, self.SA], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
-        dwg.add(dwg.line(self.SB1, self.SB4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.line(self.SWB6, self.SWB5).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.line(self.SWB1, self.SWB6).stroke('blue' , width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.SWB5, self.SWB4).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.SA1, self.SA2, self.SA3, self.SA4, self.SA5, self.SA6,
                                      self.SA1], stroke='blue',fill='#E0E0E0', stroke_width=2.5))
 
@@ -1561,7 +1593,7 @@ class Seat2DCreatorTop(object):
         text_up = "Beam " + self.data_object.beam_designation
         text_down = ""
         element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         # =================================  Column Information  ========================================
 
@@ -1639,30 +1671,32 @@ class Seat2DCreatorTop(object):
 
     def call_CWBF_top(self, file_name):
         # vb_ht = str(float(self.data_object.col_depth) + 750)
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-50 -300 1500 1020'))
-
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-400 -300 1500 1200'))
         dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWE, self.SWF, self.SWG, self.SWH, self.SWI, self.SWJ, self.SWK, self.SWL,
                                      self.SWA], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SWA1, self.SWA3, self.SWA4, self.SWA6, self.SWA1], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.SWA2, self.SWA5).stroke('blue', width=2.5, linecap='square'))
 
-        dwg.add(dwg.line(self.SB1, self.SB4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4], stroke='blue', fill='none', stroke_width=2.5))
-        # dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWA3, self.SWA4, self.SWA5, self.SWA6, self.SWA1], stroke='blue', fill='none', stoke_width=2.5))
+        dwg.add(dwg.line(self.SWB6, self.SWB5).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.line(self.SWB1, self.SWB6).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.SWB4, self.SWB5).stroke('blue', width=2.5, linecap='square'))
+        dwg.add(dwg.polyline(points=[self.SWB1, self.SWB2, self.SWB3, self.SWB4], stroke='blue', fill='none', stroke_width=2.5))
 
         # ===============================  Cross section B-B  ===============================================
 
-        ptSecA = self.SWF + (230 + self.data_object.gap +self.data_object.beam_length) * np.array([1, 0])
+        ptSecA = self.SWF + (500 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0])
         ptSecB = ptSecA + 50 * np.array([-1, 0])
         txt_pt = ptSecB + 80 * np.array([-1, 0]) + (20 * np.array([0, 1]))
         txt = "B"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = self.SWA + (230 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0])
+        ptSecC = self.SWA + (500 + self.data_object.gap + self.data_object.beam_length) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([-1, 0]))
         txt_pt = ptSecD + (80 * np.array([-1, 0])) + (20 * np.array([0, 1]))
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
-        #  ===============================  C-C section  ====================================================
-        ptSecA = self.SWA + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 3) / 8 * np.array([0, 1])
+        #  ===============================  Cross section C-C  ====================================================
+        ptSecA = self.SWA + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 2.5) * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         txt = "C"
@@ -1711,9 +1745,9 @@ class Seat2DCreatorTop(object):
 
         # =================================  Column Information  ========================================
 
-        ptSecA = self.SF + (self.data_object.col_width / 2) * np.array([1, 0])
-        ptSecB = ptSecA + (120 * np.array([0, 1]))
-        txt_pt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
+        ptSecA = self.SWG +  np.array([1, 0])
+        ptSecB = ptSecA + (60 * np.array([0, 1]))
+        txt_pt = ptSecB + (60 * np.array([-1, 0])) + (30 * np.array([0, 1]))
         line = dwg.add(dwg.line(ptSecA, ptSecB).stroke('black', width=2.5, linecap='square'))
         start_arrow = self.data_object.add_end_marker(dwg)
         self.data_object.draw_start_arrow(line, start_arrow)
@@ -1721,23 +1755,23 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.text(text, insert=txt_pt, fill='black', font_family="sans-serif", font_size=28))
 
         # ====================================  Label Gap Distance  =======================================
-        ptG1 = self.SWJ + 50 * np.array([0, -1])
+        ptG1 = self.SWI + 20 * np.array([-1, 0])
         ptG2 = self.SWB4 + 20 * np.array([1, 0])
         offset = 1
         params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
         self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
 
         # ===============================  Draw Faint line for Gap Distance  ===============================
-        pt_L_G1x = self.SWJ
-        pt_L_G1y = ptG1 + 40 * np.array([0, 1])
+        pt_L_G1x = self.SWI
+        pt_L_G1y = pt_L_G1x + 70 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_L_G1x, pt_L_G1y, dwg)
 
         pt_R_G2x = self.SWB4
-        pt_R_G2y = ptG2 + 70 * np.array([0, 1])
+        pt_R_G2y = pt_R_G2x + 80 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
 
         # ================================  2D view name  ==============================================
-        ptx = self.SC + 270 * np.array([0, 1])
+        ptx = self.SC + 470 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A) (All distances are in "mm")', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
         print"########### Saved Column Web Beam Flange Top ########### "
@@ -2213,7 +2247,7 @@ class Seat2DCreatorSide(object):
         text_up = "Beam " + self.data_object.beam_designation
         text_down = ""
         element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # =================================  Column Information  ========================================
         beam_pt = self.SA + self.data_object.col_width / 2 * np.array([1, 0])
@@ -2222,7 +2256,7 @@ class Seat2DCreatorSide(object):
         text_up = "Column " + self.data_object.col_designation
         text_down = ""
         element = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down, element)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down)
 
         # Diagonal Hatching for WELD
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))

@@ -66,7 +66,6 @@ class SeatCommonData(object):
         self.seat_angle_thickness = int(angle_data[QString("t")])
         # self.seat_angle_R1 = int(angle_data[QString("R1")])
         # self.seat_angle_R2 = float(angle_data[QString("R2")])
-        # self.seat_angle_length = int(angle_data[QString("l")])
 
         # ================  top angle  ================================
         self.top_angle_legsize_vertical = int(top_angle_data[QString("A")])
@@ -74,7 +73,6 @@ class SeatCommonData(object):
         self.top_angle_thickness = int(top_angle_data[QString("t")])
         # self.top_angle_R1 = int(top_angle_data[QString("R1")])
         # self.top_angle_R2 = float(top_angle_data[QString("R2")])
-        # self.top_angle_length = int(top_angle_data[QString("l")])
 
         self.folder = folder
 
@@ -560,11 +558,9 @@ class Seat2DCreatorFront(object):
         ptSC7y = ptSC5y - self.data_object.top_angle_thickness
         self.SC7 = np.array([ptSC7x, ptSC7y])
 
-        ptSTx = ptSC7x + self.data_object.top_angle_thickness
-        ptSTy = ptSC6y - self.data_object.top_angle_thickness
-        self.ST = np.array([ptSTx, ptSTy])
-
-
+        ptSCTx = ptSC7x + self.data_object.top_angle_thickness
+        ptSCTy = ptSC6y - self.data_object.top_angle_thickness
+        self.SCT = np.array([ptSCTx, ptSCTy])
 
         # ============================  Seat Angle  ===================================
         ptSD5x = self.data_object.col_depth
@@ -576,21 +572,28 @@ class Seat2DCreatorFront(object):
         self.SD1 = (ptSD1x, ptSD1y)
 
         ptSD4x = self.data_object.col_depth + self.data_object.seat_angle_legsize_horizontal
-        ptSD4y = (self.data_object.col_length + self.data_object.beam_depth)/2
+        ptSD4y = ptSD5y
         self.SD4 = (ptSD4x, ptSD4y)
 
-        ptSD2x = self.data_object.col_depth + self.data_object.seat_angle_thickness
+        ptSD2x = ptSD1x + self.data_object.seat_angle_thickness
         ptSD2y = ptSD5y + self.data_object.seat_angle_legsize_vertical
         self.SD2 = (ptSD2x, ptSD2y)
 
-        ptSD3x = self.data_object.col_depth + self.data_object.top_angle_legsize_horizontal
-        ptSD3y = (self.data_object.col_length + self.data_object.beam_depth)/2 + self.data_object.seat_angle_thickness
+        ptSD3x = ptSD4x
+        ptSD3y = ptSD4y + self.data_object.seat_angle_thickness
         self.SD3 = (ptSD3x, ptSD3y)
 
         ptSD6x = ptSD2x
-        ptSD6y = ptSD2y - self.data_object.seat_angle_thickness
+        ptSD6y = ptSD5y
         self.SD6 = np.array([ptSD6x, ptSD6y])
 
+        ptSD7x = ptSD5x
+        ptSD7y = ptSD5y + self.data_object.seat_angle_thickness
+        self.SD7 = np.array([ptSD7x, ptSD7y])
+
+        ptSDTx = ptSD7x + self.data_object.seat_angle_thickness
+        ptSDTy = ptSD6y + self.data_object.seat_angle_thickness
+        self.SDT = np.array([ptSDTx, ptSDTy])
         # -----------------------------------------------------------------------------------------------
         #              COLUMN WEB BEAM FLANGE CONNECTIVITY (FRONT VIEW)
         # -----------------------------------------------------------------------------------------------
@@ -673,55 +676,70 @@ class Seat2DCreatorFront(object):
         self.SWB5 = np.array([ptSWB5x, ptSWB5y])
 
         # ============================  Top Angle  ===================================
-        ptSWC5x = (self.data_object.col_width - self.data_object.col_flange_thk) / 2
+        ptSWC5x = (self.data_object.col_width + self.data_object.col_flange_thk) / 2
         ptSWC5y = (self.data_object.col_length - self.data_object.beam_depth) / 2
-        self.SWC5 = np.array([ptSWC5x, ptSWC5y])
+        self.SWC5 = (ptSWC5x, ptSWC5y)
 
         ptSWC1x = ptSWC5x
-        ptSWC1y = ptSWC5y + self.data_object.top_angle_legsize_vertical
-        self.SWC1 = np.array([ptSWC1x, ptSWC1y])
+        ptSWC1y = ptSC5y - self.data_object.top_angle_legsize_vertical
+        self.SWC1 = (ptSWC1x, ptSWC1y)
 
         ptSWC4x = ptSWC5x + self.data_object.top_angle_legsize_horizontal
         ptSWC4y = ptSWC5y
-        self.SWC4 = np.array([ptSWC4x, ptSWC4y])
+        self.SWC4 = (ptSWC4x, ptSWC4y)
+
+        ptSWC2x = ptSWC1x + self.data_object.top_angle_thickness
+        ptSWC2y = ptSWC5y - self.data_object.top_angle_legsize_vertical
+        self.SWC2 = (ptSWC2x, ptSWC2y)
 
         ptSWC3x = ptSWC4x
         ptSWC3y = ptSWC5y - self.data_object.top_angle_thickness
-        self.SWC3 = np.array([ptSWC3x, ptSWC3y])
-
-        ptSWC2x = ptSWC1x + self.data_object.top_angle_thickness
-        ptSWC2y = ptSWC1y
-        self.SWC2 = np.array([ptSWC2x, ptSWC2y])
+        self.SWC3 = (ptSWC3x, ptSWC3y)
 
         ptSWC6x = ptSWC2x
-        ptSWC6y =  ptSWC5y -self.data_object.top_angle_thickness
+        ptSWC6y = ptSWC5y  # ptSC2y - self.data_object.top_angle_thickness
         self.SWC6 = np.array([ptSWC6x, ptSWC6y])
 
+        ptSWC7x = ptSWC5x
+        ptSWC7y = ptSWC5y - self.data_object.top_angle_thickness
+        self.SWC7 = np.array([ptSWC7x, ptSWC7y])
+
+        ptSWCTx = ptSWC7x + self.data_object.top_angle_thickness
+        ptSWCTy = ptSWC6y - self.data_object.top_angle_thickness
+        self.SWCT = np.array([ptSWCTx, ptSWCTy])
+
         # ============================  Seat Angle  ===================================
-        ptSWD5x = (self.data_object.col_width - self.data_object.col_flange_thk) / 2
+        ptSWD5x = (self.data_object.col_width + self.data_object.col_flange_thk) / 2
         ptSWD5y = (self.data_object.col_length + self.data_object.beam_depth) / 2
-        self.SWD5 = np.array([ptSWD5x, ptSWD5y])
+        self.SWD5 = (ptSWD5x, ptSWD5y)
 
         ptSWD1x = ptSWD5x
-        ptSWD1y = ptSWD5y + self.data_object.seat_angle_legsize_vertical
-        self.SWD1 = np.array([ptSWD1x, ptSWD1y])
+        ptSWD1y = ptSD5y + self.data_object.seat_angle_legsize_vertical
+        self.SWD1 = (ptSWD1x, ptSWD1y)
 
         ptSWD4x = ptSWD5x + self.data_object.seat_angle_legsize_horizontal
         ptSWD4y = ptSWD5y
-        self.SWD1 = np.array([ptSWD4x, ptSWD4y])
+        self.SWD4 = (ptSWD4x, ptSWD4y)
+
+        ptSWD2x = ptSWD1x + self.data_object.seat_angle_thickness
+        ptSWD2y = ptSWD5y + self.data_object.seat_angle_legsize_vertical
+        self.SWD2 = (ptSWD2x, ptSWD2y)
 
         ptSWD3x = ptSWD4x
-        ptSWD3y = ptSWD5y + self.data_object.seat_angle_thickness
-        self.SWD3 = np.array([ptSWD3x, ptSWD3y])
-
-        ptSWD2x = ptSD5x + self.data_object.seat_angle_thickness
-        ptSWD2y = ptSWD1y
-        self.SWD2 = np.array([ptSWD2x, ptSWD2y])
+        ptSWD3y = ptSWD4y + self.data_object.seat_angle_thickness
+        self.SWD3 = (ptSWD3x, ptSWD3y)
 
         ptSWD6x = ptSWD2x
-        ptSWD6y = ptSWD1y - self.data_object.seat_angle_thickness
+        ptSWD6y = ptSWD5y
         self.SWD6 = np.array([ptSWD6x, ptSWD6y])
 
+        ptSWD7x = ptSWD5x
+        ptSWD7y = ptSWD5y + self.data_object.seat_angle_thickness
+        self.SWD7 = np.array([ptSWD7x, ptSWD7y])
+
+        ptSWDTx = ptSWD7x + self.data_object.seat_angle_thickness
+        ptSWDTy = ptSWD6y + self.data_object.seat_angle_thickness
+        self.SWDT = np.array([ptSWDTx, ptSWDTy])
         # ------------------------------------------------------------------------------------------------------------
 
     def call_CFBF_front(self, file_name):
@@ -733,8 +751,8 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.polyline(points =[self.SA1, self.SA2, self.SB2, self.SB1, self.SA1], stroke = 'blue', fill = 'none', stroke_width =2.5))
         dwg.add(dwg.line(self.SA4, self.SA3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.SB4, self.SB3).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.polyline(points=[self.ST, self.SC2, self.SC1, self.SC5, self.SC4, self.SC3, self.ST], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.SD1, self.SD5, self.SD4, self.SD3, self.SD6, self.SD2, self.SD1], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SCT, self.SC2, self.SC1, self.SC5, self.SC4, self.SC3, self.SCT], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SDT, self.SD2, self.SD1, self.SD5, self.SD4, self.SD3, self.SDT], stroke='blue', fill='none', stroke_width=2.5))
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1033,9 +1051,14 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWB3, self.SWB4, self.SWA1], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SWA4, self.SWA3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.SWB1, self.SWB2).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.polyline(points=[self.SWA1, self.SWA6, self.SWB5, self.SWB4], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.polyline(points=[self.SWA1, self.SWA6, self.SWB5, self.SWB4], stroke='red', fill='none',
+                             stroke_width=2.5).dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line(self.SWA5, self.SWA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line(self.SWB6, self.SWB1).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.polyline(points=[self.SWCT, self.SWC2, self.SWC1, self.SWC5, self.SWC4, self.SWC3, self.SWCT], stroke='red', fill='none',
+                             stroke_width=2.5).dasharray(dasharray=([2, 2])))
+        dwg.add(dwg.polyline(points=[self.SWDT, self.SWD2, self.SWD1, self.SWD5, self.SWD4, self.SWD3, self.SWDT], stroke='red', fill='none',
+                             stroke_width=2.5).dasharray(dasharray=([2, 2])))
 
         # ===============================  Cross section A-A  ===============================================
         ptSecA = self.SWA + (280*np.array([0, -1]))
@@ -1067,7 +1090,7 @@ class Seat2DCreatorFront(object):
 
         # ------------------------  here "70" represents length of the faint line vertically(right)  ------------------------
         pt_R_G2x = self.SWB5
-        pt_R_G2y = pt_R_G2x + 200 * np.array([0, 1])
+        pt_R_G2y = pt_R_G2x + 250 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

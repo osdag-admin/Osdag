@@ -549,12 +549,22 @@ class Seat2DCreatorFront(object):
         self.SC2 = (ptSC2x, ptSC2y)
 
         ptSC3x = ptSC4x
-        ptSC3y = ptSC4y - self.data_object.top_angle_thickness
+        ptSC3y = ptSC5y - self.data_object.top_angle_thickness
         self.SC3 = (ptSC3x, ptSC3y)
 
-        # ptSC6x = ptSC2x
-        # ptSC6y = ptSC2y - self.data_object.top_angle_thickness
-        # self.SC6 = np.array([ptSC6x, ptSC6y])
+        ptSC6x = ptSC2x
+        ptSC6y = ptSC5y # ptSC2y - self.data_object.top_angle_thickness
+        self.SC6 = np.array([ptSC6x, ptSC6y])
+
+        ptSC7x = ptSC5x
+        ptSC7y = ptSC5y - self.data_object.top_angle_thickness
+        self.SC7 = np.array([ptSC7x, ptSC7y])
+
+        ptSTx = ptSC7x + self.data_object.top_angle_thickness
+        ptSTy = ptSC6y - self.data_object.top_angle_thickness
+        self.ST = np.array([ptSTx, ptSTy])
+
+
 
         # ============================  Seat Angle  ===================================
         ptSD5x = self.data_object.col_depth
@@ -723,8 +733,9 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.polyline(points =[self.SA1, self.SA2, self.SB2, self.SB1, self.SA1], stroke = 'blue', fill = 'none', stroke_width =2.5))
         dwg.add(dwg.line(self.SA4, self.SA3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.SB4, self.SB3).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.polyline(points=[self.SC1, self.SC5, self.SC4, self.SC3, self.SC2], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.SD1, self.SD5, self.SD4, self.SD3, self.SD6, self.SD2], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.ST, self.SC2, self.SC1, self.SC5, self.SC4, self.SC3, self.ST], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.SD1, self.SD5, self.SD4, self.SD3, self.SD6, self.SD2, self.SD1], stroke='blue', fill='none', stroke_width=2.5))
+
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #         nr = self.data_object.no_of_rows
@@ -1056,7 +1067,7 @@ class Seat2DCreatorFront(object):
 
         # ------------------------  here "70" represents length of the faint line vertically(right)  ------------------------
         pt_R_G2x = self.SWB5
-        pt_R_G2y = pt_R_G2x + 90 * np.array([0, 1])
+        pt_R_G2y = pt_R_G2x + 200 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1770,11 +1781,12 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.text(text, insert=txt_pt, fill='black', font_family="sans-serif", font_size=28))
 
         # ====================================  Label Gap Distance  =======================================
-        ptG1 = self.SWI + 20 * np.array([-1, 0])
-        ptG2 = self.SWB4 + 20 * np.array([1, 0])
+        ptG1 = self.SWI + 50 * np.array([-1, 0])
+        ptG2 = self.SWB4 + 20 * np.array([0, -1])
         offset = 1
-        params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
+        params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
         self.data_object.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.data_object.gap) + " mm", params)
+
 
         # ===============================  Draw Faint line for Gap Distance  ===============================
         pt_L_G1x = self.SWI

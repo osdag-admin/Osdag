@@ -807,8 +807,8 @@ class MainController(QtGui.QMainWindow):
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
-        vscrollBar = self.ui.textEdit.verticalScrollBar();
-        vscrollBar.setValue(vscrollBar.maximum());
+        vscrollBar = self.ui.textEdit.verticalScrollBar()
+        vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
 
     def get_backend(self):

@@ -29,6 +29,7 @@ import os.path
 import pickle
 import shutil
 
+from utilities import osdag_display_shape
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
@@ -478,8 +479,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_columncombolist())
-            self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
+            self.ui.combo_Beam.setCurrentIndex(0)
 
             self.ui.txtFu.clear()
             self.ui.txtFy.clear()
@@ -1128,11 +1129,12 @@ class MainController(QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def checkBeam_B(self):
-        loc = self.ui.comboConnLoc.currentText()
+        loc = str(self.ui.comboConnLoc.currentText())
         if loc == "Column web-Beam web":
-            if self.ui.comboColSec.currentIndex() == 0:
+            if self.ui.comboColSec.currentIndex() == -1 or str(self.ui.combo_Beam.currentText()) == 'Select section' or str(self.ui.comboColSec.currentText()) == 'Select section':
                 return
             column = self.ui.comboColSec.currentText()
+            beam_index = self.ui.combo_Beam.currentIndex()
             dictBeamData = self.fetchBeamPara()
             dictColData = self.fetchColumnPara()
             column_D = float(dictColData["D"])
@@ -1356,11 +1358,13 @@ class MainController(QMainWindow):
         #
         # my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
         #
-        # self.display.DisplayShape(my_box, update=True)
-        #
+        # # self.display.DisplayShape(my_box, update=True)
+        # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        # osdag_display_shape(self.display, my_box, update=True)
 
 
-        self.display.EraseAll()
+
+        #self.display.EraseAll()
         self.alist = self.designParameters()
 
         self.validateInputsOnDesignBtn()
@@ -1374,14 +1378,14 @@ class MainController(QMainWindow):
         self.resultObj = self.commLogicObj.call_finCalculation()
         alist = self.resultObj.values()
 
+        self.displaylog_totextedit(self.commLogicObj)
+        self.display_output(self.resultObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
             self.callFin2D_Drawing("All")
 
-        self.displaylog_totextedit(self.commLogicObj)
-        self.display_output(self.resultObj)
 
 
 

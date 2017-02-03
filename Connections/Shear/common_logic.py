@@ -233,11 +233,12 @@ class CommonDesignLogic(object):
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
         fillet_length = self.resultObj['Plate']['height']
-        fillet_thickness = self.uiObj['Weld']['Size (mm)']
+        fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
         plate_width = self.resultObj['Plate']['width']
-        plate_thick = self.uiObj['Plate']['Thickness (mm)']
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
+        plate_thick = str(self.uiObj['Plate']['Thickness (mm)'])
+
+        bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
+        bolt_r = (float(bolt_dia) / 2)
         # bolt_R = self.boltHeadDia_Calculation(bolt_dia) /2
         bolt_R = self.bolt_R
         nut_R = bolt_R
@@ -251,10 +252,10 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         # plate = Plate(L= 300,W =100, T = 10)
-        plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
+        plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
 
         # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
+        Fweld1 = FilletWeld(L=fillet_length, b= int(fillet_thickness), h=int(fillet_thickness))
 
         # bolt = Bolt(R = 17,T = 12.5, H = 50.0, r = 10.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -262,11 +263,11 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
         
         if self.connection == "Finplate":#finColWebBeamWeb
-            gap = beam_tw + plate_thick + nut_T
+            gap = beam_tw + int(plate_thick) + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
             colwebconn = finColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         elif self.connection == "Endplate":
-            gap = column_tw + plate_thick + nut_T
+            gap = column_tw + int(plate_thick) + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)
             colwebconn = endColWebBeamWeb(column,beam,Fweld1,plate,nutBoltArray)
         

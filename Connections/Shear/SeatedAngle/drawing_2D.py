@@ -1645,8 +1645,8 @@ class Seat2DCreatorTop(object):
                 dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
-                pt_Cx1 = ptx + 10 * np.array([-1, 0])
-                pt_Dx1 = ptx + (rect_length + 10) * np.array([-1, 0])
+                pt_Cx1 = ptx + 1 * np.array([-1, 0])
+                pt_Dx1 = ptx + (rect_length - 14) * np.array([-1, 0])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
@@ -1841,8 +1841,8 @@ class Seat2DCreatorTop(object):
                     dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
                     pt_list_column.append(ptx)
 
-                    pt_Cx1 = ptx + 10 * np.array([-1, 0])
-                    pt_Dx1 = ptx + (rect_length + 10) * np.array([-1, 0])
+                    pt_Cx1 = ptx + 1 * np.array([-1, 0])
+                    pt_Dx1 = ptx + (rect_length - 14) * np.array([-1, 0])
                     dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                     pt_list_column.append(ptx)
 

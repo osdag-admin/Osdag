@@ -89,12 +89,13 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-        #boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = float(uiObj["Bolt"]["Grade"])
+        clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        # self.ui.txt_boltHoleClearance.setText(clearance)
+        self.ui.txt_boltHoleClearance.setText(clearance)
         self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
@@ -121,9 +122,7 @@ class DesignPreferences(QDialog):
 
     def set_bolthole_clernce(self):
         uiObj = self.main_controller.getuser_inputs()
-        print "uiobj from bolt_hole_clearance",uiObj
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-        print "#######", boltDia
         if boltDia != "Diameter of Bolt":
             clearance = self.get_clearance(int(boltDia))
             self.ui.txt_boltHoleClearance.setText(str(clearance))
@@ -160,7 +159,6 @@ class DesignPreferences(QDialog):
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
                   12.9: 1220}
-        print"&&&&&&&&&&&", boltGrade
         boltGrd = float(boltGrade)
         return boltFu[boltGrd]
 
@@ -1375,7 +1373,7 @@ class MainController(QMainWindow):
                                               self.alist[5], self.alist[6],
                                               self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
-        self.resultObj = self.commLogicObj.call_finCalculation()
+        self.resultObj = self.commLogicObj.call_calculation()
         alist = self.resultObj.values()
 
         self.displaylog_totextedit(self.commLogicObj)
@@ -1384,7 +1382,7 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
-            self.callFin2D_Drawing("All")
+        self.callFin2D_Drawing("All")
 
 
 
@@ -1468,7 +1466,6 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
                                          self.alist[5], self.alist[6], self.alist[7],
                                          self.alist[8], self.display, self.folder, self.connection)

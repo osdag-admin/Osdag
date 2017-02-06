@@ -87,13 +87,13 @@ class CommonDesignLogic(object):
         self.nut_T = nut_T
         self.display = display
         self.connection = connection
-        self.resultObj = self.call_finCalculation()
+        self.resultObj = self.call_calculation()
         self.connectivityObj = None
         self.folder = folder
         
     #============================= FinCalculation ===========================================
 
-    def call_finCalculation(self):  # Done
+    def call_calculation(self):  # Done
         if self.connection == "Finplate":
             outputs = finConn(self.uiObj)
         else:

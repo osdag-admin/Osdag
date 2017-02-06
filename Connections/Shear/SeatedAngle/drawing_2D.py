@@ -100,6 +100,15 @@ class SeatCommonData(object):
         print self.col_length,"col_length"
         print self.beam_length,"beam_length"
 
+    def arc_for_angle(self, dwg):
+        '''
+
+        :param dwg:
+        :return:
+        '''
+
+        arch = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
+        arch.add(dwg.path(d=" M0,3 L8,6 L5,3 L8,0 L0,3", fill='blue'))
 
     def add_start_marker(self, dwg):
         '''Draw start arrow to given line.  -------->
@@ -200,7 +209,7 @@ class SeatCommonData(object):
 
         Q12mid = 0.5 * (Q1 + Q2)
         txt_pt = Q12mid + params["textoffset"] * normal_unit_vector
-        dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=28))
+        dwg.add(dwg.text(text, insert=txt_pt, fill='black', font_family="sans-serif", font_size=28))
 
         L1 = Q1 + params["endlinedim"] * normal_unit_vector
         L2 = Q1 + params["endlinedim"] * (-normal_unit_vector)
@@ -764,14 +773,16 @@ class Seat2DCreatorFront(object):
 #         for i in range(1, (nr + 1)):
 #             colList = []
 #             for j in range(1, (nc + 1)):
-#                 pt = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + self.data_object.end_dist * np.array([0, 1]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + \
-#                      (j - 1) * self.data_object.gauge * np.array([1, 0])
+#                 pt = self.SC1  + self.data_object.end_dist * np.array([0, 1]) + \
+#                      (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge * np.array([1, 0])
 #                 dwg.add(dwg.circle(center=(pt), r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+#
 #                 ptC = pt - (bolt_r + 4) * np.array([1, 0])
 #                 PtD = pt + (bolt_r + 4) * np.array([1, 0])
 #                 dwg.add(dwg.line((ptC), (PtD)).stroke('red', width=2.0, linecap='square'))
-#                 ptE = self.ptFP + self.data_object.plateEdge_dist * np.array([1, 0]) + (j - 1) * self.data_object.gauge * np.array([1, 0])
-#                 ptF = ptE + self.data_object.plate_ht * np.array([0, 1])
+#
+#                 ptE = self.SC1 + (j - 1) * self.data_object.gauge * np.array([1, 0])
+#                 ptF = ptE +  np.array([0, 1])
 #                 dwg.add(dwg.line((ptE), (ptF)).stroke('blue', width=1.5, linecap='square').dasharray(dasharray=([20, 5, 1, 5])))
 #                 colList.append(pt)
 #             ptList.append(colList)
@@ -780,11 +791,9 @@ class Seat2DCreatorFront(object):
 #         for row in ptList:
 #             if len(row) > 0:
 #                 pitchPts.append(row[0])
-#         params = {"offset": self.data_object.col_depth + self.data_object.plateEdge_dist + 50, "textoffset": 235,
+#         params = {"offset": self.data_object.col_depth + 50, "textoffset": 235,
 #                   "lineori": "right", "endlinedim": 10}
-#         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),
-#                                                     str(len(pitchPts) - 1) + u' \u0040' + str(
-#                                                         int(self.data_object.pitch)) + " mm c/c", params)
+#         self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),str(len(pitchPts) - 1) + u' \u0040' + str(int(self.data_object.pitch)) + " mm c/c", params)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         # ===============================  Cross section A-A  ===============================================
@@ -1596,35 +1605,53 @@ class Seat2DCreatorTop(object):
         ptSecD = ptSecC + (50 * np.array([0, -1]))
         txt_pt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
+        dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#         nc = self.data_object.no_of_col
-#         bolt_r = self.data_object.bolt_dia / 2
-#         ptList = []
-#         if nc >= 1:
-#             for col in range(nc):
-#                 pt = self.FP5 + self.data_object.plateEdge_dist * np.array([1, 0]) + (
-#                                                                                      col) * self.data_object.gauge * np.array(
-#                     [1, 0])
-#                 pt1 = pt - bolt_r * np.array([1, 0])
-#                 rect_width = self.data_object.bolt_dia
-#                 rect_ht = self.data_object.beam_web_thk + self.data_object.plate_thick
-#                 dwg.add(
-#                     dwg.rect(insert=(pt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
-#                 B1 = pt + 10 * np.array([0, -1])
-#                 B2 = pt + (rect_ht + 10) * np.array([0, 1])
-#                 dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
-#                 ptList.append(pt)
-#                 dimOffset = self.data_object.beam_width / 2 + self.data_object.col_flange_thk + self.data_object.col_R1 + 150
-#                 # Draw Faint line between edge and gauge distance
-#                 ptA = B1 + (dimOffset) * np.array([0, -1])
-#                 self.data_object.draw_faint_line(B1, ptA, dwg)
-#
-#                 if len(ptList) > 1:
-#                     params = {"offset": dimOffset, "textoffset": 20, "lineori": "left", "endlinedim": 10}
-#                     self.data_object.draw_dimension_outer_arrow(dwg, np.array(ptList[0]), np.array(ptList[1]),
-#                                                                 str(int(self.data_object.gauge)) + " mm", params)
+        nc = self.data_object.no_of_col
+        nr = self.data_object.no_of_rows
+        bolt_r = self.data_object.bolt_dia / 2
+        pt_List = []
+
+        for i in range(1, (nr + 1)):
+            col_list = []
+            for j in range(1, (nc+ 1)):
+                pt = self.SA1 + (self.data_object.top_angle_legsize_horizontal - self.data_object.end_dist) * np.array([1, 0]) + \
+                     self.data_object.edge_dist * np.array([0, 1]) + (i-1) * self.data_object.pitch * np.array([0, 1]) + (j-1) * self.data_object.gauge * np.array([0, 1])
+                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+                col_list.append(pt)
+            pt_List.append(col_list)
+
+
+        # if nc >= 1:
+        #     for column in range(nc):
+        #         pt = self.SA1 + (self.data_object.top_angle_legsize_horizontal - self.data_object.end_dist) * np.array([1, 0]) + column * self.data_object.gauge * np.array([1, 0])
+        #         pt1 = pt - bolt_r * np.array([1, 0])
+                # rect_width = self.data_object.bolt_dia
+                # rect_ht = self.data_object.beam_web_thk + self.data_object.plate_thick
+                # dwg.add(
+                #     dwg.rect(insert=(pt1), size=(rect_width, rect_ht), fill='black', stroke='black', stroke_width=2.5))
+                # B1 = pt + 10 * np.array([0, -1])
+                # B2 = pt + (rect_ht + 10) * np.array([0, 1])
+                # dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
+                # ptList.append(pt)
+                # dimOffset = self.data_object.beam_width / 2 + self.data_object.col_flange_thk + self.data_object.col_R1 + 150
+                # Draw Faint line between edge and gauge distance
+                # ptA = B1 + (dimOffset) * np.array([0, -1])
+                # self.data_object.draw_faint_line(B1, ptA, dwg)
+
+                # if len(ptList) > 1:
+                #     params = {"offset": dimOffset, "textoffset": 20, "lineori": "left", "endlinedim": 10}
+                #     self.data_object.draw_dimension_outer_arrow(dwg, np.array(ptList[0]), np.array(ptList[1]),
+                #                                                 str(int(self.data_object.gauge)) + " mm", params)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         # ===============================  Beam Information  ========================================
@@ -1756,7 +1783,29 @@ class Seat2DCreatorTop(object):
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        nc = self.data_object.no_of_col
+        nr = self.data_object.no_of_rows
+        bolt_r = self.data_object.bolt_dia / 2
+        pt_List = []
+
+        for i in range(1, (nr + 1)):
+            col_list = []
+            for j in range(1, (nc + 1)):
+                pt = self.SWA1 + (self.data_object.top_angle_legsize_horizontal - self.data_object.end_dist) * np.array([1, 0]) + \
+                     self.data_object.edge_dist * np.array([0, 1]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge * np.array([0, 1])
+                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+                col_list.append(pt)
+            pt_List.append(col_list)
+
+        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #         nc = self.data_object.no_of_col
 #         bolt_r = self.data_object.bolt_dia / 2
 #         ptList = []
@@ -2334,7 +2383,55 @@ class Seat2DCreatorSide(object):
         element = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down)
 
-        # # Diagonal Hatching for WELD
+        # ===============================  Top angle Bolts plotting  ========================================
+
+        nc = self.data_object.no_of_col
+        nr = self.data_object.no_of_rows
+        bolt_r = self.data_object.bolt_dia / 2
+        pt_list_top = []
+
+        for i in range(1, (nr + 1)):
+            col_list_top = []
+            for j in range(1, (nc + 1)):
+                pt = self.SB6 + (self.data_object.top_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, -1]) + \
+                     self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge * np.array([1, 0])
+                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+                col_list_top.append(pt)
+            pt_list_top.append(col_list_top)
+
+        # ===============================  Seat angle Bolts plotting  ========================================
+
+        nc1 = self.data_object.no_of_col
+        nr1 = self.data_object.no_of_rows
+        pt_list_seat = []
+
+        for i in range(1, (nr1 + 1)):
+            col_list_seat = []
+            for j in range(1, (nc1 + 1)):
+                pt = self.SB11 + (self.data_object.seat_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, 1]) + \
+                     self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge * np.array([1, 0])
+                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+                col_list_seat.append(pt)
+            pt_list_seat.append(col_list_seat)
+
+
+                # # Diagonal Hatching for WELD
         # pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         # pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))
         # # 12 mm thickness is provided for weld to get clear visibility of weld hashed lines

@@ -68,14 +68,14 @@ def bolt_bearing(dia, t, fu, beam_fu):
 def end_plate_t_min(beam_depth, grade_bolt, dia):
     if beam_depth < 450:
         if grade_bolt <= 4.6:
-            min_endplate = min(8, dia / 3)
+            min_endplate = min(8, int(dia) / 3)
         else:
-            min_endplate = min(8, dia / 2)
+            min_endplate = min(8, int(dia) / 2)
     else:
         if grade_bolt <= 4.6:
-            min_endplate = min(10, dia / 3)
+            min_endplate = min(10, int(dia) / 3)
         else:
-            min_endplate = min(10, dia / 2)
+            min_endplate = min(10, int(dia) / 2)
     return min_endplate
 
 # BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
@@ -166,23 +166,28 @@ def end_connection(ui_obj):
     beam_sec = ui_obj['Member']['BeamSection']
     column_sec = ui_obj['Member']['ColumSection']
     connectivity = ui_obj['Member']['Connectivity']
-    beam_fu = ui_obj['Member']['fu (MPa)']
-    beam_fy = ui_obj['Member']['fy (MPa)']
+    beam_fu = float(ui_obj['Member']['fu (MPa)'])
+    beam_fy = float(ui_obj['Member']['fy (MPa)'])
               
-    shear_load = ui_obj['Load']['ShearForce (kN)']
+    shear_load = float(str(ui_obj['Load']['ShearForce (kN)']))
+    print " shear_load =", shear_load
                   
-    bolt_dia = ui_obj['Bolt']['Diameter (mm)']
+    bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
-    bolt_grade = ui_obj['Bolt']['Grade']
+    bolt_grade = float(ui_obj['Bolt']['Grade'])
               
-    end_plate_t = ui_obj['Plate']['Thickness (mm)']
+    end_plate_t = float(ui_obj['Plate']['Thickness (mm)'])
     end_plate_w = ui_obj['Plate']['Width (mm)']
+    if end_plate_w == '':
+        end_plate_w = 0
     end_plate_l = ui_obj['Plate']['Height (mm)']
+    if end_plate_l == '':
+        end_plate_l = 0
     web_plate_fu = ui_obj['Member']['fu (MPa)']
     web_plate_fy = ui_obj['Member']['fy (MPa)']
     user_height = end_plate_l 
     user_width = end_plate_w      
-    weld_t = ui_obj["Weld"]['Size (mm)']
+    weld_t = float(ui_obj["Weld"]['Size (mm)'])
     weld_fu = 410
 
     bolt_planes = 1 

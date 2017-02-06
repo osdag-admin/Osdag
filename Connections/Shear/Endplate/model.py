@@ -61,7 +61,7 @@ def get_beamcombolist():
     beam_query = QSqlQuery("Select Designation from Beams")
     combo_list.append("Select Designation")
     while(beam_query.next()):
-        combo_list.append(beam_query.value(0).toString())
+        combo_list.append(beam_query.value(0))
     return combo_list
 
 
@@ -80,7 +80,7 @@ def get_beamdata(sect):
     while(design_query.next()):
         for i in range(0, record.count()):
             col_name = record.fieldName(i)
-            ret_dict[col_name] = design_query.value(i).toString()
+            ret_dict[col_name] = design_query.value(i)
 
     # print(ret_dict[QString("tw")])
 
@@ -95,7 +95,7 @@ def get_columncombolist():
     column_query = QSqlQuery("SELECT Designation FROM Columns")
     combo_list.append("Select Column")
     while(column_query.next()):
-        combo_list.append(column_query.value(0).toString())
+        combo_list.append(column_query.value(0))
     return combo_list
 
 
@@ -116,7 +116,7 @@ def get_columndata(sect):
     while(design_query.next()):
         for i in range(0, record.count()):
             col_name = record.fieldName(i)
-            ret_dict[col_name] = design_query.value(i).toString()
+            ret_dict[col_name] = design_query.value(i)
 
     return ret_dict
 

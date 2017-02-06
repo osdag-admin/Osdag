@@ -119,8 +119,9 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        bolt_grade = float(uiObj["Bolt"]["Grade"])
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        print "#boltDia#=",boltDia
+        bolt_grade = (uiObj["Bolt"]["Grade"])
         clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
@@ -152,15 +153,22 @@ class DesignPreferences(QDialog):
 
     def set_bolthole_clernce(self):
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        clearance = self.get_clearance(boltDia)
-        self.ui.txt_boltHoleClearance.setText(str(clearance))
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != "Diameter of Bolt":
+            clearance = self.get_clearance(boltDia)
+            self.ui.txt_boltHoleClearance.setText(str(clearance))
+        else:
+            pass
+
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
-        boltGrade = float(uiObj["Bolt"]["Grade"])
-        boltfu = str(self.get_boltFu(boltGrade))
-        self.ui.txt_boltFu.setText(boltfu)
+        boltGrade = str(uiObj["Bolt"]["Grade"])
+        if boltGrade != '':
+            boltfu = str(self.get_boltFu(boltGrade))
+            self.ui.txt_boltFu.setText(boltfu)
+        else:
+            pass
 
     def get_clearance(self, boltDia):
 
@@ -168,7 +176,7 @@ class DesignPreferences(QDialog):
         overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
-            clearance = standard_clrnce[boltDia]
+            clearance = standard_clrnce[float(boltDia)]
         else:
             clearance = overhead_clrnce[boltDia]
         
@@ -179,7 +187,7 @@ class DesignPreferences(QDialog):
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
-        return boltFu[boltGrade]
+        return boltFu[float(boltGrade)]
 
     def close_designPref(self):
         self.close()
@@ -543,7 +551,7 @@ class MainController(QMainWindow):
             plate_thickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = plate_thickness.toFloat()
+            plate_thick = float(plate_thickness)
             if plate_thick <= 10:
 
                 for i in weldlist[:]:
@@ -783,27 +791,27 @@ class MainController(QMainWindow):
         '''
         uiobj = {}
         uiobj["Bolt"] = {}
-        uiobj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
-        uiobj["Bolt"]["Grade"] = float(self.ui.comboGrade.currentText())
+        uiobj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText()
+        uiobj["Bolt"]["Grade"] = (self.ui.comboGrade.currentText())
         uiobj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
         uiobj["Weld"] = {}
-        uiobj["Weld"]['Size (mm)'] = self.ui.comboWldSize.currentText().toInt()[0]
+        uiobj["Weld"]['Size (mm)'] = self.ui.comboWldSize.currentText()
 
         uiobj['Member'] = {}
         uiobj['Member']['BeamSection'] = str(self.ui.combo_Beam.currentText())
         uiobj['Member']['ColumSection'] = str(self.ui.comboColSec.currentText())
         uiobj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
-        uiobj['Member']['fu (MPa)'] = self.ui.txtFu.text().toInt()[0]
-        uiobj['Member']['fy (MPa)'] = self.ui.txtFy.text().toInt()[0]
+        uiobj['Member']['fu (MPa)'] = self.ui.txtFu.text()
+        uiobj['Member']['fy (MPa)'] = self.ui.txtFy.text()
 
         uiobj['Plate'] = {}
-        uiobj['Plate']['Thickness (mm)'] = self.ui.comboPlateThick_2.currentText().toInt()[0]
-        uiobj['Plate']['Height (mm)'] = self.ui.txtPlateLen.text().toInt()[0]  # changes the label length to height
-        uiobj['Plate']['Width (mm)'] = self.ui.txtPlateWidth.text().toInt()[0]
+        uiobj['Plate']['Thickness (mm)'] = self.ui.comboPlateThick_2.currentText()
+        uiobj['Plate']['Height (mm)'] = self.ui.txtPlateLen.text()  # changes the label length to height
+        uiobj['Plate']['Width (mm)'] = self.ui.txtPlateWidth.text()
 
         uiobj['Load'] = {}
-        uiobj['Load']['ShearForce (kN)'] = self.ui.txtShear.text().toInt()[0]
+        uiobj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
 
         return uiobj
 
@@ -1116,13 +1124,13 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text().isEmpty() or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text() == ' ' or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
-        elif self.ui.txtFy.text().isEmpty() or float(self.ui.txtFy.text()) == 0:
+        elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
-        elif self.ui.txtShear.text().isEmpty() or float(str(self.ui.txtShear.text())) == 0:
+        elif self.ui.txtShear.text() == ' ' or float(str(self.ui.txtShear.text())) == 0:
             QMessageBox.about(self, "Information", "Please select Factored shear load")
             
         elif self.ui.comboDiameter.currentIndex() == 0 :
@@ -1153,39 +1161,34 @@ class MainController(QMainWindow):
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
         if os.name == 'nt':
 
             global display, start_display, app, _
 
+            from OCC.Display.backend import get_loaded_backend
+            lodedbkend = get_loaded_backend()
             from OCC.Display.backend import get_backend, have_backend
             from osdagMainSettings import backend_name
-            if(not have_backend() and backend_name() == "pyqt5"):
+            if (not have_backend() and backend_name() == "pyqt5"):
                 get_backend("qt-pyqt5")
-
         else:
+
             global display, start_display, app, _, USED_BACKEND
+            if 'qt' in used_backend:
+                from OCC.Display.qtDisplay import qtViewer3d
+                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-            if not backend_str:
-                USED_BACKEND = self.get_backend()
-            elif backend_str in ['pyside', 'pyqt5']:
-                USED_BACKEND = backend_str
-            else:
-                raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-                sys.exit(1)
-
-            # Qt based simple GUI
-            if USED_BACKEND in ['pyqt4', 'pyside']:
-                if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.pyqt4Display
-                    from OCC.Display.qtDisplay import qtViewer3d
-                    #from PyQt4 import QtCore, QtGui, QtOpenGL
-
+        # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
-
         self.ui.modelTab = qtViewer3d(self)
 
-
-        self.setWindowTitle("Osdag Endplate")
+        # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
+        self.setWindowTitle("Osdag Finplate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 
@@ -1195,21 +1198,81 @@ class MainController(QMainWindow):
         # background gradient
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        # display black trihedron
         display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
-        def center_on_screen(self):
-                    '''Centers the window on the screen.'''
-                    resolution = QDesktopWidget().screenGeometry()
-                    self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
-                              (resolution.height() / 2) - (self.frameSize().height() / 2))
+        def centerOnScreen(self):
+            '''Centers the window on the screen.'''
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                      (resolution.height() / 2) - (self.frameSize().height() / 2))
 
         def start_display():
             self.ui.modelTab.raise_()
-            # self.ui.model2dTab.raise_()   # make the application float to the top
 
         return display, start_display
+
+
+
+
+
+        # if os.name == 'nt':
+        #
+        #     global display, start_display, app, _
+        #
+        #     from OCC.Display.backend import get_backend, have_backend
+        #     from osdagMainSettings import backend_name
+        #     if(not have_backend() and backend_name() == "pyqt5"):
+        #         get_backend("qt-pyqt5")
+        #
+        # else:
+        #     global display, start_display, app, _, USED_BACKEND
+        #
+        #     if not backend_str:
+        #         USED_BACKEND = self.get_backend()
+        #     elif backend_str in ['pyside', 'pyqt5']:
+        #         USED_BACKEND = backend_str
+        #     else:
+        #         raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
+        #         sys.exit(1)
+        #
+        #     # Qt based simple GUI
+        #     if USED_BACKEND in ['pyqt4', 'pyside']:
+        #         if USED_BACKEND == 'pyqt4':
+        #             import OCC.Display.pyqt4Display
+        #             from OCC.Display.qtDisplay import qtViewer3d
+        #             #from PyQt4 import QtCore, QtGui, QtOpenGL
+        #
+        # from OCC.Display.qtDisplay import qtViewer3d
+        #
+        # self.ui.modelTab = qtViewer3d(self)
+        #
+        #
+        # self.setWindowTitle("Osdag Endplate")
+        # self.ui.mytabWidget.resize(size[0], size[1])
+        # self.ui.mytabWidget.addTab(self.ui.modelTab, "")
+        #
+        # self.ui.modelTab.InitDriver()
+        # display = self.ui.modelTab._display
+        #
+        # # background gradient
+        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        # # display black trihedron
+        # display.display_trihedron()
+        # display.View.SetProj(1, 1, 1)
+        #
+        # def center_on_screen(self):
+        #             '''Centers the window on the screen.'''
+        #             resolution = QDesktopWidget().screenGeometry()
+        #             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+        #                       (resolution.height() / 2) - (self.frameSize().height() / 2))
+        #
+        # def start_display():
+        #     self.ui.modelTab.raise_()
+        #     # self.ui.model2dTab.raise_()   # make the application float to the top
+        #
+        # return display, start_display
 
 
 # #################################################################################################################################################
@@ -1345,7 +1408,7 @@ class MainController(QMainWindow):
         dictcoldata = self.fetch_column_param()
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
-        bolt_dia = self.uiobj["Bolt"]["Diameter (mm)"]
+        bolt_dia = int(self.uiobj["Bolt"]["Diameter (mm)"])
         bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
@@ -1365,16 +1428,18 @@ class MainController(QMainWindow):
 
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,connection)
 
-        self.result_obj = self.commLogicObj.call_finCalculation()
-        d = self.result_obj[self.result_obj.keys()[0]]
-        if len(str(d[d.keys()[0]])) == 0:
-            self.ui.btn_CreateDesign.setEnabled(False)
-        self.display_output(self.result_obj)
-        self.displaylog_totextedit(self.commLogicObj)
-        status = self.result_obj['Bolt']['status']
+        self.resultObj = self.commLogicObj.call_calculation()
+        alist = self.resultObj.values()
 
-        self.commLogicObj.call_3DModel(status)
-        self.callend2D_Drawing("All")
+        self.displaylog_totextedit(self.commLogicObj)
+        self.display_output(self.resultObj)
+        isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+        if isempty[0] == True:
+            status = self.resultObj['Bolt']['status']
+            self.commLogicObj.call_3DModel(status)
+            self.callend2D_Drawing("All")
+
+
         
     def create_2d_cad(self, connectivity):
         ''' Returns the fuse model of endplate

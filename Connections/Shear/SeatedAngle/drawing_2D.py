@@ -1607,11 +1607,13 @@ class Seat2DCreatorTop(object):
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # ===============================  Top angle Bolts plotting  ========================================
+
         nc = self.data_object.no_of_col
         nr = self.data_object.no_of_rows
         bolt_r = self.data_object.bolt_dia / 2
-        pt_List = []
+        pt_list = []
+        pt_list_column = []
 
         for i in range(1, (nr + 1)):
             col_list = []
@@ -1628,10 +1630,28 @@ class Seat2DCreatorTop(object):
                 dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
 
                 col_list.append(pt)
-            pt_List.append(col_list)
+            pt_list.append(col_list)
 
+        if nc >= 1:
+            for column in range(nc):
+                ptx = self.SA6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([0, -1]) - self.data_object.col_flange_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
+                ptx1 = ptx - bolt_r * np.array([0, 1])
+                rect_width = self.data_object.bolt_dia
+                rect_length = self.data_object.col_flange_thk + self.data_object.top_angle_thickness
+                dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-        # if nc >= 1:
+                pt_Cx = ptx + 10 * np.array([1, 0])
+                pt_Dx = ptx + (rect_length + 10) * np.array([1, 0])
+                dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
+                pt_Cx1 = ptx + 10 * np.array([-1, 0])
+                pt_Dx1 = ptx + (rect_length + 10) * np.array([-1, 0])
+                dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            # if nc >= 1:
         #     for column in range(nc):
         #         pt = self.SA1 + (self.data_object.top_angle_legsize_horizontal - self.data_object.end_dist) * np.array([1, 0]) + column * self.data_object.gauge * np.array([1, 0])
         #         pt1 = pt - bolt_r * np.array([1, 0])
@@ -1783,10 +1803,13 @@ class Seat2DCreatorTop(object):
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
+        # ===============================  Top angle Bolts plotting  ========================================
+
         nc = self.data_object.no_of_col
         nr = self.data_object.no_of_rows
         bolt_r = self.data_object.bolt_dia / 2
-        pt_List = []
+        pt_list = []
+        pt_list_column = []
 
         for i in range(1, (nr + 1)):
             col_list = []
@@ -1803,9 +1826,28 @@ class Seat2DCreatorTop(object):
                 dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
 
                 col_list.append(pt)
-            pt_List.append(col_list)
+            pt_list.append(col_list)
 
-        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            if nc >= 1:
+                for column in range(nc):
+                    ptx = self.SWA6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([0, -1]) - self.data_object.col_web_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
+                    ptx1 = ptx - bolt_r * np.array([0, 1])
+                    rect_width = self.data_object.bolt_dia
+                    rect_length = self.data_object.col_web_thk + self.data_object.top_angle_thickness
+                    dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+
+                    pt_Cx = ptx + 10 * np.array([1, 0])
+                    pt_Dx = ptx + (rect_length + 10) * np.array([1, 0])
+                    dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+                    pt_list_column.append(ptx)
+
+                    pt_Cx1 = ptx + 10 * np.array([-1, 0])
+                    pt_Dx1 = ptx + (rect_length + 10) * np.array([-1, 0])
+                    dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+                    pt_list_column.append(ptx)
+
+
+                    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #         nc = self.data_object.no_of_col
 #         bolt_r = self.data_object.bolt_dia / 2
 #         ptList = []
@@ -2263,7 +2305,6 @@ class Seat2DCreatorSide(object):
         text_down = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
-
         # ===============================  Top angle Bolts plotting  ========================================
 
         nc = self.data_object.no_of_col
@@ -2310,8 +2351,6 @@ class Seat2DCreatorSide(object):
 
                 col_list_seat.append(pt)
             pt_list_seat.append(col_list_seat)
-
-
 
         # ======================================  2D view name  ================================================
         ptx = self.SWH + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])

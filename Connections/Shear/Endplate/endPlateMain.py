@@ -796,7 +796,7 @@ class MainController(QMainWindow):
         uiobj["Bolt"]["Type"] = str(self.ui.comboType.currentText())
 
         uiobj["Weld"] = {}
-        uiobj["Weld"]['Size (mm)'] = self.ui.comboWldSize.currentText()
+        uiobj["Weld"]['Size (mm)'] = str(self.ui.comboWldSize.currentText())
 
         uiobj['Member'] = {}
         uiobj['Member']['BeamSection'] = str(self.ui.combo_Beam.currentText())
@@ -806,9 +806,9 @@ class MainController(QMainWindow):
         uiobj['Member']['fy (MPa)'] = self.ui.txtFy.text()
 
         uiobj['Plate'] = {}
-        uiobj['Plate']['Thickness (mm)'] = self.ui.comboPlateThick_2.currentText()
-        uiobj['Plate']['Height (mm)'] = self.ui.txtPlateLen.text()  # changes the label length to height
-        uiobj['Plate']['Width (mm)'] = self.ui.txtPlateWidth.text()
+        uiobj['Plate']['Thickness (mm)'] = str(self.ui.comboPlateThick_2.currentText())
+        uiobj['Plate']['Height (mm)'] = str(self.ui.txtPlateLen.text())  # changes the label length to height
+        uiobj['Plate']['Width (mm)'] = str(self.ui.txtPlateWidth.text())
 
         uiobj['Load'] = {}
         uiobj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
@@ -1438,6 +1438,9 @@ class MainController(QMainWindow):
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
             self.callend2D_Drawing("All")
+        else:
+            self.display.EraseAll()
+
 
 
         

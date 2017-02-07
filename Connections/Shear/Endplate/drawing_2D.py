@@ -41,12 +41,12 @@ class EndCommonData(object):
         self.beam_R1 = float(dict_beam_data["R1"])
         self.col_R1 = float(dict_column_data["R1"])
         self.plate_ht = ouput_obj['Plate']['height']
-        self.plate_thick = input_obj['Plate']["Thickness (mm)"]
+        self.plate_thick = int(input_obj['Plate']["Thickness (mm)"])
         self.bolt_grade = input_obj['Bolt']['Grade']
         self.plate_width = ouput_obj['Plate']['width']
         self.weld_len = ouput_obj['Weld']['weldlength']
-        self.weld_thick = input_obj['Weld']['Size (mm)']
-        self.bolt_dia = input_obj["Bolt"]["Diameter (mm)"]
+        self.weld_thick = int(input_obj['Weld']['Size (mm)'])
+        self.bolt_dia = int(input_obj["Bolt"]["Diameter (mm)"])
         self.connectivity = input_obj['Member']['Connectivity']
         self.pitch = ouput_obj['Bolt']["pitch"]
         self.gauge = ouput_obj['Bolt']["gauge"]
@@ -540,7 +540,7 @@ class End2DCreatorFront(object):
 
         self.U = self.ptP + (self.dataObj.plate_ht) * np.array([0, 1])
 
-        ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.plate_thick
+        ptRx = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + int(self.dataObj.plate_thick)
         ptRy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         self.R = (ptRx, ptRy)
 

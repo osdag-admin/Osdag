@@ -71,6 +71,14 @@ class SvgWindow(object):
         # self.btn_save.clicked.connect(view)
 
         if view == "Front":
+
+            png_image_path = self.folder + "/images_html/endFront.png"
+            options = QFileDialog.Options()
+            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)",options=options)
+            file_name = str(file_tup[0])
+            shutil.copyfile(png_image_path, file_name)
+
+
             png_image_path = self.folder + "/images_html/endFront.png"
             shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)")))
         elif view == "Side":

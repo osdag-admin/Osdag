@@ -472,6 +472,9 @@ class MainController(QMainWindow):
     def fill_plate_thick_combo(self):
         '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
         '''
+        print" combo_beam text:", self.ui.combo_Beam.currentText()
+        if str(self.ui.combo_Beam.currentText()) == 'Select section':
+            return
         dict_beam_data = self.fetch_beam_param()
         beam_tw = float(dict_beam_data["tw"])
         plate_thickness = [6, 8, 10, 12, 14, 16, 18, 20]
@@ -551,7 +554,7 @@ class MainController(QMainWindow):
             plate_thickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = float(plate_thickness)
+            plate_thick = plate_thickness
             if plate_thick <= 10:
 
                 for i in weldlist[:]:
@@ -684,6 +687,8 @@ class MainController(QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
 
+            if self.ui.combo_Beam.currentText()== "Select section" or self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentText()=='Select section':
+                return
             dict_beam_data = self.fetch_beam_param()
             dict_col_data = self.fetch_column_param()
             column_D = float(dict_col_data["D"])
@@ -699,6 +704,9 @@ class MainController(QMainWindow):
             else:
                 self.ui.btn_Design.setDisabled(False)
         elif loc == "Beam-Beam":
+
+            if self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
+                return
 
             dict_sec_beam_data = self.fetch_beam_param()
             dict_pri_beam_data = self.fetch_column_param()

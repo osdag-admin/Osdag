@@ -59,7 +59,7 @@ def get_beamcombolist():
     '''
     combo_list = []
     beam_query = QSqlQuery("Select Designation from Beams")
-    combo_list.append("Select Designation")
+    combo_list.append("Select section")
     while(beam_query.next()):
         combo_list.append(beam_query.value(0))
     return combo_list
@@ -93,7 +93,7 @@ def get_columncombolist():
     '''
     combo_list = []
     column_query = QSqlQuery("SELECT Designation FROM Columns")
-    combo_list.append("Select Column")
+    combo_list.append("Select section")
     while(column_query.next()):
         combo_list.append(column_query.value(0))
     return combo_list

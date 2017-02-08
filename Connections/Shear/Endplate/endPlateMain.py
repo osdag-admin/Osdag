@@ -427,12 +427,12 @@ class MainController(QMainWindow):
 
     def save_2d_cad_images(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
-        filename = str(filename)
+        filename,_ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fname = str(filename)
         file_extension = filename.split(".")[-1]
 
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
-            self.display.ExportToImage(filename)
+            self.display.ExportToImage(fname)
             QMessageBox.about(self, 'Information', "File saved")
 
     def disable_view_buttons(self):
@@ -1457,40 +1457,73 @@ class MainController(QMainWindow):
             self.display.EraseAll()
 
 
-
-        
-    def create_2d_cad(self, connectivity):
-        ''' Returns the fuse model of endplate
+    def create2Dcad(self):
+        ''' Returns the 3D model of finplate depending upon component
         '''
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.columnModel
+
+        elif self.commLogicObj.component == "Plate":
+            cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
+                       self.commLogicObj.connectivityObj.weldModelRight,
+                       self.commLogicObj.connectivityObj.plateModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
+        
+    # def create_2d_cad(self, connectivity):
+    #     ''' Returns the fuse model of endplate
+    #     '''
+    #     cadlist = self.connectivity.get_models()
+    #     final_model = cadlist[0]
+    #     for model in cadlist[1:]:
+    #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+    #     return final_model
 
     # Export to IGS,STEP,STL,BREP
     def save_3d_cad_images(self):
-        if self.connectivity is None:
-            self.connectivity = self.create_3d_col_web_beam_web()
+
         if self.fuse_model is None:
-            self.fuse_model = self.create_2d_cad(self.connectivity)
+            self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
-        filename = str(filename)
-        file_extension = filename.split(".")[-1]
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fName = str(fileName)
+
+        # if self.connectivity is None:
+        #     self.connectivity = self.create_3d_col_web_beam_web()
+        # if self.fuse_model is None:
+        #     self.fuse_model = self.create_2d_cad(self.connectivity)
+        # shape = self.fuse_model
+        #
+        # files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+        # filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        #
+        # filename = str(filename)
+
+        file_extension = fName.split(".")[-1]
 
         if file_extension == 'igs':
             IGESControl.IGESControl_Controller().Init()
             iges_writer = IGESControl.IGESControl_Writer()
             iges_writer.AddShape(shape)
-            iges_writer.Write(filename)
+            iges_writer.Write(fName)
 
         elif file_extension == 'brep':
 
-            BRepTools.breptools.Write(shape, filename)
+            BRepTools.breptools.Write(shape, fName)
 
         elif file_extension == 'stp':
             # initialize the STEP exporter
@@ -1499,34 +1532,35 @@ class MainController(QMainWindow):
 
             # transfer shapes and write file
             step_writer.Transfer(shape, STEPControl_AsIs)
-            status = step_writer.Write(filename)
+            status = step_writer.Write(fName)
 
             assert(status == IFSelect_RetDone)
 
         else:
             stl_writer = StlAPI_Writer()
             stl_writer.SetASCIIMode(True)
-            stl_writer.Write(shape, filename)
+            stl_writer.Write(shape, fName)
 
+        self.fuse_model = None
         QMessageBox.about(self, 'Information', "File saved")
 
-    def display_2d_model_original(self, final_model, view_name):
-
-        self.display, _ = self.init_display()
-        self.display.EraseAll()
-        # self.display.SetModeWireFrame()
-
-        self.display.DisplayShape(final_model, update=True)
-        self.display.SetModeHLR()
-
-        if (view_name == "Front"):
-            self.display.View_Front()
-        elif (view_name == "Top"):
-            self.display.View_Top()
-        elif (view_name == "Right"):
-            self.display.View_Right()
-        else:
-            pass
+    # def display_2d_model_original(self, final_model, view_name):
+    #
+    #     self.display, _ = self.init_display()
+    #     self.display.EraseAll()
+    #     # self.display.SetModeWireFrame()
+    #
+    #     self.display.DisplayShape(final_model, update=True)
+    #     self.display.SetModeHLR()
+    #
+    #     if (view_name == "Front"):
+    #         self.display.View_Front()
+    #     elif (view_name == "Top"):
+    #         self.display.View_Top()
+    #     elif (view_name == "Right"):
+    #         self.display.View_Right()
+    #     else:
+    #         pass
 
 
     def call_desired_view(self, filename, view):

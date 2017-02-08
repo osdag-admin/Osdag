@@ -44,6 +44,7 @@ from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from utilities import osdag_display_shape
 from Svg_Window import SvgWindow
+import pdfkit
 
 
 class MyAskQuestion(QDialog):
@@ -592,8 +593,8 @@ class MainController(QMainWindow):
 
     def save_2d_cad_images(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
-        fName = str(filename)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
@@ -712,7 +713,7 @@ class MainController(QMainWindow):
         '''
         ui_obj = {}
         ui_obj["Bolt"] = {}
-        ui_obj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText().toInt()[0]
+        ui_obj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText()== ' '
         ui_obj["Bolt"]["Grade"] = float(self.ui.comboBoltGrade.currentText())
         # ui_obj["Bolt"]["Grade"] = 8.8
         ui_obj["Bolt"]["Type"] = str(self.ui.comboBoltType.currentText())
@@ -721,15 +722,15 @@ class MainController(QMainWindow):
         ui_obj['Member']['BeamSection'] = str(self.ui.combo_Beam.currentText())
         ui_obj['Member']['ColumSection'] = str(self.ui.comboColSec.currentText())
         ui_obj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
-        ui_obj['Member']['fu (MPa)'] = self.ui.txtFu.text().toInt()[0]
-        ui_obj['Member']['fy (MPa)'] = self.ui.txtFy.text().toInt()[0]
+        ui_obj['Member']['fu (MPa)'] = self.ui.txtFu.text()== ' '
+        ui_obj['Member']['fy (MPa)'] = self.ui.txtFy.text()== ' '
 
         ui_obj['cleat'] = {}
         ui_obj['cleat']['section'] = str(self.ui.comboCleatSection.currentText())
-        ui_obj['cleat']['Height (mm)'] = float(self.ui.txtInputCleatHeight.text().toInt()[0])  # changes the label length to height
+        ui_obj['cleat']['Height (mm)'] = float(self.ui.txtInputCleatHeight.text()== ' ')  # changes the label length to height
 
         ui_obj['Load'] = {}
-        # ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text().toInt()[0])
+        # ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text()== ' ')
         ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text())
 
         return ui_obj
@@ -796,14 +797,17 @@ class MainController(QMainWindow):
         if sys.platform == "nt":
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
-                         options=options)
+
+        file_type = "PDF (*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        pdfkit.from_file(filename, fname, configuration=config, options=options)
+
         QMessageBox.about(self, 'Information', "Report Saved")
 
     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -828,28 +832,6 @@ class MainController(QMainWindow):
         outf << self.ui.textEdit.toPlainText()
         QApplication.restoreOverrideCursor()
 
-        # self.setCurrentFile(filename);
-        # QMessageBox.about(self,'Information',"File saved")
-
-    ###########################################################################################################################
-        # def save_yaml(self,outObj,ui_obj):
-        #     '''(dictiionary,dictionary) -> NoneType
-        #     Saving input and output to file in following format.
-        #     Bolt:
-        #       diameter: 6
-        #       grade: 8.800000190734863
-        #       type: HSFG
-        #     Load:
-        #       shearForce: 100
-
-        #     '''
-        #     newDict = {"INPUT": ui_obj, "OUTPUT": outObj}
-        #     filename = QFileDialog.getSaveFileName(self,"Save File As","output/SaveDesign","Text File (*.txt)")
-        #     f = open(filename,'w')
-        #     yaml.dump(newDict,f,allow_unicode=True, default_flow_style=False)
-
-        # return self.save_file(filename+".txt")
-        # QMessageBox.about(self,'Information',"File saved")
 
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
@@ -1073,6 +1055,10 @@ class MainController(QMainWindow):
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
         if os.name == 'nt':
 
             global display, start_display, app, _
@@ -1081,28 +1067,18 @@ class MainController(QMainWindow):
             lodedbkend = get_loaded_backend()
             from OCC.Display.backend import get_backend, have_backend
             from osdagMainSettings import backend_name
-            if(not have_backend() and backend_name() == "pyqt5"):
+            if (not have_backend() and backend_name() == "pyqt5"):
                 get_backend("qt-pyqt5")
         else:
+
             global display, start_display, app, _, USED_BACKEND
+            if 'qt' in used_backend:
+                from OCC.Display.qtDisplay import qtViewer3d
+                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-            if not backend_str:
-                USED_BACKEND = self.get_backend()
-            elif backend_str in ['pyside', 'pyqt5']:
-                USED_BACKEND = backend_str
-            else:
-                raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-                sys.exit(1)
-
-            # Qt based simple GUI
-            if USED_BACKEND in ['pyqt5', 'pyside']:
-                if USED_BACKEND == 'pyqt5':
-                    from OCC.Display.qtDisplay import qtViewer3d
-
+        # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
-
         self.ui.modelTab = qtViewer3d(self)
-        # self.ui.model2dTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Cleat Angle")
         self.ui.mytabWidget.resize(size[0], size[1])
@@ -1645,39 +1621,63 @@ class MainController(QMainWindow):
         self.call_3d_model(status)
         self.call_2d_drawing('All')
 
-    def create_2d_cad(self, connectivity):
-        ''' Returns the fuse model of cleat angle
+    # def create_2d_cad(self, connectivity):
+    #     ''' Returns the fuse model of cleat angle
+    #     '''
+    #     cadlist = self.connectivity.get_models()
+    #     final_model = cadlist[0]
+    #     for model in cadlist[1:]:
+    #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+    #     return final_model
+
+    def create2Dcad(self):
+        ''' Returns the 3D model of finplate depending upon component
         '''
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.columnModel
+
+        elif self.commLogicObj.component == "Plate":
+            cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
+                       self.commLogicObj.connectivityObj.weldModelRight,
+                       self.commLogicObj.connectivityObj.plateModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
 
     # Export to IGS,STEP,STL,BREP
 
     def save_3d_cad_images(self):
-        if self.connectivity is None:
-            self.connectivity = self.create_3d_col_web_beam_web()
+
         if self.fuse_model is None:
-            self.fuse_model = self.create_2d_cad(self.connectivity)
+            self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
-        file_name = str(filename)
-        file_extension = file_name.split(".")[-1]
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fName = str(fileName)
+
+        file_extension = fName.split(".")[-1]
 
         if file_extension == 'igs':
             IGESControl.IGESControl_Controller().Init()
             iges_writer = IGESControl.IGESControl_Writer()
             iges_writer.AddShape(shape)
-            iges_writer.Write(file_name)
+            iges_writer.Write(fName)
 
         elif file_extension == 'brep':
 
-            BRepTools.breptools.Write(shape, file_name)
+            BRepTools.breptools.Write(shape, fName)
 
         elif file_extension == 'stp':
             # initialize the STEP exporter
@@ -1686,16 +1686,60 @@ class MainController(QMainWindow):
 
             # transfer shapes and write file
             step_writer.Transfer(shape, STEPControl_AsIs)
-            status = step_writer.Write(file_name)
+            status = step_writer.Write(fName)
 
-            assert(status == IFSelect_RetDone)
+            assert (status == IFSelect_RetDone)
 
         else:
             stl_writer = StlAPI_Writer()
             stl_writer.SetASCIIMode(True)
-            stl_writer.Write(shape, file_name)
+            stl_writer.Write(shape, fName)
+
+        self.fuse_model = None
 
         QMessageBox.about(self, 'Information', "File saved")
+
+
+        #####################################################
+        # if self.connectivity is None:
+        #     self.connectivity = self.create_3d_col_web_beam_web()
+        # if self.fuse_model is None:
+        #     self.fuse_model = self.create_2d_cad(self.connectivity)
+        # shape = self.fuse_model
+        #
+        # files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+        # filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        #
+        # file_name = str(filename)
+        # file_extension = file_name.split(".")[-1]
+        #
+        # if file_extension == 'igs':
+        #     IGESControl.IGESControl_Controller().Init()
+        #     iges_writer = IGESControl.IGESControl_Writer()
+        #     iges_writer.AddShape(shape)
+        #     iges_writer.Write(file_name)
+        #
+        # elif file_extension == 'brep':
+        #
+        #     BRepTools.breptools.Write(shape, file_name)
+        #
+        # elif file_extension == 'stp':
+        #     # initialize the STEP exporter
+        #     step_writer = STEPControl_Writer()
+        #     Interface_Static_SetCVal("write.step.schema", "AP203")
+        #
+        #     # transfer shapes and write file
+        #     step_writer.Transfer(shape, STEPControl_AsIs)
+        #     status = step_writer.Write(file_name)
+        #
+        #     assert(status == IFSelect_RetDone)
+        #
+        # else:
+        #     stl_writer = StlAPI_Writer()
+        #     stl_writer.SetASCIIMode(True)
+        #     stl_writer.Write(shape, file_name)
+        #
+        # QMessageBox.about(self, 'Information', "File saved")
 
     def display_2d_model_original(self, final_model, view_name):
 

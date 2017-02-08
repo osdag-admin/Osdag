@@ -64,22 +64,21 @@ class SvgWindow(object):
     def save_2d_image_png_names(self, view):
 
         if view == "Front":
+
             png_image_path = self.folder + "/images_html/finFront.png"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)", options=options)
-            file_name = str(file_tup[0])
-            shutil.copyfile(png_image_path,file_name)
+            file_type = "PNG (*.png)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
+            shutil.copyfile(png_image_path, file_name)
+
         elif view == "Side":
             png_image_path = self.folder + "/images_html/finSide.png"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)",options=options)
-            file_name = str(file_tup[0])
+            file_type = "PNG (*.png)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
         else:
             png_image_path = self.folder + "/images_html/finTop.png"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "PNG (*.png)",options=options)
-            file_name = str(file_tup[0])
+            file_type = "PNG (*.png)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
 
         QMessageBox.about(None, 'Information', "Image Saved")
@@ -88,25 +87,22 @@ class SvgWindow(object):
 
         if view == "Front":
             png_image_path = self.folder + "/images_html/finFront.svg"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)",options=options)
-            file_name = str(file_tup[0])
+            file_type = "SVG (*.svg)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
+
         elif view == "Side":
             png_image_path = self.folder + "/images_html/finSide.svg"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)",options=options)
-            file_name = str(file_tup[0])
+            file_type = "SVG (*.svg)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
         else:
             png_image_path = self.folder + "/images_html/finTop.svg"
-            options = QFileDialog.Options()
-            file_tup = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)",options=options)
-            file_name = str(file_tup[0])
+            file_type = "SVG (*.svg)"
+            file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
 
         QMessageBox.about(None, 'Information', "Image Saved")
-
 
 def main():
     app = QApplication(sys.argv)

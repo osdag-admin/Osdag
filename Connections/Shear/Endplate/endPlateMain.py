@@ -912,22 +912,29 @@ class MainController(QMainWindow):
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+            #path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
         options = {
                    'margin-bottom': '10mm',
                    'footer-right': '[page]'
         }
-        pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
+        file_type = "PDF (*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        pdfkit.from_file(filename, fname, configuration=config, options=options)
+
+        #pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
         QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        filename, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/Logmessages", "Text files (*.txt)")
+        fileName, pat = QFileDialog.getSaveFileName(self, "Save File As",
+                                                    str(self.folder) + "/LogMessages",
+                                                    "Text files (*.txt)")
+        return self.save_file(fileName + ".txt")
+
         if filename == "":
             return
-
-        return self.save_file(filename)
 
     def save_file(self, filename):
         '''(file open for writing)-> boolean

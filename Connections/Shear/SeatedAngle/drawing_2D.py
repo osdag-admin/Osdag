@@ -774,7 +774,7 @@ class Seat2DCreatorFront(object):
         # ---------------------------------  column bolts --------------------------------------
         if nr >= 1:
             for column in range(nr):
-                ptx = self.SC5 + (self.data_object.top_angle_legsize_vertical - self.data_object.edge_dist) * np.array([0, -1]) - \
+                ptx = self.SC5 + (self.data_object.top_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, -1]) - \
                       self.data_object.col_flange_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
                 rect_width = self.data_object.bolt_dia
@@ -791,22 +791,23 @@ class Seat2DCreatorFront(object):
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
+        # -----------------------------------  beam bolts --------------------------------------
         if nr >= 1:
             for column in range(nr):
-                pty = self.SC5 + (self.data_object.top_angle_legsize_horizontal - self.data_object.edge_dist) * np.array([1, 0]) -\
+                pty = self.SC5 + (self.data_object.top_angle_legsize_horizontal - self.data_object.edge_dist) * np.array([1, 0]) - \
                       self.data_object.beam_flange_thk * np.array([0, 1]) + column * self.data_object.gauge * np.array([1, 0])
-                pty1 = pty - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_dia
-                rect_length = self.data_object.beam_flange_thk + self.data_object.top_angle_thickness
+                pty1 = pty - bolt_r * np.array([1, 0])
+                rect_width = self.data_object.beam_flange_thk + self.data_object.top_angle_thickness
+                rect_length = self.data_object.bolt_dia
                 dwg.add(dwg.rect(insert=pty1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-                pt_Cx = pty + 10 * np.array([0, -1])
-                pt_Dx = pty + (rect_length + 9) * np.array([0, -1])
+                pt_Cx = pty + np.array([0, -1])
+                pt_Dx = pty + (rect_length - 6) * np.array([0, -1])
                 dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
-                pt_Cx1 = pty + np.array([0, 1])
-                pt_Dx1 = pty + (rect_length - 9) * np.array([0, 1])
+                pt_Cx1 = pty + 15 * np.array([0, 1])
+                pt_Dx1 = pty + (rect_length + 15) * np.array([0, 1])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
@@ -814,7 +815,7 @@ class Seat2DCreatorFront(object):
         # ---------------------------------  column bolts --------------------------------------
         if nr >= 1:
             for column in range(nr):
-                ptx = self.SD5 + (self.data_object.seat_angle_legsize_vertical - self.data_object.edge_dist) * np.array([0, 1]) - \
+                ptx = self.SD5 + (self.data_object.seat_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, 1]) - \
                       self.data_object.col_flange_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
                 rect_width = self.data_object.bolt_dia
@@ -831,7 +832,27 @@ class Seat2DCreatorFront(object):
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_list_column.append(ptx)
 
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # -----------------------------------  beam bolts --------------------------------------
+        if nr >= 1:
+            for column in range(nr):
+                pty = self.SD5 + (self.data_object.seat_angle_legsize_horizontal - self.data_object.edge_dist) * np.array([1, 0]) - \
+                      self.data_object.beam_flange_thk * np.array([0, 1]) + column * self.data_object.gauge * np.array([1, 0])
+                pty1 = pty - bolt_r * np.array([1, 0])
+                rect_width = self.data_object.beam_flange_thk + self.data_object.seat_angle_thickness
+                rect_length = self.data_object.bolt_dia
+                dwg.add(dwg.rect(insert=pty1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+
+                pt_Cx = pty + np.array([0, -1])
+                pt_Dx = pty + (rect_length - 6) * np.array([0, -1])
+                dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
+                pt_Cx1 = pty + 5 * np.array([0, 1])
+                pt_Dx1 = pty + (rect_length + 15) * np.array([0, 1])
+                dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
+                # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #         nr = self.data_object.no_of_rows
 #         nc = self.data_object.no_of_col
 #         bolt_r = self.data_object.bolt_dia / 2

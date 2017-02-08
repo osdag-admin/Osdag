@@ -47,13 +47,14 @@ from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
-# TODO add input validation to select only angles which can accomodate 2 lines of bolts
+# TODO add input validation to select only angles which can accommodate 2 lines of bolts
 # TODO check reduction factors for bolt group capacity
 # TODO remove smaller bolt diameters from possible inputs
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
+# TODO overwrite calculated top angle if user selects other top angle in GUI
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -211,6 +212,45 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.max_spacing = 1
         self.max_edge_dist = 1
 
+    def top_angle_section(self):
+        """Identify appropriate top angle size based on beam depth.
+
+        Args:
+            none
+
+        Returns:
+            top_angle(string): top angle section
+
+        Note:
+            Assumptions:
+                Calculating top angle dimensions based on thumb rules:
+                    top_angle_side = beam_depth/4
+                    top_angle_thickness = top_angle_side/10
+                Select the nearest available equal angle as the top angle.
+        """
+        try:
+            top_angle_side = int(round((int(self.beam_d/4)+2)/5.0)*5.0)
+        except:
+            top_angle_side = "ISA 100X65X8"
+        top_angle = {20: "ISA 20X20X3",
+                     25: "ISA 25X25X3",
+                     30: "ISA 30X30X3",
+                     35: "ISA 35X35X4",
+                     40: "ISA 40X40X4",
+                     45: "ISA 45X45X5",
+                     50: "ISA 50X50X5",
+                     55: "ISA 55X55X6",
+                     60: "ISA 60X60X6",
+                     65: "ISA 65X65X6",
+                     70: "ISA 70X70X7",
+                     75: "ISA 75X75X8",
+                     80: "ISA 80X80X8",
+                     90: "ISA 90X90X10",
+                     "ISA 100X65X8": "ISA 100X65X8"
+                     }[top_angle_side]
+
+        return top_angle
+
     def sa_params(self, input_dict):
         """Intialise variables to use in calculations from input dictionary.
 
@@ -238,7 +278,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
-        self.top_angle = "ISA 100X65X8"
+        self.top_angle = "ISA 100X65X8" #Initialize
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
@@ -278,7 +318,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_R1 = float(self.dict_angle_data[QString("R1")])
 
         self.pitch = 0
-
+        self.top_angle = self.top_angle_section()
         self.safe = True
 
     def print_section_properties(self):

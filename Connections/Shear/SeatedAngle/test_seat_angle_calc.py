@@ -36,6 +36,30 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(self.angle_B, 75)
         self.assertEqual(self.angle_R1, 10)
 
+    def test_top_angle_section(self):
+        """Test top angle size selection based on beam depth.
+
+        Note:
+            Assumptions:
+                Calculating top angle dimensions based on thumb rules:
+                    top_angle_side = beam_depth/4
+                    top_angle_thickness = top_angle_side/10
+                Select the nearest available equal angle as the top angle.
+        """
+        temporary_beam_d = self.beam_d
+        self.beam_d = 313
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 80X80X8")
+        self.beam_d = 300
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 75X75X8")
+        self.beam_d = 270
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 70X70X7")
+        self.beam_d = 222
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 55X55X6")
+        self.beam_d = 140
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 35X35X4")
+        self.beam_d = 100
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 25X25X3")
+
     def test_sa_output(self):
         pass
 

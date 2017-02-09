@@ -2702,7 +2702,9 @@ class Seat2DCreatorSide(object):
         nr = self.data_object.no_of_rows
         bolt_r = self.data_object.bolt_dia / 2
         pt_list_top = []
+        pt_list_column = []
 
+        # ---------------------------------  column bolts --------------------------------------
         for i in range(1, (nr + 1)):
             col_list_top = []
             for j in range(1, (nc + 1)):
@@ -2720,12 +2722,33 @@ class Seat2DCreatorSide(object):
                 col_list_top.append(pt)
             pt_list_top.append(col_list_top)
 
+        # ---------------------------------  beam bolts --------------------------------------
+        if nc >= 1:
+            for column in range(nc):
+                # ptx = self.SWB6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([1, 0]) - self.data_object.beam_flange_thk * np.array([0, 1]) + column * self.data_object.gauge * np.array([-1, 0]) #+ 20
+                ptx = self.SWB5 - self.data_object.edge_dist * np.array([1, 0]) - column * self.data_object.gauge * np.array([1, 0])
+                ptx1 = ptx - bolt_r * np.array([0, 1])
+                rect_width = self.data_object.bolt_dia
+                rect_length = self.data_object.beam_flange_thk + self.data_object.top_angle_thickness
+                dwg.add(dwg.rect(insert=ptx1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
+
+                pt_Cx = ptx + 10 * np.array([0, -1])
+                pt_Dx = ptx + (rect_length + 9) * np.array([0, -1])
+                dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
+                pt_Cx1 = ptx + np.array([0, 1])
+                pt_Dx1 = ptx + (rect_length - 9) * np.array([0, 1])
+                dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+                pt_list_column.append(ptx)
+
         # ===============================  Seat angle Bolts plotting  ========================================
 
         nc1 = self.data_object.no_of_col
         nr1 = self.data_object.no_of_rows
         pt_list_seat = []
 
+        # ---------------------------------  column bolts --------------------------------------
         for i in range(1, (nr1 + 1)):
             col_list_seat = []
             for j in range(1, (nc1 + 1)):
@@ -2743,7 +2766,27 @@ class Seat2DCreatorSide(object):
                 col_list_seat.append(pt)
             pt_list_seat.append(col_list_seat)
 
+            # ---------------------------------  beam bolts --------------------------------------
+            if nc >= 1:
+                for column in range(nc):
+                    # ptx = self.SWB6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([1, 0]) - self.data_object.beam_flange_thk * np.array([0, 1]) + column * self.data_object.gauge * np.array([-1, 0]) #+ 20
+                    ptx = self.SWB12 - self.data_object.edge_dist * np.array([1, 0]) - column * self.data_object.gauge * np.array([1, 0])
+                    ptx1 = ptx - bolt_r * np.array([0, 1])
+                    rect_width = self.data_object.bolt_dia
+                    rect_length = self.data_object.beam_flange_thk + self.data_object.top_angle_thickness
+                    dwg.add(dwg.rect(insert=ptx1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
 
+                    pt_Cx = ptx + 10 * np.array([0, -1])
+                    pt_Dx = ptx + (rect_length + 9) * np.array([0, -1])
+                    dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+                    pt_list_column.append(ptx)
+
+                    pt_Cx1 = ptx + np.array([0, 1])
+                    pt_Dx1 = ptx + (rect_length - 9) * np.array([0, 1])
+                    dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+                    pt_list_column.append(ptx)
+
+                    
                 # # Diagonal Hatching for WELD
         # pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         # pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))

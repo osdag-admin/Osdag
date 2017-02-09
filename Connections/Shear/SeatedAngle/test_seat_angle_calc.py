@@ -48,6 +48,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         """
         temporary_beam_d = self.beam_d
         self.beam_d = 313
+        self.bolt_design(12)
         self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 80X80X8")
         self.beam_d = 300
         self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 75X75X8")
@@ -56,9 +57,18 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.beam_d = 222
         self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 55X55X6")
         self.beam_d = 140
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 35X35X4")
+        # "ISA 35X35X4" based on thumb rule. ISA 40X40X4 is based on edge distance requirement for 12 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 40X40X4")
         self.beam_d = 100
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 25X25X3")
+        # "ISA 25X25X3" based on thumb rule. ISA 40X40X4 is based on edge distance requirement for 12 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 40X40X4")
+        self.beam_d = 222
+        self.bolt_design(20)
+        # "ISA 55X55X6" based on thumb rule. ISA 70X70X7 is based on edge distance requirement for 20 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 70X70X7")
+        self.beam_d = 100
+        # "ISA 25X25X3" based on thumb rule. ISA 70X70X7 is based on edge distance requirement for 20 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "ISA 70X70X7")
 
     def test_sa_output(self):
         pass

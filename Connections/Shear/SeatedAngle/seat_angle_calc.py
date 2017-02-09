@@ -55,6 +55,9 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 # TODO overwrite calculated top angle if user selects other top angle in GUI
+# TODO implement 6 mm as min seat angle thickness
+# TODO - DONE moment capacity of outstanding leg based elastic moment capacity
+#
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -227,15 +230,22 @@ class SeatAngleCalculation(ConnectionCalculations):
                     top_angle_side = beam_depth/4
                     top_angle_thickness = top_angle_side/10
                 Select the nearest available equal angle as the top angle.
+                Equal angles satisfying both these thumb rules are selected for this function from steel tables
         """
         try:
-            top_angle_side = int(round((int(self.beam_d/4)+2)/5.0)*5.0)
+            # minimum length of leg of top angle is twice edge distance + angle thickness.
+            # as the side length is rounded up in the next step, ignoring angle thickness while calculating
+            # minimum length of side
+            top_angle_side_minimum = 2 * 1.5 * self.bolt_hole_diameter # twice edge distance
+            top_angle_side = max(self.beam_d/4, top_angle_side_minimum)
+            # round up to nearest 5 mm. '+2' for conservative round up.
+            top_angle_side = int(round((int(top_angle_side)+2)/5.0)*5.0)
         except:
             top_angle_side = "ISA 100X65X8"
-        top_angle = {20: "ISA 20X20X3",
-                     25: "ISA 25X25X3",
-                     30: "ISA 30X30X3",
-                     35: "ISA 35X35X4",
+        top_angle = {20: "ISA 20X20X3", # does not satisfy min edge dist req for 12 mm bolt
+                     25: "ISA 25X25X3", # does not satisfy min edge dist req for 12 mm bolt
+                     30: "ISA 30X30X3", # does not satisfy min edge dist req for 12 mm bolt
+                     35: "ISA 35X35X4", # does not satisfy min edge dist req for 12 mm bolt
                      40: "ISA 40X40X4",
                      45: "ISA 45X45X5",
                      50: "ISA 50X50X5",
@@ -550,7 +560,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             1) beta_b (in the equation in Cl 8.2.1.2) = 1.0 as the outstanding leg is plastic section
             2) using Z_p (plastic section modulus) for moment capacity
         """
-        self.leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 4) /1000
+        self.leg_moment_d = (self.angle_fy /self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6) /1000
 
         if self.shear_force <= 0.6 * self.outstanding_leg_shear_capacity:
             angle_moment_capacity_clause = "Cl 8.2.1.2"

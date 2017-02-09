@@ -39,7 +39,7 @@ class cleatCommonData(object):
         self.beam_Designation = dict_beam_data["Designation"]
         self.beam_R1 = float(dict_beam_data["R1"])
         self.col_R1 = float(dict_column_data["R1"])
-        self.cleat_ht = ouput_obj['cleat']["height"]
+        self.cleat_ht = float(ouput_obj['cleat']["height"])
         self.cleat_legsize = int(dict_angle_data["A"])
         self.cleat_legsize_1 = int(dict_angle_data["B"])
         # self.cleat_legsize_1 = 120

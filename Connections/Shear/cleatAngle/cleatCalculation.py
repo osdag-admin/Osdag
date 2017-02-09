@@ -68,7 +68,7 @@ def bearing_capacity(dia, t, fu, beam_fu):
     # calculation of kb
     kbchk1 = min_end_dist / float(3 * dia_hole)
     kbchk2 = min_pitch / float(3 * dia_hole) - 0.25
-    kbchk3 = fu / float(beam_fu)
+    kbchk3 = fu / (beam_fu)
     kbchk4 = 1
     kb = min(kbchk1, kbchk2, kbchk3, kbchk4)
     kb = round(kb, 3)
@@ -174,18 +174,20 @@ def cleat_connection(ui_obj):
     beam_sec = ui_obj['Member']['BeamSection']
     column_sec = ui_obj['Member']['ColumSection']
     connectivity = ui_obj['Member']['Connectivity']
-    beam_fu = ui_obj['Member']['fu (MPa)']
-    beam_fy = ui_obj['Member']['fy (MPa)']
+    beam_fu = float(ui_obj['Member']['fu (MPa)'])
+    beam_fy = float(ui_obj['Member']['fy (MPa)'])
               
-    shear_load = ui_obj['Load']['ShearForce (kN)']
+    shear_load = float(ui_obj['Load']['ShearForce (kN)'])
                   
-    bolt_dia = ui_obj['Bolt']['Diameter (mm)']
+    bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
-    bolt_grade = ui_obj['Bolt']['Grade']
+    bolt_grade = float(ui_obj['Bolt']['Grade'])
    
-    cleat_length = ui_obj['cleat']['Height (mm)']
-    cleat_fu = ui_obj['Member']['fu (MPa)']
-    cleat_fy = ui_obj['Member']['fy (MPa)']
+    cleat_length = str(ui_obj['cleat']['Height (mm)'])
+    if cleat_length == '':
+        cleat_length = 0
+    cleat_fu = float(ui_obj['Member']['fu (MPa)'])
+    cleat_fy = float(ui_obj['Member']['fy (MPa)'])
     cleat_sec = ui_obj['cleat']['section']
               
     dictbeamdata = get_beamdata(beam_sec)

@@ -199,7 +199,7 @@ class MainController(QMainWindow):
         self.ui.comboBoltType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        self.retrieve_prevstate()
+        ##############self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
@@ -451,8 +451,9 @@ class MainController(QMainWindow):
         '''Populates the cleat section on the basis  beam section and column section
         '''
 
-        if self.ui.combo_Beam.currentText() == "Select Designation" or self.ui.comboColSec.currentText() == "Select Column":
-            self.ui.comboCleatSection.setCurrentIndex(0)
+        if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section":
+            return
+            #self.ui.comboCleatSection.setCurrentIndex(0)
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web" or "Column flange-Beam web":
             loc = self.ui.comboConnLoc.currentText()
@@ -498,6 +499,9 @@ class MainController(QMainWindow):
     def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
+            if self.ui.comboColSec.currentIndex() == -1 or str(self.ui.combo_Beam.currentText()) == 'Select section' or str(self.ui.comboColSec.currentText()) == 'Select section':
+                return
+
 
             column = self.ui.comboColSec.currentText()
 
@@ -517,6 +521,8 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
 
         elif loc == "Beam-Beam":
+            if self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
+                return
 
             primaryBeam = self.ui.comboColSec.currentText()
             dict_sec_beam_data = self.fetch_beam_param()
@@ -537,7 +543,7 @@ class MainController(QMainWindow):
     def check_cleat_height(self, widget):
         loc = self.ui.comboConnLoc.currentText()
         cleatHeight = widget.text()
-        cleatHeight = float(cleatHeight) 
+        cleatHeight = float(cleatHeight)
         if cleatHeight == 0:
             self.ui.btn_Design.setDisabled(False)
         else:
@@ -713,24 +719,22 @@ class MainController(QMainWindow):
         '''
         ui_obj = {}
         ui_obj["Bolt"] = {}
-        ui_obj["Bolt"]["Diameter (mm)"] = self.ui.comboDiameter.currentText()== ' '
+        ui_obj["Bolt"]["Diameter (mm)"] = str(self.ui.comboDiameter.currentText())
         ui_obj["Bolt"]["Grade"] = float(self.ui.comboBoltGrade.currentText())
-        # ui_obj["Bolt"]["Grade"] = 8.8
         ui_obj["Bolt"]["Type"] = str(self.ui.comboBoltType.currentText())
 
         ui_obj['Member'] = {}
         ui_obj['Member']['BeamSection'] = str(self.ui.combo_Beam.currentText())
         ui_obj['Member']['ColumSection'] = str(self.ui.comboColSec.currentText())
         ui_obj['Member']['Connectivity'] = str(self.ui.comboConnLoc.currentText())
-        ui_obj['Member']['fu (MPa)'] = self.ui.txtFu.text()== ' '
-        ui_obj['Member']['fy (MPa)'] = self.ui.txtFy.text()== ' '
+        ui_obj['Member']['fu (MPa)'] = self.ui.txtFu.text()
+        ui_obj['Member']['fy (MPa)'] = self.ui.txtFy.text()
 
         ui_obj['cleat'] = {}
         ui_obj['cleat']['section'] = str(self.ui.comboCleatSection.currentText())
-        ui_obj['cleat']['Height (mm)'] = float(self.ui.txtInputCleatHeight.text()== ' ')  # changes the label length to height
+        ui_obj['cleat']['Height (mm)'] = str(self.ui.txtInputCleatHeight.text())  # changes the label length to height
 
         ui_obj['Load'] = {}
-        # ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text()== ' ')
         ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text())
 
         return ui_obj
@@ -739,7 +743,7 @@ class MainController(QMainWindow):
         '''
         (Dictionary)--> None
         '''
-        inputFile = QFile('saveINPUTS.txt')
+        inputFile = QFile('Connections/Shear/cleatAngle/saveINPUT.txt')
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
@@ -1087,7 +1091,6 @@ class MainController(QMainWindow):
 
         self.ui.modelTab.InitDriver()
         display = self.ui.modelTab._display
-        # display_2d = self.ui.model2dTab._display
         # background gradient
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
@@ -1104,7 +1107,6 @@ class MainController(QMainWindow):
         def start_display():
 
             self.ui.modelTab.raise_()
-            # self.ui.model2dTab.raise_()   # make the application float to the top
 
         return display, start_display
 
@@ -1125,8 +1127,6 @@ class MainController(QMainWindow):
             # osdag_display_shape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
         elif component == "cleatAngle":
 
-            # osdag_display_shape(self.display, self.connectivity.weldModelLeft, color = 'red', update = True)
-            # osdag_display_shape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
             osdag_display_shape(self.display, self.connectivity.angleModel, color='blue', update=True)
             osdag_display_shape(self.display, self.connectivity.angleLeftModel, color='blue', update=True)
             nutboltlist = self.connectivity.nut_bolt_array.get_model()
@@ -1162,13 +1162,13 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text().isEmpty() or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text()== ' ' or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
-        elif self.ui.txtFy.text().isEmpty() or float(self.ui.txtFy.text()) == 0:
+        elif self.ui.txtFy.text()== ' ' or float(self.ui.txtFy.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
-        elif self.ui.txtShear.text().isEmpty() or float(str(self.ui.txtShear.text())) == 0:
+        elif self.ui.txtShear.text()== ' ' or float(str(self.ui.txtShear.text())) == 0:
             QMessageBox.about(self, "Information", "Please select Factored shear load")
 
         elif self.ui.comboDiameter.currentIndex() == 0:
@@ -1478,14 +1478,15 @@ class MainController(QMainWindow):
 #         nut_T = 12.0 # minimum nut thickness As per Indian Standard
 #         nut_Ht = 12.2
     ######################################################################################################
-        bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
+        bolt_dia = str(ui_obj["Bolt"]["Diameter (mm)"])
+        bolt_r = (int(bolt_dia) / 2)
+        #bolt_r = bolt_dia / 2
+        bolt_R = self.bolt_head_dia_calculation(int(bolt_dia) / 2)
         nut_R = bolt_R
-        bolt_T = self.bolt_head_thick_calculation(bolt_dia)
-        bolt_Ht = self.bolt_length_calculation(bolt_dia)
+        bolt_T = self.bolt_head_thick_calculation(int(bolt_dia))
+        bolt_Ht = self.bolt_length_calculation(int(bolt_dia))
         # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-        nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
+        nut_T = self.nut_thick_calculation(int(bolt_dia))  # bolt_dia = nut_dia
         nut_Ht = 12.2  # 150
 
     ##########################################################################################################
@@ -1507,7 +1508,7 @@ class MainController(QMainWindow):
         colflangeconn = ColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
         colflangeconn.create_3dmodel()
         return colflangeconn
-    
+
 #     def call_3d_model(self, flag):
 #         self.commLogicObj.call_3DModel(flag)
 
@@ -1519,7 +1520,7 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.checkBoxCleat.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
- 
+
         if flag is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 # self.create_3d_col_web_beam_web()
@@ -1529,12 +1530,12 @@ class MainController(QMainWindow):
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create_3d_col_flange_beam_web()
                 self.fuse_model = None
- 
+
             else:
                 self.ui.mytabWidget.setCurrentIndex(0)
                 self.connectivity = self.create_3d_beam_web_beam_web()
                 self.fuse_model = None
- 
+
             self.display_3d_model("Model")
             # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
             # gpBeamOrigin = getGpPt(beamOrigin)
@@ -1549,7 +1550,7 @@ class MainController(QMainWindow):
             # gpPntplateOrigin=  getGpPt(plateOrigin)
             # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
             # self.display.DisplayShape(my_sphere,update=True)
- 
+
         else:
             self.display.EraseAll()
             # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
@@ -1871,7 +1872,7 @@ def set_osdaglogger():
     logger.setLevel(logging.DEBUG)
 
     # create the logging file handler
-    fh = logging.FileHandler("Connections/Shear/cleatAngle/fin.log", mode="a")
+    fh = logging.FileHandler("Connections/Shear/cleatAngle/cleat.log", mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1893,7 +1894,7 @@ def launch_cleatangle_controller(osdag_main_window, folder):
     set_osdaglogger()
     raw_logger = logging.getLogger("raw")
     raw_logger.setLevel(logging.INFO)
-    fh = logging.FileHandler("Connections/Shear/cleatAngle/fin.log", mode="w")
+    fh = logging.FileHandler("Connections/Shear/cleatAngle/cleat.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     raw_logger.addHandler(fh)
@@ -1917,7 +1918,7 @@ if __name__ == '__main__':
     set_osdaglogger()
     raw_logger = logging.getLogger("raw")
     raw_logger.setLevel(logging.INFO)
-    fh = logging.FileHandler("Connections/Shear/cleatAngle/fin.log", mode="w")
+    fh = logging.FileHandler("Connections/Shear/cleatAngle/cleat.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     raw_logger.addHandler(fh)

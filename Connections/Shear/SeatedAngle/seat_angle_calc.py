@@ -49,15 +49,12 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 
 # TODO add input validation to select only angles which can accommodate 2 lines of bolts
 # TODO check reduction factors for bolt group capacity
-# TODO remove smaller bolt diameters from possible inputs
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 # TODO overwrite calculated top angle if user selects other top angle in GUI
 # TODO implement 6 mm as min seat angle thickness
-# TODO - DONE moment capacity of outstanding leg based elastic moment capacity
-#
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -285,8 +282,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.custom_hole_clearance = None  # user defined hole clearance, if any
         self.beam_col_clear_gap = 5 + 5  # clearance + tolerance
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
-        # self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
-        self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
+        self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
+        # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
 
         self.top_angle = "ISA 100X65X8" #Initialize
         self.connectivity = input_dict['Member']['Connectivity']
@@ -454,6 +451,10 @@ class SeatAngleCalculation(ConnectionCalculations):
         elif self.connectivity == "Column flange-Beam web":
             self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
 
+        if self.angle_t < 6:
+            logger.warning(": Minimum thickness of 6 mm is recommended for seated angle.")
+            logger.warning(": Please revise seated angle section.")
+            
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)
 

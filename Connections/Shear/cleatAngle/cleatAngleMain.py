@@ -199,7 +199,7 @@ class MainController(QMainWindow):
         self.ui.comboBoltType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        ##############self.retrieve_prevstate()
+        self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
@@ -1020,7 +1020,7 @@ class MainController(QMainWindow):
         '''
         This method displaying Design messages(log messages)to textedit widget.
         '''
-        afile = QFile('Connections/Shear/cleatAngle/fin.log')
+        afile = QFile('Connections/Shear/cleatAngle/cleat.log')
 
         if not afile.open(QIODevice.ReadOnly):  # ReadOnly
             QMessageBox.information(None, 'info', afile.errorString())
@@ -1391,14 +1391,14 @@ class MainController(QMainWindow):
         # nut_T = 12.0 # minimum nut thickness As per Indian Standard
         # nut_Ht = 12.2 #
         ####################################################################################################################
-        bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
+        bolt_dia = str(ui_obj["Bolt"]["Diameter (mm)"])
+        bolt_r = int(bolt_dia) / 2
+        bolt_R = self.bolt_head_dia_calculation(int(bolt_dia) / 2)
         nut_R = bolt_R
-        bolt_T = self.bolt_head_thick_calculation(bolt_dia)
-        bolt_Ht = self.bolt_length_calculation(bolt_dia)
+        bolt_T = self.bolt_head_thick_calculation(int(bolt_dia))
+        bolt_Ht = self.bolt_length_calculation(int(bolt_dia))
         # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-        nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
+        nut_T = self.nut_thick_calculation(int(bolt_dia))  # bolt_dia = nut_dia
         nut_Ht = 12.2  # 150
         #####################################################################################################################
         # plate = Plate(L= 300,W =100, T = 10)

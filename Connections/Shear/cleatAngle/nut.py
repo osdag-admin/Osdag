@@ -66,82 +66,14 @@ class Nut(object):
         edges = make_edges_from_points(self.points)
         wire = make_wire_from_edges(edges)
         aFace = make_face_from_wire(wire)
-        extrude_dir = self.T * self.wDir  # extrude_dir is a numpy array
-        prism = make_prism_from_face(aFace, extrude_dir)
-        mk_fillet = BRepFilletAPI_MakeFillet(prism)
-        an_edge_explorer = TopExp_Explorer(prism, TopAbs_EDGE)
-        while an_edge_explorer.More():
-            aEdge = topods.Edge(an_edge_explorer.Current())
-            mk_fillet.Add(self.T / 17., aEdge)
-            an_edge_explorer.Next()
+        extrudeDir = self.T * self.wDir  # extrudeDir is a numpy array
+        prism = make_prism_from_face(aFace, extrudeDir)
 
-        prism = mk_fillet.Shape()
-        cyl_origin = self.sec_origin
-        # cyl_origin = self.sec_origin + self.T * self.wDir
-        inner_cyl = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.wDir)), self.r1, self.H).Shape()
-        # outerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cyl_origin), get_gp_dir(self.wDir)), self.r2, self.H).Shape()
-        # nutBody = BRepAlgoAPI_Fuse(prism, outerCyl).Shape()
-        # my_cyl = BRepPrimAPI_MakeCylinder(9.0, 6.0).Shape()
-        # result_shape = BRepAlgoAPI_Cut(nutBody, inner_cyl).Shape()
-        result_shape = BRepAlgoAPI_Cut(prism, inner_cyl).Shape()
+        cylOrigin = self.sec_origin
+        innerCyl = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cylOrigin), get_gp_dir(self.wDir)), self.r1, self.H).Shape()
 
-#         self.sec_origin = gp_Pnt(0 , 0 , 0)
-#         neckNormal = gp_DZ()
-#         # Threading : Create Surfaces
-#
-#         nutAx2_bis = gp_Ax3(self.sec_origin , neckNormal)
-#         aCyl1 = Geom_CylindricalSurface(nutAx2_bis , self.T * 0.99)
-#         aCyl2 = Geom_CylindricalSurface(nutAx2_bis , self.T * 1.05)
-#         #aCyl3 = Geom_CylindricalSurface(nutAx2_bis , self.T * 1.11)
-#         aCyl1_handle = aCyl1.GetHandle()
-#         aCyl2_handle = aCyl2.GetHandle()
-#         #aCyl3_handle = aCyl3.GetHandle()
-#
-#         # Threading : Define 2D Curves
-#         aPnt = gp_Pnt2d(2. * math.pi , self.H / 2.)
-#         aDir = gp_Dir2d(2. * math.pi , self.H / 4.)
-#         aAx2d = gp_Ax2d(aPnt , aDir)
-#         aMajor = 2. * math.pi
-#         aMinor = self.H / 7.
-#         anEllipse1 = Geom2d_Ellipse(aAx2d , aMajor , aMinor)
-#         anEllipse2 = Geom2d_Ellipse(aAx2d , aMajor , aMinor / 4.)
-#         anEllipse1_handle = anEllipse1.GetHandle()
-#         anEllipse2_handle = anEllipse2.GetHandle()
-#         aArc1 = Geom2d_TrimmedCurve(anEllipse1_handle, 0 , math.pi)
-#         aArc2 = Geom2d_TrimmedCurve(anEllipse2_handle, 0 , math.pi)
-#         aArc1_handle = aArc1.GetHandle()
-#         aArc2_handle = aArc2.GetHandle()
-#         anEllipsePnt1 = anEllipse1.Value(0)
-#         anEllipsePnt2 = anEllipse1.Value(math.pi)
-#         aSegment = GCE2d_MakeSegment(anEllipsePnt1 , anEllipsePnt2)
-#
-#         # Threading : Build Edges and Wires
-#
-#         aEdge1OnSurf1 = BRepBuilderAPI_MakeEdge( aArc1_handle , aCyl1_handle)
-#         aEdge2OnSurf1 = BRepBuilderAPI_MakeEdge( aSegment.Value() , aCyl1_handle)
-#         aEdge1OnSurf2 = BRepBuilderAPI_MakeEdge( aArc2_handle , aCyl2_handle)
-#         aEdge2OnSurf2 = BRepBuilderAPI_MakeEdge( aSegment.Value() , aCyl2_handle)
-#         threadingWire1 = BRepBuilderAPI_MakeWire(aEdge1OnSurf1.Edge() , aEdge2OnSurf1.Edge())#aEdge3OnSurf1.Edge())
-#         self.threading1 = threadingWire1
-#         threadingWire2 = BRepBuilderAPI_MakeWire(aEdge1OnSurf2.Edge() , aEdge2OnSurf2.Edge())#aEdge3OnSurf2.Edge())
-#         BRepLib.breplib.BuildCurves3d(threadingWire1.Shape())
-#         BRepLib.breplib.BuildCurves3d(threadingWire2.Shape())
-#
-#         # Create Threading
-#
-#         aTool = BRepOffsetAPI_ThruSections(True)
-#         aTool.AddWire(threadingWire1.Wire())
-#         aTool.AddWire(threadingWire2.Wire())
-#         aTool.CheckCompatibility(False)
-#         myThreading = aTool.Shape()
-#
-#         #Building the resulting compound
-#
-#         aRes = TopoDS_Compound()
-#         aBuilder = BRep.BRep_Builder()
-#         aBuilder.MakeCompound(aRes)
-#         aBuilder.Add(aRes, result_shape)
-#         aBuilder.Add(aRes, myThreading)
-#         final_shape = BRepAlgoAPI_Cut(result_shape, myThreading).Shape()
+        result_shape = BRepAlgoAPI_Cut(prism, innerCyl).Shape()
 
         return result_shape
+
+

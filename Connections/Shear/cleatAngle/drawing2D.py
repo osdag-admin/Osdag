@@ -50,7 +50,7 @@ class cleatCommonData(object):
         # self.plate_width = ouput_obj['Plate']['width']
         # self.cleat_thk = ouput_obj['Plate']['height']
         # self.cleat_thk = ouput_obj['Weld']['thickness']
-        self.bolt_dia = input_obj["Bolt"]["Diameter (mm)"]
+        self.bolt_dia = int(input_obj["Bolt"]["Diameter (mm)"])
         self.bolt_type = input_obj["Bolt"]["Type"]
         self.bolt_grade = input_obj['Bolt']['Grade']
         self.connectivity = input_obj['Member']['Connectivity']

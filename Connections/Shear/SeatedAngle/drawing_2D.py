@@ -359,15 +359,15 @@ class SeatCommonData(object):
             txt_pt_down = p2 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
         elif orientation == "NW":
             txt_pt_up = p3 + 0.2 * lengthB * label_vector + txt_offset * offset_vector
-            txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
+            txt_pt_down = p3 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
 
         elif orientation == "SE":
             txt_pt_up = p2 + 0.1 * lengthB * (-label_vector) + txt_offset * offset_vector
             txt_pt_down = p2 - 0.1 * lengthB * label_vector - (txt_offset + 15) * offset_vector
 
         elif orientation == "SW":
-            txt_pt_up = p3 + 0.1 * lengthB * label_vector + txt_offset * offset_vector
-            txt_pt_down = p3 - 0.1 * lengthB * label_vector - txt_offset * offset_vector
+            txt_pt_up = p3 + 0.2 * lengthB * label_vector + txt_offset * offset_vector
+            txt_pt_down = p3 - 0.06 * lengthB * label_vector - (txt_offset + 15) * offset_vector
 
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
 
@@ -2669,7 +2669,7 @@ class Seat2DCreatorSide(object):
     def call_CFBF_side(self, file_name):
         # vb_width = str(float(3.5 * self.data_object.col_depth))
         # vb_ht = str(float(1.4 * self.data_object.col_length))
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-410 -350 1200 1500'))
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-440 -350 1200 1500'))
         dwg.add(dwg.rect(insert=self.SA, size=(self.data_object.col_width, self.data_object.col_length), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SA1, self.SA2, self.SA3, self.SA4, self.SA5, self.SA6, self.SA7, self.SA8, self.SA9, self.SA10, self.SA11,
                                      self.SA12, self.SA1], stroke='blue', fill='none', stroke_width=2.5))
@@ -2786,7 +2786,25 @@ class Seat2DCreatorSide(object):
                     dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                     pt_list_column.append(ptx)
 
-                    
+            # ===============================  Beam Bolts Information  ========================================
+            no_of_bolts_beam = self.data_object.no_of_rows * self.data_object.no_of_col
+            bolt_pt = np.array(pt_list_column[0])      # (self.SA12 + self.SA11) /2
+            theta = 45
+            offset = 50
+            text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+            text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
+            self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
+
+            # ===============================  Column Bolts Information  ========================================
+            no_of_bolts_column = self.data_object.no_of_rows * self.data_object.no_of_col
+            bolt_pt = np.array(pt_list_top[0][0])
+            theta = 45
+            offset = 50
+            text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+            text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
+            self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
+
+
                 # # Diagonal Hatching for WELD
         # pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         # pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))

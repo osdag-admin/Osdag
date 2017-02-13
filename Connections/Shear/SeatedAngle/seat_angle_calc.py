@@ -454,7 +454,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         if self.angle_t < 6:
             logger.warning(": Minimum thickness of 6 mm is recommended for seated angle.")
             logger.warning(": Please revise seated angle section.")
-            
+
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)
 
@@ -489,6 +489,19 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.gauge = int(math.ceil(self.max_spacing))
             self.num_cols = int(math.ceil((length_avail / self.gauge) + 1))
             self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))),3)
+
+        if self.pitch > self.max_pitch:
+            """
+            Assumption: This unlikely case occurs when the pitch (which is set to the nearest minimum pitch and
+            governed by the bolt diameter), is greater than the maximum pitch (which is governed by thickness of
+            connected member).
+            It is recommended to decrease the bolt diameter or increase the thickness of the connected members.
+            """
+            logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
+            logger.warning(": Bolt pitch should be more than  %2.2f mm " % (self.min_pitch))
+            logger.warning(": Bolt pitch should be less than  %2.2f mm " % (self.max_pitch))
+            logger.info(": Select bolt with smaller bolt diameter OR)")
+            logger.info(": Select connected member with greater thickness.)")
 
         self.bolts_provided = self.num_cols*self.num_rows
         self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)

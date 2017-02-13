@@ -161,6 +161,15 @@ class ConnectionCalculations(object):
         self.max_spacing = math.ceil(min(32 * thickness_governing_min, 300))
         # print "Max spacing = " + str(self.max_spacing)
 
+        # Max pitch IS 800 Cl 10.2.3.2
+        self.max_pitch = math.ceil(min(12 * thickness_governing_min, 200))
+        # print "Max pitch = " + str(self.max_pitch)
+
+        # Max pitch of outer line of bolts IS 800 Cl 10.2.3.3
+        # assuming that this limit applies to the pitch of interior bolts as well
+        self.max_pitch = math.ceil(min(100 + 4 * thickness_governing_min, self.max_pitch))
+        # print "Max pitch = " + str(self.max_pitch)
+
         # Max spacing IS 800 Cl 10.2.4.3
         self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)).real)
         # print "Max edge distance = " + str(self.max_edge_dist)

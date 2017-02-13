@@ -1853,11 +1853,28 @@ class Seat2DCreatorTop(object):
                 #     self.data_object.draw_dimension_outer_arrow(dwg, np.array(ptList[0]), np.array(ptList[1]),
                 #                                                 str(int(self.data_object.gauge)) + " mm", params)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # ===============================  Beam Bolts Information  ========================================
+        no_of_bolts_beam = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt = np.array(pt_list[0][0])
+        theta = 55
+        offset = 170
+        text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
+
+        # ===============================  Column Bolts Information  ========================================
+        no_of_bolts_column = self.data_object.no_of_rows * self.data_object.no_of_col
+        bolt_pt = np.array(pt_list_column[0])
+        theta = 45
+        offset = 80
+        text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
 
         # ===============================  Beam Information  ========================================
         beam_pt = self.SB1 + (self.data_object.beam_length / 2) * np.array([1, 0])
         theta = 45
-        offset = 50
+        offset = 40
         text_up = "Beam " + self.data_object.beam_designation
         text_down = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
@@ -1874,13 +1891,13 @@ class Seat2DCreatorTop(object):
         dwg.add(dwg.text(text, insert=(txt_pt), fill='black', font_family="sans-serif", font_size=28))
 
         # ===============================  Top Angle Information  ========================================
-        beam_pt = self.SA2 + (self.data_object.top_angle_legsize_horizontal / 2) * np.array([1, 0])
+        beam_pt = self.SA5 + (self.data_object.top_angle_legsize_horizontal / 2) * np.array([1, 0])
         theta = 45
         offset = 90
         text_up = "ISA " + str(int(self.data_object.top_angle_legsize_vertical)) + 'x' + str(int(self.data_object.top_angle_legsize_horizontal)) + 'x' + \
                   str(int(self.data_object.top_angle_thickness))
         text_down = ""
-        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
+        self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # ====================================  Label Gap Distance  =======================================
         ptG1 = self.SG + 50 * np.array([0, -1])

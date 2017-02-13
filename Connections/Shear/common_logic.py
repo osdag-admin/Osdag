@@ -431,7 +431,7 @@ class CommonDesignLogic(object):
 
     def call_saveOutputs(self):  # Done
 
-        return self.call_finCalculation(self.uiObj)
+        return self.call_calculation(self.uiObj)
 
     #=========================================================================================
 

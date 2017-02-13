@@ -1352,17 +1352,7 @@ class MainController(QMainWindow):
     def design_btnclicked(self):
         '''
         '''
-        # from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
-        #
-        # my_box = BRepPrimAPI_MakeBox(10., 20., 30.).Shape()
-        #
-        # # self.display.DisplayShape(my_box, update=True)
-        # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        # osdag_display_shape(self.display, my_box, update=True)
-
-
-
-        #self.display.EraseAll()
+        self.display.EraseAll()
         self.alist = self.designParameters()
 
         self.validateInputsOnDesignBtn()

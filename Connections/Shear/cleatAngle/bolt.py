@@ -61,10 +61,10 @@ class Bolt(object):
         edges = make_edges_from_points(self.points)
         wire = make_wire_from_edges(edges)
         aFace = make_face_from_wire(wire)
-        extrudeDir = -self.T * self.shaftDir  # extrudeDir is a numpy array
+        extrudeDir = -self.T * self.shaft_dir  # extrudeDir is a numpy array
         boltHead = make_prism_from_face(aFace, extrudeDir)
         cylOrigin = self.origin
-        boltCylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cylOrigin), get_gp_dir(self.shaftDir)), self.r, self.H).Shape()
+        boltCylinder = BRepPrimAPI_MakeCylinder(gp_Ax2(get_gp_pt(cylOrigin), get_gp_dir(self.shaft_dir)), self.r, self.H).Shape()
 
         whole_Bolt = BRepAlgoAPI_Fuse(boltHead, boltCylinder).Shape()
 

@@ -69,6 +69,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multipler for min edge distance check - based on edge type
         root_clearance (int): clearance of bolt row from the root of seated angle
+        is_environ_corrosive (boolean): True if environement is corrosive (used for max edge distance calc)
 
         top_angle (string)
         connectivity (string)
@@ -145,6 +146,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_m1 = 0.0
         self.bolt_hole_type = 1
         self.custom_hole_clearance = None
+        self.is_environ_corrosive = False
+
         self.beam_col_clear_gap = 0
         self.min_edge_multiplier = 1
         self.root_clearance = 0
@@ -285,6 +288,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
         self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
+        self.is_environ_corrosive = False # set to True, if environment is corrosive
 
         self.top_angle = "ISA 100X65X8"  # Initialize
         self.connectivity = input_dict['Member']['Connectivity']
@@ -411,7 +415,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         thickness_governing_min = min(self.column_f_t.real, self.angle_t.real)
         self.calculate_distances(bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier,
-                                 thickness_governing_min)
+                                 thickness_governing_min, self.is_environ_corrosive)
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         self.pitch = self.min_pitch

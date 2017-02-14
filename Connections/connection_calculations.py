@@ -1,5 +1,6 @@
 import math
 
+
 class ConnectionCalculations(object):
     """Perform common calculations for connection components in abstract class.
 
@@ -122,16 +123,18 @@ class ConnectionCalculations(object):
         """
         gamma_mb = 1.25
         bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
-        1000)
+            1000)
         return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 
-    def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min):
+    def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
+                            is_environ_corrosive):
         """Calculate minimum pitch, gauge, end and edge distances.
 
         Args:
             bolt_diameter (int)
             bolt_hole_diameter (int)
             min_edge_multiplier (float)
+            thickness_governing_min (float)
 
         Returns:
             None
@@ -176,4 +179,5 @@ class ConnectionCalculations(object):
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
-        # self.max_edge_dist = min(self.max_edge_dist, 40 + 4*thickness_governing)
+        if is_environ_corrosive is True:
+            self.max_edge_dist = min(self.max_edge_dist, 40 + 4 * thickness_governing_min)

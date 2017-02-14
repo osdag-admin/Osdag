@@ -470,8 +470,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             if self.gauge < self.min_gauge:
                 self.safe = False
                 logger.error(": Bolt gauge is less than minimum gauge length [Cl 10.2.2]")
-                logger.warning(": Bolt gauge should be more than  %2.2f mm " % (self.min_gauge))
-                logger.warning(": Maximum gauge length allowed is %2.2f mm " % (self.max_spacing))
+                logger.warning(": Bolt gauge should be more than  %2.2f mm " % self.min_gauge)
+                logger.warning(": Maximum gauge length allowed is %2.2f mm " % self.max_spacing)
                 logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
         if self.gauge > self.max_spacing:
             """
@@ -498,8 +498,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             It is recommended to decrease the bolt diameter or increase the thickness of the connected members.
             """
             logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
-            logger.warning(": Bolt pitch should be more than  %2.2f mm " % (self.min_pitch))
-            logger.warning(": Bolt pitch should be less than  %2.2f mm " % (self.max_pitch))
+            logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
+            logger.warning(": Bolt pitch should be less than  %2.2f mm " % self.max_pitch)
             logger.info(": Select bolt with smaller bolt diameter OR)")
             logger.info(": Select connected member with greater thickness.)")
 
@@ -509,7 +509,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         if self.pitch < self.min_pitch and self.num_rows == 2:
             self.safe = False
             logger.error(": Bolt pitch provided is less than minimum pitch [Cl 10.2.2]")
-            logger.warning(": Bolt pitch should be more than  %2.2f mm " % (self.min_pitch))
+            logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
             logger.info(": Select angle with longer vertical leg OR)")
             logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
 
@@ -525,7 +525,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         if outstanding_leg_length_required > self.angle_B:
             self.safe = False
             logger.error(": Length of outstanding leg of angle is less than required bearing length [Cl 8.7.4]")
-            logger.warning(": Outstanding leg length should be more than %2.2f mm" %(outstanding_leg_length_required))
+            logger.warning(": Outstanding leg length should be more than %2.2f mm" %outstanding_leg_length_required)
             logger.info(": Select seated angle with longer outstanding leg")
 
         """ comparing 0.6*shear strength (0.6*V_d) vs shear force V for calling moment capacity routine
@@ -542,8 +542,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.safe = False
             required_angle_thickness_shear = round(math.ceil(self.shear_force/self.outstanding_leg_shear_capacity),1)
             logger.error(": Shear capacity of outstanding leg of seated angle is insufficient [Cl 8.4.1]")
-            logger.warning(": Shear capacity should be more than factored shear force %2.2f kN" %(self.shear_force))
-            logger.info(": Select seated angle with thickness greater than %2.2 mm" %(required_angle_thickness_shear))
+            logger.warning(": Shear capacity should be more than factored shear force %2.2f kN" %self.shear_force)
+            logger.info(": Select seated angle with thickness greater than %2.2 mm" % required_angle_thickness_shear)
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
@@ -611,7 +611,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.safe = False
             logger.error(": Moment capacity of outstanding leg of seated angle is not sufficient "
                          + angle_moment_capacity_clause)
-            logger.warning(": Moment capacity should be at least %2.2f kN-mm" %(self.moment_at_root_angle))
+            logger.warning(": Moment capacity should be at least %2.2f kN-mm" % self.moment_at_root_angle)
             logger.info(": Increase thickness or decrease length of outstanding leg of seated angle")
 
         # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
@@ -621,7 +621,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         if self.beam_shear_strength < self.shear_force:
             self.safe = False
             logger.error(": Shear capacity of supported beam is not sufficient [Cl 8.4.1]")
-            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" %(self.shear_force))
+            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" % self.shear_force)
             logger.warning(": Beam design is outside the scope of this module")
 
         # End of calculation

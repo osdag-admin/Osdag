@@ -609,10 +609,21 @@ class Seat2DCreatorFront(object):
 
         # ========================  Column plotting  ===================================
 
-        self.SWA = np.array([0, 0])
-        self.SWB = np.array([self.data_object.col_width, 0])
-        self.SWC = np.array([self.data_object.col_width, self.data_object.col_length])
-        self.SWD = np.array([0, self.data_object.col_length])
+        ptSWAx = 0
+        ptSWAy = 0
+        self.SWA = np.array([ptSWAx, ptSWAy])
+
+        ptSWBx = ptSWAx + self.data_object.col_width
+        ptSWBy = 0
+        self.SWB = np.array([ptSWBx, ptSWBy])
+
+        ptSWCx = ptSWBx
+        ptSWCy = ptSWBy + self.data_object.col_length
+        self.SWC = np.array([ptSWCx, ptSWCy])
+
+        ptSWDx = ptSWAx
+        ptSWDy = ptSWAy + self.data_object.col_length
+        self.SWD = np.array([ptSWDx, ptSWDy])
 
         ptSWEx = self.data_object.col_width / 2 - self.data_object.col_web_thk / 2
         ptSWEy = 0.0
@@ -1175,21 +1186,21 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.polyline(points=[self.SWDT, self.SWD2, self.SWD1, self.SWD5, self.SWD4, self.SWD3, self.SWDT], stroke='red', fill='none',
                              stroke_width=2.5).dasharray(dasharray=([2, 2])))
 
-        ptSecA = self.SWA + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 2.5) * np.array([0, 1])
-        ptSecB = ptSecA + (50 * np.array([0, -1]))
-        txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
-        txt = "C"
-        self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        ptSecC = ptSecA + (self.data_object.col_width + self.data_object.gap + self.data_object.beam_length + 100) * np.array([1, 0])
-        ptSecD = ptSecC + (50 * np.array([0, -1]))
-        txt_pt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
-        self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
+        # ptSecA = self.SWA + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 2.5) * np.array([0, 1])
+        # ptSecB = ptSecA + (50 * np.array([0, -1]))
+        # txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+        # txt = "C"
+        # self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
+        # ptSecC = ptSecA + (self.data_object.col_width + self.data_object.gap + self.data_object.beam_length + 100) * np.array([1, 0])
+        # ptSecD = ptSecC + (50 * np.array([0, -1]))
+        # txt_pt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+        # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+        # dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
         # ===============================  Cross section A-A  ===============================================
-        ptSecA = self.SWA + (50 * np.array([0, -1])) + (self.data_object.col_length * np.array([]))
-        ptSecB = self.SWA + (50 * np.array([0, 1]))                                       # here 50 is the length of arrow vertically
-        txt_pt = ptSecB + 10 + (10 * np.array([-1, 0])) + (np.array([0, 1]))
+        ptSecA = self.SWA + (50 * np.array([0, -1])) + (self.data_object.beam_depth/3 * np.array([0, -1]))
+        ptSecB = ptSecA + (50 * np.array([0, 1]))                                       # here 50 is the length of arrow vertically
+        txt_pt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
 
@@ -1351,11 +1362,11 @@ class Seat2DCreatorFront(object):
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         # ===============================   Column Designation  ===============================
-        pt_x = self.data_object.col_width / 2 - 10
+        pt_x = self.data_object.col_width / 2 - 20
         pt_y = 0
         pt = np.array([pt_x, pt_y])
         theta = 30
-        offset = self.data_object.col_length / 10
+        offset = 30
         text_up = "Column " + self.data_object.col_designation
         text_down = ""
         element = ""

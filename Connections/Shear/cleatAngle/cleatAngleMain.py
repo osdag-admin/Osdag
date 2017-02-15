@@ -1549,17 +1549,7 @@ class MainController(QMainWindow):
         cleat_thick = float(dict_angle_data["t"])
         angle_A = int(dict_angle_data["A"])
         angle_B = int(dict_angle_data["B"])
-        # cleat_thick = 10
-        # angle_A = 120
-        # angle_B = 90
-        # bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-        # bolt_r = bolt_dia/2
-        # bolt_R = bolt_r + 7
-        # nut_R = bolt_R
-        # bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
-        # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3750(1985)
-        # nut_T = 12.0 # minimum nut thickness As per Indian Standard
-        # nut_Ht = 12.2 #
+
         ####################################################################################################################
         bolt_dia = str(ui_obj["Bolt"]["Diameter (mm)"])
         bolt_r = int(bolt_dia) / 2

@@ -860,7 +860,8 @@ class MainController(QMainWindow):
         ui_obj = {}
         ui_obj["Bolt"] = {}
         ui_obj["Bolt"]["Diameter (mm)"] = str(self.ui.comboDiameter.currentText())
-        ui_obj["Bolt"]["Grade"] = float(self.ui.comboBoltGrade.currentText())
+        print self.ui.comboBoltGrade.currentText()
+        ui_obj["Bolt"]["Grade"] = (self.ui.comboBoltGrade.currentText())
         ui_obj["Bolt"]["Type"] = str(self.ui.comboBoltType.currentText())
 
         ui_obj['Member'] = {}

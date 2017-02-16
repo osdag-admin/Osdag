@@ -51,8 +51,20 @@ class SeatCommonData(object):
         self.gauge = output_dict['Bolt']["Gauge Distance (mm)"]
         self.end_dist = output_dict['Bolt']["End Distance (mm)"]
         self.edge_dist = output_dict['Bolt']["Edge Distance (mm)"]
+
         self.no_of_rows = output_dict['Bolt']["No. of Row"]
         self.no_of_col = output_dict['Bolt']["No. of Column"]
+
+        self.bolts_top_column_col = 2                                       #bolts attached to column top angle in no. of column
+        self.bolts_top_column_row = 1                                       #bolts attached to column top angle in no. of rows
+        self.bolts_top_beam_col = 2                                         #bolts attached to beam top angle in no. of column
+        self.bolts_top_beam_row = 1                                         #bolts attached to beam top angle in no. of rows
+
+        self.bolts_seat_column_col = output_dict['Bolt']["No. of Row"]      #bolts attached to column top angle in no.of column
+        self.bolts_seat_column_row = output_dict['Bolt']["No. of Column"]   #bolts attached to column top angle in no. of rows
+        self.bolts_seat_beam_col = 2                                        #bolts attached to beam top angle in no. of column
+        self.bolts_seat_beam_row = 1                                        #bolts attached to beam top angle in no. of rows
+
         self.angle_length = output_dict['SeatAngle']['Length (mm)']
         self.col_length = 1000
         self.beam_length = 500
@@ -924,24 +936,6 @@ class Seat2DCreatorFront(object):
         txt = "A"
         self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
 
-        # ptSecC = ptSecA + (self.data_object.beam_depth / 2 + self.data_object.beam_length + 60) * np.array([0, 1])
-        # ptSecD = ptSecC + (50 * np.array([0, 1]))
-        # txt_pt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
-        # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        # dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))  # #666666 is red color
-
-        # ptSecA = self.SWA + (280 * np.array([0, -1]))
-        # ptSecB = self.SWA + (50 * np.array([0, 1]))  # here 50 is the length of arrow vertically
-        # txt_pt = ptSecB + 10 + (10 * np.array([-1, 0])) + (np.array([0, 1]))
-        # txt = "A"
-        # self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        #
-        # ptSecC = ptSecA + (self.data_object.col_width / 2 + self.data_object.beam_length + 60) * np.array([1, 0])
-        # ptSecD = ptSecC + (50 * np.array([0, 1]))  # here 50 is the length of arrow vertically
-        # txt_pt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
-        # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        # dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))  # #666666 is red color
-
         # ===============================  Label Gap Distance  ===============================
         gap_pt = self.data_object.col_length - ((self.data_object.col_length - self.data_object.beam_depth) / 2 + self.data_object.beam_flange_thk)
         # ------------------------  here "gap_pt" represents labelling of [ ___  ___20 ] & "30" represents move 'gap_pt'vertically  ------------------------
@@ -1186,17 +1180,6 @@ class Seat2DCreatorFront(object):
         dwg.add(dwg.polyline(points=[self.SWDT, self.SWD2, self.SWD1, self.SWD5, self.SWD4, self.SWD3, self.SWDT], stroke='red', fill='none',
                              stroke_width=2.5).dasharray(dasharray=([2, 2])))
 
-        # ptSecA = self.SWA + 50 * np.array([-1, 0]) + (self.data_object.beam_width * 2.5) * np.array([0, 1])
-        # ptSecB = ptSecA + (50 * np.array([0, -1]))
-        # txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
-        # txt = "C"
-        # self.data_object.draw_cross_section(dwg, ptSecA, ptSecB, txt_pt, txt)
-        # ptSecC = ptSecA + (self.data_object.col_width + self.data_object.gap + self.data_object.beam_length + 100) * np.array([1, 0])
-        # ptSecD = ptSecC + (50 * np.array([0, -1]))
-        # txt_pt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
-        # self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
-        # dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
-
         # ===============================  Cross section A-A  ===============================================
         ptSecA = self.SWA + (50 * np.array([0, -1])) + (self.data_object.beam_depth/3 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))                                       # here 50 is the length of arrow vertically
@@ -1239,6 +1222,8 @@ class Seat2DCreatorFront(object):
         pt_list_column = []
 
         # ---------------------------------  column bolts --------------------------------------
+        for i in range(1, (nr + 1)):
+
         if nr >= 1:
             for column in range(nr):
                 ptx = self.SWC5 + (self.data_object.top_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, -1]) - \
@@ -1251,12 +1236,12 @@ class Seat2DCreatorFront(object):
                 pt_Cx = ptx + 10 * np.array([1, 0])
                 pt_Dx = ptx + (rect_length + 9) * np.array([1, 0])
                 dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-                pt_list_column.append(ptx)
+                pt_list_top.append(ptx)
 
                 pt_Cx1 = ptx + np.array([-1, 0])
                 pt_Dx1 = ptx + (rect_length - 9) * np.array([-1, 0])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-                pt_list_column.append(ptx)
+                pt_list_top.append(ptx)
 
         # -----------------------------------  beam bolts --------------------------------------
         if nr >= 1:
@@ -1394,7 +1379,7 @@ class Seat2DCreatorFront(object):
 
         # ===============================   Bolts - Top angle Beam part information  ===============================
         # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list[0][0])
+        # bolt_pt_x = np.array(pt_list_column[0])
         # theta = 45
         # offset = (self.data_object.beam_depth * 3) / 8
         # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
@@ -1403,7 +1388,7 @@ class Seat2DCreatorFront(object):
 
         # ===============================   Bolts - Top angle Column part information  ===============================
         # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list_col[-1])
+        # bolt_pt_x = np.array(pt_list_top[-1])
         # theta = 45
         # offset = (self.data_object.col_width * 3) / 8
         # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "

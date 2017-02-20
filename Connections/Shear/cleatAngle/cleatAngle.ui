@@ -1167,16 +1167,6 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>12</string>
       </property>
      </item>

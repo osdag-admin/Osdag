@@ -342,9 +342,9 @@ class MainController(QMainWindow):
         # self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock)) #USE WHEN ui_cleatAngle.py is used(btnOutput = toolButton)
 
         self.ui.toolButton.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
-        self.ui.btn_front.clicked.connect(lambda: self.call_2d_drawing("Front"))
-        self.ui.btn_top.clicked.connect(lambda: self.call_2d_drawing("Top"))
-        self.ui.btn_side.clicked.connect(lambda: self.call_2d_drawing("Side"))
+        self.ui.btn_front.clicked.connect(lambda: self.callCleat2D_drawing("Front"))
+        self.ui.btn_top.clicked.connect(lambda: self.callCleat2D_drawing("Top"))
+        self.ui.btn_side.clicked.connect(lambda: self.callCleat2D_drawing("Side"))
 
         self.ui.btn3D.clicked.connect(lambda: self.call_3d_model(True))
         self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
@@ -1799,7 +1799,9 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
-        self.callCleat2D_drawing("All")
+            self.callCleat2D_drawing("All")
+        else:
+            pass
 
         # self.validate_inputs_on_design_button()
         # self.ui.outputDock.setFixedSize(310, 710)

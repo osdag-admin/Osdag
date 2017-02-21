@@ -4,6 +4,7 @@ comment
 
 @author: aravind
 '''
+import json
 import os.path
 import pickle
 import subprocess
@@ -104,8 +105,8 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        bolt_grade = float(uiObj["Bolt"]["Grade"])
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])#int
+        bolt_grade = float(uiObj["Bolt"]["Grade"])#float
         clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
 
@@ -115,8 +116,8 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())#flat
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
 
         self.ui.combo_weldType.setCurrentIndex(0)
         designPref["weld"] = {}
@@ -157,25 +158,31 @@ class DesignPreferences(QDialog):
 
     def get_clearance(self, boltDia):
         print "************",boltDia
+        if boltDia !=  'Diameter of Bolt':
 
-        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
-        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+            standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+            overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
-        if self.ui.combo_boltHoleType.currentText() == "Standard":
-            clearance = standard_clrnce[boltDia]
+            if self.ui.combo_boltHoleType.currentText() == "Standard":
+                clearance = standard_clrnce[boltDia]
+            else:
+                clearance = overhead_clrnce[boltDia]
+
+            return clearance
         else:
-            clearance = overhead_clrnce[boltDia]
-
-        return clearance
+            pass
 
     def get_boltFu(self, boltGrade):
         '''
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
-        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
-                  12.9: 1220}
-        boltGrd = float(boltGrade)
-        return boltFu[boltGrd]
+        if boltGrade != '':
+            boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+                      12.9: 1220}
+            boltGrd = float(boltGrade)
+            return boltFu[boltGrd]
+        else:
+            pass
 
     def close_designPref(self):
         self.close()
@@ -876,7 +883,7 @@ class MainController(QMainWindow):
         ui_obj['cleat']['Height (mm)'] = str(self.ui.txtInputCleatHeight.text())  # changes the label length to height
 
         ui_obj['Load'] = {}
-        ui_obj['Load']['ShearForce (kN)'] = float(self.ui.txtShear.text())
+        ui_obj['Load']['ShearForce (kN)'] = (self.ui.txtShear.text())
 
         return ui_obj
 
@@ -894,8 +901,7 @@ class MainController(QMainWindow):
     def get_prevstate(self):
         '''
         '''
-        filename = 'saveINPUTS.txt'
-
+        filename ='Connections/Shear/cleatAngle/saveINPUT.txt'
         if os.path.isfile(filename):
             fileObject = open(filename, 'r')
             ui_obj = pickle.load(fileObject)
@@ -1850,12 +1856,11 @@ class MainController(QMainWindow):
             final_model = self.commLogicObj.connectivityObj.get_beamModel()
 
         elif self.commLogicObj.component == "Column":
-            final_model = self.commLogicObj.connectivityObj.columnModel
+            final_model = self.commLogicObj.connectivityObj.get_column_model()
 
-        elif self.commLogicObj.component == "Plate":
-            cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,
-                       self.commLogicObj.connectivityObj.weldModelRight,
-                       self.commLogicObj.connectivityObj.plateModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+        elif self.commLogicObj.component == "cleatAngle":
+            cadlist = [self.commLogicObj.connectivityObj.angleModel,
+                       self.commLogicObj.connectivityObj.angleLeftModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
@@ -1874,6 +1879,7 @@ class MainController(QMainWindow):
         if self.fuse_model is None:
             self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
+        print "$$$$$$$$$$$$$",shape
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 

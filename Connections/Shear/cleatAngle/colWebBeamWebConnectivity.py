@@ -104,13 +104,16 @@ class ColWebBeamWeb(object):
     def get_beamModel(self):
         final_beam = self.beamModel
         nut_bolt_list = self.nut_bolt_array.get_models()
+        print "print nutboltllist for cleat colbolts", len(self.nut_bolt_array.get_colbolts())
         for bolt in nut_bolt_list[0:(len(nut_bolt_list) // 2)]:
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam
     
     def get_column_model(self):
-        final_beam = self.columnModel
-        nut_bolt_list = self.nut_bolt_array.get_models()
+        final_col = self.columnModel
+        nut_bolt_list = self.nut_bolt_array.get_colbolts()
+        print "print nutboltllist for cleat colbolts", len(self.nut_bolt_array.get_colbolts())
+
         for bolt in nut_bolt_list[:]:
-            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
-        return final_beam
+            final_col = BRepAlgoAPI_Cut(final_col, bolt).Shape()
+        return final_col

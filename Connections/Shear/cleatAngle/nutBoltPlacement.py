@@ -181,8 +181,10 @@ class NutBoltArray():
         self.beambolts = []
         for bolt in self.bolts:
             self.beambolts.append(bolt.create_model())
-        dbg = self.dbg_sphere(self.origin)
-        self.beambolts.append(dbg)
+            dbg = self.dbg_sphere(self.origin)
+            self.beambolts.append(dbg)
+        return self.beambolts
+
 
     def get_colbolts(self):
         self.colbolts =[]

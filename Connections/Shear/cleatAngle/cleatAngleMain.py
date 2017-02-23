@@ -486,6 +486,8 @@ class MainController(QMainWindow):
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
+            self.ui.comboColSec.blockSignals(True)
+            self.ui.comboColSec.clear()
 
             font = QFont()
             font.setPointSize(11)
@@ -929,11 +931,11 @@ class MainController(QMainWindow):
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callCleat2D_drawing("All")
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                         self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8],self.alist[9], self.display, self.folder,
-                                         self.connection)  # , base, base1, base2, base3)
-        commLogicObj.call_designReport(fileName, popup_summary)
+        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+        #                                  self.alist[5],
+        #                                  self.alist[6], self.alist[7], self.alist[8],self.alist[9], self.display, self.folder,
+        #                                  self.connection)  # , base, base1, base2, base3)
+        self.commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
         if sys.platform == ("win32" or "win64"):
@@ -1792,7 +1794,8 @@ class MainController(QMainWindow):
                                               self.alist[5], self.alist[6],
                                               self.alist[7], self.alist[8], self.alist[9],self.display, self.folder, self.connection)
 
-        self.resultObj = self.commLogicObj.call_calculation()
+        #self.resultObj = self.commLogicObj.call_calculation()
+        self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
 
         self.displaylog_totextedit(self.commLogicObj)
@@ -1995,9 +1998,9 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                         self.alist[5], self.alist[6], self.alist[7],
-                                         self.alist[8],self.alist[9], self.display, self.folder, self.connection)
+        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+        #                                  self.alist[5], self.alist[6], self.alist[7],
+        #                                  self.alist[8],self.alist[9], self.display, self.folder, self.connection)
         if view != 'All':
 
             if view == "Front":
@@ -2014,7 +2017,7 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            commLogicObj.call2D_Drawing(view, fname, self.alist[4], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.alist[4], self.folder)
 
 
 

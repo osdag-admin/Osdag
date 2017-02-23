@@ -1366,8 +1366,8 @@ class MainController(QMainWindow):
         self.resultObj = self.commLogicObj.call_calculation()
         alist = self.resultObj.values()
 
-        self.displaylog_totextedit(self.commLogicObj)
         self.display_output(self.resultObj)
+        self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']

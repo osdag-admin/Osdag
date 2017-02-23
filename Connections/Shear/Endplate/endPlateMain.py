@@ -31,7 +31,8 @@ from endPlateCalc import end_connection
 from model import *
 from ui_endplate import Ui_MainWindow
 from drawing_2D import EndCommonData
-from Connections.Shear.common_logic import CommonDesignLogic
+# from Connections.Shear.common_logic import CommonDesignLogic
+from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 
 

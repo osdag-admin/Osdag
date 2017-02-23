@@ -186,7 +186,7 @@ class OsdagMainWindow(QMainWindow):
 
     def unavailable(self):
         QMessageBox.about(self, "INFO", "This module is not available in this version.")
-        # Following code should maintain for future coding.
+        # Following code maintain for future coding.
         # self.ui.btn_beamCol.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_compression.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_flexural.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))

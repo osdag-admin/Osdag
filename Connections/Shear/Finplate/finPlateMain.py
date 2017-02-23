@@ -14,7 +14,8 @@ from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
-from Connections.Shear.common_logic import CommonDesignLogic
+# from Connections.Shear.common_logic import CommonDesignLogic
+from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -834,11 +835,11 @@ class MainController(QMainWindow):
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callFin2D_Drawing("All")
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                         self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,
-                                         self.connection)  # , base, base1, base2, base3)
-        commLogicObj.call_designReport(fileName, popup_summary)
+        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+        #                                  self.alist[5],
+        #                                  self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,
+        #                                  self.connection)  # , base, base1, base2, base3)
+        self.commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
         if sys.platform == ("win32" or "win64"):
@@ -1340,6 +1341,7 @@ class MainController(QMainWindow):
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
+        dict_angle_data = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1347,7 +1349,7 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dict_angle_data ,loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1361,18 +1363,20 @@ class MainController(QMainWindow):
         self.unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
                                               self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.display, self.folder, self.connection)
+                                              self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
 
-        self.resultObj = self.commLogicObj.call_calculation()
+        self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
 
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
+            self.callFin2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
-        self.callFin2D_Drawing("All")
+        else:
+            pass
 
 
 
@@ -1456,9 +1460,9 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                         self.alist[5], self.alist[6], self.alist[7],
-                                         self.alist[8], self.display, self.folder, self.connection)
+        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+        #                                  self.alist[5], self.alist[6], self.alist[7],
+        #                                  self.alist[8],self.alist[9], self.display, self.folder, self.connection)
         if view != 'All':
 
             if view == "Front":
@@ -1475,7 +1479,7 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 
     # def save_2D_images(self, view):
     #

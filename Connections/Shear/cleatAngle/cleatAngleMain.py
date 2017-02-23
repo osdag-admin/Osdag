@@ -44,7 +44,7 @@ from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from Svg_Window import SvgWindow
 import pdfkit
-from commonlogic import CommonDesignLogic
+from Connections.Shear.commonlogic import CommonDesignLogic
 
 
 class DesignPreferences(QDialog):

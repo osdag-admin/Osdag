@@ -1034,46 +1034,9 @@ class Seat2DCreatorFront(object):
 
         # =================================    2D view name   ==================================
         ptx = self.SA + np.array([1, 0]) + 1100 * np.array([0, 1])
-        dwg.add(dwg.text('Front view (Sec C-C)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('Front view (Sec C-C) (All distances are in "mm")', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
         print"########### Column Flange Beam Flange Saved ############"
-
-
-        # ===============================   Bolts - Top angle Beam part information  ===============================
-        # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list[0][0])
-        # theta = 45
-        # offset = (self.data_object.beam_depth * 3) / 8
-        # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
-
-        # ===============================   Bolts - Top angle Column part information  ===============================
-        # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list_col[-1])
-        # theta = 45
-        # offset = (self.data_object.col_depth * 3) / 8
-        # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
-
-        # ===============================   Bolts - Seat angle Beam part information  ===============================
-        # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list[0][0])
-        # theta = 45
-        # offset = (self.data_object.beam_depth * 3) / 8
-        # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
-
-        # ===============================   Bolts - Seat angle Column part information  ===============================
-        # no_of_bolts = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt_x = np.array(pt_list_col[-1])
-        # theta = 45
-        # offset = (self.data_object.col_depth * 3) / 8
-        # text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts(grade" + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down)
 
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1266,25 +1229,6 @@ class Seat2DCreatorFront(object):
             pt_top_column_list.append(ptx)
 
         # -----------------------------------  beam bolts --------------------------------------
-        # for btbr in range(1, (btbr + 1)):
-        #     pty = self.SWC5 + (self.data_object.top_angle_legsize_horizontal - self.data_object.edge_dist) * np.array([1, 0]) - \
-        #           self.data_object.beam_flange_thk * np.array([0, 1])  # + column * self.data_object.gauge * np.array([1, 0])
-        #     pty1 = pty - bolt_r * np.array([1, 0])
-        #     rect_width = self.data_object.bolt_dia
-        #     rect_length = self.data_object.beam_flange_thk + self.data_object.top_angle_thickness
-        #     dwg.add(dwg.rect(insert=pty1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
-        #
-        #     pt_Cx = pty + np.array([0, -1])
-        #     pt_Dx = pty + (rect_length - 6) * np.array([0, -1])
-        #     dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-        #     pt_top_beam_list.append(pty)
-        #
-        #     pt_Cx1 = pty + 5 * np.array([0, 1])
-        #     pt_Dx1 = pty + (rect_length + 15) * np.array([0, 1])
-        #     dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-        #     pt_top_beam_list.append(pty)
-
-
         if btbr >= 1:
             for column in range(btbr):
                 pty = self.SWC5 + (self.data_object.top_angle_legsize_horizontal - self.data_object.edge_dist) * np.array([1, 0]) - \
@@ -1303,7 +1247,6 @@ class Seat2DCreatorFront(object):
                 pt_Dx1 = pty + (rect_length + 15) * np.array([0, 1])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_top_beam_list.append(pty)
-
 
         # ===============================  Seat angle Bolts plotting  ========================================
         bscr = self.data_object.bolts_seat_column_row
@@ -1381,7 +1324,7 @@ class Seat2DCreatorFront(object):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         # ===============================   Beam Information   ===============================
-        beam_pt = self.SWA1 + self.data_object.beam_length / 3 * np.array([1, 0])
+        beam_pt = self.SWA1 + self.data_object.beam_length / 4 * np.array([1, 0])
         theta = 45
         offset = 50
         text_up = "Beam " + self.data_object.beam_designation
@@ -1456,7 +1399,7 @@ class Seat2DCreatorFront(object):
 
         # ======================================   2D view name  =======================================
         ptx = self.SWA + np.array([1, 0]) + 1100 * np.array([0, 1])
-        dwg.add(dwg.text('Front view (Sec C-C) (All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('Front view (Sec C-C) (All distances are in "mm")', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
         print"########### Column Web Beam Flange Saved ############"
 
@@ -2544,9 +2487,7 @@ class Seat2DCreatorSide(object):
     # ------------------------------------------------------------------------------------------------------------
 
     def call_CWBF_side(self, file_name):
-        # vb_width = str(float(3.5 * self.data_object.col_depth))
-        # vb_ht = str(float(1.4 * self.data_object.col_length))
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-450 -350 1200 1500'))
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-480 -350 1300 1600'))
         dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWA], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SWE, self.SWH).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.SWF, self.SWG).stroke('blue', width=2.5, linecap='square'))
@@ -2596,7 +2537,6 @@ class Seat2DCreatorSide(object):
 
         # ===============================  Top angle Bolts plotting  ========================================
         btcr = self.data_object.bolts_top_column_row
-        btbr = self.data_object.bolts_top_beam_row
         btcc = self.data_object.bolts_top_column_col
         btbc = self.data_object.bolts_top_beam_col
 
@@ -2670,60 +2610,57 @@ class Seat2DCreatorSide(object):
         # ---------------------------------  beam bolts --------------------------------------
         if bsbc >= 1:
             for row in range(bsbc):
-                # ptx = self.SWB6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([1, 0]) - self.data_object.beam_flange_thk * np.array([0, 1]) + column * self.data_object.gauge * np.array([-1, 0]) #+ 20
-                ptx = self.SWB11 + self.data_object.edge_dist * np.array([1, 0]) + row * self.data_object.gauge * np.array([1, 0])
-                ptx1 = ptx - bolt_r  * np.array([0, 1])
+                pty = self.SWB12 + self.data_object.edge_dist * np.array([-1, 0]) + row * self.data_object.gauge * np.array([-1, 0])
+                pty1 = pty - bolt_r * np.array([0, 1])
                 rect_width = self.data_object.bolt_dia
                 rect_length = self.data_object.beam_flange_thk + self.data_object.seat_angle_thickness
-                dwg.add(dwg.rect(insert=ptx1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
+                dwg.add(dwg.rect(insert=pty1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
 
-                pt_Cx = ptx + 10 * np.array([0, -1])
-                pt_Dx = ptx + (rect_length + 9) * np.array([0, -1])
+                pt_Cx = pty + 10 * np.array([0, -1])
+                pt_Dx = pty + (rect_length + 9) * np.array([0, -1])
                 dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-                pt_seat_beam_list.append(ptx)
+                pt_seat_beam_list.append(pty)
 
-                pt_Cx1 = ptx + np.array([0, 1])
-                pt_Dx1 = ptx + (rect_length - 9) * np.array([0, 1])
+                pt_Cx1 = pty + np.array([0, 1])
+                pt_Dx1 = pty + (rect_length - 9) * np.array([0, 1])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-                pt_seat_beam_list.append(ptx)
+                pt_seat_beam_list.append(pty)
 
         # ===============================  Beam Top angle Bolts Information  ========================================
-        # no_of_bolts_beam = self.data_object.bolts_top_beam_row * self.data_object.bolts_top_beam_col
-        # bolt_pt = np.array(pt_list_column[0])
-        # theta = 45
-        # offset = 50
-        # text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
-        # text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
+        no_of_bolts_beam = self.data_object.bolts_top_beam_row * self.data_object.bolts_top_beam_col
+        bolt_pt = np.array(pt_top_beam_list[0])
+        theta = 45
+        offset = 50
+        text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
 
         # ===============================  Column Top angle Bolts Information  ========================================
-        # no_of_bolts_column = self.data_object.bolts_top_column_row * self.data_object.bolts_top_column_col
-        # bolt_pt = np.array(pt_list_top[-1])
-        # theta = 45
-        # offset = 50
-        # text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
+        no_of_bolts_column = self.data_object.bolts_top_column_row * self.data_object.bolts_top_column_col
+        bolt_pt = np.array(pt_top_column_list[0][0])
+        theta = 45
+        offset = 50
+        text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
 
         # ===============================  Beam Seat angle Bolts Information  ========================================
-        # no_of_bolts_beam = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt = np.array(pt_list_column_seat[0])
-        # theta = 45
-        # offset = 50
-        # text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
-        # text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
+        no_of_bolts_beam = self.data_object.bolts_seat_beam_row * self.data_object.bolts_seat_beam_col
+        bolt_pt = np.array(pt_seat_beam_list[0])
+        theta = 45
+        offset = 60
+        text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
 
         # ===============================  Column Seat angle Bolts Information  ========================================
-        # no_of_bolts_column = self.data_object.no_of_rows * self.data_object.no_of_col
-        # bolt_pt = np.array(pt_list_seat[0][0])
-        # theta = 45
-        # offset = 50
-        # text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
-        # text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
-        # self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
-
-
+        no_of_bolts_column = self.data_object.bolts_seat_column_row * self.data_object.bolts_seat_column_col
+        bolt_pt = np.array(pt_seat_column_list[0][0])
+        theta = 45
+        offset = 50
+        text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
+        text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
 
         # ======================================  2D view name  ================================================
         ptx = self.SWH + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])

@@ -115,6 +115,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         leg_moment_d (float): M_d
         outstanding_leg_shear_capacity (float)
         beam_shear_strength (float)
+        beam_web_local_buckling_capacity (float)
         bolt_shear_capacity (float)
         k_b (float)
         bolt_bearing_capacity (float)
@@ -195,6 +196,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.moment_high_shear_beta = 0.0
         self.outstanding_leg_shear_capacity = 0.0
         self.beam_shear_strength = 0.0
+        self.beam_web_local_buckling_capacity = 0.0
         self.bolt_shear_capacity = 0.0
         self.k_b = 0.0
         self.bolt_bearing_capacity = 0.0
@@ -288,7 +290,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
         self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
-        self.is_environ_corrosive = False # set to True, if environment is corrosive
+        self.is_environ_corrosive = False  # set to True, if environment is corrosive
 
         self.top_angle = "ISA 100X65X8"  # Initialize
         self.connectivity = input_dict['Member']['Connectivity']
@@ -521,6 +523,19 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.info(": Select angle with longer vertical leg OR)")
             logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
 
+        root_3 = math.sqrt(3)
+
+        # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
+        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000,
+                                         1)
+        # logger.info(": Beam shear capacity = " + str(self.beam_shear_strength))
+
+        if self.beam_shear_strength < self.shear_force:
+            self.safe = False
+            logger.error(": Shear capacity of supported beam is not sufficient [Cl 8.4.1]")
+            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" % self.shear_force)
+            logger.warning(": Beam design is outside the scope of this module")
+
         # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
         # Rearranged equation from Cl 8.7.4
         bearing_length = round((self.shear_force * 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
@@ -541,7 +556,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         Shear capacity of the outstanding leg of cleat = A_v * f_yw / root_3 / gamma_m0
          = w*t*fy/gamma_m0/root_3
         """
-        root_3 = math.sqrt(3)
+
         self.outstanding_leg_shear_capacity = round(
             self.angle_l * self.angle_t * self.angle_fy * 0.001 / root_3 * self.gamma_m0, 1)  # kN
         # logger.info(": Shear strength of outstanding leg = " + str(self.outstanding_leg_shear_capacity))
@@ -590,7 +605,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             # to avoid irreversible deformation (in case of cantilever),
             # under service-ability loads, moment_d shall be less than 1.5*Z_e*f_y/gamma_m0
             leg_moment_d_limiting = 1.5 * (self.angle_fy / self.gamma_m0) * (
-            self.angle_l * self.angle_t ** 2 / 6) / 1000
+                self.angle_l * self.angle_t ** 2 / 6) / 1000
             angle_outst_leg_mcapacity = min(self.leg_moment_d, leg_moment_d_limiting)
         else:
             self.is_shear_high = True
@@ -609,7 +624,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             where, beta = ((2V/V_d) - 1)^2
             """
             leg_moment_d_limiting = 1.2 * (self.angle_fy / self.gamma_m0) * (
-            self.angle_l * self.angle_t ** 2 / 6) / 1000
+                self.angle_l * self.angle_t ** 2 / 6) / 1000
             beta_moment = ((2 * self.shear_force / self.outstanding_leg_shear_capacity) - 1) ** 2
             angle_outst_leg_mcapacity = min((1 - beta_moment) * self.leg_moment_d, leg_moment_d_limiting)
             self.moment_high_shear_beta = beta_moment  # for design report
@@ -624,15 +639,44 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.warning(": Moment capacity should be at least %2.2f kN-mm" % self.moment_at_root_angle)
             logger.info(": Increase thickness or decrease length of outstanding leg of seated angle")
 
-        # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
-        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000, 1)
-        # logger.info(": Beam shear capacity = " + str(self.beam_shear_strength))
+        """ Check for local buckling capacity of web of supported beam (Cl 8.7.3.1)
+        Variables are prefixed with bwlb: beam web local buckling
 
-        if self.beam_shear_strength < self.shear_force:
+        Assumptions:
+                1) Effective length of web of supported beam (8.7.1.5) [KL = L]
+                2) steel_E = 200000 MPa
+                3) Effective sectional area for computing design compressive strength P_d (7.1.2)
+                is taken as indicated in (8.7.3.1)
+        """
+
+        # Area of cross section of beam web:
+        bwlb_b1 = b1  # width of stiff bearing on flange (8.7.1.3)
+
+        # Dispersion of the load through the web at 45 degree, to the level of half the depth of the cross-section
+        bwlb_n1 = self.beam_d / 2 - self.beam_R1 - self.beam_f_t
+
+        # Effective length of web of supported beam (8.7.1.5) assumed KL = L
+        bwlb_KL = self.beam_d - 2 * self.beam_f_t - 2 * self.beam_R1
+
+        # For calculating design compressive strength of web of supported beam (7.1.2.1)
+        steel_E = 200000  # MPa
+        bwlb_lambda = (bwlb_KL * 2 * root_3 / self.beam_w_t / math.pi) * math.sqrt(self.beam_fy / steel_E)
+        bwlb_alpha = 0.49  # Imperfection factor for buckling class 'c' (IS 800 - Table 7 and 8.7.3.1)
+        bwlb_phi = 0.5 * (1 + bwlb_alpha * (bwlb_lambda - 0.2) + bwlb_lambda ** 2)
+        bwlb_chi = max((bwlb_phi + (bwlb_phi ** 2 - bwlb_lambda ** 2) ** 0.5) ** (-1), 1.0)
+        bwlb_f_cd = bwlb_chi * self.beam_fy/self.gamma_m0
+
+        # Design compressive strength (7.1.2)
+        bwlb_P_d = (bwlb_b1 + bwlb_n1) * bwlb_f_cd
+        self.beam_web_local_buckling_capacity = bwlb_P_d
+
+        if self.beam_web_local_buckling_capacity < self.shear_force:
             self.safe = False
-            logger.error(": Shear capacity of supported beam is not sufficient [Cl 8.4.1]")
-            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" % self.shear_force)
-            logger.warning(": Beam design is outside the scope of this module")
+            logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
+            logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
+            logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
+
+        print self.beam_web_local_buckling_capacity
 
         # End of calculation
         # ---------------------------------------------------------------------------

@@ -18,7 +18,7 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Osdag')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'osdag')
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
     # db.open()
@@ -94,11 +94,11 @@ def get_columncombolist():
     '''
     comboList = []
     columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
+    a = columnQuery.size()
 
     comboList.append("Select section")
     while(columnQuery.next()):
         comboList.append(columnQuery.value(0))
-    print comboList
     return comboList
 
 

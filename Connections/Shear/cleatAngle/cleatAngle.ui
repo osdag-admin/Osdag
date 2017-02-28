@@ -3510,7 +3510,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>584</y>
+       <y>592</y>
        <width>200</width>
        <height>30</height>
       </rect>
@@ -3535,7 +3535,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>614</y>
+       <y>630</y>
        <width>200</width>
        <height>30</height>
       </rect>

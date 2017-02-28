@@ -70,8 +70,17 @@ class ColFlangeBeamWeb(object):
         # plateOrigin = (((self.column.sec_origin + self.column.D/2 ) * (- self.column.vDir)) +
         #           (self.column.length/2 * self.column.wDir) + ((self.beam.t/2.0 )* (-self.beam.uDir))) +
         #           ((self.plate.T/2.0) * (-self.beam.uDir))
+        # plateOrigin = (((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) +
+        #                ((self.column.length / 2.0 + (self.beam.T + self.beam.R1 + 5)) * self.column.wDir) +
+        #                ((self.beam.t / 2.0) * (-self.beam.uDir))) + ((self.plate.T / 2.0) * (-self.beam.uDir))
+        # spacing = (self.beam.D - (self.beam.T + self.beam.R1 + 5))/2
+        # plate_center = (self.beam.D/2) - spacing
+
+        spacing = (self.beam.T + self.beam.R1 + 5)+ (self.plate.L/2)
+        plate_center = (self.beam.D / 2) - spacing
+
         plateOrigin = (((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) +
-                       ((self.column.length / 2.0 + (self.beam.T + self.beam.R1 + 5)) * self.column.wDir) +
+                       ((self.column.length / 2.0 + (plate_center)) * self.column.wDir) +
                        ((self.beam.t / 2.0) * (-self.beam.uDir))) + ((self.plate.T / 2.0) * (-self.beam.uDir))
 
         uDir = numpy.array([1.0, 0.0, 0])

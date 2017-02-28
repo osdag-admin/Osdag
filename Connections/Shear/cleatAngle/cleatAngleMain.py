@@ -12,39 +12,27 @@ import subprocess
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QDesktopWidget
-from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from OCC import IGESControl
-from OCC import VERSION, BRepTools
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDesktopWidget
+from OCC import IGESControl,BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.StlAPI import StlAPI_Writer
-import shutil
-from ui_cleatAngle import Ui_MainWindow
-from ISection import ISection
-from angle import Angle
-from beamWebBeamWebConnectivity import BeamWebBeamWeb
-from bolt import Bolt
 from cleatCalculation import cleat_connection
-from ui_design_preferences import Ui_ShearDesignPreferences
-from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
-from colWebBeamWebConnectivity import ColWebBeamWeb
-from reportGenerator import *
 from drawing2D import *
 from model import *
-from notch import Notch
-from nut import Nut
-from nutBoltPlacement import NutBoltArray
+from ui_design_preferences import Ui_ShearDesignPreferences
+from ui_cleatAngle import Ui_MainWindow
 from ui_popUpWindow import Ui_Capacitydetals
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from Svg_Window import SvgWindow
-import pdfkit
 from Connections.Shear.commonlogic import CommonDesignLogic
+import shutil
+import pdfkit
 
 
 class DesignPreferences(QDialog):
@@ -837,16 +825,13 @@ class MainController(QMainWindow):
         '''
         self.ui.lbl_connectivity.show()
         loc = self.ui.comboConnLoc.currentText()
-        if loc == "Column flange-Beam web":
 
-            # pixmap = QPixmap(":/newPrefix/images/beam2.jpg")
+        if loc == "Column flange-Beam web":
             pixmap = QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
-            # self.ui.lbl_connectivity.show()
         elif(loc == "Column web-Beam web"):
-            # picmap = QPixmap(":/newPrefix/images/beam.jpg")
             picmap = QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
@@ -931,12 +916,7 @@ class MainController(QMainWindow):
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callCleat2D_drawing("All")
-        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-        #                                  self.alist[5],
-        #                                  self.alist[6], self.alist[7], self.alist[8],self.alist[9], self.display, self.folder,
-        #                                  self.connection)  # , base, base1, base2, base3)
         self.commLogicObj.call_designReport(fileName, popup_summary)
-
         # Creates pdf
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
@@ -954,45 +934,13 @@ class MainController(QMainWindow):
         pdfkit.from_file(fileName, fname, configuration=config, options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
-        #&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    #     # filename, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files (*.html)")
-    #     filename = self.folder + "/images_html/Html_Report.html"
-    #     filename = str(filename)
-    #     self.call_2d_drawing("All")
-    #     # base, base_front, base_top, base_side = self.call_2d_drawing("All")
-    #     # self.outdict = self.result_obj#self.outputdict()
-    #
-    #     self.inputdict = self.getuser_inputs()  # self.getuser_inputss()
-    #     self.outdict = cleat_connection(self.inputdict)
-    #     dict_beam_data = self.fetch_beam_param()
-    #
-    #     dict_column_data = self.fetch_column_param()
-    #     dict_cleat_data = self.fetch_angle_param()
-    #     save_html(self.outdict, self.inputdict, dict_beam_data, dict_column_data, dict_cleat_data, popup_summary, filename, self.folder)
-    #
-    #     # ########################################## Creates pdf: ####################################################################
-    #     if sys.platform == "nt":
-    #         path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    #     else:
-    #         path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-    #     config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
-    #     options = {
-    #         'margin-bottom': '10mm',
-    #         'footer-right': '[page]'
-    #     }
-    #
-    #     file_type = "PDF (*.pdf)"
-    #     fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
-    #     pdfkit.from_file(filename, fname, configuration=config, options=options)
-    #
-    #     QMessageBox.about(self, 'Information', "Report Saved")
-    #
-    # # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
 
     def save_log(self):
 
         filename, pat = QFileDialog.getSaveFileName(self, "Save File As", str(self.folder) + "/Logmessages", "Text files (*.txt)")
         return self.save_file(filename + ".txt")
+
 
     def save_file(self, filename):
         '''(file open for writing)-> boolean
@@ -1029,15 +977,8 @@ class MainController(QMainWindow):
 
         self.ui.comboCleatSection.setCurrentIndex((0))
         self.ui.txtInputCleatHeight.clear()
-        # self.ui.txtPlateWidth.clear()
-        # self.ui.comboWldSize.setCurrentIndex((0))
 
-        # ----------------------------------------------- Output ------------------------------------------------------------------
-        # self.ui.txtShrCapacity.clear()
-        # self.ui.txtbearCapacity.clear()
-        # self.ui.txtBoltCapacity.clear()
         self.ui.txtNoBolts.clear()
-        # self.ui.txtBoltGrpCapacity.clear()
         self.ui.txt_row.clear()
         self.ui.txt_column.clear()
         self.ui.txtBeamPitch.clear()
@@ -1054,17 +995,9 @@ class MainController(QMainWindow):
         self.ui.txtEndDist_c.clear()
         self.ui.txtEdgeDist_c.clear()
 
-        # self.ui.txtPlateThick.clear()
         self.ui.outputCleatHeight.clear()
-        # self.ui.txtplate_width.clear()
-        # self.ui.txtExtMomnt.clear()
-        # self.ui.txtMomntCapacity.clear()
-        # self.ui.txtWeldThick.clear()
-        # self.ui.txtResltShr.clear()
-        # self.ui.txtWeldStrng.clear()
         self.ui.textEdit.clear()
 
-        # ---------------------------------- Erase Display ------------------------------------------------------------------
         self.display.EraseAll()
 
     def dockbtn_clicked(self, widget):
@@ -1121,22 +1054,17 @@ class MainController(QMainWindow):
                 else:
                     result_obj = output_obj
 
-        # result_obj['Bolt']
         shear_capacity = result_obj['Bolt']['shearcapacity']
 
-        # self.uiPopUp.lineEdit_companyName.setText(str(shear_capacity))
 
         bearing_capacity = result_obj['Bolt']['bearingcapacity']
-        # self.ui.txtbearCapacity.setText(str(bearing_capacity))
 
         bolt_capacity = result_obj['Bolt']['boltcapacity']
-        # self.ui.txtBoltCapacity.setText(str(bolt_capacity))
 
         no_ofbolts = result_obj['Bolt']['numofbolts']
         self.ui.txtNoBolts.setText(str(no_ofbolts))
         # newly added field
         bolt_grp_capacity = result_obj['Bolt']['boltgrpcapacity']
-        # self.ui.txtBoltGrpCapacity.setText(str(bolt_grp_capacity))
 
         no_ofrows = result_obj['Bolt']['numofrow']
         self.ui.txt_row.setText(str(no_ofrows))
@@ -1155,7 +1083,7 @@ class MainController(QMainWindow):
 
         edge_dist = result_obj['Bolt']['enddist']
         self.ui.txtEdgeDist.setText(str(edge_dist))
-        # column
+
         c_noOfBolts = result_obj['cleat']['numofbolts']
         self.ui.txtNoBolts_c.setText(str(c_noOfBolts))
         cno_ofrows = result_obj['cleat']['numofrow']
@@ -1176,24 +1104,18 @@ class MainController(QMainWindow):
         edge_dist = result_obj['cleat']['end']
         self.ui.txtEdgeDist_c.setText(str(edge_dist))
 
-        # Newly included fields
         cleat_ht = result_obj['cleat']['height']
         self.ui.outputCleatHeight.setText(str(cleat_ht))
 
-        # plate_width = result_obj['Cleat']['width']
-        # self.ui.txtplate_width.setText(str(plate_width))
 
         moment_demand = result_obj['cleat']['externalmoment']
-        # self.ui.txtExtMoment.setText(str(moment_demand))
 
         moment_capacity = result_obj['cleat']['momentcapacity']
-        # self.ui.txtMomntCapacity.setText(str(moment_capacity))
 
     def displaylog_totextedit(self,commLogicObj):
         '''
         This method displaying Design messages(log messages)to textedit widget.
         '''
-        #afile = QFile('Connections/Shear/cleatAngle/cleat.log')
         fname = str(commLogicObj.call_saveMessages())
         afile = QFile(fname)
 
@@ -1214,17 +1136,11 @@ class MainController(QMainWindow):
         since python comes with Tk included, but that PySide or PyQt4
         is much preferred
         """
-        # try:
-        #     from PySide import QtCore, QtGui
-        #     return 'pyside'
-        # except:
-        #     pass
         try:
             from PyQt5 import QtCore, QtGui
             return 'pyqt4'
         except:
             pass
-        # Check wxPython
         try:
             import wx
             return 'wx'
@@ -1262,14 +1178,11 @@ class MainController(QMainWindow):
         self.setWindowTitle("Osdag Cleat Angle")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
-        # self.ui.mytabWidget.addTab(self.ui.model2dTab,"")
 
         self.ui.modelTab.InitDriver()
         display = self.ui.modelTab._display
         # background gradient
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
-        # display black trihedron
         display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
@@ -1285,40 +1198,6 @@ class MainController(QMainWindow):
 
         return display, start_display
 
-#     def display_3d_model(self, component):
-#         self.display.EraseAll()
-#         self.display.SetModeShaded()
-#         display.DisableAntiAliasing()
-# #         self.display.set_bg_gradient_color(23,1,32,23,1,32)
-#         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-# #         self.display.set_bg_gradient_color(28,9,99,252,243,235)
-#         self.display.View_Front()
-#         self.display.View_Iso()
-#         self.display.FitAll()
-#         if component == "Column":
-#             osdag_display_shape(self.display, self.connectivity.get_column_model(), update=True)
-#         elif component == "Beam":
-#             osdag_display_shape(self.display, self.connectivity.get_beam_model(), material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-#             # osdag_display_shape(self.display, self.connectivity.beamModel, material = Graphic3d_NOT_2D_ALUMINUM, update=True)
-#         elif component == "cleatAngle":
-#
-#             osdag_display_shape(self.display, self.connectivity.angleModel, color='blue', update=True)
-#             osdag_display_shape(self.display, self.connectivity.angleLeftModel, color='blue', update=True)
-#             nutboltlist = self.connectivity.nut_bolt_array.get_model()
-#             for nutbolt in nutboltlist:
-#                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-#             # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
-#         elif component == "Model":
-#             osdag_display_shape(self.display, self.connectivity.columnModel, update=True)
-#             osdag_display_shape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM, update=True)
-#             # osdag_display_shape(self.display, self.connectivity.weldModelLeft, color = 'red', update = True)
-#             # osdag_display_shape(self.display, self.connectivity.weldModelRight, color = 'red', update = True)
-#             osdag_display_shape(self.display, self.connectivity.angleModel, color='blue', update=True)
-#             osdag_display_shape(self.display, self.connectivity.angleLeftModel, color='blue', update=True)
-#             nutboltlist = self.connectivity.nut_bolt_array.get_model()
-#             for nutbolt in nutboltlist:
-#                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-#             # self.display.DisplayShape(self.connectivity.nut_bolt_array.get_models(), color = Quantity_NOC_SADDLEBROWN, update=True)
 
     def validate_inputs_on_design_button(self):
 
@@ -1354,7 +1233,6 @@ class MainController(QMainWindow):
         elif self.ui.comboCleatSection.currentIndex() == 0:
             QMessageBox.about(self, "Information", "Please select Cleat angle")
 
-    # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''
         This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
@@ -1372,6 +1250,7 @@ class MainController(QMainWindow):
         bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
         return bolt_head_thick[bolt_diameter]
 
+
     def bolt_head_dia_calculation(self, bolt_diameter):
         '''
         This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
@@ -1387,6 +1266,7 @@ class MainController(QMainWindow):
         '''
         bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
         return bolt_head_dia[bolt_diameter]
+
 
     def bolt_length_calculation(self, bolt_diameter):
         '''
@@ -1412,6 +1292,7 @@ class MainController(QMainWindow):
 
         return bolt_head_dia[bolt_diameter]
 
+
     def nut_thick_calculation(self, bolt_diameter):
         '''
         Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
@@ -1420,305 +1301,10 @@ class MainController(QMainWindow):
 
         return nut_dia[bolt_diameter]
 
-    # def create_3d_beam_web_beam_web(self):
-    #     '''
-    #     creating 3d cad model with beam web beam web
-    #     '''
-    #     ui_obj = self.getuser_inputs()
-    #     result_obj = cleat_connection(ui_obj)
-    #
-    #     # ################################### PRIMARY BEAM PARAMETERS ########################################################
-    #
-    #     dict_beam_data = self.fetch_column_param()
-    #     pBeam_D = int(dict_beam_data["D"])
-    #     pBeam_B = int(dict_beam_data["B"])
-    #     pBeam_tw = float(dict_beam_data["tw"])
-    #     pBeam_T = float(dict_beam_data["T"])
-    #     pBeam_alpha = float(dict_beam_data["FlangeSlope"])
-    #     pBeam_R1 = float(dict_beam_data["R1"])
-    #     pBeam_R2 = float(dict_beam_data["R2"])
-    #     pBeam_length = 800.0  # This parameter as per view of 3D cad model
-    #
-    #     # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-    #     column = ISection(B=pBeam_B, T=pBeam_T, D=pBeam_D, t=pBeam_tw,
-    #                       R1=pBeam_R1, R2=pBeam_R2, alpha=pBeam_alpha,
-    #                       length=pBeam_length, notch_obj=None)
-    #
-    #     # #### SECONDARY BEAM PARAMETERS ######
-    #     dictbeamdata2 = self.fetch_beam_param()
-    #
-    #     sBeam_D = int(dictbeamdata2["D"])
-    #     sBeam_B = int(dictbeamdata2["B"])
-    #     sBeam_tw = float(dictbeamdata2["tw"])
-    #     sBeam_T = float(dictbeamdata2["T"])
-    #     sBeam_alpha = float(dictbeamdata2["FlangeSlope"])
-    #     sBeam_R1 = float(dictbeamdata2["R1"])
-    #     sBeam_R2 = float(dictbeamdata2["R2"])
-    #
-    #     # ---------------------------- Notch dimensions -----------------------------------------------------------------
-    #     notch_obj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
-    #     # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-    #     beam = ISection(B=sBeam_B, T=sBeam_T, D=sBeam_D,
-    #                     t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
-    #                     alpha=sBeam_alpha, length=500, notch_obj=notch_obj)
-    #
-    #     # ############################################# WELD,PLATE,BOLT AND NUT PARAMETERS #######################################
-    #
-    #     dict_angle_data = self.fetch_angle_param()
-    #     cleat_length = result_obj['cleat']['height']
-    #
-    #     cleat_thick = float(dict_angle_data["t"])
-    #     angle_A = int(dict_angle_data["A"])
-    #     angle_B = int(dict_angle_data["B"])
-    #     # cleat_thick = 10
-    #     # angle_A = 120
-    #     # angle_B = 90
-    #     # bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-    #     # bolt_r = bolt_dia/2
-    #     # bolt_R = bolt_r + 7
-    #     # nut_R = bolt_R
-    #     # bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
-    #     # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3750(1985)
-    #     # nut_T = 12.0 # minimum nut thickness As per Indian Standard
-    #     # nut_Ht = 12.2 #
-    #
-    #     bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-    #     bolt_r = bolt_dia / 2
-    #     bolt_R = self.bolt_head_dia_calculation(bolt_dia) / 2
-    #     nut_R = bolt_R
-    #     bolt_T = self.bolt_head_thick_calculation(bolt_dia)
-    #     bolt_Ht = self.bolt_length_calculation(bolt_dia)
-    #     # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-    #     nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-    #     nut_Ht = 12.2  # 150
-    #     # plate = Plate(L= 300,W =100, T = 10)
-    #     angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
-    #
-    #     # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
-    #     bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
-    #
-    #     # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
-    #     nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-    #
-    #     gap = sBeam_tw + 2 * cleat_thick + nut_T
-    #     cgap = pBeam_tw + cleat_thick + nut_T
-    #
-    #     nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap, cgap)
-    #
-    #     beamwebconn = BeamWebBeamWeb(column, beam, notch_obj, angle, nut_bolt_array)
-    #     beamwebconn.create_3dmodel()
-    #
-    #     return beamwebconn
-
-    # def create_3d_col_web_beam_web(self):
-    #     '''
-    #     creating 3d cad model with column web beam web
-    #     '''
-    #     ui_obj = self.getuser_inputs()
-    #     result_obj = cleat_connection(ui_obj)
-    #
-    #     dict_beam_data = self.fetch_beam_param()
-    #     # ################################## BEAM PARAMETERS ####################################################################
-    #     beam_D = int(dict_beam_data["D"])
-    #     beam_B = int(dict_beam_data["B"])
-    #     beam_tw = float(dict_beam_data["tw"])
-    #     beam_T = float(dict_beam_data["T"])
-    #     beam_alpha = float(dict_beam_data["FlangeSlope"])
-    #     beam_R1 = float(dict_beam_data["R1"])
-    #     beam_R2 = float(dict_beam_data["R2"])
-    #     beam_length = 500.0  # This parameter as per view of 3D cad model
-    #
-    #     # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-    #     beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
-    #                     R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-    #                     length=beam_length, notch_obj=None)
-    #
-    #     # #################################################### COLUMN PARAMETERS #################################################
-    #     dict_column_data = self.fetch_column_param()
-    #
-    #     column_D = int(dict_column_data["D"])
-    #     column_B = int(dict_column_data["B"])
-    #     column_tw = float(dict_column_data["tw"])
-    #     column_T = float(dict_column_data["T"])
-    #     column_alpha = float(dict_column_data["FlangeSlope"])
-    #     column_R1 = float(dict_column_data["R1"])
-    #     column_R2 = float(dict_column_data["R2"])
-    #
-    #     # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-    #     column = ISection(B=column_B, T=column_T, D=column_D,
-    #                       t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notch_obj=None)
-    #     # ########################################## WELD,PLATE,BOLT AND NUT PARAMETERS ############################################
-    #     dict_angle_data = self.fetch_angle_param()
-    #     cleat_length = result_obj['cleat']['height']
-    #
-    #     cleat_thick = float(dict_angle_data["t"])
-    #     angle_A = int(dict_angle_data["A"])
-    #     angle_B = int(dict_angle_data["B"])
-    #
-    #     ####################################################################################################################
-    #     bolt_dia = str(ui_obj["Bolt"]["Diameter (mm)"])
-    #     bolt_r = int(bolt_dia) / 2
-    #     bolt_R = self.bolt_head_dia_calculation(int(bolt_dia) / 2)
-    #     nut_R = bolt_R
-    #     bolt_T = self.bolt_head_thick_calculation(int(bolt_dia))
-    #     bolt_Ht = self.bolt_length_calculation(int(bolt_dia))
-    #     # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-    #     nut_T = self.nut_thick_calculation(int(bolt_dia))  # bolt_dia = nut_dia
-    #     nut_Ht = 12.2  # 150
-    #     #####################################################################################################################
-    #     # plate = Plate(L= 300,W =100, T = 10)
-    #     angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
-    #
-    #     # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
-    #     bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
-    #
-    #     # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
-    #     nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-    #
-    #     gap = beam_tw + 2 * cleat_thick + nut_T
-    #     cgap = column_tw + cleat_thick + nut_T
-    #
-    #     nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap, cgap)
-    #
-    #     colwebconn = ColWebBeamWeb(column, beam, angle, nut_bolt_array)
-    #     colwebconn.create_3dmodel()
-    #
-    #     return colwebconn
-
-#     def create_3d_col_flange_beam_web(self):
-#         '''
-#         Creating 3d cad model with column flange beam web connection
-#         '''
-#         ui_obj = self.getuser_inputs()
-#         result_obj = cleat_connection(ui_obj)
-#
-#         dict_beam_data = self.fetch_beam_param()
-#         # #### BEAM PARAMETERS #####
-#         beam_D = int(dict_beam_data["D"])
-#         beam_B = int(dict_beam_data["B"])
-#         beam_tw = float(dict_beam_data["tw"])
-#         beam_T = float(dict_beam_data["T"])
-#         beam_alpha = float(dict_beam_data["FlangeSlope"])
-#         beam_R1 = float(dict_beam_data["R1"])
-#         beam_R2 = float(dict_beam_data["R2"])
-#         beam_length = 500.0  # This parameter as per view of 3D cad model
-#
-#         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-#         beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
-#                         R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-#                         length=beam_length, notch_obj=None)
-#
-#         # ############################################## COLUMN PARAMETERS ##################################################
-#         dict_column_data = self.fetch_column_param()
-#
-#         column_D = int(dict_column_data["D"])
-#         column_B = int(dict_column_data["B"])
-#         column_tw = float(dict_column_data["tw"])
-#         column_T = float(dict_column_data["T"])
-#         column_alpha = float(dict_column_data["FlangeSlope"])
-#         column_R1 = float(dict_column_data["R1"])
-#         column_R2 = float(dict_column_data["R2"])
-#
-#         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-#         column = ISection(B=column_B, T=column_T, D=column_D,
-#                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notch_obj=None)
-#
-#         # ############################### Cleat,BOLT AND NUT PARAMETERS ###########################################################
-#         dict_angle_data = self.fetch_angle_param()
-#         cleat_length = result_obj['cleat']['height']
-#
-#         cleat_thick = float(dict_angle_data["t"])
-#         angle_A = int(dict_angle_data["A"])
-#         angle_B = int(dict_angle_data["B"])
-# #         cleat_thick = 10
-# #         angle_A = 120
-# #         angle_B = 90
-#
-# #         bolt_dia = ui_obj["Bolt"]["Diameter (mm)"]
-# #         bolt_r = bolt_dia/2
-# #         bolt_R = bolt_r + 7
-# #         nut_R = bolt_R
-# #         bolt_T = 10.0 # minimum bolt thickness As per Indian Standard
-# #         bolt_Ht = 50.0 # minimum bolt length as per Indian Standard
-# #         nut_T = 12.0 # minimum nut thickness As per Indian Standard
-# #         nut_Ht = 12.2
-#     ######################################################################################################
-#         bolt_dia = str(ui_obj["Bolt"]["Diameter (mm)"])
-#         bolt_r = (int(bolt_dia) / 2)
-#         #bolt_r = bolt_dia / 2
-#         bolt_R = self.bolt_head_dia_calculation(int(bolt_dia) / 2)
-#         nut_R = bolt_R
-#         bolt_T = self.bolt_head_thick_calculation(int(bolt_dia))
-#         bolt_Ht = self.bolt_length_calculation(int(bolt_dia))
-#         # bolt_Ht = 50.0 # minimum bolt length as per Indian Standard IS 3757(1989)
-#         nut_T = self.nut_thick_calculation(int(bolt_dia))  # bolt_dia = nut_dia
-#         nut_Ht = 12.2  # 150
-#
-#     ##########################################################################################################
-#
-#         # plate = Plate(L= 300,W =100, T = 10)
-#         angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
-#
-#         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
-#         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
-#
-#         # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
-#         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-#
-#         gap = beam_tw + 2 * cleat_thick + nut_T
-#         cgap = column_T + cleat_thick + nut_T
-#
-#         nut_bolt_array = NutBoltArray(result_obj, nut, bolt, gap, cgap)
-#
-#         colflangeconn = ColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
-#         colflangeconn.create_3dmodel()
-#         return colflangeconn
 
     def call_3d_model(self, flag):
         self.commLogicObj.call_3DModel(flag)
 
-    # def call_3d_model(self, flag):
-    #     # self.ui.btnSvgSave.setEnabled(True)
-    #     self.ui.btn3D.setChecked(Qt.Checked)
-    #     if self.ui.btn3D.isChecked():
-    #         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
-    #         self.ui.chkBxCol.setChecked(Qt.Unchecked)
-    #         self.ui.checkBoxCleat.setChecked(Qt.Unchecked)
-    #         self.ui.mytabWidget.setCurrentIndex(0)
-    #
-    #     if flag is True:
-    #         if self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-    #             # self.create_3d_col_web_beam_web()
-    #             self.connectivity = self.create_3d_col_web_beam_web()
-    #             self.fuse_model = None
-    #         elif self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-    #             self.ui.mytabWidget.setCurrentIndex(0)
-    #             self.connectivity = self.create_3d_col_flange_beam_web()
-    #             self.fuse_model = None
-    #
-    #         else:
-    #             self.ui.mytabWidget.setCurrentIndex(0)
-    #             self.connectivity = self.create_3d_beam_web_beam_web()
-    #             self.fuse_model = None
-    #
-    #         self.display_3d_model("Model")
-    #         # beamOrigin = self.connectivity.beam.secOrigin + self.connectivity.beam.t/2 * (-self.connectivity.beam.uDir)
-    #         # gpBeamOrigin = getGpPt(beamOrigin)
-    #         # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-    #         # self.display.DisplayShape(my_sphere2,color = 'red',update = True)
-    #         # beamOrigin = self.connectivity.beam.secOrigin
-    #         # gpBeamOrigin = getGpPt(beamOrigin)
-    #         # my_sphere2 = BRepPrimAPI_MakeSphere(gpBeamOrigin,1).Shape()
-    #         # self.display.DisplayShape(my_sphere2,color = 'blue',update = True)
-    #         # plateOrigin =(self.connectivity.plate.secOrigin + self.connectivity.plate.T/2.0 *(self.connectivity.plate.uDir)+ self.connectivity.weldLeft.L/2.0
-    #         # * (self.connectivity.plate.vDir) + self.connectivity.plate.T * (-self.connectivity.weldLeft.uDir))
-    #         # gpPntplateOrigin=  getGpPt(plateOrigin)
-    #         # my_sphere = BRepPrimAPI_MakeSphere(gpPntplateOrigin,2).Shape()
-    #         # self.display.DisplayShape(my_sphere,update=True)
-    #
-    #     else:
-    #         self.display.EraseAll()
-    #         # self.display.DisplayMessage(gp_Pnt(1000,0,400),"Sorry, can not create 3D model",height = 23.0)
 
     def call_3d_beam(self):
         '''
@@ -1733,6 +1319,8 @@ class MainController(QMainWindow):
 
         self.commLogicObj.display_3DModel("Beam")
 
+
+
     def call_3d_column(self):
         '''
         '''
@@ -1744,6 +1332,7 @@ class MainController(QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
         self.commLogicObj.display_3DModel("Column")
 
+
     def call_3d_cleatangle(self):
         '''Displaying FinPlate in 3D
         '''
@@ -1754,7 +1343,7 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
         self.commLogicObj.display_3DModel("cleatAngle")
-        #self.display_3d_model("cleatAngle")
+
 
     def designParameters(self):
         '''
@@ -1794,7 +1383,6 @@ class MainController(QMainWindow):
                                               self.alist[5], self.alist[6],
                                               self.alist[7], self.alist[8], self.alist[9],self.display, self.folder, self.connection)
 
-        #self.resultObj = self.commLogicObj.call_calculation()
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
 
@@ -1808,45 +1396,6 @@ class MainController(QMainWindow):
         else:
             pass
 
-        # self.validate_inputs_on_design_button()
-        # self.ui.outputDock.setFixedSize(310, 710)
-        # self.enable_view_buttons()
-        # self. unchecked_all_checkbox()
-        #
-        # # self.set_designlogger()
-        # # Getting User Inputs.
-        # self.ui_obj = self.getuser_inputs()
-        # self.save_inputs(self.ui_obj)
-        #
-        # # FinPlate Design Calculations.
-        # self.result_obj = cleat_connection(self.ui_obj)
-        # d = self.result_obj[self.result_obj.keys()[0]]
-        # if len(str(d[d.keys()[0]])) == 0:
-        #     self.ui.btn_CreateDesign.setEnabled(False)
-        # # self.outputdict()
-        #
-        # # Displaying Design Calculations To Output Window
-        # self.display_output(self.result_obj)
-        #
-        # # Displaying Messages related to FinPlate Design.
-        # self.displaylog_totextedit()
-        #
-        # # Displaying 3D Cad model
-        # status = self.result_obj['Bolt']['status']
-        # self.call_3d_model(status)
-        # self.call_2d_drawing('All')
-
-
-
-
-    # def create_2d_cad(self, connectivity):
-    #     ''' Returns the fuse model of cleat angle
-    #     '''
-    #     cadlist = self.connectivity.get_models()
-    #     final_model = cadlist[0]
-    #     for model in cadlist[1:]:
-    #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-    #     return final_model
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
@@ -1918,66 +1467,6 @@ class MainController(QMainWindow):
         QMessageBox.about(self, 'Information', "File saved")
 
 
-        #####################################################
-        # if self.connectivity is None:
-        #     self.connectivity = self.create_3d_col_web_beam_web()
-        # if self.fuse_model is None:
-        #     self.fuse_model = self.create_2d_cad(self.connectivity)
-        # shape = self.fuse_model
-        #
-        # files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        # filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
-        #
-        # file_name = str(filename)
-        # file_extension = file_name.split(".")[-1]
-        #
-        # if file_extension == 'igs':
-        #     IGESControl.IGESControl_Controller().Init()
-        #     iges_writer = IGESControl.IGESControl_Writer()
-        #     iges_writer.AddShape(shape)
-        #     iges_writer.Write(file_name)
-        #
-        # elif file_extension == 'brep':
-        #
-        #     BRepTools.breptools.Write(shape, file_name)
-        #
-        # elif file_extension == 'stp':
-        #     # initialize the STEP exporter
-        #     step_writer = STEPControl_Writer()
-        #     Interface_Static_SetCVal("write.step.schema", "AP203")
-        #
-        #     # transfer shapes and write file
-        #     step_writer.Transfer(shape, STEPControl_AsIs)
-        #     status = step_writer.Write(file_name)
-        #
-        #     assert(status == IFSelect_RetDone)
-        #
-        # else:
-        #     stl_writer = StlAPI_Writer()
-        #     stl_writer.SetASCIIMode(True)
-        #     stl_writer.Write(shape, file_name)
-        #
-        # QMessageBox.about(self, 'Information', "File saved")
-
-    def display_2d_model_original(self, final_model, view_name):
-
-        self.display, _ = self.init_display()
-        self.display.EraseAll()
-        # self.display.SetModeWireFrame()
-
-        self.display.DisplayShape(final_model, update=True)
-        self.display.SetModeHLR()
-
-        if (view_name == "Front"):
-            self.display.View_Front()
-        elif (view_name == "Top"):
-            self.display.View_Top()
-        elif (view_name == "Right"):
-            self.display.View_Right()
-        else:
-            pass
-
-
     def call_desired_view(self, filename, view):
         self. unchecked_all_checkbox()
 
@@ -1998,9 +1487,7 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-        #                                  self.alist[5], self.alist[6], self.alist[7],
-        #                                  self.alist[8],self.alist[9], self.display, self.folder, self.connection)
+
         if view != 'All':
 
             if view == "Front":
@@ -2036,28 +1523,34 @@ class MainController(QMainWindow):
 
         else:
             event.ignore()
-# ********************************* Help Action *********************************************************************************************
+
 
     def about_osdag(self):
         dialog = MyAboutOsdag(self)
         dialog.show()
 
+
     def open_osdag(self):
         self.about_osdag()
+
 
     def tutorials(self):
         dialog = MyTutorials(self)
         dialog.show()
 
+
     def open_tutorials(self):
         self.tutorials()
+
 
     def ask_question(self):
         dialog = MyAskQuestion(self)
         dialog.show()
 
+
     def open_question(self):
         self.ask_question()
+
 
     def sample_report(self):
 
@@ -2070,6 +1563,7 @@ class MainController(QMainWindow):
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
+
     def sample_problem(self):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
         for pdf_file in os.listdir(root_path):
@@ -2080,7 +1574,6 @@ class MainController(QMainWindow):
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
-# ********************************************************************************************************************************************************
 
 
 def set_osdaglogger():
@@ -2095,9 +1588,6 @@ def set_osdaglogger():
 
     # create the logging file handler
     fh = logging.FileHandler("Connections/Shear/cleatAngle/cleat.log", mode="a")
-
-    # ,datefmt='%a, %d %b %Y %H:%M:%S'
-    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     formatter = logging.Formatter('''
     <div  class="LOG %(levelname)s">

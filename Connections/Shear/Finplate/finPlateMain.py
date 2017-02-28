@@ -4,6 +4,8 @@ comment
 
 @author: deepa
 '''
+import json
+
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
 from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
@@ -44,7 +46,6 @@ class DesignPreferences(QDialog):
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        # self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
     def save_designPref_para(self):
@@ -90,14 +91,21 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        bolt_grade = float(uiObj["Bolt"]["Grade"])
-        clearance = str(self.get_clearance(boltDia))
-        bolt_fu = str(self.get_boltFu(bolt_grade))
+        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
+            pass
+        else:
+            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+            clearance = str(self.get_clearance(boltDia))
+            self.ui.txt_boltHoleClearance.setText(clearance)
+        if uiObj["Bolt"]["Grade"] == '':
+            pass
+        else:
+            bolt_grade = float(uiObj["Bolt"]["Grade"])
+            bolt_fu = str(self.get_boltFu(bolt_grade))
+            self.ui.txt_boltFu.setText(bolt_fu)
+
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        self.ui.txt_boltHoleClearance.setText(clearance)
-        self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
@@ -275,8 +283,8 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
-        self.ui.combo_Beam.addItems(get_beamcombolist())
         self.ui.comboColSec.addItems(get_columncombolist())
+        self.ui.combo_Beam.addItems(get_beamcombolist())
 
         self.ui.inputDock.setFixedSize(310, 710)
 
@@ -766,6 +774,45 @@ class MainController(QMainWindow):
         uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
 
         return uiObj
+
+    def saveDesign_inputs(self):
+
+        fileName = QFileDialog.getSaveFileName(self,
+                                                     "Save Design", 'output/finplate/Design/untitled.osi',
+                                                     "Input Files(*.osi)")
+
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                          "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiObj, out_file)
+
+        out_file.close()
+
+        pass
+
+    def openDesign_inputs(self):
+
+        fileName = QFileDialog.getOpenFileName(self, "Open Design", 'output/finplate/Design/', "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                          "There was an error opening \"%s\"" % fileName)
+            return
+        uiObj = json.load(in_file)
+        self.setDictToUserInputs(uiObj)
 
     def save_inputs(self, uiObj):
         '''Save the user inputs in text format

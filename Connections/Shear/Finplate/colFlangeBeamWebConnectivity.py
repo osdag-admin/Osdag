@@ -10,7 +10,7 @@ import copy
 
 class ColFlangeBeamWeb(object):
 
-    def __init__(self, column, beam, Fweld, plate, nut_bolt_array):
+    def __init__(self, column, beam, Fweld, plate, nut_bolt_array,gap):
         self.column = column
         self.beam = beam
         self.weldLeft = Fweld
@@ -23,6 +23,7 @@ class ColFlangeBeamWeb(object):
         self.weldModelRight = None
         self.plateModel = None
         self.sphereModel = None
+        self.gap = gap
         self.clearDist = 20.0  # This distance between edge of the column web/flange and beam cross section
 
     def create_3dmodel(self):
@@ -48,13 +49,13 @@ class ColFlangeBeamWeb(object):
         self.column.place(columnOrigin, column_uDir, wDir1)
 
     def createBeamGeometry(self):
-        beamOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.clearDist * (-self.column.vDir))
+        beamOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.gap * (-self.column.vDir))
         uDir = numpy.array([1.0, 0.0, 0])
         wDir = numpy.array([0.0, -1.0, 0.0])
         self.beam.place(beamOrigin, uDir, wDir)
 
     def createButtWeld(self):
-        pass
+        passg
         # plateThickness = 10
         # uDir3 = numpy.array([0, 1.0, 0])
         # wDir3 = numpy.array([1.0, 0, 0.0])

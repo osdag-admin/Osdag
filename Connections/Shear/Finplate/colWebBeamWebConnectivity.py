@@ -71,9 +71,12 @@ class ColWebBeamWeb(object):
         #            self.column.length/2.0 * self.column.wDir +
         #            self.beam.t/2.0 * (-self.beam.uDir)+
         #            self.plate.T/2.0 * (-self.beam.uDir))
+        spacing = (self.beam.T + self.beam.R1 + 5) + (self.plate.L / 2)
+        plate_center = (self.beam.D / 2) - spacing
+
         plateOrigin = (self.column.sec_origin +
                        self.column.t / 2.0 * self.column.uDir +
-                       (self.column.length / 2.0 + (self.beam.T + self.beam.R1 + 5)) * self.column.wDir +
+                       (self.column.length / 2.0 + (plate_center)) * self.column.wDir +
                        self.beam.t / 2.0 * (-self.beam.uDir) +
                        self.plate.T / 2.0 * (-self.beam.uDir))
         uDir = numpy.array([0, 1.0, 0])

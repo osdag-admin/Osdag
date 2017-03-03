@@ -66,7 +66,7 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["weld"]["safety_factor"] = float(1.5)
 
-            self.saved_designPref["detailing"] = {}
+        self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
         if typeOfEdge == "a - Sheared or hand flame cut":
@@ -224,7 +224,7 @@ class MyPopupDialog(QDialog):
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
-        self.desired_location(filename)
+        self.desired_location(filename[0])
 
         return str(filename)
 

@@ -340,7 +340,8 @@ class FinCommonData(object):
     def draw_weld_Marker(self, dwg, oriX, oriY, line):
 
         weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
-        weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+        #weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+        weldMarker.add(dwg.path(d="M 0 7.5 L 8 0 L 8 15 z", fill='none', stroke='black'))
         dwg.defs.add(weldMarker)
         self.drawEndArrow(line, weldMarker)
 
@@ -689,7 +690,7 @@ class Fin2DCreatorFront(object):
                                                str(int(self.dataObj.pitch)) + " mm c/c", params)
 
         # Cross section A-A
-        ptSecA = self.FA + (270 * np.array([0, -1]))
+        ptSecA = self.FA + (320 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
@@ -829,8 +830,8 @@ class Fin2DCreatorFront(object):
 #         weldPtx = (self.dataObj.D_col)
 #         weldPty = ((self.dataObj.col_L - self.dataObj.D_beam)/2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         weldPt = self.ptFP + 6 * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1])
-        theta = 45
-        offset = self.dataObj.col_B
+        theta = 60
+        offset = self.dataObj.col_B + 100
         textUp = "         z " + str(int(self.dataObj.weld_thick)) + " mm"
         textDown = ""  # u"\u25C1"
         element = "weld"

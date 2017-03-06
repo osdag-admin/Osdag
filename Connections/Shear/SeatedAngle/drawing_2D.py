@@ -1402,7 +1402,7 @@ class Seat2DCreatorFront(object):
         pt_top_anglex = self.SWC2
         pt_top_angley = pt_top_anglex + self.data_object.beam_length * np.array([1, 0])
         self.data_object.draw_faint_line(pt_top_anglex, pt_top_angley, dwg)
-        # ----------------------------------------------------------------------------------------------------------------------------
+
         pt_top_anglex1 = np.array(pt_top_column_list[0])
         pt_top_angley1 = pt_top_anglex1 + self.data_object.beam_length * np.array([1, 0])
         self.data_object.draw_faint_line(pt_top_anglex1, pt_top_angley1, dwg)
@@ -1410,55 +1410,56 @@ class Seat2DCreatorFront(object):
         point = pt_top_anglex1 - self.data_object.end_dist * np.array([0, 1])
         params = {"offset": self.data_object.beam_length, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglex1, point, str(self.data_object.end_dist), params)
-        # -----------------------------------------------------------------------------------------------------------------------------
+        # =================================================================
 
         pt_top_anglexx = self.SWC3
-        pt_top_angleyy = pt_top_anglexx + self.data_object.beam_length * np.array([0, -1])
+        pt_top_angleyy = pt_top_anglexx + (self.data_object.beam_length - 150) * np.array([0, -1])
         self.data_object.draw_faint_line(pt_top_anglexx, pt_top_angleyy, dwg)
-        # ------------------------------------------------------------------------------------------------------------------------------
+
         pt_top_anglexx1 = np.array(pt_top_beam_list[1])
-        pt_top_angleyy1 = pt_top_anglexx1 + self.data_object.beam_length * np.array([0, -1])
+        pt_top_angleyy1 = pt_top_anglexx1 + (self.data_object.beam_length - 150) * np.array([0, -1])
         self.data_object.draw_faint_line(pt_top_anglexx1, pt_top_angleyy1, dwg)
 
         point1 = pt_top_anglexx1 - self.data_object.edge_dist * np.array([1, 0])
-        params = {"offset": self.data_object.beam_length, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglexx1, point1, str(self.data_object.end_dist), params)
-
-
-
-        # pt_rightx = self.SWC3
-        # pt_righty = pt_rightx + 300 * np.array([0, -1])
-        # self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
-        # pt_right1x = np.array(pt_top_beam_list[1])
-        # pt_right1y = pt_right1x + 300 * np.array([0, -1])
-        # self.data_object.draw_faint_line(pt_right1x, pt_right1y, dwg)
-        # offset =
-        # params = {"offset": self.data_object.col_length, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 30}
-        # self.data_object.draw_dimension_inner_arrow(dwg, pt_righty, pt_right1y, str(self.data_object.edge_dist) + " mm", params)
+        params = {"offset": (self.data_object.beam_length - 150), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglexx1, point1, str(self.data_object.edge_dist), params)
 
 
         # ======================================  Faint line for Seat angle bolts distances  ================================================
-        pt_leftx = self.SWD2
-        pt_lefty = pt_leftx + 500 * np.array([1, 0])
-        self.data_object.draw_faint_line(pt_leftx, pt_lefty, dwg)
-        pt_left1x = np.array(pt_seat_column_list[0])
-        pt_left1y = pt_left1x + 500 * np.array([1, 0])
-        self.data_object.draw_faint_line(pt_left1x, pt_left1y, dwg)
-        offset = 1
-        params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 30}
-        self.data_object.draw_dimension_inner_arrow(dwg, pt_lefty, pt_left1y, str(self.data_object.end_dist) + " mm", params)
+        pt_seat_anglex = self.SWD2
+        pt_seat_angley = pt_seat_anglex + self.data_object.beam_length * np.array([1, 0])
+        self.data_object.draw_faint_line(pt_seat_anglex, pt_seat_angley, dwg)
+
+        pt_seat_anglex1 = np.array(pt_seat_column_list[1])
+        pt_seat_angley1 = pt_seat_anglex1 + self.data_object.beam_length * np.array([1, 0])
+        self.data_object.draw_faint_line(pt_seat_anglex1, pt_seat_angley1, dwg)
+
+        point2 = pt_seat_anglex1 + self.data_object.end_dist * np.array([0, -1])
+        params = {"offset": self.data_object.beam_length, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglex1, point2, str(self.data_object.end_dist) + " mm", params)
+        # =================================================================
+
+        pt_seat_anglexx = self.SWD3
+        pt_seat_angleyy = pt_seat_anglexx + (self.data_object.beam_length - 200) * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_seat_anglexx, pt_seat_angleyy, dwg)
+
+        pt_seat_anglexx1 = np.array(pt_seat_beam_list[1])
+        pt_seat_angleyy1 = pt_seat_anglexx1 + (self.data_object.beam_length - 200) * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_seat_anglexx1, pt_seat_angleyy1, dwg)
+
+        point1 = pt_seat_anglexx1 - self.data_object.edge_dist * np.array([1, 0])
+        params = {"offset": (self.data_object.beam_length - 200), "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point1, str(self.data_object.edge_dist), params)
 
 
-        pt_rightx = self.SWD3
-        pt_righty = pt_rightx + 300 * np.array([0, 1])
-        self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
-        pt_right1x = np.array(pt_seat_beam_list[1])
-        pt_right1y = pt_right1x + 300 * np.array([0, 1])
-        self.data_object.draw_faint_line(pt_right1x, pt_right1y, dwg)
-        offset = 1
-        params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 30}
-        self.data_object.draw_dimension_inner_arrow(dwg, pt_righty, pt_right1y, str(self.data_object.edge_dist) + " mm", params)
-
+        # pt_rightx = self.SWD3
+        # pt_righty = pt_rightx + (self.data_object.beam_length - 200) * np.array([0, 1])
+        # self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
+        # pt_right1x = np.array(pt_seat_beam_list[1])
+        # pt_right1y = pt_right1x + (self.data_object.beam_length - 200) * np.array([0, 1])
+        # self.data_object.draw_faint_line(pt_right1x, pt_right1y, dwg)
+        # params = {"offset": (self.data_object.beam_length - 200), "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        # self.data_object.draw_dimension_outer_arrow(dwg, pt_righty, pt_right1y, str(self.data_object.edge_dist) + " mm", params)
 
         # ======================================   2D view name  =======================================
         ptx = self.SWA + np.array([1, 0]) + 1160 * np.array([0, 1])
@@ -2069,16 +2070,6 @@ class Seat2DCreatorTop(object):
         self.data_object.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
 
-        # ======================================  Faint line for TOp angle bolts distances  ================================================
-        pt_leftx = self.SWA1
-        pt_lefty = pt_leftx + 170 * np.array([-1, 0])
-        self.data_object.draw_faint_line(pt_leftx, pt_lefty, dwg)
-
-        pt_rightx = self.SWA6
-        pt_righty = pt_rightx + 170 * np.array([-1, 0])
-        self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
-
-
         # ===============================  Top angle Bolts plotting  ========================================
 
         btcc = self.data_object.bolts_top_column_col
@@ -2109,7 +2100,8 @@ class Seat2DCreatorTop(object):
             # --------------------------------  column bolts -----------------------------
             if btcc >= 1:
                 for column in range(btcc):
-                    ptx = self.SWA6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([0, -1]) - self.data_object.col_web_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
+                    ptx = self.SWA6 + (self.data_object.angle_length - self.data_object.edge_dist) * np.array([0, -1]) -\
+                          self.data_object.col_web_thk * np.array([1, 0]) + column * self.data_object.gauge * np.array([0, 1])
                     ptx1 = ptx - bolt_r * np.array([0, 1])
                     rect_width = self.data_object.bolt_dia
                     rect_length = self.data_object.col_web_thk + self.data_object.top_angle_thickness
@@ -2195,6 +2187,44 @@ class Seat2DCreatorTop(object):
                   str(int(self.data_object.top_angle_thickness))
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
+        # ======================================  Faint line for TOp angle bolts distances  ================================================
+        pt_leftx = self.SWA1
+        pt_lefty = pt_leftx + self.data_object.col_depth * np.array([-1, 0])
+        self.data_object.draw_faint_line(pt_leftx, pt_lefty, dwg)
+
+        pt_top_anglex1 = np.array(pt_top_column_list[1])
+        pt_top_angley1 = pt_top_anglex1 + self.data_object.col_depth * np.array([-1, 0])
+        self.data_object.draw_faint_line(pt_top_anglex1, pt_top_angley1, dwg)
+
+        point1 = pt_top_anglex1 - self.data_object.edge_dist * np.array([0, 1])
+        params = {"offset": self.data_object.col_depth, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglex1, point1, str(self.data_object.edge_dist), params)
+
+        # -----------------------------------------------------------------------------------------------------------------------------
+        pt_rightx = self.SWA6
+        pt_righty = pt_rightx + self.data_object.col_depth * np.array([-1, 0])
+        self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
+
+        pt_top_anglexx1 = np.array(pt_top_column_list[1]) + self.data_object.gauge * np.array([0, 1])
+        pt_top_angleyy1 = pt_top_anglexx1 + self.data_object.col_depth * np.array([-1, 0])
+        self.data_object.draw_faint_line(pt_top_anglexx1, pt_top_angleyy1, dwg)
+
+        point2 = pt_top_anglexx1 - self.data_object.edge_dist * np.array([0, -1])
+        params = {"offset": self.data_object.col_depth, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglexx1, point2, str(self.data_object.edge_dist), params)
+
+        params = {"offset": self.data_object.col_depth, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, point1, point2, str(self.data_object.gauge), params)
+
+        pt_leftx1 = self.SWA3
+        pt_lefty1 = pt_leftx1 + self.data_object.col_depth * np.array([0, -1])
+        self.data_object.draw_faint_line(pt_leftx1, pt_lefty1, dwg)
+
+        pt_beamx = np.array(pt_top_beam_list[0][0]) - self.data_object.col_depth * np.array([0, -1])
+        pt_beamy = pt_beamx + self.data_object.col_depth * np.array([0, -1])
+        self.data_object.draw_faint_line(pt_beamx, pt_beamy, dwg)
+
+
         # ====================================  Label Gap Distance  =======================================
         gap_pt = self.data_object.col_depth - 340
         ptG1 = self.SWI + (gap_pt + 13) * np.array([0, -1])
@@ -2211,6 +2241,8 @@ class Seat2DCreatorTop(object):
         pt_R_G2x = self.SWB4
         pt_R_G2y = pt_R_G2x + 70 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_R_G2x, pt_R_G2y, dwg)
+
+
 
         # ================================  2D view name  ==============================================
         ptx = self.SC + 470 * np.array([0, 1])
@@ -2608,14 +2640,6 @@ class Seat2DCreatorSide(object):
         text_down = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
-        # ======================================  Faint line for TOp angle bolts distances  ================================================
-        pt_leftx = self.SWB2
-        pt_lefty = pt_leftx + 170 * np.array([0, -1])
-        self.data_object.draw_faint_line(pt_leftx, pt_lefty, dwg)
-
-        pt_rightx = self.SWB3
-        pt_righty = pt_rightx + 170 * np.array([0, -1])
-        self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
 
         # ===============================  Top angle Bolts plotting  ========================================
         btcr = self.data_object.bolts_top_column_row
@@ -2733,7 +2757,7 @@ class Seat2DCreatorSide(object):
         offset = 60
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
         text_down = "for M " + str(self.data_object.bolt_dia) + " bolts (grade " + str(self.data_object.grade) + ")"
-        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
+        self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
 
         # ===============================  Column Seat angle Bolts Information  ========================================
         no_of_bolts_column = self.data_object.bolts_seat_column_row * self.data_object.bolts_seat_column_col
@@ -2743,6 +2767,37 @@ class Seat2DCreatorSide(object):
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_dia) + u'\u00d8' + " holes"
         text_down = "for M " + str(self.data_object.bolt_dia) + "bolts (grade " + str(self.data_object.grade) + ")"
         self.data_object.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
+
+
+        # ======================================  Faint line for TOp angle bolts distances  ================================================
+        pt_leftx = self.SWB2
+        pt_lefty = pt_leftx + self.data_object.col_depth * np.array([0, -1])
+        self.data_object.draw_faint_line(pt_leftx, pt_lefty, dwg)
+
+        pt_top_anglex1 = np.array(pt_top_column_list[0][0])
+        pt_top_angley1 = pt_top_anglex1 + (self.data_object.col_depth + 50) * np.array([0, -1])
+        self.data_object.draw_faint_line(pt_top_anglex1, pt_top_angley1, dwg)
+
+        point1 = pt_top_anglex1 - self.data_object.edge_dist * np.array([-1, 0])
+        params = {"offset": (self.data_object.col_depth + 50), "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglex1, point1, str(self.data_object.edge_dist), params)
+
+        # -----------------------------------------------------------------------------------------------------------------------------
+        pt_rightx = self.SWB3
+        pt_righty = pt_rightx + self.data_object.col_depth * np.array([0, -1])
+        self.data_object.draw_faint_line(pt_rightx, pt_righty, dwg)
+
+        pt_top_anglexx1 = np.array(pt_top_column_list[0][0]) + self.data_object.gauge * np.array([1, 0])
+        pt_top_angleyy1 = pt_top_anglexx1 - (self.data_object.col_depth + 50) * np.array([0, 1])
+        self.data_object.draw_faint_line(pt_top_anglexx1, pt_top_angleyy1, dwg)
+
+        point2 = pt_top_anglexx1 - self.data_object.edge_dist * np.array([-1, 0])
+        params = {"offset": (self.data_object.col_depth + 50), "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglexx1, point2, str(self.data_object.edge_dist), params)
+
+        params = {"offset": (self.data_object.col_depth + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, point1, point2, str(self.data_object.gauge), params)
+
 
         # ======================================  2D view name  ================================================
         ptx = self.SWH + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])

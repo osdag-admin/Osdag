@@ -867,7 +867,7 @@ class Fin2DCreatorFront(object):
 
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-410 -350 1250 1280'))
 
-        ptSecA = self.A + (270 * np.array([0, -1]))
+        ptSecA = self.A + (330 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"

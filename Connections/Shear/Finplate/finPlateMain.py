@@ -348,6 +348,8 @@ class MainController(QMainWindow):
         self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
         self.ui.actionSave_curren_image_as.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
+        self.ui.action_savedesign.triggered.connect(self.saveDesign_inputs)
+        self.ui.action_open_design.triggered.connect(self.openDesign_inputs)
         # graphics
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
         self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
@@ -619,7 +621,7 @@ class MainController(QMainWindow):
         ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum or of a
         Single Run Fillet Weld)
         '''
-        if self.ui.combo_Beam.currentText() == "Select section":
+        if str(self.ui.combo_Beam.currentText()) == "Select section":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return
@@ -635,16 +637,16 @@ class MainController(QMainWindow):
             plate_thickness = self.ui.comboPlateThick_2.currentText()
             plate_thick = float(plate_thickness)
 
-            if self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-                if self.ui.comboColSec.currentText() == "Select section":
+            if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
+                if str(self.ui.comboColSec.currentText()) == "Select section":
                     self.ui.comboWldSize.clear()
                     return
                 else:
                     column_tf = float(dictcoldata["T"])
                     thickerPart = column_tf > plate_thick and column_tf or plate_thick
 
-            elif self.ui.comboConnLoc.currentText() == "Column web-Beam web":
-                if self.ui.comboColSec.currentText() == "Select section":
+            elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
+                if str(self.ui.comboColSec.currentText()) == "Select section":
                     self.ui.comboWldSize.clear()
                     return
                 else:
@@ -776,8 +778,8 @@ class MainController(QMainWindow):
 
     def saveDesign_inputs(self):
 
-        fileName = QFileDialog.getSaveFileName(self,
-                                                     "Save Design", 'output/finplate/Design/untitled.osi',
+        fileName,_ = QFileDialog.getSaveFileName(self,
+                                                     "Save Design", str(self.folder) + "/untitled.osi",
                                                      "Input Files(*.osi)")
 
         if not fileName:
@@ -800,7 +802,7 @@ class MainController(QMainWindow):
 
     def openDesign_inputs(self):
 
-        fileName = QFileDialog.getOpenFileName(self, "Open Design", 'output/finplate/Design/', "All Files(*)")
+        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
         if not fileName:
             return
         try:
@@ -1234,7 +1236,7 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text()== ' ' < 0 or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text()== ' '  or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
         elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:

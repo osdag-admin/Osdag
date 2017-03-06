@@ -179,7 +179,7 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":#finBeamWebBeamWeb/endBeamWebBeamWeb
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj,nut,bolt,gap)
-            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate,nutBoltArray)
+            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray)
         elif self.connection == "Endplate":
             gap = sBeam_tw + plate_thick + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj,nut,bolt,gap)

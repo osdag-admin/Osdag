@@ -1290,7 +1290,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Finplate")
+        self.commLogicObj.display_3DModel("Plate")
 
     def unchecked_allChkBox(self):
         '''
@@ -1343,7 +1343,7 @@ class MainController(QtGui.QMainWindow):
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
                                               self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
-        self.resultObj = self.commLogicObj.call_finCalculation()
+        self.resultObj = self.commLogicObj.resultObj
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1351,8 +1351,8 @@ class MainController(QtGui.QMainWindow):
         self.displaylog_totextedit(self.commLogicObj)
         status = self.resultObj['Bolt']['status']
 
-        self.commLogicObj.call_3DModel(status)
         self.callFin2D_Drawing("All")
+        self.commLogicObj.call_3DModel(status)
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component

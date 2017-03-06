@@ -7,7 +7,7 @@ import sys
 from PyQt4 import QtGui
 from ui_OsdagMainPage import Ui_MainWindow
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
-from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
+# from Connections.Shear.cleatAngle.cleatAngleMain import launchCleatAngleController
 from Connections.Shear.Endplate.endPlateMain import launchEndPlateController
 from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleController
 import os.path

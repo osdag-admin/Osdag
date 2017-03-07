@@ -16,8 +16,8 @@ from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
-# from Connections.Shear.common_logic import CommonDesignLogic
-from Connections.Shear.commonlogic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
+#from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -303,7 +303,7 @@ class MainController(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
         # self.ui.btn_2D.clicked.connect(self.call2D_Drawing)
-        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel(True))
+        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel)
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxFinplate.clicked.connect(self.call_3DFinplate)
@@ -635,12 +635,9 @@ class MainController(QMainWindow):
             dictbeamdata = self.fetchBeamPara()
             beam_tw = float(dictbeamdata["tw"])
             column_sec = str(self.ui.comboColSec.currentText())
-            # u'Select section'
             if column_sec == 'Select section':
                 return
             dictcoldata = self.fetchColumnPara()
-            # column_tf = float(dictcoldata[QString("T")])
-            # column_tw = float(dictcoldata[QString("tw")])
             plate_thickness = self.ui.comboPlateThick_2.currentText()
             plate_thick = float(plate_thickness)
 
@@ -890,10 +887,7 @@ class MainController(QMainWindow):
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callFin2D_Drawing("All")
-        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-        #                                  self.alist[5],
-        #                                  self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,
-        #                                  self.connection)  # , base, base1, base2, base3)
+
         self.commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
@@ -1329,8 +1323,17 @@ class MainController(QMainWindow):
 
     # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-    def call_3DModel(self, flag):
-        self.commLogicObj.call_3DModel(flag)
+    def call_3DModel(self):
+        '''
+        This routine responsible for diasplaying 3D Cad model
+        :param flag: boolean
+        :return:
+        '''
+        if self.ui.btn3D.isChecked:
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
+        self.commLogicObj.display_3DModel("Model")
 
     def call_3DBeam(self):
         '''
@@ -1433,6 +1436,7 @@ class MainController(QMainWindow):
             self.commLogicObj.call_3DModel(status)
         else:
             pass
+        #self.display.EraseAll()
 
 
 

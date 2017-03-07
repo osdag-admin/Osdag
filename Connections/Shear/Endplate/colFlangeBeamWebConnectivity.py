@@ -112,9 +112,16 @@ class ColFlangeBeamWeb(object):
     def get_beamModel(self):
         return self.beamModel
     
+    # def get_column_model(self):
+    #     final_column = self.columnModel
+    #     print"printing nutBoltarray from endplate/colFlamgeBeamWebConnectivity",self.nut_bolt_array
+    #     bolt_list = self.nut_bolt_array.get_bolt_list()
+    #     for bolt in bolt_list[:]:
+    #         final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()
+    #     return final_column
+
     def get_column_model(self):
         final_column = self.columnModel
-        print"printing nutBoltarray from endplate/colFlamgeBeamWebConnectivity",self.nut_bolt_array
         bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:
             final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()

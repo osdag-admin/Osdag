@@ -4,6 +4,8 @@ comment
 
 @author: deepa
 '''
+import json
+
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget,QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
@@ -31,8 +33,8 @@ from endPlateCalc import end_connection
 from model import *
 from ui_endplate import Ui_MainWindow
 from drawing_2D import EndCommonData
-# from Connections.Shear.common_logic import CommonDesignLogic
-from Connections.Shear.commonlogic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
+#from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 
 
@@ -342,6 +344,8 @@ class MainController(QMainWindow):
         self.ui.actionSave_front_view.triggered.connect(lambda: self.callend2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.callend2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.callend2D_Drawing("Top"))
+        self.ui.actionSave_design.triggered.connect(self.saveDesign_inputs)
+        self.ui.actionOpen_design.triggered.connect(self.openDesign_inputs)
         self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
@@ -824,6 +828,43 @@ class MainController(QMainWindow):
 
         return uiobj
 
+    def saveDesign_inputs(self):
+
+        fileName,_ = QFileDialog.getSaveFileName(self,
+                                                     "Save Design", str(self.folder) + "/untitled.osi",
+                                                     "Input Files(*.osi)")
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                          "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiobj, out_file)
+
+        out_file.close()
+
+    def openDesign_inputs(self):
+
+        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                          "There was an error opening \"%s\"" % fileName)
+            return
+
+        uiobj = json.load(in_file)
+        self.setDictToUserInputs(uiobj)
+
     def save_inputs(self, uiobj):
         '''(Dictionary)--> None
         '''
@@ -1204,7 +1245,7 @@ class MainController(QMainWindow):
         self.ui.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
-        self.setWindowTitle("Osdag Finplate")
+        self.setWindowTitle("Osdag Endplate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 
@@ -1422,6 +1463,7 @@ class MainController(QMainWindow):
 
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
+        dict_angle_data = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiobj["Bolt"]["Diameter (mm)"])
@@ -1429,7 +1471,7 @@ class MainController(QMainWindow):
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
         nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiobj, dictbeamdata, dictcoldata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiobj, dictbeamdata, dictcoldata, dict_angle_data,loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1442,18 +1484,18 @@ class MainController(QMainWindow):
         self.unchecked_all_checkbox()
         connection = "Endplate"
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder,connection)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9],self.display, self.folder,connection)
 
-        self.resultObj = self.commLogicObj.call_calculation()
+        self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
 
         self.displaylog_totextedit(self.commLogicObj)
         self.display_output(self.resultObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
+            self.callend2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
-            self.callend2D_Drawing("All")
         else:
             self.display.EraseAll()
 
@@ -1465,7 +1507,7 @@ class MainController(QMainWindow):
             final_model = self.commLogicObj.connectivityObj.get_beamModel()
 
         elif self.commLogicObj.component == "Column":
-            final_model = self.commLogicObj.connectivityObj.columnModel
+            final_model = self.commLogicObj.connectivityObj.get_column_model()
 
         elif self.commLogicObj.component == "Plate":
             cadlist = [self.commLogicObj.connectivityObj.weldModelLeft,

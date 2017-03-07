@@ -495,7 +495,7 @@ QMenu::item:selected {
      <string>File</string>
     </property>
     <addaction name="actionNew_2"/>
-    <addaction name="actionOpen_2"/>
+    <addaction name="actionOpen_design"/>
     <addaction name="separator"/>
     <addaction name="actionSave_3D_model"/>
     <addaction name="actionSave_CAD_image"/>
@@ -507,6 +507,9 @@ QMenu::item:selected {
     <addaction name="actionSave_log_messages_2"/>
     <addaction name="actionCreate_design_report_2"/>
     <addaction name="actionSave_design"/>
+    <addaction name="actionLoad_input"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="styleSheet">
@@ -4297,9 +4300,9 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpen_2">
+  <action name="actionOpen_design">
    <property name="text">
-    <string>Open</string>
+    <string>Open design</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -4436,6 +4439,16 @@ QMenu::item:selected {
   <action name="actionDesign_Preferences">
    <property name="text">
     <string>Design Preferences</string>
+   </property>
+  </action>
+  <action name="actionLoad_input">
+   <property name="text">
+    <string>Load input</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
    </property>
   </action>
  </widget>

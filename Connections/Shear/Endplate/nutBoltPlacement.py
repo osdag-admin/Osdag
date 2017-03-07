@@ -124,6 +124,10 @@ class NutBoltArray():
         boltlist = []
         for bolt in self.bolts:
             boltlist.append(bolt.create_model())
+            dbg = self.dbg_sphere(self.origin)
+            self.models.append(dbg)
         for bolt in self.bolts1:
             boltlist.append(bolt.create_model())
+            dbg = self.dbg_sphere(self.origin1)
+            self.models.append(dbg)
         return boltlist

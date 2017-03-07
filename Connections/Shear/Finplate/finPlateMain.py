@@ -419,7 +419,10 @@ class MainController(QMainWindow):
 
     def fetchColumnPara(self):
 
-        column_sec = self.ui.comboColSec.currentText()
+        column_sec = str(self.ui.comboColSec.currentText())
+        #u'Select section'
+        if column_sec == 'Select section':
+            return
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             dictcoldata = get_beamdata(column_sec)
@@ -631,6 +634,10 @@ class MainController(QMainWindow):
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
             dictbeamdata = self.fetchBeamPara()
             beam_tw = float(dictbeamdata["tw"])
+            column_sec = str(self.ui.comboColSec.currentText())
+            # u'Select section'
+            if column_sec == 'Select section':
+                return
             dictcoldata = self.fetchColumnPara()
             # column_tf = float(dictcoldata[QString("T")])
             # column_tw = float(dictcoldata[QString("tw")])

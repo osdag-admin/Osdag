@@ -367,16 +367,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -441,7 +432,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -3077,7 +3068,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="lbl_topanglesection">
      <property name="geometry">
       <rect>
-       <x>6</x>
+       <x>0</x>
        <y>490</y>
        <width>151</width>
        <height>25</height>

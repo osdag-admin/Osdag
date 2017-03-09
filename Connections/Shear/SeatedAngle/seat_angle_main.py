@@ -182,7 +182,8 @@ class MainController(QtGui.QMainWindow):
 
         # comboConnLoc renamed to combo_connectivity
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.setimage_connection)
-        self.retrieve_prevstate()
+        #####self.retrieve_prevstate()
+
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
@@ -317,7 +318,6 @@ class MainController(QtGui.QMainWindow):
         angle_sec = self.ui.combo_topangle_section.currentText()
         dict_top_angle = get_angledata(angle_sec)
         return dict_top_angle
-        
 
     def showFontDialogue(self):
 
@@ -394,6 +394,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txt_fu.clear()
             self.ui.txt_fy.clear()
             self.ui.txt_shear_force.clear()
+
             self.ui.combo_topangle_section.setCurrentIndex(0)
 
             self.ui.txt_bolt_shear_capacity.clear()
@@ -425,6 +426,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.txt_fu.clear()
             self.ui.txt_fy.clear()
             self.ui.txt_shear_force.clear()
+
             self.ui.combo_topangle_section.setCurrentIndex(0)
 
             self.ui.txt_bolt_shear_capacity.clear()
@@ -523,8 +525,8 @@ class MainController(QtGui.QMainWindow):
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
-        uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
 
+        uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
 
         return uiObj
 

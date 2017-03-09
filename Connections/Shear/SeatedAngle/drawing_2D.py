@@ -792,7 +792,6 @@ class Seat2DCreatorFront(object):
 
         pt_top_column_list = []
         pt_top_beam_list = []
-
         bolt_r = self.data_object.bolt_dia / 2
 
         # ---------------------------------  column bolts --------------------------------------
@@ -1058,7 +1057,6 @@ class Seat2DCreatorFront(object):
         params = {"offset": (self.data_object.beam_length - 150), "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, pt_top_anglexx1, point1, str(self.data_object.edge_dist), params)
 
-
         # ======================================  Faint line for Seat angle bolts distances  ================================================
         pt_seat_anglex = self.SD2
         pt_seat_angley = pt_seat_anglex + self.data_object.beam_length * np.array([1, 0])
@@ -1084,8 +1082,6 @@ class Seat2DCreatorFront(object):
         point3 = pt_seat_anglexx1 - self.data_object.edge_dist * np.array([-1, 0])
         params = {"offset": (self.data_object.beam_length - 200), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point3, str(self.data_object.edge_dist), params)
-
-
 
         # =================================    2D view name   ==================================
         ptx = self.SA + np.array([1, 0]) + 1100 * np.array([0, 1])
@@ -1250,7 +1246,6 @@ class Seat2DCreatorFront(object):
         pt_L_G1x = self.SWG
         pt_L_G1y = pt_L_G1x + 40 * np.array([0, 1])
         self.data_object.draw_faint_line(pt_L_G1x, pt_L_G1y, dwg)
-
         # ------------------------  here "70" represents length of the faint line vertically(right)  ------------------------
         pt_R_G2x = self.SWB5
         pt_R_G2y = pt_R_G2x + 250 * np.array([0, 1])

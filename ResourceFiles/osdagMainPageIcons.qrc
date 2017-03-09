@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="newPrefix">
+    <file>images/click_image.png</file>
+    <file>images/image3487.png</file>
     <file>images/iitblogo.png</file>
     <file>images/Osdag.png</file>
     <file>images/iitb.png</file>

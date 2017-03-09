@@ -5,39 +5,28 @@ comment
 @author: deepa
 '''
 from PyQt4.QtCore import QString, pyqtSignal
-from OCC.TopoDS import topods, TopoDS_Shape
-from OCC.gp import gp_Pnt
-from nutBoltPlacement import NutBoltArray
 from OCC import VERSION, BRepTools
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
+from ui_ask_a_question import Ui_AskQuestion
+from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
-from finPlateCalc import finConn
 import pickle
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Quantity import Quantity_NOC_SADDLEBROWN
-from ISection import ISection
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-from weld import  Weld
-from plate import Plate
-from bolt import Bolt
-from nut import Nut 
-from notch import Notch
 import os.path
-from utilities import osdagDisplayShape
+import subprocess
+from utilities import osdag_display_shape
 from colWebBeamWebConnectivity import ColWebBeamWeb
 from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from OCC import IGESControl
-from filletweld import FilletWeld
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
 from drawing_2D import FinCommonData
-
 from report_generator import * # TODO refactored code in report_generator; old = reportGenerator
 from ModelUtils import getGpPt
 ##### Testing imports
@@ -45,7 +34,145 @@ import OCC.V3d
 import pdfkit
 import shutil
 import webbrowser
-from commonLogic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
+#from commonLogic import CommonDesignLogic
+from fileinput import filename
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
+from PyQt4 import QtSvg
+from Svg_Window import SvgWindow
+
+class DesignPreferences(QtGui.QDialog):
+
+    def __init__(self, parent=None):
+
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_ShearDesignPreferences()
+        self.ui.setupUi(self)
+        self.main_controller = parent
+        self.saved = None
+        self.set_default_para()
+        self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+
+    def save_designPref_para(self):
+        '''
+        This routine is responsible for saving all design preferences selected by the user
+        '''
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            designPref["weld"]["safety_factor"] = float(1.5)
+
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text().isEmpty():
+
+            designPref["detailing"]["gap"] = int(20)
+        else:
+            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+
+        self.saved = True
+
+        QtGui.QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return designPref
+
+        #self.main_controller.call_designPref(designPref)
+
+    def set_default_para(self):
+        '''
+        '''
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        bolt_grade = float(uiObj["Bolt"]["Grade"])
+        clearance = str(self.get_clearance(boltDia))
+        bolt_fu = str(self.get_boltFu(bolt_grade))
+
+        self.ui.combo_boltHoleType.setCurrentIndex(0)
+        self.ui.txt_boltHoleClearance.setText(clearance)
+        self.ui.txt_boltFu.setText(bolt_fu)
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        self.ui.combo_weldType.setCurrentIndex(0)
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        designPref["weld"]["safety_factor"] = float(1.25)
+
+        self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+        self.ui.txt_detailingGap.setText(str(20))
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        designPref["detailing"]["gap"] = int(20)
+        self.saved = False
+
+        return designPref
+
+    def set_bolthole_clernce(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        clearance = self.get_clearance(boltDia)
+        self.ui.txt_boltHoleClearance.setText(str(clearance))
+
+    def set_boltFu(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltGrade = float(uiObj["Bolt"]["Grade"])
+        boltfu = str(self.get_boltFu(boltGrade))
+        self.ui.txt_boltFu.setText(boltfu)
+
+    def get_clearance(self, boltDia):
+
+        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+
+        if self.ui.combo_boltHoleType.currentText() == "Standard":
+            clearance = standard_clrnce[boltDia]
+        else:
+            clearance = overhead_clrnce[boltDia]
+        
+        return clearance
+
+    def get_boltFu(self, boltGrade):
+        '''
+        This routine returns ultimate strength of bolt depending upon grade of bolt chosen
+        '''
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
+        return boltFu[boltGrade]
+    
+    def close_designPref(self):
+        self.close()
+
+
+class MyAskQuestion(QtGui.QDialog):
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class MyTutorials(QtGui.QDialog):
@@ -59,7 +186,7 @@ class MyTutorials(QtGui.QDialog):
 class MyAboutOsdag(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -104,7 +231,7 @@ class MyPopupDialog(QtGui.QDialog):
 
         inputData = self.getPopUpInputs()
         filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files',
-                                                     str(self. mainController.folder) + "/Profile", '*.txt')
+                                                     str(self. mainController.foldloader) + "/Profile", '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -127,7 +254,7 @@ class MyPopupDialog(QtGui.QDialog):
 
     def useUserProfile(self):
 
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", "All Files (*)")
+        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -154,7 +281,7 @@ class MainController(QtGui.QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.8],
+        self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.9],
                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
@@ -194,15 +321,15 @@ class MainController(QtGui.QMainWindow):
         maxfyVal = 450
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         # File Menu
 
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callFin2D_Drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.callFin2D_Drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callFin2D_Drawing("Top"))
-        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
+        self.ui.actionfinPlate_quit.setShortcut('Ctrl+Q')
+        self.ui.actionfinPlate_quit.setStatusTip('Exit application')
+        self.ui.actionfinPlate_quit.triggered.connect(QtGui.qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.createDesignReport)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -218,14 +345,15 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionFinplate_2.triggered.connect(self.call_3DFinplate)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
         self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populateWeldThickCombo("comboPlateThick_2"))
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
+        self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -240,6 +368,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
+
 # ************************************** Osdag logo for html********************************************************************
         self.ui.btn_Design.clicked.connect(self.osdag_header)
 
@@ -248,17 +377,22 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSample_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
+
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
 
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-
+        
+        self.connection = "Finplate"
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
         self.commLogicObj = None
+        self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"
@@ -273,6 +407,7 @@ class MainController(QtGui.QMainWindow):
         return dictbeamdata
 
     def fetchColumnPara(self):
+
         column_sec = self.ui.comboColSec.currentText()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -288,17 +423,12 @@ class MainController(QtGui.QMainWindow):
             self.ui.lbl_column.setText("Primary beam *")
 
             self.ui.chkBxBeam.setText("SBeam")
-            # self.ui.chkBxBeam.setShortcut("MainWindow", "Alt+Shift+B")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
-            # self.ui.chkBxCol.setShortcut("MainWindow", "Alt+Shift+C")
             self.ui.chkBxCol.setToolTip("Primary beam")
 
             self.ui.comboColSec.clear()
-            # self.ui.comboColSec.setObjectName("comboSecondaryBeam")
-            # self.ui.comboSecondaryBeam.addItems(get_beamcombolist())
             self.ui.comboColSec.addItems(get_beamcombolist())
-            # self.ui.comboColSec.currentIndex()
             self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
 
@@ -424,7 +554,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.btn_CreateDesign.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
 
-        # Disable Menubar 
+        # Disable Menubar
         self.ui.menubar.setEnabled(False)
 
     def enableViewButtons(self):
@@ -503,7 +633,7 @@ class MainController(QtGui.QMainWindow):
                     column_tf = float(dictcoldata[QString("T")])
                     thickerPart = column_tf > plate_thick[0] and column_tf or plate_thick[0]
 
-            elif self.ui.comboConnLoc.currentText() == "Column web-Beam web": 
+            elif self.ui.comboConnLoc.currentText() == "Column web-Beam web":
                 if self.ui.comboColSec.currentText() == "Select section":
                     self.ui.comboWldSize.clear()
                     return
@@ -602,7 +732,8 @@ class MainController(QtGui.QMainWindow):
         return True
 
     def getuser_inputs(self):
-        '''(none) -> Dictionary
+        '''
+        keyword arguments: None
 
         Returns the dictionary object with the user input fields for designing fin plate connection
 
@@ -634,9 +765,11 @@ class MainController(QtGui.QMainWindow):
         return uiObj
 
     def save_inputs(self, uiObj):
+        '''Save the user inputs in text format
 
-        '''(Dictionary)--> None
-
+        Args:
+            :param uiObj: User inputs
+            :type uiObj:Dictionary
         '''
         inputFile = QtCore.QFile('Connections/Shear/Finplate/saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
@@ -696,16 +829,27 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, popup_summary):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/", "Html Files(*.html)")
-        fileName = str(fileName + ".html")
-        base, base1, base2, base3 = self.callFin2D_Drawing("All")
+        fileName = self.folder + "/images_html/Html_Report.html"
+        fileName = str(fileName)
+        self.callFin2D_Drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base1, base2, base3)
+                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)  #, base, base1, base2, base3)
         commLogicObj.call_designReport(fileName, popup_summary)
 
-        QtGui.QMessageBox.about(self, 'Information', "Report Saved")
+        # Creates pdf
+        if sys.platform == ("win32" or "win64"):
+            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        else:
+            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
 
-    # # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        options = {
+                   'margin-bottom': '10mm',
+                   'footer-right': '[page]'
+        }
+        pdfkit.from_file(fileName,  str(QtGui.QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
+
+        QtGui.QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
@@ -1151,7 +1295,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Finplate")
+        self.commLogicObj.display_3DModel("Plate")
 
     def unchecked_allChkBox(self):
         '''
@@ -1163,11 +1307,24 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxFinplate.setChecked(QtCore.Qt.Unchecked)
 
+    def call_designPref(self, designPref):
+        self.uiObj = self.getuser_inputs()
+        self.uiObj
+        print"printing designpreferences"
+        print designPref
+
     def designParameters(self):
         '''
         This routine returns the neccessary design parameters.
         '''
         self.uiObj = self.getuser_inputs()
+        if self.designPrefDialog.saved is not True:
+            design_pref = self.designPrefDialog.set_default_para()
+        else:
+            design_pref = self.designPrefDialog.save_designPref_para()
+        self.uiObj.update(design_pref)
+        print "printing designprefernces", self.uiObj
+
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         loc = str(self.ui.comboConnLoc.currentText())
@@ -1188,14 +1345,10 @@ class MainController(QtGui.QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self. unchecked_allChkBox()
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
+                                              self.alist[7], self.alist[8], self.display, self.folder, self.connection)
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top) 
-
-        self.resultObj = self.commLogicObj.call_finCalculation()
+        self.resultObj = self.commLogicObj.resultObj
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1203,10 +1356,8 @@ class MainController(QtGui.QMainWindow):
         self.displaylog_totextedit(self.commLogicObj)
         status = self.resultObj['Bolt']['status']
 
+        self.callFin2D_Drawing("All")
         self.commLogicObj.call_3DModel(status)
-
-
-        # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
@@ -1284,22 +1435,39 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-        base = ''
-        base_front = ''
-        base_side = ''
-        base_top = ''
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, base, base_front, base_side, base_top)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                         self.alist[8], self.display, self.folder, self.connection)
+        
+
         if view != 'All':
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            fname = str(fileName)
+            # fileName = ''
+
+#           app2 = QtGui.QApplication(sys.argv)
+            if view == "Front":
+                filename = self.folder + "/images_html/finFront.svg"
+
+            elif view == "Side":
+                filename = self.folder + "/images_html/finSide.svg"
+
+            else:
+                filename = self.folder + "/images_html/finTop.svg"
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+
         else:
             fname = ''
-        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
-        return base, base1, base2, base3
-        # commLogicObj.call2D_Drawing(view,fname)
+            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+
+    def save_2D_images(self, view):
+
+        fileName = QtGui.QFileDialog.getSaveFileName(self,
+                                                     "Save as PNG", str(self.folder) + '/untitled.png',
+                                                     "PNG files (*.png)")
+        f = open(self.callFin2D_Drawing(view), 'w')
+        f.close()
+        QtGui.QMessageBox.about(self, 'Information', "Image Saved")
 
     def closeEvent(self, event):
         '''
@@ -1316,7 +1484,7 @@ class MainController(QtGui.QMainWindow):
         else:
             event.ignore()
 
-# ********************************* Help Action *********************************************************************************************
+# Help Action
 
     def about_osdag(self):
         dialog = MyAboutOsdag(self)
@@ -1332,14 +1500,42 @@ class MainController(QtGui.QMainWindow):
     def open_tutorials(self):
         self.tutorials()
 
+    def ask_question(self):
+        dialog = MyAskQuestion(self)
+        dialog.show()
+
+    def open_question(self):
+        self.ask_question()
+
     def sample_report(self):
-        url = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'Sample_Folder', 'Sample_Report', 'The_PyQt4_tutorial.pdf')
-        webbrowser.open_new(r'file:///' + url)
+
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform == ("win32" or "win64"):
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
     def sample_problem(self):
-        webbrowser.open_new(r'file:///D:/EclipseWorkspace/OsdagLIVE/Sample_Folder/Sample_Problems/The_PyQt4_tutorial.pdf')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
+        for pdf_file in os.listdir(root_path):
+            if pdf_file.endswith('.pdf'):
+                if sys.platform ==("win32" or "win64"):
+                    os.startfile("%s/%s" % (root_path, pdf_file))
+                else:
+                    opener ="open" if sys.platform == "darwin" else "xdg-open"
+                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
 
-# ********************************************************************************************************************************************************
+    def design_preferences(self):
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearace(self):
+        self.designPrefDialog.set_bolthole_clernce()
+
+    def call_boltFu(self):
+        self.designPrefDialog.set_boltFu()
 
 
 def set_osdaglogger():
@@ -1368,8 +1564,6 @@ def set_osdaglogger():
     </div>''')
     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
     fh.setFormatter(formatter)
-
-    # add handler to logger object
     logger.addHandler(fh)
 
 
@@ -1408,8 +1602,3 @@ if __name__ == '__main__':
     window = MainController()
     window.show()
     sys.exit(app.exec_())
-
-
-
-
-

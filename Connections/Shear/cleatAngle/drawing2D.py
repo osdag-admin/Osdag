@@ -40,8 +40,11 @@ class cleatCommonData(object):
         self.beam_R1 = float(dict_beam_data["R1"])
         self.col_R1 = float(dict_column_data["R1"])
         self.cleat_ht = float(ouput_obj['cleat']["height"])
-        self.cleat_legsize = int(dict_angle_data["A"])
-        self.cleat_legsize_1 = int(dict_angle_data["B"])
+        cleat_legsizes = str(dict_angle_data["AXB"])
+        cleat_legsize_A = int(cleat_legsizes.split('x')[0])
+        cleat_legsize_B = int(cleat_legsizes.split('x')[1])
+        self.cleat_legsize = int(cleat_legsize_A)
+        self.cleat_legsize_1 = int(cleat_legsize_B)
         # self.cleat_legsize_1 = 120
         self.cleat_thk = int(dict_angle_data["t"])
         # self.plate_ht= ouput_obj['Plate']['height']
@@ -3020,7 +3023,6 @@ class Cleat2DCreatorSide(object):
             pt_down_left = np.array(pitch_pts_c[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
             params = {"offset": v_length + 50, "textoffset": 35, "lineori": "left", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, pt_down, pt_down_left, str(int(self.dataObj.cgauge)), params)
-
             pt_down = np.array(pitch_pts_c[-1][-1]) + self.dataObj.cedge_dist * np.array([0, 1])
             pt_down_left = np.array(pitch_pts_c1[-1][-1]) + self.dataObj.cedge_dist * np.array([0, 1])
             c_gauge = 2 * self.dataObj.cleat_legsize_1 - 2 * (self.dataObj.cgauge + self.dataObj.cend_dist) - self.dataObj.beam_tw
@@ -3031,7 +3033,7 @@ class Cleat2DCreatorSide(object):
             pt_down = np.array(pitch_pts_c[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
             pt_down_left = np.array(pitch_pts_c1[-1][0]) + self.dataObj.cedge_dist * np.array([0, 1])
             c_gauge = 2 * self.dataObj.cleat_legsize_1 - 2 * (self.dataObj.cend_dist) - self.dataObj.beam_tw
-            params = {"offset": v_length + 50, "textoffset": 35, "lineori": "right", "endlinedim": 10}
+            params = {"offset": v_length , "textoffset": 35, "lineori": "right", "endlinedim": 10}
             self.dataObj.draw_dimension_outer_arrow(dwg, pt_down, pt_down_left, str(int(c_gauge)), params)
 
 

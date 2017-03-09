@@ -18,7 +18,7 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'CleatSections')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'osdag')
 #     filepath = "D:\EclipseWorkspace\OsdagWorkshop\Database\CleatSections"
 
 #     db = QSqlDatabase.database("QSQLITE")
@@ -138,7 +138,7 @@ def get_anglecombolist():
     This function returns the list of Indian Standard Angles Designation.
     '''
     combo_list = []
-    angle_query = QSqlQuery("SELECT Designation FROM Angles ORDER BY A,B")
+    angle_query = QSqlQuery("SELECT Designation FROM Angles ORDER BY Id ASC")
     combo_list.append("Select Cleat")
     while(angle_query.next()):
         combo_list.append(angle_query.value(0))

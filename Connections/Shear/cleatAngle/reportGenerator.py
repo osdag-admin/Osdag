@@ -93,8 +93,12 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     column_B = str(float(dict_col_data["B"]))
 
     #     dict_cleat_data = get_angledata(cleat_sec)
-    cleat_legsize = str(int(dict_cleat_data["A"]))
-    cleat_legsize_1 = str(int(dict_cleat_data["B"]))
+    cleat_legsizes = str(dict_cleat_data["AXB"])
+    cleat_legsize_A = int(cleat_legsizes.split('x')[0])
+    cleat_legsize_B = int(cleat_legsizes.split('x')[1])
+
+    cleat_legsize = str(int(cleat_legsize_A))
+    cleat_legsize_1 = str(int(cleat_legsize_B))
     cleat_thk = str(int(dict_cleat_data["t"]))
 
     # 'Size (mm)'

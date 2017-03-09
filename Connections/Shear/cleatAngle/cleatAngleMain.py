@@ -608,7 +608,10 @@ class MainController(QMainWindow):
             for ele in angle_list[1:]:
                 angle_sec = str(ele)
                 dict_angle_data = get_angledata(angle_sec)
-                cleat_legsize_b = float(dict_angle_data['B'])
+                cleat_legsizes = str(dict_angle_data["AXB"])
+                cleat_legsize_A = int(cleat_legsizes.split('x')[0])
+                cleat_legsize_B = int(cleat_legsizes.split('x')[1])
+                cleat_legsize_b = float(cleat_legsize_B)
                 con_legsize = 2 * cleat_legsize_b + beam_tw
                 space = colWeb - con_legsize
                 if space > 0:

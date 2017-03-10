@@ -31,7 +31,7 @@ from OCC.StlAPI import StlAPI_Writer
 import OCC.V3d
 
 from model import *
-from utilities import osdagDisplayShape
+from utilities import osdag_display_shape
 # from drawing_2D import FinCommonData
 
 from ISection import ISection
@@ -919,43 +919,43 @@ class MainController(QtGui.QMainWindow):
             self.display.FitAll()
 
         if component == "Column":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivity.columnModel, update=True)
         elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
+            osdag_display_shape(self.display, self.connectivity.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
         elif component == "SeatAngle":
-            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.angleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
-            # osdagDisplayShape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[8], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[9], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[10], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[11], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[12], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[13], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[14], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[15], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[16], color=Quantity_NOC_SADDLEBROWN, update=True)
-            # osdagDisplayShape(self.display, nutboltlist[17], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[0], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[1], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[2], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[3], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[4], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[5], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[6], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[7], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[8], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[9], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[10], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[11], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[12], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[13], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[14], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[15], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[16], color=Quantity_NOC_SADDLEBROWN, update=True)
+            # osdag_display_shape(self.display, nutboltlist[17], color=Quantity_NOC_SADDLEBROWN, update=True)
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivity.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
+            osdag_display_shape(self.display, self.connectivity.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivity.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            osdagDisplayShape(self.display, self.connectivity.angleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivity.topclipangleModel, color='blue', update=True)
             nutboltlist = self.connectivity.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
             # -------------------------------------------------------------------------
             # TODO check the 3D drawing generating functions below

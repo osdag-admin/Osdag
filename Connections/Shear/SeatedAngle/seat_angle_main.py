@@ -11,7 +11,7 @@ import sys
 import subprocess
 import pdfkit
 
-from PyQt4.QtCore import pyqtSignal,QString
+from PyQt4.QtCore import pyqtSignal
 from PyQt4 import QtCore
 from PyQt4 import QtGui
 import shutil
@@ -313,7 +313,7 @@ class MainController(QtGui.QMainWindow):
         angle_sec = self.ui.combo_angle_section.currentText()
         dict_angle_data = get_angledata(angle_sec)
         return dict_angle_data
-    
+
     def fetch_top_angle_para(self):
         angle_sec = self.ui.combo_topangle_section.currentText()
         dict_top_angle = get_angledata(angle_sec)
@@ -389,7 +389,6 @@ class MainController(QtGui.QMainWindow):
             self.ui.combo_column_section.setCurrentIndex(0)
             self.ui.combo_bolt_diameter.setCurrentIndex(0)
             self.ui.combo_angle_section.setCurrentIndex(0)
-            self.ui.combo_topangle_section.setCurrentIndex(0)
             self.ui.combo_bolt_type.setCurrentIndex(0)
             self.ui.combo_bolt_grade.setCurrentIndex(0)
             self.ui.txt_fu.clear()
@@ -504,9 +503,9 @@ class MainController(QtGui.QMainWindow):
 
     def getuser_inputs(self):
         '''(nothing) -> Dictionary
-        
+
         Returns the dictionary object with the user input fields for designing fin plate connection
-        
+
         '''
         uiObj = {}
         uiObj["Bolt"] = {}
@@ -534,7 +533,7 @@ class MainController(QtGui.QMainWindow):
     def save_inputs(self, uiObj):
 
         '''(Dictionary)--> None
-         
+
         '''
         inputFile = QtCore.QFile('saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
@@ -642,9 +641,9 @@ class MainController(QtGui.QMainWindow):
 
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
-        
+
         Resets all fields in input as well as output window
-    
+
         '''
         # Input
 
@@ -690,7 +689,7 @@ class MainController(QtGui.QMainWindow):
     def dockbtn_clicked(self, widget):
 
         '''(QWidget) -> NoneType
-        
+
         This method dock and undock widget(QdockWidget)
         '''
 
@@ -866,10 +865,11 @@ class MainController(QtGui.QMainWindow):
             # Qt based simple GUI
             if USED_BACKEND in ['pyqt4', 'pyside']:
                 if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.pyqt4Display
+                    import OCC.Display.qtDisplay
                     from PyQt4 import QtCore, QtGui, QtOpenGL
 
-        from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
+
         self.ui.modelTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Seated Angle Connection")
@@ -1054,7 +1054,7 @@ class MainController(QtGui.QMainWindow):
     def create3DColFlangeBeamWeb(self):
         '''
         Creating 3d cad model with column flange beam web connection
-        
+
         '''
         uiObj = self.getuser_inputs()
         resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
@@ -1095,8 +1095,8 @@ class MainController(QtGui.QMainWindow):
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
 
         ##### ANGLE PARAMETERS ######
-
         dict_angle_data = self.fetch_angle_para()
+
         angle_l = resultObj['SeatAngle']["Length (mm)"]
         angle_a = int(dict_angle_data[QString("A")])
         angle_b = int(dict_angle_data[QString("B")])
@@ -1107,19 +1107,8 @@ class MainController(QtGui.QMainWindow):
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
-        
-        dictTopangledata = self.fetch_top_angle_para()
 
-        topangle_l = resultObj['SeatAngle']["Length (mm)"]
-        topangle_a = int(dictTopangledata[QString("A")])
-        topangle_b = int(dictTopangledata[QString("B")])
-        topangle_t = float(dictTopangledata[QString("t")])
-        topangle_r1 = float(dictTopangledata[QString("R1")])
-
-        topangle_r2 = (dictTopangledata[QString("R2")]).toFloat()
-        print "printing topangle R2", topangle_r2
-        
-        topclipangle = Angle(L=topangle_l, A=topangle_a, B=topangle_b, T=topangle_t, R1=topangle_r1, R2=topangle_r2[0])
+        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
 
@@ -1157,8 +1146,7 @@ class MainController(QtGui.QMainWindow):
         return colflangeconn
 
     # TODO check 3D drawing generating functions above
-    # -----------------------------------------------------
-
+    # -------------------------------------------------------------------------------
     def call_3DModel(self, flag):
         # self.ui.btnSvgSave.setEnabled(True)
         self.ui.btn3D.setChecked(QtCore.Qt.Checked)

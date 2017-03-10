@@ -284,12 +284,8 @@ class myDialog(QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle("Capacity Details")
         self.mainController = parent
-        # web = QWebView()
-        # ui_obj = self.MainController().getuser_inputs()
         ui_obj = self.mainController.getuser_inputs()
         x = cleat_connection(ui_obj)
-        # x = MainController().outputdict()
-        # x = m.outputdict()
 
         self.ui.shear_b.setText(str(x['Bolt']['shearcapacity']))
         self.ui.bearing_b.setText(str(x['Bolt']['bearingcapacity']))
@@ -341,7 +337,7 @@ class MainController(QMainWindow):
         self.ui.btn_top.clicked.connect(lambda: self.callCleat2D_drawing("Top"))
         self.ui.btn_side.clicked.connect(lambda: self.callCleat2D_drawing("Side"))
 
-        self.ui.btn3D.clicked.connect(lambda: self.call_3d_model(True))
+        self.ui.btn3D.clicked.connect(self.call_3d_model)
         self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
         self.ui.chkBxCol.clicked.connect(self.call_3d_column)
         # self.ui.chkBxFinplate.clicked.connect(self.call_3d_cleatangle)
@@ -382,9 +378,8 @@ class MainController(QMainWindow):
         self.ui.actionShow_cleat_angle.triggered.connect(self.call_3d_cleatangle)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model(True))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
-        # ############################## MARCH_14 #############################
-        # populate cleat section and secondary beam according to user input
 
+        # populate cleat section and secondary beam according to user input
         self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fill_cleatsection_combo())
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
@@ -405,7 +400,6 @@ class MainController(QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
-# ************************************** Osdag logo for html***************************************************************************************************
         self.ui.btn_Design.clicked.connect(self.osdag_header)
 
 # ************************************ Help button *******************************************************************************
@@ -547,7 +541,7 @@ class MainController(QMainWindow):
             self.ui.outputBoltLbl.setFont(font)
             self.ui.outputBoltLbl.setText("Beam")
 
-            # self.ui.comboColSec.clear()
+            self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_columncombolist())
 
 # ---------------------------------------- Users input-----------------------------------------------------------------------------
@@ -881,7 +875,6 @@ class MainController(QMainWindow):
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
-        # yaml.dump(ui_obj, inputFile,allow_unicode=True, default_flow_style = False)
         pickle.dump(ui_obj, inputFile)
 
     def get_prevstate(self):
@@ -914,8 +907,6 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
-
-        #&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
         fileName = self.folder + "/images_html/Html_Report.html"
         fileName = str(fileName)
         self.callCleat2D_drawing("All")
@@ -1305,8 +1296,13 @@ class MainController(QMainWindow):
         return nut_dia[bolt_diameter]
 
 
-    def call_3d_model(self, flag):
-        self.commLogicObj.call_3DModel(flag)
+    def call_3d_model(self):
+        self.ui.btn3D.setChecked(Qt.Checked)
+        if self.ui.btn3D.isChecked():
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.checkBoxCleat.setChecked(Qt.Unchecked)
+        self.commLogicObj.display_3DModel("Model")
 
 
     def call_3d_beam(self):

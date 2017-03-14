@@ -50,6 +50,7 @@ from ui_ask_a_question import Ui_AskQuestion
 from utilities import osdag_display_shape
 from Svg_Window import SvgWindow
 from OCC.Display import OCCViewer
+
 # from OCC.Display.backend import get_qt_modules
 from macpath import basename
 # from OCC.Display.backend import get_backend
@@ -1942,7 +1943,8 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     module_setup()
-    # web = QWebView()
-    window = MainController()
+#     web = QWebView()
+    folder = None
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

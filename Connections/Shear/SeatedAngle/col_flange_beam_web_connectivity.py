@@ -97,8 +97,8 @@ class ColFlangeBeamWeb(object):
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.R2 * (1 - 1 / root2) * self.angle.uDir
         nutboltArrayOrigin = nutboltArrayOrigin - self.angle.R2 / root2 * self.angle.vDir
+
         ########################################################################
-        # ----------------------------- nutboltArrayOrigin = self.angle.secOrigin
         # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir
         # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir
         # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
@@ -117,7 +117,7 @@ class ColFlangeBeamWeb(object):
         # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir
         # bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
 
-        topclipgaugeDir = self.topclipangle.wDir
+        topclipgaugeDir = -self.topclipangle.wDir
         topclippitchDir = -self.topclipangle.uDir
         topclipboltDir = -self.topclipangle.vDir
 
@@ -126,13 +126,15 @@ class ColFlangeBeamWeb(object):
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin - self.topclipangle.R2 / root2 * self.topclipangle.uDir
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.R2 * (1 - 1 / root2) * self.topclipangle.vDir
+        topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
 
         # --------------- topclipnutboltArrayOrigin = self.topclipangle.secOrigin
+
         # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir
         # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir
         # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir
 
-        topclipbgaugeDir = self.topclipangle.wDir
+        topclipbgaugeDir = -self.topclipangle.wDir
         topclipbpitchDir = -self.topclipangle.vDir
         topclipbboltDir = -self.topclipangle.uDir
 
@@ -141,8 +143,10 @@ class ColFlangeBeamWeb(object):
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin - self.topclipangle.R2 / root2 * self.topclipangle.vDir
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.R2 * (1 - 1 / root2) * self.topclipangle.uDir
+        topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
+        
+        #-------------- topclipbnutboltArrayOrigin = self.topclipangle.secOrigin
 
-        # -------------- topclipbnutboltArrayOrigin = self.topclipangle.secOrigin
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
@@ -164,16 +168,22 @@ class ColFlangeBeamWeb(object):
         # return self.nutBoltArray.getboltModels()
 
     def get_beamModel(self):
-        finalBeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[0:(len(nutBoltlist) // 2)]:
-            finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
-        return finalBeam
-
+        finalbeam = self.beamModel
+        nutBoltlist = self.nutBoltArray.get_beam_bolts()
+        print len(nutBoltlist)
+        for bolt in nutBoltlist:
+            finalbeam = BRepAlgoAPI_Cut(finalbeam,bolt).Shape()
+        return finalbeam
+    
     def get_angleModel(self):
         finalAngle = self.angleModel
-        #         nutBoltlist = self.nutBoltArray.getModels()
-        #         for bolt in nutBoltlist[0:(len(nutBoltlist)//2)]:
-        #             finalAngle = BRepAlgoAPI_Cut(finalAngle,bolt).Shape()
         return finalAngle
-   
+
+    def get_columnModel(self):
+        finalcol = self.columnModel
+        nutBoltlist = self.nutBoltArray.get_column_bolts()
+        print len(nutBoltlist)
+        for bolt in nutBoltlist:
+            finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
+        return finalcol
+

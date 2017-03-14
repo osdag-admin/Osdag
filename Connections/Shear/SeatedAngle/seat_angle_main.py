@@ -53,9 +53,10 @@ from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_HelpOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_a_question import Ui_AskQuestion
-# You can delete ite
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
+# from apt.auth import update
+from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
 
 
 # TODO change connectivity to Column Flange to Beam FLANGE
@@ -182,17 +183,12 @@ class MainController(QtGui.QMainWindow):
 
         # comboConnLoc renamed to combo_connectivity
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.setimage_connection)
-        #####self.retrieve_prevstate()
+        self.retrieve_prevstate()
 
         self.ui.combo_connectivity.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
 
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
-
-        # self.ui.btn_front.clicked.connect(self.call_Frontview)
-        # self.ui.btn_front.clicked.connect(self.call_Frontview)
-        # self.ui.btn_top.clicked.connect(self.call_Topview)
-        # self.ui.btn_side.clicked.connect(self.call_Sideview)
 
         self.ui.btn3D.clicked.connect(lambda: self.call_3DModel(True))
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
@@ -224,6 +220,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
+
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
         self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
@@ -244,22 +241,14 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
 
-        # self.ui.combo_beam_section.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
-
-        # TODO checkBeam_B is incomplete
-        # self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
-        # self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
-        # self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
-        #     lambda: self.populateWeldThickCombo("comboPlateThick_2"))
-
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
-        self.ui.btn_front.clicked.connect(lambda: self.call2D_Drawing("Front"))
-        self.ui.btn_side.clicked.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.btn_top.clicked.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.btn_front.clicked.connect(lambda: self.call_seatangle2D_Drawing("Front"))
+        self.ui.btn_side.clicked.connect(lambda: self.call_seatangle2D_Drawing("Side"))
+        self.ui.btn_top.clicked.connect(lambda: self.call_seatangle2D_Drawing("Top"))
 
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
@@ -289,10 +278,10 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        # image_path = os.path.dirname(os.path.abspath(__file__)) + os.path + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
-        # shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
-        image_path = os.path.join("ResourceFiles", "Osdag_header.png")
-        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+        image_path = os.path.dirname(os.path.abspath(__file__)) + str(os.path) + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
+        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
+        # image_path = os.path.join("ResourceFiles", "Osdag_header.png")
+        # shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
     # noinspection PyPep8Naming
     def fetchBeamPara(self):
@@ -796,22 +785,102 @@ class MainController(QtGui.QMainWindow):
         top_angle = resultObj['SeatAngle']['Top Angle']
         self.ui.txt_top_angle.setText(str(top_angle))
 
-    def displaylog_totextedit(self):
+    def displaylog_totextedit(self,commLogicObj):
         '''
         This method displaying Design messages(log messages)to textedit widget.
         '''
-
-        afile = QtCore.QFile('./seatangle.log')
-
+        
+        fname = str(commLogicObj.call_saveMessages())
+        afile = QtCore.QFile(fname)
+     
         if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
             QtGui.QMessageBox.information(None, 'info', afile.errorString())
-
+     
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
         vscrollBar = self.ui.textEdit.verticalScrollBar()
         vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
+
+    ''' 10 Mar 2017 - Merge conflict documentation.
+    Delete this string block in later commits.
+    Below functions were present in seatedAngle branch and absent in the
+    succending branches.
+        boltHeadThickCalculation(self, boltDia)
+        boltHeadDia_Calculation(self,boltDia):
+        boltLength_Calculation(self,boltDia):
+        nutThick_Calculation(self,boltDia):
+    '''
+
+    def boltHeadThick_Calculation(self,boltDia):
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        
+        '''
+        boltHeadThick = {5:4, 6:5, 8:6, 10:7, 12:8, 16:10, 20:12.5, 22:14, 24:15, 27:17, 30:18.7, 36:22.5 }
+        return boltHeadThick[boltDia]
+        
+        
+    def boltHeadDia_Calculation(self,boltDia):
+
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        
+        '''
+        boltHeadDia = {5:7, 6:8, 8:10, 10:15, 12:20, 16:27, 20:34, 22:36, 24:41, 27:46, 30:50, 36:60 }
+        return boltHeadDia[boltDia]
+    
+    def boltLength_Calculation(self,boltDia):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+       
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    | 
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       | 
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__ 
+        
+        '''
+        boltHeadDia = {5:40, 6:40, 8:40, 10:40, 12:40, 16:50, 20:50, 22:50, 24:50, 27:60, 30:65, 36:75 }
+       
+        return boltHeadDia[boltDia]
+    
+    def nutThick_Calculation(self,boltDia):
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
+        nutDia = {5:5, 6:5.65, 8:7.15, 10:8.75, 12:11.3, 16:15, 20:17.95, 22:19.0, 24:21.25, 27:23, 30:25.35, 36:30.65 }
+        
+        return nutDia[boltDia]
+    
 
     def get_backend(self):
         """
@@ -1147,6 +1216,7 @@ class MainController(QtGui.QMainWindow):
 
     # TODO check 3D drawing generating functions above
     # -------------------------------------------------------------------------------
+
     def call_3DModel(self, flag):
         # self.ui.btnSvgSave.setEnabled(True)
         self.ui.btn3D.setChecked(QtCore.Qt.Checked)
@@ -1244,6 +1314,7 @@ class MainController(QtGui.QMainWindow):
 
         else:
             self.display.EraseAll()
+        self.commLogicObj.call_3DModel(flag)
 
     def call_3DBeam(self):
         '''
@@ -1256,7 +1327,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.display3Dmodel("Beam")
+        self.commLogicObj.display_3DModel("Beam")
 
     def call_3DColumn(self):
         '''
@@ -1267,7 +1338,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.display3Dmodel("Column")
+        self.commLogicObj.display_3DModel("Column")
 
     def call_3DSeatAngle(self):
         '''Displaying Seat Angle in 3D
@@ -1278,6 +1349,7 @@ class MainController(QtGui.QMainWindow):
             self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
             self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
+        self.commLogicObj.display_3DModel("SeatAngle")
 
             # TODO uncomment display3D model after debugging
             # self.display3Dmodel("SeatAngle")
@@ -1288,7 +1360,24 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-
+        
+    def designParameters(self):
+        '''
+        This routine returns the neccessary design parameters.
+        '''
+        self.uiObj = self.getuser_inputs()
+        dictbeamdata = self.fetchBeamPara()
+        dictcoldata = self.fetchColumnPara()
+        dictangledata = self.fetch_angle_para()
+        loc = str(self.ui.combo_connectivity.currentText())
+        component = "Model"
+        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
+        bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
+        bolt_T = self.boltHeadThick_Calculation(bolt_dia)
+        bolt_Ht = self.boltLength_Calculation(bolt_dia)
+        nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
+        return [self.uiObj, dictbeamdata, dictcoldata, dictangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+    
     def design_btnclicked(self):
         '''
         '''
@@ -1297,15 +1386,18 @@ class MainController(QtGui.QMainWindow):
         if self.ui.combo_connectivity.currentIndex() == 0:
             QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
 
+        self.alist = self.designParameters()
+
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
 
         # Getting User Inputs.
-        self.uiObj = self.getuser_inputs()
-
+        #self.uiObj = self.getuser_inputs()
+        
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
         # Seated Angle Design Calculations.
-        self.resultObj = self.sa_calc_object.seat_angle_connection(self.uiObj)
+        self.resultObj = self.commLogicObj.call_finCalculation()
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1314,11 +1406,12 @@ class MainController(QtGui.QMainWindow):
         self.display_output(self.resultObj)
 
         # Displaying Messages related to Seated Angle Design.
-        self.displaylog_totextedit()
+        self.displaylog_totextedit(self.commLogicObj)
 
         # Displaying 3D Cad model
         status = self.resultObj['SeatAngle']['status']
-        self.call_3DModel(status)
+
+        self.commLogicObj.call_3DModel(status)
         self.call2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
@@ -1372,69 +1465,8 @@ class MainController(QtGui.QMainWindow):
 
         QtGui.QMessageBox.about(self, 'Information', "File saved")
 
-    def display2DModelOriginal(self, final_model, viewName):
+    def call_seatangle2D_Drawing(self, view):  # call2D_Drawing(self,view)
 
-        self.display, _ = self.init_display()
-        self.display.EraseAll()
-        # self.display.SetModeWireFrame()
-
-        self.display.DisplayShape(final_model, update=True)
-        self.display.SetModeHLR()
-
-        if (viewName == "Front"):
-            self.display.View_Front()
-        elif (viewName == "Top"):
-            self.display.View_Top()
-        elif (viewName == "Right"):
-            self.display.View_Right()
-        else:
-            pass
-
-    # def display2DModel(self, final_model, viewName):
-    #
-    #     # display, start_display, _, _ = self.simpleGUI()
-    #     # self.display2d,_,_ = self.init_display(backend_str="pyqt4")
-    #     self.display.EraseAll()
-    #
-    #     self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-    #
-    #     self.display.SetModeHLR()
-    #     # self.display.SetModeShaded()
-    #     # Get Context
-    #     ais_context = self.display.GetContext().GetObject()
-    #
-    #     # Get Prs3d_drawer from previous context
-    #     drawer_handle = ais_context.DefaultDrawer()
-    #     drawer = drawer_handle.GetObject()
-    #     drawer.EnableDrawHiddenLine()
-    #
-    #     hla = drawer.HiddenLineAspect().GetObject()
-    #     hla.SetWidth(2)
-    #     hla.SetColor(Quantity_NOC_RED)
-    #
-    #     # increase line width in the current viewer
-    #     # This is only viewed in the HLR mode (hit 'e' key for instance)
-    #
-    #     line_aspect = drawer.SeenLineAspect().GetObject()
-    #     line_aspect.SetWidth(2.8)
-    #     line_aspect.SetColor(Quantity_NOC_BLUE1)
-    #
-    #     self.display.DisplayShape(final_model, update=False)
-    #
-    #     if (viewName == "Front"):
-    #         self.display.View_Front()
-    #     elif (viewName == "Top"):
-    #         self.display.View_Top()
-    #     elif (viewName == "Right"):
-    #         self.display.View_Right()
-    #     elif (viewName == "Left"):
-    #         self.display.View_Left()
-    #     else:
-    #         pass
-    #
-    #         # start_display()
-
-    def call2D_Drawing(self, view):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
@@ -1468,14 +1500,16 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
         self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
 
-        uiObj = self.uiObj
-        resultObj = self.resultObj
-        dict_beam_data = self.fetchBeamPara()
-        dict_col_data = self.fetchColumnPara()
-        dict_angle_data = self.fetch_angle_para()
-        dict_top_angle = self.fetch_top_angle_para()
-        seatCommonObj = SeatCommonData(uiObj, resultObj, dict_beam_data, dict_col_data, dict_angle_data, dict_top_angle, self.folder)
-        seatCommonObj.save_to_svg(str(fileName), view)
+        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
+        if view != 'All':
+            fileName = QtGui.QFileDialog.getSaveFileName(self,
+                                                         "Save SVG", str(self.folder) + '/untitled.svg',
+                                                         "SVG files (*.svg)")
+            fname = str(fileName)
+        else:
+            fname = ''
+        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+        return base, base1, base2, base3
 
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()
@@ -1582,7 +1616,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
     # while launching from Osdag Main:
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
@@ -1609,7 +1643,7 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
     # while launching from Osdag Main:
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="./Connections/Shear/SeatedAngle/log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 

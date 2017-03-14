@@ -303,7 +303,7 @@ class MainController(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
         # self.ui.btn_2D.clicked.connect(self.call2D_Drawing)
-        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel)
+        self.ui.btn3D.clicked.connect(self.call_3DModel)
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxFinplate.clicked.connect(self.call_3DFinplate)
@@ -354,7 +354,7 @@ class MainController(QMainWindow):
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
         self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
         self.ui.actionFinplate_2.triggered.connect(self.call_3DFinplate)
-        self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel(True))
+        self.ui.actionShow_all.triggered.connect(self.call_3DModel)
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 

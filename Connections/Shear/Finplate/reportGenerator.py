@@ -1,3 +1,5 @@
+"""This file is redundant. Use report_generator.py"""
+
 '''
 Created on Dec 10, 2015
 

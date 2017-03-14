@@ -26,6 +26,7 @@ from ui_design_preferences import Ui_ShearDesignPreferences
 from ui_cleatAngle import Ui_MainWindow
 from ui_popUpWindow import Ui_Capacitydetals
 from ui_summary_popup import Ui_Dialog
+<<<<<<< HEAD
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
@@ -178,6 +179,24 @@ class DesignPreferences(QDialog):
 
 
 class MyAskQuestion(QDialog):
+=======
+from utilities import osdagDisplayShape
+
+from OCC.Display import OCCViewer
+
+# from OCC.Display.backend import get_qt_modules
+from macpath import basename
+# from OCC.Display.backend import get_backend
+# get_backend("qt-pyqt4")
+# import OCC.Display.qtDisplay
+# QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+# import OCC.Display.qtDisplay
+# from Connections.Shear.cleatAngle.ui_popUpWindow import Ui_Capacitydetals
+# Developed by aravind
+class MyPopupDialog(QtGui.QDialog):
+    
+>>>>>>> seatedAngle
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_AskQuestion()

@@ -870,5 +870,6 @@ def cleat_connection(ui_obj):
     else:
         logger.error(": Design is not safe \n ")
         logger.debug(" :=========End Of design===========")
-     
+
     return output_obj
+

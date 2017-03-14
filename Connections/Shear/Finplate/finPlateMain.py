@@ -26,6 +26,14 @@ from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.IFSelect import IFSelect_RetDone
 from OCC.StlAPI import StlAPI_Writer
+
+# from drawing_2D import FinCommonData
+#
+# from report_generator import * # TODO refactored code in report_generator; old = reportGenerator
+# from ModelUtils import getGpPt
+# ##### Testing imports
+# import OCC.V3d
+
 import pdfkit
 import subprocess
 import os.path
@@ -1678,6 +1686,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    window = MainController()
+    folder = None
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

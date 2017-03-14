@@ -1,9 +1,8 @@
-
 **/*.log
 *.pyo
-~*
-output/*
 *.xml
 **/*.txt
 *.pyc
 .idea/
+*~
+*.html

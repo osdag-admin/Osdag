@@ -10,9 +10,11 @@ from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
+
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os
+from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleController
 import os.path
 import subprocess
 
@@ -47,10 +49,12 @@ class OsdagMainWindow(QMainWindow):
         self.ui.setupUi(self)
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
 
+
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
         self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_start.clicked.connect(self.show_desgin_connection)
+
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
@@ -109,6 +113,7 @@ class OsdagMainWindow(QMainWindow):
         options = QFileDialog.Options()
         folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
 
+
         #folder = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','..', 'Osdag_workspace'), 'All Files (*)')
         folder = str(folder)
         if not os.path.exists(folder):
@@ -133,7 +138,9 @@ class OsdagMainWindow(QMainWindow):
             # QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
 
         elif self.ui.rdbtn_seat.isChecked():
-            QMessageBox.about(self, "INFO", "Seated connection design is coming soon!")
+            launchSeatedAngleController(self, folder)
+            self.ui.myStackedWidget.setCurrentIndex(0)
+            # QtGui.QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
 
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")

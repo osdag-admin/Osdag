@@ -327,14 +327,15 @@ class CommonDesignLogic(object):
 
         if flag is True:
 
-            if self.loc == "Column web-Beam web":
+            if self.loc == "Column web-Beam flange":
                 self.connectivityObj = self.create3DColWebBeamWeb()
 
-            elif self.loc == "Column flange-Beam web":
+            elif self.loc == "Column flange-Beam flange":
                 self.connectivityObj = self.create3DColFlangeBeamWeb()
 
             else:
-                self.connectivityObj = self.create3DBeamWebBeamWeb()
+                pass
+
 
             self.display_3DModel("Model")
 

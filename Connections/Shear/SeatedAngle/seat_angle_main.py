@@ -217,9 +217,9 @@ class MainController(QtGui.QMainWindow):
         # Menu Bar
         # File Menu
 
-        self.ui.actionSave_front_view.triggered.connect(lambda: self.call2D_Drawing("Front"))
-        self.ui.actionSave_side_view.triggered.connect(lambda: self.call2D_Drawing("Side"))
-        self.ui.actionSave_top_view.triggered.connect(lambda: self.call2D_Drawing("Top"))
+        self.ui.actionSave_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
+        self.ui.actionSave_side_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Side"))
+        self.ui.actionSave_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
 
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
@@ -278,8 +278,9 @@ class MainController(QtGui.QMainWindow):
 
     def osdag_header(self):
         # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = os.path.dirname(os.path.abspath(__file__)) + str(os.path) + os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")
-        shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
+        image_path = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder),"images_html"))
+        # shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
         # image_path = os.path.join("ResourceFiles", "Osdag_header.png")
         # shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
 
@@ -585,7 +586,7 @@ class MainController(QtGui.QMainWindow):
     def save_design(self, report_summary):
         filename = self.folder + "/images_html/Html_Report.html"
         file_name = str(filename)
-        self.call2D_Drawing("All")
+        self.call_seatangle2D_Drawing("All")
         inputdict = self.uiObj
         outdict = self.resultObj
 
@@ -1412,7 +1413,7 @@ class MainController(QtGui.QMainWindow):
         status = self.resultObj['SeatAngle']['status']
 
         self.commLogicObj.call_3DModel(status)
-        self.call2D_Drawing("All")
+        self.call_seatangle2D_Drawing("All")
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of finplate
@@ -1649,7 +1650,7 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
     module_setup()
-    folder = None
+    folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
     window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

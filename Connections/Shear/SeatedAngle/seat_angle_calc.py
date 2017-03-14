@@ -254,6 +254,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                      75: "ISA 75X75X8",
                      80: "ISA 80X80X8",
                      90: "ISA 90X90X10",
+                     100: "ISA 100X100X10",
                      "ISA 100X65X8": "ISA 100X65X8"
                      }[top_angle_side]
 

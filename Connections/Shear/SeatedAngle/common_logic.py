@@ -372,7 +372,7 @@ class CommonDesignLogic(object):
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
 
-        finCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,folder)
+        finCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, view, folder)
         finCommonObj.saveToSvg(str(fileName), view)
 
     #=========================================================================================

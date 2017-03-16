@@ -7,6 +7,7 @@ from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 import cairosvg
+import os
 
 
 class SeatCommonData(object):
@@ -424,17 +425,17 @@ class SeatCommonData(object):
             elif view == "Top":
                 seat_2d_top.call_CFBF_top(file_name)
             else:
-                file_name = str(self.folder) + '/images_html/seatFront.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatFront.svg")
                 seat_2d_front.call_CFBF_front(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatFront.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatFront.svg"))
 
-                file_name = str(self.folder) + '/images_html/seatSide.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatSide.svg")
                 seat_2d_side.call_CFBF_side(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatSide.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatSide.svg"))
 
-                file_name = str(self.folder) + '/images_html/seatTop.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatTop.svg")
                 seat_2d_top.call_CFBF_top(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatTop.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatTop.svg"))
 
         elif self.connectivity == 'Column web-Beam flange':
             if view == "Front":
@@ -444,17 +445,17 @@ class SeatCommonData(object):
             elif view == "Top":
                 seat_2d_top.call_CWBF_top(file_name)
             else:
-                file_name = str(self.folder) + '/images_html/seatFront.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatFront.svg")
                 seat_2d_front.call_CWBF_front(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatFront.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatFront.svg"))
 
-                file_name = str(self.folder) + '/images_html/seatSide.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatSide.svg")
                 seat_2d_side.call_CWBF_side(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatSide.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatSide.svg"))
 
-                file_name = str(self.folder) + '/images_html/seatTop.svg'
+                file_name = os.path.join(str(self.folder), "images_html", "seatTop.svg")
                 seat_2d_top.call_CWBF_top(file_name)
-                cairosvg.svg2png(file_obj=file_name, write_to=str(self.folder) + '/images_html/seatTop.png')
+                cairosvg.svg2png(file_obj=file_name, write_to=os.path.join(str(self.folder), "images_html", "seatTop.svg"))
 
 
 class Seat2DCreatorFront(object):

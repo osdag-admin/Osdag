@@ -13,6 +13,7 @@ import pdfkit
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtWidgets import QDesktopWidget
 from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
 import shutil
 import webbrowser
@@ -50,9 +51,9 @@ from drawing_2D import SeatCommonData
 from report_generator import *
 from ui_seat_angle import Ui_MainWindow  # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
-from ui_aboutosdag import Ui_HelpOsdag
+from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
-from ui_ask_a_question import Ui_AskQuestion
+from ui_ask_question import Ui_AskQuestion
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 # from apt.auth import update
@@ -66,7 +67,7 @@ from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
 
 class MyAskQuestion(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_AskQuestion()
         self.ui.setupUi(self)
         self.mainController = parent
@@ -83,7 +84,7 @@ class MyTutorials(QDialog):
 class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_HelpOsdag()
+        self.ui = Ui_AboutOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
@@ -523,8 +524,8 @@ class MainController(QMainWindow):
         '''(Dictionary)--> None
 
         '''
-        inputFile = QtCore.QFile('saveINPUT.txt')
-        if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
+        inputFile = QFile('saveINPUT.txt')
+        if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         pickle.dump(uiObj, inputFile)
@@ -602,7 +603,7 @@ class MainController(QMainWindow):
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        pdfkit.from_file(filename, str(QtGui.QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
+        pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
                          options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
@@ -616,15 +617,15 @@ class MainController(QMainWindow):
     def save_file(self, fileName):
         '''(file open for writing)-> boolean
         '''
-        fname = QtCore.QFile(fileName)
+        fname = QFile(fileName)
 
-        if not fname.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
+        if not fname.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
-        outf = QtCore.QTextStream(fname)
-        QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+        outf = QTextStream(fname)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         outf << self.ui.textEdit.toPlainText()
         QApplication.restoreOverrideCursor()
 
@@ -713,7 +714,7 @@ class MainController(QMainWindow):
             widget.clear()
             widget.setFocus()
             palette = QPalette()
-            palette.setColor(QPalette.Foreground, QtCore.Qt.red)
+            palette.setColor(QPalette.Foreground, Qt.red)
             lblwidget.setPalette(palette)
         else:
             palette = QPalette()
@@ -791,12 +792,12 @@ class MainController(QMainWindow):
         '''
         
         fname = str(commLogicObj.call_saveMessages())
-        afile = QtCore.QFile(fname)
+        afile = QFile(fname)
      
-        if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
+        if not afile.open(QIODevice.ReadOnly):  # ReadOnly
             QMessageBox.information(None, 'info', afile.errorString())
      
-        stream = QtCore.QTextStream(afile)
+        stream = QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
         vscrollBar = self.ui.textEdit.verticalScrollBar()
@@ -1022,13 +1023,13 @@ class MainController(QMainWindow):
 
         dict_beam_data = self.fetchBeamPara()
         ##### BEAM PARAMETERS #####
-        beam_D = int(dict_beam_data[QString("D")])
-        beam_B = int(dict_beam_data[QString("B")])
-        beam_tw = float(dict_beam_data[QString("tw")])
-        beam_T = float(dict_beam_data[QString("T")])
-        beam_alpha = float(dict_beam_data[QString("FlangeSlope")])
-        beam_R1 = float(dict_beam_data[QString("R1")])
-        beam_R2 = float(dict_beam_data[QString("R2")])
+        beam_D = int(dict_beam_data["D"])
+        beam_B = int(dict_beam_data["B"])
+        beam_tw = float(dict_beam_data["tw"])
+        beam_T = float(dict_beam_data["T"])
+        beam_alpha = float(dict_beam_data["FlangeSlope"])
+        beam_R1 = float(dict_beam_data["R1"])
+        beam_R2 = float(dict_beam_data["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -1039,13 +1040,13 @@ class MainController(QMainWindow):
         ##### COLUMN PARAMETERS ######
         dict_col_data = self.fetchColumnPara()
 
-        column_D = int(dict_col_data[QString("D")])
-        column_B = int(dict_col_data[QString("B")])
-        column_tw = float(dict_col_data[QString("tw")])
-        column_T = float(dict_col_data[QString("T")])
-        column_alpha = float(dict_col_data[QString("FlangeSlope")])
-        column_R1 = float(dict_col_data[QString("R1")])
-        column_R2 = float(dict_col_data[QString("R2")])
+        column_D = int(dict_col_data["D"])
+        column_B = int(dict_col_data["B"])
+        column_tw = float(dict_col_data["tw"])
+        column_T = float(dict_col_data["T"])
+        column_alpha = float(dict_col_data["FlangeSlope"])
+        column_R1 = float(dict_col_data["R1"])
+        column_R2 = float(dict_col_data["R2"])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
@@ -1055,11 +1056,11 @@ class MainController(QMainWindow):
         dict_angle_data = self.fetch_angle_para()
 
         angle_l = resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(dict_angle_data[QString("A")])
-        angle_b = int(dict_angle_data[QString("B")])
-        angle_t = float(dict_angle_data[QString("t")])
-        angle_r1 = float(dict_angle_data[QString("R1")])
-        angle_r2 = float(dict_angle_data[QString("R2")])
+        angle_a = int(dict_angle_data["A"])
+        angle_b = int(dict_angle_data["B"])
+        angle_t = float(dict_angle_data["t"])
+        angle_r1 = float(dict_angle_data["R1"])
+        angle_r2 = float(dict_angle_data["R2"])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
@@ -1117,13 +1118,13 @@ class MainController(QMainWindow):
         #         plate_width = resultObj['Plate']['width']
         #         plate_thick = uiObj['Plate']['Thickness (mm)']
         ##### BEAM PARAMETERS #####
-        beam_D = int(dict_beam_data[QString("D")])
-        beam_B = int(dict_beam_data[QString("B")])
-        beam_tw = float(dict_beam_data[QString("tw")])
-        beam_T = float(dict_beam_data[QString("T")])
-        beam_alpha = float(dict_beam_data[QString("FlangeSlope")])
-        beam_R1 = float(dict_beam_data[QString("R1")])
-        beam_R2 = float(dict_beam_data[QString("R2")])
+        beam_D = int(dict_beam_data["D"])
+        beam_B = int(dict_beam_data["B"])
+        beam_tw = float(dict_beam_data["tw"])
+        beam_T = float(dict_beam_data["T"])
+        beam_alpha = float(dict_beam_data["FlangeSlope"])
+        beam_R1 = float(dict_beam_data["R1"])
+        beam_R2 = float(dict_beam_data["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -1134,13 +1135,13 @@ class MainController(QMainWindow):
         ##### COLUMN PARAMETERS ######
         dict_col_data = self.fetchColumnPara()
 
-        column_D = int(dict_col_data[QString("D")])
-        column_B = int(dict_col_data[QString("B")])
-        column_tw = float(dict_col_data[QString("tw")])
-        column_T = float(dict_col_data[QString("T")])
-        column_alpha = float(dict_col_data[QString("FlangeSlope")])
-        column_R1 = float(dict_col_data[QString("R1")])
-        column_R2 = float(dict_col_data[QString("R2")])
+        column_D = int(dict_col_data["D"])
+        column_B = int(dict_col_data["B"])
+        column_tw = float(dict_col_data["tw"])
+        column_T = float(dict_col_data["T"])
+        column_alpha = float(dict_col_data["FlangeSlope"])
+        column_R1 = float(dict_col_data["R1"])
+        column_R2 = float(dict_col_data["R2"])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
@@ -1150,12 +1151,12 @@ class MainController(QMainWindow):
         dict_angle_data = self.fetch_angle_para()
 
         angle_l = resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(dict_angle_data[QString("A")])
-        angle_b = int(dict_angle_data[QString("B")])
-        angle_t = float(dict_angle_data[QString("t")])
-        angle_r1 = float(dict_angle_data[QString("R1")])
+        angle_a = int(dict_angle_data["A"])
+        angle_b = int(dict_angle_data["B"])
+        angle_t = float(dict_angle_data["t"])
+        angle_r1 = float(dict_angle_data["R1"])
 
-        angle_r2 = (dict_angle_data[QString("R2")]).toFloat()
+        angle_r2 = (dict_angle_data["R2"]).toFloat()
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
@@ -1202,11 +1203,11 @@ class MainController(QMainWindow):
 
     def call_3DModel(self, flag):
         # self.ui.btnSvgSave.setEnabled(True)
-        self.ui.btn3D.setChecked(QtCore.Qt.Checked)
+        self.ui.btn3D.setChecked(Qt.Checked)
         if self.ui.btn3D.isEnabled():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
         if flag == True:
@@ -1303,11 +1304,11 @@ class MainController(QMainWindow):
         '''
         Creating and displaying 3D Beam
         '''
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxBeam.setChecked(Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
         self.commLogicObj.display_3DModel("Beam")
@@ -1315,22 +1316,22 @@ class MainController(QMainWindow):
     def call_3DColumn(self):
         '''
         '''
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxCol.setChecked(Qt.Checked)
         if self.ui.chkBxCol.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
         self.commLogicObj.display_3DModel("Column")
 
     def call_3DSeatAngle(self):
         '''Displaying Seat Angle in 3D
         '''
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Checked)
+        self.ui.chkBxSeatAngle.setChecked(Qt.Checked)
         if self.ui.chkBxSeatAngle.isChecked():
-            self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-            self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-            self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+            self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+            self.ui.chkBxCol.setChecked(Qt.Unchecked)
+            self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
         self.commLogicObj.display_3DModel("SeatAngle")
 
@@ -1339,10 +1340,10 @@ class MainController(QMainWindow):
 
     def unchecked_allChkBox(self):
 
-        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
+        self.ui.btn3D.setChecked(Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(Qt.Unchecked)
+        self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
         
     def designParameters(self):
         '''
@@ -1367,7 +1368,7 @@ class MainController(QMainWindow):
         # TODO input validation
         # self.validateInputsOnDesignBtn()
         if self.ui.combo_connectivity.currentIndex() == 0:
-            QtGui.QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.about(self, "Information", "Please select connectivity")
 
         self.alist = self.designParameters()
 
@@ -1478,10 +1479,10 @@ class MainController(QMainWindow):
 
     def callDesired_View(self, fileName, view):
 
-        self.ui.chkBxSeatAngle.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxBeam.setChecked(QtCore.Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(QtCore.Qt.Unchecked)
-        self.ui.btn3D.setChecked(QtCore.Qt.Unchecked)
+        self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
+        self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+        self.ui.chkBxCol.setChecked(Qt.Unchecked)
+        self.ui.btn3D.setChecked(Qt.Unchecked)
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
         if view != 'All':

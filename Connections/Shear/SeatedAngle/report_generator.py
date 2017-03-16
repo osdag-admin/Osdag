@@ -193,8 +193,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.job_number = ""
         self.method = ""
 
-    def save_html(self, output_object, input_object, report_summary, file_name, folder, base,
-                  base_front, base_top, base_side):
+    def save_html(self, output_object, input_object, report_summary, file_name, folder):
         """Create and save html report for Seated angle connection.
 
         Args:
@@ -518,16 +517,16 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('/tr')
         rstr += design_summary_row(0, "Views", "detail", col_span="2")
 
-        png = folder + "/css/" + base
+        png = folder + "/images_html/3D_Model.png"
         datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png
 
-        side = folder + "/css/" + base_side
+        side = folder + "/images_html/seatSide.png"
         dataside = '<object type="image/svg+xml" data= %s width ="400"></object>' % side
 
-        top = folder + "/css/" + base_top
+        top = folder + "/images_html/seatTop.png"
         datatop = '<object type="image/svg+xml" data= %s width ="400"></object>' % top
 
-        front = folder + "/css/" + base_front
+        front = folder + "/images_html/seatFront.png"
         datafront = '<object type="image/svg+xml" data= %s width ="450"></object>' % front
 
         row = [0, datapng, datatop]
@@ -639,7 +638,7 @@ def t(param):
     return '<' + param + '>'
 
 
-def w(param):
+def w(n):
     """Enclose argument in curly brace parenthesis.
 
     Args:

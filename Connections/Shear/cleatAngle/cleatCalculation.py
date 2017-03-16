@@ -872,4 +872,3 @@ def cleat_connection(ui_obj):
         logger.debug(" :=========End Of design===========")
 
     return output_obj
-

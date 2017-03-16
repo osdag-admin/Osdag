@@ -47,15 +47,11 @@ from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
-
-# TODO add input validation to select only angles which can accommodate 2 lines of bolts
-# TODO check reduction factors for bolt group capacity
+# TODO add input validation to select only angles which can accomodate 2 lines of bolts
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
-# TODO overwrite calculated top angle if user selects other top angle in GUI
-# TODO implement 6 mm as min seat angle thickness
 
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
@@ -205,8 +201,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolts_required = 1
         self.num_rows = 1
         self.num_cols = 1
-        self.pitch = 1
-        self.gauge = 1
         self.min_end_dist = 1
         self.min_edge_dist = 1
         self.min_pitch = 1
@@ -214,6 +208,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.end_dist = 1
         self.edge_dist = 1
         self.pitch = 1
+        self.gauge_two_bolt = 1
         self.gauge = 1
         self.max_spacing = 1
         self.max_edge_dist = 1
@@ -259,6 +254,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                      75: "ISA 75X75X8",
                      80: "ISA 80X80X8",
                      90: "ISA 90X90X10",
+                     100: "ISA 100X100X10",
                      "ISA 100X65X8": "ISA 100X65X8"
                      }[top_angle_side]
 
@@ -292,7 +288,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
         self.is_environ_corrosive = False  # set to True, if environment is corrosive
 
-        self.top_angle = "ISA 100X65X8"  # Initialize
+        self.top_angle = input_dict['Angle']['TopAngleSection']
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
@@ -388,6 +384,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "No. of Column": int(self.num_cols),
             "Pitch Distance (mm)": self.pitch,
             "Gauge Distance (mm)": self.gauge,
+            "Gauge Two Bolt (mm)": self.gauge_two_bolt,
             "End Distance (mm)": self.min_end_dist,
             "Edge Distance (mm)": self.min_edge_dist,
 
@@ -454,11 +451,14 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.sa_params(input_dict)
         self.bolt_design(self.bolt_diameter)
 
-        if self.connectivity == "Column web-Beam web":
-            limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
+
+        if self.connectivity == "Column web-Beam flange":
+            limiting_angle_length = self.column_d - 2*self.column_f_t - 2*self.column_R1 - self.root_clearance
+
             self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
-        elif self.connectivity == "Column flange-Beam web":
+        elif self.connectivity == "Column flange-Beam flange":
             self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
+            print self.beam_w_f
 
         if self.angle_t < 6:
             logger.warning(": Minimum thickness of 6 mm is recommended for seated angle.")
@@ -466,11 +466,16 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         # Determine single or double line of bolts
         length_avail = (self.angle_l - 2 * self.edge_dist)
+        
+        # Determine gauge for two bolts
+        self.gauge_two_bolt = length_avail
 
         self.num_rows = 1
         self.num_cols = max(self.bolts_required, 2)
         self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))), 3)
         # TODO check for zero num_cols
+        # TODO verify gauge for: bolt should not pass through column web in beam to column flange connectivity
+        # TODO verify gauge for: bolt should not pass through beam web in any connectivity
 
         if self.gauge < self.min_gauge:
             self.num_rows = 2

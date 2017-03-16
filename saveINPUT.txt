@@ -2,48 +2,52 @@
 S'Member'
 p1
 (dp2
-S'ColumnSection'
+S'fu (MPa)'
 p3
-S'ISSC 200'
-p4
-sS'fu (MPa)'
-p5
 I410
-sS'BeamSection'
-p6
-S'ISMB 400'
-p7
-sS'fy (MPa)'
-p8
-I250
 sS'Connectivity'
+p4
+S'Column flange-Beam flange'
+p5
+sS'ColumnSection'
+p6
+S'ISSC 200'
+p7
+sS'BeamSection'
+p8
+S'ISMB 400'
 p9
-S'Column flange-Beam web'
+sS'fy (MPa)'
 p10
+I250
 ssS'Load'
 p11
 (dp12
 S'ShearForce (kN)'
 p13
-I140
+F100.0
 ssS'Angle'
 p14
 (dp15
-S'AngleSection'
+S'TopAngleSection'
 p16
-S'Select Designation'
+S'ISA 125X75X12'
 p17
-ssS'Bolt'
+sS'AngleSection'
 p18
-(dp19
-S'Grade'
+S'ISA 100X75X12'
+p19
+ssS'Bolt'
 p20
+(dp21
+S'Grade'
+p22
 F10.8
 sS'Diameter (mm)'
-p21
+p23
 I20
 sS'Type'
-p22
+p24
 S'HSFG'
-p23
+p25
 ss.

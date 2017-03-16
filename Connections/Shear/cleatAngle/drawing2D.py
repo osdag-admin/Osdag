@@ -25,7 +25,6 @@ class cleatCommonData(object):
         :type dict_beam_data:  dictionary (Beam sectional properties)
         :param dict_column_data :
         :type dict_beam_data: dictionary (Column sectional properties dictionary)
-
         '''
         self.beam_T = float(dict_beam_data["T"])
         self.col_T = float(dict_column_data["T"])
@@ -76,8 +75,7 @@ class cleatCommonData(object):
         self.notch_offset = (self.col_T + self.col_R1)
 
         self.folder = folder
-
-        print self.beam_T, "beam_T"
+        print self.beam_T,  "beam_T"
         print self.col_T, "col_T"
         print self.D_beam, "D_beam"
         print self.D_col, "D_col"

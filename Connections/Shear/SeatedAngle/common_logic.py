@@ -17,7 +17,7 @@ from ISection import ISection
 from angle import Angle
 from nut_bolt_placement import NutBoltArray
 
-from utilities import osdagDisplayShape
+from utilities import osdag_display_shape      
 
 import OCC.V3d
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
@@ -303,38 +303,39 @@ class CommonDesignLogic(object):
             self.display.FitAll()
 
         if component == "Column":
-            osdagDisplayShape(self.display, self.connectivityObj.get_columnModel(), update=True)
+            osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
         elif component == "Beam":
-            osdagDisplayShape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
+            osdag_display_shape(self.display, self.connectivityObj.get_beamModel(), material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
         elif component == "SeatAngle":
-            osdagDisplayShape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
         elif component == "Model":
-            osdagDisplayShape(self.display, self.connectivityObj.columnModel, update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
+            osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                               update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-            osdagDisplayShape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
-                osdagDisplayShape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
     #=========================================================================================
     def call_3DModel(self, flag):  # Done
 
         if flag is True:
 
-            if self.loc == "Column web-Beam web":
+            if self.loc == "Column web-Beam flange":
                 self.connectivityObj = self.create3DColWebBeamWeb()
 
-            elif self.loc == "Column flange-Beam web":
+            elif self.loc == "Column flange-Beam flange":
                 self.connectivityObj = self.create3DColFlangeBeamWeb()
 
             else:
-                self.connectivityObj = self.create3DBeamWebBeamWeb()
+                pass
+
 
             self.display_3DModel("Model")
 
@@ -371,7 +372,7 @@ class CommonDesignLogic(object):
     #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
 
-        finCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,folder)
+        finCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, view, folder)
         finCommonObj.saveToSvg(str(fileName), view)
 
     #=========================================================================================

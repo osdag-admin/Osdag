@@ -3,8 +3,6 @@ Created on Oct 25, 2016
 
 @author: Jayant Patil
 '''
-import time
-import math
 import sys
 import model
 from PyQt4 import QtGui
@@ -12,9 +10,7 @@ from report_generator import ReportGenerator
 from seat_angle_calc import SeatAngleCalculation
 from test_seat_angle_calc import create_sample_ui_input
 from test_seat_angle_calc import create_sample_ui_output
-from seat_angle_calc import SeatAngleCalculation
 import unittest
-import os
 
 class TestReportGenerator(unittest.TestCase, ReportGenerator):
     """Test ReportGenerator Class functions.
@@ -25,9 +21,6 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
     Note:
         Currently, does not automatically check the output report.
         Need to do it manually.
-        An object can access the calculation parameters as attributes of
-        the instance (sa_calc_obj) of SeatAngleCalculation; which itself
-        is an attribute of this class.
     """
 
     def setUp(self):

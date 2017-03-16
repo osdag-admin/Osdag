@@ -127,5 +127,4 @@ class ColWebBeamWeb(object):
         return finalBeam
 
     def get_column_model(self):
-
         return self.columnModel

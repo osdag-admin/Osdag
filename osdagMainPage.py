@@ -12,7 +12,7 @@ from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.Finplate.finPlateMain import launchFinPlateController
 
 import os
-# this is test
+
 #from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleController
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller

@@ -277,14 +277,10 @@ class MainController(QtGui.QMainWindow):
         self.sa_calc_object = SeatAngleCalculation()
 
     def osdag_header(self):
-        # osdag_header() and store_osdagheader(str) functions are combined here
-        image_path = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "ResourceFiles", "Osdag_header.png")))
-        shutil.copyfile(image_path, os.path.join(str(self.folder),"images_html"))
-        # shutil.copyfile(image_path, str(self.folder) + os.path.join("images_html", "Osdag_header.png"))
-        # image_path = os.path.join("ResourceFiles", "Osdag_header.png")
-        # shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
-    # noinspection PyPep8Naming
+# noinspection PyPep8Naming
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_beam_section.currentText()
         dict_beam_data = get_beamdata(beam_sec)
@@ -584,7 +580,8 @@ class MainController(QtGui.QMainWindow):
         # function name changed from createDesignReport
 
     def save_design(self, report_summary):
-        filename = self.folder + "/images_html/Html_Report.html"
+        # filename = self.folder + "/images_html/Html_Report.html"
+        filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
         self.call_seatangle2D_Drawing("All")
         inputdict = self.uiObj
@@ -1477,19 +1474,19 @@ class MainController(QtGui.QMainWindow):
 
             self.callDesired_View(fileName, view)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-            data = str(self.folder) + "/images_html/3D_Model.png"
+            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
             self.display.ExportToImage(data)
             self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
         else:
             if view == "Front":
-                filename = self.folder + "/images_html/seatFront.svg"
+                filename = os.path.join(str(self.folder),  "images_html", "seatFront.svg")
 
             elif view == "Side":
-                filename = self.folder + "/images_html/seatSide.svg"
+                filename = os.path.join(str(self.folder), "images_html", "seatSide.svg")
 
             else:
-                filename = self.folder + "/images_html/seatTop.svg"
+                filename = os.path.join(str(self.folder), "images_html","seatTop.svg")
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)

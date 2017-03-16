@@ -140,7 +140,7 @@ class OsdagMainWindow(QMainWindow):
         elif self.ui.rdbtn_seat.isChecked():
             # launchSeatedAngleController(self, folder)
             # self.ui.myStackedWidget.setCurrentIndex(0)
-            QtGui.QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
+            QMessageBox.about(self,"INFO","Seated connection design is coming soon!")
 
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")

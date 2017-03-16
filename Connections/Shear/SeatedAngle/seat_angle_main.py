@@ -9,9 +9,9 @@ Updated 23-Aug-2016
 import os.path
 import sys
 
-from PyQt4.QtCore import pyqtSignal
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
 import shutil
 import webbrowser
 import pickle
@@ -55,27 +55,27 @@ from ui_tutorial import Ui_Tutorial
 # from apt.auth import update
 from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
 
-class MyTutorials(QtGui.QDialog):
+class MyTutorials(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_Tutorial()
         self.ui.setupUi(self)
         self.mainController = parent
 
 
-class MyAboutOsdag(QtGui.QDialog):
+class MyAboutOsdag(QDialog):
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_HelpOsdag()
         self.ui.setupUi(self)
         self.mainController = parent
 
 
 # below class was previously MyPopupDialog in the other modules
-class DesignReportDialog(QtGui.QDialog):
+class DesignReportDialog(QDialog):
     print "Design Report - Dseign Profile dialog box"
     def __init__(self, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
         self.mainController = parent
@@ -92,8 +92,8 @@ class DesignReportDialog(QtGui.QDialog):
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
-                                                     QtGui.QFileDialog.DontUseNativeDialog)
+        filename = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+                                                     QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
         self.desired_location(filename)
@@ -105,7 +105,7 @@ class DesignReportDialog(QtGui.QDialog):
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
-        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
+        filename = QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
                                                      '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
@@ -128,7 +128,7 @@ class DesignReportDialog(QtGui.QDialog):
         return report_summary
 
     def useUserProfile(self):
-        filename = QtGui.QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+        filename = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
                                                      "All Files (*)")
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
@@ -141,12 +141,12 @@ class DesignReportDialog(QtGui.QDialog):
             pass
 
 
-class MainController(QtGui.QMainWindow):
+class MainController(QMainWindow):
 
     closed = pyqtSignal()
 
     def __init__(self, folder):
-        QtGui.QMainWindow.__init__(self)
+        QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
@@ -176,11 +176,11 @@ class MainController(QtGui.QMainWindow):
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
 
-        validator = QtGui.QIntValidator()
+        validator = QIntValidator()
         self.ui.txt_fu.setValidator(validator)
         self.ui.txt_fy.setValidator(validator)
 
-        dbl_validator = QtGui.QDoubleValidator()
+        dbl_validator = QDoubleValidator()
         #TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
@@ -203,7 +203,7 @@ class MainController(QtGui.QMainWindow):
         self.ui.actionSave_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
         self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
         self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(QtGui.qApp.quit)
+        self.ui.actionQuit_fin_plate_design.triggered.connect(qApp.quit)
 
         self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log)
@@ -287,7 +287,7 @@ class MainController(QtGui.QMainWindow):
     
     def showFontDialogue(self):
 
-        font, ok = QtGui.QFontDialog.getFont()
+        font, ok = QFontDialog.getFont()
         if ok:
             self.ui.inputDock.setFont(font)
             self.ui.outputDock.setFont(font)
@@ -307,13 +307,13 @@ class MainController(QtGui.QMainWindow):
 
     def save2DcadImages(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
         if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
             self.display.ExportToImage(fName)
-            QtGui.QMessageBox.about(self, 'Information', "File saved")
+            QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
         '''
@@ -385,13 +385,13 @@ class MainController(QtGui.QMainWindow):
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
-            pixmap = QtGui.QPixmap(":/newPrefix/images/colF2.png")
+            pixmap = QPixmap(":/newPrefix/images/colF2.png")
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             # self.ui.lbl_connectivity.show()
         elif (loc == "Column web-Beam web"):
-            picmap = QtGui.QPixmap(":/newPrefix/images/colW3.png")
+            picmap = QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
@@ -436,7 +436,7 @@ class MainController(QtGui.QMainWindow):
         '''
         inputFile = QtCore.QFile('saveINPUT.txt')
         if not inputFile.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "Application",
+            QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         pickle.dump(uiObj, inputFile)
 
@@ -491,7 +491,7 @@ class MainController(QtGui.QMainWindow):
 
     def save_design(self, report_summary):
 
-        file_name, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
+        file_name, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder) + "/",
                                                                    "Html Files (*.html)")
         file_name = str(file_name)
         base, base_front, base_top, base_side = self.call2D_Drawing("All")
@@ -502,11 +502,11 @@ class MainController(QtGui.QMainWindow):
         report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder, base,
                   base_front, base_top, base_side)
 
-        QtGui.QMessageBox.about(self, 'Information', "Report Saved")
+        QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
-        fileName, pat = QtGui.QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
+        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -516,14 +516,14 @@ class MainController(QtGui.QMainWindow):
         fname = QtCore.QFile(fileName)
 
         if not fname.open(QtCore.QFile.WriteOnly | QtCore.QFile.Text):
-            QtGui.QMessageBox.warning(self, "Application",
+            QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
         outf = QtCore.QTextStream(fname)
-        QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+        QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         outf << self.ui.textEdit.toPlainText()
-        QtGui.QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
 
     def resetbtn_clicked(self):
         '''(NoneType) -> NoneType
@@ -606,14 +606,14 @@ class MainController(QtGui.QMainWindow):
         textStr = widget.text()
         val = int(textStr)
         if (val < min_value or val > max_value):
-            QtGui.QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
+            QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
             widget.clear()
             widget.setFocus()
-            palette = QtGui.QPalette()
-            palette.setColor(QtGui.QPalette.Foreground, QtCore.Qt.red)
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, QtCore.Qt.red)
             lblwidget.setPalette(palette)
         else:
-            palette = QtGui.QPalette()
+            palette = QPalette()
             lblwidget.setPalette(palette)
 
     def display_output(self, outputObj):
@@ -691,7 +691,7 @@ class MainController(QtGui.QMainWindow):
         afile = QtCore.QFile(fname)
      
         if not afile.open(QtCore.QIODevice.ReadOnly):  # ReadOnly
-            QtGui.QMessageBox.information(None, 'info', afile.errorString())
+            QMessageBox.information(None, 'info', afile.errorString())
      
         stream = QtCore.QTextStream(afile)
         self.ui.textEdit.clear()
@@ -843,7 +843,7 @@ class MainController(QtGui.QMainWindow):
 
         def centerOnScreen(self):
             '''Centers the window on the screen.'''
-            resolution = QtGui.QDesktopWidget().screenGeometry()
+            resolution = QDesktopWidget().screenGeometry()
             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                       (resolution.height() / 2) - (self.frameSize().height() / 2))
         def start_display():
@@ -854,7 +854,7 @@ class MainController(QtGui.QMainWindow):
 
     def showColorDialog(self):
 
-        col = QtGui.QColorDialog.getColor()
+        col = QColorDialog.getColor()
         colorTup = col.getRgb()
         r = colorTup[0]
         g = colorTup[1]
@@ -1117,7 +1117,7 @@ class MainController(QtGui.QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QtGui.QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
 
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
@@ -1147,7 +1147,7 @@ class MainController(QtGui.QMainWindow):
             stl_writer.SetASCIIMode(True)
             stl_writer.Write(shape, fName)
 
-        QtGui.QMessageBox.about(self, 'Information', "File saved")
+        QMessageBox.about(self, 'Information', "File saved")
 
     def call_seatangle2D_Drawing(self, view):  # call2D_Drawing(self,view)
 
@@ -1161,7 +1161,7 @@ class MainController(QtGui.QMainWindow):
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
         if view != 'All':
-            fileName = QtGui.QFileDialog.getSaveFileName(self,
+            fileName = QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
                                                          "SVG files (*.svg)")
             fname = str(fileName)
@@ -1174,10 +1174,10 @@ class MainController(QtGui.QMainWindow):
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
-        reply = QtGui.QMessageBox.question(self, 'Message',
-                                           "Are you sure to quit?", QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        reply = QMessageBox.question(self, 'Message',
+                                           "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 
-        if reply == QtGui.QMessageBox.Yes:
+        if reply == QMessageBox.Yes:
             self.closed.emit()
             event.accept()
         else:
@@ -1275,7 +1275,7 @@ if __name__ == '__main__':
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     module_setup()
     folder = None
     window = MainController(folder)

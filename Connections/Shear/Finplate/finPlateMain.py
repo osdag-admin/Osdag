@@ -8,7 +8,7 @@ import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
-from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
@@ -236,7 +236,7 @@ class MyPopupDialog(QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename = QFileDialog.getSaveFileName(self, 'Save Files',
+        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files',
                                                      str(self.mainController.foldloader) + "/Profile", '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
@@ -395,15 +395,6 @@ class MainController(QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-
-        self.connection = "Finplate"
-        self.connectivity = None
-        self.fuse_model = None
-        self.disableViewButtons()
-        self.resultObj = None
-        self.uiObj = None
-        self.commLogicObj = None
-        self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"

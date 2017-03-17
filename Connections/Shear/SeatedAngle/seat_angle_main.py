@@ -49,6 +49,7 @@ from col_flange_beam_web_connectivity import ColFlangeBeamWeb
 from svg_window import SvgWindow
 from drawing_2D import SeatCommonData
 from report_generator import *
+from ui_design_preferences import Ui_ShearDesignPreferences
 from ui_seat_angle import Ui_MainWindow  # ui_seat_angle is the revised ui (~23 Aug 2016)
 from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
@@ -63,6 +64,144 @@ from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
 
 # TODO change connectivity to Column Flange to Beam FLANGE
 # TODO change connectivity to Column Web to Beam FLANGE
+class DesignPreferences(QDialog):
+    def __init__(self, parent=None):
+
+        QDialog.__init__(self, parent)
+        self.ui = Ui_ShearDesignPreferences()
+        self.ui.setupUi(self)
+        self.main_controller = parent
+        self.saved = None
+        self.set_default_para()
+        self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+
+    def save_designPref_para(self):
+        '''
+        This routine is responsible for saving all design preferences selected by the user
+        '''
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        self.saved_designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+
+        self.saved_designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text()== '':
+
+            self.saved_designPref["detailing"]["gap"] = int(20)
+        else:
+            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+
+        self.saved = True
+
+        QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return self.saved_designPref
+
+        # self.main_controller.call_designPref(designPref)
+
+    def set_default_para(self):
+        '''
+        '''
+        uiObj = self.main_controller.getuser_inputs()
+        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
+            pass
+        else:
+            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+            clearance = str(self.get_clearance(boltDia))
+            self.ui.txt_boltHoleClearance.setText(clearance)
+        if uiObj["Bolt"]["Grade"] == '':
+            pass
+        else:
+            bolt_grade = float(uiObj["Bolt"]["Grade"])
+            bolt_fu = str(self.get_boltFu(bolt_grade))
+            self.ui.txt_boltFu.setText(bolt_fu)
+
+
+        self.ui.combo_boltHoleType.setCurrentIndex(0)
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+
+        self.ui.combo_weldType.setCurrentIndex(0)
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        designPref["weld"]["safety_factor"] = float(1.25)
+
+        self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+        self.ui.txt_detailingGap.setText(str(20))
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        designPref["detailing"]["gap"] = int(20)
+        self.saved = False
+
+        return designPref
+
+    def set_bolthole_clernce(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != "Diameter of Bolt":
+            clearance = self.get_clearance(int(boltDia))
+            self.ui.txt_boltHoleClearance.setText(str(clearance))
+        else:
+            pass
+
+
+
+    def set_boltFu(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltGrade = str(uiObj["Bolt"]["Grade"])
+        if boltGrade != '':
+            boltfu = str(self.get_boltFu(boltGrade))
+            self.ui.txt_boltFu.setText(boltfu)
+        else:
+            pass
+
+    def get_clearance(self, boltDia):
+
+        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+
+        if self.ui.combo_boltHoleType.currentText() == "Standard":
+            clearance = standard_clrnce[boltDia]
+        else:
+            clearance = overhead_clrnce[boltDia]
+
+        return clearance
+
+    def get_boltFu(self, boltGrade):
+        '''
+        This routine returns ultimate strength of bolt depending upon grade of bolt chosen
+        '''
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+                  12.9: 1220}
+        boltGrd = float(boltGrade)
+        return boltFu[boltGrd]
+
+    def close_designPref(self):
+        self.close()
 
 
 class MyAskQuestion(QDialog):
@@ -111,7 +250,7 @@ class DesignReportDialog(QDialog):
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear
-        filename = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+        filename,_ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
                                                      QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
@@ -124,7 +263,7 @@ class DesignReportDialog(QDialog):
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
-        filename = QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
+        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
                                                      '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
@@ -147,7 +286,7 @@ class DesignReportDialog(QDialog):
         return report_summary
 
     def useUserProfile(self):
-        filename = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+        filename,_ = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
                                                      "All Files (*)")
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
@@ -193,7 +332,7 @@ class MainController(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
-        self.ui.btn3D.clicked.connect(lambda: self.call_3DModel(True))
+        self.ui.btn3D.clicked.connect(self.call_3DModel)
         self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
@@ -268,7 +407,7 @@ class MainController(QMainWindow):
 
         from osdagMainSettings import backend_name
 
-        self.display, self.start_display = self.init_display(backend_str=backend_name())
+        self.display, _ = self.init_display(backend_str=backend_name())
 
         # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 
@@ -883,87 +1022,58 @@ class MainController(QMainWindow):
         return nutDia[boltDia]
     
 
-    def get_backend(self):
-        """
-        loads a backend
-        backends are loaded in order of preference
-        since python comes with Tk included, but that PySide or PyQt4
-        is much preferred
-        """
-        #         try:
-        #             from PySide import QtCore, QtGui
-        #             return 'pyside'
-        #         except:
-        #             pass
-        try:
-            from PyQt4 import QtCore, QtGui
-            return 'pyqt4'
-        except:
-            pass
-        # Check wxPython
-        try:
-            import wx
-            return 'wx'
-        except:
-            raise ImportError("No compliant GUI library found. You must have either PySide, PyQt4 or wxPython installed.")
-            sys.exit(1)
-
-    # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
         if os.name == 'nt':
 
-            global display, start_display, app
+            global display, start_display, app, _
 
             from OCC.Display.backend import get_loaded_backend
             lodedbkend = get_loaded_backend()
             from OCC.Display.backend import get_backend, have_backend
             from osdagMainSettings import backend_name
-            if (not have_backend() and backend_name() == "pyqt4"):
-                get_backend("qt-pyqt4")
-
+            if (not have_backend() and backend_name() == "pyqt5"):
+                get_backend("qt-pyqt5")
         else:
+
             global display, start_display, app, _, USED_BACKEND
+            if 'qt' in used_backend:
+                from OCC.Display.qtDisplay import qtViewer3d
+                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-            if not backend_str:
-                USED_BACKEND = self.get_backend()
-            elif backend_str in ['pyside', 'pyqt4']:
-                USED_BACKEND = backend_str
-            else:
-                raise ValueError("You should pass either 'qt' or 'tkinter' to the init_display function.")
-                sys.exit(1)
-
-            # Qt based simple GUI
-            if USED_BACKEND in ['pyqt4', 'pyside']:
-                if USED_BACKEND == 'pyqt4':
-                    import OCC.Display.qtDisplay
-                    from PyQt4 import QtCore, QtGui, QtOpenGL
-
-        from OCC.Display.qtDisplay import qtViewer3d
-
+        # from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import  qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        self.setWindowTitle("Osdag Seated Angle Connection")
+        # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
+        self.setWindowTitle("Osdag Finplate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 
         self.ui.modelTab.InitDriver()
         display = self.ui.modelTab._display
 
+        # background gradient
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
         display.display_trihedron()
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
             '''Centers the window on the screen.'''
-            resolution = QDesktopWidget().screenGeometry()
+            resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                       (resolution.height() / 2) - (self.frameSize().height() / 2))
 
         def start_display():
-
             self.ui.modelTab.raise_()
 
         return display, start_display
+
 
     def showColorDialog(self):
 
@@ -1201,7 +1311,7 @@ class MainController(QMainWindow):
     # TODO check 3D drawing generating functions above
     # -------------------------------------------------------------------------------
 
-    def call_3DModel(self, flag):
+    def call_3DModel(self):
         # self.ui.btnSvgSave.setEnabled(True)
         self.ui.btn3D.setChecked(Qt.Checked)
         if self.ui.btn3D.isEnabled():
@@ -1210,17 +1320,16 @@ class MainController(QMainWindow):
             self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        if flag == True:
-            if self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
-                # self.create3DColWebBeamWeb()
-                self.connectivity = self.create3DColWebBeamWeb()
-                self.fuse_model = None
+        if self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
+            # self.create3DColWebBeamWeb()
+            self.connectivity = self.create3DColWebBeamWeb()
+            self.fuse_model = None
 
-            else:
-                # self.ui.combo_connectivity.currentText() == "Column flange-Beam flange":
-                self.ui.mytabWidget.setCurrentIndex(0)
-                self.connectivity = self.create3DColFlangeBeamWeb()
-                self.fuse_model = None
+        else:
+            # self.ui.combo_connectivity.currentText() == "Column flange-Beam flange":
+            self.ui.mytabWidget.setCurrentIndex(0)
+            self.connectivity = self.create3DColFlangeBeamWeb()
+            self.fuse_model = None
 
             # else:
             #     self.ui.mytabWidget.setCurrentIndex(0)
@@ -1296,9 +1405,9 @@ class MainController(QMainWindow):
             my_sphere7 = BRepPrimAPI_MakeSphere(angletopRealOrigin, 2.5).Shape()
             self.display.DisplayShape(my_sphere7, color='green', update=True)
 
-        else:
-            self.display.EraseAll()
-        self.commLogicObj.call_3DModel(flag)
+
+        self.display.EraseAll()
+        self.commLogicObj.call_3DModel()
 
     def call_3DBeam(self):
         '''

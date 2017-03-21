@@ -5,7 +5,6 @@ Created on 14-Oct-2016
 '''
 
 import os
-from PyQt4.QtCore import QString
 from col_web_beam_web_connectivity import ColWebBeamWeb
 #from beamWebBeamWebConnectivity import BeamWebBeamWeb
 from col_flange_beam_web_connectivity import ColFlangeBeamWeb
@@ -74,13 +73,13 @@ class CommonDesignLogic(object):
         #-------------------------- creating 3d cad model with beam web beam web
         #------------------------------------------------------------------- '''
         #----------------------------------- ##### PRIMARY BEAM PARAMETERS #####
-        #------------------------- pBeam_D = int(self.dictcoldata[QString("D")])
-        #------------------------- pBeam_B = int(self.dictcoldata[QString("B")])
-        #--------------------- pBeam_tw = float(self.dictcoldata[QString("tw")])
-        #----------------------- pBeam_T = float(self.dictcoldata[QString("T")])
-        #--------- pBeam_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        #--------------------- pBeam_R1 = float(self.dictcoldata[QString("R1")])
-        #--------------------- pBeam_R2 = float(self.dictcoldata[QString("R2")])
+        #------------------------- pBeam_D = int(self.dictcoldata["D")])
+        #------------------------- pBeam_B = int(self.dictcoldata["B"])
+        #--------------------- pBeam_tw = float(self.dictcoldata["tw"])
+        #----------------------- pBeam_T = float(self.dictcoldata["T"])
+        #--------- pBeam_alpha = float(self.dictcoldata["FlangeSlope"])
+        #--------------------- pBeam_R1 = float(self.dictcoldata["R1"])
+        #--------------------- pBeam_R2 = float(self.dictcoldata["R2"])
         #---- pBeam_length = 800.0  # This parameter as per view of 3D cad model
 #------------------------------------------------------------------------------ 
         # # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -90,13 +89,13 @@ class CommonDesignLogic(object):
 #------------------------------------------------------------------------------ 
         #-------------------------------- ##### SECONDARY BEAM PARAMETERS ######
 #------------------------------------------------------------------------------ 
-        #------------------------ sBeam_D = int(self.dictbeamdata[QString("D")])
-        #------------------------ sBeam_B = int(self.dictbeamdata[QString("B")])
-        #-------------------- sBeam_tw = float(self.dictbeamdata[QString("tw")])
-        #---------------------- sBeam_T = float(self.dictbeamdata[QString("T")])
-        #-------- sBeam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        #-------------------- sBeam_R1 = float(self.dictbeamdata[QString("R1")])
-        #-------------------- sBeam_R2 = float(self.dictbeamdata[QString("R2")])
+        #------------------------ sBeam_D = int(self.dictbeamdata["D")])
+        #------------------------ sBeam_B = int(self.dictbeamdata["B")])
+        #-------------------- sBeam_tw = float(self.dictbeamdata["tw")])
+        #---------------------- sBeam_T = float(self.dictbeamdata["T")])
+        #-------- sBeam_alpha = float(self.dictbeamdata["FlangeSlope")])
+        #-------------------- sBeam_R1 = float(self.dictbeamdata["R1")])
+        #-------------------- sBeam_R2 = float(self.dictbeamdata["R2")])
 #------------------------------------------------------------------------------ 
         #-------------------------------------------------- # --Notch dimensions
         # notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10), length=sBeam_B)
@@ -141,13 +140,13 @@ class CommonDesignLogic(object):
         creating 3d cad model with column web beam web
         '''
         ##### BEAM PARAMETERS #####
-        beam_D = int(self.dictbeamdata[QString("D")])
-        beam_B = int(self.dictbeamdata[QString("B")])
-        beam_tw = float(self.dictbeamdata[QString("tw")])
-        beam_T = float(self.dictbeamdata[QString("T")])
-        beam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(self.dictbeamdata[QString("R1")])
-        beam_R2 = float(self.dictbeamdata[QString("R2")])
+        beam_D = int(self.dictbeamdata["D"])
+        beam_B = int(self.dictbeamdata["B"])
+        beam_tw = float(self.dictbeamdata["tw"])
+        beam_T = float(self.dictbeamdata["T"])
+        beam_alpha = float(self.dictbeamdata["FlangeSlope"])
+        beam_R1 = float(self.dictbeamdata["R1"])
+        beam_R2 = float(self.dictbeamdata["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -157,13 +156,13 @@ class CommonDesignLogic(object):
 
         ##### COLUMN PARAMETERS ######
 
-        column_D = int(self.dictcoldata[QString("D")])
-        column_B = int(self.dictcoldata[QString("B")])
-        column_tw = float(self.dictcoldata[QString("tw")])
-        column_T = float(self.dictcoldata[QString("T")])
-        column_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(self.dictcoldata[QString("R1")])
-        column_R2 = float(self.dictcoldata[QString("R2")])
+        column_D = int(self.dictcoldata["D"])
+        column_B = int(self.dictcoldata["B"])
+        column_tw = float(self.dictcoldata["tw"])
+        column_T = float(self.dictcoldata["T"])
+        column_alpha = float(self.dictcoldata["FlangeSlope"])
+        column_R1 = float(self.dictcoldata["R1"])
+        column_R2 = float(self.dictcoldata["R2"])
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
@@ -171,18 +170,21 @@ class CommonDesignLogic(object):
         ##### ANGLE PARAMETERS ######
 
         angle_l = self.resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(self.dictangledata[QString("A")])
-        angle_b = int(self.dictangledata[QString("B")])
-        angle_t = float(self.dictangledata[QString("t")])
-        angle_r1 = float(self.dictangledata[QString("R1")])
-        angle_r2 = float(self.dictangledata[QString("R2")])
+        seat_legsizes = str(self.dictangledata["AXB"])
+        angle_a = int(seat_legsizes.split('x')[0])
+        angle_b = int(seat_legsizes.split('x')[1])
+        # angle_a = int(self.dictangledata["A"])
+        # angle_b = int(self.dictangledata["B"])
+        angle_t = float(self.dictangledata["t"])
+        angle_r1 = float(self.dictangledata["R1"])
+        angle_r2 = float(self.dictangledata["R2"])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
         # TODO add topclipangle field  in user inputs(changes in .ui file)
         topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia/2
+        bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
+        bolt_r = int(bolt_dia)/2
         bolt_R = self.bolt_R
         nut_R = bolt_R
         bolt_T = self.bolt_T 
@@ -212,13 +214,13 @@ class CommonDesignLogic(object):
         Creating 3d cad model with column flange beam web connection
         '''
         ##### BEAM PARAMETERS #####
-        beam_D = int(self.dictbeamdata[QString("D")])
-        beam_B = int(self.dictbeamdata[QString("B")])
-        beam_tw = float(self.dictbeamdata[QString("tw")])
-        beam_T = float(self.dictbeamdata[QString("T")])
-        beam_alpha = float(self.dictbeamdata[QString("FlangeSlope")])
-        beam_R1 = float(self.dictbeamdata[QString("R1")])
-        beam_R2 = float(self.dictbeamdata[QString("R2")])
+        beam_D = int(self.dictbeamdata["D"])
+        beam_B = int(self.dictbeamdata["B"])
+        beam_tw = float(self.dictbeamdata["tw"])
+        beam_T = float(self.dictbeamdata["T"])
+        beam_alpha = float(self.dictbeamdata["FlangeSlope"])
+        beam_R1 = float(self.dictbeamdata["R1"])
+        beam_R2 = float(self.dictbeamdata["R2"])
         beam_length = 500.0  # This parameter as per view of 3D cad model
 
         # beam = ISectionold(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
@@ -227,13 +229,13 @@ class CommonDesignLogic(object):
 
         ##### COLUMN PARAMETERS ######
 
-        column_D = int(self.dictcoldata[QString("D")])
-        column_B = int(self.dictcoldata[QString("B")])
-        column_tw = float(self.dictcoldata[QString("tw")])
-        column_T = float(self.dictcoldata[QString("T")])
-        column_alpha = float(self.dictcoldata[QString("FlangeSlope")])
-        column_R1 = float(self.dictcoldata[QString("R1")])
-        column_R2 = float(self.dictcoldata[QString("R2")])
+        column_D = int(self.dictcoldata["D"])
+        column_B = int(self.dictcoldata["B"])
+        column_tw = float(self.dictcoldata["tw"])
+        column_T = float(self.dictcoldata["T"])
+        column_alpha = float(self.dictcoldata["FlangeSlope"])
+        column_R1 = float(self.dictcoldata["R1"])
+        column_R2 = float(self.dictcoldata["R2"])
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         column = ISection(B=column_B, T=column_T, D=column_D,
@@ -243,21 +245,24 @@ class CommonDesignLogic(object):
 #         dictangledata = self.fetchAnglePara()
 
         angle_l = self.resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(self.dictangledata[QString("A")])
-        angle_b = int(self.dictangledata[QString("B")])
-        angle_t = float(self.dictangledata[QString("t")])
-        angle_r1 = float(self.dictangledata[QString("R1")])
+        seat_legsizes = str(self.dictangledata["AXB"])
+        angle_a =int(seat_legsizes.split('x')[0])
+        angle_b = int(seat_legsizes.split('x')[1])
+        #angle_a = int(self.dictangledata["A"])
+        #angle_b = int(self.dictangledata["B"])
+        angle_t = float(self.dictangledata["t"])
+        angle_r1 = float(self.dictangledata["R1"])
         
-        angle_r2 = (self.dictangledata[QString("R2")]).toFloat()
+        angle_r2 = (self.dictangledata["R2"])
 
         # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
+        angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
 
-        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
+        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2)
         
         
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia/2
+        bolt_dia = str(self.uiObj["Bolt"]["Diameter (mm)"])
+        bolt_r = int(bolt_dia)/2
         bolt_R = self.bolt_R
         nut_R = bolt_R
         bolt_T = self.bolt_T 
@@ -373,7 +378,7 @@ class CommonDesignLogic(object):
     def callDesired_View(self, fileName, view, folder):
 
         finCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, view, folder)
-        finCommonObj.saveToSvg(str(fileName), view)
+        finCommonObj.save_to_svg(str(fileName), view)
 
     #=========================================================================================
     def call_saveMessages(self):  # Done

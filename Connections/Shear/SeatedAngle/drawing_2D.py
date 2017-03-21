@@ -3,7 +3,6 @@ Created on 08-Nov-2016
 @author: jayant patil
 '''
 import svgwrite
-from PyQt4.QtCore import QString
 import numpy as np
 from numpy import math
 import cairosvg
@@ -17,7 +16,7 @@ class SeatCommonData(object):
 
     """
 
-    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, top_angle_data, folder):
+    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, view,folder):
         """Initialise seated angle connection's geometric properties as class attributes.
 
         Args:
@@ -33,19 +32,19 @@ class SeatCommonData(object):
             None
 
         """
-        self.beam_flange_thk = float(beam_data[QString("T")])
-        self.col_flange_thk = float(column_data[QString("T")])
-        self.beam_depth = int(beam_data[QString("D")])
-        self.col_depth = int(column_data[QString("D")])
-        self.col_width = int(column_data[QString("B")])
-        self.beam_width = int(beam_data[QString("B")])
-        self.col_web_thk = float(column_data[QString("tw")])
-        self.beam_web_thk = float(beam_data[QString("tw")])
-        self.col_designation = column_data[QString("Designation")]
-        self.beam_designation = beam_data[QString("Designation")]
-        self.beam_R1 = float(beam_data[QString("R1")])
-        self.col_R1 = float(column_data[QString("R1")])
-        self.bolt_dia = input_dict["Bolt"]["Diameter (mm)"]
+        self.beam_flange_thk = float(beam_data["T"])
+        self.col_flange_thk = float(column_data["T"])
+        self.beam_depth = int(beam_data["D"])
+        self.col_depth = int(column_data["D"])
+        self.col_width = int(column_data["B"])
+        self.beam_width = int(beam_data["B"])
+        self.col_web_thk = float(column_data["tw"])
+        self.beam_web_thk = float(beam_data["tw"])
+        self.col_designation = column_data["Designation"]
+        self.beam_designation = beam_data["Designation"]
+        self.beam_R1 = float(beam_data["R1"])
+        self.col_R1 = float(column_data["R1"])
+        self.bolt_dia = str(input_dict["Bolt"]["Diameter (mm)"])
         self.grade = input_dict["Bolt"]["Grade"]
         self.connectivity = input_dict['Member']['Connectivity']
         self.pitch = output_dict['Bolt']["Pitch Distance (mm)"]
@@ -74,18 +73,23 @@ class SeatCommonData(object):
         # self.notch_ht = self.col_flange_thk + self.col_R1
 
         # ================  seat angle  ==============================
-        self.seat_angle_legsize_vertical = int(angle_data[QString("A")])
-        self.seat_angle_legsize_horizontal = int(angle_data[QString("B")])
-        self.seat_angle_thickness = int(angle_data[QString("t")])
-        # self.seat_angle_R1 = int(angle_data[QString("R1")])
-        # self.seat_angle_R2 = float(angle_data[QString("R2")])
+        seat_legsizes = str(angle_data["AXB"])
+        self.seat_angle_legsize_vertical = int(seat_legsizes.split('x')[0])
+        self.seat_angle_legsize_horizontal = int(seat_legsizes.split('x')[1])
+        self.seat_angle_thickness = int(angle_data["t"])
+        # self.seat_angle_R1 = int(angle_data["R1"])
+        # self.seat_angle_R2 = float(angle_data["R2"])
 
         # ================  top angle  ================================
-        self.top_angle_legsize_vertical = int(top_angle_data[QString("A")])
-        self.top_angle_legsize_horizontal = int(top_angle_data[QString("B")])
-        self.top_angle_thickness = int(top_angle_data[QString("t")])
-        # self.top_angle_R1 = int(top_angle_data[QString("R1")])
-        # self.top_angle_R2 = float(top_angle_data[QString("R2")])
+        seat_legsizes = str(angle_data["AXB"])
+        self.top_angle_legsize_vertical = int(seat_legsizes.split('x')[0])
+        self.top_angle_legsize_horizontal = int(seat_legsizes.split('x')[1])
+
+        # self.top_angle_legsize_vertical = int(top_angle_data["A"])
+        # self.top_angle_legsize_horizontal = int(top_angle_data["B"])
+        self.top_angle_thickness = int(angle_data["t"])
+        # self.top_angle_R1 = int(top_angle_data["R1"])
+        # self.top_angle_R2 = float(top_angle_data["R2"])
 
         self.folder = folder
 
@@ -793,7 +797,7 @@ class Seat2DCreatorFront(object):
 
         pt_top_column_list = []
         pt_top_beam_list = []
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = float(self.data_object.bolt_dia) / 2
 
         # ---------------------------------  column bolts --------------------------------------
         if btcr >= 1:
@@ -1257,7 +1261,7 @@ class Seat2DCreatorFront(object):
         btcr = self.data_object.bolts_top_column_row
         btbr = self.data_object.bolts_top_beam_row
 
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = int(self.data_object.bolt_dia )/ 2
         pt_top_column_list = []
         pt_top_beam_list = []
 
@@ -1930,7 +1934,7 @@ class Seat2DCreatorTop(object):
         btbr = self.data_object.bolts_top_beam_row
         btcc = self.data_object.bolts_top_column_col
 
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = int(self.data_object.bolt_dia )/ 2
         pt_top_column_list = []
         pt_top_beam_list = []
 
@@ -2187,7 +2191,7 @@ class Seat2DCreatorTop(object):
         btbc = self.data_object.bolts_top_beam_col
         btbr = self.data_object.bolts_top_beam_row
 
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = int(self.data_object.bolt_dia) / 2
         pt_top_column_list = []
         pt_top_beam_list = []
         # --------------------------------  beam bolts -----------------------------
@@ -2762,7 +2766,7 @@ class Seat2DCreatorSide(object):
         btcc = self.data_object.bolts_top_column_col
         btbc = self.data_object.bolts_top_beam_col
 
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = int(self.data_object.bolt_dia )/ 2
         pt_top_column_list = []
         pt_top_beam_list = []
 
@@ -3053,7 +3057,7 @@ class Seat2DCreatorSide(object):
         btcc = self.data_object.bolts_top_column_col
         btcr = self.data_object.bolts_top_column_row
         btbc = self.data_object.bolts_top_beam_col
-        bolt_r = self.data_object.bolt_dia / 2
+        bolt_r = int(self.data_object.bolt_dia )/ 2
 
         pt_top_column_list = []
         pt_top_beam_list = []

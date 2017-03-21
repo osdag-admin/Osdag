@@ -1,12 +1,12 @@
 import sys
 import unittest, model, math
+from PyQt5.QtWidgets import QApplication
 from seat_angle_calc import SeatAngleCalculation
-from PyQt4 import QtGui
 
 
 class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
-        app = QtGui.QApplication(sys.argv)
+        #app = QApplication(sys.argv)
         model.module_setup()
         sample_input = create_sample_ui_input()
         self.sa_params(sample_input)
@@ -202,6 +202,7 @@ def create_sample_ui_input():
     input_dict['Bolt']['Type'] = "Black Bolt"
     input_dict['Bolt']['Grade'] = "4.6"
     input_dict['Angle']["AngleSection"] = "ISA 150X75X12"
+    input_dict['Angle']["TopAngleSection"] = "ISA 150X75X12"
     return input_dict
 
 
@@ -259,7 +260,7 @@ if __name__ == '__main__':
     # while launching from Seated Angle folder:
     # rawLogger.info('''<link rel="stylesheet" type="text/css" href=".//log.css"/>''')
 
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     # window = MainController()
     # window.show()
     ex = TestSeatAngleCalculation()

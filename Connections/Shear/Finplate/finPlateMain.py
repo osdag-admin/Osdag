@@ -395,6 +395,13 @@ class MainController(QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
+        self.connection = "Finplate"
+        self.connectivity = None
+        self.fuse_model = None
+        self.disableViewButtons()
+        self.resultObj = None
+        self.uiObj = None
+        self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = "ResourceFiles/Osdag_header.png"

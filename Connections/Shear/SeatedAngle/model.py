@@ -4,9 +4,10 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 
-from PyQt4 import QtGui
-from PyQt4.QtSql import *
-import logging, os
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtWidgets import QMessageBox, qApp
+import logging
+import os
 
 # logging.basicConfig(filename = 'finlog.html',filemode = 'w',level = logging.DEBUG)
 logger = None
@@ -21,13 +22,13 @@ def set_databaseconnection():
     db.setDatabaseName(filepath)
     db.open()
     if not db.open():
-        QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
-                                   QtGui.qApp.tr("Unable to establish a database connection.\n"
+        QMessageBox.critical(None, qApp.tr("Cannot open database"),
+                                   qApp.tr("Unable to establish a database connection.\n"
                                                  "This example needs SQLite support. Please read "
                                                  "the Qt SQL driver documentation for information "
                                                  "how to build it.\n\n"
                                                  "Click Cancel to exit."),
-                                   QtGui.QMessageBox.Cancel)
+                                   QMessageBox.Cancel)
         return False
 
         # logger.info("fetching records from database")
@@ -58,9 +59,9 @@ def get_beamcombolist():
     '''
     comboList = []
     beamQuery = QSqlQuery("Select Designation from Beams")
-    comboList.append("Select Designation")
+    comboList.append("Select section")
     while (beamQuery.next()):
-        comboList.append(beamQuery.value(0).toString())
+        comboList.append(beamQuery.value(0))
     # print "printing comboList"
     # print comboList
     return comboList
@@ -84,7 +85,7 @@ def get_beamdata(sect):
     while (designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            retDict[colName] = designQuery.value(i)
 
     # print(retDict[QString("tw")])
 
@@ -99,7 +100,7 @@ def get_columncombolist():
     columnQuery = QSqlQuery("SELECT Designation FROM Columns")
     comboList.append("Select section")
     while (columnQuery.next()):
-        comboList.append(columnQuery.value(0).toString())
+        comboList.append(columnQuery.value(0))
     return comboList
 
 
@@ -119,7 +120,7 @@ def get_columndata(sect):
     while (designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            retDict[colName] = designQuery.value(i)
 
     return retDict
 
@@ -130,9 +131,9 @@ def get_anglecombolist():
     '''
     comboList = []
     angleQuery = QSqlQuery("Select Designation from Angles")
-    comboList.append("Select Designation")
+    comboList.append("Select section")
     while (angleQuery.next()):
-        comboList.append(angleQuery.value(0).toString())
+        comboList.append(angleQuery.value(0))
     # print "printing comboList"
     # print comboList
     return comboList
@@ -157,7 +158,7 @@ def get_angledata(sect):
     while (designQuery.next()):
         for i in range(0, record.count()):
             angle_name = record.fieldName(i)
-            retDict[angle_name] = designQuery.value(i).toString()
+            retDict[angle_name] = designQuery.value(i)
 
     # print(retDict[QString("tw")])
 

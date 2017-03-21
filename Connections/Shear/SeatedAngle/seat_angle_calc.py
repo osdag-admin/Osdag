@@ -42,7 +42,6 @@ ASCII diagram
 import math
 import logging
 from model import get_angledata, get_beamdata, get_columndata, module_setup
-from PyQt4.Qt import QString
 from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
@@ -293,13 +292,13 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
         self.beam_fu = input_dict['Member']['fu (MPa)']
-        self.beam_fy = input_dict['Member']['fy (MPa)']
+        self.beam_fy = str(input_dict['Member']['fy (MPa)'])
         self.column_fy = self.beam_fy
         self.column_fu = self.beam_fu
-        self.angle_fy = self.beam_fy
+        self.angle_fy = float(str(self.beam_fy))
         self.angle_fu = self.beam_fu
         self.shear_force = input_dict['Load']['ShearForce (kN)']
-        self.bolt_diameter = input_dict['Bolt']['Diameter (mm)']
+        self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
         self.bolt_fu = int(float(self.bolt_grade)) * 100
@@ -313,19 +312,22 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.dict_column_data = get_columndata(self.column_section)
         self.dict_angle_data = get_angledata(self.angle_sec)
 
-        self.beam_w_t = float(self.dict_beam_data[QString("tw")])  # beam web thickness
-        self.beam_f_t = float(self.dict_beam_data[QString("T")])  # beam flange thickness
-        self.beam_d = float(self.dict_beam_data[QString("D")])  # beam depth
-        self.beam_w_f = float(self.dict_beam_data[QString("B")])  # beam width
-        self.beam_R1 = float(self.dict_beam_data[QString("R1")])  # beam root radius
-        self.column_f_t = float(self.dict_column_data[QString("T")])  # column flange thickness
-        self.column_d = float(self.dict_column_data[QString("D")])  # column depth
-        self.column_w_f = float(self.dict_column_data[QString("B")])  # column width
-        self.column_R1 = float(self.dict_column_data[QString("R1")])  # column root radius
-        self.angle_t = float(self.dict_angle_data[QString("t")])  # angle thickness
-        self.angle_A = float(self.dict_angle_data[QString("A")])  # longer leg of unequal angle
-        self.angle_B = float(self.dict_angle_data[QString("B")])  # shorter leg of unequal angle
-        self.angle_R1 = float(self.dict_angle_data[QString("R1")])
+        self.beam_w_t = float(self.dict_beam_data["tw"])  # beam web thickness
+        self.beam_f_t = float(self.dict_beam_data["T"])  # beam flange thickness
+        self.beam_d = float(self.dict_beam_data["D"])  # beam depth
+        self.beam_w_f = float(self.dict_beam_data["B"])  # beam width
+        self.beam_R1 = float(self.dict_beam_data["R1"])  # beam root radius
+        self.column_f_t = float(self.dict_column_data["T"])  # column flange thickness
+        self.column_d = float(self.dict_column_data["D"])  # column depth
+        self.column_w_f = float(self.dict_column_data["B"])  # column width
+        self.column_R1 = float(self.dict_column_data["R1"])  # column root radius
+        self.angle_t = float(self.dict_angle_data["t"])  # angle thickness
+        seat_legsizes = str(self.dict_angle_data["AXB"])
+        self.angle_A = int(seat_legsizes.split('x')[0])
+        self.angle_B = int(seat_legsizes.split('x')[1])
+        #self.angle_A = float(self.dict_angle_data["A"])  # longer leg of unequal angle
+        #self.angle_B = float(self.dict_angle_data["B"])  # shorter leg of unequal angle
+        self.angle_R1 = float(self.dict_angle_data["R1"])
 
         self.pitch = 0
         self.top_angle = self.top_angle_section()
@@ -349,10 +351,10 @@ class SeatAngleCalculation(ConnectionCalculations):
         print self.beam_R1, " Beam root radius"
         print "\nColumn section ", self.column_section
         print self.column_f_t, "Column flange thickness"
-        print float(self.dict_column_data[QString("tw")]), "Column web thickness"
-        print float(self.dict_column_data[QString("D")]), "Column depth"
-        print float(self.dict_column_data[QString("B")]), "Column width"
-        print float(self.dict_column_data[QString("R1")]), "Column root radius"
+        print float(self.dict_column_data["tw"]), "Column web thickness"
+        print float(self.dict_column_data["D"]), "Column depth"
+        print float(self.dict_column_data["B"]), "Column width"
+        print float(self.dict_column_data["R1"]), "Column root radius"
         print "\nAngle section ", self.angle_sec
         print self.angle_t, "Angle thickness"
         print self.angle_A, "Longer leg of unequal angle"
@@ -531,7 +533,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         root_3 = math.sqrt(3)
 
         # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
-        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * self.beam_fy / root_3 / self.gamma_m0 / 1000,
+        self.beam_shear_strength = round(self.beam_d * self.beam_w_t * float(self.beam_fy) / root_3 / self.gamma_m0 / 1000,
                                          1)
         # logger.info(": Beam shear capacity = " + str(self.beam_shear_strength))
 
@@ -665,11 +667,11 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         # For calculating design compressive strength of web of supported beam (7.1.2.1)
         steel_E = 200000  # MPa
-        bwlb_lambda = (bwlb_KL * 2 * root_3 / self.beam_w_t / math.pi) * math.sqrt(self.beam_fy / steel_E)
+        bwlb_lambda = (bwlb_KL * 2 * root_3 / self.beam_w_t / math.pi) * math.sqrt(float(self.beam_fy) / steel_E)
         bwlb_alpha = 0.49  # Imperfection factor for buckling class 'c' (IS 800 - Table 7 and 8.7.3.1)
         bwlb_phi = 0.5 * (1 + bwlb_alpha * (bwlb_lambda - 0.2) + bwlb_lambda ** 2)
         bwlb_chi = max((bwlb_phi + (bwlb_phi ** 2 - bwlb_lambda ** 2) ** 0.5) ** (-1), 1.0)
-        bwlb_f_cd = bwlb_chi * self.beam_fy/self.gamma_m0
+        bwlb_f_cd = bwlb_chi * float(self.beam_fy)/self.gamma_m0
 
         # Design compressive strength (7.1.2)
         bwlb_P_d = (bwlb_b1 + bwlb_n1) * bwlb_f_cd

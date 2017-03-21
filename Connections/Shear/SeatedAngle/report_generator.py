@@ -5,7 +5,6 @@ Created on Oct 21, 2016
 '''
 import time
 import math
-from PyQt4.QtCore import QString
 from seat_angle_calc import SeatAngleCalculation
 
 

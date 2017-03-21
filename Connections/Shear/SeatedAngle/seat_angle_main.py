@@ -416,6 +416,7 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
+        self.connection = "SeatedAngle"
         self.sa_calc_object = SeatAngleCalculation()
 
     def osdag_header(self):
@@ -637,7 +638,7 @@ class MainController(QMainWindow):
         '''
         uiObj = {}
         uiObj["Bolt"] = {}
-        uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText().toInt()[0]
+        uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText()
         uiObj["Bolt"]["Grade"] = float(self.ui.combo_bolt_grade.currentText())
         uiObj["Bolt"]["Type"] = str(self.ui.combo_bolt_type.currentText())
 
@@ -645,8 +646,8 @@ class MainController(QMainWindow):
         uiObj['Member']['BeamSection'] = str(self.ui.combo_beam_section.currentText())
         uiObj['Member']['ColumnSection'] = str(self.ui.combo_column_section.currentText())
         uiObj['Member']['Connectivity'] = str(self.ui.combo_connectivity.currentText())
-        uiObj['Member']['fu (MPa)'] = self.ui.txt_fu.text().toInt()[0]
-        uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text().toInt()[0]
+        uiObj['Member']['fu (MPa)'] = self.ui.txt_fu.text()
+        uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text()
 
         uiObj['Load'] = {}
         uiObj['Load']['ShearForce (kN)'] = float(self.ui.txt_shear_force.text())
@@ -1462,14 +1463,16 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         dictangledata = self.fetch_angle_para()
+        dict_top_angle = self.fetch_top_angle_para()
         loc = str(self.ui.combo_connectivity.currentText())
         component = "Model"
-        bolt_dia = self.uiObj["Bolt"]["Diameter (mm)"]
+        bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
+        print "bolt_dia =",bolt_dia
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dictangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dictangledata,dict_top_angle, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
     
     def design_btnclicked(self):
         '''
@@ -1488,9 +1491,9 @@ class MainController(QMainWindow):
         # Getting User Inputs.
         #self.uiObj = self.getuser_inputs()
         
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9],self.alist[10] ,self.display, self.folder)
         # Seated Angle Design Calculations.
-        self.resultObj = self.commLogicObj.call_finCalculation()
+        self.resultObj = self.commLogicObj.resultObj
         d = self.resultObj[self.resultObj.keys()[0]]
         if len(str(d[d.keys()[0]])) == 0:
             self.ui.btn_CreateDesign.setEnabled(False)
@@ -1601,7 +1604,7 @@ class MainController(QMainWindow):
             fname = str(fileName)
         else:
             fname = ''
-        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[4], self.folder)
         return base, base1, base2, base3
 
     def closeEvent(self, event):

@@ -933,7 +933,7 @@ class MainController(QMainWindow):
         self.ui.btn3D.setChecked(Qt.Unchecked)
 
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
-                                         self.alist[7], self.alist[8], self.display, self.folder, self.connection)
+                                         self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
         if view != 'All':
             fileName = QFileDialog.getSaveFileName(self,
                                                          "Save SVG", str(self.folder) + '/untitled.svg',
@@ -948,7 +948,7 @@ class MainController(QMainWindow):
         filename = str(filename)
         self.call_end2D_drawing("All")
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8], self.display, self.folder, self.connection)
+                                         self.alist[6], self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
         commLogicObj.call_designReport(filename, popup_summary)
         
         if sys.platform == ("win32" or "win64"):

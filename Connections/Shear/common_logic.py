@@ -24,6 +24,7 @@ from Connections.Shear.cleatAngle.colFlangeBeamWebConnectivity import ColFlangeB
 from Connections.Shear.Finplate.finPlateCalc import finConn
 from Connections.Shear.Endplate.endPlateCalc import end_connection
 from Connections.Shear.cleatAngle.cleatCalculation import cleat_connection
+from Connections.Shear.SeatedAngle.seat_angle_calc import SeatAngleCalculation
 # from endPlateCalc import endConn
 # ------------------ from Connections.Shear.Finplate.filletweld import FilletWeld
 # ------------------ from Connections.Shear.Endplate.filletweld import FilletWeld
@@ -99,6 +100,7 @@ class CommonDesignLogic(object):
         self.nut_T = nut_T
         self.display = display
         self.connection = connection
+        sa_calc_obj = SeatAngleCalculation()
         self.resultObj = self.call_calculation()
         #self.resultObj = None
         self.connectivityObj = None
@@ -116,6 +118,8 @@ class CommonDesignLogic(object):
         elif self.connection == "cleatAngle":
             outputs = cleat_connection(self.uiObj)
             #self.resultObj = cleat_connection(self.uiObj)
+        elif self.connection == "SeatedAngle":
+            outputs = self.sa_calc_obj.seat_angle_connection(self.uiObj)
         else:
             pass
         return outputs
@@ -155,6 +159,7 @@ class CommonDesignLogic(object):
         if self.connection == "cleatAngle" or self.connection == 'seatedAngle':
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
+
             angle_A = int(self.dictangledata["A"])
             angle_B = int(self.dictangledata["B"])
         else:
@@ -258,6 +263,9 @@ class CommonDesignLogic(object):
         if self.connection == "cleatAngle" or self.connection == 'seatedAngle':
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
+            # seat_legsizes = str(self.dict_angle_data["AXB"])
+            # self.angle_A = int(seat_legsizes.split('x')[0])
+            # self.angle_B = int(seat_legsizes.split('x')[1])
             angle_A = int(self.dictangledata["A"])
             angle_B = int(self.dictangledata["B"])
         else:
@@ -343,6 +351,9 @@ class CommonDesignLogic(object):
         if self.connection == "cleatAngle" or self.connection == 'seatedAngle':
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
+            # seat_legsizes = str(self.dict_angle_data["AXB"])
+            # self.angle_A = int(seat_legsizes.split('x')[0])
+            # self.angle_B = int(seat_legsizes.split('x')[1])
             angle_A = int(self.dictangledata["A"])
             angle_B = int(self.dictangledata["B"])
         else:

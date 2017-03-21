@@ -122,7 +122,7 @@ class ConnectionCalculations(object):
 
         """
         gamma_mb = 1.25
-        bolt_nominal_bearing_capacity = 2.5 * k_b * bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
+        bolt_nominal_bearing_capacity = 2.5 * float(str(k_b) )* bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
             1000)
         return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 

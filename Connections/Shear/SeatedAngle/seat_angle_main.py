@@ -1460,10 +1460,17 @@ class MainController(QMainWindow):
         This routine returns the neccessary design parameters.
         '''
         self.uiObj = self.getuser_inputs()
+        if self.designPrefDialog.saved is not True:
+            design_pref = self.designPrefDialog.set_default_para()
+        else:
+            design_pref = self.designPrefDialog.saved_designPref #self.designPrefDialog.save_designPref_para()
+        self.uiObj.update(design_pref)
+
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
-        dictangledata = self.fetch_angle_para()
-        dict_top_angle = self.fetch_top_angle_para()
+        dict_seatangledata = self.fetch_angle_para()
+        dict_topangledata = self.fetch_top_angle_para()
+        dict_angledata = dict_seatangledata.update(dict_topangledata)
         loc = str(self.ui.combo_connectivity.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1472,43 +1479,38 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dictangledata,dict_top_angle, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
     
     def design_btnclicked(self):
         '''
         '''
         # TODO input validation
-        # self.validateInputsOnDesignBtn()
-        if self.ui.combo_connectivity.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select connectivity")
-
+        self.display.EraseAll()
         self.alist = self.designParameters()
-
+        # self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
+                                              self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                              self.alist[8], self.alist[9],self.display, self.folder)
 
-        # Getting User Inputs.
-        #self.uiObj = self.getuser_inputs()
-        
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9],self.alist[10] ,self.display, self.folder)
-        # Seated Angle Design Calculations.
         self.resultObj = self.commLogicObj.resultObj
-        d = self.resultObj[self.resultObj.keys()[0]]
-        if len(str(d[d.keys()[0]])) == 0:
-            self.ui.btn_CreateDesign.setEnabled(False)
-
-        # Displaying Design Calculations To Output Window
+        alist = self.resultObj.values()
         self.display_output(self.resultObj)
-
-        # Displaying Messages related to Seated Angle Design.
         self.displaylog_totextedit(self.commLogicObj)
+        isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+        if isempty[0] == True:
+            self.call_seatangle2D_Drawing("All")
 
-        # Displaying 3D Cad model
-        status = self.resultObj['SeatAngle']['status']
+            # Displaying Messages related to Seated Angle Design.
+            self.displaylog_totextedit(self.commLogicObj)
 
-        self.commLogicObj.call_3DModel(status)
-        self.call_seatangle2D_Drawing("All")
+            # Displaying 3D Cad model
+            status = self.resultObj['SeatAngle']['status']
+        else:
+            pass
+
 
     def create2Dcad(self, connectivity):
         ''' Returns the fuse model of finplate

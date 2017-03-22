@@ -32,7 +32,6 @@ import os.path
 import pickle
 import shutil
 
-from utilities import osdag_display_shape
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):

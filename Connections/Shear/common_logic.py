@@ -351,11 +351,11 @@ class CommonDesignLogic(object):
         if self.connection == "cleatAngle" or self.connection == 'seatedAngle':
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
-            # seat_legsizes = str(self.dict_angle_data["AXB"])
-            # self.angle_A = int(seat_legsizes.split('x')[0])
-            # self.angle_B = int(seat_legsizes.split('x')[1])
-            angle_A = int(self.dictangledata["A"])
-            angle_B = int(self.dictangledata["B"])
+            seat_legsizes = str(self.dictangledata["AXB"])
+            angle_A = int(seat_legsizes.split('x')[0])
+            angle_B = int(seat_legsizes.split('x')[1])
+            # angle_A = int(self.dictangledata["A"])
+            # angle_B = int(self.dictangledata["B"])
         else:
             fillet_length = self.resultObj['Plate']['height']
             fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])

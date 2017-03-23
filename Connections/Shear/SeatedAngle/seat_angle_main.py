@@ -418,6 +418,7 @@ class MainController(QMainWindow):
         self.uiObj = None
         self.connection = "SeatedAngle"
         self.sa_calc_object = SeatAngleCalculation()
+        self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
@@ -639,7 +640,7 @@ class MainController(QMainWindow):
         uiObj = {}
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText()
-        uiObj["Bolt"]["Grade"] = float(self.ui.combo_bolt_grade.currentText())
+        uiObj["Bolt"]["Grade"] = self.ui.combo_bolt_grade.currentText()
         uiObj["Bolt"]["Type"] = str(self.ui.combo_bolt_type.currentText())
 
         uiObj['Member'] = {}
@@ -650,7 +651,7 @@ class MainController(QMainWindow):
         uiObj['Member']['fy (MPa)'] = self.ui.txt_fy.text()
 
         uiObj['Load'] = {}
-        uiObj['Load']['ShearForce (kN)'] = float(self.ui.txt_shear_force.text())
+        uiObj['Load']['ShearForce (kN)'] = (self.ui.txt_shear_force.text())
 
         uiObj['Angle'] = {}
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
@@ -1468,13 +1469,15 @@ class MainController(QMainWindow):
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
-        dict_seatangledata = self.fetch_angle_para()
+        dict_angledata = self.fetch_angle_para()
+        print "seated angle = ",dict_angledata
         dict_topangledata = self.fetch_top_angle_para()
-        dict_angledata = dict_seatangledata.update(dict_topangledata)
+        print "top angle data", dict_topangledata
+
         loc = str(self.ui.combo_connectivity.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
-        print "bolt_dia =",bolt_dia
+
         bolt_R = self.boltHeadDia_Calculation(bolt_dia) / 2
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)

@@ -297,7 +297,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.column_fu = self.beam_fu
         self.angle_fy = float(str(self.beam_fy))
         self.angle_fu = self.beam_fu
-        self.shear_force = input_dict['Load']['ShearForce (kN)']
+        self.shear_force = str(input_dict['Load']['ShearForce (kN)'])
         self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
@@ -430,7 +430,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_bearing_capacity = self.bolt_bearing(bolt_diameter, single_bolt, thickness_governing_min,
                                                        self.beam_fu, self.k_b).real
         self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
-        self.bolts_required = int(math.ceil(self.shear_force / self.bolt_value))
+        self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
     def seat_angle_connection(self, input_dict):
@@ -537,15 +537,15 @@ class SeatAngleCalculation(ConnectionCalculations):
                                          1)
         # logger.info(": Beam shear capacity = " + str(self.beam_shear_strength))
 
-        if self.beam_shear_strength < self.shear_force:
+        if self.beam_shear_strength < float(self.shear_force):
             self.safe = False
             logger.error(": Shear capacity of supported beam is not sufficient [Cl 8.4.1]")
-            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" % self.shear_force)
+            logger.warning(": Shear capacity of supported beam should be at least %2.2f kN" % float(self.shear_force))
             logger.warning(": Beam design is outside the scope of this module")
 
         # length of bearing required at the root line of beam (b) = R*gamma_m0/t_w*f_yw
         # Rearranged equation from Cl 8.7.4
-        bearing_length = round((self.shear_force * 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
+        bearing_length = round((float(self.shear_force )* 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
         # logger.info(": Length of bearing required at the root line of beam = " + str(bearing_length))
 
         # Required length of outstanding leg = bearing length + beam_col_clear_gap,
@@ -570,10 +570,10 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
-            required_angle_thickness_shear = round(math.ceil(self.shear_force / self.outstanding_leg_shear_capacity), 1)
+            required_angle_thickness_shear = round(math.ceil(float(self.shear_force )/ self.outstanding_leg_shear_capacity), 1)
             logger.error(": Shear capacity of outstanding leg of seated angle is insufficient [Cl 8.4.1]")
-            logger.warning(": Shear capacity should be more than factored shear force %2.2f kN" % self.shear_force)
-            logger.info(": Select seated angle with thickness greater than %2.2 mm" % required_angle_thickness_shear)
+            logger.warning(": Shear capacity should be more than factored shear force %2.2f kN" % float(self.shear_force))
+            logger.info(": Select seated angle with thickness greater than %2.2f mm" % required_angle_thickness_shear)
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
@@ -595,7 +595,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             use appropriate moment capacity equation
         """
 
-        self.moment_at_root_angle = round(self.shear_force * (b2 / b1) * (b2 / 2), 1)
+        self.moment_at_root_angle = round(float(self.shear_force )* (b2 / b1) * (b2 / 2), 1)
         # logger.info(": Moment at root angle = " + str(self.moment_at_root_angle))
         # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt ISA200x150x16
 
@@ -606,7 +606,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         """
         self.leg_moment_d = (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6) / 1000
 
-        if self.shear_force <= 0.6 * self.outstanding_leg_shear_capacity:
+        if float(self.shear_force )<= 0.6 * self.outstanding_leg_shear_capacity:
             angle_moment_capacity_clause = "Cl 8.2.1.2"
             self.is_shear_high = False
             # to avoid irreversible deformation (in case of cantilever),
@@ -632,7 +632,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             """
             leg_moment_d_limiting = 1.2 * (self.angle_fy / self.gamma_m0) * (
                 self.angle_l * self.angle_t ** 2 / 6) / 1000
-            beta_moment = ((2 * self.shear_force / self.outstanding_leg_shear_capacity) - 1) ** 2
+            beta_moment = ((2 * float(self.shear_force )/ self.outstanding_leg_shear_capacity) - 1) ** 2
             angle_outst_leg_mcapacity = min((1 - beta_moment) * self.leg_moment_d, leg_moment_d_limiting)
             self.moment_high_shear_beta = beta_moment  # for design report
 

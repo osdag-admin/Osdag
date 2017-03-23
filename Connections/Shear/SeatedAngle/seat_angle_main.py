@@ -249,8 +249,8 @@ class DesignReportDialog(QDialog):
         self.mainController.save_design(report_summary)
 
     def getLogoFilePath(self, lblwidget):
-        self.ui.lbl_browse.clear
-        filename,_ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+        self.ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
                                                      QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
@@ -259,12 +259,11 @@ class DesignReportDialog(QDialog):
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoFin.png")
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
-        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile",
-                                                     '*.txt')
+        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"),  '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -286,7 +285,7 @@ class DesignReportDialog(QDialog):
         return report_summary
 
     def useUserProfile(self):
-        filename,_ = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+        filename,_ = QFileDialog.getOpenFileName(self, 'Open Files', os.path.join(str(self.mainController.folder),  "Profile"),
                                                      "All Files (*)")
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
@@ -469,7 +468,7 @@ class MainController(QMainWindow):
 
     def save2DcadImages(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
@@ -749,7 +748,7 @@ class MainController(QMainWindow):
 
     def save_log(self):
 
-        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", str(self.folder)+"/LogMessages",
+        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1526,7 +1525,7 @@ class MainController(QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"), files_types)
 
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
@@ -1596,7 +1595,7 @@ class MainController(QMainWindow):
         commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
         if view != 'All':
             fileName = QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
+                                                         "Save SVG", os.path.join(str(self.folder), 'untitled.svg'),
                                                          "SVG files (*.svg)")
             fname = str(fileName)
         else:

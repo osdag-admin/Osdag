@@ -500,12 +500,11 @@ class CommonDesignLogic(object):
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
         if view == "All":
-            ''
 
             self.callDesired_View(fileName, view, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-            data = str(folder) + "/images_html/3D_Model.png"
+            data = os.path.join(str(folder), "images_html","3D_Model.png")
 
             self.display.ExportToImage(data)
 
@@ -537,11 +536,11 @@ class CommonDesignLogic(object):
     # =========================================================================================
     def call_saveMessages(self):  # Done
         if self.connection == "Finplate":
-            fileName = "Connections/Shear/Finplate/fin.log"
+            fileName = os.path.join("Connections", "Shear", "Finplate", "fin.log")
         elif self.connection == "Endplate":
-            fileName = "Connections/Shear/Endplate/end.log"
+            fileName = os.path.join("Connections", "Shear", "Endplate", "end.log")
         else:
-            fileName = "Connections/Shear/cleatAngle/cleat.log"
+            fileName = os.path.join("Connections", "Shear", "cleatAngle", "cleat.log")
 
         return fileName
 

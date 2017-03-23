@@ -409,9 +409,9 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin_2d_top.call_CFBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatFront.svg")
                 fin_2d_front.call_CFBW_front(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -421,9 +421,9 @@ class cleatCommonData(object):
                 # base_front = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_CFBW_side(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -433,9 +433,9 @@ class cleatCommonData(object):
                 # base_side = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_CFBW_top(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -453,9 +453,9 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin_2d_top.call_CWBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatFront.svg")
                 fin_2d_front.call_CWBW_front(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -465,9 +465,9 @@ class cleatCommonData(object):
                 # base_front = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_CWBW_side(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -477,9 +477,9 @@ class cleatCommonData(object):
                 # base_side = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_CWBW_top(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -497,9 +497,9 @@ class cleatCommonData(object):
             elif view == "Top":
                 fin_2d_top.call_BWBW_top(filename)
             else:
-                filename = str(self.folder) + '/images_html/cleatFront.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatFront.svg")
                 fin_2d_front.call_BWBW_front(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatFront.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -509,9 +509,9 @@ class cleatCommonData(object):
                 # base_front = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatSide.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_BWBW_side(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatSide.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):
@@ -521,9 +521,9 @@ class cleatCommonData(object):
                 # base_side = os.path.basename(str(filename))
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-                filename = str(self.folder) + '/images_html/cleatTop.svg'
+                filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_BWBW_top(filename)
-                cairosvg.svg2png(file_obj=filename, write_to=str(self.folder) + '/images_html/cleatTop.png')
+                cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
                 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 # for n in range(1, 100, 1):

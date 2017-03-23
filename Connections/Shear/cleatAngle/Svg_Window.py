@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QApplication, QFileDialog, QSpacerItem, QSizePolicy,
     QMessageBox, QHBoxLayout, QFrame, QLabel, QGridLayout
 import sys
 import shutil
+import os
 
 
 class SvgWindow(object):
@@ -66,18 +67,18 @@ class SvgWindow(object):
 
         if view == "Front":
 
-            png_image_path = self.folder + "/images_html/cleatFront.png"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatFront.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
 
         elif view == "Side":
-            png_image_path = self.folder + "/images_html/cleatSide.png"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatSide.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
         else:
-            png_image_path = self.folder + "/images_html/cleatTop.png"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatTop.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
@@ -88,18 +89,18 @@ class SvgWindow(object):
     def save_2d_image_svg_names(self, view):
 
         if view == "Front":
-            png_image_path = self.folder + "/images_html/cleatFront.svg"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatFront.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
 
         elif view == "Side":
-            png_image_path = self.folder + "/images_html/cleatSide.svg"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatSide.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)
         else:
-            png_image_path = self.folder + "/images_html/cleatTop.svg"
+            png_image_path = os.path.join(self.folder, "images_html", "cleatTop.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)

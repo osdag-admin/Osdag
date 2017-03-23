@@ -8,7 +8,7 @@ from PyQt5 import QtCore
 import numpy as np
 from numpy import math
 import cairosvg
-
+import os
 
 class FinCommonData(object):
 
@@ -366,18 +366,17 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCFBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finFront.svg")
                 fin2DFront.callCFBWfront(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finFront.png"))
 
-                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finSide.svg")
                 fin2DSide.callCFBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finSide.png"))
 
-
-                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finTop.svg")
                 fin2DTop.callCFBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finTop.png"))
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -387,17 +386,17 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callCWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finFront.svg")
                 fin2DFront.callCWBWfront(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finFront.png"))
 
-                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finSide.svg")
                 fin2DSide.callCWBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finSide.png"))
 
-                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finTop.svg")
                 fin2DTop.callCWBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finTop.png"))
 
         else:
             if view == "Front":
@@ -407,17 +406,17 @@ class FinCommonData(object):
             elif view == "Top":
                 fin2DTop.callBWBWTop(fileName)
             else:
-                fileName = str(self.folder) + '/images_html/finFront.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finFront.svg")
                 fin2DFront.callBWBWfront(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finFront.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finFront.png"))
 
-                fileName = str(self.folder) + '/images_html/finSide.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finSide.svg")
                 fin2DSide.callBWBWSide(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finSide.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finSide.png"))
 
-                fileName = str(self.folder) + '/images_html/finTop.svg'
+                fileName = os.path.join(str(self.folder), "images_html",  "finTop.svg")
                 fin2DTop.callBWBWTop(fileName)
-                cairosvg.svg2png(file_obj=fileName, write_to=str(self.folder) + '/images_html/finTop.png')
+                cairosvg.svg2png(file_obj=fileName, write_to=os.path.join(str(self.folder), "images_html",  "finTop.png"))
 
 
 

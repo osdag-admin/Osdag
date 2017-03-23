@@ -1,45 +1,26 @@
 <link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:14</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Weld thickness is not sufficient [cl. 10.5.7; Insdag Detailing Manual, 2002]</span>
-    </div>
-
-    <div  class="LOG WARNING">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:14</span>
-        <span class="LEVEL">WARNING</span>
-        <span class="MSG">: Minimum weld thickness is required is 10.00 mm </span>
-    </div>
-
-    <div  class="LOG INFO">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:14</span>
-        <span class="LEVEL">INFO</span>
-        <span class="MSG">: Increase the weld thickness or length of weld/finplate</span>
-    </div>
-
-    <div  class="LOG ERROR">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:14</span>
-        <span class="LEVEL">ERROR</span>
-        <span class="MSG">: Design is not safe 
- </span>
-    </div>
-
-    <div  class="LOG DEBUG">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:14</span>
-        <span class="LEVEL">DEBUG</span>
-        <span class="MSG"> :=========End Of design===========</span>
-    </div>
-
-    <div  class="LOG INFO">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:21</span>
+<link rel="stylesheet" type="text/css" href="Connections/Shear/cleatAngle/log.css"/>
+an>
         <span class="LEVEL">INFO</span>
         <span class="MSG">: Overall finplate connection design is safe 
 </span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Wed, 19 Oct 2016 12:16:21</span>
+        <span class="DATE">Thu, 23 Mar 2017 16:50:45</span>
+        <span class="LEVEL">DEBUG</span>
+        <span class="MSG"> :=========End Of design===========</span>
+    </div>
+
+    <div  class="LOG INFO">
+        <span class="DATE">Thu, 23 Mar 2017 16:51:41</span>
+        <span class="LEVEL">INFO</span>
+        <span class="MSG">: Overall cleat Angle connection design is safe 
+</span>
+    </div>
+
+    <div  class="LOG DEBUG">
+        <span class="DATE">Thu, 23 Mar 2017 16:51:41</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>

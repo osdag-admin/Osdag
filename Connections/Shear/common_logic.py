@@ -263,11 +263,11 @@ class CommonDesignLogic(object):
         if self.connection == "cleatAngle" or self.connection == 'seatedAngle':
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
-            # seat_legsizes = str(self.dict_angle_data["AXB"])
-            # self.angle_A = int(seat_legsizes.split('x')[0])
-            # self.angle_B = int(seat_legsizes.split('x')[1])
-            angle_A = int(self.dictangledata["A"])
-            angle_B = int(self.dictangledata["B"])
+            seat_legsizes = str(self.dictangledata["AXB"])
+            angle_A = int(seat_legsizes.split('x')[0])
+            angle_B = int(seat_legsizes.split('x')[1])
+            # angle_A = int(self.dictangledata["A"])
+            # angle_B = int(self.dictangledata["B"])
         else:
             fillet_length = self.resultObj['Plate']['height']
             fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
@@ -511,12 +511,11 @@ class CommonDesignLogic(object):
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
         if view == "All":
-            ''
 
             self.callDesired_View(fileName, view, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-            data = str(folder) + "/images_html/3D_Model.png"
+            data = os.path.join(str(folder), "images_html","3D_Model.png")
 
             self.display.ExportToImage(data)
 
@@ -548,11 +547,11 @@ class CommonDesignLogic(object):
     # =========================================================================================
     def call_saveMessages(self):  # Done
         if self.connection == "Finplate":
-            fileName = "Connections/Shear/Finplate/fin.log"
+            fileName = os.path.join("Connections", "Shear", "Finplate", "fin.log")
         elif self.connection == "Endplate":
-            fileName = "Connections/Shear/Endplate/end.log"
+            fileName = os.path.join("Connections", "Shear", "Endplate", "end.log")
         else:
-            fileName = "Connections/Shear/cleatAngle/cleat.log"
+            fileName = os.path.join("Connections", "Shear", "cleatAngle", "cleat.log")
 
         return fileName
 

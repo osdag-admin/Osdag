@@ -215,8 +215,8 @@ class MyPopupDialog(QDialog):
 
     def getLogoFilePath(self, lblwidget):
 
-        self.ui.lbl_browse.clear
-        filename = QFileDialog.getOpenFileName(
+        self.ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(
             self, 'Open File', " ",
             'Images (*.png *.svg*.jpg)',
             None, QFileDialog.DontUseNativeDialog)
@@ -229,14 +229,12 @@ class MyPopupDialog(QDialog):
 
     def desired_location(self, filename):
 
-        shutil.copyfile(filename, str(self.mainController.folder) +
-                        "/images_html/cmpylogoFin.png")
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
 
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files',
-                                                     str(self.mainController.foldloader) + "/Profile", '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.foldloader), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -259,7 +257,7 @@ class MyPopupDialog(QDialog):
 
     def useUserProfile(self):
 
-        filename = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile",
+        filename , _= QFileDialog.getOpenFileName(self, 'Open Files', os.path.join(str(self.mainController.folder), "Profile"),
                                                      '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
@@ -403,11 +401,8 @@ class MainController(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
-        image_path = "ResourceFiles/Osdag_header.png"
-        self.store_osdagheader(image_path)
-
-    def store_osdagheader(self, image_path):
-        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
     def fetchBeamPara(self):
         beam_sec = self.ui.combo_Beam.currentText()
@@ -545,7 +540,7 @@ class MainController(QMainWindow):
     def save_cadImages(self):
 
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
@@ -780,7 +775,7 @@ class MainController(QMainWindow):
     def saveDesign_inputs(self):
 
         fileName,_ = QFileDialog.getSaveFileName(self,
-                                                     "Save Design", str(self.folder) + "/untitled.osi",
+                                                     "Save Design", os.path.join(str(self.folder),  "untitled.osi"),
                                                      "Input Files(*.osi)")
 
         if not fileName:
@@ -823,7 +818,7 @@ class MainController(QMainWindow):
             :param uiObj: User inputs
             :type uiObj:Dictionary
         '''
-        inputFile = QFile('Connections/Shear/Finplate/saveINPUT.txt')
+        inputFile = QFile(os.path.join("Connections", "Shear", "Finplate", "saveINPUT.txt"))
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
@@ -832,7 +827,7 @@ class MainController(QMainWindow):
     def get_prevstate(self):
         '''
         '''
-        fileName = 'Connections/Shear/Finplate/saveINPUT.txt'
+        fileName = os.path.join("Connections", "Shear", "Finplate", "saveINPUT.txt")
 
         if os.path.isfile(fileName):
             fileObject = open(fileName, 'r')
@@ -881,7 +876,7 @@ class MainController(QMainWindow):
 
     def save_design(self, popup_summary):
 
-        fileName = self.folder + "/images_html/Html_Report.html"
+        fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
         fileName = str(fileName)
         self.callFin2D_Drawing("All")
 
@@ -889,7 +884,7 @@ class MainController(QMainWindow):
 
         # Creates pdf
         if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
             path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
@@ -908,7 +903,7 @@ class MainController(QMainWindow):
     def save_log(self):
 
         fileName, pat = QFileDialog.getSaveFileName(self, "Save File As",
-                                                                   str(self.folder) + "/LogMessages",
+                                                                   os.path.join(str(self.folder), "LogMessages"),
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1118,22 +1113,22 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        if os.name == 'nt':
+        # if os.name == 'nt':
+        #
+        #     global display, start_display, app, _
+        #
+        #     from OCC.Display.backend import get_loaded_backend
+        #     lodedbkend = get_loaded_backend()
+        #     from OCC.Display.backend import get_backend, have_backend
+        #     from osdagMainSettings import backend_name
+        #     if (not have_backend() and backend_name() == "pyqt5"):
+        #         get_backend("qt-pyqt5")
+        # else:
 
-            global display, start_display, app, _
-
-            from OCC.Display.backend import get_loaded_backend
-            lodedbkend = get_loaded_backend()
-            from OCC.Display.backend import get_backend, have_backend
-            from osdagMainSettings import backend_name
-            if (not have_backend() and backend_name() == "pyqt5"):
-                get_backend("qt-pyqt5")
-        else:
-
-            global display, start_display, app, _, USED_BACKEND
-            if 'qt' in used_backend:
-                from OCC.Display.qtDisplay import qtViewer3d
-                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import  qtViewer3d
@@ -1469,7 +1464,7 @@ class MainController(QMainWindow):
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"), files_types)
         fName = str(fileName)
 
         file_extension = fName.split(".")[-1]
@@ -1519,13 +1514,13 @@ class MainController(QMainWindow):
         if view != 'All':
 
             if view == "Front":
-                filename = self.folder + "/images_html/finFront.svg"
+                filename = os.path.join(self.folder, "images_html", "finFront.svg")
 
             elif view == "Side":
-                filename = self.folder + "/images_html/finSide.svg"
+                filename = os.path.join(self.folder, "images_html", "finSide.svg")
 
             else:
-                filename = self.folder + "/images_html/finTop.svg"
+                filename = os.path.join(self.folder, "images_html", "finTop.svg")
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)

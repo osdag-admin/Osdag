@@ -216,9 +216,8 @@ class MyPopupDialog(QDialog):
 
     def get_logo_file_path(self, lblwidget):
 
-        self.ui.lbl_browse.clear
-        filename = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
-
+        self.ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
         self.desired_location(filename)
@@ -226,11 +225,11 @@ class MyPopupDialog(QDialog):
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, str(self.mainController.folder) + "/images_html/cmpylogoEnd.png")
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoEnd.png"))
 
     def save_user_profile(self):
         input_data = self.get_design_report_inputs()
-        filename = QFileDialog.getSaveFileName(self, 'Save Files', str(self.mainController.folder) + "/Profile", '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
 
         infile = open(filename, 'w')
         pickle.dump(input_data, infile)
@@ -254,7 +253,7 @@ class MyPopupDialog(QDialog):
         return input_summary
 
     def use_user_profile(self):
-        filename = QFileDialog.getOpenFileName(self, 'Open Files', str(self.mainController.folder) + "/Profile", '*.txt')
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -400,8 +399,8 @@ class MainController(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
-        image_path = "ResourceFiles/Osdag_header.png"
-        shutil.copyfile(image_path, str(self.folder) + "/images_html/Osdag_header.png")
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
     def show_font_dialog(self):
         font, ok = QFontDialog.getFont()
@@ -432,7 +431,7 @@ class MainController(QMainWindow):
 
     def save_2d_cad_images(self):
         files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        filename,_ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.png", files_types)
+        filename,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fname = str(filename)
         file_extension = filename.split(".")[-1]
 
@@ -830,9 +829,7 @@ class MainController(QMainWindow):
 
     def saveDesign_inputs(self):
 
-        fileName,_ = QFileDialog.getSaveFileName(self,
-                                                     "Save Design", str(self.folder) + "/untitled.osi",
-                                                     "Input Files(*.osi)")
+        fileName,_ = QFileDialog.getSaveFileName(self,"Save Design", os.path.join(str(self.folder), "untitled.osi"),"Input Files(*.osi)")
         if not fileName:
             return
 
@@ -868,7 +865,7 @@ class MainController(QMainWindow):
     def save_inputs(self, uiobj):
         '''(Dictionary)--> None
         '''
-        input_file = QFile('Connections/Shear/Endplate/saveINPUT.txt')
+        input_file = QFile(os.path.join("Connections", "Shear", "Endplate", "saveINPUT.txt"))
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (input_file, file.errorString()))
@@ -877,7 +874,7 @@ class MainController(QMainWindow):
     def get_prevstate(self):
         '''
         '''
-        filename = 'Connections/Shear/Endplate/saveINPUT.txt'
+        filename = os.path.join("Connections", "Shear", "Endplate", "saveINPUT.txt")
 
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
@@ -932,27 +929,33 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6],
-                                         self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
         if view != 'All':
-            fileName = QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", str(self.folder) + '/untitled.svg',
-                                                         "SVG files (*.svg)")
-            fname = str(fileName)
+
+            if view == "Front":
+                filename = os.path.join(self.folder, "images_html", "endFront.svg")
+
+            elif view == "Side":
+                filename = os.path.join(self.folder, "images_html", "endSide.svg")
+
+            else:
+                filename = os.path.join(self.folder, "images_html", "endTop.svg")
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+
         else:
             fname = ''
-            commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
         
     def save_design(self, popup_summary):
-        filename = self.folder + "/images_html/Html_Report.html"
+        filename = os.path.join(self.folder, "images_html", "Html_Report.html")
         filename = str(filename)
         self.call_end2D_drawing("All")
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5],
-                                         self.alist[6], self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
-        commLogicObj.call_designReport(filename, popup_summary)
-        
+
+        self.commLogicObj.call_designReport(filename, popup_summary)
+
         if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             #path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
             path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
@@ -971,7 +974,7 @@ class MainController(QMainWindow):
     def save_log(self):
 
         fileName, pat = QFileDialog.getSaveFileName(self, "Save File As",
-                                                    str(self.folder) + "/LogMessages",
+                                                    os.path.join(str(self.folder), "LogMessages"),
                                                     "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1196,26 +1199,6 @@ class MainController(QMainWindow):
         elif self.ui.comboType.currentIndex() == 0:
             QMessageBox.about(self, "Information", "Please select Type of  bolt")
 
-    def get_backend(self):
-        """
-        loads a backend
-        backends are loaded in order of preference
-        since python comes with Tk included, but that PySide or PyQt4
-        is much preferred
-        """
-        try:
-            from PyQt5 import QtCore, QtGui, QtOpenGL
-            return 'pyqt4'
-        except:
-            pass
-        # Check wxPython
-        try:
-            import wx
-            return 'wx'
-        except:
-            raise ImportError("No compliant GUI library found. You must have either PySide, PyQt4 or wxPython installed.")
-            sys.exit(1)
-
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
 
@@ -1223,22 +1206,22 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        if os.name == 'nt':
+        # if os.name == 'nt':
+        #
+        #     global display, start_display, app, _
+        #
+        #     from OCC.Display.backend import get_loaded_backend
+        #     lodedbkend = get_loaded_backend()
+        #     from OCC.Display.backend import get_backend, have_backend
+        #     from osdagMainSettings import backend_name
+        #     if (not have_backend() and backend_name() == "pyqt5"):
+        #         get_backend("qt-pyqt5")
+        # else:
 
-            global display, start_display, app, _
-
-            from OCC.Display.backend import get_loaded_backend
-            lodedbkend = get_loaded_backend()
-            from OCC.Display.backend import get_backend, have_backend
-            from osdagMainSettings import backend_name
-            if (not have_backend() and backend_name() == "pyqt5"):
-                get_backend("qt-pyqt5")
-        else:
-
-            global display, start_display, app, _, USED_BACKEND
-            if 'qt' in used_backend:
-                from OCC.Display.qtDisplay import qtViewer3d
-                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import qtViewer3d
@@ -1542,7 +1525,7 @@ class MainController(QMainWindow):
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"), files_types)
         fName = str(fileName)
 
         # if self.connectivity is None:
@@ -1630,13 +1613,13 @@ class MainController(QMainWindow):
         if view != 'All':
 
             if view == "Front":
-                filename = self.folder + "/images_html/endFront.svg"
+                filename = os.path.join(self.folder, "images_html", "endFront.svg")
 
             elif view == "Side":
-                filename = self.folder + "/images_html/endSide.svg"
+                filename = os.path.join(self.folder, "images_html",  "endSide.svg")
 
             else:
-                filename = self.folder + "/images_html/endTop.svg"
+                filename = os.path.join(self.folder, "images_html", "endTop.svg")
 
             svg_file = SvgWindow()
             svg_file.call_svgwindow(filename, view, self.folder)
@@ -1645,36 +1628,36 @@ class MainController(QMainWindow):
             fname = ''
             self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
 
-    def call_2d_drawing(self, view):
-
-        ''' This routine saves the 2D SVG image as per the connectivity selected
-        SVG image created through svgwrite pacage which takes design INPUT and OUTPUT parameters from Endplate GUI.
-        '''
-        self.ui.chkBxEndplate.setChecked(Qt.Unchecked)
-        self.ui.chkBxBeam.setChecked(Qt.Unchecked)
-        self.ui.chkBxCol.setChecked(Qt.Unchecked)
-        self.ui.btn3D.setChecked(Qt.Unchecked)
-
-        if view == "All":
-            filename = ''
-            self.call_desired_view(filename, view)
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-            data = str(self.folder) + "/images_html/3D_Model.png"
-            self.display.ExportToImage(data)
-
-        else:
-
-            if view == "Front":
-                filename = self.folder + "/images_html/endFront.svg"
-
-            elif view == "Side":
-                filename = self.folder + "/images_html/endSide.svg"
-
-            else:
-                filename = self.folder + "/images_html/endTop.svg"
-
-            svg_file = SvgWindow()
-            svg_file.call_svgwindow(filename, view, self.folder)
+    # def call_2d_drawing(self, view):
+    #
+    #     ''' This routine saves the 2D SVG image as per the connectivity selected
+    #     SVG image created through svgwrite pacage which takes design INPUT and OUTPUT parameters from Endplate GUI.
+    #     '''
+    #     self.ui.chkBxEndplate.setChecked(Qt.Unchecked)
+    #     self.ui.chkBxBeam.setChecked(Qt.Unchecked)
+    #     self.ui.chkBxCol.setChecked(Qt.Unchecked)
+    #     self.ui.btn3D.setChecked(Qt.Unchecked)
+    #
+    #     if view == "All":
+    #         filename = ''
+    #         self.call_desired_view(filename, view)
+    #         self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+    #         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+    #         self.display.ExportToImage(data)
+    #
+    #     else:
+    #
+    #         if view == "Front":
+    #             filename = os.path.join(self.folder, "images_html", "endFront.svg")
+    #
+    #         elif view == "Side":
+    #             filename = os.path.join(self.folder, "images_html", "endSide.svg")
+    #
+    #         else:
+    #             filename = os.path.join(self.folder, "images_html", "endTop.svg")
+    #
+    #         svg_file = SvgWindow()
+    #         svg_file.call_svgwindow(filename, view, self.folder)
 
     def closeEvent(self, event):
         '''

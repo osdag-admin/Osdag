@@ -1392,6 +1392,7 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         dict_angle_data = {}
+        dict_topangledata = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1412,15 +1413,16 @@ class MainController(QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                              self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8],self.alist[9], self.display, self.folder, self.connection)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
+                                              self.alist[4],self.alist[5], self.alist[6],self.alist[7],
+                                              self.alist[8],self.alist[9], self.alist[10], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
         if isempty[0] == True:
             self.callFin2D_Drawing("All")
             status = self.resultObj['Bolt']['status']

@@ -58,7 +58,8 @@ from ui_ask_question import Ui_AskQuestion
 from ModelUtils import getGpPt
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 # from apt.auth import update
-from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
+#from Connections.Shear.SeatedAngle.common_logic import CommonDesignLogic
+from Connections.Shear.common_logic import CommonDesignLogic
 
 
 
@@ -1215,99 +1216,99 @@ class MainController(QMainWindow):
 
         return colwebconn
 
-    def create3DColFlangeBeamWeb(self):
-        '''
-        Creating 3d cad model with column flange beam web connection
-
-        '''
-        uiObj = self.getuser_inputs()
-        resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
-
-        dict_beam_data = self.fetchBeamPara()
-        #         fillet_length = resultObj['Plate']['height']
-        #         fillet_thickness =  resultObj['Weld']['thickness']
-        #         plate_width = resultObj['Plate']['width']
-        #         plate_thick = uiObj['Plate']['Thickness (mm)']
-        ##### BEAM PARAMETERS #####
-        beam_D = int(dict_beam_data["D"])
-        beam_B = int(dict_beam_data["B"])
-        beam_tw = float(dict_beam_data["tw"])
-        beam_T = float(dict_beam_data["T"])
-        beam_alpha = float(dict_beam_data["FlangeSlope"])
-        beam_R1 = float(dict_beam_data["R1"])
-        beam_R2 = float(dict_beam_data["R2"])
-        beam_length = 500.0  # This parameter as per view of 3D cad model
-
-        # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
-        beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
-                        R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-                        length=beam_length)
-
-        ##### COLUMN PARAMETERS ######
-        dict_col_data = self.fetchColumnPara()
-
-        column_D = int(dict_col_data["D"])
-        column_B = int(dict_col_data["B"])
-        column_tw = float(dict_col_data["tw"])
-        column_T = float(dict_col_data["T"])
-        column_alpha = float(dict_col_data["FlangeSlope"])
-        column_R1 = float(dict_col_data["R1"])
-        column_R2 = float(dict_col_data["R2"])
-
-        # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        column = ISection(B=column_B, T=column_T, D=column_D,
-                          t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
-
-        ##### ANGLE PARAMETERS ######
-        dict_angle_data = self.fetch_angle_para()
-
-        angle_l = resultObj['SeatAngle']["Length (mm)"]
-        angle_a = int(dict_angle_data["A"])
-        angle_b = int(dict_angle_data["B"])
-        angle_t = float(dict_angle_data["t"])
-        angle_r1 = float(dict_angle_data["R1"])
-
-        angle_r2 = (dict_angle_data["R2"]).toFloat()
-
-        # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
-        angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
-
-        topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
-
-        #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-
-        #         fillet_length = resultObj['Plate']['height']
-        #         fillet_thickness =  resultObj['Weld']['thickness']
-        #         plate_width = resultObj['Plate']['width']
-        #         plate_thick = uiObj['Plate']['Thickness (mm)']
-        bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
-        bolt_r = bolt_dia / 2
-        bolt_R = bolt_r + 7
-        nut_R = bolt_R
-        bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
-        bolt_Ht = 50.0  # minimum bolt length as per Indian Standard
-        nut_T = 12.0  # minimum nut thickness As per Indian Standard
-        nut_Ht = 12.2  #
-
-        # plate = Plate(L= 300,W =100, T = 10)
-        #         angle = Angle(L = angle_l, A = angle_a, B = angle_b,T = angle_t, R1 = angle_r1, R2 = angle_r2)
-
-        # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
-        #         Fweld1 = FilletWeld(L= fillet_length,b = fillet_thickness, h = fillet_thickness)
-
-        # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
-        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
-
-        # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
-        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
-
-        gap = beam_tw + angle_t + nut_T
-
-        nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
-
-        colflangeconn = ColFlangeBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
-        colflangeconn.create_3dmodel()
-        return colflangeconn
+    # def create3DColFlangeBeamWeb(self):
+    #     '''
+    #     Creating 3d cad model with column flange beam web connection
+    #
+    #     '''
+    #     uiObj = self.getuser_inputs()
+    #     resultObj = self.sa_calc_object.seat_angle_connection(uiObj)
+    #
+    #     dict_beam_data = self.fetchBeamPara()
+    #     #         fillet_length = resultObj['Plate']['height']
+    #     #         fillet_thickness =  resultObj['Weld']['thickness']
+    #     #         plate_width = resultObj['Plate']['width']
+    #     #         plate_thick = uiObj['Plate']['Thickness (mm)']
+    #     ##### BEAM PARAMETERS #####
+    #     beam_D = int(dict_beam_data["D"])
+    #     beam_B = int(dict_beam_data["B"])
+    #     beam_tw = float(dict_beam_data["tw"])
+    #     beam_T = float(dict_beam_data["T"])
+    #     beam_alpha = float(dict_beam_data["FlangeSlope"])
+    #     beam_R1 = float(dict_beam_data["R1"])
+    #     beam_R2 = float(dict_beam_data["R2"])
+    #     beam_length = 500.0  # This parameter as per view of 3D cad model
+    #
+    #     # beam = ISection(B = 140, T = 16,D = 400,t = 8.9, R1 = 14, R2 = 7, alpha = 98,length = 500)
+    #     beam = ISection(B=beam_B, T=beam_T, D=beam_D, t=beam_tw,
+    #                     R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+    #                     length=beam_length)
+    #
+    #     ##### COLUMN PARAMETERS ######
+    #     dict_col_data = self.fetchColumnPara()
+    #
+    #     column_D = int(dict_col_data["D"])
+    #     column_B = int(dict_col_data["B"])
+    #     column_tw = float(dict_col_data["tw"])
+    #     column_T = float(dict_col_data["T"])
+    #     column_alpha = float(dict_col_data["FlangeSlope"])
+    #     column_R1 = float(dict_col_data["R1"])
+    #     column_R2 = float(dict_col_data["R2"])
+    #
+    #     # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
+    #     column = ISection(B=column_B, T=column_T, D=column_D,
+    #                       t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000)
+    #
+    #     ##### ANGLE PARAMETERS ######
+    #     dict_angle_data = self.fetch_angle_para()
+    #
+    #     angle_l = resultObj['SeatAngle']["Length (mm)"]
+    #     angle_a = int(dict_angle_data["A"])
+    #     angle_b = int(dict_angle_data["B"])
+    #     angle_t = float(dict_angle_data["t"])
+    #     angle_r1 = float(dict_angle_data["R1"])
+    #
+    #     angle_r2 = (dict_angle_data["R2"]).toFloat()
+    #
+    #     # column = ISection(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
+    #     angle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
+    #
+    #     topclipangle = Angle(L=angle_l, A=angle_a, B=angle_b, T=angle_t, R1=angle_r1, R2=angle_r2[0])
+    #
+    #     #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
+    #
+    #     #         fillet_length = resultObj['Plate']['height']
+    #     #         fillet_thickness =  resultObj['Weld']['thickness']
+    #     #         plate_width = resultObj['Plate']['width']
+    #     #         plate_thick = uiObj['Plate']['Thickness (mm)']
+    #     bolt_dia = uiObj["Bolt"]["Diameter (mm)"]
+    #     bolt_r = bolt_dia / 2
+    #     bolt_R = bolt_r + 7
+    #     nut_R = bolt_R
+    #     bolt_T = 10.0  # minimum bolt thickness As per Indian Standard
+    #     bolt_Ht = 50.0  # minimum bolt length as per Indian Standard
+    #     nut_T = 12.0  # minimum nut thickness As per Indian Standard
+    #     nut_Ht = 12.2  #
+    #
+    #     # plate = Plate(L= 300,W =100, T = 10)
+    #     #         angle = Angle(L = angle_l, A = angle_a, B = angle_b,T = angle_t, R1 = angle_r1, R2 = angle_r2)
+    #
+    #     # Fweld1 = FilletWeld(L= 300,b = 6, h = 6)
+    #     #         Fweld1 = FilletWeld(L= fillet_length,b = fillet_thickness, h = fillet_thickness)
+    #
+    #     # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
+    #     bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
+    #
+    #     # nut =Nut(R = bolt_R, T = 10.0,  H = 11, innerR1 = 4.0, outerR2 = 8.3)
+    #     nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+    #
+    #     gap = beam_tw + angle_t + nut_T
+    #
+    #     nutBoltArray = NutBoltArray(resultObj, nut, bolt, gap)
+    #
+    #     colflangeconn = ColFlangeBeamWeb(column, beam, angle, topclipangle, nutBoltArray)
+    #     colflangeconn.create_3dmodel()
+    #     return colflangeconn
 
     # TODO check 3D drawing generating functions above
     # -------------------------------------------------------------------------------
@@ -1469,9 +1470,7 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
         dict_angledata = self.fetch_angle_para()
-        print "seated angle = ",dict_angledata
         dict_topangledata = self.fetch_top_angle_para()
-        print "top angle data", dict_topangledata
 
         loc = str(self.ui.combo_connectivity.currentText())
         component = "Model"
@@ -1481,7 +1480,7 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata, dict_topangledata,  loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
     
     def design_btnclicked(self):
         '''
@@ -1495,22 +1494,20 @@ class MainController(QMainWindow):
         self.unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
                                               self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                              self.alist[8], self.alist[9],self.display, self.folder)
+                                              self.alist[8], self.alist[9],self.alist[10], self.display, self.folder,self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
         if isempty[0] == True:
             self.call_seatangle2D_Drawing("All")
-
-            # Displaying Messages related to Seated Angle Design.
-            self.displaylog_totextedit(self.commLogicObj)
-
-            # Displaying 3D Cad model
             status = self.resultObj['SeatAngle']['status']
+            self.commLogicObj.call_3DModel(status)
         else:
+
             pass
 
 
@@ -1570,46 +1567,29 @@ class MainController(QMainWindow):
         ''' This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
-
-        if view == "All":
-            fileName = ''
-
-            self.callDesired_View(fileName, view)
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-            self.display.ExportToImage(data)
-            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-
-        else:
-            if view == "Front":
-                filename = os.path.join(str(self.folder),  "images_html", "seatFront.svg")
-
-            elif view == "Side":
-                filename = os.path.join(str(self.folder), "images_html", "seatSide.svg")
-
-            else:
-                filename = os.path.join(str(self.folder), "images_html","seatTop.svg")
-
-            svg_file = SvgWindow()
-            svg_file.call_svgwindow(filename, view, self.folder)
-
-    def callDesired_View(self, fileName, view):
-
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
 
-        commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.display, self.folder)
         if view != 'All':
-            fileName = QFileDialog.getSaveFileName(self,
-                                                         "Save SVG", os.path.join(str(self.folder), 'untitled.svg'),
-                                                         "SVG files (*.svg)")
-            fname = str(fileName)
+
+            if view == "Front":
+                filename = os.path.join(self.folder, "images_html", "seatFront.svg")
+
+            elif view == "Side":
+                filename = os.path.join(self.folder, "images_html", "seatSide.svg")
+
+            else:
+                filename = os.path.join(self.folder, "images_html", "seatTop.svg")
+
+            svg_file = SvgWindow()
+            svg_file.call_svgwindow(filename, view, self.folder)
+
         else:
             fname = ''
-        base, base1, base2, base3 = commLogicObj.call2D_Drawing(view, fname, self.alist[4], self.folder)
-        return base, base1, base2, base3
+            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+
 
     def closeEvent(self, event):
         uiInput = self.getuser_inputs()

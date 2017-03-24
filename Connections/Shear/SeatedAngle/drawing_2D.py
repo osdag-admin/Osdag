@@ -16,7 +16,7 @@ class SeatCommonData(object):
 
     """
 
-    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, view,folder):
+    def __init__(self, input_dict, output_dict, beam_data, column_data, angle_data, dicttopangledata,view,folder):
         """Initialise seated angle connection's geometric properties as class attributes.
 
         Args:
@@ -81,13 +81,13 @@ class SeatCommonData(object):
         # self.seat_angle_R2 = float(angle_data["R2"])
 
         # ================  top angle  ================================
-        seat_legsizes = str(angle_data["AXB"])
+        seat_legsizes = str(dicttopangledata["AXB"])
         self.top_angle_legsize_vertical = int(seat_legsizes.split('x')[0])
         self.top_angle_legsize_horizontal = int(seat_legsizes.split('x')[1])
 
         # self.top_angle_legsize_vertical = int(top_angle_data["A"])
         # self.top_angle_legsize_horizontal = int(top_angle_data["B"])
-        self.top_angle_thickness = int(angle_data["t"])
+        self.top_angle_thickness = int(dicttopangledata["t"])
         # self.top_angle_R1 = int(top_angle_data["R1"])
         # self.top_angle_R2 = float(top_angle_data["R2"])
 

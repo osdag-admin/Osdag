@@ -1529,7 +1529,7 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
     # def save_2D_images(self, view):
     #

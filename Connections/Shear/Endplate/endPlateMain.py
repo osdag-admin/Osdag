@@ -1626,7 +1626,7 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
     # def call_2d_drawing(self, view):
     #

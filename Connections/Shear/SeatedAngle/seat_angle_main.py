@@ -665,7 +665,11 @@ class MainController(QMainWindow):
         '''(Dictionary)--> None
 
         '''
-        inputFile = QFile('saveINPUT.txt')
+        if __name__ == '__main__':
+            file_name = 'saveINPUT.txt'
+        else:
+            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                       "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
@@ -675,12 +679,12 @@ class MainController(QMainWindow):
         '''
         '''
         if __name__ == '__main__':
-            fileName = 'saveINPUT.txt'
+            file_name = 'saveINPUT.txt'
         else:
-            fileName = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
 
-        if os.path.isfile(fileName):
-            fileObject = open(fileName, 'r')
+        if os.path.isfile(file_name):
+            fileObject = open(file_name, 'r')
             uiObj = pickle.load(fileObject)
             return uiObj
         else:
@@ -751,7 +755,7 @@ class MainController(QMainWindow):
 
     def save_log(self):
 
-        fileName, pat = QFileDialog.getSaveFileNameAndFilter(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
+        fileName, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
                                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
@@ -1480,7 +1484,9 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata, dict_topangledata,  loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata,
+                dict_topangledata,  loc, component, bolt_R, bolt_T,
+                bolt_Ht, nut_T]
     
     def design_btnclicked(self):
         '''
@@ -1494,9 +1500,11 @@ class MainController(QMainWindow):
         self.unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
                                               self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                              self.alist[8], self.alist[9],self.alist[10], self.display, self.folder,self.connection)
+                                              self.alist[8], self.alist[9],self.alist[10], self.display,
+                                              self.folder,self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
+        print "resultobj from seat_angle_main",self.resultObj
         alist = self.resultObj.values()
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
@@ -1588,10 +1596,15 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
 
     def closeEvent(self, event):
+        '''
+        Closing Seated angle window
+        :param event:
+        :return:
+        '''
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',

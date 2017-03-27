@@ -91,8 +91,9 @@ class CommonDesignLogic(object):
     # ------------------------------------------- self.connectivityObj = None
 
 
-    def __init__(self, uiObj, dictbeamdata, dictcoldata, dictangledata, dicttopangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T, display,
-                 folder, connection):
+    def __init__(self, uiObj, dictbeamdata, dictcoldata, dictangledata,
+                 dicttopangledata, loc, component, bolt_R, bolt_T,
+                 bolt_Ht, nut_T, display,folder, connection):
 
         self.uiObj = uiObj
         self.dictbeamdata = dictbeamdata
@@ -107,9 +108,9 @@ class CommonDesignLogic(object):
         self.nut_T = nut_T
         self.display = display
         self.connection = connection
-        self.sa_calc_obj = SeatAngleCalculation()
-        self.sa_report = ReportGenerator(self.sa_calc_obj)
+
         self.resultObj = self.call_calculation()
+
         #self.resultObj = None
         self.connectivityObj = None
         self.folder = folder
@@ -127,7 +128,9 @@ class CommonDesignLogic(object):
             outputs = cleat_connection(self.uiObj)
             #self.resultObj = cleat_connection(self.uiObj)
         elif self.connection == "SeatedAngle":
+            self.sa_calc_obj = SeatAngleCalculation()
             outputs = self.sa_calc_obj.seat_angle_connection(self.uiObj)
+            #outputs = self.sa_calc_obj.output_dict
         else:
             pass
         return outputs
@@ -573,7 +576,7 @@ class CommonDesignLogic(object):
 
     # =========================================================================================
 
-    def call2D_Drawing(self, view, fileName, loc, folder):  # Rename function with call_view_images()
+    def call2D_Drawing(self, view, fileName, folder):  # Rename function with call_view_images()
         ''' This routine saves the 2D SVG image as per the connectivity selected
         SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
         '''
@@ -611,16 +614,22 @@ class CommonDesignLogic(object):
             cleatCommonObj.save_to_svg(str(fileName),view)
         else:
             seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, self.dicttopangledata, folder)
-        seatCommonObj.save_to_svg(str(fileName),view)
+            seatCommonObj.save_to_svg(str(fileName),view)
 
     # =========================================================================================
     def call_saveMessages(self):  # Done
+
         if self.connection == "Finplate":
             fileName = os.path.join("Connections", "Shear", "Finplate", "fin.log")
+
         elif self.connection == "Endplate":
             fileName = os.path.join("Connections", "Shear", "Endplate", "end.log")
-        else:
+
+        elif self.connection == "cleatAngle":
             fileName = os.path.join("Connections", "Shear", "cleatAngle", "cleat.log")
+
+        else:
+            fileName = os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")
 
         return fileName
 
@@ -640,6 +649,7 @@ class CommonDesignLogic(object):
                 cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
                                 profileSummary,htmlfilename, self.folder)
             else:
+                self.sa_report = ReportGenerator(self.sa_calc_obj)
                 self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 
     # =========================================================================================

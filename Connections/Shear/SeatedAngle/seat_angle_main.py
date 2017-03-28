@@ -614,6 +614,13 @@ class MainController(QMainWindow):
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
+        elif loc == "Column flange-Beam flange":
+            # TODO change the pixmap as per seated angle connectivity
+            pixmap = QPixmap(":/newPrefix/images/colF2.png")
+            pixmap.scaledToHeight(60)
+            pixmap.scaledToWidth(50)
+            self.ui.lbl_connectivity.setPixmap(pixmap)
+
         else:
             self.ui.lbl_connectivity.hide()
 
@@ -1500,9 +1507,9 @@ class MainController(QMainWindow):
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
         if isempty[0] == True:
-            self.call_seatangle2D_Drawing("All")
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
+            self.call_seatangle2D_Drawing("All")
         else:
 
             pass

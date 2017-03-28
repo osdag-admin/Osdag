@@ -391,6 +391,8 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             angle_A = int(seat_legsizes.split('x')[0])
             angle_B = int(seat_legsizes.split('x')[1])
+            angle_r1 = float(self.dicttopangledata["R1"])
+            angle_r2 = float(self.dicttopangledata["R2"])
 
         elif self.connection == 'SeatedAngle':
             seat_length = self.resultObj['SeatAngle']['Length (mm)']
@@ -398,12 +400,16 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             seatangle_A = int(seat_legsizes.split('x')[0])
             seatangle_B = int(seat_legsizes.split('x')[1])
+            seatangle_r1 = float(self.dictangledata["R1"])
+            seatangle_r2 = float(self.dictangledata["R2"])
 
             topangle_length = self.resultObj['SeatAngle']['Length (mm)']
             topangle_thick = float(self.dicttopangledata["t"])
             top_legsizes = str(self.dicttopangledata["AXB"])
             topangle_A = int(top_legsizes.split('x')[0])
             topangle_B = int(top_legsizes.split('x')[1])
+            topangle_r1 = float(self.dicttopangledata["R1"])
+            topangle_r2 = float(self.dicttopangledata["R2"])
 
         else:
             fillet_length = self.resultObj['Plate']['height']
@@ -425,10 +431,10 @@ class CommonDesignLogic(object):
 
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=seatangle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1 = angle_r1, R2 = angle_r2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick)
-            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1 = seatangle_r1, R2 = seatangle_r2)
+            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1 = topangle_r1,R2 = topangle_r2)
         else:
             # plate = Plate(L= 300,W =100, T = 10)
             plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
@@ -536,7 +542,7 @@ class CommonDesignLogic(object):
                 # nutboltlist = self.connectivityObj.nutBoltArray.getModels()
                 # for nutbolt in nutboltlist:
                 #     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
+            nutboltlist = self.connectivityObj.nutBoltArray.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -548,7 +554,7 @@ class CommonDesignLogic(object):
             if self.loc == "Column web-Beam web":
                 self.connectivityObj = self.create3DColWebBeamWeb()
 
-            elif self.loc == "Column flange-Beam web":
+            elif self.loc == "Column flange-Beam web" or self.loc == "Column flange-Beam flange":
                 self.connectivityObj = self.create3DColFlangeBeamWeb()
 
             else:

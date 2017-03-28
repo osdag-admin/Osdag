@@ -48,8 +48,8 @@ class ColFlangeBeamWeb(object):
         self.createNutBoltArray()
 
         # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
         self.angleModel = self.angle.createModel()
         self.topclipangleModel = self.topclipangle.createModel()
         #         self.plateModel = self.plate.createModel()
@@ -66,21 +66,22 @@ class ColFlangeBeamWeb(object):
         self.column.place(columnOrigin, column_uDir, wDir1)
 
     def createBeamGeometry(self):
-        beamOrigin = ((self.column.secOrigin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (
-        self.clearDist * (-self.column.vDir))
+        beamOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + \
+                     (self.column.length / 2 * self.column.wDir) + (self.clearDist * (-self.column.vDir))
         uDir = numpy.array([1.0, 0.0, 0])
         wDir = numpy.array([0.0, -1.0, 0.0])
         self.beam.place(beamOrigin, uDir, wDir)
 
     def createAngleGeometry(self):
         #         angleOrigin =(self.column.secOrigin+self.column.D/2) * (-self.angle.vDir) + (self.column.length/2 - self.beam.D/2)* (-self.angle.uDir)+self.column.secOrigin*self.angle.wDir
-        angleOrigin = ((self.column.secOrigin + self.column.D / 2) * (-self.column.vDir)) + ((self.column.length / 2 - self.beam.D / 2) * self.column.wDir) + (
-        self.angle.L / 2 * (-self.column.uDir))
+        angleOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + \
+                      ((self.column.length / 2 - self.beam.D / 2) * self.column.wDir) + \
+                      (self.angle.L / 2 * (-self.column.uDir))
         uDir = numpy.array([0.0, -1.0, 0.0])
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.angle.place(angleOrigin, uDir, wDir)
 
-        topclipangleOrigin = ((self.column.secOrigin + self.column.D / 2) * (-self.column.vDir)) + (
+        topclipangleOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (
         (self.column.length / 2 + self.beam.D / 2) * self.column.wDir) + (self.angle.L / 2 * (self.column.uDir))
         tcuDir = numpy.array([0.0, -1.0, 0.0])
         tcwDir = numpy.array([-1.0, 0.0, 0.0])

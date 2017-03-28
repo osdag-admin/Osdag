@@ -689,7 +689,7 @@ class Fin2DCreatorFront(object):
                                                str(int(self.dataObj.pitch)) + " mm c/c", params)
 
         # Cross section A-A
-        ptSecA = self.FA + (320 * np.array([0, -1]))
+        ptSecA = self.FA + (350 * np.array([0, -1]))
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"

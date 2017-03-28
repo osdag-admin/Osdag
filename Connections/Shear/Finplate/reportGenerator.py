@@ -15,6 +15,7 @@ import pickle
 
 
 def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename, folder):
+    print uiObj, "UIOBJ............"
     fileName = (filename)
     myfile = open(fileName, "w")
     myfile.write(t('! DOCTYPE html'))
@@ -123,8 +124,18 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     bearingcapacity = str(round(outObj['Bolt']['bearingcapacity'], 4))
     momentDemand = str(outObj['Plate']['externalmoment'])
 
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Preferences
+    bolt_hole_type = str(uiObj["bolt"]["bolt_hole_type"])
+    bolt_hole_clrnce = str(uiObj['bolt']['bolt_hole_clrnce'])
+    bolt_mtrl_grade = str(uiObj["bolt"]["bolt_fu"])
+    weld_type = str(uiObj["weld"]["typeof_weld"])
+    weld_mtrl_grade = str(uiObj["weld"]["safety_factor"])
+    edge_type = str(uiObj["detailing"]["typeof_edge"])
+    detail_edgend_dist = str(uiObj["detailing"]["min_edgend_dist"])
+    detail_gap = str(uiObj["detailing"]["gap"])
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
@@ -446,6 +457,139 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
+           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Method']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, method]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+
+    # Design Preferences
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    row = [0, "Design Preferences", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, "Bolt", "Hole Type", "Hole Clearance", "Material Grade"]
+    rstr += t('td rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('t')
+    row = [0,  bolt_hole_type, bolt_hole_clrnce, bolt_mtrl_grade]
+    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, "Weld", "Type of Weld",  "Material Grade", ""]
+    rstr += t('td rowspan="2"  rowspan="2"  class="header1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('t')
+    row = [0, weld_type,  weld_mtrl_grade, ""]
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+
+    rstr += t('tr')
+    row = [0, "Detailing", "Type of Edges", "Minimum Edge-End Distance",  "Gap"]
+    rstr += t('td  rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('t')
+    row = [0,  edge_type, detail_edgend_dist,  detail_gap]
+    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+
 # *************************************************************************************************************************
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
@@ -746,7 +890,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
 # *************************************************************************************************************************
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
     rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
     rstr += t('tr')
     row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',

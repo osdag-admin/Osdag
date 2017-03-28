@@ -1034,22 +1034,22 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        if os.name == 'nt':
+        # if os.name == 'nt':
+        #
+        #     global display, start_display, app, _
+        #
+        #     from OCC.Display.backend import get_loaded_backend
+        #     lodedbkend = get_loaded_backend()
+        #     from OCC.Display.backend import get_backend, have_backend
+        #     from osdagMainSettings import backend_name
+        #     if (not have_backend() and backend_name() == "pyqt5"):
+        #         get_backend("qt-pyqt5")
+        # else:
 
-            global display, start_display, app, _
-
-            from OCC.Display.backend import get_loaded_backend
-            lodedbkend = get_loaded_backend()
-            from OCC.Display.backend import get_backend, have_backend
-            from osdagMainSettings import backend_name
-            if (not have_backend() and backend_name() == "pyqt5"):
-                get_backend("qt-pyqt5")
-        else:
-
-            global display, start_display, app, _, USED_BACKEND
-            if 'qt' in used_backend:
-                from OCC.Display.qtDisplay import qtViewer3d
-                QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         # from OCC.Display.pyqt4Display import qtViewer3d
         from OCC.Display.qtDisplay import  qtViewer3d

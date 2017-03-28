@@ -367,7 +367,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -432,7 +441,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -519,6 +528,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="actionDesign_preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -4300,6 +4310,11 @@ QMenu::item:selected {
   <action name="actionQuit_seat_angle_design">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionDesign_preferences">
+   <property name="text">
+    <string>Design preferences</string>
    </property>
   </action>
  </widget>

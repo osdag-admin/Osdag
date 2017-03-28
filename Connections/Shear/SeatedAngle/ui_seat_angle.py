@@ -169,7 +169,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1332, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1332, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setStyleSheet("QMenu {\n"
@@ -1589,6 +1589,8 @@ class Ui_MainWindow(object):
         self.actionFAQ.setObjectName("actionFAQ")
         self.actionQuit_seat_angle_design = QtWidgets.QAction(MainWindow)
         self.actionQuit_seat_angle_design.setObjectName("actionQuit_seat_angle_design")
+        self.actionDesign_preferences = QtWidgets.QAction(MainWindow)
+        self.actionDesign_preferences.setObjectName("actionDesign_preferences")
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
@@ -1606,6 +1608,7 @@ class Ui_MainWindow(object):
         self.menuEdit.addAction(self.actionCut)
         self.menuEdit.addAction(self.actionCopy)
         self.menuEdit.addAction(self.actionPaste)
+        self.menuEdit.addAction(self.actionDesign_preferences)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuView.addSeparator()
         self.menuHelp.addAction(self.actionSample_Reports)
@@ -1948,6 +1951,7 @@ class Ui_MainWindow(object):
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question"))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionQuit_seat_angle_design.setText(_translate("MainWindow", "Quit"))
+        self.actionDesign_preferences.setText(_translate("MainWindow", "Design preferences"))
 
 import icons_rc
 

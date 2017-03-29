@@ -1357,8 +1357,8 @@ class MainController(QMainWindow):
         self.unchecked_all_checkbox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
                                               self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.alist[9],self.display, self.folder, self.connection)
-
+                                              self.alist[7], self.alist[8], self.alist[9], self.alist[10], self.display, self.folder, self.connection)
+        
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
 

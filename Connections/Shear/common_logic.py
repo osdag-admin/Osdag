@@ -58,7 +58,7 @@ from Connections.Shear.SeatedAngle.nut_bolt_placement import NutBoltArray as sea
 from utilities import osdag_display_shape
 
 import OCC.V3d
-from OCC.Quantity import Quantity_NOC_SADDLEBROWN
+from OCC.Quantity import Quantity_NOC_SADDLEBROWN, Quantity_NOC_BLUE1
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 
 from Connections.Shear.Finplate.drawing_2D import FinCommonData
@@ -531,7 +531,7 @@ class CommonDesignLogic(object):
             if self.connection == "Finplate" or self.connection == "Endplate":
                 osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.plateModel, color= Quantity_NOC_BLUE1, update=True)
 
             elif self.connection == "cleatAngle":
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
@@ -542,7 +542,7 @@ class CommonDesignLogic(object):
                 # nutboltlist = self.connectivityObj.nutBoltArray.getModels()
                 # for nutbolt in nutboltlist:
                 #     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.get_models()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -551,7 +551,7 @@ class CommonDesignLogic(object):
 
         if flag is True:
 
-            if self.loc == "Column web-Beam web":
+            if self.loc == "Column web-Beam web" or self.loc == "Column web-Beam flange":
                 self.connectivityObj = self.create3DColWebBeamWeb()
 
             elif self.loc == "Column flange-Beam web" or self.loc == "Column flange-Beam flange":

@@ -642,7 +642,7 @@ class Fin2DCreatorFront(object):
         self.BC1 = self.BA6 + self.dataObj.col_R1 * np.array([0, -1])
 
     def callCFBWfront(self, fileName):
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-350 -380 1200 1300'))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-400 -380 1300 1300'))
 
         dwg.add(dwg.polyline(points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.FE), (self.FH)).stroke('blue', width=2.5, linecap='square'))
@@ -695,7 +695,7 @@ class Fin2DCreatorFront(object):
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
         # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
-        ptSecC = self.FA2 + (410 * np.array([0, -1]))
+        ptSecC = self.FA2 + (500 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -2058,7 +2058,7 @@ class Fin2DCreatorSide(object):
         '''
         vb_width = str(float(4 * self.dataObj.D_col))
         vb_ht = str(float(1.4 * self.dataObj.col_L))
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-40 -100 ' + vb_width + ' ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-350 -100 ' + vb_width + ' ' + vb_ht))
 
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))

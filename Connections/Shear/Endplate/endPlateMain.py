@@ -1447,6 +1447,7 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
         dict_angle_data = {}
+        dict_topangle_data = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiobj["Bolt"]["Diameter (mm)"])
@@ -1454,7 +1455,7 @@ class MainController(QMainWindow):
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
         nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiobj, dictbeamdata, dictcoldata, dict_angle_data,loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiobj, dictbeamdata, dictcoldata, dict_angle_data, dict_topangle_data, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1467,7 +1468,10 @@ class MainController(QMainWindow):
         self.unchecked_all_checkbox()
         connection = "Endplate"
 
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9],self.display, self.folder,connection)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
+                                              self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                              self.alist[8], self.alist[9],self.alist[10], self.display,
+                                              self.folder,connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()

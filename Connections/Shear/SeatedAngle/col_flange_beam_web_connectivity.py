@@ -29,8 +29,8 @@ class ColFlangeBeamWeb(object):
         self.angle = angle
         #         self.topclipangle = topclipangle
         self.topclipangle = topclipangle
-        self.nutBoltArray = nutBoltArray
-        #         self.bnutBoltArray = bnutBoltArray
+        self.nut_bolt_array = nutBoltArray
+        #         self.bnut_bolt_array = bnutBoltArray
         self.columnModel = None
         self.beamModel = None
         self.angleModel = None
@@ -55,9 +55,9 @@ class ColFlangeBeamWeb(object):
         #         self.plateModel = self.plate.createModel()
         #         self.weldModelLeft = self.weldLeft.createModel()
         #         self.weldModelRight = self.weldRight.createModel()
-        self.nutboltArrayModels = self.nutBoltArray.createModel()
+        self.nutboltArrayModels = self.nut_bolt_array.createModel()
 
-    #         self.bnutBoltArrayModels = self.bnutBoltArray.createModel()
+    #         self.bnutBoltArrayModels = self.bnut_bolt_array.createModel()
 
     def creatColumGeometry(self):
         columnOrigin = numpy.array([0, 0, 0])
@@ -152,7 +152,7 @@ class ColFlangeBeamWeb(object):
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
 
-        self.nutBoltArray.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir, bnutboltArrayOrigin, bgaugeDir, bpitchDir, bboltDir, topclipnutboltArrayOrigin,
+        self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir, bnutboltArrayOrigin, bgaugeDir, bpitchDir, bboltDir, topclipnutboltArrayOrigin,
                                 topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin, topclipbgaugeDir, topclipbpitchDir,
                                 topclipbboltDir)
 
@@ -162,15 +162,15 @@ class ColFlangeBeamWeb(object):
         # + self.nutBoltArray.getnutboltModels()
         # return [self.columnModel,self.plateModel, self.weldModelLeft,self.weldModelRight,
         #         self.beamModel] + self.nutBoltArray.getModels()
-        return [self.columnModel, self.beamModel, self.angleModel, self.topclipangleModel] + self.nutBoltArray.getModels()
+        return [self.columnModel, self.beamModel, self.angleModel, self.topclipangleModel] + self.nut_bolt_array.getModels()
 
     def get_nutboltmodels(self):
-        return self.nutBoltArray.getModels()
+        return self.nut_bolt_array.getModels()
         # return self.nutBoltArray.getboltModels()
 
     def get_beamModel(self):
         finalbeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.get_beam_bolts()
+        nutBoltlist = self.nut_bolt_array.get_beam_bolts()
         print len(nutBoltlist)
         for bolt in nutBoltlist:
             finalbeam = BRepAlgoAPI_Cut(finalbeam,bolt).Shape()
@@ -182,7 +182,7 @@ class ColFlangeBeamWeb(object):
 
     def get_columnModel(self):
         finalcol = self.columnModel
-        nutBoltlist = self.nutBoltArray.get_column_bolts()
+        nutBoltlist = self.nut_bolt_array.get_column_bolts()
         print len(nutBoltlist)
         for bolt in nutBoltlist:
             finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()

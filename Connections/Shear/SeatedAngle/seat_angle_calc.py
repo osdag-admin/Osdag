@@ -198,6 +198,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_value = 0.0
         self.bolt_group_capacity = 0.0
         self.bolts_required = 1
+        self.bolts_provided = 1
         self.num_rows = 1
         self.num_cols = 1
         self.min_end_dist = 1
@@ -421,6 +422,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Capacity of Bolt (kN)": 45.3,
             "Bolt group capacity (kN)": 181.2,
             "No. of Bolts": 4,
+            "No. of Bolts Required": self.bolts_required,
             "No. of Row": 2,
             "No. of Column": 2,
             "Pitch Distance (mm)": self.pitch,

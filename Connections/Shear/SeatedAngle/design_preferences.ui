@@ -335,12 +335,12 @@ p, li { white-space: pre-wrap; }
          </property>
          <item>
           <property name="text">
-           <string>Yes</string>
+           <string>No</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>No</string>
+           <string>Yes</string>
           </property>
          </item>
         </widget>
@@ -348,7 +348,7 @@ p, li { white-space: pre-wrap; }
        <item row="8" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Slip factor (mu_f)</string>
+          <string>Slip factor ( µf)</string>
          </property>
         </widget>
        </item>
@@ -373,7 +373,7 @@ frictional resistance to slip (n_e)</string>
        <item row="9" column="4">
         <widget class="QLineEdit" name="txt_frictional_resistance">
          <property name="text">
-          <string/>
+          <string>1</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -486,12 +486,12 @@ corrosive influences?</string>
           <widget class="QComboBox" name="combo_detailingmemebers">
            <item>
             <property name="text">
-             <string>Yes</string>
+             <string>No</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>No</string>
+             <string>Yes</string>
             </property>
            </item>
           </widget>

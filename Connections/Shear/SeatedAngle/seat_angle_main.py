@@ -83,6 +83,17 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
 
+        self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
+        self.saved_designPref["bolt"]["slip_factor"] = float(self.ui.txt_slip_factor.text())
+        self.saved_designPref["bolt"]["frictional_resist"] = int(self.ui.txt_frictional_resistance.text())
+
+        # self.saved_designPref["weld"] = {}
+        # weldType = str(self.ui.combo_weldType.currentText())
+        # self.saved_designPref["weld"]["typeof_weld"] = weldType
+        # if weldType == "Shop weld":
+        #     self.saved_designPref["weld"]["safety_factor"] = float(1.25)
+        # else:
+        #     self.saved_designPref["weld"]["safety_factor"] = float(1.5)
 
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
@@ -98,6 +109,7 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
 
         self.saved = True
+        self.saved_designPref["detailing"]["corrosive"] = str(self.ui.combo_detailingmemebers.currentText())
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
@@ -1746,7 +1758,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
+    # folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
+    folder = None
     window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

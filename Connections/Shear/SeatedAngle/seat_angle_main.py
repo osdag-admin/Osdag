@@ -230,7 +230,7 @@ class MyAboutOsdag(QDialog):
 
 # below class was previously MyPopupDialog in the other modules
 class DesignReportDialog(QDialog):
-    print "Design Report - Dseign Profile dialog box"
+    # print "Design Report - Dseign Profile dialog box"
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -590,7 +590,7 @@ class MainController(QMainWindow):
                 self.ui.combo_column_section.addItems(get_beamcombolist())
 
             self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
-            print uiObj
+            # print uiObj
             self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
 
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
@@ -1512,7 +1512,7 @@ class MainController(QMainWindow):
                                               self.folder,self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
-        print "resultobj from seat_angle_main",self.resultObj
+        # print "resultobj from seat_angle_main",self.resultObj
         alist = self.resultObj.values()
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
@@ -1696,7 +1696,7 @@ def set_osdaglogger():
     if __name__ == '__main__':
         fh = logging.FileHandler("./seatangle.log", mode="a")
     else:
-        fh = logging.FileHandler(os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log"), mode="a")
+        fh = logging.FileHandler(os.path.join(os.getcwd(),os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")), mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1758,8 +1758,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    # folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
-    folder = None
+    folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
+    # folder = None
     window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

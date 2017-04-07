@@ -6,7 +6,7 @@ Created on 07-Jun-2015
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from ModelUtils import getGpPt
+from Connections.Component.ModelUtils import getGpPt
 
 
 class NutBoltArray():
@@ -132,5 +132,4 @@ pDir      |      |       | End distance  |
 
     def get_models(self):
         return self.models
-    
     

@@ -510,8 +510,8 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
         elif component == "SeatAngle":
-            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='BLUE1', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='BLUE1', update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -537,8 +537,8 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
             else:
-                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='BLUE1', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color='BLUE1', update=True)
                 # nutboltlist = self.connectivityObj.nutBoltArray.getModels()
                 # for nutbolt in nutboltlist:
                 #     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)

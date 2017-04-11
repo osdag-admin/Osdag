@@ -105,7 +105,7 @@ class SvgWindow(object):
             #shutil.copyfile(png_image_path, str(QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", "SVG (*.svg)")))
 
         elif view == "Side":
-            png_image_path = (self.folder, "images_html", "endSide.svg")
+            png_image_path =os.path.join (self.folder, "images_html", "endSide.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             shutil.copyfile(png_image_path, file_name)

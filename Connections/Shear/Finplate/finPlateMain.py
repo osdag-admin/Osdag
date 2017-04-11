@@ -563,7 +563,13 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
+
+        # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
         '''
@@ -577,7 +583,12 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxFinplate.setEnabled(True)
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
+
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 

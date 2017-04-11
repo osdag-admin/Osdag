@@ -56,7 +56,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     projecttitle = str(reportsummary['ProjectTitle'])
     subtitle = str(reportsummary['Subtitle'])
     jobnumber = str(reportsummary['JobNumber'])
-    method = str(reportsummary['Method'])
+    # method = str(reportsummary['Method'])
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
 
@@ -184,9 +184,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -509,9 +509,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -642,9 +642,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -943,9 +943,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -1048,9 +1048,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, ""]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')

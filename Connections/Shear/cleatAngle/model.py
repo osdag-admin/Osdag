@@ -18,7 +18,7 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'osdag')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Rev_osdag')
 #     filepath = "D:\EclipseWorkspace\OsdagWorkshop\Database\CleatSections"
 
 #     db = QSqlDatabase.database("QSQLITE")

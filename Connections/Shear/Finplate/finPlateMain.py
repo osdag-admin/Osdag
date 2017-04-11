@@ -223,7 +223,7 @@ class MyPopupDialog(QDialog):
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
-        self.desired_location(filename[0])
+        self.desired_location(filename)
 
         return str(filename)
 
@@ -234,7 +234,7 @@ class MyPopupDialog(QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.foldloader), "Profile"), '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()

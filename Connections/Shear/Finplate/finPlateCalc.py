@@ -282,7 +282,8 @@ def finConn(uiObj):
             bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,n_e,bolt_hole_type)
             bolt_bearing_capacity = 'N/A'
             bolt_capacity = bolt_shear_capacity
-            # TODO update report, output window'- disable bolt bearing capacity
+            # TODO update report - bolt capacities (after design preferences are added to report)
+            # TODO update output window - disable bolt bearing capacity
         if shear_load != 0:
        # bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
 

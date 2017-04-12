@@ -2,7 +2,8 @@
 from numpy import float
 import cmath
 import math
-import sys;
+import sys
+from Connections.connection_calculations import ConnectionCalculations
 
 from model import *
 import logging
@@ -245,13 +246,21 @@ def end_connection(ui_obj):
         t_thinner = min(column_w_t.real, end_plate_t.real)
     
     if bolt_type == 'HSFG':
-        
-        bolt_shear_capacity = HSFG_bolt_shear(0.48, bolt_dia, 1, bolt_fu)
+        # TODO Set parameters based on updated design preferences input from GUI
+        mu_f = 0.4
+        n_e = 1 # number of effective interfaces offering frictional resistance
+        bolt_hole_type = 1 # 1 - standard hole, 0 - oversize hole
+        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, bolt_hole_type)
+        #bolt_shear_capacity = HSFG_bolt_shear(0.48, bolt_dia, 1, bolt_fu)
+        bolt_bearing_capacity = 'N/A'
+        # TODO GUI - disable bearing capacity in output doc
+        # TODO update design report
+        bolt_capacity = bolt_shear_capacity
     else:
         bolt_shear_capacity = black_bolt_shear(bolt_dia, 1, bolt_fu)
-    bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, beam_fu, beam_fu).real
-    
-    bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
+        bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, beam_fu, beam_fu).real
+        bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
+
     
     if shear_load != 0:
         #                 bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))

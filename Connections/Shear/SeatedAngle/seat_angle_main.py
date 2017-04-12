@@ -317,7 +317,7 @@ class MainController(QMainWindow):
 
         self.grade_type = {'Please Select Type': '',
                            'HSFG': [8.8, 10.8],
-                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.combo_bolt_type.setCurrentIndex(0)

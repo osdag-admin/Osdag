@@ -318,13 +318,13 @@ class MainController(QMainWindow):
 
         self.gradeType = {'Select Bolt Type': '',
                           'HSFG': [8.8, 10.8],
-                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.comboBoltType.addItems(self.gradeType.keys())
         self.ui.comboBoltType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboBoltType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        self.retrieve_prevstate()
+        ###TODAY####self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
@@ -419,7 +419,7 @@ class MainController(QMainWindow):
         self.result_obj = None
         self.ui_obj = None
         self.commLogicObj = None
-        self.designPrefDialog = DesignPreferences(self)
+        #self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))

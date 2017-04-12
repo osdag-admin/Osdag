@@ -11,30 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string/>
+   <string>Tutorial</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="ResourceFiles/icons.qrc">
+   <iconset>
     <normaloff>:/newPrefix/images/Osdag.png</normaloff>:/newPrefix/images/Osdag.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="ResourceFiles/icons.qrc">:/newPrefix/images/click_image.png</pixmap>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
     <widget class="QTextBrowser" name="textBrowser">
      <property name="html">
       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

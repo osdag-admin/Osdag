@@ -1798,10 +1798,13 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    qfile_instance = QFileDialog.Options()
-    # folder, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    # folder = str(folder)
-    folder = "F:\Osdag_workspace\1"
-    window = MainController(folder)
+    # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
+    workspace_folder_path = "F:\Osdag_workspace"
+    if not os.path.exists(workspace_folder_path):
+        os.mkdir(workspace_folder_path, 0755)
+    image_folder_path = os.path.join(workspace_folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(workspace_folder_path)
     window.show()
     sys.exit(app.exec_())

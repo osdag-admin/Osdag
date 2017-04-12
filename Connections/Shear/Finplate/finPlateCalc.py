@@ -273,13 +273,13 @@ def finConn(uiObj):
         if bolt_type == 'Black Bolt':
             bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu)
             bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,kb, beam_fu)
-            bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
+            bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
         elif bolt_type == 'HSFG':
             # TODO update mu_f, bolt_hole_type from design preferences
             mu_f = 0.4
             bolt_hole_type = 1 # 1 for standard, 0 for oversize hole
             n_e = 1 # number of effective surfaces offering fricitonal resistance
-            bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,n_e,bolt_hole_type)
+            bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,mu_f,n_e,bolt_hole_type)
             bolt_bearing_capacity = 'N/A'
             bolt_capacity = bolt_shear_capacity
             # TODO update report - bolt capacities (after design preferences are added to report)

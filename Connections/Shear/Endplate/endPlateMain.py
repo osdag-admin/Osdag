@@ -1798,6 +1798,10 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    window = MainController()
+    qfile_instance = QFileDialog.Options()
+    # folder, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
+    # folder = str(folder)
+    folder = "F:\Osdag_workspace\1"
+    window = MainController(folder)
     window.show()
     sys.exit(app.exec_())

@@ -539,12 +539,12 @@ class MainController(QMainWindow):
 
     def save_cadImages(self):
 
-        files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
+        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
         fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
 

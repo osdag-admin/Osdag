@@ -280,7 +280,7 @@ class DesignReportDialog(QDialog):
         report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        report_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        # report_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
         return report_summary
 
@@ -494,7 +494,11 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
 
     def enableViewButtons(self):
         '''
@@ -510,7 +514,11 @@ class MainController(QMainWindow):
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
 
     def convert_col_combo_to_beam(self):
         loc = self.ui.combo_connectivity.currentText()
@@ -747,7 +755,7 @@ class MainController(QMainWindow):
 
         # Creates PDF
         if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
@@ -755,8 +763,11 @@ class MainController(QMainWindow):
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
-        pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
-                         options=options)
+        file_type = "PDF(*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", file_type)
+        pdfkit.from_file(filename, fname, configuration=config, options=options)
+        # pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config,
+        #                  options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
 

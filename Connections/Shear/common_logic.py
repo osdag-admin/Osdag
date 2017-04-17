@@ -535,7 +535,7 @@ class CommonDesignLogic(object):
 
             elif self.connection == "cleatAngle":
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
+                #osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
             else:
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)

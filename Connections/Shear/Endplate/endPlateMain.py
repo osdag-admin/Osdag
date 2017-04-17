@@ -286,7 +286,7 @@ class MainController(QMainWindow):
         
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
-                         'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                         'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 10.9, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboType.setCurrentIndex(0)
@@ -339,7 +339,7 @@ class MainController(QMainWindow):
         self.ui.actionZoom_in.triggered.connect(self.call_zoom_in)
         self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
         self.ui.actionSave_3D_model.triggered.connect(self.save_3d_cad_images)
-        self.ui.actionSave_CAD_image.triggered.connect(self.save_2d_cad_images)
+        self.ui.actionSave_CAD_image.triggered.connect(self.save_cadImages)
         self.ui.actionSave_front_view.triggered.connect(lambda: self.callend2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.callend2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.callend2D_Drawing("Top"))
@@ -429,15 +429,17 @@ class MainController(QMainWindow):
     def call_panning(self):
         self.display.Pan(50, 0)
 
-    def save_2d_cad_images(self):
-        files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        filename,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
-        fname = str(filename)
-        file_extension = filename.split(".")[-1]
+    def save_cadImages(self):
 
-        if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
-            self.display.ExportToImage(fname)
+        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+        fName = str(fileName)
+        file_extension = fName.split(".")[-1]
+
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
+            self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
+
 
     def disable_view_buttons(self):
         '''

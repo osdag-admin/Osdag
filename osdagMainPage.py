@@ -4,6 +4,9 @@ Created on 31-Mar-2016
 @author: deepa
 '''
 import sys
+from PyQt5 import Qt
+
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from ui_OsdagMainPage import Ui_MainWindow
 from ui_tutorial import Ui_Tutorial
@@ -45,6 +48,7 @@ class OsdagMainWindow(QMainWindow):
 
     def __init__(self):
         QMainWindow.__init__(self)
+        #show_msg = pyqtSignal()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
@@ -59,9 +63,10 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_gantry.clicked.connect(self.unavailable)
         self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
-
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
+
+
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
@@ -184,7 +189,7 @@ class OsdagMainWindow(QMainWindow):
 
 
     def unavailable(self):
-        QMessageBox.about(self, "INFO", "This module is not available in this version.")
+        QMessageBox.about(self, "INFO", "This module is not available in the current version.")
         # Following code maintain for future coding.
         # self.ui.btn_beamCol.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
         # self.ui.btn_compression.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))

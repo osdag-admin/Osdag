@@ -79,14 +79,14 @@ class Angle(object):
         self.T = T
         self.R1 = R1
         self.R2 = R2
-        self.secOrigin = numpy.array([0, 0, 0])
+        self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
         self.vDir = self.wDir * self.uDir
         self.computeParams()
 
     def place(self, secOrigin, uDir, wDir):
-        self.secOrigin = secOrigin
+        self.sec_origin = secOrigin
         self.uDir = uDir
         self.wDir = wDir
         self.computeParams()
@@ -94,26 +94,26 @@ class Angle(object):
     def computeParams(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
         root2 = math.sqrt(2)
-        self.a1 = self.secOrigin
-        self.a2 = self.secOrigin + (self.A) * self.vDir
-        self.a3 = self.secOrigin + (self.T - self.R2) * self.uDir + self.A * self.vDir
-        self.a4 = self.secOrigin + (self.T - self.R2 + self.R2 / root2) * self.uDir + (
+        self.a1 = self.sec_origin
+        self.a2 = self.sec_origin + (self.A) * self.vDir
+        self.a3 = self.sec_origin + (self.T - self.R2) * self.uDir + self.A * self.vDir
+        self.a4 = self.sec_origin + (self.T - self.R2 + self.R2 / root2) * self.uDir + (
                                                                                       self.A - self.R2 + self.R2 / root2) * self.vDir
-        self.a5 = self.secOrigin + (self.T) * self.uDir + (self.A - self.R2) * self.vDir
-        self.a6 = self.secOrigin + (self.T) * self.uDir + (self.T + self.R1) * self.vDir
-        self.a7 = self.secOrigin + (self.T + self.R1 - self.R1 / root2) * self.uDir + (
+        self.a5 = self.sec_origin + (self.T) * self.uDir + (self.A - self.R2) * self.vDir
+        self.a6 = self.sec_origin + (self.T) * self.uDir + (self.T + self.R1) * self.vDir
+        self.a7 = self.sec_origin + (self.T + self.R1 - self.R1 / root2) * self.uDir + (
                                                                                       self.T + self.R1 - self.R1 / root2) * self.vDir
-        self.a8 = self.secOrigin + (self.T + self.R1) * self.uDir + self.T * self.vDir
-        self.a9 = self.secOrigin + (self.B - self.R2) * self.uDir + self.T * self.vDir
-        self.a10 = self.secOrigin + (self.B - self.R2 + self.R2 / root2) * self.uDir + (
+        self.a8 = self.sec_origin + (self.T + self.R1) * self.uDir + self.T * self.vDir
+        self.a9 = self.sec_origin + (self.B - self.R2) * self.uDir + self.T * self.vDir
+        self.a10 = self.sec_origin + (self.B - self.R2 + self.R2 / root2) * self.uDir + (
                                                                                        self.T - self.R2 + self.R2 / root2) * self.vDir
-        self.a11 = self.secOrigin + (self.B) * self.uDir + (self.T - self.R2) * self.vDir
-        self.a12 = self.secOrigin + self.B * self.uDir
+        self.a11 = self.sec_origin + (self.B) * self.uDir + (self.T - self.R2) * self.vDir
+        self.a12 = self.sec_origin + self.B * self.uDir
 
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6, self.a7, self.a8, self.a9, self.a10,
                        self.a11, self.a12]
 
-    def createModel(self):
+    def create_model(self):
 
         ######################################################
         edges = []

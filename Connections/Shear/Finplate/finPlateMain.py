@@ -285,7 +285,7 @@ class MainController(QMainWindow):
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.9],
-                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8,9.8,10.9, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboType.setCurrentIndex(0)
@@ -539,12 +539,12 @@ class MainController(QMainWindow):
 
     def save_cadImages(self):
 
-        files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
+        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
         fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
 

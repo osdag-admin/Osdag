@@ -91,15 +91,30 @@ class DesignPreferences(QDialog):
     def set_default_para(self):
         '''
         '''
+        # uiObj = self.main_controller.getuser_inputs()
+        # boltDia = int(uiObj["Bolt"]["Diameter (mm)"])#int
+        # bolt_grade = float(uiObj["Bolt"]["Grade"])#float
+        # clearance = str(self.get_clearance(boltDia))
+        # bolt_fu = str(self.get_boltFu(bolt_grade))
+        #
+        # self.ui.combo_boltHoleType.setCurrentIndex(0)
+        # self.ui.txt_boltHoleClearance.setText(clearance)
+        # self.ui.txt_boltFu.setText(bolt_fu)
         uiObj = self.main_controller.getuser_inputs()
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])#int
-        bolt_grade = float(uiObj["Bolt"]["Grade"])#float
-        clearance = str(self.get_clearance(boltDia))
-        bolt_fu = str(self.get_boltFu(bolt_grade))
+        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
+            pass
+        else:
+            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+            clearance = str(self.get_clearance(boltDia))
+            self.ui.txt_boltHoleClearance.setText(clearance)
+        if uiObj["Bolt"]["Grade"] == '':
+            pass
+        else:
+            bolt_grade = float(uiObj["Bolt"]["Grade"])
+            bolt_fu = str(self.get_boltFu(bolt_grade))
+            self.ui.txt_boltFu.setText(bolt_fu)
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        self.ui.txt_boltHoleClearance.setText(clearance)
-        self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
@@ -318,13 +333,13 @@ class MainController(QMainWindow):
 
         self.gradeType = {'Select Bolt Type': '',
                           'HSFG': [8.8, 10.8],
-                          'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.comboBoltType.addItems(self.gradeType.keys())
         self.ui.comboBoltType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboBoltType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        self.retrieve_prevstate()
+        ###TODAY####self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
@@ -366,7 +381,7 @@ class MainController(QMainWindow):
         self.ui.actionZoom_in.triggered.connect(self.call_zoom_in)
         self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
         self.ui.actionSave_3D_model_as.triggered.connect(self.save_3d_cad_images)
-        self.ui.actionSave_CAD_image.triggered.connect(self.save_2d_cad_images)
+        self.ui.actionSave_CAD_image.triggered.connect(self.save_cadImages)
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callCleat2D_drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.callCleat2D_drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callCleat2D_drawing("Top"))
@@ -723,15 +738,17 @@ class MainController(QMainWindow):
     def call_panning(self):
         self.display.Pan(50, 0)
 
-    def save_2d_cad_images(self):
-        files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder),  "untitled.png"), files_types)
+    def save_cadImages(self):
+
+        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
+
 
     def disable_view_buttons(self):
         '''
@@ -1335,6 +1352,7 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
         dictangledata = self.fetch_angle_param()
+        dict_topangledata ={}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1342,7 +1360,7 @@ class MainController(QMainWindow):
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
         nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata,dictangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata,dictangledata,dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1614,6 +1632,15 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    window = MainController()
+    ########################################
+    workspace_folder_path = "F:\OSDAG_workspace"
+    if not os.path.exists(workspace_folder_path):
+        os.mkdir(workspace_folder_path, 0755)
+    image_folder_path = os.path.join(workspace_folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(workspace_folder_path)
+    ########################################
+    window = MainController(workspace_folder_path)
     window.show()
     sys.exit(app.exec_())

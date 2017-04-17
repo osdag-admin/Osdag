@@ -310,9 +310,9 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=seatangle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=column_R1, R2=column_R2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick)
             topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
 
         else:
@@ -391,8 +391,8 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             angle_A = int(seat_legsizes.split('x')[0])
             angle_B = int(seat_legsizes.split('x')[1])
-            angle_r1 = float(self.dicttopangledata["R1"])
-            angle_r2 = float(self.dicttopangledata["R2"])
+            angle_r1 = float(str(self.dictangledata["R1"]))
+            angle_r2 = float(str(self.dictangledata["R2"]))
 
         elif self.connection == 'SeatedAngle':
             seat_length = self.resultObj['SeatAngle']['Length (mm)']
@@ -400,16 +400,16 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             seatangle_A = int(seat_legsizes.split('x')[0])
             seatangle_B = int(seat_legsizes.split('x')[1])
-            seatangle_r1 = float(self.dictangledata["R1"])
-            seatangle_r2 = float(self.dictangledata["R2"])
+            seatangle_r1 = float(str(self.dictangledata["R1"]))
+            seatangle_r2 = float(str(self.dictangledata["R2"]))
 
             topangle_length = self.resultObj['SeatAngle']['Length (mm)']
             topangle_thick = float(self.dicttopangledata["t"])
             top_legsizes = str(self.dicttopangledata["AXB"])
             topangle_A = int(top_legsizes.split('x')[0])
             topangle_B = int(top_legsizes.split('x')[1])
-            topangle_r1 = float(self.dicttopangledata["R1"])
-            topangle_r2 = float(self.dicttopangledata["R2"])
+            topangle_r1 = float(str(self.dicttopangledata["R1"]))
+            topangle_r2 = float(str(self.dicttopangledata["R2"]))
 
         else:
             fillet_length = self.resultObj['Plate']['height']
@@ -567,10 +567,10 @@ class CommonDesignLogic(object):
             # gpColOrigin = getGpPt(col_origin)
             # my_sphere = BRepPrimAPI_MakeSphere(gpColOrigin, 5).Shape()
             # self.display.DisplayShape(my_sphere,color = 'red',update = True)
-            # beam_origin = ((self.connectivityObj.column.sec_origin + self.connectivityObj.column.D / 2) * (-self.connectivityObj.column.vDir)) + (self.connectivityObj.column.length / 2 * self.connectivityObj.column.wDir) + (20 * (-self.connectivityObj.column.vDir))
-            # gpBeamOrigin = getGpPt(beam_origin)
-            # my_sphere1 = BRepPrimAPI_MakeSphere(gpBeamOrigin, 5).Shape()
-            # self.display.DisplayShape(my_sphere1, color='yellow', update=True)
+            angle_origin = ((self.connectivityObj.angle.sec_origin))
+            gpBeamOrigin = getGpPt(angle_origin)
+            my_sphere1 = BRepPrimAPI_MakeSphere(gpBeamOrigin, 5).Shape()
+            self.display.DisplayShape(my_sphere1, color='red', update=True)
         else:
             self.display.EraseAll()
 

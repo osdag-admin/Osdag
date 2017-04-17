@@ -310,9 +310,9 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=seatangle_A, B=angle_B, T=cleat_thick, R1=column_R1, R2=column_R2)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=column_R1, R2=column_R2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick)
             topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
 
         else:

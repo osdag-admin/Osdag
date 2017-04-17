@@ -310,14 +310,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_fu = int(float(self.bolt_grade)) * 100
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
-        if self.connectivity == "Beam-Beam":
-            self.dict_beam_data = get_beamdata(self.beam_section)
-            self.dict_column_data = get_beamdata(self.column_section)
-        else:
-            self.dict_beam_data = get_beamdata(self.beam_section)
-            self.dict_column_data = get_columndata(self.column_section)
+        self.dict_beam_data = get_beamdata(self.beam_section)
+        self.dict_column_data = get_columndata(self.column_section)
         self.dict_angle_data = get_angledata(self.angle_sec)
-
         self.beam_w_t = float(self.dict_beam_data["tw"])  # beam web thickness
         self.beam_f_t = float(self.dict_beam_data["T"])  # beam flange thickness
         self.beam_d = float(self.dict_beam_data["D"])  # beam depth

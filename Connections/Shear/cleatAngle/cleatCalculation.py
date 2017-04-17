@@ -7,6 +7,7 @@ Created on 25-Mar-2016
 import math
 from model import *
 import logging
+from Connections.connection_calculations import ConnectionCalculations
 flag = 1
 logger = None
 

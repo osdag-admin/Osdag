@@ -1352,8 +1352,7 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
         dictangledata = self.fetch_angle_param()
-        print "Cleatangledata =", dictangledata
-        dict_topangledata = {}
+        dict_topangledata ={}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])

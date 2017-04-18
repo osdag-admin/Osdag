@@ -279,6 +279,8 @@ class CommonDesignLogic(object):
             cleat_legsizes = str(self.dictangledata["AXB"])
             angle_A = int(cleat_legsizes.split('x')[0])
             angle_B = int(cleat_legsizes.split('x')[1])
+            angle_r1 = float(str(self.dictangledata["R1"]))
+            angle_r2 = float(str(self.dictangledata["R2"]))
             # angle_A = int(self.dictangledata["A"])
             # angle_B = int(self.dictangledata["B"])
 
@@ -288,12 +290,16 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             seatangle_A = int(seat_legsizes.split('x')[0])
             seatangle_B = int(seat_legsizes.split('x')[1])
+            seatangle_r1 = float(str(self.dictangledata["R1"]))
+            seatangle_r2 = float(str(self.dictangledata["R2"]))
 
             topangle_length = self.resultObj['SeatAngle']['Length (mm)']
             topangle_thick = float(self.dicttopangledata["t"])
             top_legsizes = str(self.dicttopangledata["AXB"])
             topangle_A = int(top_legsizes.split('x')[0])
             topangle_B = int(top_legsizes.split('x')[1])
+            topangle_r1 = float(str(self.dicttopangledata["R1"]))
+            topangle_r2 = float(str(self.dicttopangledata["R2"]))
         else:
             fillet_length = self.resultObj['Plate']['height']
             fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
@@ -310,10 +316,10 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1 = angle_r1, R2 = angle_r2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick)
-            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
+            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick,R1 = seatangle_r1, R2 = seatangle_r2)
+            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1 = topangle_r1, R2 = topangle_r2)
 
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
@@ -535,7 +541,7 @@ class CommonDesignLogic(object):
 
             elif self.connection == "cleatAngle":
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-                #osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
             else:
                 osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)

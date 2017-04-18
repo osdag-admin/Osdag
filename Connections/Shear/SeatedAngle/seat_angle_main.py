@@ -195,7 +195,8 @@ class DesignPreferences(QDialog):
         '''
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
-        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+        # TODO : change grade to 10.9; also update UI
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
                   12.9: 1220}
         boltGrd = float(boltGrade)
         return boltFu[boltGrd]
@@ -445,8 +446,11 @@ class MainController(QMainWindow):
         return dict_angle_data
 
     def fetch_top_angle_para(self):
-        angle_sec = self.ui.combo_topangle_section.currentText()
-        dict_top_angle = get_angledata(angle_sec)
+        if self.ui.combo_topangle_section.currentText() is not None:
+            angle_sec = self.ui.combo_topangle_section.currentText()
+            dict_top_angle = get_angledata(angle_sec)
+        else:
+            dict_top_angle = {}
         return dict_top_angle
 
     def showFontDialogue(self):
@@ -1760,8 +1764,13 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
-    # folder = None
-    window = MainController(folder)
+    # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
+    workspace_folder_path = "F:\Osdag_workspace\seated_angle"
+    if not os.path.exists(workspace_folder_path):
+        os.mkdir(workspace_folder_path, 0755)
+    image_folder_path = os.path.join(workspace_folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(workspace_folder_path)
     window.show()
     sys.exit(app.exec_())

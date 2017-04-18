@@ -156,7 +156,7 @@ class ColFlangeBeamWeb(object):
                                 topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin, topclipbgaugeDir, topclipbpitchDir,
                                 topclipbboltDir)
 
-    def get_models(self):
+    def getModels(self):
         '''Returning 3D models
         '''
         # + self.nutBoltArray.getnutboltModels()
@@ -180,7 +180,7 @@ class ColFlangeBeamWeb(object):
         finalAngle = self.angleModel
         return finalAngle
 
-    def get_columnModel(self):
+    def get_column_model(self):
         finalcol = self.columnModel
         nutBoltlist = self.nut_bolt_array.get_column_bolts()
         print len(nutBoltlist)

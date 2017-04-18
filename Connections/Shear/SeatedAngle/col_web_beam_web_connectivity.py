@@ -146,7 +146,7 @@ class ColWebBeamWeb(object):
                   
         self.nutBoltArray.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir,bnutboltArrayOrigin,bgaugeDir,bpitchDir,bboltDir, topclipnutboltArrayOrigin, topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin,topclipbgaugeDir,topclipbpitchDir,topclipbboltDir)
       
-    def get_models(self):
+    def getModels(self):
         '''Returning 3D models
         '''
         return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nutBoltArray.getModels()

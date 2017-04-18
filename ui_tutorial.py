@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class  Ui_Tutorial(object):
+class Ui_Tutorial(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(400, 125)
@@ -17,17 +17,10 @@ class  Ui_Tutorial(object):
         Dialog.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
-        self.label = QtWidgets.QLabel(Dialog)
-        self.label.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.label.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap(":/newPrefix/images/click_image.png"))
-        self.label.setObjectName("label")
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
         self.textBrowser = QtWidgets.QTextBrowser(Dialog)
         self.textBrowser.setOpenExternalLinks(True)
         self.textBrowser.setObjectName("textBrowser")
-        self.gridLayout.addWidget(self.textBrowser, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.textBrowser, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -48,7 +41,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui =  Ui_Tutorial()
+    ui = Ui_Tutorial()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

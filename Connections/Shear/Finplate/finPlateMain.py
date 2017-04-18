@@ -223,7 +223,7 @@ class MyPopupDialog(QDialog):
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
-        self.desired_location(filename[0])
+        self.desired_location(filename)
 
         return str(filename)
 
@@ -234,7 +234,7 @@ class MyPopupDialog(QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.foldloader), "Profile"), '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -251,7 +251,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
         return input_summary
 
@@ -563,7 +563,13 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
+
+        # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
         '''
@@ -577,7 +583,12 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxFinplate.setEnabled(True)
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
+
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 

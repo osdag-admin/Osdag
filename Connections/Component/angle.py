@@ -111,7 +111,7 @@ class Angle(object):
         self.a12 = self.sec_origin + self.B * self.uDir
 
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6, self.a7, self.a8, self.a9, self.a10,
-                       self.a11, self.a12]
+                      self.a11, self.a12]
 
     def create_model(self):
 

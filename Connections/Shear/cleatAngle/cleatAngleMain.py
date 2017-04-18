@@ -754,7 +754,11 @@ class MainController(QMainWindow):
         '''
         Disables the all buttons in toolbar
         '''
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
 
         self.ui.btn_capacity.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
@@ -782,7 +786,11 @@ class MainController(QMainWindow):
         self.ui.btn_top.setEnabled(True)
         self.ui.btn_side.setEnabled(True)
 
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
 
         self.ui.btn3D.setEnabled(True)
         self.ui.chkBxBeam.setEnabled(True)
@@ -1352,8 +1360,8 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
         dictangledata = self.fetch_angle_param()
-        print "Cleatangledata =", dictangledata
         dict_topangledata = {}
+
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1361,7 +1369,7 @@ class MainController(QMainWindow):
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
         nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata,dictangledata,dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata,dictangledata, dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1374,19 +1382,17 @@ class MainController(QMainWindow):
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
         self.unchecked_all_checkbox()
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                              self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.alist[9], self.alist[10], self.display, self.folder, self.connection)
+        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4], self.alist[5], self.alist[6], self.alist[7], self.alist[8], self.alist[9], self.alist[10], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
-
-        self.displaylog_totextedit(self.commLogicObj)
         self.display_output(self.resultObj)
+        self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
         if isempty[0] == True:
-            status = self.resultObj['Bolt']['status']
             self.callCleat2D_drawing("All")
+            status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
         else:
             pass

@@ -130,7 +130,7 @@ class Ui_Capacitydetals(object):
         self.lbl_capacity.setText(_translate("Capacitydetals", "Capacity of bolt (kN)", None))
         self.lbl_boltGrp.setText(_translate("Capacitydetals", "Bolt group capacity (kN)", None))
         self.lbl_col.setText(_translate("Capacitydetals", "<html><head/><body><p><span style=\" font-weight:600;\">Supporting member</span></p></body></html>", None))
-        self.lbl_beam.setText(_translate("Capacitydetals", "<html><head/><body><p><span style=\" font-weight:600;\">Suppoted member</span></p></body></html>", None))
+        self.lbl_beam.setText(_translate("Capacitydetals", "<html><head/><body><p><span style=\" font-weight:600;\">Supported member</span></p></body></html>", None))
         self.lbl_cleat.setText(_translate("Capacitydetals", "<html><head/><body><p><span style=\" font-weight:600;\">Cleat Angle</span></p></body></html>", None))
         self.lbl_shear_b.setText(_translate("Capacitydetals", "Shear capacity (kN)", None))
         self.lbl_bearing_b.setText(_translate("Capacitydetals", "Bearing capacity (kN)", None))

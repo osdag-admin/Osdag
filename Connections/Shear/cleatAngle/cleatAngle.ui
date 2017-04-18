@@ -382,16 +382,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -456,7 +447,7 @@
      <x>0</x>
      <y>0</y>
      <width>1329</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -611,13 +602,11 @@ QMenu::item:selected {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionOsdag_Manual"/>
+    <addaction name="actionVideo_Tutorials"/>
     <addaction name="actionSample_Reports"/>
     <addaction name="actionSample_Problems"/>
-    <addaction name="actionVideo_Tutorials"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="actionFAQ"/>
     <addaction name="separator"/>
     <addaction name="actionAbout_Osdag"/>
    </widget>
@@ -4117,7 +4106,7 @@ QMenu::item:selected {
   </action>
   <action name="actionSample_Reports">
    <property name="text">
-    <string>Sample Reports</string>
+    <string>Sample Design Report</string>
    </property>
   </action>
   <action name="actionSample_Problems">

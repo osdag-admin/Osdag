@@ -24,7 +24,7 @@ class ColWebBeamWeb(object):
         self.beam = beam
         self.angle = angle
         self.topclipangle = topclipangle
-        self.nutBoltArray = nutBoltArray
+        self.nut_bolt_array = nutBoltArray
         self.columnModel = None
         self.beamModel = None
         self.angleModel= None
@@ -38,11 +38,11 @@ class ColWebBeamWeb(object):
         self.createNutBoltArray()
         
         # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
         self.angleModel = self.angle.createModel()
         self.topclipangleModel = self.topclipangle.createModel()
-        self.nutboltArrayModels = self.nutBoltArray.createModel()
+        self.nutboltArrayModels = self.nut_bolt_array.createModel()
         
     def creatColumGeometry(self):
         columnOrigin = numpy.array([0, 0, 0])
@@ -52,19 +52,19 @@ class ColWebBeamWeb(object):
         
                 
     def createBeamGeometry(self):
+        beamorigin = self.column.sec_origin + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir)
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
-        origin2 = self.column.secOrigin + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir) 
-        self.beam.place(origin2, uDir, wDir)
+        self.beam.place(beamorigin, uDir, wDir)
         
     def createAngleGeometry(self):
-        angleOrigin =((self.column.secOrigin)*self.column.vDir)+((self.column.length/2-self.beam.D/2) * self.column.wDir)+(self.angle.L/2 * (-self.column.vDir))
+        angleOrigin =((self.column.sec_origin)*self.column.vDir)+((self.column.length/2-self.beam.D/2) * self.column.wDir)+(self.angle.L/2 * (-self.column.vDir))
 
         wDir = numpy.array([0.0, 1.0, 0.0])
         uDir = numpy.array([1.0, 0.0, 0.0])
         self.angle.place(angleOrigin, uDir, wDir)
                  
-        topclipangleOrigin =((self.column.secOrigin)*self.column.vDir)+((self.column.length/2+self.beam.D/2) * self.column.wDir)+(self.topclipangle.L/2 * (self.column.vDir))
+        topclipangleOrigin =((self.column.sec_origin)*self.column.vDir)+((self.column.length/2+self.beam.D/2) * self.column.wDir)+(self.topclipangle.L/2 * (self.column.vDir))
 
         wDir = numpy.array([0.0, -1.0, 0.0])
         uDir = numpy.array([1.0, 0.0, 0.0])
@@ -144,16 +144,18 @@ class ColWebBeamWeb(object):
         # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
         #=======================================================================
                   
-        self.nutBoltArray.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir,bnutboltArrayOrigin,bgaugeDir,bpitchDir,bboltDir, topclipnutboltArrayOrigin, topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin,topclipbgaugeDir,topclipbpitchDir,topclipbboltDir)
+        self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir, bnutboltArrayOrigin, bgaugeDir, bpitchDir,
+                                bboltDir, topclipnutboltArrayOrigin, topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin,
+                                topclipbgaugeDir, topclipbpitchDir, topclipbboltDir)
       
     def get_models(self):
         '''Returning 3D models
         '''
-        return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nutBoltArray.getModels()
+        return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nutBoltArray.get_models()
         
                 
     def get_nutboltmodels(self):
-        return self.nutBoltArray.getModels()
+        return self.nutBoltArray.get_models()
     
     def get_beamModel(self):
         finalbeam = self.beamModel

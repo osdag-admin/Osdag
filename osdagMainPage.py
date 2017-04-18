@@ -70,7 +70,7 @@ class OsdagMainWindow(QMainWindow):
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
-        if loc == "Sample Reports":
+        if loc == "Sample Design Report":
             self.sample_report()
         elif loc == "Sample Problems":
             self.sample_problem()
@@ -80,8 +80,8 @@ class OsdagMainWindow(QMainWindow):
             self.about_osdag()
         elif loc == "Ask Us a Question":
             self.ask_question()
-        elif loc == "FAQ":
-            pass
+        # elif loc == "FAQ":
+        #     pass
 
     def disable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(False)

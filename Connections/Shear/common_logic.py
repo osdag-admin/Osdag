@@ -280,6 +280,8 @@ class CommonDesignLogic(object):
             cleat_legsizes = str(self.dictangledata["AXB"])
             angle_A = int(cleat_legsizes.split('x')[0])
             angle_B = int(cleat_legsizes.split('x')[1])
+            angle_r1 = float(self.dictangledata["R1"])
+            angle_r2 = float(self.dictangledata["R2"])
             # angle_A = int(self.dictangledata["A"])
             # angle_B = int(self.dictangledata["B"])
 
@@ -289,12 +291,17 @@ class CommonDesignLogic(object):
             seat_legsizes = str(self.dictangledata["AXB"])
             seatangle_A = int(seat_legsizes.split('x')[0])
             seatangle_B = int(seat_legsizes.split('x')[1])
+            seatangle_r1 = float(self.dictangledata["R1"])
+            seatangle_r2 = float(self.dictangledata["R2"])
 
             topangle_length = self.resultObj['SeatAngle']['Length (mm)']
             topangle_thick = float(self.dicttopangledata["t"])
             top_legsizes = str(self.dicttopangledata["AXB"])
             topangle_A = int(top_legsizes.split('x')[0])
             topangle_B = int(top_legsizes.split('x')[1])
+            topangle_r1 = float(self.dicttopangledata["R1"])
+            topangle_r2 = float(self.dicttopangledata["R2"])
+
         else:
             fillet_length = self.resultObj['Plate']['height']
             fillet_thickness = str(self.uiObj['Weld']['Size (mm)'])
@@ -311,11 +318,11 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+            # TODO update R1, R2 above
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick)
-            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
-
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1, R2=seatangle_r2)
+            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1, R2=topangle_r2)
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
 
@@ -345,9 +352,10 @@ class CommonDesignLogic(object):
             gap = column_tw + seat_thick + nut_T
             bgap = beam_T + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
-            colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colflangeconn.create_3dmodel()
-
+            # colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
+            # colflangeconn.create_3dmodel()
+            colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
+            colwebconn.create_3dmodel()
 
         colwebconn.create_3dmodel()
 
@@ -513,7 +521,7 @@ class CommonDesignLogic(object):
         elif component == "SeatAngle":
             osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='BLUE1', update=True)
             osdag_display_shape(self.display, self.connectivityObj.angleModel, color='BLUE1', update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -617,7 +625,7 @@ class CommonDesignLogic(object):
             endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             endCommonObj.save_to_svg(str(fileName), view)
         elif self.connection == "cleatAngle":
-            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,folder)
+            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, folder)
             cleatCommonObj.save_to_svg(str(fileName),view)
         else:
             seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, self.dicttopangledata, folder)

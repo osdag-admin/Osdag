@@ -161,11 +161,11 @@ class ColFlangeBeamWeb(object):
         '''
         # + self.nutBoltArray.getnutboltModels()
         # return [self.columnModel,self.plateModel, self.weldModelLeft,self.weldModelRight,
-        #         self.beamModel] + self.nutBoltArray.getModels()
-        return [self.columnModel, self.beamModel, self.angleModel, self.topclipangleModel] + self.nut_bolt_array.getModels()
+        #         self.beamModel] + self.nutBoltArray.get_models()
+        return [self.columnModel, self.beamModel, self.angleModel, self.topclipangleModel] + self.nut_bolt_array.get_models()
 
     def get_nutboltmodels(self):
-        return self.nut_bolt_array.getModels()
+        return self.nut_bolt_array.get_models()
         # return self.nutBoltArray.getboltModels()
 
     def get_beamModel(self):
@@ -180,7 +180,7 @@ class ColFlangeBeamWeb(object):
         finalAngle = self.angleModel
         return finalAngle
 
-    def get_columnModel(self):
+    def get_column_model(self):
         finalcol = self.columnModel
         nutBoltlist = self.nut_bolt_array.get_column_bolts()
         print len(nutBoltlist)

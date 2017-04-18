@@ -4,50 +4,55 @@ p1
 (dp2
 S'fu (MPa)'
 p3
-I410
-sS'Connectivity'
+V410
 p4
-S'Column flange-Beam flange'
+sS'Connectivity'
 p5
-sS'ColumnSection'
+S'Column flange-Beam flange'
 p6
-S'ISSC 200'
+sS'ColumnSection'
 p7
-sS'BeamSection'
+S'UC 203 x 203 x 86'
 p8
-S'ISMB 400'
+sS'BeamSection'
 p9
-sS'fy (MPa)'
+S'MB 300'
 p10
-I250
-ssS'Load'
+sS'fy (MPa)'
 p11
-(dp12
-S'ShearForce (kN)'
+V250
+p12
+ssS'Load'
 p13
-F100.0
-ssS'Angle'
-p14
-(dp15
-S'TopAngleSection'
+(dp14
+S'ShearForce (kN)'
+p15
+V100.0
 p16
-S'ISA 125X75X12'
+ssS'Angle'
 p17
-sS'AngleSection'
-p18
-S'ISA 100X75X12'
+(dp18
+S'TopAngleSection'
 p19
-ssS'Bolt'
+S'150 150 X 10'
 p20
-(dp21
-S'Grade'
+sS'AngleSection'
+p21
+S'150 150 X 15'
 p22
-F10.8
-sS'Diameter (mm)'
+ssS'Bolt'
 p23
-I20
-sS'Type'
-p24
-S'HSFG'
+(dp24
+S'Grade'
 p25
+V10.8
+p26
+sS'Diameter (mm)'
+p27
+V20
+p28
+sS'Type'
+p29
+S'HSFG'
+p30
 ss.

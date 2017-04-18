@@ -310,9 +310,9 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  # 150
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=seatangle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=column_R1, R2=column_R2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=angle_A, B=seatangle_B, T=seat_thick)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick)
             topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick)
 
         else:
@@ -512,7 +512,7 @@ class CommonDesignLogic(object):
         elif component == "SeatAngle":
             osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
             osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -616,7 +616,7 @@ class CommonDesignLogic(object):
             endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             endCommonObj.save_to_svg(str(fileName), view)
         elif self.connection == "cleatAngle":
-            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,folder)
+            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, folder)
             cleatCommonObj.save_to_svg(str(fileName),view)
         else:
             seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, self.dicttopangledata, folder)

@@ -1068,9 +1068,10 @@ class Seat2DCreatorFront(object):
         pt_seat_angleyy1 = pt_seat_anglexx1 + (self.data_object.beam_length + 110) * np.array([1, 0])
         self.data_object.draw_faint_line(pt_seat_anglexx1, pt_seat_angleyy1, dwg)
 
-        point4 = pt_seat_anglexx1 - self.data_object.pitch * np.array([0, -1])
-        params = {"offset": (self.data_object.beam_length + 110), "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
-        self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point4, str(self.data_object.pitch) , params)
+
+        # point4 = pt_seat_anglexx1 - self.data_object.pitch * np.array([0, -1])
+        # params = {"offset": (self.data_object.beam_length + 110), "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        # self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point4, str(self.data_object.pitch) , params)
 
         # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         pt_seat_anglexx = self.SD3
@@ -3268,9 +3269,9 @@ class Seat2DCreatorSide(object):
         pt_seat_angleyy2 = pt_seat_anglexx2 + (self.data_object.col_depth + 50) * np.array([-1,0])
         self.data_object.draw_faint_line(pt_seat_anglexx2, pt_seat_angleyy2, dwg)
 
-        point4 = pt_seat_anglexx2 + self.data_object.pitch * np.array([0, 1])
-        params = {"offset": (self.data_object.col_depth + 50), "textoffset": 40, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-        self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx2, point4, str(self.data_object.pitch), params)
+        # point4 = pt_seat_anglexx2 + self.data_object.pitch * np.array([0, 1])
+        # params = {"offset": (self.data_object.col_depth + 50), "textoffset": 40, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        # self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx2, point4, str(self.data_object.pitch), params)
 
         # ======================================  2D view name ====================================
         ptx = self.SD + (self.data_object.col_width / 5.5) * np.array([0, 1]) + 50 * np.array([-1, 0])

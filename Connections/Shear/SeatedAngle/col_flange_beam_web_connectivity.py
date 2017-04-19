@@ -50,8 +50,8 @@ class ColFlangeBeamWeb(object):
         # Call for createModel
         self.columnModel = self.column.create_model()
         self.beamModel = self.beam.create_model()
-        self.angleModel = self.angle.createModel()
-        self.topclipangleModel = self.topclipangle.createModel()
+        self.angleModel = self.angle.create_model()
+        self.topclipangleModel = self.topclipangle.create_model()
         #         self.plateModel = self.plate.createModel()
         #         self.weldModelLeft = self.weldLeft.createModel()
         #         self.weldModelRight = self.weldRight.createModel()
@@ -93,7 +93,7 @@ class ColFlangeBeamWeb(object):
         boltDir = -self.angle.uDir
 
         root2 = math.sqrt(2)
-        nutboltArrayOrigin = self.angle.secOrigin
+        nutboltArrayOrigin = self.angle.sec_origin
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.R2 * (1 - 1 / root2) * self.angle.uDir
@@ -108,7 +108,7 @@ class ColFlangeBeamWeb(object):
         bpitchDir = -self.angle.uDir
         bboltDir = -self.angle.vDir
 
-        bnutboltArrayOrigin = self.angle.secOrigin + self.angle.B * self.angle.uDir
+        bnutboltArrayOrigin = self.angle.sec_origin + self.angle.B * self.angle.uDir
         bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir
         bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.R2 * (1 - 1 / root2) * self.angle.vDir
         bnutboltArrayOrigin = bnutboltArrayOrigin - self.angle.R2 / root2 * self.angle.uDir
@@ -122,7 +122,7 @@ class ColFlangeBeamWeb(object):
         topclippitchDir = -self.topclipangle.uDir
         topclipboltDir = -self.topclipangle.vDir
 
-        topclipnutboltArrayOrigin = self.topclipangle.secOrigin
+        topclipnutboltArrayOrigin = self.topclipangle.sec_origin
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.B * self.topclipangle.uDir
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin - self.topclipangle.R2 / root2 * self.topclipangle.uDir
@@ -139,7 +139,7 @@ class ColFlangeBeamWeb(object):
         topclipbpitchDir = -self.topclipangle.vDir
         topclipbboltDir = -self.topclipangle.uDir
 
-        topclipbnutboltArrayOrigin = self.topclipangle.secOrigin
+        topclipbnutboltArrayOrigin = self.topclipangle.sec_origin
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin - self.topclipangle.R2 / root2 * self.topclipangle.vDir

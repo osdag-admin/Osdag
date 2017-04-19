@@ -40,8 +40,8 @@ class ColWebBeamWeb(object):
         # Call for createModel
         self.columnModel = self.column.create_model()
         self.beamModel = self.beam.create_model()
-        self.angleModel = self.angle.createModel()
-        self.topclipangleModel = self.topclipangle.createModel()
+        self.angleModel = self.angle.create_model()
+        self.topclipangleModel = self.topclipangle.create_model()
         self.nutboltArrayModels = self.nut_bolt_array.createModel()
         
     def creatColumGeometry(self):
@@ -85,7 +85,7 @@ class ColWebBeamWeb(object):
         #=======================================================================
         
         root2 = math.sqrt(2)
-        nutboltArrayOrigin = self.angle.secOrigin  
+        nutboltArrayOrigin = self.angle.sec_origin
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir 
         nutboltArrayOrigin= nutboltArrayOrigin + self.angle.T * self.angle.uDir 
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.uDir 
@@ -96,7 +96,7 @@ class ColWebBeamWeb(object):
         bpitchDir = -self.angle.uDir
         bboltDir = -self.angle.vDir
         
-        bnutboltArrayOrigin = self.angle.secOrigin + self.angle.B * self.angle.uDir 
+        bnutboltArrayOrigin = self.angle.sec_origin + self.angle.B * self.angle.uDir
         bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir 
         bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.R2*(1-1/root2) * self.angle.vDir 
         bnutboltArrayOrigin = bnutboltArrayOrigin - self.angle.R2/root2*self.angle.uDir
@@ -112,7 +112,7 @@ class ColWebBeamWeb(object):
         topclippitchDir = -self.topclipangle.uDir
         topclipboltDir = -self.topclipangle.vDir
         
-        topclipnutboltArrayOrigin = self.topclipangle.secOrigin  
+        topclipnutboltArrayOrigin = self.topclipangle.sec_origin
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.B * self.topclipangle.uDir 
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir 
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin - self.topclipangle.R2/root2 * self.topclipangle.uDir 
@@ -130,7 +130,7 @@ class ColWebBeamWeb(object):
         topclipbpitchDir = -self.topclipangle.vDir
         topclipbboltDir = -self.topclipangle.uDir
         
-        topclipbnutboltArrayOrigin = self.topclipangle.secOrigin  
+        topclipbnutboltArrayOrigin = self.topclipangle.sec_origin
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir 
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir 
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin - self.topclipangle.R2/root2 * self.topclipangle.vDir 
@@ -151,15 +151,15 @@ class ColWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nutBoltArray.get_models()
+        return [self.columnModel,self.angleModel,self.beamModel,self.topclipangleModel] + self.nut_bolt_array.get_models()
         
                 
     def get_nutboltmodels(self):
-        return self.nutBoltArray.get_models()
+        return self.nut_bolt_array.get_models()
     
     def get_beamModel(self):
         finalbeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.get_beam_bolts()
+        nutBoltlist = self.nut_bolt_array.get_beam_bolts()
         for bolt in nutBoltlist:
             finalbeam = BRepAlgoAPI_Cut(finalbeam,bolt).Shape()
         return finalbeam
@@ -170,7 +170,7 @@ class ColWebBeamWeb(object):
     
     def get_columnModel(self):
         finalcol = self.columnModel
-        nutBoltlist = self.nutBoltArray.get_column_bolts()
+        nutBoltlist = self.nut_bolt_array.get_column_bolts()
         for bolt in nutBoltlist:
             finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
         return finalcol

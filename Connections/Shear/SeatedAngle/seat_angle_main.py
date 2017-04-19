@@ -635,7 +635,7 @@ class MainController(QMainWindow):
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
             # self.ui.lbl_connectivity.show()
-        elif (loc == "Column web-Beam web"):
+        elif (loc == "Column web-Beam flange"):
             picmap = QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
@@ -1776,7 +1776,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_workspace\seated_angle"
+    workspace_folder_path = "D:\Osdag_workspace\seated_angle"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

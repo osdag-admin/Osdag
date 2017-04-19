@@ -6,7 +6,7 @@ from seat_angle_calc import SeatAngleCalculation
 
 class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
-        #app = QApplication(sys.argv)
+        app = QApplication(sys.argv)
         model.module_setup()
         sample_input = create_sample_ui_input()
         self.sa_params(sample_input)
@@ -193,16 +193,16 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
 def create_sample_ui_input():
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
     input_dict['Member']['Connectivity'] = "Column flange-Beam web"
-    input_dict['Member']['BeamSection'] = "ISMB 300"
-    input_dict['Member']['ColumnSection'] = "ISSC 200"
+    input_dict['Member']['BeamSection'] = "MB 300"
+    input_dict['Member']['ColumnSection'] = "SC 200"
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
     input_dict['Load']['ShearForce (kN)'] = 100
     input_dict['Bolt']['Diameter (mm)'] = 20
     input_dict['Bolt']['Type'] = "Black Bolt"
     input_dict['Bolt']['Grade'] = "4.6"
-    input_dict['Angle']["AngleSection"] = "ISA 150X75X12"
-    input_dict['Angle']["TopAngleSection"] = "ISA 150X75X12"
+    input_dict['Angle']["AngleSection"] = "150 75X12"
+    input_dict['Angle']["TopAngleSection"] = "150 75X12"
     return input_dict
 
 
@@ -215,7 +215,7 @@ def create_sample_ui_output():
         "Shear Demand (kN/mm)": 100,
         "Shear Capacity (kN/mm)": 220,
         "Beam Shear Strength (kN/mm)": 303,
-        "Top Angle": "ISA 60X60X6"
+        "Top Angle": "60 60X6"
     }
     output_dict['Bolt'] = {
         "status": True,

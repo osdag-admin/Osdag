@@ -4,12 +4,44 @@ import math
 class ConnectionCalculations(object):
     """Perform common calculations for connection components in abstract class.
 
+    Attributes:
+        k_b (float) - factor for bolt bearing capacity calculation
+        bolt_hole_diameter (int)
+        bolt_fu (int)
+        angle_fu (int)
+        angle_fy (int)
+        min_pitch (int)
+        min_gauge (int)
+        min_edge_dist (int)
+        min_end_dist (int)
+        max_pitch (int)
+        max_edge_dist (int)
+        end_dist (int)
+        pitch (int)
+
     Note:
         This is the parent class for each connection module's calculation class.
 
     """
 
-    def bolt_hole_clearance(self, bolt_hole_type, bolt_diameter, custom_hole_clearance):
+    def __init__(self):
+        self.k_b = 1.0
+        self.bolt_hole_diameter = 1.0
+        self.bolt_fu = 1.0
+        self.angle_fu = 1.0
+        self.angle_fy = 1.0
+        self.max_spacing = 1.0
+        self.min_pitch = 1.0
+        self.min_gauge = 1.0
+        self.min_edge_dist = 1.0
+        self.min_end_dist = 1.0
+        self.max_pitch = 1.0
+        self.max_edge_dist = 1.0
+        self.end_dist = 1.0
+        self.pitch = 1.0
+
+    @staticmethod
+    def bolt_hole_clearance(bolt_hole_type, bolt_diameter, custom_hole_clearance):
         """Calculate bolt hole clearance.
 
         Args:
@@ -53,7 +85,8 @@ class ConnectionCalculations(object):
             hole_clearance = custom_hole_clearance  # units: mm
         return hole_clearance  # units: mm
 
-    def bolt_shear(self, bolt_diameter, number_of_bolts, bolt_fu):
+    @staticmethod
+    def bolt_shear(bolt_diameter, number_of_bolts, bolt_fu):
         """Calculate factored shear capacity of bolt(s) based on IS 800, Cl 10.3.3.
 
         Args:
@@ -87,6 +120,54 @@ class ConnectionCalculations(object):
         bolt_nominal_shear_capacity = bolt_fu * number_of_bolts * bolt_area / math.sqrt(3) / 1000
         return round(bolt_nominal_shear_capacity / gamma_mb, 1)
 
+    @staticmethod
+    def bolt_shear_hsfg(bolt_diameter, bolt_fu, mu_f, n_e, bolt_hole_type):
+        """ Calculate design shear capacity of a single HSFG bolt(s) based on Cl 10.4.3
+
+        Args:
+             bolt_diameter (int)
+             bolt_fu (int) - ultimate stress of bolt Fu
+             mu_f(float) - coefficient of friction/ slip factor
+             n_e (int) - number of effective interfaces offering resistance to slip
+             bolt_hole_type (int) - 1 for standard hole, 0 for oversize hole
+
+        Returns:
+            v_db - Factored shear capacity of HSFG bolt as float
+
+        Note:
+            Assumptions:
+            1) slip is not allowed at ultimate load
+            2) there is no tension acting on bolt
+            3) area of bolt at threaded portion (mm^2) is taken from DSS- N. Subramanian table 5.9 (pg 348)
+            4) the provision of long joints is applicable - Cl 10.4.3.1 and is calculated according to Cl 10.3.3.1
+            5) Minimum bolt tension (proof load) at installation assumed as bolt_area_threads*proof_stress
+            6) Reduction factor for long joints not calculated in this function
+
+        """
+        gamma_mf = 1.25  # factor of safety at ultimate load
+        proof_stress = 0.7 * bolt_fu  # proof stress
+        # bolt_area_threads - area of bolt at threads
+        bolt_area_threads = {
+            '12': 84.3,
+            '16': 157,
+            '20': 245,
+            '22': 303,
+            '24': 353,
+            '27': 459,
+            '30': 561,
+            '36': 817
+        }[str(bolt_diameter)]
+        # F_0 - minimum bolt tension (proof load) at bolt installation
+        # proof load (Kn)(minimum bolt tension)
+        F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
+        K_h = {
+            1: 1.0,
+            0: 0.85
+        }[bolt_hole_type]
+        v_nsf = mu_f * n_e * K_h * F_0  # nominal shear capacity of bolt
+        v_dsf = v_nsf / gamma_mf
+        return v_dsf
+
     def calculate_kb(self):
         """Calculate k_b for bearing capacity of bolt
 
@@ -103,7 +184,8 @@ class ConnectionCalculations(object):
                        1)
         self.k_b = round(self.k_b, 3)
 
-    def bolt_bearing(self, bolt_diameter, number_of_bolts, thickness_plate, k_b, plate_fu):
+    @staticmethod
+    def bolt_bearing(bolt_diameter, number_of_bolts, thickness_plate, k_b, plate_fu):
         """Calculate factored bearing capacity of bolt(s) based on IS 800, Cl 10.3.4.
 
         Args:
@@ -122,8 +204,8 @@ class ConnectionCalculations(object):
 
         """
         gamma_mb = 1.25
-        bolt_nominal_bearing_capacity = 2.5 * float(str(k_b) )* bolt_diameter * number_of_bolts * thickness_plate * plate_fu / (
-            1000)
+        bolt_nominal_bearing_capacity = 2.5 * float(str(k_b)) * bolt_diameter * number_of_bolts * thickness_plate * \
+                                        plate_fu / 1000
         return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
@@ -135,6 +217,7 @@ class ConnectionCalculations(object):
             bolt_hole_diameter (int)
             min_edge_multiplier (float)
             thickness_governing_min (float)
+            is_environ_corrosive (boolean)
 
         Returns:
             None

@@ -6,9 +6,8 @@ Created on 17-Mar-2016
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
-# from PyQt4 import QtGui
 from model import *
-# from PyQt4.Qt import QString
+from Connections.connection_calculations import ConnectionCalculations
 import math
 import logging
 flag = 1
@@ -271,14 +270,24 @@ def finConn(uiObj):
         # Bolt capacity calculation
         t_thinner = min(beam_w_t, web_plate_t);
         bolt_planes = 1
-        bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu)
-        bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,kb, beam_fu)
-
-        bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity);
+        if bolt_type == 'Black Bolt':
+            bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu)
+            bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,kb, beam_fu)
+            bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
+        elif bolt_type == 'HSFG':
+            # TODO update mu_f, bolt_hole_type from design preferences
+            mu_f = 0.4
+            bolt_hole_type = 1 # 1 for standard, 0 for oversize hole
+            n_e = 1 # number of effective surfaces offering fricitonal resistance
+            bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,mu_f,n_e,bolt_hole_type)
+            bolt_bearing_capacity = 'N/A'
+            bolt_capacity = bolt_shear_capacity
+            # TODO update report - bolt capacities (after design preferences are added to report)
+            # TODO update output window - disable bolt bearing capacity
         if shear_load != 0:
        # bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
 
-            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1; 
+            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1;
         else:
             bolts_required = int(shear_load / bolt_capacity)
             

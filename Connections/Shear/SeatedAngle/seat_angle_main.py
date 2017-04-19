@@ -195,7 +195,8 @@ class DesignPreferences(QDialog):
         '''
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
-        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+        # TODO : change grade to 10.9; also update UI
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
                   12.9: 1220}
         boltGrd = float(boltGrade)
         return boltFu[boltGrd]
@@ -317,7 +318,7 @@ class MainController(QMainWindow):
 
         self.grade_type = {'Please Select Type': '',
                            'HSFG': [8.8, 10.8],
-                           'Black Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 12.9]}
+                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.combo_bolt_type.setCurrentIndex(0)
@@ -372,7 +373,7 @@ class MainController(QMainWindow):
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
         self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_current_2D_image_as.triggered.connect(self.save2DcadImages)
+        self.ui.actionSave_current_2D_image_as.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
 
         # Graphics menu
@@ -445,8 +446,11 @@ class MainController(QMainWindow):
         return dict_angle_data
 
     def fetch_top_angle_para(self):
-        angle_sec = self.ui.combo_topangle_section.currentText()
-        dict_top_angle = get_angledata(angle_sec)
+        if self.ui.combo_topangle_section.currentText() is not None:
+            angle_sec = self.ui.combo_topangle_section.currentText()
+            dict_top_angle = get_angledata(angle_sec)
+        else:
+            dict_top_angle = {}
         return dict_top_angle
 
     def showFontDialogue(self):
@@ -469,15 +473,17 @@ class MainController(QMainWindow):
     def call_Pannig(self):
         self.display.Pan(50, 0)
 
-    def save2DcadImages(self):
-        files_types = "PNG (*.png);;JPG (*.jpg);;GIF (*.gif)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+    def save_cadImages(self):
+
+        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpg' or file_extension == 'gif':
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
+
 
     def disableViewButtons(self):
         '''
@@ -1758,8 +1764,13 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    folder = os.path.abspath(os.path.join(os.getcwd(),os.path.join("..", "..", "..", "Osdag_Workspace", "1")))
-    # folder = None
-    window = MainController(folder)
+    # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
+    workspace_folder_path = "F:\Osdag_workspace\seated_angle"
+    if not os.path.exists(workspace_folder_path):
+        os.mkdir(workspace_folder_path, 0755)
+    image_folder_path = os.path.join(workspace_folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(workspace_folder_path)
     window.show()
     sys.exit(app.exec_())

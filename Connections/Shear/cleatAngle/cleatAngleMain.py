@@ -159,7 +159,6 @@ class DesignPreferences(QDialog):
             pass
 
     def get_clearance(self, boltDia):
-        print "************",boltDia
         if boltDia !=  'Diameter of Bolt':
 
             standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
@@ -552,7 +551,7 @@ class MainController(QMainWindow):
             self.ui.outputBoltLbl.setFont(font)
             self.ui.outputBoltLbl.setText("Beam")
 
-            self.ui.comboColSec.clear()
+            #self.ui.comboColSec.clear()
             self.ui.comboColSec.addItems(get_columncombolist())
 
 # ---------------------------------------- Users input-----------------------------------------------------------------------------
@@ -860,7 +859,6 @@ class MainController(QMainWindow):
         ui_obj = {}
         ui_obj["Bolt"] = {}
         ui_obj["Bolt"]["Diameter (mm)"] = str(self.ui.comboDiameter.currentText())
-        print self.ui.comboBoltGrade.currentText()
         ui_obj["Bolt"]["Grade"] = (self.ui.comboBoltGrade.currentText())
         ui_obj["Bolt"]["Type"] = str(self.ui.comboBoltType.currentText())
 
@@ -1189,37 +1187,50 @@ class MainController(QMainWindow):
 
     def validate_inputs_on_design_button(self):
 
+        flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.information(self, "Information", "Please select connectivity")
+            flag = False
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
+                    QMessageBox.information(self, "Information", "Please select column section")
+                    flag = False
+
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
+                    QMessageBox.information(self, "Information", "Please select beam section")
+                    flag = False
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Primary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
+                    flag = False
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Secondary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
+                    flag = False
+        if self.ui.txtFu.text()== '' or float(self.ui.txtFu.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
+            flag = False
 
-        if self.ui.txtFu.text()== ' ' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
+        elif self.ui.txtFy.text()== '' or float(self.ui.txtFy.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
+            flag = False
 
-        elif self.ui.txtFy.text()== ' ' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
-
-        elif self.ui.txtShear.text()== ' ' or float(str(self.ui.txtShear.text())) == 0:
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
+        elif self.ui.txtShear.text()== '' or str(self.ui.txtShear.text())== 0:
+            reply = QMessageBox.information(self, "Information", "Please select Factored shear load")
+            flag = False
 
         elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
+            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
+            flag = False
 
         elif self.ui.comboBoltType.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of  bolt")
+            QMessageBox.information(self, "Information", "Please select Type of  bolt")
+            flag = False
         elif self.ui.comboCleatSection.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Cleat angle")
+            QMessageBox.information(self, "Information", "Please select Cleat angle")
+            flag = False
+        return  flag
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''
@@ -1352,7 +1363,6 @@ class MainController(QMainWindow):
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
         dictangledata = self.fetch_angle_param()
-        print "Cleatangledata =", dictangledata
         dict_topangledata = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
@@ -1370,13 +1380,14 @@ class MainController(QMainWindow):
         self.display.EraseAll()
         self.alist = self.designParameters()
 
-        self.validate_inputs_on_design_button()
+        if self.validate_inputs_on_design_button() == False:
+            return
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
         self.unchecked_all_checkbox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-                                              self.alist[5], self.alist[6],
-                                              self.alist[7], self.alist[8], self.alist[9], self.alist[10], self.display, self.folder, self.connection)
+                                              self.alist[5], self.alist[6],self.alist[7], self.alist[8], self.alist[9],
+                                              self.alist[10], self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
@@ -1422,7 +1433,6 @@ class MainController(QMainWindow):
         if self.fuse_model is None:
             self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
-        print "$$$$$$$$$$$$$",shape
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 

@@ -50,7 +50,8 @@ class ColWebBeamWeb(object):
         self.beam.place(origin2, uDir, wDir)
 
     def create_angle_geometry(self):
-        angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5) * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
+        angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5)
+                         * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
                          self.clearDist * (-self.beam.wDir))
         # uDir0 = numpy.array([1.0, 0, 0])
         # wDir0 = numpy.array([0, 1, 0])

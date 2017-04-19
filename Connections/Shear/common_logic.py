@@ -173,8 +173,8 @@ class CommonDesignLogic(object):
             cleat_legsizes = str(self.dictangledata["AXB"])
             angle_A = int(cleat_legsizes.split('x')[0])
             angle_B = int(cleat_legsizes.split('x')[1])
-            # angle_A = int(self.dictangledata["A"])
-            # angle_B = int(self.dictangledata["B"])
+            angle_r1 = float(str(self.dictangledata["R1"]))
+            angle_r2 = float(str(self.dictangledata["R2"]))
         else:
             plate_thick = float(self.uiObj['Plate']['Thickness (mm)'])
             fillet_length = float(self.resultObj['Plate']['height'])
@@ -192,7 +192,8 @@ class CommonDesignLogic(object):
 
 
         if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick)
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+            #angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, )
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
             Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
@@ -509,15 +510,15 @@ class CommonDesignLogic(object):
                                 update=True)
         elif component == "cleatAngle":
 
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color = Quantity_NOC_BLUE1 , update=True)
             nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
         elif component == "SeatAngle":
-            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color = Quantity_NOC_BLUE1, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color= Quantity_NOC_BLUE1, update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -525,7 +526,7 @@ class CommonDesignLogic(object):
         elif self.component == "Plate":
             osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.plateModel, color='blue', update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color= Quantity_NOC_BLUE1, update=True)
             nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -540,11 +541,11 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, self.connectivityObj.plateModel, color= Quantity_NOC_BLUE1, update=True)
 
             elif self.connection == "cleatAngle":
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color='blue', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color = Quantity_NOC_BLUE1 ,update=True)
             else:
-                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color='blue', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color='blue', update=True)
+                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color = Quantity_NOC_BLUE1, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1 ,update=True)
                 # nutboltlist = self.connectivityObj.nutBoltArray.getModels()
                 # for nutbolt in nutboltlist:
                 #     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -573,10 +574,10 @@ class CommonDesignLogic(object):
             # gpColOrigin = getGpPt(col_origin)
             # my_sphere = BRepPrimAPI_MakeSphere(gpColOrigin, 5).Shape()
             # self.display.DisplayShape(my_sphere,color = 'red',update = True)
-            angle_origin = ((self.connectivityObj.angle.sec_origin))
-            gpBeamOrigin = getGpPt(angle_origin)
-            my_sphere1 = BRepPrimAPI_MakeSphere(gpBeamOrigin, 5).Shape()
-            self.display.DisplayShape(my_sphere1, color='red', update=True)
+            # angle_origin = ((self.connectivityObj.angle.sec_origin))
+            # gpBeamOrigin = getGpPt(angle_origin)
+            # my_sphere1 = BRepPrimAPI_MakeSphere(gpBeamOrigin, 5).Shape()
+            # self.display.DisplayShape(my_sphere1, color='red', update=True)
         else:
             self.display.EraseAll()
 

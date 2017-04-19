@@ -80,9 +80,7 @@ def get_beamdata(sect):
     query_str = "Select * from Beams where Designation = '%s'" % section
     
     design_query = QSqlQuery(query_str)
-    print(design_query)
 
-    print design_query.size()
     ret_dict = {}
     record = design_query.record()
     
@@ -91,8 +89,7 @@ def get_beamdata(sect):
             col_name = record.fieldName(i)
             ret_dict[col_name] = design_query.value(i)
 
-    # print(ret_dict[QString("tw")])
-    
+
     return ret_dict
 
 
@@ -119,9 +116,7 @@ def get_columndata(sect):
     query_str = "Select * from Columns where Designation = '%s'" % section
     
     design_query = QSqlQuery(query_str)
-    print(design_query)
-    
-    print design_query.size()
+
     ret_dict = {}
     record = design_query.record()
     
@@ -155,9 +150,7 @@ def get_angledata(sect):
     query_str = "Select * from Angles where Designation = '%s'" % section
      
     design_query = QSqlQuery(query_str)
-    print(design_query)
-     
-    print design_query.size()
+
     ret_dict = {}
     record = design_query.record()
      

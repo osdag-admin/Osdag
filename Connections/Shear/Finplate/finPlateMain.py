@@ -1229,13 +1229,13 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text()== ' '  or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text()== ''  or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
-        elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:
+        elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
-        elif self.ui.txtShear.text() == ' ' or float(str(self.ui.txtShear.text())) == 0:
+        elif self.ui.txtShear.text() == '' or float(str(self.ui.txtShear.text())) == str(0):
             QMessageBox.about(self, "Information", "Please select Factored shear load")
 
         elif self.ui.comboDiameter.currentIndex() == 0:

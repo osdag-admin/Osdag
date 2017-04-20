@@ -297,13 +297,13 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
-        self.beam_fu = input_dict['Member']['fu (MPa)']
-        self.beam_fy = str(input_dict['Member']['fy (MPa)'])
-        self.column_fy = self.beam_fy
-        self.column_fu = self.beam_fu
-        self.angle_fy = float(str(self.beam_fy))
-        self.angle_fu = self.beam_fu
-        self.shear_force = str(input_dict['Load']['ShearForce (kN)'])
+        self.beam_fu = int(input_dict['Member']['fu (MPa)'])
+        self.beam_fy = int(input_dict['Member']['fy (MPa)'])
+        self.column_fy = int(self.beam_fy)
+        self.column_fu = int(self.beam_fu)
+        self.angle_fy = int(str(self.beam_fy))
+        self.angle_fu = int(self.beam_fu)
+        self.shear_force = float(input_dict['Load']['ShearForce (kN)'])
         self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
@@ -451,6 +451,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         """
         self.root_clearance = 5
+        # TODO : bolt_hole_diameter = bolt_diameter + 2*clearance # Rectify the below line
         self.bolt_hole_diameter = self.bolt_diameter + self.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter,
                                                                            self.custom_hole_clearance)
 

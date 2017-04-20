@@ -281,8 +281,6 @@ def cleat_connection(ui_obj):
     bolt_capacity = min(bolt_shear_capacity, bearing_capacity_b)
     bolt_capacity = (bolt_capacity / 2.0)
     
-#     print "capacity details" ,bolt_bearing_capacity ,bearing_capacity_plt ,bolt_shear_capacity,bearing_capacity_beam
-    
     if shear_load != 0:
         bolts_required = int(math.ceil(shear_load / (2 * bolt_capacity)))
     else:

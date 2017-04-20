@@ -15,7 +15,6 @@ import pickle
 
 
 def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename, folder):
-    print uiObj, "UIOBJ............"
     fileName = (filename)
     myfile = open(fileName, "w")
     myfile.write(t('! DOCTYPE html'))

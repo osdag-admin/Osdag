@@ -1537,8 +1537,8 @@ class MainController(QMainWindow):
 
         if isempty[0] == True:
             status = self.resultObj['SeatAngle']['status']
-            self.call_seatangle2D_Drawing("All")
             self.commLogicObj.call_3DModel(status)
+            self.call_seatangle2D_Drawing("All")
         else:
 
             pass

@@ -235,11 +235,13 @@ class ConnectionCalculations(object):
 
         # TODO: rethink rounding off of MINIMUM distances
         # round off the actual distances and check against minimum
-        if self.min_pitch % 5 != 0 or self.min_gauge % 5 != 0:
+        if self.min_pitch % 5 != 0:
             self.min_pitch = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
-            self.min_gauge = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
-        if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
+        if self.min_gauge % 5 != 0:
+            self.min_gauge = ((self.min_gauge / 5) + 1) * 5 - self.min_gauge % 5
+        if self.min_edge_dist % 5 != 0:
             self.min_edge_dist = int((int(self.min_edge_dist / 5) + 1) * 5)
+        if self.min_end_dist % 5 != 0:
             self.min_end_dist = int((int(self.min_end_dist / 5) + 1) * 5)
 
         # Max spacing IS 800 Cl 10.2.3.1

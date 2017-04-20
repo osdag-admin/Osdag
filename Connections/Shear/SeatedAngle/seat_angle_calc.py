@@ -47,7 +47,6 @@ from Connections.connection_calculations import ConnectionCalculations
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 
-# TODO add input validation to select only angles which can accomodate 2 lines of bolts
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
 # TODO incorrect pitch calcs.
@@ -124,14 +123,12 @@ class SeatAngleCalculation(ConnectionCalculations):
         num_cols (int)
         pitch (float)
         gauge (float)
+        end_dist (int)
+        edge_dist (int)        
         min_end_dist (int)
         min_edge_dist (int)
         min_pitch (int)
         min_gauge (int)
-        end_dist (int)
-        edge_dist (int)
-        pitch (float)
-        gauge (float)
         max_spacing (int)
         max_edge_dist (int)
 
@@ -456,26 +453,30 @@ class SeatAngleCalculation(ConnectionCalculations):
                                                                                     self.bolt_diameter,
                                                                                     self.custom_hole_clearance)
 
-        thickness_governing_min = min(self.column_f_t.real, self.angle_t.real)
+        thickness_governing_min = min(self.column_f_t, self.angle_t)
         self.calculate_distances(self.bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier,
                                  thickness_governing_min, self.is_environ_corrosive)
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
+        # pitch is calculated in the seat_angle_connection Method. The minimum pitch is used for kb (bearing) calcs.
         self.pitch = self.min_pitch
 
         self.calculate_kb()
 
         # Bolt capacity
-        thickness_governing_min = min(self.column_f_t.real, self.angle_t.real)
-        single_bolt = 1
+        thickness_governing_min = min(self.column_f_t, self.angle_t)
         if self.is_hsfg is False:
-            self.bolt_shear_capacity = self.bolt_shear(self.bolt_diameter, single_bolt, self.bolt_fu).real
-            self.bolt_bearing_capacity = self.bolt_bearing(self.bolt_diameter, single_bolt, thickness_governing_min,
-                                                           self.beam_fu, self.k_b).real
+            self.bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter=self.bolt_diameter,
+                                                                         number_of_bolts=1, bolt_fu=self.bolt_fu)
+            self.bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter=self.bolt_diameter,
+                                                                             number_of_bolts=1,
+                                                                             thickness_plate=thickness_governing_min,
+                                                                             k_b=self.k_b, plate_fu=self.beam_fu)
             self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         elif self.is_hsfg is True:
-            self.bolt_value = self.bolt_shear_hsfg(self.bolt_diameter, self.bolt_fu, self.mu_f, self.n_e,
-                                                   self.bolt_hole_type)
+            self.bolt_value = ConnectionCalculations.bolt_shear_hsfg(self.bolt_diameter, self.bolt_fu, self.mu_f,
+                                                                     self.n_e,
+                                                                     self.bolt_hole_type)
         # Check for long joints is not applicable for seated angle connection
         self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
@@ -571,7 +572,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             (self.num_rows - 1) * (self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
         if self.pitch < self.min_pitch and self.num_rows == 2:
             self.safe = False
-            logger.error(": Bolt pitch provided is less than minimum pitch [Cl 10.2.2]")
+            logger.error(": Bolt pitch calculated is less than minimum pitch [Cl 10.2.2]")
             logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
             logger.info(": Select angle with longer vertical leg OR)")
             logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
@@ -727,11 +728,11 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.beam_web_local_buckling_capacity = bwlb_P_d
 
         # TODO: Uncomment below block after CAD and report is resolved
-        # if self.beam_web_local_buckling_capacity < self.shear_force:
-        #     self.safe = False
-        #     logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
-        #     logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
-        #     logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
+        if self.beam_web_local_buckling_capacity < self.shear_force:
+            self.safe = False
+            logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
+            logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
+            logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
         #
         # print self.beam_web_local_buckling_capacity
 

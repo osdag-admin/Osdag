@@ -11,16 +11,14 @@ import sys
 import subprocess
 import pdfkit
 
-from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
-from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
-from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog
 import shutil
 import pickle
 
 from OCC import VERSION, BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
-from OCC.Quantity import Quantity_NOC_SADDLEBROWN
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from OCC import IGESControl
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.Interface import Interface_Static_SetCVal
@@ -54,9 +52,9 @@ class DesignPreferences(QDialog):
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
     def save_designPref_para(self):
-        '''
+        """
         This routine is responsible for saving all design preferences selected by the user
-        '''
+        """
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
@@ -74,7 +72,7 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        if self.ui.txt_detailingGap.text()== '':
+        if self.ui.txt_detailingGap.text() == '':
 
             self.saved_designPref["detailing"]["gap"] = int(20)
         else:
@@ -87,8 +85,11 @@ class DesignPreferences(QDialog):
         return self.saved_designPref
 
     def set_default_para(self):
-        '''
-        '''
+        """
+        
+        Returns:
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
             pass
@@ -152,9 +153,9 @@ class DesignPreferences(QDialog):
         return clearance
 
     def get_boltFu(self, boltGrade):
-        '''
+        """
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
-        '''
+        """
         # TODO : change grade to 10.9; also update UI
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
                   12.9: 1220}
@@ -209,7 +210,7 @@ class DesignReportDialog(QDialog):
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
-                                                     QFileDialog.DontUseNativeDialog)
+                                                  QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
         self.desired_location(filename)
@@ -221,7 +222,8 @@ class DesignReportDialog(QDialog):
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
-        filename,_ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"),  '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -242,8 +244,9 @@ class DesignReportDialog(QDialog):
         return report_summary
 
     def useUserProfile(self):
-        filename,_ = QFileDialog.getOpenFileName(self, 'Open Files', os.path.join(str(self.mainController.folder),  "Profile"),
-                                                     "All Files (*)")
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"),
+                                                  "All Files (*)")
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -296,7 +299,7 @@ class MainController(QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
-        #TODO add input validations
+        # TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -374,7 +377,7 @@ class MainController(QMainWindow):
         self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
-        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
     def fetchBeamPara(self):
@@ -425,18 +428,19 @@ class MainController(QMainWindow):
 
     def save_cadImages(self):
         files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                  files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
-        '''
+        """
         Disables the all buttons in toolbar
-        '''
+        """
         self.ui.btn_front.setEnabled(False)
         self.ui.btn_side.setEnabled(False)
         self.ui.btn_top.setEnabled(False)
@@ -454,9 +458,9 @@ class MainController(QMainWindow):
         self.ui.menuEdit.setEnabled(False)
 
     def enableViewButtons(self):
-        '''
+        """
         Enables the all buttons in toolbar
-        '''
+        """
         self.ui.btn_front.setEnabled(True)
         self.ui.btn_side.setEnabled(True)
         self.ui.btn_top.setEnabled(True)
@@ -540,22 +544,26 @@ class MainController(QMainWindow):
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
         if uiObj is not None:
-            self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
+            self.ui.combo_connectivity.setCurrentIndex(
+                self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
                 self.ui.combo_column_section.addItems(get_beamcombolist())
 
-            self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
-            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
+            self.ui.combo_beam_section.setCurrentIndex(
+                self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            self.ui.combo_column_section.setCurrentIndex(
+                self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
 
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
             self.ui.txt_fy.setText(str(uiObj['Member']['fy (MPa)']))
 
             self.ui.txt_shear_force.setText(str(uiObj['Load']['ShearForce (kN)']))
 
-            self.ui.combo_bolt_diameter.setCurrentIndex(self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            self.ui.combo_bolt_diameter.setCurrentIndex(
+                self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
             combo_type_index = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
             self.ui.combo_bolt_type.setCurrentIndex(combo_type_index)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
@@ -567,9 +575,9 @@ class MainController(QMainWindow):
             self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
 
     def setimage_connection(self):
-        '''
+        """
         Setting image to connctivity.
-        '''
+        """
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connectivity.currentText()
         if loc == "Column flange-Beam web":
@@ -593,11 +601,11 @@ class MainController(QMainWindow):
         return True
 
     def getuser_inputs(self):
-        '''(nothing) -> Dictionary
+        """(nothing) -> Dictionary
 
         Returns the dictionary object with the user input fields for designing fin plate connection
 
-        '''
+        """
         uiObj = {}
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText()
@@ -622,10 +630,9 @@ class MainController(QMainWindow):
         return uiObj
 
     def save_inputs(self, uiObj):
+        """(Dictionary)--> None
 
-        '''(Dictionary)--> None
-
-        '''
+        """
         if __name__ == '__main__':
             file_name = 'saveINPUT.txt'
         else:
@@ -633,12 +640,15 @@ class MainController(QMainWindow):
         inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
-                                      "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
+                                "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         pickle.dump(uiObj, inputFile)
 
     def get_prevstate(self):
-        '''
-        '''
+        """
+        
+        Returns:
+
+        """
         if __name__ == '__main__':
             file_name = 'saveINPUT.txt'
         else:
@@ -652,9 +662,8 @@ class MainController(QMainWindow):
             return None
 
     def outputdict(self):
-
-        ''' Returns the output of design in dictionary object.
-        '''
+        """Returns the output of design in dictionary object.
+        """
         outObj = {}
         outObj['SeatAngle'] = {}
         outObj['SeatAngle']["Length (mm)"] = float(self.ui.txt_seat_length.text())
@@ -708,7 +717,7 @@ class MainController(QMainWindow):
             'footer-right': '[page]'
         }
         file_type = "PDF(*.pdf)"
-        fname, _ = QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", file_type)
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
         pdfkit.from_file(filename, fname, configuration=config, options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
@@ -716,17 +725,17 @@ class MainController(QMainWindow):
     def save_log(self):
 
         fileName, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
-                                                                   "Text files (*.txt)")
+                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
     def save_file(self, fileName):
-        '''(file open for writing)-> boolean
-        '''
+        """(file open for writing)-> boolean
+        """
         fname = QFile(fileName)
 
         if not fname.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
-                                      "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
+                                "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
         outf = QTextStream(fname)
@@ -735,11 +744,10 @@ class MainController(QMainWindow):
         QApplication.restoreOverrideCursor()
 
     def resetbtn_clicked(self):
-        '''(NoneType) -> NoneType
-
-        Resets all fields in input as well as output window
-
-        '''
+        """(NoneType) -> NoneType
+        
+        Resets all fields in input as well as output window        
+        """
         # Input
         self.ui.combo_beam_section.setCurrentIndex(0)
         self.ui.combo_column_section.setCurrentIndex(0)
@@ -780,10 +788,10 @@ class MainController(QMainWindow):
         self.display.EraseAll()
 
     def dockbtn_clicked(self, widget):
-        '''(QWidget) -> NoneType
+        """(QWidget) -> NoneType
 
         This method dock and undock widget(QdockWidget)
-        '''
+        """
         flag = widget.isHidden()
         if (flag):
             widget.show()
@@ -791,8 +799,8 @@ class MainController(QMainWindow):
             widget.hide()
 
     def combotype_currentindexchanged(self, index):
-        '''(Number) -> NoneType
-        '''
+        """(Number) -> NoneType
+        """
         items = self.grade_type[str(index)]
 
         self.ui.combo_bolt_grade.clear()
@@ -803,9 +811,9 @@ class MainController(QMainWindow):
         self.ui.combo_bolt_grade.addItems(strItems)
 
     def check_range(self, widget, lblwidget, min_value, max_value):
-        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        """(QlineEdit,QLable,Number,Number)---> NoneType
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
-        '''
+        """
         textStr = widget.text()
         val = int(textStr)
         if (val < min_value or val > max_value):
@@ -820,9 +828,9 @@ class MainController(QMainWindow):
             lblwidget.setPalette(palette)
 
     def display_output(self, outputObj):
-        '''(dictionary) --> NoneType
+        """(dictionary) --> NoneType
         Setting design result values to the respective textboxes in the output window
-        '''
+        """
         for k in outputObj.keys():
             for key in outputObj[k].keys():
                 if (outputObj[k][key] == ""):
@@ -883,16 +891,16 @@ class MainController(QMainWindow):
         top_angle = resultObj['SeatAngle']['Top Angle']
         self.ui.txt_top_angle.setText(str(top_angle))
 
-    def displaylog_totextedit(self,commLogicObj):
-        '''
+    def displaylog_totextedit(self, commLogicObj):
+        """
         This method displaying Design messages(log messages)to textedit widget.
-        '''
+        """
         fname = str(commLogicObj.call_saveMessages())
         afile = QFile(fname)
-     
+
         if not afile.open(QIODevice.ReadOnly):  # ReadOnly
             QMessageBox.information(None, 'info', afile.errorString())
-     
+
         stream = QTextStream(afile)
         self.ui.textEdit.clear()
         self.ui.textEdit.setHtml(stream.readAll())
@@ -900,8 +908,8 @@ class MainController(QMainWindow):
         vscrollBar.setValue(vscrollBar.maximum())
         afile.close()
 
-    def boltHeadThick_Calculation(self,boltDia):
-        '''
+    def boltHeadThick_Calculation(self, boltDia):
+        """
         This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
        
        bolt Head Dia
@@ -913,13 +921,12 @@ class MainController(QMainWindow):
            |  |
            |  |
         
-        '''
-        boltHeadThick = {5:4, 6:5, 8:6, 10:7, 12:8, 16:10, 20:12.5, 22:14, 24:15, 27:17, 30:18.7, 36:22.5 }
+        """
+        boltHeadThick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
         return boltHeadThick[boltDia]
-        
-    def boltHeadDia_Calculation(self,boltDia):
 
-        '''
+    def boltHeadDia_Calculation(self, boltDia):
+        """
         This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
        
        bolt Head Dia
@@ -931,12 +938,12 @@ class MainController(QMainWindow):
            |  |
            |  |
         
-        '''
-        boltHeadDia = {5:7, 6:8, 8:10, 10:15, 12:20, 16:27, 20:34, 22:36, 24:41, 27:46, 30:50, 36:60 }
+        """
+        boltHeadDia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
         return boltHeadDia[boltDia]
-    
-    def boltLength_Calculation(self,boltDia):
-        '''
+
+    def boltLength_Calculation(self, boltDia):
+        """
         This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
        
        bolt Head Dia
@@ -954,17 +961,18 @@ class MainController(QMainWindow):
            |  |       |
            |__|    ___|__ 
         
-        '''
-        boltHeadDia = {5:40, 6:40, 8:40, 10:40, 12:40, 16:50, 20:50, 22:50, 24:50, 27:60, 30:65, 36:75 }
-       
+        """
+        boltHeadDia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+
         return boltHeadDia[boltDia]
-    
-    def nutThick_Calculation(self,boltDia):
-        '''
+
+    def nutThick_Calculation(self, boltDia):
+        """
         Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
-        '''
-        nutDia = {5:5, 6:5.65, 8:7.15, 10:8.75, 12:11.3, 16:15, 20:17.95, 22:19.0, 24:21.25, 27:23, 30:25.35, 36:30.65 }
-        
+        """
+        nutDia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35,
+                  36: 30.65}
+
         return nutDia[boltDia]
 
     def init_display(self, backend_str=None, size=(1024, 768)):
@@ -978,7 +986,7 @@ class MainController(QMainWindow):
             from OCC.Display.qtDisplay import qtViewer3d
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
-        from OCC.Display.qtDisplay import  qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Seatedangle")
@@ -1005,7 +1013,6 @@ class MainController(QMainWindow):
 
         return display, start_display
 
-
     def showColorDialog(self):
 
         col = QColorDialog.getColor()
@@ -1016,22 +1023,21 @@ class MainController(QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def call_3DModel(self):
-        '''
+        """
         This routine responsible for diasplaying 3D Cad model
         :param flag: boolean
         :return:
-        '''
+        """
         if self.ui.btn3D.isChecked:
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
             self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
         self.commLogicObj.display_3DModel("Model")
 
-
     def call_3DBeam(self):
-        '''
+        """
         Creating and displaying 3D Beam
-        '''
+        """
         self.ui.chkBxBeam.setChecked(Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
@@ -1042,8 +1048,8 @@ class MainController(QMainWindow):
         self.commLogicObj.display_3DModel("Beam")
 
     def call_3DColumn(self):
-        '''
-        '''
+        """
+        """
         self.ui.chkBxCol.setChecked(Qt.Checked)
         if self.ui.chkBxCol.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1053,8 +1059,8 @@ class MainController(QMainWindow):
         self.commLogicObj.display_3DModel("Column")
 
     def call_3DSeatAngle(self):
-        '''Displaying Seat Angle in 3D
-        '''
+        """Displaying Seat Angle in 3D
+        """
         self.ui.chkBxSeatAngle.setChecked(Qt.Checked)
         if self.ui.chkBxSeatAngle.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1069,16 +1075,16 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
-        
+
     def designParameters(self):
-        '''
+        """
         This routine returns the neccessary design parameters.
-        '''
+        """
         self.uiObj = self.getuser_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
         else:
-            design_pref = self.designPrefDialog.saved_designPref #self.designPrefDialog.save_designPref_para()
+            design_pref = self.designPrefDialog.saved_designPref  # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
 
         dictbeamdata = self.fetchBeamPara()
@@ -1095,12 +1101,12 @@ class MainController(QMainWindow):
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
         return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata,
-                dict_topangledata,  loc, component, bolt_R, bolt_T,
+                dict_topangledata, loc, component, bolt_R, bolt_T,
                 bolt_Ht, nut_T]
-    
+
     def design_btnclicked(self):
-        '''
-        '''
+        """
+        """
         # TODO input validation
         self.display.EraseAll()
         self.alist = self.designParameters()
@@ -1110,8 +1116,8 @@ class MainController(QMainWindow):
         self.unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
                                               self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                              self.alist[8], self.alist[9],self.alist[10], self.display,
-                                              self.folder,self.connection)
+                                              self.alist[8], self.alist[9], self.alist[10], self.display,
+                                              self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         # print "resultobj from seat_angle_main",self.resultObj
@@ -1127,10 +1133,9 @@ class MainController(QMainWindow):
         else:
             pass
 
-
     def create2Dcad(self, connectivity):
-        ''' Returns the fuse model of finplate
-        '''
+        """ Returns the fuse model of finplate
+        """
         cadlist = self.connectivity.get_models()
         final_model = cadlist[0]
         for model in cadlist[1:]:
@@ -1147,7 +1152,8 @@ class MainController(QMainWindow):
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"), files_types)
+        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                               files_types)
 
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
@@ -1180,9 +1186,9 @@ class MainController(QMainWindow):
         QMessageBox.about(self, 'Information', "File saved")
 
     def call_seatangle2D_Drawing(self, view):
-        ''' This routine saves the 2D SVG image as per the connectivity selected
+        """ This routine saves the 2D SVG image as per the connectivity selected
             SVG image created through svgwrite package which takes design INPUT and OUTPUT parameters from Finplate GUI.
-        '''
+        """
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
@@ -1206,17 +1212,16 @@ class MainController(QMainWindow):
             fname = ''
             self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
-
     def closeEvent(self, event):
-        '''
+        """
         Closing Seated angle window
         :param event:
         :return:
-        '''
+        """
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
-                                           "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+                                     "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.closed.emit()
@@ -1289,7 +1294,8 @@ def set_osdaglogger():
     if __name__ == '__main__':
         fh = logging.FileHandler("./seatangle.log", mode="a")
     else:
-        fh = logging.FileHandler(os.path.join(os.getcwd(),os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")), mode="a")
+        fh = logging.FileHandler(
+            os.path.join(os.getcwd(), os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")), mode="a")
 
     formatter = logging.Formatter('''
       <div  class="LOG %(levelname)s">

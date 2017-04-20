@@ -423,6 +423,12 @@ class MainController(QMainWindow):
         return dictcoldata
 
     def convertColComboToBeam(self):
+        """
+
+        Returns:
+
+        """
+        self.display.EraseAll()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.lbl_beam.setText(" Secondary beam *")
@@ -1113,18 +1119,6 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        # if os.name == 'nt':
-        #
-        #     global display, start_display, app, _
-        #
-        #     from OCC.Display.backend import get_loaded_backend
-        #     lodedbkend = get_loaded_backend()
-        #     from OCC.Display.backend import get_backend, have_backend
-        #     from osdagMainSettings import backend_name
-        #     if (not have_backend() and backend_name() == "pyqt5"):
-        #         get_backend("qt-pyqt5")
-        # else:
-
         global display, start_display, app, _, USED_BACKEND
         if 'qt' in used_backend:
             from OCC.Display.qtDisplay import qtViewer3d
@@ -1134,7 +1128,6 @@ class MainController(QMainWindow):
         from OCC.Display.qtDisplay import  qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
         self.setWindowTitle("Osdag Finplate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
@@ -1408,7 +1401,6 @@ class MainController(QMainWindow):
         '''
         self.display.EraseAll()
         self.alist = self.designParameters()
-        print self.alist[0]
 
         self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)

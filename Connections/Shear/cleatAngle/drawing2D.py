@@ -90,10 +90,6 @@ class cleatCommonData(object):
         smarker.add(dwg.path(d=" M0,0 L3,3 L0,6 L8,3 L0,0", fill='black'))
         dwg.defs.add(smarker)
 
-        # smarker = dwg.marker(insert=(-8,0), size =(30,20), orient="auto")
-        # smarker.add(dwg.polyline([(-2.5,0), (0,3), (-8,0), (0,-3)], fill='black'))
-        # smarker.add(dwg.polyline([(0,0), (3,3), (0,6), (8,3),(0,0)], fill='black'))
-
         return smarker
 
     def add_section_maker(self, dwg):
@@ -119,11 +115,7 @@ class cleatCommonData(object):
         :type dwg : svgwrite  ( Container for all svg elements)
 
         '''
-        # emarker = dwg.marker(insert=(8,0), size =(30,20), orient="auto")
         emarker = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
-        # emarker.add(dwg.polyline([(2.5,0), (0,3), (8,0), (0,-3)], fill='black'))
-        # emarker.add(dwg.polyline([(0,3), (8,6), (5,3), (8,0),(0,3)], fill='black'))
-        # emarker.add(dwg.path(d="M2,2 L2,13 L8,7 L2,2"", fill='red'))
         emarker.add(dwg.path(d=" M0,3 L8,6 L5,3 L8,0 L0,3", fill='black'))
         dwg.defs.add(emarker)
         return emarker
@@ -181,8 +173,6 @@ class cleatCommonData(object):
         if params["lineori"] == "left":
             normal_unit_vector = -normal_unit_vector
 
-        # Q1 = pt1 + params["offset"] * normal_unit_vector
-        # Q2 = pt2 + params["offset"] * normal_unit_vector
         Q1 = pt1 + params["offset"] * normal_unit_vector
         Q2 = pt2 + params["offset"] * normal_unit_vector
         line = dwg.add(dwg.line(Q1, Q2).stroke('black', width=2.5, linecap='square'))
@@ -243,8 +233,6 @@ class cleatCommonData(object):
         :type params["arrowlen"]: float (Size of the arrow)
         '''
 
-        # smarker = self.add_s_marker(dwg)
-        # emarker = self.add_e_marker(dwg)
         smarker = self.add_s_marker(dwg)
         emarker = self.add_e_marker(dwg)
 
@@ -344,15 +332,12 @@ class cleatCommonData(object):
 
         line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill='none', stroke='black', stroke_width=2.5))
 
-        # smarker = self.addSMarker(dwg)
         emarker = self.add_e_marker(dwg)
-        # self.draw_start_arrow(line, smarker)
         self.draw_start_arrow(line, emarker)
 
         dwg.add(dwg.text(text_up, insert=(txt_pt_up), fill='black', font_family="sans-serif", font_size=28))
         dwg.add(dwg.text(text_down, insert=(txt_pt_down), fill='black', font_family="sans-serif", font_size=28))
 
-    # def save_to_svg(self, filename, view, base_front, base_top, base_side):
     def save_to_svg(self, filename, view):
         '''
          It returns the svg drawing depending upon connectivity
@@ -376,37 +361,15 @@ class cleatCommonData(object):
                 fin_2d_front.call_CFBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatFrontFB" + str(n) + ".svg"
-                #         continue
-                # base_front = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
                 filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_CFBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatSideFB" + str(n) + ".svg"
-                #         continue
-                # base_side = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_CFBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatTopFB" + str(n) + ".svg"
-                #         continue
-                # base_top = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         elif self.connectivity == 'Column web-Beam web':
             if view == "Front":
@@ -420,37 +383,14 @@ class cleatCommonData(object):
                 fin_2d_front.call_CWBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatFrontWB" + str(n) + ".svg"
-                #         continue
-                # base_front = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
                 filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_CWBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
-
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatSideWB" + str(n) + ".svg"
-                #         continue
-                # base_side = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_CWBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatTopWB" + str(n) + ".svg"
-                #         continue
-                # base_top = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         else:
             if view == "Front":
@@ -464,38 +404,14 @@ class cleatCommonData(object):
                 fin_2d_front.call_BWBW_front(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatFront.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatFrontBB" + str(n) + ".svg"
-                #         continue
-                # base_front = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
                 filename = os.path.join(str(self.folder), "images_html", "cleatSide.svg")
                 fin_2d_side.call_BWBW_side(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatSide.png"))
-
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatSideBB" + str(n) + ".svg"
-                #         continue
-                # base_side = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                 filename = os.path.join(str(self.folder), "images_html", "cleatTop.svg")
                 fin_2d_top.call_BWBW_top(filename)
                 cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "cleatTop.png"))
 
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% for saving multiple images %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # for n in range(1, 100, 1):
-                #     if (os.path.exists(filename)):
-                #         filename = str(self.folder) + "/images_html/cleatTopBB" + str(n) + ".svg"
-                #         continue
-                # base_top = os.path.basename(str(filename))
-                # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                # return base_front, base_top, base_side
 
 
 class Cleat2DCreatorFront(object):
@@ -756,15 +672,6 @@ class Cleat2DCreatorFront(object):
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
         pt2 = self.BA5 - self.dataObj.col_R1 * np.array([1, 0])
 
-        #         d=[]
-        #         d.append("M")
-        #         d.append(pt1)
-        #         d.append("C")
-        #         d.append(self.BA5)
-        #         d.append(",")
-        #         d.append(self.BA5)
-        #         d.append(",")
-        #         d.append(pt2)
         d = []
         d.append("M")
         d.append(pt1)
@@ -779,9 +686,6 @@ class Cleat2DCreatorFront(object):
         d.append(",")
         d.append(pt2)
         dwg.add(dwg.path(d=d, stroke="blue", fill="none", stroke_width="2.5"))
-        #         d="M80 230
-        #            A 45 45, 0, 0, 1, 125 275
-        #            L 125 230 Z" fill="purple"
 
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col
@@ -803,9 +707,6 @@ class Cleat2DCreatorFront(object):
                 ptE = pt - (bolt_r + 4) * np.array([0, 1])
                 PtF = pt + (bolt_r + 4) * np.array([0, 1])
                 dwg.add(dwg.line((ptE), (PtF)).stroke('red', width=2.0, linecap='square'))
-                #                 ptE = self.ptFP + self.dataObj.edge_dist * np.array([1,0]) +(j-1) * self.dataObj.gauge * np.array([1,0])
-                #                 ptF = ptE + self.dataObj.cleat_ht * np.array([0,1])
-                #                 dwg.add(dwg.line((ptE),(ptF)).stroke('blue',width = 1.5,linecap = 'square').dasharray(dasharray = ([20, 5, 1, 5])))
                 col_list.append(pt)
             pt_list.append(col_list)
 
@@ -828,7 +729,6 @@ class Cleat2DCreatorFront(object):
 
                 # Included cleat height and pitch details of column bolt group
                 # Drawing faint lines at right top and bottom corners of cleat
-            #         rt1 = self.FP + self.dataObj.cleat_legsize * np.array([1,0])
         rt2 = self.BR + (self.dataObj.beam_L + 150 - self.dataObj.gauge) * np.array([1, 0])
         self.dataObj.draw_faint_line(self.BR, rt2, dwg)
         #         rb1 = rt1 + self.dataObj.cleat_ht * np.array([0,1])
@@ -964,7 +864,6 @@ class Cleat2DCreatorFront(object):
         ptx = self.BA + 330 * np.array([1, 0]) + (v_height - 700) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
-        #         dwg.add(dwg.path(d =" M0,3 C10,10 20,10 30,20", fill='black'))
         dwg.save()
 
     def call_CFBW_front(self, filename):
@@ -978,11 +877,6 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.line((self.FA4), (self.FA3)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.FB4), (self.FB3)).stroke('blue', width=2.5, linecap='square'))
 
-        # Weld hatching to represent WELD.
-        #         pattern = dwg.defs.add(dwg.pattern(id ="diagonalHatch",size=(4, 4), patternUnits="userSpaceOnUse",patternTransform="rotate(45 2 2)"))
-        #         pattern.add(dwg.path(d = "M -1,2 l 6,0", stroke='#000000',stroke_width = 0.7))
-        #         dwg.add(dwg.rect(insert=(self.FP), size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht),fill= "url(#diagonalHatch)", stroke='white', stroke_width=2.0))
-        #
 
         dwg.add(dwg.rect(insert=(self.FP), size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.FW), size=(self.dataObj.cleat_legsize - self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill='none', stroke='blue',
@@ -1009,9 +903,6 @@ class Cleat2DCreatorFront(object):
                 ptE = pt - (bolt_r + 4) * np.array([0, 1])
                 PtF = pt + (bolt_r + 4) * np.array([0, 1])
                 dwg.add(dwg.line((ptE), (PtF)).stroke('red', width=2.0, linecap='square'))
-                #                 ptE = self.ptFP + self.dataObj.edge_dist * np.array([1,0]) +(j-1) * self.dataObj.gauge * np.array([1,0])
-                #                 ptF = ptE + self.dataObj.cleat_ht * np.array([0,1])
-                #                 dwg.add(dwg.line((ptE),(ptF)).stroke('blue',width = 1.5,linecap = 'square').dasharray(dasharray = ([20, 5, 1, 5])))
                 col_list.append(pt)
             pt_list.append(col_list)
 
@@ -1283,8 +1174,6 @@ class Cleat2DCreatorFront(object):
                 ptC = pt - (bolt_r + 4) * np.array([1, 0])
                 PtD = pt + (bolt_r + 4) * np.array([1, 0])
                 dwg.add(dwg.line((ptC), (PtD)).stroke('red', width=2.0, linecap='square'))
-                #                 ptE = self.ptP + (self.dataObj.cleat_legsize - self.dataObj.end_dist) * np.array([1,0]) +(j-1) * self.dataObj.gauge * np.array([1,0])
-                #                 ptF = ptE + self.dataObj.cleat_ht * np.array([0,1])
                 ptE = pt - (bolt_r + 4) * np.array([0, 1])
                 ptF = pt + (bolt_r + 4) * np.array([0, 1])
                 dwg.add(dwg.line((ptE), (ptF)).stroke('blue', width=1.5, linecap='square').dasharray(dasharray=([20, 5, 1, 5])))
@@ -1517,23 +1406,7 @@ class Cleat2DCreatorTop(object):
         self.FJ = self.FC + self.dataObj.col_tw * np.array([0, 1])
         self.FK = self.FB + self.dataObj.col_B * np.array([0, 1])
         self.FL = self.FK + self.dataObj.col_T * np.array([-1, 0])
-        #         self.FA7 = self.FD + (self.dataObj.col_T + self.dataObj.gap) * np.array([1,0])
-        #         self.FP1 = self.FA7 + self.dataObj.beam_tw * np.array([0,1])
-        #         self.FP = self.FP1 + self.dataObj.gap * np.array([-1,0])
-        #         self.FA1 = self.FA7 + (self.dataObj.beam_B - self.dataObj.beam_tw)/2 *np.array([0,-1])
-        #         self.FA2 = self.FA1 + self.dataObj.beam_L * np.array([1,0])
-        #         self.FA3 = self.FA2 + self.dataObj.beam_B * np.array([0,1])
-        #         self.FA4 = self.FA1 + self.dataObj.beam_B * np.array([0,1])
-        #         self.FX = self.FP + self.dataObj.cleat_thk * np.array([0,1])
-        #         self.FP2 = self.FP + self.dataObj.cleat_legsize * np.array([1,0])
-        #         self.FP3 = self.FP2 + self.dataObj.cleat_thk * np.array([0,1])
-        #         self.FP4 =  self.FX + self.dataObj.gap * np.array([1,0])
-        #         self.FA8 = self.FA7 + self.dataObj.beam_L * np.array([1,0])
-        #         self.FA6 = self.FP1 + self.dataObj.beam_L * np.array([1,0])
-        #         self.FP5 = self.FA7 + self.dataObj.gap * np.array([-1,0])
-
         self.FA7 = self.FA + (self.dataObj.D_col + self.dataObj.gap) * np.array([1, 0]) + (self.dataObj.col_B / 2 - self.dataObj.beam_tw / 2) * np.array([0, 1])
-
         self.FA1 = self.FA7 + (self.dataObj.beam_B / 2 - self.dataObj.beam_tw / 2) * np.array([0, -1])
         self.FA4 = self.FA1 + self.dataObj.beam_B * np.array([0, 1])
         self.FA5 = self.FA7 - 20 * np.array([1, 0])
@@ -1555,20 +1428,6 @@ class Cleat2DCreatorTop(object):
         self.FQ6 = self.FQ3 - (self.dataObj.cleat_legsize - self.dataObj.cleat_thk) * np.array([1, 0])
         self.FQ5 = self.FQ6 - (self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk) * np.array([0, 1])
         self.FQ4 = self.FQ5 - (self.dataObj.cleat_thk) * np.array([1, 0])
-        #         # Weld Triangle
-        #
-        #         self.ptFP = self.FP + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
-        #         self.FQ = self.FP + self.dataObj.cleat_thk * np.array([1,0])
-        #         self.ptFQ = self.FQ  + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
-        #         self.FR = self.FP + self.dataObj.cleat_thk * np.array([0,-1])
-        #         self.ptFR = self.FR + 2.5 * np.array([1,0]) + 2.5 * np.array([0,-1])
-        #
-        #         self.FX = self.FP + (self.dataObj.cleat_thk)* np.array([0,1])
-        #         self.ptFX = self.FX + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
-        #         self.FY = self.FX + (self.dataObj.cleat_thk) * np.array([0,1])
-        #         self.ptFY = self.FY + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
-        #         self.FZ = self.FX + (self.dataObj.cleat_thk) * np.array([1,0])
-        #         self.ptFZ = self.FZ + 2.5 * np.array([1,0]) + 2.5 * np.array([0,1])
 
         # Points for Beam - Beam connection
         self.beam_beam_length = self.dataObj.beam_B + 200
@@ -1654,9 +1513,6 @@ class Cleat2DCreatorTop(object):
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BE), (self.BF)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.BG), (self.BH)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        #         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-
-        #         dwg.add(dwg.line((self.BA2),(self.BA1),(self.BA8),(self.BA7)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
 
         dwg.add(dwg.polyline(points=[(self.BA2), (self.BA1), (self.BA8), (self.BA7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
 
@@ -1677,17 +1533,6 @@ class Cleat2DCreatorTop(object):
         dwg.add(dwg.polyline(points=[(self.BQ1), (self.BQ2), (self.BQ3), (self.BQ6), (self.BQ7), (self.BQ10), (self.BQ1)], stroke='red', fill='none',
                              stroke_width=2.5).dasharray(dasharray=([5, 5])))
 
-        #         dwg.add(dwg.line((self.BH1),(self.BG1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.line((self.BE1),(self.BF1)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.polyline(points=[(self.BJ1),(self.BI1),(self.BL1),(self.BK1),(self.BA)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.line((self.BP4),(self.BP5)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.line((self.BP9),(self.BG1)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.line((self.BQ9),(self.BE1)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.line((self.BQ4),(self.BQ5)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.polyline(points=[(self.BP9),(self.BP10),(self.BP1),(self.BP2),(self.BP3),(self.BP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.polyline(points=[(self.BQ9),(self.BQ10),(self.BQ1),(self.BQ2),(self.BQ3),(self.BQ4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.line((self.BP10 + self.dataObj.gap * np.array([1,0])),(self.BQ10 + self.dataObj.gap * np.array([1,0]))).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-
         nc = self.dataObj.no_of_col
         nc_c = self.dataObj.no_of_ccol
         bolt_r = self.dataObj.bolt_dia / 2
@@ -1705,14 +1550,7 @@ class Cleat2DCreatorTop(object):
                 B2 = pt + (rect_ht + 10) * np.array([0, 1])
                 dwg.add(dwg.line((B1), (B2)).stroke('black', width=2.5, linecap='square'))
                 pt_list.append(pt)
-            #                 if len(pt_list) > 1:
-            #                     dim_offset = self.dataObj.beam_B/2 + self.dataObj.col_T + self.dataObj.col_R1 + 100
-            #                     pt1  = np.array(pt_list[1])
-            #                     pt2 = pt1 - (self.dataObj.beam_B/2 + self.dataObj.col_T + self.dataObj.col_R1 + 100) * np.array([0,1])
-            # #                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
-            #                     params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim":10}
-            #                     self.dataObj.draw_dimension_outer_arrow(dwg,np.array(pt_list[0]),np.array(pt_list[1]),  str(int(self.dataObj.gauge)) + "mm", params)
-            #                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
+
         if nc_c >= 1:
             for col in range(nc_c):
                 pt_c = self.BP1 + self.dataObj.cend_dist * np.array([0, 1]) - self.dataObj.col_tw * np.array([1, 0]) + (col) * self.dataObj.cgauge * np.array(
@@ -1882,14 +1720,6 @@ class Cleat2DCreatorTop(object):
         dwg.add(dwg.polyline(
             points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FE), (self.FF), (self.FG), (self.FH), (self.FI), (self.FJ), (self.FK), (self.FL),
                     (self.FA)], stroke='blue', fill='none', stroke_width=2.5))
-        #         dwg.add(dwg.rect(insert=(self.FA1), size=(self.dataObj.beam_L, self.dataObj.beam_B),fill = 'none', stroke='blue', stroke_width=2.5))
-        #         dwg.add(dwg.line((self.FP),(self.FP1)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.line((self.FX),(self.FP4)).stroke('blue',width = 2.5,linecap = 'square'))
-        #         dwg.add(dwg.polyline(points=[(self.FP1),(self.FP2),(self.FP3),(self.FP4)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.line((self.FA7),(self.FA8)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.line((self.FP1),(self.FA6)).stroke('red',width = 2.5,linecap = 'square').dasharray(dasharray = ([5,5])))
-        #         dwg.add(dwg.polyline([(self.ptFP), (self.ptFQ), (self.ptFR), (self.ptFP)], fill='black',stroke_width=2.5,stroke='black'))
-        #         dwg.add(dwg.polyline([(self.ptFX), (self.ptFY), (self.ptFZ), (self.ptFX)], fill='black',stroke_width=2.5,stroke='black'))
 
         dwg.add(dwg.rect(insert=(self.FA1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.FA7), (self.FA8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
@@ -1925,7 +1755,6 @@ class Cleat2DCreatorTop(object):
                     dim_offset = self.dataObj.beam_B / 2 + self.dataObj.col_T + self.dataObj.col_R1 + 100
                     pt1 = np.array(pt_list[1])
                     pt2 = pt1 - (self.dataObj.beam_B / 2 + self.dataObj.col_T + self.dataObj.col_R1 + 100) * np.array([0, 1])
-                    #                     self.dataObj.draw_faint_line(pt1,pt2,dwg)
                     params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
                     self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), np.array(pt_list[1]), str(int(self.dataObj.gauge)), params)
                     self.dataObj.draw_faint_line(pt1, pt2, dwg)
@@ -1952,11 +1781,6 @@ class Cleat2DCreatorTop(object):
                 B2_1 = pt_c1 + (rect_ht + 10) * np.array([1, 0])
                 dwg.add(dwg.line((B1_1), (B2_1)).stroke('black', width=2.5, linecap='square'))
                 pt_list_c1.append(pt_c1)
-
-            #                 if len(pt_list_c) > 1:
-            #                     dim_offset = self.dataObj.beam_B/2 + self.dataObj.col_T + self.dataObj.col_R1 + 50
-            #                     params = {"offset": dim_offset, "textoffset": 20, "lineori": "left", "endlinedim":10}
-            #                     self.dataObj.draw_dimension_outer_arrow(dwg,np.array(pt_list_c[0]),np.array(pt_list_c[1]),  str(int(self.dataObj.gauge)) , params)
 
         if nc_c > 1:
             ptb = np.array(pt_list_c[1])
@@ -2027,7 +1851,6 @@ class Cleat2DCreatorTop(object):
         self.dataObj.draw_oriented_arrow(dwg, plt_pt, theta, "SE", offset, text_up, text_down)
 
         # Bolt Information for beam connectivity
-        #         bolt_pt = self.FP5 + self.dataObj.edge_dist * np.array([1,0]) + (nc -1) * self.dataObj.gauge * np.array([1,0])
         bolt_pt = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.beam_B) + 50
@@ -2109,9 +1932,6 @@ class Cleat2DCreatorTop(object):
         dwg.add(dwg.line((self.Q), (self.Q1)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[(self.Q1), (self.Q2), (self.Q3), (self.Q7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
         dwg.add(dwg.polyline(points=[(self.Q7), (self.Q6), (self.Q5), (self.Q4)], stroke='blue', fill='none', stroke_width=2.5))
-
-        #         dwg.add(dwg.polyline([(self.ptP), (self.ptO), (self.ptR), (self.ptP)], fill='black',stroke_width=2.5,stroke='black'))
-        #         dwg.add(dwg.polyline([(self.ptX), (self.ptY), (self.ptZ), (self.ptX)], fill='black',stroke_width=2.5,stroke='black'))
 
         nc = self.dataObj.no_of_col
         nc_c = self.dataObj.no_of_ccol
@@ -2322,11 +2142,6 @@ class Cleat2DCreatorSide(object):
         self.FA8 = self.FA1 + self.dataObj.D_beam * np.array([0, 1])
         self.FA9 = self.FA1 + (self.dataObj.D_beam - self.dataObj.beam_T) * np.array([0, 1])
         self.FA10 = self.FA11 + (self.dataObj.D_beam - (2 * self.dataObj.beam_T)) * np.array([0, 1])
-        #         self.FP = self.FA11 + (self.dataObj.beam_R1 + 3) * np.array([0,1])
-        #         self.FQ = self.FP + self.dataObj.cleat_thk * np.array([-1,0])
-        #         self.FX = self.FQ + self.dataObj.cleat_thk * np.array([-1,0])
-        #         self.FR = self.FP + self.dataObj.cleat_ht * np.array([0,1])
-        #         self.FY = self.FX + self.dataObj.cleat_ht * np.array([0,1])
 
         self.FP = self.FA11 + (self.dataObj.beam_R1 + 3) * np.array([0, 1])
         self.FQ = self.FP + self.dataObj.cleat_thk * np.array([-1, 0])
@@ -2402,8 +2217,6 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.rect(insert=self.BP, size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.rect(insert=self.BQ, size=((self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk), self.dataObj.cleat_ht), fill='none', stroke='blue',
                          stroke_width=2.5))
-        #         dwg.add(dwg.rect(insert=(self.BX), size=(-self.dataObj.cleat_thk, self.dataObj.cleat_ht),fill = 'none', stroke='blue', stroke_width=2.5))
-        #         dwg.add(dwg.rect(insert=(self.BY), size=(-(self.dataObj.cleat_legsize_1-self.dataObj.cleat_thk), self.dataObj.cleat_ht),fill = 'none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.rect(insert=self.BY, size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.rect(insert=self.BZ, size=((self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk), self.dataObj.cleat_ht), fill='none', stroke='blue',
                          stroke_width=2.5))

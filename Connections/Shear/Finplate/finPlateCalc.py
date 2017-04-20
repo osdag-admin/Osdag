@@ -1071,10 +1071,3 @@ def finConn(uiObj):
     
     return outputObj
 
-# Print the output values for hard-code inputs required to check independent calculation file   
-#  
-# if __name__ == '__main__':
-#        
-#     output = finConn()
-#     print"#####################################"
-#     print output

@@ -49,7 +49,6 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
-# TODO incorrect pitch calcs.
 # TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 
 
@@ -618,12 +617,14 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
-            required_angle_thickness_shear = round(
-                math.ceil(float(self.shear_force) / self.outstanding_leg_shear_capacity), 1)
+            print "angle t = ", self.angle_t
+            required_angle_thickness_shear = math.ceil(self.shear_force*self.angle_t / self.outstanding_leg_shear_capacity)
             logger.error(": Shear capacity of outstanding leg of seated angle is insufficient [Cl 8.4.1]")
             logger.warning(
+                ": Shear capacity of outstanding leg of seated angle is %2.2f kN" % float(self.outstanding_leg_shear_capacity))
+            logger.warning(
                 ": Shear capacity should be more than factored shear force %2.2f kN" % float(self.shear_force))
-            logger.info(": Select seated angle with thickness greater than %2.2f mm" % required_angle_thickness_shear)
+            logger.info(": Select seated angle with thickness greater than %2.1f mm" % required_angle_thickness_shear)
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)

@@ -632,10 +632,7 @@ class MainController(QMainWindow):
         """(Dictionary)--> None
 
         """
-        if __name__ == '__main__':
-            file_name = 'saveINPUT.txt'
-        else:
-            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
         inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -648,10 +645,7 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        if __name__ == '__main__':
-            file_name = 'saveINPUT.txt'
-        else:
-            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
 
         if os.path.isfile(file_name):
             fileObject = open(file_name, 'r')
@@ -1289,12 +1283,7 @@ def set_osdaglogger():
             logger.removeHandler(handler)
 
     logger.setLevel(logging.DEBUG)
-
-    if __name__ == '__main__':
-        fh = logging.FileHandler("./seatangle.log", mode="a")
-    else:
-        fh = logging.FileHandler(
-            os.path.join(os.getcwd(), os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")), mode="a")
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="a")
 
     formatter = logging.Formatter('''
       <div  class="LOG %(levelname)s">
@@ -1332,7 +1321,8 @@ if __name__ == '__main__':
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
     # For the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
-    fh = logging.FileHandler("./seatangle.log", mode="w")
+    # TODO make paths platform agnostic
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)

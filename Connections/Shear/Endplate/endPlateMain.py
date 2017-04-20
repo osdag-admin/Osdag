@@ -1491,9 +1491,9 @@ class MainController(QMainWindow):
         self.display_output(self.resultObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
-            self.callend2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+            self.callend2D_Drawing("All")
         else:
             pass
             # self.display.EraseAll()

@@ -452,7 +452,6 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         """
         self.root_clearance = 5
-        # TODO : bolt_hole_diameter = bolt_diameter + 2*clearance # Rectify the below line
         self.bolt_hole_diameter = self.bolt_diameter + 2 * self.bolt_hole_clearance(self.bolt_hole_type,
                                                                                     self.bolt_diameter,
                                                                                     self.custom_hole_clearance)
@@ -748,5 +747,3 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.debug(": =========End Of design===========")
 
         return self.output_dict
-
-# if __name__ == '__main__':

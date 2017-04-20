@@ -57,27 +57,26 @@ class ConnectionCalculations(object):
             IS 800, Table 19 (Cl 10.2.1) : Clearances for Fastener Holes
 
         """
+        # TODO : Update bolt diameters in all modules (UI and calculations).
         if bolt_hole_type == 1:  # standard hole
             hole_clearance = {
                 12: 1,
-                14: 1,
                 16: 2,
-                18: 2,
                 20: 2,
-                22: 2,
+                # 22: 2,
                 24: 2,
+                # 27: 3,
                 30: 3,
                 36: 3
             }[bolt_diameter]
         elif bolt_hole_type == 0:  # over size hole
             hole_clearance = {
                 12: 3,
-                14: 3,
                 16: 4,
-                18: 4,
                 20: 4,
-                22: 4,
+                # 22: 4,
                 24: 6,
+                # 27: 8,
                 30: 8,
                 36: 8
             }[bolt_diameter]
@@ -111,9 +110,9 @@ class ConnectionCalculations(object):
             '12': 84.3,
             '16': 157,
             '20': 245,
-            '22': 303,
+            # '22': 303,
             '24': 353,
-            '27': 459,
+            # '27': 459,
             '30': 561,
             '36': 817
         }[str(bolt_diameter)]

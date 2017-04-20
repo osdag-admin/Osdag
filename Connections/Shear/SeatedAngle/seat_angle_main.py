@@ -299,7 +299,6 @@ class MainController(QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
-        # TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -1313,7 +1312,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    # TODO for the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
+    # For the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
     fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
@@ -1332,7 +1331,7 @@ if __name__ == '__main__':
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    # TODO for the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
+    # For the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
     fh = logging.FileHandler("./seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)

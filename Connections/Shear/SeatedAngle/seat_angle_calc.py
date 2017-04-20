@@ -242,23 +242,23 @@ class SeatAngleCalculation(ConnectionCalculations):
             # round up to nearest 5 mm. '+2' for conservative round up.
             top_angle_side = int(round((int(top_angle_side) + 2) / 5.0) * 5.0)
         except:
-            top_angle_side = "ISA 100X65X8"
-        top_angle = {20: "ISA 20X20X3",  # does not satisfy min edge dist req for 12 mm bolt
-                     25: "ISA 25X25X3",  # does not satisfy min edge dist req for 12 mm bolt
-                     30: "ISA 30X30X3",  # does not satisfy min edge dist req for 12 mm bolt
-                     35: "ISA 35X35X4",  # does not satisfy min edge dist req for 12 mm bolt
-                     40: "ISA 40X40X4",
-                     45: "ISA 45X45X5",
-                     50: "ISA 50X50X5",
-                     55: "ISA 55X55X6",
-                     60: "ISA 60X60X6",
-                     65: "ISA 65X65X6",
-                     70: "ISA 70X70X7",
-                     75: "ISA 75X75X8",
-                     80: "ISA 80X80X8",
-                     90: "ISA 90X90X10",
-                     100: "ISA 100X100X10",
-                     "ISA 100X65X8": "ISA 100X65X8"
+            top_angle_side = "100 65 X 8"
+        top_angle = {20: "20 20 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                     25: "25 25 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                     30: "30 30X3",  # does not satisfy min edge dist req for 12 mm bolt
+                     35: "35 35 X 4",  # does not satisfy min edge dist req for 12 mm bolt
+                     40: "40 40 X 4",
+                     45: "45 45 X 5",
+                     50: "50 50 X 5",
+                     55: "55 55 X 6",
+                     60: "60 60 X 6",
+                     65: "65 65 X 6",
+                     70: "70 70 X 7",
+                     75: "75 75 X 8",
+                     80: "80 80 X 8",
+                     90: "90 90 X 10",
+                     100: "100 100 X 10",
+                     "100 65 X 8": "100 65 X 8"
                      }[top_angle_side]
 
         return top_angle
@@ -412,7 +412,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Shear Demand (kN)": 100,
             "Shear Capacity (kN)": 220,
             "Beam Shear Strength (kN)": 303,
-            "Top Angle": "ISA 60X60X6",
+            "Top Angle": "60 60 X 6",
             "status": True
         }
         self.output_dict['Bolt'] = {
@@ -641,7 +641,7 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.moment_at_root_angle = round(float(self.shear_force )* (b2 / b1) * (b2 / 2), 1)
         # logger.info(": Moment at root angle = " + str(self.moment_at_root_angle))
-        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt ISA200x150x16
+        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt '200 150 x 16'
 
         """
         Assumption

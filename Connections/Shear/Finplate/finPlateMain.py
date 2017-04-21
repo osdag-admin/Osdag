@@ -7,7 +7,9 @@ comment
 import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
@@ -46,6 +48,25 @@ class DesignPreferences(QDialog):
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+        self.ui.combo_slipfactor.currentIndexChanged[str].connect(self.highlight_slipfactor_description)
+
+    def highlight_slipfactor_description(self):
+
+        lines = self.ui.textBrowser.toPlainText()
+        data = lines.split('\n')
+        slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
+        self.script_cursor = QTextCursor(self.ui.textBrowser.document())
+        self.ui.textBrowser.setTextCursor(self.script_cursor)
+        self.script_cursor.movePosition(QTextCursor.Start)
+        for str(slip_factor) in data:
+            self.script_cursor.movePosition(QTextCursor.Down)
+
+        self.script_cursor.movePosition(QTextCursor.EndOfLine)
+        self.script_cursor.movePosition(QTextCursor.Start, QTextCursor.KeepAnchor)
+        tmp = self.script_cursor.blockFormat()
+        tmp.setBackground(QBrush(Qt.yellow))
+        self.script_cursor.setBlockFormat(tmp)
+
 
     def save_designPref_para(self):
         '''
@@ -54,8 +75,10 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["n_e"]= int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())

@@ -120,7 +120,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     weld_fu = str(outObj['Weld']['weld_fu'])
     weld_l = str(outObj['Weld']['effectiveWeldlength'])
     shearCapacity = str(round(outObj['Bolt']['shearcapacity'], 3))
-    bearingcapacity = str(round(outObj['Bolt']['bearingcapacity'], 4))
+
+    bearingcapacity = str((outObj['Bolt']['bearingcapacity']))
+
     momentDemand = str(outObj['Plate']['externalmoment'])
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -685,7 +687,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu + ")/(1.25*1000)  = " +
+    if bearingcapacity == "N/A" :
+        row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
+    else:
+        row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu + ")/(1.25*1000)  = " +
            bearingcapacity + "<br> [cl. 10.3.4]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -695,8 +700,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-    boltCapacity = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
-    row = [0, "Bolt capacity (kN)", "", "Min (" + shearCapacity + ", " + bearingcapacity + ") = " + boltCapacity, ""]
+    if bearingcapacity == "N/A" :
+        boltCapacity = str(float(shearCapacity))
+        row = [0, "Bolt capacity (kN)", "",   boltCapacity, "<p align=left style=color:green><b>Pass</b></p>"]
+    else:
+        # boltCapacity = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
+        boltCapacity =  str(min(float(shearCapacity), float(bearingcapacity)))
+        row = [0, "Bolt capacity (kN)", "", "Min (" + shearCapacity + ", " + bearingcapacity + ") = " + boltCapacity, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

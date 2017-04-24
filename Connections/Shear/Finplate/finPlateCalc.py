@@ -46,6 +46,17 @@ def bolt_bearing(dia, t, kb, fu):
     return Vb
  
 
+# BOLT: Determination of factored design force of HSFG bolts Vsf = Vnsf / Ymf = uf * ne * Kh * Fo where Vnsf: The nominal shear capacity of bolt
+def HSFG_bolt_shear(uf, dia, n, fu):
+    Anb = math.pi * dia * dia * 0.25 * 0.78  # threaded area(Anb) = 0.78 x shank area
+    Fo = Anb * 0.7 * fu
+    Kh = 1  # Assuming fastners in Clearence hole
+    Ymf = 1.25  # Ymf = 1.25 if Slip resistance is designed at ultimate load
+    Vsf = uf * n * Kh * Fo / (Ymf * 1000)
+    Vsf = round(Vsf, 3)
+    return Vsf
+
+
 # PLATE HEIGHT: minimum height of fin plate
 # [Source: INSDAG detailing manual, page: 5-7] 
 def fin_min_h(beam_d):
@@ -64,8 +75,10 @@ def fin_min_thk(shear_load, bolt_fy, web_plate_l):
 # [Source: INSDAG detailing manual, page: 5-7]
 
 
-def fin_max_thk(bolt_dia):
-    max_plate_thk = 0.5 * bolt_dia
+# def fin_max_thk(bolt_dia):
+def fin_max_thk(beam_d):
+    # max_plate_thk = 0.5 * bolt_dia
+    max_plate_thk = 0.5 * beam_d
     return max_plate_thk
 
 # Function for block shear capacity calculation
@@ -244,36 +257,43 @@ def finConn(uiObj):
     def boltDesign(web_plate_l):
         # I: Check for number of bolts -------------------
         bolt_fu = int(bolt_grade) * 100
-        bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu;
+        bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
          
         # Spacing of bolts for web plate -------------------
         if bolt_dia == 12 or bolt_dia == 14:
             dia_hole = bolt_dia + 1
-        elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
+        # elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
+        elif bolt_dia == 16 or bolt_dia == 20 or bolt_dia == 24:
             dia_hole = bolt_dia + 2
         else:
             dia_hole = bolt_dia + 3    
      
         # Minimum spacing
-        min_pitch = int(2.5 * bolt_dia);
-        min_gauge = int(2.5 * bolt_dia);
-        min_end_dist = int(1.7 * (dia_hole));
+        min_pitch = int(2.5 * bolt_dia)
+        min_gauge = int(2.5 * bolt_dia)
+        if uiObj["detailing"]["typeof_edge"] == "a - Shear or hand flame cut":
+            min_end_dist = int(1.7 * (dia_hole))
+        else:
+            min_end_dist = int(1.5 * (dia_hole))
+        min_edge_dist = min_end_dist
+
          
         # Calculation of kb
-        kbChk1 = min_end_dist / float(3 * dia_hole);
-        kbChk2 = min_pitch / float(3 * dia_hole) - 0.25;
-        kbChk3 = bolt_fu / float(beam_fu);
-        kbChk4 = 1;
-        kb = min(kbChk1, kbChk2, kbChk3, kbChk4);
+        kbChk1 = min_end_dist / float(3 * dia_hole)
+        kbChk2 = min_pitch / float(3 * dia_hole) - 0.25
+        kbChk3 = bolt_fu / float(beam_fu)
+        kbChk4 = 1
+        kb = min(kbChk1, kbChk2, kbChk3, kbChk4)
         kb = round(kb, 3)
          
         # Bolt capacity calculation
-        t_thinner = min(beam_w_t, web_plate_t);
+        t_thinner = min(beam_w_t, web_plate_t.real)
         bolt_planes = 1
-        if bolt_type == 'Black Bolt':
-            bolt_shear_capacity = bolt_shear(bolt_dia,bolt_planes,bolt_fu)
-            bolt_bearing_capacity = bolt_bearing(bolt_dia,t_thinner,kb, beam_fu)
+        if bolt_type == 'Bearing Bolt':
+            bolt_shear_capacity = bolt_shear(bolt_dia, bolt_planes,bolt_fu)
+            bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, kb, beam_fu)
             bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
+
         elif bolt_type == 'HSFG':
             # TODO update mu_f, bolt_hole_type from design preferences
             mu_f = 0.4
@@ -284,32 +304,34 @@ def finConn(uiObj):
             bolt_capacity = bolt_shear_capacity
             # TODO update report - bolt capacities (after design preferences are added to report)
             # TODO update output window - disable bolt bearing capacity
+
+
         if shear_load != 0:
        # bolts_required = int(math.ceil(shear_load/(2*bolt_capacity)))
 
-            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1;
+            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1
         else:
             bolts_required = int(shear_load / bolt_capacity)
             
         if bolts_required > 0 and  bolts_required <= 2 :
-            bolts_required = 3;
+            bolts_required = 3
          
         # Bolt group capacity
-        bolt_group_capacity = bolts_required * bolt_capacity;
+        bolt_group_capacity = bolts_required * bolt_capacity
          
         if min_pitch % 10 != 0 or min_gauge % 10 != 0:
-            min_pitch = (min_pitch / 10) * 10 + 10;
-            min_gauge = (min_gauge / 10) * 10 + 10;
+            min_pitch = (min_pitch / 10) * 10 + 10
+            min_gauge = (min_gauge / 10) * 10 + 10
         else:
-            min_pitch = min_pitch;
-            min_gauge = min_gauge;
+            min_pitch = min_pitch
+            min_gauge = min_gauge
 
         # clause 10.2.2 is800
-        max_spacing = int(min(100 + 4 * t_thinner, 200));  # clause 10.2.3.3 is800
+        max_spacing = int(min(100 + 4 * t_thinner, 200))  # clause 10.2.3.3 is800
         #TODO: check max spacing
 
         if min_end_dist % 10 != 0:
-            min_end_dist = (min_end_dist / 10) * 10 + 10;
+            min_end_dist = (min_end_dist / 10) * 10 + 10
             min_edge_dist = min_end_dist
         else:
             min_end_dist = min_end_dist
@@ -317,14 +339,14 @@ def finConn(uiObj):
             
         # Pitch calculation for a user given finplate height
         if web_plate_l != 0:
-            length_avail = (web_plate_l - 2 * min_end_dist);
-            pitch = round(length_avail / (bolts_required - 1), 3);
+            length_avail = (web_plate_l - 2 * min_end_dist)
+            pitch = round(length_avail / (bolts_required - 1), 3)
         
         # Calculation of finplate height for optional height input
         elif web_plate_l == 0:
             bolt_line = 1
             web_plate_l_opt = (bolts_required - 1) * min_pitch + 2 * min_end_dist
-            length_avail = (web_plate_l_opt - 2 * min_end_dist);
+            length_avail = (web_plate_l_opt - 2 * min_end_dist)
             pitch = min_pitch    
             # Check for maximum/minimum plate height for optional finplate height input
             if web_plate_l_opt > max_plate_height :

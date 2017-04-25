@@ -351,7 +351,7 @@ class CommonDesignLogic(object):
             # colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
             # colflangeconn.create_3dmodel()
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colwebconn.create_3dmodel()
+            # colwebconn.create_3dmodel()
 
         colwebconn.create_3dmodel()
 
@@ -473,7 +473,7 @@ class CommonDesignLogic(object):
             bgap = beam_tw + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colflangeconn.create_3dmodel()
+            # colflangeconn.create_3dmodel()
 
         colflangeconn.create_3dmodel()
         return colflangeconn
@@ -495,6 +495,10 @@ class CommonDesignLogic(object):
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XposYnegZpos)
         #     # self.display.View.SetProj(OCC.V3d.V3d_Xneg)
 
         # else:

@@ -1,21 +1,12 @@
-<<<<<<< HEAD
 **/*.log
 *.pyo
 *.xml
 **/*.txt
-=======
-*.txt
-*.pyo
->>>>>>> drawingsSeatedAngle
 *.pyc
 .idea/
 *~
-<<<<<<< HEAD
-*.html
-=======
 *.html
 *.xml
 *.log
 output/*
 Osdag_Workspace/*
->>>>>>> drawingsSeatedAngle

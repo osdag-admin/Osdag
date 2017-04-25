@@ -257,6 +257,8 @@ class SeatAngleCalculation(ConnectionCalculations):
                      100: "100 100 X 10",
                      "100 65 X 8": "100 65 X 8"
                      }[top_angle_side]
+        # TODO User specified top angle should overwrite calculated top angle.
+        # logger should display message as warning/info. use dictionary to execute this.
 
         return top_angle
 
@@ -521,27 +523,39 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.num_rows = 1
         self.num_cols = max(self.bolts_required, 2)
         self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))), 3)
-        # TODO check for zero num_cols
         # TODO verify gauge for: bolt should not pass through column web in beam to column flange connectivity
         # TODO verify gauge for: bolt should not pass through beam web in any connectivity
 
         if self.gauge < self.min_gauge:
             self.num_rows = 2
-            self.num_cols = int((self.bolts_required + 1) / 2)
-            self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
-            if self.gauge < self.min_gauge:
+            if self.bolts_required % 2 == 1:
+                self.bolts_provided = self.bolts_required + 1
+            else:
+                self.bolts_provided = self.bolts_required
+            self.num_cols = self.bolts_provided/self.num_rows
+            if self.num_cols == 1:
                 self.safe = False
-                logger.error(": Bolt gauge is less than minimum gauge length [Cl 10.2.2]")
-                logger.warning(": Bolt gauge should be more than  %2.2f mm " % self.min_gauge)
-                logger.warning(": Maximum gauge length allowed is %2.2f mm " % self.max_spacing)
-                logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
+                logger.error(": Detailing failure")
+                logger.warning(": The minimum gauge distance for selected bolt diameter is %2.2f mm [Cl 10.2.2] " % self.min_gauge)
+                logger.warning(": The minimum edge distance for selected bolt diameter is %2.2f mm [Cl 10.2.4.2] " % self.min_edge_dist)
+                logger.warning(": The available length of seated angle is %2.2f mm " % self.angle_l)
+                logger.warning(": Two bolts of selected diameter cannot fit in the availiable length of seated angle")
+                logger.info(": Select bolt with lower grade/diameter to reduce minimum gauge, edge distances)")
+            else:
+                self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
+                if self.gauge < self.min_gauge:
+                    self.safe = False
+                    logger.error(": Bolt gauge is less than minimum gauge distance [Cl 10.2.2]")
+                    logger.warning(": Bolt gauge should be more than  %2.2f mm " % self.min_gauge)
+                    logger.warning(": Maximum gauge distance allowed is %2.2f mm " % self.max_spacing)
+                    logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
         if self.gauge > self.max_spacing:
             """
             Assumption: keeping minimum edge distance the same and increasing the number of bolts,
                 to meet the max spacing requirement.
             1) set gauge = max spacing
             2) get approx (conservative) number of bolts per line based on this gauge
-            3) use the revised number of bolts per line to get revised gauge length
+            3) use the revised number of bolts per line to get revised gauge distance
 
             The engineer can choose to use a different logic by keeping the number of bolts same,
                 and increasing the edge distance.

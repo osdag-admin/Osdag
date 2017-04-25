@@ -194,7 +194,6 @@ class CommonDesignLogic(object):
 
         if self.connection == "cleatAngle" :
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-            #angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, )
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
             Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)

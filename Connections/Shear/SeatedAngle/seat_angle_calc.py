@@ -41,7 +41,7 @@ ASCII diagram
 
 import math
 import logging
-from model import get_angledata, get_beamdata, get_columndata, module_setup
+from model import get_angledata, get_beamdata, get_columndata
 from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
@@ -359,8 +359,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         print self.angle_B, "Shorter leg of unequal angle"
         print self.angle_R1, "Root radius of angle"
 
-    # TODO: remove sa_output and replace with sa_output_backup
-    def sa_output_backup(self):
+    def sa_output(self):
         """Create and return dictionary of output parameters."""
         self.output_dict = {'SeatAngle': {}, 'Bolt': {}}
         self.output_dict['SeatAngle'] = {
@@ -375,6 +374,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         }
 
         self.output_dict['Bolt'] = {
+            "status": self.safe,
             "Shear Capacity (kN)": self.bolt_shear_capacity,
             "Bearing Capacity (kN)": self.bolt_bearing_capacity,
             "Capacity of Bolt (kN)": self.bolt_value,
@@ -386,8 +386,8 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Pitch Distance (mm)": self.pitch,
             "Gauge Distance (mm)": self.gauge,
             "Gauge Two Bolt (mm)": self.gauge_two_bolt,
-            "End Distance (mm)": self.min_end_dist,
-            "Edge Distance (mm)": self.min_edge_dist,
+            "End Distance (mm)": self.end_dist,
+            "Edge Distance (mm)": self.edge_dist,
 
             # output dictionary items for design report
             "bolt_fu": self.bolt_fu,
@@ -399,7 +399,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "hole_dia": self.bolt_hole_diameter
         }
 
-    def sa_output(self):
+    def sa_output_hardcoded(self):
         """Create and return dictionary of output parameters."""
         self.output_dict = {'SeatAngle': {}, 'Bolt': {}}
         self.output_dict['SeatAngle'] = {

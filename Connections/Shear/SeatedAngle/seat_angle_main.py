@@ -45,6 +45,9 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        self.ui.tabWidget.removeTab(1)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
@@ -60,6 +63,8 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
         self.saved_designPref["bolt"]["slip_factor"] = float(self.ui.txt_slip_factor.text())
@@ -80,6 +85,7 @@ class DesignPreferences(QDialog):
 
         self.saved = True
         self.saved_designPref["detailing"]["corrosive"] = str(self.ui.combo_detailingmemebers.currentText())
+        self.saved_designPre["design"]["design_method"] = self.ui.combo_design_method.currentText()
         QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
@@ -110,6 +116,8 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -118,6 +126,8 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False
 
         return designPref

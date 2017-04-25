@@ -640,19 +640,18 @@ class CommonDesignLogic(object):
 
         fileName = str(htmlfilename)
 
-        if not os.path.isfile(fileName):
-            if self.connection == "Finplate":
-                fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-                              htmlfilename, self.folder)
-            elif self.connection == "Endplate":
-                end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-                              htmlfilename, self.folder)
-            elif self.connection == "cleatAngle":
-                cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
-                                profileSummary,htmlfilename, self.folder)
-            else:
-                self.sa_report = ReportGenerator(self.sa_calc_obj)
-                self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
+        if self.connection == "Finplate":
+            fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
+                          htmlfilename, self.folder)
+        elif self.connection == "Endplate":
+            end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
+                          htmlfilename, self.folder)
+        elif self.connection == "cleatAngle":
+            cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
+                            profileSummary,htmlfilename, self.folder)
+        else:
+            self.sa_report = ReportGenerator(self.sa_calc_obj)
+            self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 
     # =========================================================================================
 

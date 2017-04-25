@@ -650,6 +650,7 @@ class CommonDesignLogic(object):
                 cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
                                 profileSummary,htmlfilename, self.folder)
             else:
+                # TODO ReportGenerator object is getting a default initialized sa_calc_obj
                 self.sa_report = ReportGenerator(self.sa_calc_obj)
                 self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 

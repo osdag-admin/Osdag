@@ -381,7 +381,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Bearing Capacity (kN)": self.bolt_bearing_capacity,
             "Capacity of Bolt (kN)": self.bolt_value,
             "Bolt group capacity (kN)": self.bolt_group_capacity,
-            "No. of Bolts": self.bolts_provided,
+            "No. of Bolts Provided": self.bolts_provided,
             "No. of Bolts Required": self.bolts_required,
             "No. of Row": int(self.num_rows),
             "No. of Column": int(self.num_cols),
@@ -449,7 +449,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             None
 
         """
-        self.root_clearance = 5
+        self.root_clearance = 10
         self.bolt_hole_diameter = self.bolt_diameter + 2 * self.bolt_hole_clearance(self.bolt_hole_type,
                                                                                     self.bolt_diameter,
                                                                                     self.custom_hole_clearance)
@@ -480,6 +480,8 @@ class SeatAngleCalculation(ConnectionCalculations):
                                                                      self.bolt_hole_type)
         # Check for long joints is not applicable for seated angle connection
         self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
+        if self.connectivity == "Column flange-Beam flange" and self.bolts_required % 2 == 1:
+            self.bolts_required = self.bolts_required + 1
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
     def seat_angle_connection(self, input_dict):
@@ -576,18 +578,19 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
             logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
             logger.warning(": Bolt pitch should be less than  %2.2f mm " % self.max_pitch)
-            logger.info(": Select bolt with smaller bolt diameter OR)")
+            logger.info(": Select bolt with smaller bolt diameter OR")
             logger.info(": Select connected member with greater thickness.)")
 
         self.bolts_provided = self.num_cols * self.num_rows
         self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)
         self.pitch = int(math.ceil(
-            (self.num_rows - 1) * (self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
+            # (self.num_rows - 1) * (self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - self.root_clearance)))
+            (self.num_rows - 1) * (self.angle_A - self.end_dist - self.angle_t - self.angle_R1 - 1.5 * self.bolt_diameter)))
         if self.pitch < self.min_pitch and self.num_rows == 2:
             self.safe = False
             logger.error(": Bolt pitch calculated is less than minimum pitch [Cl 10.2.2]")
             logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
-            logger.info(": Select angle with longer vertical leg OR)")
+            logger.info(": Select angle with longer vertical leg OR")
             logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
 
         root_3 = math.sqrt(3)

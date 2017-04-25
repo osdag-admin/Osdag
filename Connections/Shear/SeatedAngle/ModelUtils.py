@@ -31,7 +31,7 @@ def make_vertex(*args):
 
 
 def make_n_sided(edges, continuity=GeomAbs_C0):
-    n_sided = BRepFill_Filling()  # TODO Checck optional NbIter=6)
+    n_sided = BRepFill_Filling()
     for edg in edges:
         n_sided.Add(edg, continuity)
     n_sided.Build()

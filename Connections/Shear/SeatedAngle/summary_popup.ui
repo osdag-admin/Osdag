@@ -17,6 +17,16 @@
    <set>Qt::ImhNone</set>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="9" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="lbl_companyName">
      <property name="text">
@@ -38,6 +48,20 @@
     <widget class="QLabel" name="lbl_comapnyLogo">
      <property name="text">
       <string>Company Logo :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lbl_groupName">
+     <property name="text">
+      <string>Group/Team Name :</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lbl_designer">
+     <property name="text">
+      <string>Designer :</string>
      </property>
     </widget>
    </item>
@@ -74,13 +98,6 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lbl_groupName">
-     <property name="text">
-      <string>Group/Team Name :</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="QLineEdit" name="lineEdit_groupName">
      <property name="focusPolicy">
@@ -88,13 +105,6 @@
      </property>
      <property name="cursorPosition">
       <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="lbl_designer">
-     <property name="text">
-      <string>Designer :</string>
      </property>
     </widget>
    </item>
@@ -185,6 +195,13 @@
      </property>
     </widget>
    </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="lbl_addComment">
+     <property name="text">
+      <string>Additional Comments :</string>
+     </property>
+    </widget>
+   </item>
    <item row="7" column="1">
     <widget class="QLineEdit" name="lineEdit_jobNumber">
      <property name="focusPolicy">
@@ -192,40 +209,7 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="lbl_method">
-     <property name="text">
-      <string>Method :</string>
-     </property>
-    </widget>
-   </item>
    <item row="8" column="1">
-    <widget class="QComboBox" name="comboBox_method">
-     <item>
-      <property name="text">
-       <string>Limit State Design</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Limit State (Capacity Based) Design</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Working Stress Design</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="lbl_addComment">
-     <property name="text">
-      <string>Additional Comments :</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
     <widget class="QTextEdit" name="txt_additionalComments">
      <property name="focusPolicy">
       <enum>Qt::StrongFocus</enum>
@@ -259,16 +243,6 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <tabstops>
@@ -281,7 +255,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>lineEdit_projectTitle</tabstop>
   <tabstop>lineEdit_subtitle</tabstop>
   <tabstop>lineEdit_jobNumber</tabstop>
-  <tabstop>comboBox_method</tabstop>
   <tabstop>txt_additionalComments</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>

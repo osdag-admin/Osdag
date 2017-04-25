@@ -64,8 +64,8 @@ def fin_min_thk(shear_load, bolt_fy, web_plate_l):
 # [Source: INSDAG detailing manual, page: 5-7]
 
 
-def fin_max_thk(beam_d):
-    max_plate_thk = 0.5 * beam_d
+def fin_max_thk(bolt_dia):
+    max_plate_thk = 0.5 * bolt_dia
     return max_plate_thk
 
 # Function for block shear capacity calculation
@@ -663,7 +663,7 @@ def finConn(uiObj):
             logger.info("Try to increase the plate thickness")
     
     # Calculation for maximum/minimum plate thickness
-    max_plate_thk = fin_max_thk(beam_d);
+    max_plate_thk = fin_max_thk(bolt_dia);
     max_plate_thk = round(max_plate_thk, 3);
     if web_plate_l != 0:
         min_plate_thk = fin_min_thk(shear_load, beam_fy, web_plate_l);
@@ -1080,10 +1080,3 @@ def finConn(uiObj):
     
     return outputObj
 
-# Print the output values for hard-code inputs required to check independent calculation file   
-#  
-# if __name__ == '__main__':
-#        
-#     output = finConn()
-#     print"#####################################"
-#     print output

@@ -886,6 +886,9 @@ color:#ffffff;
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
       <property name="styleSheet">
        <string notr="true">QComboBox::hover
 {
@@ -901,6 +904,9 @@ color:#ffffff;
 
 </string>
       </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
       <property name="frame">
        <bool>true</bool>
       </property>
@@ -911,22 +917,17 @@ color:#ffffff;
       </item>
       <item>
        <property name="text">
-        <string>Sample Reports</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Sample Problems</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
         <string>Video Tutorials</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>FAQ</string>
+        <string>Sample Design Report</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sample Problems</string>
        </property>
       </item>
       <item>
@@ -1307,7 +1308,7 @@ color:#ffffff;
      <x>0</x>
      <y>0</y>
      <width>1410</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

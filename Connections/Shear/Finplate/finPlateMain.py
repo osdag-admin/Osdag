@@ -7,7 +7,12 @@ comment
 import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QRegExp
+from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtGui import QTextCharFormat
+from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from ui_finPlate import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
@@ -41,11 +46,55 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+        self.ui.combo_slipfactor.currentIndexChanged[str].connect(self.highlight_slipfactor_description)
+
+    def highlight_slipfactor_description(self):
+        slip_factor = str(self.ui.combo_slipfactor.currentText())
+        self.textCursor = QTextCursor(self.ui.textBrowser.document())
+        cursor = self.textCursor
+        # Setup the desired format for matches
+        format = QTextCharFormat()
+        format.setBackground(QBrush(QColor("red")))
+        # Setup the regex engine
+        pattern = str(slip_factor)
+        regex = QRegExp(pattern)
+        # Process the displayed document
+        pos = 0
+        index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
+        while (index != -1):
+            # Select the matched text and apply the desired format
+            cursor.setPosition(index)
+            cursor.movePosition(QTextCursor.EndOfLine,1)
+            #cursor.movePosition(QTextCursor.EndOfWord, 1)
+            cursor.mergeCharFormat(format)
+            # Move to the next match
+            pos = index + regex.matchedLength()
+            index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
+
+
+            # lines = self.ui.textBrowser.toPlainText()
+        # #print lines
+        # data = lines.split('\n')
+        # slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
+        # self.script_cursor = QTextCursor(self.ui.textBrowser.document())
+        # self.ui.textBrowser.setTextCursor(self.script_cursor)
+        # self.script_cursor.movePosition(QTextCursor.Start)
+        # for line in lines:
+        #
+        #     self.script_cursor.movePosition(QTextCursor.StartOfLine)
+        #     self.script_cursor.movePosition(QTextCursor.EndOfLine)
+        #     self.script_cursor.movePosition(QTextCursor.NextRow, QTextCursor.KeepAnchor)
+        #     tmp = self.script_cursor.blockFormat()
+        #     tmp.setBackground(QBrush(Qt.yellow))
+        #     self.script_cursor.setBlockFormat(tmp)
+
 
     def save_designPref_para(self):
         '''
@@ -54,8 +103,10 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["n_e"]= int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -223,7 +274,7 @@ class MyPopupDialog(QDialog):
 
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
-        self.desired_location(filename[0])
+        self.desired_location(filename)
 
         return str(filename)
 
@@ -234,7 +285,7 @@ class MyPopupDialog(QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.foldloader), "Profile"), '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -251,7 +302,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
         return input_summary
 
@@ -423,6 +474,12 @@ class MainController(QMainWindow):
         return dictcoldata
 
     def convertColComboToBeam(self):
+        """
+
+        Returns:
+
+        """
+        self.display.EraseAll()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.lbl_beam.setText(" Secondary beam *")
@@ -563,7 +620,13 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
+
+        # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
         '''
@@ -577,7 +640,12 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxFinplate.setEnabled(True)
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
+
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 
@@ -1113,18 +1181,6 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        # if os.name == 'nt':
-        #
-        #     global display, start_display, app, _
-        #
-        #     from OCC.Display.backend import get_loaded_backend
-        #     lodedbkend = get_loaded_backend()
-        #     from OCC.Display.backend import get_backend, have_backend
-        #     from osdagMainSettings import backend_name
-        #     if (not have_backend() and backend_name() == "pyqt5"):
-        #         get_backend("qt-pyqt5")
-        # else:
-
         global display, start_display, app, _, USED_BACKEND
         if 'qt' in used_backend:
             from OCC.Display.qtDisplay import qtViewer3d
@@ -1134,7 +1190,6 @@ class MainController(QMainWindow):
         from OCC.Display.qtDisplay import  qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
         self.setWindowTitle("Osdag Finplate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
@@ -1229,13 +1284,13 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text()== ' '  or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text()== ''  or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
-        elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:
+        elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
 
-        elif self.ui.txtShear.text() == ' ' or float(str(self.ui.txtShear.text())) == 0:
+        elif self.ui.txtShear.text() == '' or float(str(self.ui.txtShear.text())) == str(0):
             QMessageBox.about(self, "Information", "Please select Factored shear load")
 
         elif self.ui.comboDiameter.currentIndex() == 0:
@@ -1408,7 +1463,6 @@ class MainController(QMainWindow):
         '''
         self.display.EraseAll()
         self.alist = self.designParameters()
-        print self.alist[0]
 
         self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)

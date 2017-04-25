@@ -35,7 +35,8 @@ class SvgWindow(object):
         self.gridlayout.addLayout(self.horizontallayout, 1, 1, 1, 1)
         spaceritem2 = QSpacerItem(260, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.gridlayout.addItem(spaceritem2, 1, 2, 1, 1)
-        self.svgWidget.setFixedSize(1000, 800)
+        # self.svgWidget.setFixedSize(1000, 800)
+        self.svgWidget.showNormal()
 
         # spaceritem1 = QSpacerItem(18, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         # self.horizontallayout.addItem(spaceritem1)

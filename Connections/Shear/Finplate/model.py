@@ -83,8 +83,6 @@ def get_beamdata(sect):
             colName = record.fieldName(i)
             retDict[colName] = designQuery.value(i)
 
-    # print(retDict[QString("tw")])
-
     return retDict
 
 

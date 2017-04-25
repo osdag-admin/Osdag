@@ -248,7 +248,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
 
         return input_summary
 
@@ -377,7 +377,8 @@ class MainController(QMainWindow):
         self.ui.btn_CreateDesign.clicked.connect(self.osdag_header)
         self.ui.btn_CreateDesign.clicked.connect(self.create_design_report)  # Saves the create design report
 
-        self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
+        # ************************************ Help button *******************************************************************************
+        self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionSample_Report.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
@@ -453,7 +454,11 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(False)
         self.ui.chkBxCol.setEnabled(False)
         self.ui.chkBxEndplate.setEnabled(False)
-        self.ui.menubar.setEnabled(False)
+        # self.ui.menubar.setEnabled(False)
+        self.ui.menuFile.setEnabled(False)
+        self.ui.menuEdit.setEnabled(False)
+        self.ui.menuView.setEnabled(False)
+        self.ui.menuGraphics.setEnabled(False)
 
         self.ui.btn_SaveMessages.setEnabled(False)
         self.ui.btn_CreateDesign.setEnabled(False)
@@ -470,7 +475,11 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(True)
         self.ui.chkBxCol.setEnabled(True)
         self.ui.chkBxEndplate.setEnabled(True)
-        self.ui.menubar.setEnabled(True)
+        # self.ui.menubar.setEnabled(True)
+        self.ui.menuFile.setEnabled(True)
+        self.ui.menuEdit.setEnabled(True)
+        self.ui.menuView.setEnabled(True)
+        self.ui.menuGraphics.setEnabled(True)
 
         self.ui.btn_SaveMessages.setEnabled(True)
         self.ui.btn_CreateDesign.setEnabled(True)
@@ -947,7 +956,7 @@ class MainController(QMainWindow):
 
         else:
             fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.alist[3], self.folder)
+            self.commLogicObj.call2D_Drawing(view, fname,  self.folder)
         
     def save_design(self, popup_summary):
         filename = os.path.join(self.folder, "images_html", "Html_Report.html")
@@ -1486,7 +1495,8 @@ class MainController(QMainWindow):
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
         else:
-            self.display.EraseAll()
+            pass
+            # self.display.EraseAll()
 
 
     def create2Dcad(self):

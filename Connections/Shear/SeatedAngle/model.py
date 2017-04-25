@@ -17,6 +17,7 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
+    # TODO explicitly close database connection on exit
     filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
@@ -154,7 +155,6 @@ def get_angledata(sect):
     retDict = {}
     record = designQuery.record()
 
-    # TODO rework angle section name 
     while (designQuery.next()):
         for i in range(0, record.count()):
             angle_name = record.fieldName(i)

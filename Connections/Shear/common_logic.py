@@ -3,7 +3,7 @@ Created on 18-Nov-2016
 
 @author: deepa
 '''
-# inconsequential comment
+
 import os
 
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere

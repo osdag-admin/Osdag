@@ -295,8 +295,7 @@ def finConn(uiObj):
             bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
 
         elif bolt_type == 'HSFG':
-            # TODO update mu_f, bolt_hole_type from design preferences
-            mu_f = 0.4
+            mu_f = 0.55
             bolt_hole_type = 1 # 1 for standard, 0 for oversize hole
             n_e = 1 # number of effective surfaces offering fricitonal resistance
             bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,mu_f,n_e,bolt_hole_type)

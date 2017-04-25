@@ -294,17 +294,19 @@ class Ui_ShearDesignPreferences(object):
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
         self.label_19 = QtWidgets.QLabel(self.tab_Design)
-        self.label_19.setGeometry(QtCore.QRect(21, 31, 84, 16))
+        self.label_19.setGeometry(QtCore.QRect(21, 31, 101, 16))
         self.label_19.setObjectName("label_19")
         self.combo_design_method = QtWidgets.QComboBox(self.tab_Design)
         self.combo_design_method.setGeometry(QtCore.QRect(160, 31, 227, 22))
         self.combo_design_method.setObjectName("combo_design_method")
         self.combo_design_method.addItem("")
+        self.combo_design_method.addItem("")
+        self.combo_design_method.addItem("")
         self.tabWidget.addTab(self.tab_Design, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(3)
         self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -485,6 +487,8 @@ class Ui_ShearDesignPreferences(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("Dialog", "Detailing"))
         self.label_19.setText(_translate("Dialog", "Design Method"))
         self.combo_design_method.setItemText(0, _translate("Dialog", "Limit State Design"))
+        self.combo_design_method.setItemText(1, _translate("Dialog", "Limit State (Capacity based) Design"))
+        self.combo_design_method.setItemText(2, _translate("Dialog", "Working Stress Design"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Design), _translate("Dialog", "Design"))
 
 

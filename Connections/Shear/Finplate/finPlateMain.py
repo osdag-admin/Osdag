@@ -7,8 +7,11 @@ comment
 import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 from ui_finPlate import Ui_MainWindow
@@ -43,6 +46,8 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
@@ -51,21 +56,44 @@ class DesignPreferences(QDialog):
         self.ui.combo_slipfactor.currentIndexChanged[str].connect(self.highlight_slipfactor_description)
 
     def highlight_slipfactor_description(self):
+        slip_factor = str(self.ui.combo_slipfactor.currentText())
+        self.textCursor = QTextCursor(self.ui.textBrowser.document())
+        cursor = self.textCursor
+        # Setup the desired format for matches
+        format = QTextCharFormat()
+        format.setBackground(QBrush(QColor("red")))
+        # Setup the regex engine
+        pattern = str(slip_factor)
+        regex = QRegExp(pattern)
+        # Process the displayed document
+        pos = 0
+        index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
+        while (index != -1):
+            # Select the matched text and apply the desired format
+            cursor.setPosition(index)
+            cursor.movePosition(QTextCursor.EndOfLine,1)
+            #cursor.movePosition(QTextCursor.EndOfWord, 1)
+            cursor.mergeCharFormat(format)
+            # Move to the next match
+            pos = index + regex.matchedLength()
+            index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
-        lines = self.ui.textBrowser.toPlainText()
-        data = lines.split('\n')
-        slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
-        self.script_cursor = QTextCursor(self.ui.textBrowser.document())
-        self.ui.textBrowser.setTextCursor(self.script_cursor)
-        self.script_cursor.movePosition(QTextCursor.Start)
-        for str(slip_factor) in data:
-            self.script_cursor.movePosition(QTextCursor.Down)
 
-        self.script_cursor.movePosition(QTextCursor.EndOfLine)
-        self.script_cursor.movePosition(QTextCursor.Start, QTextCursor.KeepAnchor)
-        tmp = self.script_cursor.blockFormat()
-        tmp.setBackground(QBrush(Qt.yellow))
-        self.script_cursor.setBlockFormat(tmp)
+            # lines = self.ui.textBrowser.toPlainText()
+        # #print lines
+        # data = lines.split('\n')
+        # slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
+        # self.script_cursor = QTextCursor(self.ui.textBrowser.document())
+        # self.ui.textBrowser.setTextCursor(self.script_cursor)
+        # self.script_cursor.movePosition(QTextCursor.Start)
+        # for line in lines:
+        #
+        #     self.script_cursor.movePosition(QTextCursor.StartOfLine)
+        #     self.script_cursor.movePosition(QTextCursor.EndOfLine)
+        #     self.script_cursor.movePosition(QTextCursor.NextRow, QTextCursor.KeepAnchor)
+        #     tmp = self.script_cursor.blockFormat()
+        #     tmp.setBackground(QBrush(Qt.yellow))
+        #     self.script_cursor.setBlockFormat(tmp)
 
 
     def save_designPref_para(self):

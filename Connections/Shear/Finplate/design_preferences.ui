@@ -68,7 +68,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_Bolt">
       <attribute name="title">
@@ -171,23 +171,6 @@ frictional resistance to slip (n_e)</string>
             <layout class="QGridLayout" name="gridLayout_14">
              <item row="0" column="0">
               <layout class="QGridLayout" name="gridLayout_9">
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="txt_boltHoleClearance">
-                 <property name="text">
-                  <string>2</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QLabel" name="label_9">
-                 <property name="text">
-                  <string>mm</string>
-                 </property>
-                </widget>
-               </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_8">
                  <property name="text">
@@ -227,6 +210,23 @@ frictional resistance to slip (n_e)</string>
                    <string>Over-sized</string>
                   </property>
                  </item>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="txt_boltHoleClearance">
+                 <property name="text">
+                  <string>2</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="label_9">
+                 <property name="text">
+                  <string>mm</string>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -793,7 +793,7 @@ corrosive influences?</string>
         <rect>
          <x>21</x>
          <y>31</y>
-         <width>84</width>
+         <width>101</width>
          <height>16</height>
         </rect>
        </property>
@@ -813,6 +813,16 @@ corrosive influences?</string>
        <item>
         <property name="text">
          <string>Limit State Design</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Limit State (Capacity based) Design</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Working Stress Design</string>
         </property>
        </item>
       </widget>

@@ -5,7 +5,8 @@ Created on Oct 25, 2016
 '''
 import sys
 import model
-from PyQt4 import QtGui
+from PyQt5 import QtGui
+from PyQt5 import QtWidgets
 from report_generator import ReportGenerator
 from seat_angle_calc import SeatAngleCalculation
 from test_seat_angle_calc import create_sample_ui_input
@@ -32,10 +33,10 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         Returns:
             None
         """
-        app = QtGui.QApplication(sys.argv)
+        app = QtWidgets.QApplication(sys.argv)
         model.module_setup()
         self.sa_calc_obj = SeatAngleCalculation()
-        sa_sample_ui_input = create_sample_ui_input()
+        sa_sample_ui_input = create_sample_ui_input("SA 0")
         self.sa_calc_obj.seat_angle_connection(sa_sample_ui_input )
         self.report_summary = create_sample_report_summary()
 
@@ -76,7 +77,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
             It takes only report_summary as parameter and uses hardcoded values of other parameters.
         """
         output_dict = create_sample_ui_output()
-        input_dict = create_sample_ui_input()
+        input_dict = create_sample_ui_input("SA 0")
         file_name = "design_report.html"
         folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
         base = "3D_ModelFinFB.png"
@@ -86,8 +87,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
 
         report_generator_instance = ReportGenerator(self.sa_calc_obj)
         report_generator_instance.save_html(output_dict, input_dict, report_summary, folder_location+file_name,
-                                            folder_location, base,
-                                            base_front, base_top, base_side)
+                                            folder_location)
 
 
 def create_sample_report_summary():

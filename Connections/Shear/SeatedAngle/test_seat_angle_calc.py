@@ -8,7 +8,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
         app = QApplication(sys.argv)
         model.module_setup()
-        sample_input = create_sample_ui_input()
+        sample_input = create_sample_ui_input("SA 0")
         self.sa_params(sample_input)
 
     def test_sa_params(self):
@@ -181,19 +181,60 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 3, 1))
 
 
-def create_sample_ui_input():
+def create_sample_ui_input(sa_connection_id):
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
-    input_dict['Member']['Connectivity'] = "Column flange-Beam web"
-    input_dict['Member']['BeamSection'] = "MB 300"
-    input_dict['Member']['ColumnSection'] = "SC 200"
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
-    input_dict['Load']['ShearForce (kN)'] = 100
-    input_dict['Bolt']['Diameter (mm)'] = 20
-    input_dict['Bolt']['Type'] = "Black Bolt"
-    input_dict['Bolt']['Grade'] = "4.6"
-    input_dict['Angle']["AngleSection"] = "150 75 X 12"
-    input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+    if sa_connection_id == "SA 0":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam web"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "SC 200"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 20
+        input_dict['Bolt']['Type'] = "Black Bolt"
+        input_dict['Bolt']['Grade'] = "4.6"
+        input_dict['Angle']["AngleSection"] = "150 75 X 12"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+    elif sa_connection_id == "SA 2":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 20
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 3":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 16
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 4":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 200"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 80
+        input_dict['Bolt']['Diameter (mm)'] = 12
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "6.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 6":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 12
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
     return input_dict
 
 

@@ -1348,16 +1348,11 @@ class Seat2DCreatorFront(object):
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_seat_column_list.append(ptx)
 
-        # pitchPts = []
-        # # for row in ptList:
-        # for row in pt_seat_column_list:
-        #     if len(row) > 0:
-        #         pitchPts.append(row[0])
-        # # txt_offset = (self.data_object.col_width + self.data_object.col_web_thk) / 2
-
-        params = {"offset":self.data_object.beam_length + 50, "textoffset": 15, "lineori": "right", "endlinedim": 10}
-        self.data_object.draw_dimension_outer_arrow(dwg, np.array(pt_seat_column_list[0]), np.array(pt_seat_column_list[len(pt_seat_column_list)-1]), str(len(pt_seat_column_list) - 1) +
-                                                    u' \u0040' + str(int(self.data_object.pitch)) + " mm c/c", params)
+        if bscr > 1:
+            params = {"offset":self.data_object.beam_length + 50, "textoffset": 15, "lineori": "right", "endlinedim": 10}
+            self.data_object.draw_dimension_outer_arrow(dwg, np.array(pt_seat_column_list[0]), np.array(pt_seat_column_list[len(pt_seat_column_list)-1]), str(len(pt_seat_column_list) - 1) +u' \u0040' + str(int(self.data_object.pitch)) + " mm c/c", params)
+        else:
+            pass
 
         # -----------------------------------  beam bolts --------------------------------------
         if bsbr >= 1:
@@ -1541,10 +1536,6 @@ class Seat2DCreatorFront(object):
         pt_seat_anglexx1 = np.array(pt_seat_column_list[-1])
         pt_seat_angleyy1 = pt_seat_anglexx1 + (self.data_object.beam_length + 50) * np.array([1, 0])
         self.data_object.draw_faint_line(pt_seat_anglexx1, pt_seat_angleyy1, dwg)
-        #
-        # point4 = pt_seat_anglexx1 - self.data_object.pitch * np.array([0, -1])
-        # params = {"offset": (self.data_object.beam_length + 110), "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
-        # self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point4, str(self.data_object.pitch) , params)
 
         # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         pt_seat_anglexx = self.SWD3

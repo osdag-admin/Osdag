@@ -917,6 +917,7 @@ class MainController(QMainWindow):
         self.callCleat2D_drawing("All")
         self.commLogicObj.call_designReport(fileName, popup_summary)
         # Creates pdf
+        # TODO update wkhtmltopdf paths
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:

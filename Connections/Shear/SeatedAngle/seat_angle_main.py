@@ -284,7 +284,7 @@ class MainController(QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.grade_type = {'Please Select Type': '',
+        self.grade_type = {'Please Select Type': '', # TODO HSFG 10.9
                            'HSFG': [8.8, 10.8],
                            'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
@@ -682,7 +682,7 @@ class MainController(QMainWindow):
         outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txt_bolt_bearing_capacity.text())
         outObj['Bolt']["Capacity of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
         outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txt_bolt_group_capacity.text())
-        outObj['Bolt']["No. of Bolts"] = float(self.ui.txt_no_bolts.text())
+        outObj['Bolt']["No. of Bolts Provided"] = float(self.ui.txt_no_bolts.text())
         outObj['Bolt']["No. of Row"] = int(self.ui.txt_bolt_rows.text())
         outObj['Bolt']["No. of Column"] = int(self.ui.txt_bolt_cols.text())
         outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
@@ -850,7 +850,7 @@ class MainController(QMainWindow):
         bolt_capacity = resultObj['Bolt']['Capacity of Bolt (kN)']
         self.ui.txt_bolt_capacity.setText(str(bolt_capacity))
 
-        no_of_bolts = resultObj['Bolt']['No. of Bolts']
+        no_of_bolts = resultObj['Bolt']['No. of Bolts Provided']
         self.ui.txt_no_bolts.setText(str(no_of_bolts))
         bolt_grp_capacity = resultObj['Bolt']['Bolt group capacity (kN)']
         self.ui.txt_bolt_group_capacity.setText(str(bolt_grp_capacity))
@@ -1132,7 +1132,7 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            self.call_seatangle2D_Drawing("All")
+            # self.call_seatangle2D_Drawing("All")
         else:
             pass
 

@@ -351,7 +351,7 @@ class CommonDesignLogic(object):
             # colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
             # colflangeconn.create_3dmodel()
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colwebconn.create_3dmodel()
+            # colwebconn.create_3dmodel()
 
         colwebconn.create_3dmodel()
 
@@ -473,7 +473,7 @@ class CommonDesignLogic(object):
             bgap = beam_tw + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colflangeconn.create_3dmodel()
+            # colflangeconn.create_3dmodel()
 
         colflangeconn.create_3dmodel()
         return colflangeconn
@@ -495,6 +495,10 @@ class CommonDesignLogic(object):
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XposYnegZpos)
         #     # self.display.View.SetProj(OCC.V3d.V3d_Xneg)
 
         # else:
@@ -639,7 +643,6 @@ class CommonDesignLogic(object):
 
         fileName = str(htmlfilename)
 
-        # if not os.path.isfile(fileName):
         if self.connection == "Finplate":
             fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
                           htmlfilename, self.folder)
@@ -650,6 +653,7 @@ class CommonDesignLogic(object):
             cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
                             profileSummary,htmlfilename, self.folder)
         else:
+            # TODO ReportGenerator object is getting a default initialized sa_calc_obj
             self.sa_report = ReportGenerator(self.sa_calc_obj)
             self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 

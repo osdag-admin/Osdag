@@ -1329,7 +1329,7 @@ class Seat2DCreatorFront(object):
         pt_seat_beam_list = []
         # ---------------------------------  column bolts --------------------------------------
         if bscr >= 1:
-            # for column in range(1, (bscr+1)):
+        # for column in range(1, (bscr+1)):
             for column in range(bscr):
                 ptx = self.SWD5 + (self.data_object.seat_angle_legsize_vertical - self.data_object.end_dist) * np.array([0, 1]) - \
                       self.data_object.col_web_thk * np.array([1, 0]) + column * self.data_object.pitch * np.array([0, -1])
@@ -1347,6 +1347,17 @@ class Seat2DCreatorFront(object):
                 pt_Dx1 = ptx + (rect_length - 9) * np.array([-1, 0])
                 dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
                 pt_seat_column_list.append(ptx)
+
+        # pitchPts = []
+        # # for row in ptList:
+        # for row in pt_seat_column_list:
+        #     if len(row) > 0:
+        #         pitchPts.append(row[0])
+        # # txt_offset = (self.data_object.col_width + self.data_object.col_web_thk) / 2
+
+        params = {"offset":self.data_object.beam_length + 50, "textoffset": 15, "lineori": "right", "endlinedim": 10}
+        self.data_object.draw_dimension_outer_arrow(dwg, np.array(pt_seat_column_list[0]), np.array(pt_seat_column_list[len(pt_seat_column_list)-1]), str(len(pt_seat_column_list) - 1) +
+                                                    u' \u0040' + str(int(self.data_object.pitch)) + " mm c/c", params)
 
         # -----------------------------------  beam bolts --------------------------------------
         if bsbr >= 1:
@@ -1370,7 +1381,19 @@ class Seat2DCreatorFront(object):
                 pt_seat_beam_list.append(pty)
 
  # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^   Pitch   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
- # #        nr = self.data_object.no_of_rows
+ #                pitchPts = []
+ #                # for row in ptList:
+ #                for row in pt_seat_column_list:
+ #                    if len(row) > 0:
+ #                        pitchPts.append(row[0])
+ #                # txt_offset = (self.data_object.col_width + self.data_object.col_web_thk) / 2
+ #                params = {"offset": (self.data_object.col_width + self.data_object.col_web_thk) / 2, "textoffset": 150, "lineori": "right", "endlinedim": 10}
+ #                self.data_object.draw_dimension_outer_arrow(dwg, np.array(pt_seat_column_list[0]), np.array(pt_seat_column_list[-1]), str(len(pitchPts) -1) +
+ #                                                            u' \u0040' +str(int(self.data_object.pitch)) + " mm c/c", params)
+ #                # self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' +
+ #                #                                             str(int(self.data_object.pitch)) + " mm c/c", params)
+
+                # #        nr = self.data_object.no_of_rows
  # #        nc = self.data_object.no_of_col
  #        bolt_r = float(self.data_object.bolt_dia) / 2
  #        bscr = self.data_object.bolts_seat_column_row
@@ -1398,24 +1421,14 @@ class Seat2DCreatorFront(object):
  #                colList.append(pt)
  #            ptList.append(colList)
 
-        pitchPts = []
-        # for row in ptList:
-        for row in pt_seat_column_list:
-            if len(row) > 0:
-                pitchPts.append(row[0])
-        txt_offset = (self.data_object.col_width + self.data_object.col_web_thk) / 2
-        params = {"offset": (self.data_object.col_width + self.data_object.col_web_thk) / 2 ,
-                  "textoffset": txt_offset, "lineori": "right", "endlinedim": 10}
-        self.data_object.draw_dimension_outer_arrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]),
-                                                    str(len(pitchPts) - 1) + u' \u0040' + str(int(self.data_object.pitch)) + " mm c/c", params)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         # ===============================   Beam Information   ===============================
         beam_pt = self.SWA1 + self.data_object.beam_length / 4 * np.array([1, 0])
         theta = 45
         offset = self.data_object.beam_depth / 3
-        text_up = "Beam " + self.data_object.beam_designation
-        text_down = ""  # text_down shows empty
+        text_up = ""    # text_down shows empty
+        text_down = "Beam " + self.data_object.beam_designation
         element = ""    # elements shows empty
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
@@ -1434,9 +1447,9 @@ class Seat2DCreatorFront(object):
         seat_angle_pt = self.SWD3
         theta = 45
         offset = self.data_object.beam_depth / 2
-        text_up = "ISA." + str(int(self.data_object.seat_angle_legsize_vertical)) + "X" + str(int(self.data_object.seat_angle_legsize_horizontal)) +\
+        text_up = ""
+        text_down = "ISA." + str(int(self.data_object.seat_angle_legsize_vertical)) + "X" + str(int(self.data_object.seat_angle_legsize_horizontal)) +\
                   "X" + str(int(self.data_object.seat_angle_thickness))
-        text_down = ""
         self.data_object.draw_oriented_arrow(dwg, seat_angle_pt, theta, "SE", offset, text_up, text_down)
 
         # ===============================   Top angle information  ===============================
@@ -1477,7 +1490,7 @@ class Seat2DCreatorFront(object):
 
         # ===============================   Bolts - Seat angle Column part information  ===============================
         no_of_bolts = self.data_object.bolts_seat_column_row * self.data_object.bolts_seat_column_col
-        bolt_pt_x = np.array(pt_seat_column_list[-1])
+        bolt_pt_x = np.array(pt_seat_column_list[0])
         theta = 45
         offset = (self.data_object.col_width * 3) / 8
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_dia)) + u'\u00d8' + "holes "
@@ -1525,13 +1538,13 @@ class Seat2DCreatorFront(object):
         self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglex1, point2, str(self.data_object.end_dist) , params)
         # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        pt_seat_anglexx1 = np.array(pt_seat_column_list[0]) - self.data_object.pitch
-        pt_seat_angleyy1 = pt_seat_anglexx1 + (self.data_object.beam_length + 110) * np.array([1, 0])
+        pt_seat_anglexx1 = np.array(pt_seat_column_list[-1])
+        pt_seat_angleyy1 = pt_seat_anglexx1 + (self.data_object.beam_length + 50) * np.array([1, 0])
         self.data_object.draw_faint_line(pt_seat_anglexx1, pt_seat_angleyy1, dwg)
-
-        point4 = pt_seat_anglexx1 - self.data_object.pitch * np.array([0, -1])
-        params = {"offset": (self.data_object.beam_length + 110), "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
-        self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point4, str(self.data_object.pitch) , params)
+        #
+        # point4 = pt_seat_anglexx1 - self.data_object.pitch * np.array([0, -1])
+        # params = {"offset": (self.data_object.beam_length + 110), "textoffset": 20, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        # self.data_object.draw_dimension_outer_arrow(dwg, pt_seat_anglexx1, point4, str(self.data_object.pitch) , params)
 
         # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         pt_seat_anglexx = self.SWD3

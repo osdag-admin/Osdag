@@ -49,13 +49,27 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
+        int_validator = QIntValidator()
+        self.ui.txt_boltHoleClearance.setValidator(int_validator)
+        dbl_validator = QDoubleValidator()
+        self.ui.txt_boltFu.setValidator(dbl_validator)
+        self.ui.txt_boltFu.setMaxLength(7)
+        self.ui.txt_weldFu.setValidator(dbl_validator)
+        self.ui.txt_weldFu.setMaxLength(7)
+        self.ui.txt_detailingGap.setValidator(dbl_validator)
+        self.ui.txt_detailingGap.setMaxLength(5)
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
-        self.ui.combo_slipfactor.currentIndexChanged[str].connect(self.highlight_slipfactor_description)
+
 
     def highlight_slipfactor_description(self):
+        """
+        Highlight the description of currosponding slipfactor on selection of inputs
+        Note : This routine is not in use in current version
+        :return:
+        """
         slip_factor = str(self.ui.combo_slipfactor.currentText())
         self.textCursor = QTextCursor(self.ui.textBrowser.document())
         cursor = self.textCursor
@@ -79,23 +93,6 @@ class DesignPreferences(QDialog):
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
 
-            # lines = self.ui.textBrowser.toPlainText()
-        # #print lines
-        # data = lines.split('\n')
-        # slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
-        # self.script_cursor = QTextCursor(self.ui.textBrowser.document())
-        # self.ui.textBrowser.setTextCursor(self.script_cursor)
-        # self.script_cursor.movePosition(QTextCursor.Start)
-        # for line in lines:
-        #
-        #     self.script_cursor.movePosition(QTextCursor.StartOfLine)
-        #     self.script_cursor.movePosition(QTextCursor.EndOfLine)
-        #     self.script_cursor.movePosition(QTextCursor.NextRow, QTextCursor.KeepAnchor)
-        #     tmp = self.script_cursor.blockFormat()
-        #     tmp.setBackground(QBrush(Qt.yellow))
-        #     self.script_cursor.setBlockFormat(tmp)
-
-
     def save_designPref_para(self):
         '''
         This routine is responsible for saving all design preferences selected by the user
@@ -106,7 +103,6 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        self.saved_designPref["bolt"]["n_e"]= int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -128,7 +124,8 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["gap"] = int(20)
         else:
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
-
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
@@ -161,6 +158,8 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.ui.combo_slipfactor.setCurrentIndex(8)
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
         designPref["weld"] = {}
@@ -175,6 +174,8 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
 
         return designPref
@@ -330,6 +331,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        #self.columndata = get_columncombolist()
         self.ui.comboColSec.addItems(get_columncombolist())
         self.ui.combo_Beam.addItems(get_beamcombolist())
 
@@ -450,6 +452,7 @@ class MainController(QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.designPrefDialog = DesignPreferences(self)
+
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
@@ -1443,6 +1446,7 @@ class MainController(QMainWindow):
         else:
             design_pref = self.designPrefDialog.saved_designPref #self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
+        print "design_pref = ", self.uiObj
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()

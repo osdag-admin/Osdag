@@ -91,12 +91,13 @@ def get_columncombolist():
     This function returns the list of Indian Standard Column Designation.
     '''
     comboList = []
-    columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
+    columnQuery = QSqlQuery("SELECT Designation, FROM Columns order by id ASC")
     a = columnQuery.size()
 
     comboList.append("Select section")
     while(columnQuery.next()):
         comboList.append(columnQuery.value(0))
+        #comboList.append(columnQuery.value(1))
     return comboList
 
 

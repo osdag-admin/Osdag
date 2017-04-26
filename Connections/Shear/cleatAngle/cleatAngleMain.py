@@ -41,6 +41,11 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        self.ui.tabWidget.removeTab(1)
+        validator = QIntValidator()
+        self.ui.txt_detailingGap.setValidator(validator)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
@@ -56,6 +61,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -77,6 +83,9 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["gap"] = int(20)
         else:
             designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        designPref["design"] = {}
+        self.ui.combo_design_method.setCurrentIndex(0)
+        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
 
         self.saved = True
 
@@ -109,6 +118,8 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())#flat
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
+        self.ui.combo_slipfactor.setCurrentIndex(8)
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
         designPref["weld"] = {}
@@ -123,6 +134,9 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        self.ui.combo_design_method.setCurrentIndex(0)
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False
 
         return designPref
@@ -410,6 +424,7 @@ class MainController(QMainWindow):
         self.ui.actionSample_Reports.triggered.connect(self.sample_report)
         self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
+        self.ui.actionDesign_preferences.triggered.connect(self.design_preferences)
 
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
@@ -1575,6 +1590,14 @@ class MainController(QMainWindow):
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+    def design_preferences(self):
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearace(self):
+        self.designPrefDialog.set_bolthole_clernce()
+
+    def call_boltFu(self):
+        self.designPrefDialog.set_boltFu()
 
 
 

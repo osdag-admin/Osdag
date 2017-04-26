@@ -64,11 +64,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        self.saved_designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
-
         self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
-        self.saved_designPref["bolt"]["slip_factor"] = float(self.ui.txt_slip_factor.text())
-        self.saved_designPref["bolt"]["frictional_resist"] = int(self.ui.txt_frictional_resistance.text())
 
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
@@ -83,9 +79,11 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
 
-        self.saved = True
         self.saved_designPref["detailing"]["corrosive"] = str(self.ui.combo_detailingmemebers.currentText())
+        self.saved_designPref["design"] = {}
+        self.ui.combo_design_method.setCurrentIndex(0)
         self.saved_designPre["design"]["design_method"] = self.ui.combo_design_method.currentText()
+        self.saved = True
         QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
@@ -116,8 +114,8 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.ui.combo_slipfactor.setCurrentIndex(8)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -126,6 +124,7 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        self.ui.combo_design_method.setCurrentIndex(0)
         designPref["design"] = {}
         designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False

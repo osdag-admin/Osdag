@@ -172,7 +172,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1329, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1329, 19))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setStyleSheet("QMenu {\n"
@@ -1474,6 +1474,8 @@ class Ui_MainWindow(object):
         self.actionFAQ.setObjectName("actionFAQ")
         self.actionAbout_Osdag = QtWidgets.QAction(MainWindow)
         self.actionAbout_Osdag.setObjectName("actionAbout_Osdag")
+        self.actionDesign_preferences = QtWidgets.QAction(MainWindow)
+        self.actionDesign_preferences.setObjectName("actionDesign_preferences")
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addSeparator()
@@ -1490,6 +1492,7 @@ class Ui_MainWindow(object):
         self.menuEdit.addAction(self.actionCut)
         self.menuEdit.addAction(self.actionCopy)
         self.menuEdit.addAction(self.actionPaste)
+        self.menuEdit.addAction(self.actionDesign_preferences)
         self.menuView.addAction(self.actionEnlarge_font_size)
         self.menuHelp.addAction(self.actionVideo_Tutorials)
         self.menuHelp.addAction(self.actionSample_Reports)
@@ -1817,6 +1820,7 @@ class Ui_MainWindow(object):
         self.actionAsk_Us_a_Question.setText(_translate("MainWindow", "Ask Us a Question"))
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionAbout_Osdag.setText(_translate("MainWindow", "About Osdag"))
+        self.actionDesign_preferences.setText(_translate("MainWindow", "Design  preferences"))
 
 import icons_rc
 

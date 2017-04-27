@@ -119,10 +119,9 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     web_plate_fy = str(outObj['Plate']['web_plate_fy'])
     weld_fu = str(outObj['Weld']['weld_fu'])
     weld_l = str(outObj['Weld']['effectiveWeldlength'])
-    shearCapacity = str(round(outObj['Bolt']['shearcapacity'], 3))
-
+    shearCapacity = str(outObj['Bolt']['shearcapacity'])
     bearingcapacity = str((outObj['Bolt']['bearingcapacity']))
-
+    #bearingcapacity = str(outObj['Bolt']['bearingcapacity'])
     momentDemand = str(outObj['Plate']['externalmoment'])
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&

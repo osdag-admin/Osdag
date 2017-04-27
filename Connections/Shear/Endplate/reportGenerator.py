@@ -716,6 +716,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     if bearingcapacity == "N/A":
         row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
     else:
+
         row = [0, "Bolt bearing capacity (kN)", "",
                " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + t_thinner + "*" + beam_fu + ")/(1.25*1000)  = " +
                bearingcapacity + "<br> [cl. 10.3.4]", ""]

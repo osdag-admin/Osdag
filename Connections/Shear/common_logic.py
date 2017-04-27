@@ -194,7 +194,6 @@ class CommonDesignLogic(object):
 
         if self.connection == "cleatAngle" :
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-            #angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, )
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
             Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
@@ -352,7 +351,7 @@ class CommonDesignLogic(object):
             # colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
             # colflangeconn.create_3dmodel()
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colwebconn.create_3dmodel()
+            # colwebconn.create_3dmodel()
 
         colwebconn.create_3dmodel()
 
@@ -474,7 +473,7 @@ class CommonDesignLogic(object):
             bgap = beam_tw + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            colflangeconn.create_3dmodel()
+            # colflangeconn.create_3dmodel()
 
         colflangeconn.create_3dmodel()
         return colflangeconn
@@ -496,6 +495,10 @@ class CommonDesignLogic(object):
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column flange-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
+        elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
+            self.display.View.SetProj(OCC.V3d.V3d_XposYnegZpos)
         #     # self.display.View.SetProj(OCC.V3d.V3d_Xneg)
 
         # else:
@@ -650,6 +653,7 @@ class CommonDesignLogic(object):
             cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
                             profileSummary,htmlfilename, self.folder)
         else:
+            # TODO ReportGenerator object is getting a default initialized sa_calc_obj
             self.sa_report = ReportGenerator(self.sa_calc_obj)
             self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 

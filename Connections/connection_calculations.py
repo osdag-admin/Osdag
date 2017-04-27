@@ -194,7 +194,7 @@ class ConnectionCalculations(object):
             k_b (float)
             plate_fu (int)
 
-        Return:
+        Returns:
              Factored bearing capacity of bolt(s) as float.
 
         Note:
@@ -235,29 +235,27 @@ class ConnectionCalculations(object):
 
         # TODO: rethink rounding off of MINIMUM distances
         # round off the actual distances and check against minimum
-        if self.min_pitch % 5 != 0 or self.min_gauge % 5 != 0:
+        if self.min_pitch % 5 != 0:
             self.min_pitch = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
-            self.min_gauge = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
-        if self.min_edge_dist % 5 != 0 or self.min_end_dist % 5 != 0:
+        if self.min_gauge % 5 != 0:
+            self.min_gauge = ((self.min_gauge / 5) + 1) * 5 - self.min_gauge % 5
+        if self.min_edge_dist % 5 != 0:
             self.min_edge_dist = int((int(self.min_edge_dist / 5) + 1) * 5)
+        if self.min_end_dist % 5 != 0:
             self.min_end_dist = int((int(self.min_end_dist / 5) + 1) * 5)
 
         # Max spacing IS 800 Cl 10.2.3.1
         self.max_spacing = math.ceil(min(32 * thickness_governing_min, 300))
-        # print "Max spacing = " + str(self.max_spacing)
 
         # Max pitch IS 800 Cl 10.2.3.2
         self.max_pitch = math.ceil(min(12 * thickness_governing_min, 200))
-        # print "Max pitch = " + str(self.max_pitch)
 
         # Max pitch of outer line of bolts IS 800 Cl 10.2.3.3
         # assuming that this limit applies to the pitch of interior bolts as well
         self.max_pitch = math.ceil(min(100 + 4 * thickness_governing_min, self.max_pitch))
-        # print "Max pitch = " + str(self.max_pitch)
 
         # Max spacing IS 800 Cl 10.2.4.3
         self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)).real)
-        # print "Max edge distance = " + str(self.max_edge_dist)
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.

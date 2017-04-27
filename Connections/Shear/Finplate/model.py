@@ -85,19 +85,46 @@ def get_beamdata(sect):
 
     return retDict
 
+def get_oldbeamcombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    while(columnQuery.next()):
+        old_columnList.append(columnQuery.value(0))
+
+    return old_columnList
+
+
+def get_oldcolumncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    #comboList.append("Select section")
+    while(columnQuery.next()):
+        old_columnList.append(columnQuery.value(0))
+
+    return old_columnList
+
 
 def get_columncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
     '''
     comboList = []
-    columnQuery = QSqlQuery("SELECT Designation, FROM Columns order by id ASC")
+    columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
     a = columnQuery.size()
 
     comboList.append("Select section")
     while(columnQuery.next()):
         comboList.append(columnQuery.value(0))
-        #comboList.append(columnQuery.value(1))
     return comboList
 
 

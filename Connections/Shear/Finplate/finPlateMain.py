@@ -331,9 +331,9 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
-        #self.columndata = get_columncombolist()
-        self.ui.comboColSec.addItems(get_columncombolist())
-        self.ui.combo_Beam.addItems(get_beamcombolist())
+
+        self.get_columndata()
+        self.get_beamdata()
 
         self.ui.inputDock.setFixedSize(310, 710)
 
@@ -453,6 +453,41 @@ class MainController(QMainWindow):
         self.uiObj = None
         self.designPrefDialog = DesignPreferences(self)
 
+    def get_columndata(self):
+        """Fetch  old and new column sections from "Intg_osdag" database.
+        Returns:
+
+        """
+        columndata = get_columncombolist()
+        old_colList = get_oldcolumncombolist()
+        self.ui.comboColSec.addItems(columndata)
+        self.color_oldDB_sections(old_colList,columndata,self.ui.comboColSec)
+
+    def get_beamdata(self):
+        """Fetch old and new beam sections from "Intg_osdag" database
+        Returns:
+
+        """
+        beamdata = get_beamcombolist()
+        old_beamList = get_oldbeamcombolist()
+        self.ui.combo_Beam.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList,beamdata,self.ui.combo_Beam)
+
+    def color_oldDB_sections(self, old_section, intg_section, combo_section):
+        """display old sections in red color.
+
+        Args:
+            old_section(str): Old sections from IS 808 1984
+            intg_section(str): Revised sections from IS 808 2007
+            combo_section(QcomboBox): Beam/Column dropdown list
+
+        Returns:
+
+        """
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                combo_section.setItemData(indx,QBrush(QColor("red")),Qt.TextColorRole)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
@@ -464,9 +499,12 @@ class MainController(QMainWindow):
         return dictbeamdata
 
     def fetchColumnPara(self):
+        """Return  sectional properties of selected column section
+        Returns:
+            dictcoldata(dict): Sectional properties of column
 
+        """
         column_sec = str(self.ui.comboColSec.currentText())
-        #u'Select section'
         if column_sec == 'Select section':
             return
         loc = self.ui.comboConnLoc.currentText()
@@ -477,11 +515,11 @@ class MainController(QMainWindow):
         return dictcoldata
 
     def convertColComboToBeam(self):
-        """
-
+        """Replace colulmn cobobox to Primary beam sections and change text of column section(label) to primary beam.
         Returns:
 
         """
+
         self.display.EraseAll()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -598,7 +636,11 @@ class MainController(QMainWindow):
         self.display.Pan(50, 0)
 
     def save_cadImages(self):
+        """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
 
+        Returns:
+
+        """
         files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
         fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
         fName = str(fileName)
@@ -609,9 +651,11 @@ class MainController(QMainWindow):
             QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
-        '''
-        Disables the all buttons in toolbar
-        '''
+        """Disable all tool buttons on Toolbar.
+
+        Returns:
+
+        """
         self.ui.btnFront.setEnabled(False)
         self.ui.btnSide.setEnabled(False)
         self.ui.btnTop.setEnabled(False)
@@ -632,10 +676,11 @@ class MainController(QMainWindow):
         # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
-        '''
-        Enables the all buttons in toolbar
-        '''
-        # self.ui.btn_2D.setEnabled(True)
+        """Enable the all buttons in toolbar
+
+        Returns:
+
+        """
         self.ui.btnFront.setEnabled(True)
         self.ui.btnSide.setEnabled(True)
         self.ui.btnTop.setEnabled(True)
@@ -652,10 +697,13 @@ class MainController(QMainWindow):
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 
-    def fillPlateThickCombo(self, culprit):
+    def fillPlateThickCombo(self):
+        """Populates the plate thickness on the basis of beam web thickness and plate thickness check
 
-        '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
-        '''
+        Returns:
+
+        """
+
         if self.ui.combo_Beam.currentText() == "Select section":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
@@ -681,12 +729,14 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.blockSignals(False)
             self.ui.comboPlateThick_2.setCurrentIndex(0)
 
-    def populateWeldThickCombo(self, culprit):
-        '''
-        Returns the weld thickness on the basis column flange and plate thickness check
-        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum or of a
-        Single Run Fillet Weld)
-        '''
+    def populateWeldThickCombo(self):
+        """Return weld thickness on the basis column flange and plate thickness check
+        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21
+        (Name of the table :Minimum Size of First Rum or of a Single Run Fillet Weld)
+
+        Returns:
+
+        """
         if str(self.ui.combo_Beam.currentText()) == "Select section":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
@@ -741,9 +791,11 @@ class MainController(QMainWindow):
                 self.ui.comboWldSize.addItem(str(element))
 
     def retrieve_prevstate(self):
-        '''
-        This routine is responsible for maintaining previous session's  data
-        '''
+        """Maintain previous session's data.
+        Returns:
+
+        """
+
         uiObj = self.get_prevstate()
         self.setDictToUserInputs(uiObj)
 
@@ -1727,7 +1779,16 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    folder = None
-    window = MainController(folder)
+    ########################################
+    folder_path = "/home/deepa-c/Osdag_workspace"
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path, 0755)
+    image_folder_path = os.path.join(folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(folder_path)
+    ########################################
+    #folder = None
+    window = MainController(folder_path)
     window.show()
     sys.exit(app.exec_())

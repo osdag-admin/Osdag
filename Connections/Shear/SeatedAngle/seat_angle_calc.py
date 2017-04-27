@@ -41,11 +41,11 @@ ASCII diagram
 
 import math
 import logging
+import model
 from model import get_angledata, get_beamdata, get_columndata
 from Connections.connection_calculations import ConnectionCalculations
 
 logger = logging.getLogger("osdag.SeatAngleCalc")
-
 
 # TODO bolts_provided and bolts_required in UI and output_dict
 # TODO pitch and gauge rounding off issues
@@ -309,6 +309,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_fu = int(float(self.bolt_grade)) * 100
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
+        model.set_databaseconnection()
         self.dict_beam_data = get_beamdata(self.beam_section)
         self.dict_column_data = get_columndata(self.column_section)
         self.dict_angle_data = get_angledata(self.angle_sec)
@@ -510,7 +511,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
         elif self.connectivity == "Column flange-Beam flange":
             self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
-            print self.beam_w_f
 
         if self.angle_t < 6:
             logger.warning(": Minimum thickness of 6 mm is recommended for seated angle.")
@@ -634,7 +634,6 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         if self.outstanding_leg_shear_capacity < self.shear_force:
             self.safe = False
-            print "angle t = ", self.angle_t
             required_angle_thickness_shear = math.ceil(self.shear_force*self.angle_t / self.outstanding_leg_shear_capacity)
             logger.error(": Shear capacity of outstanding leg of seated angle is insufficient [Cl 8.4.1]")
             logger.warning(
@@ -751,8 +750,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
             logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
             logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
-        #
-        # print self.beam_web_local_buckling_capacity
 
         # End of calculation
         # ---------------------------------------------------------------------------

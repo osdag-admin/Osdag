@@ -8,7 +8,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
         app = QApplication(sys.argv)
         model.module_setup()
-        sample_input = create_sample_ui_input("SA 0")
+        sample_input = create_sample_ui_input_sa("SA_0")
         self.sa_params(sample_input)
 
     def test_sa_params(self):
@@ -181,11 +181,11 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 3, 1))
 
 
-def create_sample_ui_input(sa_connection_id):
+def create_sample_ui_input_sa(sa_connection_id):
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
-    if sa_connection_id == "SA 0":
+    if sa_connection_id == "SA_0":
         input_dict['Member']['Connectivity'] = "Column flange-Beam web"
         input_dict['Member']['BeamSection'] = "MB 300"
         input_dict['Member']['ColumnSection'] = "SC 200"
@@ -195,7 +195,7 @@ def create_sample_ui_input(sa_connection_id):
         input_dict['Bolt']['Grade'] = "4.6"
         input_dict['Angle']["AngleSection"] = "150 75 X 12"
         input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
-    elif sa_connection_id == "SA 2":
+    elif sa_connection_id == "SA_2":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
         input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
@@ -205,7 +205,7 @@ def create_sample_ui_input(sa_connection_id):
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
-    elif sa_connection_id == "SA 3":
+    elif sa_connection_id == "SA_3":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
         input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
@@ -215,7 +215,7 @@ def create_sample_ui_input(sa_connection_id):
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
-    elif sa_connection_id == "SA 4":
+    elif sa_connection_id == "SA_4":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 200"
         input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
@@ -225,7 +225,7 @@ def create_sample_ui_input(sa_connection_id):
         input_dict['Bolt']['Grade'] = "6.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
-    elif sa_connection_id == "SA 6":
+    elif sa_connection_id == "SA_6":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
         input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
@@ -238,7 +238,8 @@ def create_sample_ui_input(sa_connection_id):
     return input_dict
 
 
-def create_sample_ui_output():
+def create_sample_ui_output_sa():
+    # TODO : Update the output cases
     output_dict = {'SeatAngle': {}, 'Bolt': {}}
     output_dict['SeatAngle'] = {
         "Length (mm)": 140,

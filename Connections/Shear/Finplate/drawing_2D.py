@@ -57,7 +57,8 @@ class FinCommonData(object):
         self.no_of_col = int( ouputObj['Bolt']["numofcol"])
         self.col_L = 700
         self.beam_L = 350
-        self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        self.gap = float(str(inputObj['detailing']['gap'])) # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        #self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
         self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else 50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
         self.beamToBeamDist = 10
         self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0

@@ -144,7 +144,16 @@ def finConn(uiObj):
 
     weld_t = float(uiObj["Weld"]['Size (mm)'])
 
-#####################################################################################
+    old_beam_section = get_oldbeamcombolist()
+    old_col_section = get_oldcolumncombolist()
+
+    if beam_sec in old_beam_section:
+        logger.warning(" : You are using section (in red color) that is not available in latest version of IS 808")
+    if column_sec in old_col_section:
+        logger.warning(" : You are using section (in red color) that is not available in latest version of IS 808")
+
+
+    #####################################################################################
 
 # Hard-code input data required to check overall calculation as independent file  
 #     beam_sec = 'ISMB300'    # Secondary beam
@@ -187,6 +196,8 @@ def finConn(uiObj):
 
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
+
+
 
     # Plate thickness check
     if web_plate_t < beam_w_t:

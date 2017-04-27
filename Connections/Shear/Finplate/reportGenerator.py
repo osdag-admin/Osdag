@@ -360,7 +360,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     # row = [2, "Size (mm)", "6"]
-    row = [2, "Size (mm)", weldSize]
+    row = [2, "Size (mm)", weld_Thick]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -676,7 +676,11 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
-    row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+    if bearingcapacity == "N/A" :
+        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+               ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
+    else:
+        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
            ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -867,7 +871,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     resultant_shear = str(round(math.sqrt(math.pow((x / b), 2) + math.pow((float(shear_load) / a), 2)), 3))
     momentDemand_knmm = str(int(float(momentDemand) * 1000))
     row = [0, "Weld strength (kN/mm)", " &#8730;[(" + momentDemand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_load + "/(2*" +
-           effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear, "<i>f</i><sub>v</sub>= (0.7*" + weldSize + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " +
+           effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear, "<i>f</i><sub>v</sub>= (0.7*" + weld_Thick + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " +
            weld_strength + "<br>[cl. 10.5.7]", " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -885,7 +889,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 #     maxWeld = str(9) if str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2)) == 9 else str((float( platethk)*0.8))
 #     row =[0,"Weld thickness (mm)","Max(("+resultant_shear+"*&#8730;3*1.25)/(0.7*"+weld_fu+")"+", 0.8*"+platethk+") = "+ maxWeld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",weldSize,"<p align=right style=color:green><b>Pass</b></p>"]
     row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
-           "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weldSize, "<p align=left style=color:green><b>Pass</b></p>"]
+           "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick, "<p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

@@ -58,6 +58,7 @@ class ConnectionCalculations(object):
 
         """
         # TODO : Update bolt diameters in all modules (UI and calculations).
+        hole_clearance = 0
         if bolt_hole_type == 1:  # standard hole
             hole_clearance = {
                 12: 1,
@@ -97,7 +98,7 @@ class ConnectionCalculations(object):
             Factored shear capacity of bolt(s) as float.
 
         Note:
-            Bolt factored shear capacity = bolt_fu * number_of_bolts * Area_bolt_net_tensile / (square_root(3) * gamma_mb)
+            Bolt factored shear capacity = bolt_fu * number_of_bolts * Area_bolt_net_tensile / square_root_3 / gamma_mb
             Assumptions:
             1)for all bolts, shear plane passes through threaded area
             2)for all bolts, tensile stress area equals the threaded area
@@ -159,22 +160,20 @@ class ConnectionCalculations(object):
         # F_0 - minimum bolt tension (proof load) at bolt installation
         # proof load (Kn)(minimum bolt tension)
         F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
-        K_h = {
+        k_h = {
             1: 1.0,
             0: 0.85
         }[bolt_hole_type]
-        v_nsf = mu_f * n_e * K_h * F_0  # nominal shear capacity of bolt
+        v_nsf = mu_f * n_e * k_h * F_0  # nominal shear capacity of bolt
         v_dsf = v_nsf / gamma_mf
         return v_dsf
 
     def calculate_kb(self):
         """Calculate k_b for bearing capacity of bolt
 
-        Args:
-            None
+        Args:            
 
         Returns:
-            None
 
         """
         self.k_b = min(self.end_dist / float(3 * self.bolt_hole_diameter),
@@ -198,13 +197,13 @@ class ConnectionCalculations(object):
              Factored bearing capacity of bolt(s) as float.
 
         Note:
-            Bolt factored bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
+            Bolt bearing capacity = 2.5 * k_b * bolt_diameter * sum_thickness_of_connecting_plates * f_u / gamma_mb
             #TODO : implement reduction factor 0.7 for over size holes - Cl 10.3.4
 
         """
         gamma_mb = 1.25
-        bolt_nominal_bearing_capacity = 2.5 * float(str(k_b)) * bolt_diameter * number_of_bolts * thickness_plate * \
-                                        plate_fu / 1000
+        bolt_nominal_bearing_capacity = 2.5 * float(str(k_b)) * bolt_diameter * number_of_bolts \
+                                        * thickness_plate * plate_fu / 1000
         return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
@@ -255,7 +254,7 @@ class ConnectionCalculations(object):
         self.max_pitch = math.ceil(min(100 + 4 * thickness_governing_min, self.max_pitch))
 
         # Max spacing IS 800 Cl 10.2.4.3
-        self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)).real)
+        self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)))
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.

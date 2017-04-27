@@ -13,11 +13,9 @@ from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb a
 from Connections.Shear.cleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
 from Connections.Shear.SeatedAngle.col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
 
-
 from Connections.Shear.Finplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as finBeamWebBeamWeb
 from Connections.Shear.Endplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as endBeamWebBeamWeb
 from Connections.Shear.cleatAngle.beamWebBeamWebConnectivity import BeamWebBeamWeb as cleatBeamWebBeamWeb
-
 
 from Connections.Shear.Finplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as finColFlangeBeamWeb
 from Connections.Shear.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as endColFlangeBeamWeb
@@ -66,7 +64,6 @@ from Connections.Shear.Endplate.drawing_2D import EndCommonData
 from Connections.Shear.cleatAngle.drawing2D import cleatCommonData
 from Connections.Shear.SeatedAngle.drawing_2D import SeatCommonData
 
-
 from Connections.Shear.Finplate.reportGenerator import save_html as fin_save_html
 from Connections.Shear.Endplate.reportGenerator import save_html as end_save_html
 from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
@@ -74,6 +71,7 @@ from Connections.Shear.SeatedAngle.report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
 import json
 from Connections.Component.ModelUtils import *
+
 
 class CommonDesignLogic(object):
     # --------------------------------------------- def __init__(self, **kwargs):
@@ -93,13 +91,13 @@ class CommonDesignLogic(object):
 
     def __init__(self, uiObj, dictbeamdata, dictcoldata, dictangledata,
                  dicttopangledata, loc, component, bolt_R, bolt_T,
-                 bolt_Ht, nut_T, display,folder, connection):
+                 bolt_Ht, nut_T, display, folder, connection):
 
         self.uiObj = uiObj
         self.dictbeamdata = dictbeamdata
         self.dictcoldata = dictcoldata
         self.dictangledata = dictangledata
-        
+
         self.dicttopangledata = dicttopangledata
         self.loc = loc
         self.component = component
@@ -109,10 +107,8 @@ class CommonDesignLogic(object):
         self.nut_T = nut_T
         self.display = display
         self.connection = connection
-
         self.resultObj = self.call_calculation()
 
-        #self.resultObj = None
         self.connectivityObj = None
         self.folder = folder
 
@@ -121,20 +117,17 @@ class CommonDesignLogic(object):
     def call_calculation(self):  # Done
         if self.connection == "Finplate":
             outputs = finConn(self.uiObj)
-            #self.resultObj = finConn(self.uiObj)
         elif self.connection == "Endplate":
             outputs = end_connection(self.uiObj)
-            #self.resultObj = end_connection(self.uiObj)
         elif self.connection == "cleatAngle":
             outputs = cleat_connection(self.uiObj)
-            #self.resultObj = cleat_connection(self.uiObj)
         elif self.connection == "SeatedAngle":
             self.sa_calc_obj = SeatAngleCalculation()
             outputs = self.sa_calc_obj.seat_angle_connection(self.uiObj)
-            #outputs = self.sa_calc_obj.output_dict
         else:
             pass
         return outputs
+
     # =========================================================================================
 
     def create3DBeamWebBeamWeb(self):
@@ -191,13 +184,11 @@ class CommonDesignLogic(object):
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
 
-
-        if self.connection == "cleatAngle" :
+        if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=plate_thick)
             Fweld1 = FilletWeld(L=fillet_length, b=fillet_thickness, h=fillet_thickness)
-
 
         # --Notch dimensions
         if self.connection == "Finplate":
@@ -208,13 +199,12 @@ class CommonDesignLogic(object):
                              width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick) + 10), length=sBeam_B)
         elif self.connection == "cleatAngle":
             notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10),
-                              length=sBeam_B)
+                             length=sBeam_B)
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)
         beam = ISection(B=sBeam_B, T=sBeam_T, D=sBeam_D,
                         t=sBeam_tw, R1=sBeam_R1, R2=sBeam_R2,
                         alpha=sBeam_alpha, length=500, notchObj=notchObj)
-
 
         # bolt = Bolt(R = bolt_R,T = bolt_T, H = 38.0, r = 4.0 )
         bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
@@ -314,11 +304,13 @@ class CommonDesignLogic(object):
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
 
-        if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1 = angle_r1, R2 = angle_r2)
+        if self.connection == "cleatAngle":
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick,R1 = seatangle_r1, R2 = seatangle_r2)
-            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1 = topangle_r1, R2 = topangle_r2)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
+                              R2=seatangle_r2)
+            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
+                                 R2=topangle_r2)
         else:
             plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
 
@@ -348,10 +340,7 @@ class CommonDesignLogic(object):
             gap = column_tw + seat_thick + nut_T
             bgap = beam_T + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
-            # colflangeconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            # colflangeconn.create_3dmodel()
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            # colwebconn.create_3dmodel()
 
         colwebconn.create_3dmodel()
 
@@ -390,7 +379,7 @@ class CommonDesignLogic(object):
                           t=column_tw, R1=column_R1, R2=column_R2, alpha=column_alpha, length=1000, notchObj=None)
 
         #### WELD,PLATE,BOLT AND NUT PARAMETERS #####
-        if self.connection == "cleatAngle" :
+        if self.connection == "cleatAngle":
             cleat_length = self.resultObj['cleat']['height']
             cleat_thick = float(self.dictangledata["t"])
             seat_legsizes = str(self.dictangledata["AXB"])
@@ -434,12 +423,13 @@ class CommonDesignLogic(object):
         nut_Ht = 12.2  #
         gap = self.uiObj['detailing']['gap']
 
-
-        if self.connection == "cleatAngle" :
-            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1 = angle_r1, R2 = angle_r2)
+        if self.connection == "cleatAngle":
+            angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
         elif self.connection == 'SeatedAngle':
-            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1 = seatangle_r1, R2 = seatangle_r2)
-            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1 = topangle_r1,R2 = topangle_r2)
+            seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
+                              R2=seatangle_r2)
+            topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
+                                 R2=topangle_r2)
         else:
             # plate = Plate(L= 300,W =100, T = 10)
             plate = Plate(L=fillet_length, W=plate_width, T=int(plate_thick))
@@ -456,7 +446,7 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":
             nut_space = beam_tw + int(plate_thick) + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj, nut, bolt, nut_space)  # finColFlangeBeamWeb
-            colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray,gap)
+            colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
 
         elif self.connection == "Endplate":
             gap = column_T + int(plate_thick) + nut_T
@@ -473,7 +463,6 @@ class CommonDesignLogic(object):
             bgap = beam_tw + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
-            # colflangeconn.create_3dmodel()
 
         colflangeconn.create_3dmodel()
         return colflangeconn
@@ -490,7 +479,6 @@ class CommonDesignLogic(object):
 
         self.display.DisableAntiAliasing()
 
-        #         self.display.set_bg_gradient_color(23,1,32,150,150,170)
         self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
@@ -499,11 +487,6 @@ class CommonDesignLogic(object):
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
         elif self.loc == "Column web-Beam flange" and self.connection == "SeatedAngle":
             self.display.View.SetProj(OCC.V3d.V3d_XposYnegZpos)
-        #     # self.display.View.SetProj(OCC.V3d.V3d_Xneg)
-
-        # else:
-        #     self.display.View_Iso()
-        #     self.display.FitAll()
 
         if self.component == "Column":
             osdag_display_shape(self.display, self.connectivityObj.get_columnModel(), update=True)
@@ -512,15 +495,17 @@ class CommonDesignLogic(object):
                                 update=True)
         elif component == "cleatAngle":
 
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1, update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color = Quantity_NOC_BLUE1 , update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
+                                update=True)
             nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
         elif component == "SeatAngle":
-            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color = Quantity_NOC_BLUE1, update=True)
-            osdag_display_shape(self.display, self.connectivityObj.angleModel, color= Quantity_NOC_BLUE1, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
+                                update=True)
+            osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
             nutboltlist = self.connectivityObj.nutBoltArray.getModels()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -528,7 +513,7 @@ class CommonDesignLogic(object):
         elif self.component == "Plate":
             osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
             osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-            osdag_display_shape(self.display, self.connectivityObj.plateModel, color= Quantity_NOC_BLUE1, update=True)
+            osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1, update=True)
             nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -540,17 +525,19 @@ class CommonDesignLogic(object):
             if self.connection == "Finplate" or self.connection == "Endplate":
                 osdag_display_shape(self.display, self.connectivityObj.weldModelLeft, color='red', update=True)
                 osdag_display_shape(self.display, self.connectivityObj.weldModelRight, color='red', update=True)
-                osdag_display_shape(self.display, self.connectivityObj.plateModel, color= Quantity_NOC_BLUE1, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.plateModel, color=Quantity_NOC_BLUE1,
+                                    update=True)
 
             elif self.connection == "cleatAngle":
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color = Quantity_NOC_BLUE1 ,update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
+                                    update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleLeftModel, color=Quantity_NOC_BLUE1,
+                                    update=True)
             else:
-                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color = Quantity_NOC_BLUE1, update=True)
-                osdag_display_shape(self.display, self.connectivityObj.angleModel, color = Quantity_NOC_BLUE1 ,update=True)
-                # nutboltlist = self.connectivityObj.nutBoltArray.getModels()
-                # for nutbolt in nutboltlist:
-                #     osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+                osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
+                                    update=True)
+                osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1,
+                                    update=True)
             nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
@@ -590,11 +577,11 @@ class CommonDesignLogic(object):
             self.callDesired_View(fileName, view, folder)
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-            data = os.path.join(str(folder), "images_html","3D_Model.png")
+            data = os.path.join(str(folder), "images_html", "3D_Model.png")
 
             self.display.ExportToImage(data)
 
-            #self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
             self.display.View_Iso()
             self.display.FitAll()
 
@@ -615,11 +602,13 @@ class CommonDesignLogic(object):
             endCommonObj = EndCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, folder)
             endCommonObj.save_to_svg(str(fileName), view)
         elif self.connection == "cleatAngle":
-            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, folder)
-            cleatCommonObj.save_to_svg(str(fileName),view)
+            cleatCommonObj = cleatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata,
+                                             self.dictangledata, folder)
+            cleatCommonObj.save_to_svg(str(fileName), view)
         else:
-            seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata, self.dictangledata, self.dicttopangledata, folder)
-            seatCommonObj.save_to_svg(str(fileName),view)
+            seatCommonObj = SeatCommonData(self.uiObj, self.resultObj, self.dictbeamdata, self.dictcoldata,
+                                           self.dictangledata, self.dicttopangledata, folder)
+            seatCommonObj.save_to_svg(str(fileName), view)
 
     # =========================================================================================
     def call_saveMessages(self):  # Done
@@ -651,12 +640,12 @@ class CommonDesignLogic(object):
                 end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
                               htmlfilename, self.folder)
             elif self.connection == "cleatAngle":
-                cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
-                                profileSummary,htmlfilename, self.folder)
+                cleat_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,
+                                profileSummary, htmlfilename, self.folder)
             else:
                 # TODO ReportGenerator object is getting a default initialized sa_calc_obj
                 self.sa_report = ReportGenerator(self.sa_calc_obj)
-                self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
+                self.sa_report.save_html(profileSummary, htmlfilename, self.folder)
 
     # =========================================================================================
 

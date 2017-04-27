@@ -1,11 +1,3 @@
-'''
-Created on 07-May-2015
-@author: deepa
-
-Updated 23-Aug-2016
-@author: jayant
-'''
-
 import os.path
 import sys
 import subprocess
@@ -28,7 +20,7 @@ from OCC.StlAPI import StlAPI_Writer
 from model import *
 
 from svg_window import SvgWindow
-from report_generator import *
+import report_generator
 from ui_design_preferences import Ui_ShearDesignPreferences
 from ui_seat_angle import Ui_MainWindow
 from ui_summary_popup import Ui_Dialog
@@ -36,6 +28,7 @@ from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.common_logic import CommonDesignLogic
+import seat_angle_calc
 
 
 class DesignPreferences(QDialog):
@@ -52,14 +45,13 @@ class DesignPreferences(QDialog):
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clearance)
 
     def save_designPref_para(self):
         """
         This routine is responsible for saving all design preferences selected by the user
         """
-        self.saved_designPref = {}
-        self.saved_designPref["bolt"] = {}
+        self.saved_designPref = {"bolt": {}}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
@@ -111,8 +103,7 @@ class DesignPreferences(QDialog):
             self.ui.txt_boltFu.setText(bolt_fu)
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        designPref = {}
-        designPref["bolt"] = {}
+        designPref = {"bolt": {}}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
@@ -132,7 +123,7 @@ class DesignPreferences(QDialog):
 
         return designPref
 
-    def set_bolthole_clernce(self):
+    def set_bolthole_clearance(self):
         uiObj = self.main_controller.getuser_inputs()
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         if boltDia != "Diameter of Bolt":
@@ -239,8 +230,7 @@ class DesignReportDialog(QDialog):
         infile.close()
 
     def get_report_summary(self):
-        report_summary = {}
-        report_summary["ProfileSummary"] = {}
+        report_summary = {"ProfileSummary": {}}
         report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
         report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
         report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
@@ -284,7 +274,7 @@ class MainController(QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.grade_type = {'Please Select Type': '', # TODO HSFG 10.9
+        self.grade_type = {'Please Select Type': '',  # TODO HSFG 10.9
                            'HSFG': [8.8, 10.8],
                            'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
@@ -382,7 +372,7 @@ class MainController(QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.connection = "SeatedAngle"
-        self.sa_calc_object = SeatAngleCalculation()
+        self.sa_calc_object = seat_angle_calc.SeatAngleCalculation()
         self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
@@ -552,7 +542,7 @@ class MainController(QMainWindow):
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
-        if uiObj is not None:
+        if uiObj != None:
             self.ui.combo_connectivity.setCurrentIndex(
                 self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
@@ -585,7 +575,7 @@ class MainController(QMainWindow):
 
     def setimage_connection(self):
         """
-        Setting image to connctivity.
+        Setting image to connectivity.
         """
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connectivity.currentText()
@@ -594,7 +584,7 @@ class MainController(QMainWindow):
             pixmap.scaledToHeight(60)
             pixmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(pixmap)
-        elif (loc == "Column web-Beam flange"):
+        elif loc == "Column web-Beam flange":
             picmap = QPixmap(":/newPrefix/images/colW3.png")
             picmap.scaledToHeight(60)
             picmap.scaledToWidth(50)
@@ -615,8 +605,7 @@ class MainController(QMainWindow):
         Returns the dictionary object with the user input fields for designing fin plate connection
 
         """
-        uiObj = {}
-        uiObj["Bolt"] = {}
+        uiObj = {"Bolt": {}}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_bolt_diameter.currentText()
         uiObj["Bolt"]["Grade"] = self.ui.combo_bolt_grade.currentText()
         uiObj["Bolt"]["Type"] = str(self.ui.combo_bolt_type.currentText())
@@ -667,8 +656,7 @@ class MainController(QMainWindow):
     def outputdict(self):
         """Returns the output of design in dictionary object.
         """
-        outObj = {}
-        outObj['SeatAngle'] = {}
+        outObj = {'SeatAngle': {}}
         outObj['SeatAngle']["Length (mm)"] = float(self.ui.txt_seat_length.text())
         outObj['SeatAngle']["Moment Demand (kN-mm)"] = float(self.ui.txt_moment_demand.text())
         outObj['SeatAngle']["Moment Capacity (kN-mm)"] = float(self.ui.txt_moment_capacity.text())
@@ -703,18 +691,16 @@ class MainController(QMainWindow):
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
         self.call_seatangle2D_Drawing("All")
-        inputdict = self.uiObj
-        outdict = self.resultObj
 
-        report_generator_instance = ReportGenerator(self.sa_calc_object)
-        report_generator_instance.save_html(outdict, inputdict, report_summary, file_name, self.folder)
+        report_generator_instance = report_generator.ReportGenerator(self.sa_calc_object)
+        report_generator_instance.save_html(report_summary, file_name, self.folder)
 
         # Creates PDF
         if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
+            path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+            path_wkhtmltopdf = r'/usr/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'
@@ -722,7 +708,6 @@ class MainController(QMainWindow):
         file_type = "PDF(*.pdf)"
         fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
         pdfkit.from_file(filename, fname, configuration=config, options=options)
-
         QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
@@ -796,7 +781,7 @@ class MainController(QMainWindow):
         This method dock and undock widget(QdockWidget)
         """
         flag = widget.isHidden()
-        if (flag):
+        if flag:
             widget.show()
         else:
             widget.hide()
@@ -814,12 +799,12 @@ class MainController(QMainWindow):
         self.ui.combo_bolt_grade.addItems(strItems)
 
     def check_range(self, widget, lblwidget, min_value, max_value):
-        """(QlineEdit,QLable,Number,Number)---> NoneType
+        """(QlineEdit, QLabel, Number, Number)---> NoneType
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         """
         textStr = widget.text()
         val = int(textStr)
-        if (val < min_value or val > max_value):
+        if val < min_value or val > max_value:
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
             widget.clear()
             widget.setFocus()
@@ -836,7 +821,7 @@ class MainController(QMainWindow):
         """
         for k in outputObj.keys():
             for key in outputObj[k].keys():
-                if (outputObj[k][key] == ""):
+                if outputObj[k][key] == "":
                     resultObj = outputObj
                 else:
                     resultObj = outputObj
@@ -992,7 +977,7 @@ class MainController(QMainWindow):
         from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        self.setWindowTitle("Osdag Seatedangle")
+        self.setWindowTitle("Seated Angle Connection")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 
@@ -1006,7 +991,7 @@ class MainController(QMainWindow):
         display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
-            '''Centers the window on the screen.'''
+            """Centers the window on the screen."""
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
                       (resolution.height() / 2) - (self.frameSize().height() / 2))
@@ -1027,8 +1012,8 @@ class MainController(QMainWindow):
 
     def call_3DModel(self):
         """
-        This routine responsible for diasplaying 3D Cad model
-        :param flag: boolean
+        This routine responsible for displaying 3D Cad model
+        :param: boolean
         :return:
         """
         if self.ui.btn3D.isChecked:
@@ -1081,7 +1066,7 @@ class MainController(QMainWindow):
 
     def designParameters(self):
         """
-        This routine returns the neccessary design parameters.
+        This routine returns the necessary design parameters.
         """
         self.uiObj = self.getuser_inputs()
         if self.designPrefDialog.saved is not True:
@@ -1123,13 +1108,12 @@ class MainController(QMainWindow):
                                               self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
-        # print "resultobj from seat_angle_main",self.resultObj
         alist = self.resultObj.values()
         self.display_output(self.resultObj)
         self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
-        if isempty[0] == True:
+        if isempty[0] is True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
             # self.call_seatangle2D_Drawing("All")
@@ -1276,8 +1260,8 @@ class MainController(QMainWindow):
     def design_preferences(self):
         self.designPrefDialog.show()
 
-    def bolt_hole_clearace(self):
-        self.designPrefDialog.set_bolthole_clernce()
+    def bolt_hole_clearance(self):
+        self.designPrefDialog.set_bolthole_clearance()
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()
@@ -1286,7 +1270,6 @@ class MainController(QMainWindow):
 def set_osdaglogger():
     global logger
     if logger == None:
-
         logger = logging.getLogger("osdag")
     else:
         for handler in logger.handlers[:]:
@@ -1303,7 +1286,6 @@ def set_osdaglogger():
       </div>''')
     formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
     fh.setFormatter(formatter)
-
     logger.addHandler(fh)
 
 
@@ -1321,7 +1303,6 @@ def launchSeatedAngleController(osdagMainWindow, folder):
 
     window = MainController(folder)
     osdagMainWindow.hide()
-
     window.show()
     window.closed.connect(osdagMainWindow.show)
 
@@ -1339,7 +1320,7 @@ if __name__ == '__main__':
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/SeatedAngle/log.css"/>''')
     app = QApplication(sys.argv)
     module_setup()
-    # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
+    # workspace_folder_path, _ = QFileDialog.getSaveFileName('Select Workspace Directory', "F:\Osdag_workspace")
     workspace_folder_path = 'F:\Osdag_workspace\seated_angle'
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)

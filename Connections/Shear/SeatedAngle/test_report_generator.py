@@ -13,6 +13,7 @@ import unittest
 import logging
 import seat_angle_main
 
+
 # logger = logging.getLogger("osdag.SeatAngleCalc")
 
 class TestReportGenerator(unittest.TestCase, ReportGenerator):
@@ -73,12 +74,12 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
 
         sa_sample_ui_input = test_seat_angle_calc.create_sample_ui_input_sa(sa_connection_id=sa_connection_id)
         sa_calc_obj = SeatAngleCalculation()
-        sa_sample_ui_output = sa_calc_obj.seat_angle_connection(sa_sample_ui_input)
+        sa_calc_obj.seat_angle_connection(sa_sample_ui_input)
         report_summary = self.create_sample_report_summary(sa_connection_id)
         folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"  # Add dummy images of views here.
         file_name = folder_location + "design_report_" + sa_connection_id + ".html"
         report_generator_instance = ReportGenerator(sa_calc_obj)
-        report_generator_instance.save_html(sa_sample_ui_output, sa_sample_ui_input, report_summary, file_name,
+        report_generator_instance.save_html(report_summary, file_name,
                                             folder_location)
 
     def create_sample_report_summary(self, sa_connection_id):

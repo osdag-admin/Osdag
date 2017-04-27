@@ -8,7 +8,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
     def setUp(self):
         app = QApplication(sys.argv)
         model.module_setup()
-        sample_input = create_sample_ui_input()
+        sample_input = create_sample_ui_input("SA 0")
         self.sa_params(sample_input)
 
     def test_sa_params(self):
@@ -58,19 +58,19 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.beam_d = 222
         self.assertEqual(SeatAngleCalculation.top_angle_section(self), "55 55 X 6")
         self.beam_d = 140
-        # "35 35 X 4" based on thumb rule. '40 40 X 4' is based on edge distance requirement for 12 mm bolt
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "40 40 X 4")
+        # "35 35 X 4" based on thumb rule. '45 45 X 5' is based on edge distance requirement for 12 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "45 45 X 5")
         self.beam_d = 100
-        # "25 25 X 3" based on thumb rule. '40 40 X 4' is based on edge distance requirement for 12 mm bolt
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "40 40 X 4")
+        # "25 25 X 3" based on thumb rule. '45 45 X 5' is based on edge distance requirement for 12 mm bolt
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "45 45 X 5")
         self.beam_d = 222
         self.bolt_diameter = 20
         self.bolt_design()
         # "55 55 X 6" based on thumb rule. '70 70 X 7' is based on edge distance requirement for 20 mm bolt
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "70 70 X 7")
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "75 75 X 8")
         self.beam_d = 100
         # "25 25 X 3" based on thumb rule. '70 70 X 7' is based on edge distance requirement for 20 mm bolt
-        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "70 70 X 7")
+        self.assertEqual(SeatAngleCalculation.top_angle_section(self), "75 75 X 8")
 
 
     def test_bolt_shear_capacity_single_bolt(self):
@@ -134,11 +134,11 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(self.min_pitch, 30)
         self.assertEqual(self.min_gauge, 30)
         self.min_edge_multiplier = 1.5
-        self.assertEqual(self.min_end_dist, 20)
-        self.assertEqual(self.min_edge_dist, 20)
-        self.assertEqual(self.k_b, 0.513)
+        self.assertEqual(self.min_end_dist, 25)
+        self.assertEqual(self.min_edge_dist, 25)
+        self.assertEqual(self.k_b, 0.464)
         self.assertEqual(round(self.bolt_shear_capacity, 1), 15.6)
-        self.assertEqual(round(self.bolt_bearing_capacity, 1), 60.6)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 54.8)
         self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 15.6))
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 7, 1))
         self.assertEqual(round(self.max_spacing, 0), 300)
@@ -150,9 +150,9 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(self.min_gauge, 40)
         self.assertEqual(self.min_end_dist, 30)
         self.assertEqual(self.min_edge_dist, 30)
-        self.assertEqual(self.k_b, 0.491)
+        self.assertEqual(self.k_b, 0.417)
         self.assertEqual(round(self.bolt_shear_capacity, 1), 29.0)
-        self.assertEqual(round(self.bolt_bearing_capacity, 1), 77.3)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 65.7)
         self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 29.0))
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 4, 1))
 
@@ -160,11 +160,11 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.bolt_design()
         self.assertEqual(self.min_pitch, 60)
         self.assertEqual(self.min_gauge, 60)
-        self.assertEqual(self.min_end_dist, 40)
-        self.assertEqual(self.min_edge_dist, 40)
-        self.assertEqual(self.k_b, 0.513)
+        self.assertEqual(self.min_end_dist, 45)
+        self.assertEqual(self.min_edge_dist, 45)
+        self.assertEqual(self.k_b, 0.464)
         self.assertEqual(round(self.bolt_shear_capacity, 1), 65.2)
-        self.assertEqual(round(self.bolt_bearing_capacity, 1), 121.2)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 109.6)
         self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 65.2))
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 2, 1))
 
@@ -172,28 +172,69 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.bolt_design()
         self.assertEqual(self.min_pitch, 50)
         self.assertEqual(self.min_gauge, 50)
-        self.assertEqual(self.min_end_dist, 35)
-        self.assertEqual(self.min_edge_dist, 35)
-        self.assertEqual(self.k_b, 0.508)
+        self.assertEqual(self.min_end_dist, 40)
+        self.assertEqual(self.min_edge_dist, 40)
+        self.assertEqual(self.k_b, 0.444)
         self.assertEqual(round(self.bolt_shear_capacity, 1), 45.3)
-        self.assertEqual(round(self.bolt_bearing_capacity, 1), 100.0)
+        self.assertEqual(round(self.bolt_bearing_capacity, 1), 87.4)
         self.assertEqual(round(self.bolts_required, 1), math.ceil(100 / 45.3))
         self.assertEqual(round(self.bolt_group_capacity, 1), round(self.bolt_shear_capacity * 3, 1))
 
 
-def create_sample_ui_input():
+def create_sample_ui_input(sa_connection_id):
     input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
-    input_dict['Member']['Connectivity'] = "Column flange-Beam web"
-    input_dict['Member']['BeamSection'] = "MB 300"
-    input_dict['Member']['ColumnSection'] = "SC 200"
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
-    input_dict['Load']['ShearForce (kN)'] = 100
-    input_dict['Bolt']['Diameter (mm)'] = 20
-    input_dict['Bolt']['Type'] = "Black Bolt"
-    input_dict['Bolt']['Grade'] = "4.6"
-    input_dict['Angle']["AngleSection"] = "150 75 X 12"
-    input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+    if sa_connection_id == "SA 0":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam web"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "SC 200"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 20
+        input_dict['Bolt']['Type'] = "Black Bolt"
+        input_dict['Bolt']['Grade'] = "4.6"
+        input_dict['Angle']["AngleSection"] = "150 75 X 12"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+    elif sa_connection_id == "SA 2":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 20
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 3":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 16
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 4":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 200"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 80
+        input_dict['Bolt']['Diameter (mm)'] = 12
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "6.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+    elif sa_connection_id == "SA 6":
+        input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
+        input_dict['Member']['BeamSection'] = "MB 300"
+        input_dict['Member']['ColumnSection'] = "UC 203 x 203 x 86"
+        input_dict['Load']['ShearForce (kN)'] = 100
+        input_dict['Bolt']['Diameter (mm)'] = 12
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
+        input_dict['Bolt']['Grade'] = "5.8"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
+        input_dict['Angle']["TopAngleSection"] = "150 150 10"
     return input_dict
 
 

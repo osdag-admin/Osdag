@@ -13,11 +13,11 @@ import pdfkit
 
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
-from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import shutil
 import pickle
 
-from OCC import VERSION, BRepTools
+from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 from OCC import IGESControl
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
@@ -45,6 +45,9 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        self.ui.tabWidget.removeTab(1)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
@@ -60,6 +63,8 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
         self.saved_designPref["bolt"]["slip_factor"] = float(self.ui.txt_slip_factor.text())
@@ -80,6 +85,7 @@ class DesignPreferences(QDialog):
 
         self.saved = True
         self.saved_designPref["detailing"]["corrosive"] = str(self.ui.combo_detailingmemebers.currentText())
+        self.saved_designPre["design"]["design_method"] = self.ui.combo_design_method.currentText()
         QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
@@ -110,6 +116,8 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        designPref["bolt"]["n_e"] = int(str(self.ui.txt_frictional_resistance.text()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -118,6 +126,8 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False
 
         return designPref
@@ -274,7 +284,7 @@ class MainController(QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.grade_type = {'Please Select Type': '',
+        self.grade_type = {'Please Select Type': '', # TODO HSFG 10.9
                            'HSFG': [8.8, 10.8],
                            'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
@@ -299,7 +309,6 @@ class MainController(QMainWindow):
         self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
-        # TODO add input validations
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -633,10 +642,7 @@ class MainController(QMainWindow):
         """(Dictionary)--> None
 
         """
-        if __name__ == '__main__':
-            file_name = 'saveINPUT.txt'
-        else:
-            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
         inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -649,10 +655,7 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        if __name__ == '__main__':
-            file_name = 'saveINPUT.txt'
-        else:
-            file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
 
         if os.path.isfile(file_name):
             fileObject = open(file_name, 'r')
@@ -679,7 +682,7 @@ class MainController(QMainWindow):
         outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txt_bolt_bearing_capacity.text())
         outObj['Bolt']["Capacity of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
         outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txt_bolt_group_capacity.text())
-        outObj['Bolt']["No. of Bolts"] = float(self.ui.txt_no_bolts.text())
+        outObj['Bolt']["No. of Bolts Provided"] = float(self.ui.txt_no_bolts.text())
         outObj['Bolt']["No. of Row"] = int(self.ui.txt_bolt_rows.text())
         outObj['Bolt']["No. of Column"] = int(self.ui.txt_bolt_cols.text())
         outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
@@ -847,7 +850,7 @@ class MainController(QMainWindow):
         bolt_capacity = resultObj['Bolt']['Capacity of Bolt (kN)']
         self.ui.txt_bolt_capacity.setText(str(bolt_capacity))
 
-        no_of_bolts = resultObj['Bolt']['No. of Bolts']
+        no_of_bolts = resultObj['Bolt']['No. of Bolts Provided']
         self.ui.txt_no_bolts.setText(str(no_of_bolts))
         bolt_grp_capacity = resultObj['Bolt']['Bolt group capacity (kN)']
         self.ui.txt_bolt_group_capacity.setText(str(bolt_grp_capacity))
@@ -1129,7 +1132,7 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            self.call_seatangle2D_Drawing("All")
+            # self.call_seatangle2D_Drawing("All")
         else:
             pass
 
@@ -1290,12 +1293,7 @@ def set_osdaglogger():
             logger.removeHandler(handler)
 
     logger.setLevel(logging.DEBUG)
-
-    if __name__ == '__main__':
-        fh = logging.FileHandler("./seatangle.log", mode="a")
-    else:
-        fh = logging.FileHandler(
-            os.path.join(os.getcwd(), os.path.join("Connections", "Shear", "SeatedAngle", "seatangle.log")), mode="a")
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="a")
 
     formatter = logging.Formatter('''
       <div  class="LOG %(levelname)s">
@@ -1313,7 +1311,7 @@ def launchSeatedAngleController(osdagMainWindow, folder):
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    # TODO for the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
+    # For the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
     fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
@@ -1332,8 +1330,9 @@ if __name__ == '__main__':
     set_osdaglogger()
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    # TODO for the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
-    fh = logging.FileHandler("./seatangle.log", mode="w")
+    # For the following to work, set the working directory of seat_angle_main.py to the root Osdag folder
+    # TODO make paths platform agnostic
+    fh = logging.FileHandler("./Connections/Shear/SeatedAngle/seatangle.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)

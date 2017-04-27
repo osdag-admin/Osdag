@@ -111,7 +111,8 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     weld_fu = str(410)
     weld_l = str(outobj['Weld']['weldlength'])
     shear_capacity = str(round(outobj['Bolt']['shearcapacity'], 3))
-    bearingcapacity = str(round(outobj['Bolt']['bearingcapacity'], 4))
+    # bearingcapacity = str(round(outobj['Bolt']['bearingcapacity'], 4))
+    bearingcapacity = str(outobj['Bolt']['bearingcapacity'])
     critical_shear = str(round(outobj['Bolt']['critshear'], 3))
 
 
@@ -672,8 +673,14 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + t_thinner + "*" + beam_fu + ")/(1.25*1000) = " +
-           bearingcapacity + "<br> [cl. 10.3.4]", ""]
+    if bearingcapacity == "N/A":
+        row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
+    else:
+        row = [0, "Bolt bearing capacity (kN)", ""," <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + t_thinner + "*" + beam_fu +
+               ")/(1.25*1000)  = " + bearingcapacity + "<br> [cl. 10.3.4]", ""]
+
+    # row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + t_thinner + "*" + beam_fu + ")/(1.25*1000) = " +
+    #        bearingcapacity + "<br> [cl. 10.3.4]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -682,9 +689,18 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-    bolt_capacity = str(min(float(shear_capacity), float(bearingcapacity)))
-    row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearingcapacity + ") = " + bolt_capacity,
-           "<p align=left style=color:green><b>Pass</b></p>"]
+    if bearingcapacity == "N/A":
+        bolt_capacity = str(float(shear_capacity))
+        row = [0, "Bolt capacity (kN)", "", bolt_capacity, "<p align=left style=color:green><b>Pass</b></p>"]
+    else:
+        # boltCapacity = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
+        bolt_capacity = str(min(float(shear_capacity), float(bearingcapacity)))
+        row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearingcapacity + ") = " + bolt_capacity,
+               ""]
+
+    # bolt_capacity = str(min(float(shear_capacity), float(bearingcapacity)))
+    # row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity + ", " + bearingcapacity + ") = " + bolt_capacity,
+    #        "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

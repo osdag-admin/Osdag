@@ -184,6 +184,7 @@ def finConn(uiObj):
 #     bolt_planes = 1 
 ##################################################################################
     # Read input values from Beam/Column database
+    set_databaseconnection()
     if connectivity == "Beam-Beam":
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_beamdata(column_sec)

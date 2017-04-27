@@ -190,7 +190,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.project_title = ""
         self.sub_title = ""
         self.job_number = ""
-        # self.method = ""
+        self.client = ""
 
     def save_html(self, output_object, input_object, report_summary, file_name, folder):
         """Create and save html report for Seated angle connection.
@@ -243,7 +243,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.project_title = str(report_summary['ProjectTitle'])
         self.sub_title = str(report_summary['Subtitle'])
         self.job_number = str(report_summary['JobNumber'])
-        # self.method = str(report_summary['Method'])
+        self.client = str(report_summary['Client'])
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
@@ -582,10 +582,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr = nl() + " " + nl() + t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
         rstr += t('tr') + nl()
         row = [0, '<object type= "image/PNG" data= "cmpylogoSeatAngle.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
+               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
         rstr += html_space(1) + t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(1) + t('td colspan="2" align= "right"') + row[2] + t('/td') + nl()
+        rstr += html_space(1) + t('td colspan="2" align= "center"') + row[2] + t('/td') + nl()
         rstr += t('/tr') + nl()
 
         rstr += t('tr') + nl()
@@ -605,7 +604,7 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += t('tr') + nl()
         rstr += design_summary_row(0, "Date", "detail", text_two=time.strftime("%d /%m /%Y"), is_row=False)
-        rstr += design_summary_row(0, " ", "detail", text_two=" ", is_row=False)
+        rstr += design_summary_row(0, "Client", "detail", text_two=self.client, is_row=False)
         rstr += t('/tr')
         rstr += t('/table') + nl() + " " + nl()
 

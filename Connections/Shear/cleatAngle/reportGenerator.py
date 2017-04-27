@@ -216,11 +216,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -602,11 +600,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -733,11 +729,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1009,11 +1003,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1307,11 +1299,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1413,11 +1403,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')

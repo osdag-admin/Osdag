@@ -302,7 +302,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        input_summary["Client"] = str(self.ui.lineEdit_client.text())
 
         return input_summary
 

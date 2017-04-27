@@ -249,6 +249,7 @@ class DesignReportDialog(QDialog):
         report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
         report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+        report_summary["Client"] = str(self.ui.lineEdit_client.text())
         report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
 
         return report_summary

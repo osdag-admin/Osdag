@@ -358,6 +358,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
 
+
+        # TODO add Design Preferences here
+
         # -----------------------------------------------------------------------------------
         rstr += self.design_report_header()
         # -----------------------------------------------------------------------------------

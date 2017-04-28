@@ -526,61 +526,96 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-
+# --------------------------------      BOLT      -----------------------------------------------------------------------------------------------
+    row = [0, "Bolt ", " "]
     rstr += t('tr')
-    row = [0, "Bolt", "Hole Type", "Hole Clearance", "Material Grade"]
-    rstr += t('td rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    rstr += t('t')
-    row = [0,  bolt_hole_type, bolt_hole_clrnce, bolt_mtrl_grade]
-    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "", " "]
+    row = [0, "Hole Type", bolt_hole_type]
     rstr += t('tr')
-    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, "Weld", "Type of Weld",  "Material Grade", ""]
-    rstr += t('td rowspan="2"  rowspan="2"  class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('t')
-    row = [0, weld_type,  weld_mtrl_grade, ""]
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "", " "]
+    row = [0, "Hole Clearance (mm)", bolt_hole_clrnce]
     rstr += t('tr')
-    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-
+    row = [0, "Material Grade (MPa)", bolt_mtrl_grade]
     rstr += t('tr')
-    row = [0, "Detailing", "Type of Edges", "Minimum Edge-End Distance",  "Gap"]
-    rstr += t('td  rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    rstr += t('t')
-    row = [0,  edge_type, detail_edgend_dist,  detail_gap]
-    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    #TODO add slip factor
+    # slip = 0.55
+    # row = [0, "Slip factor", slip]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    # --------------------------------      WELD      -----------------------------------------------------------------------------------------------
+    row = [0, "Weld ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Type of Weld", weld_type]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Material Grade (MPa)", weld_mtrl_grade]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # --------------------------------      DETAILING      -----------------------------------------------------------------------------------------------
+    row = [0, "Detailing ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Type of Edges", edge_type]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Minimum Edge-End Distance", detail_edgend_dist]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Gap (mm)", detail_gap]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # TODO add yes or no option??
+    # row = [0, "Corrosive influences", " "]
+    # rstr += t('tr')
+    # rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
+
+    # --------------------------------      DESIGN      -----------------------------------------------------------------------------------------------
+    row = [0, "Design ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Design Method", "Limit State Design "]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('/table')

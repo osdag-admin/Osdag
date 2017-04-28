@@ -77,6 +77,18 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     cleat_fy = str(uiobj['Member']['fy (MPa)'])
     cleat_sec = str(uiobj['cleat']['section'])
 
+    # Design Preferences
+    bolt_hole_clrnce = float(str(uiobj["bolt"]["bolt_hole_clrnce"]))
+    bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
+    bolt_fu = float(str(uiobj["bolt"]["bolt_fu"]))
+    slip_factor = float(str(uiobj["bolt"]["slip_factor"]))
+
+    typeof_edge = str(uiobj["detailing"]["typeof_edge"])
+    min_edgend_dist = float(str(uiobj["detailing"]["min_edgend_dist"]))
+    gap = float(str(uiobj["detailing"]["gap"]))
+
+    design_method = str(uiobj["design"]["design_method"])
+
     #     dict_beam_data  = get_beamdata(beam_sec)
     beam_tw = str(float(dict_beam_data["tw"]))
     beam_f_t = str(float(dict_beam_data["T"]))

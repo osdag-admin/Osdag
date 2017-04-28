@@ -80,7 +80,21 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     beam_fu = str(uiobj['Member']['fu (MPa)'])
     beam_fy = str(uiobj['Member']['fy (MPa)'])
     weld_size = str(uiobj["Weld"]['Size (mm)'])
-    # 'Size (mm)'
+
+    # Design Preferences
+    bolt_hole_clrnce = float(str(uiobj["bolt"]["bolt_hole_clrnce"]))
+    bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
+    bolt_fu = float(str(uiobj["bolt"]["bolt_fu"]))
+    slip_factor = float(str(uiobj["bolt"]["slip_factor"]))
+
+    typeof_weld = str(uiobj["weld"]["typeof_weld"])
+    safety_factor = float(str(uiobj["weld"]["safety_factor"]))
+
+    typeof_edge = str(uiobj["detailing"]["typeof_edge"])
+    min_edgend_dist = float(str(uiobj["detailing"]["min_edgend_dist"]))
+    gap = float(str(uiobj["detailing"]["gap"]))
+
+    design_method = str(uiobj["design"]["design_method"])
 
     minplatethk = str(int(round(outobj['Plate']['MinThick'], 1)))
     blockshear = str(int(round(outobj['Plate']['blockshear'], 1)))

@@ -53,6 +53,7 @@ def module_setup():
     set_databaseconnection()
 
 
+
 def get_beamcombolist():
     '''(None) -> (List)
     This function returns list of Indian Standard Beam Designation.

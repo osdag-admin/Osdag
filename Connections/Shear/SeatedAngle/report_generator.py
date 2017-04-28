@@ -1,8 +1,3 @@
-'''
-Created on Oct 21, 2016
-
-@author: Jayant Patil
-'''
 import time
 import math
 from seat_angle_calc import SeatAngleCalculation
@@ -18,7 +13,7 @@ class ReportGenerator(SeatAngleCalculation):
         bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
         custom_hole_clearance (float): user defined hole clearance, if any
         beam_col_clear_gap (int): clearance + tolerance
-        min_edge_multiplier (float): multipler for min edge distance check - based on edge type
+        min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
         root_clearance (int): clearance of bolt row from the root of seated angle
 
         top_angle (string)
@@ -103,6 +98,7 @@ class ReportGenerator(SeatAngleCalculation):
         Returns:
             None
         """
+        super(ReportGenerator, self).__init__()
         self.max_spacing = sa_calc_object.max_spacing
         self.gamma_mb = sa_calc_object.gamma_mb
         self.gamma_m0 = sa_calc_object.gamma_m0
@@ -190,21 +186,15 @@ class ReportGenerator(SeatAngleCalculation):
         self.project_title = ""
         self.sub_title = ""
         self.job_number = ""
-        # self.method = ""
+        self.client = ""
 
-    def save_html(self, output_object, input_object, report_summary, file_name, folder):
+    def save_html(self, report_summary, file_name, folder):
         """Create and save html report for Seated angle connection.
 
         Args:
-            output_object (dict): Calculated output parameters of connection
-            input_object (dict): User input parameters of connection
             report_summary (dict): Structural Engineer details design report
             file_name (string): Name of design report file
             folder (path): Location of folder to save design report
-            base (path): Location of folder to save design report dependencies
-            base_front (string): Location to save design report dependency (front view image)
-            base_top  (string): Location to save design report dependency (top view image)
-            base_side (string): Location to save design report dependency (side view image)
 
         Returns:
             None
@@ -243,7 +233,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.project_title = str(report_summary['ProjectTitle'])
         self.sub_title = str(report_summary['Subtitle'])
         self.job_number = str(report_summary['JobNumber'])
-        # self.method = str(report_summary['Method'])
+        self.client = str(report_summary['Client'])
         additional_comments = str(report_summary['AdditionalComments'])
 
         # Seated angle design parameters
@@ -254,20 +244,20 @@ class ReportGenerator(SeatAngleCalculation):
         beam_sec = str(self.beam_section)
         beam_col_clear_gap = str(self.beam_col_clear_gap)
 
-        boltGrade = str(self.bolt_grade)
+        bolt_grade = str(self.bolt_grade)
         bolt_diameter = str(self.bolt_diameter)
         bolt_hole_type = str(self.bolt_hole_type)
 
-        beam_depth = str(self.beam_d)
-        beam_flange_thickness = str(self.beam_f_t)
-        beam_root_radius = str(self.beam_R1)
-        col_flange_thickness = str(self.column_f_t)
-        col_root_radius = str(self.column_R1)
+        # beam_depth = str(self.beam_d)
+        # beam_flange_thickness = str(self.beam_f_t)
+        # beam_root_radius = str(self.beam_R1)
+        # col_flange_thickness = str(self.column_f_t)
+        # col_root_radius = str(self.column_R1)
 
         seated_angle_section = str(self.angle_sec)
         top_angle_section = str(self.top_angle)
         angle_fu = str(self.angle_fu)
-        angle_fy = str(self.angle_fy)
+        # angle_fy = str(self.angle_fy)
 
         bolts_provided = str(self.bolts_provided)
         bolts_required = str(self.bolts_required)
@@ -278,8 +268,8 @@ class ReportGenerator(SeatAngleCalculation):
         gauge = str(self.gauge)
         pitch = str(self.pitch)
         end = str(self.end_dist)
-        moment_demand = str(self.moment_at_root_angle)
-        gap = '20'
+        # moment_demand = str(self.moment_at_root_angle)
+        # gap = '20'
         # TODO replace hardcoded gap value
 
         bolt_fu = str(self.bolt_fu)
@@ -291,10 +281,10 @@ class ReportGenerator(SeatAngleCalculation):
         dia_hole = str(self.bolt_hole_diameter)
         shear_capacity = str(self.bolt_shear_capacity)
         bearing_capacity = str(self.bolt_bearing_capacity)
+
+        design_conclusion = "Fail"  # default
         if self.safe == True:
             design_conclusion = "Pass"
-        elif self.safe == False:
-            design_conclusion = "Fail"
 
         # -----------------------------------------------------------------------------------
         rstr = self.design_report_header()
@@ -340,7 +330,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(2, "Hole", "detail2", text_two=bolt_hole_type)
         rstr += design_summary_row(1, "Bolts", "detail1", col_span="2")
         rstr += design_summary_row(2, "Type", "detail2", text_two=bolt_type)
-        rstr += design_summary_row(2, "Grade", "detail2", text_two=boltGrade)
+        rstr += design_summary_row(2, "Grade", "detail2", text_two=bolt_grade)
         rstr += design_summary_row(2, "Diameter (mm)", "detail2", text_two=bolt_diameter)
         rstr += design_summary_row(2, "Bolts - Required", "detail2", text_two=bolts_required)
         rstr += design_summary_row(2, "Bolts - Provided", "detail2", text_two=bolts_provided)
@@ -357,6 +347,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += " " + nl() + t('/table')
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
+
+
+        # TODO add Design Preferences here
 
         # -----------------------------------------------------------------------------------
         rstr += self.design_report_header()
@@ -408,28 +401,31 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, check_pass)
 
         # Bolt pitch (mm)
-        minPitch = str(int(2.5 * float(bolt_dia)))
-        maxPitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + \
-                    ", 300) = " + maxPitch + "<br> [cl. 10.2.2]"
+        min_pitch = str(int(2.5 * float(bolt_dia)))
+        max_pitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
+        req_field = " &#8805; 2.5* " + bolt_dia + " = " + min_pitch + ",  &#8804; Min(32*" + beam_w_t + \
+                    ", 300) = " + max_pitch + "<br> [cl. 10.2.2]"
         rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, check_pass)
 
         # Bolt gauge (mm)
-        minGauge = str(int(2.5 * float(bolt_dia)))
-        maxGauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]"
+        min_gauge = str(int(2.5 * float(bolt_dia)))
+        max_gauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
+        req_field = " &#8805; 2.5*" + bolt_dia + " = " + min_gauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " \
+                    + max_gauge + " <br> [cl. 10.2.2]"
         rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, check_pass)
 
         # End distance (mm)
-        minEnd = str(1.7 * float(dia_hole))
-        maxEnd = str(12 * float(beam_w_t))
-        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]"
+        min_end = str(1.7 * float(dia_hole))
+        max_end = str(12 * float(beam_w_t))
+        req_field = " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_w_t + " = " + max_end + \
+                    " <br> [cl. 10.2.4]"
         rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
 
         # Edge distance (mm)
-        minEdge = str(1.7 * float(dia_hole))
-        maxEdge = str(12 * float(beam_w_t))
-        req_field = " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + "<br> [Cl. 10.2.4]"
+        min_edge = str(1.7 * float(dia_hole))
+        max_edge = str(12 * float(beam_w_t))
+        req_field = " &#8805; 1.7*" + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_w_t + " = " + max_edge + \
+                    "<br> [Cl. 10.2.4]"
         rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
         # Seated angle
@@ -446,7 +442,7 @@ class ReportGenerator(SeatAngleCalculation):
             prov_field = str(self.angle_l)
         rstr += design_check_row("Length (mm)", req_field, prov_field, check_pass)
 
-        # Length of oustanding leg
+        # Length of outstanding leg
         req_field = "b = R * " + sub("gamma", "m0") + "/" + sub("t", "w") + sub("f", "yw") + "<br> [Cl. 8.7.4]"
         prov_field = str(self.angle_B)
         rstr += design_check_row("Outstanding leg length (mm)", req_field, prov_field, check_pass)
@@ -475,7 +471,7 @@ class ReportGenerator(SeatAngleCalculation):
             req_field += sub("M", "d") + " &#8805 Moment at root of angle"
             req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
             prov_field += "<br>=" + str(self.moment_capacity_angle)
-        elif self.is_shear_high is True:
+        elif self.is_shear_high == True:
             req_field = "As V &#8805 0.6 " + sub("V", "d")
             req_field += ",<br>[Cl 8.2.1.3] is applicable <br>"
 
@@ -573,8 +569,7 @@ class ReportGenerator(SeatAngleCalculation):
     def design_report_header(self):
         """Create and return html code to display Report Header.
 
-        Args:
-            None
+        Args:            
 
         Returns:
             rstr (str): string containing html code to table (used as Report Header)
@@ -582,10 +577,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr = nl() + " " + nl() + t('table border-collapse= "collapse" border="1px solid black" width=100%') + nl()
         rstr += t('tr') + nl()
         row = [0, '<object type= "image/PNG" data= "cmpylogoSeatAngle.png" height=60 ></object>',
-               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-               '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp></object>']
+               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
         rstr += html_space(1) + t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(1) + t('td colspan="2" align= "right"') + row[2] + t('/td') + nl()
+        rstr += html_space(1) + t('td colspan="2" align= "center"') + row[2] + t('/td') + nl()
         rstr += t('/tr') + nl()
 
         rstr += t('tr') + nl()
@@ -605,7 +599,7 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += t('tr') + nl()
         rstr += design_summary_row(0, "Date", "detail", text_two=time.strftime("%d /%m /%Y"), is_row=False)
-        rstr += design_summary_row(0, " ", "detail", text_two=" ", is_row=False)
+        rstr += design_summary_row(0, "Client", "detail", text_two=self.client, is_row=False)
         rstr += t('/tr')
         rstr += t('/table') + nl() + " " + nl()
 
@@ -643,7 +637,7 @@ def w(n):
     """Enclose argument in curly brace parenthesis.
 
     Args:
-        param (str): parameter to be enclosed in curly brace parenthesis.
+        n (str): parameter to be enclosed in curly brace parenthesis.
 
     Returns:
         rstr (str): given param enclosed in curly brace parenthesis.
@@ -655,7 +649,7 @@ def quote(m):
     """Enclose argument in double quotes.
 
     Args:
-        param (str): parameter to be enclosed in double quotes
+        m (str): parameter to be enclosed in double quotes
 
     Returns:
         rstr (str): given param enclosed in double quotes
@@ -666,8 +660,7 @@ def quote(m):
 def nl():
     """Create new line.
 
-    Args:
-        None
+    Args:        
 
     Returns:
         new line tag.
@@ -696,7 +689,7 @@ def sub(string, subscript):
 
     Args:
         string (str):
-        subscript (str): string to be subscripted.
+        subscript (str): string to be subscript
 
     Returns:
         (str): html code with concatenated string and subscript
@@ -727,10 +720,9 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
     col_span = kwargs.get('col_span', "1")
     is_row = kwargs.get('is_row', True)
 
+    row_string = ""  # default
     if is_row == True:
         row_string = t('tr') + nl()
-    elif is_row == False:
-        row_string = ""
 
     if col_span != "1":
         row_string = row_string + html_space(4) + t('td colspan=' + col_span + ' class="' + text_one_css + '"') + space(
@@ -740,10 +732,8 @@ def design_summary_row(tab_spaces, text_one, text_one_css, **kwargs):
                      + t('/td') + nl()
         row_string = row_string + html_space(4) + t('td class="' + text_two_css + '"') + text_two + t('/td') + nl()
 
-    if is_row is True:
+    if is_row == True:
         row_string = row_string + t('/tr') + nl()
-    elif is_row is False:
-        pass
 
     return row_string
 

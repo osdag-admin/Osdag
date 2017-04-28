@@ -275,7 +275,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        input_summary["Client"] = str(self.ui.lineEdit_client.text())
 
         return input_summary
 
@@ -345,7 +345,7 @@ class MainController(QMainWindow):
         self.ui.comboBoltType.setCurrentIndex(0)
 
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
-        ###TODAY####self.retrieve_prevstate()
+        self.retrieve_prevstate()
         # Adding GUI changes for beam to beam connection
         self.ui.comboConnLoc.currentIndexChanged[str].connect(self.convert_col_combo_to_beam)
         #############################################################################################################
@@ -932,11 +932,12 @@ class MainController(QMainWindow):
         self.callCleat2D_drawing("All")
         self.commLogicObj.call_designReport(fileName, popup_summary)
         # Creates pdf
+        # TODO update wkhtmltopdf paths
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            # path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
-            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
+            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
         options = {
@@ -1399,9 +1400,9 @@ class MainController(QMainWindow):
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
         if isempty[0] == True:
-            self.callCleat2D_drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+            self.callCleat2D_drawing("All")
         else:
             pass
 

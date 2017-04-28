@@ -25,4 +25,4 @@ def set_default_edge_style(shp, display):
     
 def osdag_display_shape(display, shapes, material=None, texture=None, color=None, transparency=None, update=False):
     set_default_edge_style(shapes, display)
-    display.DisplayShape(shapes, material, texture, color, transparency, update=True)
+    display.DisplayShape(shapes, material, texture, color, transparency, update=update)

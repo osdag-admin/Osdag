@@ -695,7 +695,6 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
         ptSecC = self.FA2 + (500 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
@@ -768,10 +767,11 @@ class Fin2DCreatorFront(object):
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
         ptC2 = ptC1 + 20 * np.array([0, 1])
+        #ptC2 = ptC1 + float(str(self.dataObj.gap)) * np.array([0, 1])
         self.dataObj.drawFaintLine(ptC1, ptC2, dwg)
 
         ptD1 = self.FB1
-        ptD2 = ptD1 + 70 * np.array([0, 1])
+        ptD2 = ptD1 + 160 * np.array([0, 1])
         self.dataObj.drawFaintLine(ptD1, ptD2, dwg)
 
         ###### Draws faint line to show dimensions #########
@@ -1533,17 +1533,17 @@ class Fin2DCreatorTop(object):
         self.dataObj.drawOrientedArrow(dwg, weldPt, theta, "SE", offset, textUp, textDown, element)
 
         # Gap Informatoin
-        ptG1 = self.FF + 50 * np.array([0, -1])
-        ptG2 = ptG1 + 20 * np.array([1, 0])
+        ptG1 = self.FF + 150 * np.array([0, -1])
+        ptG2 = ptG1 +  float(str(self.dataObj.gap)) * np.array([1, 0])
         offset = 1
         params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim":10, "arrowlen":50}
         self.dataObj.draw_dimension_innerArrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
         # Draw Faint Lines to representation of Gap distance #
         ptA = self.FF
-        ptB = ptG1
+        ptB = ptA + 140 * np.array([0,-1])#ptG1
         self.dataObj.drawFaintLine(ptA, ptB, dwg)
         ptC = self.FA1
-        ptD = ptG2
+        ptD = ptC + 195 * np.array([0,-1])#ptG2
         self.dataObj.drawFaintLine(ptC, ptD, dwg)
 
         # 2D view name

@@ -84,6 +84,21 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     # 'Size (mm)'
     weld_Thick = str(uiObj['Weld']['Size (mm)'])
 
+    # Design Preferences
+    bolt_hole_clrnce = float(str(uiObj["bolt"]["bolt_hole_clrnce"]))
+    bolt_hole_type = str(uiObj["bolt"]["bolt_hole_type"])
+    bolt_fu = float(str(uiObj["bolt"]["bolt_fu"]))
+    slip_factor = float(str(uiObj["bolt"]["slip_factor"]))
+
+    typeof_weld = str(uiObj["weld"]["typeof_weld"])
+    safety_factor = float(str(uiObj["weld"]["safety_factor"]))
+
+    typeof_edge = str(uiObj["detailing"]["typeof_edge"])
+    min_edgend_dist = float(str(uiObj["detailing"]["min_edgend_dist"]))
+    gap = float(str(uiObj["detailing"]["gap"]))
+
+    design_method = str(uiObj["design"]["design_method"])
+
     beamdepth = str(int(round(outObj['Plate']['beamdepth'], 1)))
     beamflangethk = str(int(round(outObj['Plate']['beamflangethk'], 1)))
     beamrootradius = str(int(round(outObj['Plate']['beamrootradius'], 1)))

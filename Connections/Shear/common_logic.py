@@ -21,34 +21,18 @@ from Connections.Shear.Finplate.colFlangeBeamWebConnectivity import ColFlangeBea
 from Connections.Shear.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as endColFlangeBeamWeb
 from Connections.Shear.cleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
 from Connections.Shear.SeatedAngle.col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
-# from colFlangeBeamWebConnectivity import ColFlangeBeamWeb
 
 from Connections.Shear.Finplate.finPlateCalc import finConn
 from Connections.Shear.Endplate.endPlateCalc import end_connection
 from Connections.Shear.cleatAngle.cleatCalculation import cleat_connection
 from Connections.Shear.SeatedAngle.seat_angle_calc import SeatAngleCalculation
-# from endPlateCalc import endConn
-# ------------------ from Connections.Shear.Finplate.filletweld import FilletWeld
-# ------------------ from Connections.Shear.Endplate.filletweld import FilletWeld
 from Connections.Component.filletweld import FilletWeld
-# from filletweld import FilletWeld
 from Connections.Component.plate import Plate
-# from Connections.Shear.Finplate.plate import Plate
-# from plate import Plate
 from Connections.Component.bolt import Bolt
-# from Connections.Shear.Finplate.bolt import Bolt
-# from Connections.Shear.Endplate.bolt import Bolt
-# from bolt import Bolt
 from Connections.Component.nut import Nut
-# -------------------------------- from Connections.Shear.Finplate.nut import Nut
-# -------------------------------- from Connections.Shear.Endplate.nut import Nut
-# from nut import Nut
 from Connections.Component.notch import Notch
-# ------------------------------------------------------- from notch import Notch
 from Connections.Component.ISection import ISection
-# ------------------------------------------------- from ISection import ISection
 from Connections.Component.angle import Angle
-
 from Connections.Shear.Finplate.nutBoltPlacement import NutBoltArray as finNutBoltArray
 from Connections.Shear.Endplate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 from Connections.Shear.cleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
@@ -113,7 +97,6 @@ class CommonDesignLogic(object):
         self.folder = folder
 
     # ============================= FinCalculation ===========================================
-
     def call_calculation(self):  # Done
         if self.connection == "Finplate":
             outputs = finConn(self.uiObj)
@@ -127,8 +110,6 @@ class CommonDesignLogic(object):
         else:
             pass
         return outputs
-
-    # =========================================================================================
 
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):
@@ -343,7 +324,6 @@ class CommonDesignLogic(object):
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
         colwebconn.create_3dmodel()
-
         return colwebconn
 
     def create3DColFlangeBeamWeb(self):
@@ -467,8 +447,6 @@ class CommonDesignLogic(object):
         colflangeconn.create_3dmodel()
         return colflangeconn
 
-    # =========================================================================================
-
     def display_3DModel(self, component):
 
         self.component = component
@@ -542,7 +520,6 @@ class CommonDesignLogic(object):
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-    # =========================================================================================
     def call_3DModel(self, flag):  # Done
 
         if flag is True:
@@ -560,13 +537,8 @@ class CommonDesignLogic(object):
         else:
             self.display.EraseAll()
 
-    # =========================================================================================
-
     def call_saveOutputs(self):  # Done
-
         return self.call_calculation(self.uiObj)
-
-    # =========================================================================================
 
     def call2D_Drawing(self, view, fileName, folder):  # Rename function with call_view_images()
         ''' This routine saves the 2D SVG image as per the connectivity selected
@@ -592,7 +564,6 @@ class CommonDesignLogic(object):
             self.callDesired_View(fileName, view, folder)
             f.close()
 
-    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     def callDesired_View(self, fileName, view, folder):
 
         if self.connection == "Finplate":
@@ -610,7 +581,6 @@ class CommonDesignLogic(object):
                                            self.dictangledata, self.dicttopangledata, folder)
             seatCommonObj.save_to_svg(str(fileName), view)
 
-    # =========================================================================================
     def call_saveMessages(self):  # Done
 
         if self.connection == "Finplate":
@@ -627,33 +597,31 @@ class CommonDesignLogic(object):
 
         return fileName
 
-    # =========================================================================================
     def call_designReport(self, htmlfilename, profileSummary):
 
         fileName = str(htmlfilename)
 
-        if not os.path.isfile(fileName):
-            if self.connection == "Finplate":
-                fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-                              htmlfilename, self.folder)
-            elif self.connection == "Endplate":
-                end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
-                              htmlfilename, self.folder)
-            elif self.connection == "cleatAngle":
-                cleat_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, self.dictangledata,
-                                profileSummary, htmlfilename, self.folder)
-            else:
-                # TODO ReportGenerator object is getting a default initialized sa_calc_obj
-                self.sa_report = ReportGenerator(self.sa_calc_obj)
-                self.sa_report.save_html(profileSummary, htmlfilename, self.folder)
-
-    # =========================================================================================
+        if self.connection == "Finplate":
+            fin_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
+                          htmlfilename, self.folder)
+        elif self.connection == "Endplate":
+            end_save_html(self.resultObj, self.uiObj, self.dictbeamdata, self.dictcoldata, profileSummary,
+                          htmlfilename, self.folder)
+        elif self.connection == "cleatAngle":
+            cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
+                            profileSummary,htmlfilename, self.folder)
+        else:
+            # TODO ReportGenerator object is getting a default initialized sa_calc_obj
+            self.sa_report = ReportGenerator(self.sa_calc_obj)
+            self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 
     def load_userProfile(self):
+        # TODO load_userProfile - deepa
         pass
 
-    # =========================================================================================
+
     def save_userProfile(self, profile_summary, fileName):
+        # TODO save_userProfile - deepa
         filename = str(fileName)
 
         infile = open(filename, 'w')
@@ -661,6 +629,6 @@ class CommonDesignLogic(object):
         infile.close()
         pass
 
-    # =========================================================================================
     def save_CADimages(self):  # png,jpg and tiff
+        # TODO save_CADimages - deepa
         pass

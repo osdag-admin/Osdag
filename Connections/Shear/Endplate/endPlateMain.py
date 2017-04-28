@@ -179,7 +179,7 @@ class DesignPreferences(QDialog):
         overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
-            clearance = standard_clrnce[float(boltDia)]
+            clearance = standard_clrnce[float(str(boltDia))]
         else:
             clearance = overhead_clrnce[boltDia]
         
@@ -248,7 +248,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        input_summary["Client"] = str(self.ui.lineEdit_client.text())
 
         return input_summary
 
@@ -1491,9 +1491,9 @@ class MainController(QMainWindow):
         self.display_output(self.resultObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
-            self.callend2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+            self.callend2D_Drawing("All")
         else:
             pass
             # self.display.EraseAll()

@@ -3,10 +3,10 @@ Created on 07-Jun-2015
 
 @author: deepa
 '''
-from bolt import Bolt
-from nut import Nut
+from Connections.Component.bolt import Bolt
+from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from ModelUtils import getGpPt
+from Connections.Component.ModelUtils import getGpPt
 
 
 class NutBoltArray():
@@ -117,12 +117,12 @@ pDir      |      |       | End distance  |
             self.bolts[index].place(pos, gaugeDir, boltDir)
             self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
 
-    def createModel(self):
+    def create_model(self):
         for bolt in self.bolts:
-            self.models.append(bolt.createModel())
+            self.models.append(bolt.create_model())
 
         for nut in self.nuts:
-            self.models.append(nut.createModel())
+            self.models.append(nut.create_model())
 
         dbg = self.dbgSphere(self.origin)
         self.models.append(dbg)
@@ -130,5 +130,6 @@ pDir      |      |       | End distance  |
     def dbgSphere(self, pt):
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
 
-    def getModels(self):
+    def get_models(self):
         return self.models
+    

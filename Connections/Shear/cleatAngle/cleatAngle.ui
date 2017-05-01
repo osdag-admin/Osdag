@@ -174,7 +174,7 @@
         <rect>
          <x>420</x>
          <y>0</y>
-         <width>90</width>
+         <width>101</width>
          <height>29</height>
         </rect>
        </property>
@@ -202,9 +202,9 @@
       <widget class="QCheckBox" name="checkBoxCleat">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>530</x>
          <y>0</y>
-         <width>100</width>
+         <width>131</width>
          <height>29</height>
         </rect>
        </property>
@@ -382,7 +382,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -447,7 +456,7 @@
      <x>0</x>
      <y>0</y>
      <width>1329</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -533,6 +542,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="actionDesign_preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -602,7 +612,13 @@ QMenu::item:selected {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_Cleat_Angle"/>
+    <addaction name="actionVideo_Tutorials"/>
+    <addaction name="actionSample_Reports"/>
+    <addaction name="actionSample_Problems"/>
+    <addaction name="separator"/>
+    <addaction name="actionAsk_Us_a_Question"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Osdag"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
     <property name="styleSheet">
@@ -1146,16 +1162,6 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>Diameter of Bolt</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10</string>
       </property>
      </item>
      <item>
@@ -3503,7 +3509,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>584</y>
+       <y>592</y>
        <width>200</width>
        <height>30</height>
       </rect>
@@ -3528,7 +3534,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>614</y>
+       <y>630</y>
        <width>200</width>
        <height>30</height>
       </rect>
@@ -4101,6 +4107,46 @@ QMenu::item:selected {
   <action name="actionAbout_Cleat_Angle">
    <property name="text">
     <string>About Cleat Angle</string>
+   </property>
+  </action>
+  <action name="actionOsdag_Manual">
+   <property name="text">
+    <string>Osdag Manual</string>
+   </property>
+  </action>
+  <action name="actionSample_Reports">
+   <property name="text">
+    <string>Sample Design Report</string>
+   </property>
+  </action>
+  <action name="actionSample_Problems">
+   <property name="text">
+    <string>Sample Problems</string>
+   </property>
+  </action>
+  <action name="actionVideo_Tutorials">
+   <property name="text">
+    <string>Video Tutorials</string>
+   </property>
+  </action>
+  <action name="actionAsk_Us_a_Question">
+   <property name="text">
+    <string>Ask Us a Question</string>
+   </property>
+  </action>
+  <action name="actionFAQ">
+   <property name="text">
+    <string>FAQ</string>
+   </property>
+  </action>
+  <action name="actionAbout_Osdag">
+   <property name="text">
+    <string>About Osdag</string>
+   </property>
+  </action>
+  <action name="actionDesign_preferences">
+   <property name="text">
+    <string>Design  preferences</string>
    </property>
   </action>
  </widget>

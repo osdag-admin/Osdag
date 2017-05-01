@@ -193,29 +193,17 @@
     </widget>
    </item>
    <item row="8" column="0">
-    <widget class="QLabel" name="lbl_method">
+    <widget class="QLabel" name="lbl_client">
      <property name="text">
-      <string>Method :</string>
+      <string>Client :</string>
      </property>
     </widget>
    </item>
    <item row="8" column="1">
-    <widget class="QComboBox" name="comboBox_method">
-     <item>
-      <property name="text">
-       <string>Limit State Design</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Limit State (Capacity Based) Design</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Working Stress Design</string>
-      </property>
-     </item>
+    <widget class="QLineEdit" name="lineEdit_client">
+     <property name="focusPolicy">
+      <enum>Qt::StrongFocus</enum>
+     </property>
     </widget>
    </item>
    <item row="9" column="0">
@@ -281,7 +269,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>lineEdit_projectTitle</tabstop>
   <tabstop>lineEdit_subtitle</tabstop>
   <tabstop>lineEdit_jobNumber</tabstop>
-  <tabstop>comboBox_method</tabstop>
   <tabstop>txt_additionalComments</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>

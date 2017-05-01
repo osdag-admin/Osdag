@@ -4,8 +4,8 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 import sys
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtSql import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtWidgets import QMessageBox, qApp
 import logging
 import os
 
@@ -13,11 +13,12 @@ import os
 # logging.basicConfig(filename = 'finlog.html',filemode = 'w',level = logging.DEBUG)
 logger = None
 
+
 def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'CleatSections')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
 #     filepath = "D:\EclipseWorkspace\OsdagWorkshop\Database\CleatSections"
 
 #     db = QSqlDatabase.database("QSQLITE")
@@ -29,16 +30,15 @@ def set_databaseconnection():
     # db.open()
     if not db.open():
         
-        QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
-               QtGui.qApp.tr("Unable to establish a database connection.\n"
-                             "This example needs SQLite support. Please read "
-                             "the Qt SQL driver documentation for information "
-                             "how to build it.\n\n"
-                             "Click Cancel to exit."),
-               QtGui.QMessageBox.Cancel)
+        QMessageBox.critical(None, qApp.tr("Cannot open database"),
+                                   qApp.tr("Unable to establish a database connection.\n"
+                                                 "This example needs SQLite support. Please read "
+                                                 "the Qt SQL driver documentation for information "
+                                                 "how to build it.\n\n"
+                                                 "Click Cancel to exit."),
+                                   QMessageBox.Cancel)
         return False   
 
-    
 
 # def set_databaseconnection():
 #     '''
@@ -58,18 +58,17 @@ def module_setup():
     logger = logging.getLogger("osdag.model")
     set_databaseconnection()
 
+
 def get_beamcombolist():
     '''(None) -> (List)
     This function returns list of Indian Standard Beam Designation.
-    '''      
-    comboList = []
-    beamQuery = QSqlQuery("Select Designation from Beams")
-    comboList.append("Select Designation")
-    while(beamQuery.next()):
-        comboList.append(beamQuery.value(0).toString())
-    print "printing comboList"
-    print comboList
-    return comboList
+    '''
+    combo_list = []
+    beam_query = QSqlQuery("Select Designation from Beams")
+    combo_list.append("Select section")
+    while(beam_query.next()):
+        combo_list.append(beam_query.value(0))
+    return combo_list
 
 
 def get_beamdata(sect):
@@ -78,34 +77,34 @@ def get_beamdata(sect):
     '''
     section = sect
    
-    queryStr = "Select * from Beams where Designation = '%s'" % section
+    query_str = "Select * from Beams where Designation = '%s'" % section
     
-    designQuery = QSqlQuery(queryStr)
-    print(designQuery)
+    design_query = QSqlQuery(query_str)
 
-    print designQuery.size()
-    retDict = {}
-    record = designQuery.record()
+    ret_dict = {}
+    record = design_query.record()
     
-    while(designQuery.next()):
+    while(design_query.next()):
         for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            col_name = record.fieldName(i)
+            ret_dict[col_name] = design_query.value(i)
 
-    # print(retDict[QString("tw")])
-    
-    return retDict
-    
+
+    return ret_dict
+
+
 def get_columncombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Column Designation.
-    '''      
-    comboList = []
-    columnQuery = QSqlQuery("SELECT Designation FROM Columns")
-    comboList.append("Select Column")
-    while(columnQuery.next()):
-        comboList.append(columnQuery.value(0).toString())
-    return comboList
+    '''
+    combo_list = []
+    column_query = QSqlQuery("SELECT Designation FROM Columns")
+    combo_list.append("Select section")
+    while(column_query.next()):
+        combo_list.append(column_query.value(0)
+                          )
+    return combo_list
+
 
 def get_columndata(sect):
 
@@ -114,32 +113,32 @@ def get_columndata(sect):
     '''
     section = sect
     # section = Ui_MainWindow.comboColSec.currentText()
-    queryStr = "Select * from Columns where Designation = '%s'" % section
+    query_str = "Select * from Columns where Designation = '%s'" % section
     
-    designQuery = QSqlQuery(queryStr)
-    print(designQuery)
+    design_query = QSqlQuery(query_str)
+
+    ret_dict = {}
+    record = design_query.record()
     
-    print designQuery.size()
-    retDict = {}
-    record = designQuery.record()
-    
-    while(designQuery.next()):
+    while(design_query.next()):
         for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            col_name = record.fieldName(i)
+            ret_dict[col_name] = design_query.value(i)
     
-    return retDict
+    return ret_dict
+
 
 def get_anglecombolist():
     '''(None) -> (List)
     This function returns the list of Indian Standard Angles Designation.
-    '''      
-    comboList = []
-    angleQuery = QSqlQuery("SELECT Designation FROM Angles ORDER BY A,B")
-    comboList.append("Select Cleat")
-    while(angleQuery.next()):
-        comboList.append(angleQuery.value(0).toString())
-    return comboList
+    '''
+    combo_list = []
+    angle_query = QSqlQuery("SELECT Designation FROM Angles ORDER BY Id ASC")
+    combo_list.append("Select Cleat")
+    while(angle_query.next()):
+        combo_list.append(angle_query.value(0))
+    return combo_list
+
 
 def get_angledata(sect):
  
@@ -148,20 +147,18 @@ def get_angledata(sect):
     '''
     section = sect
 #     section = Ui_MainWindow.comboColSec.currentText()
-    queryStr = "Select * from Angles where Designation = '%s'" % section
+    query_str = "Select * from Angles where Designation = '%s'" % section
      
-    designQuery = QSqlQuery(queryStr)
-    print(designQuery)
+    design_query = QSqlQuery(query_str)
+
+    ret_dict = {}
+    record = design_query.record()
      
-    print designQuery.size()
-    retDict = {}
-    record = designQuery.record()
-     
-    while(designQuery.next()):
+    while(design_query.next()):
         for i in range(0, record.count()):
-            angleName = record.fieldName(i)
-            retDict[angleName] = designQuery.value(i).toString()
+            angle_name = record.fieldName(i)
+            ret_dict[angle_name] = design_query.value(i)
     
-    return retDict
+    return ret_dict
 
 # module_setup()

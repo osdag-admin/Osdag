@@ -120,7 +120,7 @@ class ColFlangeBeamWeb(object):
     #         final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()
     #     return final_column
 
-    def get_column_model(self):
+    def get_columnModel(self):
         final_column = self.columnModel
         bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:

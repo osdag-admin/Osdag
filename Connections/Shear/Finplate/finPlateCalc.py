@@ -143,6 +143,9 @@ def finConn(uiObj):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
+    # add gap from design preferences
+    designP_gap = int(uiObj["detailing"]["gap"])
+
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
@@ -451,7 +454,7 @@ def finConn(uiObj):
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
-            Ecc = min_edge_dist + 20
+            Ecc = min_edge_dist + designP_gap   #20
             # Moment due to shear external force
             M1 = shear_load * Ecc;
              
@@ -478,7 +481,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + 20   
+                Ecc = min_edge_dist + min_gauge / 2 +designP_gap    #20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -539,7 +542,7 @@ def finConn(uiObj):
         elif web_plate_l == 0 and web_plate_w == 0:
             if bolt_line == 1:
                 # Moment due to shear external force
-                Ecc = min_edge_dist + 20
+                Ecc = min_edge_dist + designP_gap # 20
                 M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
@@ -553,7 +556,7 @@ def finConn(uiObj):
                     moment_demand = round(moment_demand * 0.001, 3)
             elif bolt_line == 2:        
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + 20
+                Ecc = min_edge_dist + min_gauge / 2 + designP_gap # 20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -641,22 +644,22 @@ def finConn(uiObj):
         if boltParameters['numofcol'] == 1:
             edge_dist = boltParameters['enddist']
             plate_edge = web_plate_w - edge_dist       
-            web_plate_w_req = 2 * boltParameters['enddist'] + 20
+            web_plate_w_req = 2 * boltParameters['enddist'] + designP_gap  #20
         if boltParameters['numofcol'] == 2:
             edge_dist = boltParameters['enddist']
             plate_edge = web_plate_w - boltParameters['gauge'] - boltParameters['enddist']    
-            web_plate_w_req = boltParameters['gauge'] + 2 * boltParameters['enddist'] + 20
+            web_plate_w_req = boltParameters['gauge'] + 2 * boltParameters['enddist'] + designP_gap  #20
             
             
     if web_plate_w == 0:   
         if boltParameters['numofcol'] == 1:
             edge_dist = boltParameters['enddist']
-            plate_edge = edge_dist + 20      
+            plate_edge = edge_dist + designP_gap  #20
             web_plate_w_req = plate_edge + boltParameters['enddist'];
             web_plate_w_opt = web_plate_w_req
         if boltParameters['numofcol'] == 2:
             edge_dist = boltParameters['enddist'] 
-            plate_edge = edge_dist + 20 
+            plate_edge = edge_dist + designP_gap   #20
             web_plate_w_req = boltParameters['gauge'] + plate_edge + boltParameters['enddist'];
             web_plate_w_opt = web_plate_w_req;      
 

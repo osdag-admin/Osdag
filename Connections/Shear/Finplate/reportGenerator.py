@@ -753,7 +753,11 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
     bolts = str(round(float(shear_load) / float(boltCapacity), 1))
-    row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, noOfBolts, " <p align=left style=color:green><b>Pass</b></p>"]
+    if float(bolts) > int(noOfBolts):
+        row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, noOfBolts,
+               " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "No. of bolts", shear_load + "/" + boltCapacity + " = " + bolts, noOfBolts, " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -838,7 +842,12 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     minPlateThick = str(round(5 * float(shear_load) * 1000 / (float(plateLength) * float(web_plate_fy)), 2))
-    row = [0, "Plate thickness (mm)", "(5*" + shear_load + "*1000)/(" + plateLength + "*" + web_plate_fy + ") = " + minPlateThick +
+    if float(minPlateThick) > int(plateThick):
+        row = [0, "Plate thickness (mm)",
+               "(5*" + shear_load + "*1000)/(" + plateLength + "*" + web_plate_fy + ") = " + minPlateThick +
+               "<br> [Owens and Cheal, 1989]", plateThick, "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Plate thickness (mm)", "(5*" + shear_load + "*1000)/(" + plateLength + "*" + web_plate_fy + ") = " + minPlateThick +
            "<br> [Owens and Cheal, 1989]", plateThick, "  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -878,7 +887,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     # row =[0,"Plate moment capacity (kNm)","(2*90.5*100<sup>2</sup>)/100 = 18.1","<i>M</i><sub>d</sub> =1.2*250*<i>Z</i> = 40.9 <br>[cl. 8.2.1.2]","<p align=right style=color:green><b>Pass</b></p>"]
     z = math.pow(float(plateLength), 2) * (float(plateThick) / (6 * 1.1 * 1000000))
     momentCapacity = str(round(1.2 * float(web_plate_fy) * z, 2))
-    row = [0, "Plate moment capacity (kNm)", "(2*" + shearCapacity + "*" + pitch + "<sup>2</sup>)/(" + pitch + "*1000) = " + moment_demand,
+    if float(moment_demand) > float(web_plate_fy) :
+        row = [0, "Plate moment capacity (kNm)",
+               "(2*" + shearCapacity + "*" + pitch + "<sup>2</sup>)/(" + pitch + "*1000) = " + moment_demand,
+               "<i>M</i><sub>d</sub> = (1.2*" + web_plate_fy + "*<i>Z</i>)/(1000*1.1) = " + momentCapacity + "<br>[cl. 8.2.1.2]",
+               "<p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Plate moment capacity (kNm)", "(2*" + shearCapacity + "*" + pitch + "<sup>2</sup>)/(" + pitch + "*1000) = " + moment_demand,
            "<i>M</i><sub>d</sub> = (1.2*" + web_plate_fy + "*<i>Z</i>)/(1000*1.1) = " + momentCapacity + "<br>[cl. 8.2.1.2]",
            "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -904,9 +919,16 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     x = (float(momentDemand) * 1000 * 6)
     resultant_shear = str(round(math.sqrt(math.pow((x / b), 2) + math.pow((float(shear_load) / a), 2)), 3))
     momentDemand_knmm = str(int(float(momentDemand) * 1000))
-    row = [0, "Weld strength (kN/mm)", " &#8730;[(" + momentDemand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_load + "/(2*" +
-           effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear, "<i>f</i><sub>v</sub>= (0.7*" + weld_Thick + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " +
-           weld_strength + "<br>[cl. 10.5.7]", " <p align=left style=color:green><b>Pass</b></p>"]
+    if float(resultant_shear) > float(weld_strength):
+        row = [0, "Weld strength (kN/mm)",
+               " &#8730;[(" + momentDemand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_load + "/(2*" +
+               effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear,
+               "<i>f</i><sub>v</sub>= (0.7*" + weld_Thick + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " +
+               weld_strength + "<br>[cl. 10.5.7]", " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Weld strength (kN/mm)", " &#8730;[(" + momentDemand_knmm + "*6)/(2*" + effWeldLen + "<sup>2</sup>)]<sup>2</sup> + [" + shear_load + "/(2*" +
+               effWeldLen + ")]<sup>2</sup> <br>= " + resultant_shear, "<i>f</i><sub>v</sub>= (0.7*" + weld_Thick + "*" + weld_fu + ")/(&#8730;3*1.25)<br>= " +
+               weld_strength + "<br>[cl. 10.5.7]", " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -922,8 +944,14 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 #     maxweld = str(9) if str((float( platethk)*0.8)) > str(9) else str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2))
 #     maxWeld = str(9) if str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2)) == 9 else str((float( platethk)*0.8))
 #     row =[0,"Weld thickness (mm)","Max(("+resultant_shear+"*&#8730;3*1.25)/(0.7*"+weld_fu+")"+", 0.8*"+platethk+") = "+ maxWeld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",weldSize,"<p align=right style=color:green><b>Pass</b></p>"]
-    row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
-           "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick, "<p align=left style=color:green><b>Pass</b></p>"]
+    if float(maxweld) <= int(weld_Thick):
+        row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
+               "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick,
+               "<p align=left style=color:green><b>Pass</b></p>"]
+    else:
+        row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
+               "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick,
+               "<p align=left style=color:red><b>Fail</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

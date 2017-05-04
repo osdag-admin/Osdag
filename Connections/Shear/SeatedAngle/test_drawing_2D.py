@@ -3,8 +3,8 @@ import sys
 import model
 from PyQt4 import QtGui
 from seat_angle_calc import SeatAngleCalculation
-from test_seat_angle_calc import create_sample_ui_input
-from test_seat_angle_calc import create_sample_ui_output
+from test_seat_angle_calc import create_sample_ui_input_sa
+from test_seat_angle_calc import create_sample_ui_output_sa
 import svgwrite
 from PyQt4.QtCore import QString
 import cairosvg
@@ -36,7 +36,7 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
         app = QtGui.QApplication(sys.argv)
         model.module_setup()
         self.sa_calc_obj = SeatAngleCalculation()
-        sa_sample_ui_input = create_sample_ui_input()
+        sa_sample_ui_input = create_sample_ui_input_sa()
         self.sa_calc_obj.seat_angle_connection(sa_sample_ui_input )
 
     def test_print_sample_ui_input_output(self):
@@ -76,8 +76,8 @@ class TestSeatCommonData(unittest.TestCase, SeatCommonData):
             This function is similar to save_design in seat_angle_main.py except:
             It takes only report_summary as parameter and uses hardcoded values of other parameters.
         """
-        output_dict = create_sample_ui_output()
-        input_dict = create_sample_ui_input()
+        output_dict = create_sample_ui_output_sa()
+        input_dict = create_sample_ui_input_sa()
         model.module_setup()
         model_beam_data = model.get_beamdata(input_dict["Member"]["BeamSection"])
         model_column_data = model.get_columndata(input_dict["Member"]["ColumnSection"])

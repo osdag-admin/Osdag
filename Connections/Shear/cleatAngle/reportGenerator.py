@@ -49,7 +49,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     projecttitle = str(reportsummary['ProjectTitle'])
     subtitle = str(reportsummary['Subtitle'])
     jobnumber = str(reportsummary['JobNumber'])
-    method = str(reportsummary['Method'])
+    client = str(reportsummary['Client'])
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -76,6 +76,18 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     cleat_fu = str(uiobj['Member']['fu (MPa)'])
     cleat_fy = str(uiobj['Member']['fy (MPa)'])
     cleat_sec = str(uiobj['cleat']['section'])
+
+    # Design Preferences
+    bolt_hole_clrnce = float(str(uiobj["bolt"]["bolt_hole_clrnce"]))
+    bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
+    bolt_fu = float(str(uiobj["bolt"]["bolt_fu"]))
+    slip_factor = float(str(uiobj["bolt"]["slip_factor"]))
+
+    typeof_edge = str(uiobj["detailing"]["typeof_edge"])
+    min_edgend_dist = float(str(uiobj["detailing"]["min_edgend_dist"]))
+    gap = float(str(uiobj["detailing"]["gap"]))
+
+    design_method = str(uiobj["design"]["design_method"])
 
     #     dict_beam_data  = get_beamdata(beam_sec)
     beam_tw = str(float(dict_beam_data["tw"]))
@@ -216,11 +228,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -261,9 +271,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, 'Client']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, client]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -601,13 +611,175 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Client']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Preferences
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    row = [0, "Design Preferences", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    # --------------------------------      BOLT      -----------------------------------------------------------------------------------------------
+    row = [0, "Bolt ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Hole Type", bolt_hole_type]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Hole Clearance (mm)", bolt_hole_clrnce]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Material Grade (MPa)", bolt_mtrl_grade]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # TODO add slip factor
+    # slip = 0.55
+    # row = [0, "Slip factor", slip]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    # --------------------------------      WELD      -----------------------------------------------------------------------------------------------
+    row = [0, "Weld ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Type of Weld", weld_type]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Material Grade (MPa)", weld_mtrl_grade]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # --------------------------------      DETAILING      -----------------------------------------------------------------------------------------------
+    row = [0, "Detailing ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Type of Edges", edge_type]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Minimum Edge-End Distance", detail_edgend_dist]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Gap (mm)", detail_gap]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # TODO add yes or no option??
+    # row = [0, "Corrosive influences", " "]
+    # rstr += t('tr')
+    # rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
+
+    # --------------------------------      DESIGN      -----------------------------------------------------------------------------------------------
+    row = [0, "Design ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Design Method", "Limit State Design "]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # *************************************************************************************************************************
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -648,9 +820,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, 'Client']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, client]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -661,7 +833,6 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     #     rstr += t('/hr')
     rstr += t('/hr')
 
-    # *************************************************************************************************************************
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Design Check
 
@@ -874,146 +1045,15 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
 
-    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    # Header of the pdf fetched from dialogbox
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-    rstr += t('/hr')
-
-    # *************************************************************************************************************************
-
-    # Design Preferences
-
-    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    row = [0, "Design Preferences", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, "Bolt", "Hole Type", "Hole Clearance", "Material Grade"]
-    rstr += t('td rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('t')
-    row = [0, bolt_hole_type, bolt_hole_clrnce, bolt_mtrl_grade]
-    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, "Weld", "Type of Weld", "Material Grade", ""]
-    rstr += t('td rowspan="2"  rowspan="2"  class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('t')
-    row = [0, weld_type, weld_mtrl_grade, ""]
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="4" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, "Detailing", "Type of Edges", "Minimum Edge-End Distance", "Gap"]
-    rstr += t('td  rowspan="2" class="header1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('t')
-    row = [0, edge_type, detail_edgend_dist, detail_gap]
-    rstr += t('td  class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('/table')
-    rstr += t('h1 style="page-break-before:always"')  # page break
-    rstr += t('/h1')
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Header of the pdf fetched from dialogbox
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1054,9 +1094,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, 'Client']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, client]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -1307,11 +1347,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1352,9 +1390,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, 'Client']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, client]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')
@@ -1413,11 +1451,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('table border-collapse= "collapse" border="1px solid black" width=100%')
 
     rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "images_html/cmpylogoCleat.png"  height=60></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="2">Created with</font>'' &nbsp'
-           '<object type= "image/PNG" data= "images_html/Osdag_header.png" height=60></object>']
+    row = [0, '<object type= "image/PNG" data= "cmpylogoCleat.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
     rstr += t('td colspan="2" align= "center" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "right" ') + row[2] + t('/td')
+    rstr += t('td colspan="2" align= "center" ') + row[2] + t('/td')
     rstr += t('/tr')
 
     rstr += t('tr')
@@ -1458,9 +1494,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     row = [0, time.strftime("%d /%m /%Y")]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Method']
+    row = [0, 'Client']
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
-    row = [0, method]
+    row = [0, client]
     rstr += t('td class= "detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
     rstr += t('/table')

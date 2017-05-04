@@ -57,7 +57,8 @@ class FinCommonData(object):
         self.no_of_col = int( ouputObj['Bolt']["numofcol"])
         self.col_L = 700
         self.beam_L = 350
-        self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        self.gap = float(str(inputObj['detailing']['gap'])) # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        #self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
         self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else 50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
         self.beamToBeamDist = 10
         self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
@@ -694,7 +695,6 @@ class Fin2DCreatorFront(object):
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        # ptSecC = self.FA2 + (520 * np.array([0, -1]))   *****************************************
         ptSecC = self.FA2 + (500 * np.array([0, -1]))
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
@@ -767,10 +767,11 @@ class Fin2DCreatorFront(object):
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
         ptC2 = ptC1 + 20 * np.array([0, 1])
+        #ptC2 = ptC1 + float(str(self.dataObj.gap)) * np.array([0, 1])
         self.dataObj.drawFaintLine(ptC1, ptC2, dwg)
 
         ptD1 = self.FB1
-        ptD2 = ptD1 + 70 * np.array([0, 1])
+        ptD2 = ptD1 + 160 * np.array([0, 1])
         self.dataObj.drawFaintLine(ptD1, ptD2, dwg)
 
         ###### Draws faint line to show dimensions #########
@@ -1532,17 +1533,17 @@ class Fin2DCreatorTop(object):
         self.dataObj.drawOrientedArrow(dwg, weldPt, theta, "SE", offset, textUp, textDown, element)
 
         # Gap Informatoin
-        ptG1 = self.FF + 50 * np.array([0, -1])
-        ptG2 = ptG1 + 20 * np.array([1, 0])
+        ptG1 = self.FF + 150 * np.array([0, -1])
+        ptG2 = ptG1 +  float(str(self.dataObj.gap)) * np.array([1, 0])
         offset = 1
         params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim":10, "arrowlen":50}
         self.dataObj.draw_dimension_innerArrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
         # Draw Faint Lines to representation of Gap distance #
         ptA = self.FF
-        ptB = ptG1
+        ptB = ptA + 140 * np.array([0,-1])#ptG1
         self.dataObj.drawFaintLine(ptA, ptB, dwg)
         ptC = self.FA1
-        ptD = ptG2
+        ptD = ptC + 195 * np.array([0,-1])#ptG2
         self.dataObj.drawFaintLine(ptC, ptD, dwg)
 
         # 2D view name

@@ -5,13 +5,16 @@ Created on Oct 25, 2016
 '''
 import sys
 import model
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from report_generator import ReportGenerator
 from seat_angle_calc import SeatAngleCalculation
-from test_seat_angle_calc import create_sample_ui_input
-from test_seat_angle_calc import create_sample_ui_output
+import test_seat_angle_calc
 import unittest
+import logging
+import seat_angle_main
+
+
+# logger = logging.getLogger("osdag.SeatAngleCalc")
 
 class TestReportGenerator(unittest.TestCase, ReportGenerator):
     """Test ReportGenerator Class functions.
@@ -25,7 +28,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
     """
 
     def setUp(self):
-        """Create database connection and instantiate sa_calculation object.
+        """Create database connection.
 
         Args:
             None
@@ -34,23 +37,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
             None
         """
         app = QtWidgets.QApplication(sys.argv)
-        model.module_setup()
-        self.sa_calc_obj = SeatAngleCalculation()
-        sa_sample_ui_input = create_sample_ui_input("SA 0")
-        self.sa_calc_obj.seat_angle_connection(sa_sample_ui_input )
-        self.report_summary = create_sample_report_summary()
-
-    def test_print_sample_ui_input_output(self):
-        """Print sample UI input and sample UI output dictionaries.
-
-           Args:
-               None
-
-           Returns:
-               None
-           """
-        # print create_sample_ui_input()
-        # print create_sample_ui_output()
+        model.set_databaseconnection()
 
     def test_save_html_report(self):
         """Save html report with dummy images in the views section.
@@ -61,9 +48,17 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         Returns:
             None
         """
-        self.save_design_hardcoded(self.report_summary)
+        sa_connection_id_list = {
+            1: "SA_0",
+            2: "SA_2",
+            3: "SA_3",
+            4: "SA_4",
+            5: "SA_6"
+        }
+        for connection_id in sa_connection_id_list.values():
+            self.save_test_design_report(connection_id)
 
-    def save_design_hardcoded(self, report_summary):
+    def save_test_design_report(self, sa_connection_id):
         """Save html design report at hardcoded location.
 
         Args:
@@ -76,39 +71,36 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
             This function is similar to save_design in seat_angle_main.py except:
             It takes only report_summary as parameter and uses hardcoded values of other parameters.
         """
-        output_dict = create_sample_ui_output()
-        input_dict = create_sample_ui_input("SA 0")
-        file_name = "design_report.html"
-        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"
-        base = "3D_ModelFinFB.png"
-        base_front = "finFrontFB.svg"
-        base_top = "finSideFB.svg"
-        base_side = "finTopFB.svg"
 
-        report_generator_instance = ReportGenerator(self.sa_calc_obj)
-        report_generator_instance.save_html(output_dict, input_dict, report_summary, folder_location+file_name,
+        sa_sample_ui_input = test_seat_angle_calc.create_sample_ui_input_sa(sa_connection_id=sa_connection_id)
+        sa_calc_obj = SeatAngleCalculation()
+        sa_calc_obj.seat_angle_connection(sa_sample_ui_input)
+        report_summary = self.create_sample_report_summary(sa_connection_id)
+        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"  # Add dummy images of views here.
+        file_name = folder_location + "design_report_" + sa_connection_id + ".html"
+        report_generator_instance = ReportGenerator(sa_calc_obj)
+        report_generator_instance.save_html(report_summary, file_name,
                                             folder_location)
 
+    def create_sample_report_summary(self, sa_connection_id):
+        """Create and return hardcoded sample report_summary (dict).
+    
+        Args:
+            None
+    
+        Returns:
+            report_summary (dict): Structural Engineer details for design report
+        """
+        report_summary = {}
+        report_summary["ProfileSummary"] = {}
+        report_summary["ProfileSummary"]["CompanyName"] = "FOSSEE"
+        report_summary["ProfileSummary"]["CompanyLogo"] = "IIT Bombay"
+        report_summary["ProfileSummary"]["Group/TeamName"] = "Osdag"
+        report_summary["ProfileSummary"]["Designer"] = "Jayant Patil"
 
-def create_sample_report_summary():
-    """Create and return hardcoded sample report_summary (dict).
-
-    Args:
-        None
-
-    Returns:
-        report_summary (dict): Structural Engineer details for design report
-    """
-    report_summary = {}
-    report_summary["ProfileSummary"] = {}
-    report_summary["ProfileSummary"]["CompanyName"] = "FOSSEE"
-    report_summary["ProfileSummary"]["CompanyLogo"] = "IIT Bombay"
-    report_summary["ProfileSummary"]["Group/TeamName"] = "Osdag"
-    report_summary["ProfileSummary"]["Designer"] = "Jayant Patil"
-
-    report_summary["ProjectTitle"] = "Connection modules development"
-    report_summary["Subtitle"] = "Seated angle connection"
-    report_summary["JobNumber"] = "SA001"
-    report_summary["AdditionalComments"] = "Add more comments here."
-    report_summary["Method"] = "Limit State Design (No Earthquake Load)"
-    return report_summary
+        report_summary["ProjectTitle"] = "Connection modules development"
+        report_summary["Subtitle"] = "Seated angle connection"
+        report_summary["JobNumber"] = sa_connection_id
+        report_summary["AdditionalComments"] = "Add more comments here."
+        report_summary["Method"] = "Limit State Design (No Earthquake Load)"
+        return report_summary

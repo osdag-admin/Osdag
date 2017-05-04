@@ -21,7 +21,7 @@ def set_databaseconnection():
     filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
-    db.open()
+    #db.open()
     if not db.open():
         QMessageBox.critical(None, qApp.tr("Cannot open database"),
                                    qApp.tr("Unable to establish a database connection.\n"

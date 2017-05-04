@@ -1,16 +1,16 @@
-'''
+"""
 Created on 07-May-2015
 comment
 
 @author: deepa
-'''
+"""
 import json
 
-from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
@@ -22,7 +22,7 @@ from ui_ask_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
 from Connections.Shear.common_logic import CommonDesignLogic
-#from Connections.Shear.commonlogic import CommonDesignLogic
+# from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -49,13 +49,25 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
+        int_validator = QIntValidator()
+        self.ui.txt_boltHoleClearance.setValidator(int_validator)
+        dbl_validator = QDoubleValidator()
+        self.ui.txt_boltFu.setValidator(dbl_validator)
+        self.ui.txt_boltFu.setMaxLength(7)
+        self.ui.txt_weldFu.setValidator(dbl_validator)
+        self.ui.txt_weldFu.setMaxLength(7)
+        self.ui.txt_detailingGap.setValidator(dbl_validator)
+        self.ui.txt_detailingGap.setMaxLength(5)
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
-        self.ui.combo_slipfactor.currentIndexChanged[str].connect(self.highlight_slipfactor_description)
 
     def highlight_slipfactor_description(self):
+        """Highlight the description of currosponding slipfactor on selection of inputs
+        Note : This routine is not in use in current version
+        :return:
+        """
         slip_factor = str(self.ui.combo_slipfactor.currentText())
         self.textCursor = QTextCursor(self.ui.textBrowser.document())
         cursor = self.textCursor
@@ -71,42 +83,23 @@ class DesignPreferences(QDialog):
         while (index != -1):
             # Select the matched text and apply the desired format
             cursor.setPosition(index)
-            cursor.movePosition(QTextCursor.EndOfLine,1)
-            #cursor.movePosition(QTextCursor.EndOfWord, 1)
+            cursor.movePosition(QTextCursor.EndOfLine, 1)
+            # cursor.movePosition(QTextCursor.EndOfWord, 1)
             cursor.mergeCharFormat(format)
             # Move to the next match
             pos = index + regex.matchedLength()
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
-
-            # lines = self.ui.textBrowser.toPlainText()
-        # #print lines
-        # data = lines.split('\n')
-        # slip_factor = float(str(self.ui.combo_slipfactor.currentText()))
-        # self.script_cursor = QTextCursor(self.ui.textBrowser.document())
-        # self.ui.textBrowser.setTextCursor(self.script_cursor)
-        # self.script_cursor.movePosition(QTextCursor.Start)
-        # for line in lines:
-        #
-        #     self.script_cursor.movePosition(QTextCursor.StartOfLine)
-        #     self.script_cursor.movePosition(QTextCursor.EndOfLine)
-        #     self.script_cursor.movePosition(QTextCursor.NextRow, QTextCursor.KeepAnchor)
-        #     tmp = self.script_cursor.blockFormat()
-        #     tmp.setBackground(QBrush(Qt.yellow))
-        #     self.script_cursor.setBlockFormat(tmp)
-
-
     def save_designPref_para(self):
-        '''
+        """
         This routine is responsible for saving all design preferences selected by the user
-        '''
+        """
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        self.saved_designPref["bolt"]["n_e"]= int(str(self.ui.txt_frictional_resistance.text()))
 
         self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -115,6 +108,7 @@ class DesignPreferences(QDialog):
             self.saved_designPref["weld"]["safety_factor"] = float(1.25)
         else:
             self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+        self.saved_designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
@@ -123,17 +117,21 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        if self.ui.txt_detailingGap.text()== '':
+        if self.ui.txt_detailingGap.text() == '':
 
             self.saved_designPref["detailing"]["gap"] = int(20)
         else:
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
 
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
+
 
         # self.main_controller.call_designPref(designPref)
 
@@ -154,19 +152,22 @@ class DesignPreferences(QDialog):
             bolt_fu = str(self.get_boltFu(bolt_grade))
             self.ui.txt_boltFu.setText(bolt_fu)
 
-
         self.ui.combo_boltHoleType.setCurrentIndex(0)
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.ui.combo_slipfactor.setCurrentIndex(8)
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
         designPref["weld"]["safety_factor"] = float(1.25)
+        self.ui.txt_weldFu.setText(str(410))
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -175,6 +176,12 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+
+        self.ui.combo_detailing_memebers.setCurrentIndex(0)
+        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
+        designPref["design"] = {}
+        designPref["design"]["design _method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
 
         return designPref
@@ -187,8 +194,6 @@ class DesignPreferences(QDialog):
             self.ui.txt_boltHoleClearance.setText(str(clearance))
         else:
             pass
-
-
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
@@ -285,7 +290,8 @@ class MyPopupDialog(QDialog):
     def saveUserProfile(self):
 
         inputData = self.getPopUpInputs()
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
         infile = open(filename, 'w')
         pickle.dump(inputData, infile)
         infile.close()
@@ -302,14 +308,15 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        input_summary["Client"] = str(self.ui.lineEdit_client.text())
 
         return input_summary
 
     def useUserProfile(self):
 
-        filename , _= QFileDialog.getOpenFileName(self, 'Open Files', os.path.join(str(self.mainController.folder), "Profile"),
-                                                     '*.txt')
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"),
+                                                  '*.txt')
         if os.path.isfile(filename):
             outfile = open(filename, 'r')
             reportsummary = pickle.load(outfile)
@@ -330,13 +337,14 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
-        self.ui.comboColSec.addItems(get_columncombolist())
-        self.ui.combo_Beam.addItems(get_beamcombolist())
+
+        self.get_columndata()
+        self.get_beamdata()
 
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.gradeType = {'Please Select Type': '', 'HSFG': [8.8, 10.9],
-                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8,9.8,10.9, 12.9]}
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboType.setCurrentIndex(0)
@@ -406,12 +414,13 @@ class MainController(QMainWindow):
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
+        #self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
+        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo)
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
-            lambda: self.populateWeldThickCombo("comboPlateThick_2"))
+            lambda: self.populateWeldThickCombo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
@@ -451,8 +460,44 @@ class MainController(QMainWindow):
         self.uiObj = None
         self.designPrefDialog = DesignPreferences(self)
 
+    def get_columndata(self):
+        """Fetch  old and new column sections from "Intg_osdag" database.
+        Returns:
+
+        """
+        columndata = get_columncombolist()
+        old_colList = get_oldcolumncombolist()
+        self.ui.comboColSec.addItems(columndata)
+        self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
+
+    def get_beamdata(self):
+        """Fetch old and new beam sections from "Intg_osdag" database
+        Returns:
+
+        """
+        beamdata = get_beamcombolist()
+        old_beamList = get_oldbeamcombolist()
+        self.ui.combo_Beam.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+
+    def color_oldDB_sections(self, old_section, intg_section, combo_section):
+        """display old sections in red color.
+
+        Args:
+            old_section(str): Old sections from IS 808 1984
+            intg_section(str): Revised sections from IS 808 2007
+            combo_section(QcomboBox): Beam/Column dropdown list
+
+        Returns:
+
+        """
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
     def osdag_header(self):
-        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
     def fetchBeamPara(self):
@@ -461,9 +506,12 @@ class MainController(QMainWindow):
         return dictbeamdata
 
     def fetchColumnPara(self):
+        """Return  sectional properties of selected column section
+        Returns:
+            dictcoldata(dict): Sectional properties of column
 
+        """
         column_sec = str(self.ui.comboColSec.currentText())
-        #u'Select section'
         if column_sec == 'Select section':
             return
         loc = self.ui.comboConnLoc.currentText()
@@ -474,11 +522,11 @@ class MainController(QMainWindow):
         return dictcoldata
 
     def convertColComboToBeam(self):
-        """
-
+        """Replace colulmn cobobox to Primary beam sections and change text of column section(label) to primary beam.
         Returns:
 
         """
+
         self.display.EraseAll()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
@@ -595,20 +643,27 @@ class MainController(QMainWindow):
         self.display.Pan(50, 0)
 
     def save_cadImages(self):
+        """Save CAD Model in image formats(PNG,JPEG,BMP,TIFF)
 
+        Returns:
+
+        """
         files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-        fileName,_ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                  files_types)
         fName = str(fileName)
         file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp'or file_extension == 'tiff' :
+        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
             self.display.ExportToImage(fName)
             QMessageBox.about(self, 'Information', "File saved")
 
     def disableViewButtons(self):
-        '''
-        Disables the all buttons in toolbar
-        '''
+        """Disable all tool buttons on Toolbar.
+
+        Returns:
+
+        """
         self.ui.btnFront.setEnabled(False)
         self.ui.btnSide.setEnabled(False)
         self.ui.btnTop.setEnabled(False)
@@ -629,10 +684,11 @@ class MainController(QMainWindow):
         # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
-        '''
-        Enables the all buttons in toolbar
-        '''
-        # self.ui.btn_2D.setEnabled(True)
+        """Enable the all buttons in toolbar
+
+        Returns:
+
+        """
         self.ui.btnFront.setEnabled(True)
         self.ui.btnSide.setEnabled(True)
         self.ui.btnTop.setEnabled(True)
@@ -649,10 +705,13 @@ class MainController(QMainWindow):
         self.ui.btn_CreateDesign.setEnabled(True)
         self.ui.btn_SaveMessages.setEnabled(True)
 
-    def fillPlateThickCombo(self, culprit):
+    def fillPlateThickCombo(self):
+        """Populates the plate thickness on the basis of beam web thickness and plate thickness check
 
-        '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
-        '''
+        Returns:
+
+        """
+
         if self.ui.combo_Beam.currentText() == "Select section":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
@@ -678,12 +737,14 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.blockSignals(False)
             self.ui.comboPlateThick_2.setCurrentIndex(0)
 
-    def populateWeldThickCombo(self, culprit):
-        '''
-        Returns the weld thickness on the basis column flange and plate thickness check
-        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum or of a
-        Single Run Fillet Weld)
-        '''
+    def populateWeldThickCombo(self):
+        """Return weld thickness on the basis column flange and plate thickness check
+        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21
+        (Name of the table :Minimum Size of First Rum or of a Single Run Fillet Weld)
+
+        Returns:
+
+        """
         if str(self.ui.combo_Beam.currentText()) == "Select section":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
@@ -738,9 +799,11 @@ class MainController(QMainWindow):
                 self.ui.comboWldSize.addItem(str(element))
 
     def retrieve_prevstate(self):
-        '''
-        This routine is responsible for maintaining previous session's  data
-        '''
+        """Maintain previous session's data.
+        Returns:
+
+        """
+
         uiObj = self.get_prevstate()
         self.setDictToUserInputs(uiObj)
 
@@ -842,9 +905,9 @@ class MainController(QMainWindow):
 
     def saveDesign_inputs(self):
 
-        fileName,_ = QFileDialog.getSaveFileName(self,
-                                                     "Save Design", os.path.join(str(self.folder),  "untitled.osi"),
-                                                     "Input Files(*.osi)")
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
 
         if not fileName:
             return
@@ -854,7 +917,7 @@ class MainController(QMainWindow):
 
         except IOError:
             QMessageBox.information(self, "Unable to open file",
-                                          "There was an error opening \"%s\"" % fileName)
+                                    "There was an error opening \"%s\"" % fileName)
             return
 
         # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
@@ -866,7 +929,7 @@ class MainController(QMainWindow):
 
     def openDesign_inputs(self):
 
-        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
         if not fileName:
             return
         try:
@@ -874,7 +937,7 @@ class MainController(QMainWindow):
 
         except IOError:
             QMessageBox.information(self, "Unable to open file",
-                                          "There was an error opening \"%s\"" % fileName)
+                                    "There was an error opening \"%s\"" % fileName)
             return
         uiObj = json.load(in_file)
         self.setDictToUserInputs(uiObj)
@@ -889,7 +952,7 @@ class MainController(QMainWindow):
         inputFile = QFile(os.path.join("Connections", "Shear", "Finplate", "saveINPUT.txt"))
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
-                                      "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
+                                "Cannot write file %s:\n%s." % (inputFile, file.errorString()))
         pickle.dump(uiObj, inputFile)
 
     def get_prevstate(self):
@@ -955,24 +1018,24 @@ class MainController(QMainWindow):
             path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
             path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
-            #path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf = path_wkthmltopdf)
+            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'
         }
         file_type = "PDF (*.pdf)"
-        fname,_ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
-        pdfkit.from_file(fileName,fname,configuration=config, options=options)
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        pdfkit.from_file(fileName, fname, configuration=config, options=options)
 
         QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 
         fileName, pat = QFileDialog.getSaveFileName(self, "Save File As",
-                                                                   os.path.join(str(self.folder), "LogMessages"),
-                                                                   "Text files (*.txt)")
+                                                    os.path.join(str(self.folder), "LogMessages"),
+                                                    "Text files (*.txt)")
         return self.save_file(fileName + ".txt")
 
     def save_file(self, fileName):
@@ -982,7 +1045,7 @@ class MainController(QMainWindow):
 
         if not fname.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
-                                      "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
+                                "Cannot write file %s:\n%s." % (fileName, fname.errorString()))
             return False
 
         outf = QTextStream(fname)
@@ -1187,7 +1250,7 @@ class MainController(QMainWindow):
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         # from OCC.Display.pyqt4Display import qtViewer3d
-        from OCC.Display.qtDisplay import  qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
         self.setWindowTitle("Osdag Finplate")
@@ -1226,7 +1289,9 @@ class MainController(QMainWindow):
     def checkBeam_B(self):
         loc = str(self.ui.comboConnLoc.currentText())
         if loc == "Column web-Beam web":
-            if self.ui.comboColSec.currentIndex() == -1 or str(self.ui.combo_Beam.currentText()) == 'Select section' or str(self.ui.comboColSec.currentText()) == 'Select section':
+            if self.ui.comboColSec.currentIndex() == -1 or str(
+                    self.ui.combo_Beam.currentText()) == 'Select section' or str(
+                self.ui.comboColSec.currentText()) == 'Select section':
                 return
             column = self.ui.comboColSec.currentText()
             beam_index = self.ui.combo_Beam.currentIndex()
@@ -1242,7 +1307,7 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(True)
                 self.disableViewButtons()
                 QMessageBox.about(self, 'Information',
-                                        "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                                  "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
                 self.enableViewButtons()
@@ -1263,7 +1328,7 @@ class MainController(QMainWindow):
             if PBeamWebDepth <= SBeam_D:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
-                                        "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                                  "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
             else:
                 self.ui.btn_Design.setDisabled(False)
 
@@ -1284,7 +1349,7 @@ class MainController(QMainWindow):
                 elif self.ui.combo_Beam.currentIndex() == 0:
                     QMessageBox.about(self, "Information", "Please select Secondary beam  section")
 
-        if self.ui.txtFu.text()== ''  or float(self.ui.txtFu.text()) == 0:
+        if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
             QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
 
         elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
@@ -1441,8 +1506,9 @@ class MainController(QMainWindow):
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
         else:
-            design_pref = self.designPrefDialog.saved_designPref #self.designPrefDialog.save_designPref_para()
+            design_pref = self.designPrefDialog.saved_designPref  # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
+        print "design_pref = ", self.uiObj
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
@@ -1456,21 +1522,24 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dict_angle_data, dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [self.uiObj, dictbeamdata, dictcoldata, dict_angle_data, dict_topangledata, loc, component, bolt_R,
+                bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
         '''
         self.display.EraseAll()
         self.alist = self.designParameters()
+        print "printing design para with DP =", self.alist[0]
 
         self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
         self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
-                                              self.alist[4],self.alist[5], self.alist[6],self.alist[7],
-                                              self.alist[8],self.alist[9], self.alist[10], self.display, self.folder, self.connection)
+                                              self.alist[4], self.alist[5], self.alist[6], self.alist[7],
+                                              self.alist[8], self.alist[9], self.alist[10], self.display, self.folder,
+                                              self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
@@ -1479,13 +1548,12 @@ class MainController(QMainWindow):
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
         if isempty[0] == True:
-            self.callFin2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+            self.callFin2D_Drawing("All")
         else:
             pass
-        #self.display.EraseAll()
-
+            # self.display.EraseAll()
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
@@ -1521,7 +1589,8 @@ class MainController(QMainWindow):
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"), files_types)
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                  files_types)
         fName = str(fileName)
 
         file_extension = fName.split(".")[-1]
@@ -1602,7 +1671,7 @@ class MainController(QMainWindow):
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
-                                           "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+                                     "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.closed.emit()
@@ -1610,7 +1679,7 @@ class MainController(QMainWindow):
         else:
             event.ignore()
 
-        # Help Action
+            # Help Action
 
     def about_osdag(self):
         dialog = MyAboutOsdag(self)
@@ -1723,7 +1792,16 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     module_setup()
-    folder = None
-    window = MainController(folder)
+    ########################################
+    folder_path = "/home/deepa-c/Osdag_workspace"
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path, 0755)
+    image_folder_path = os.path.join(folder_path, 'images_html')
+    if not os.path.exists(image_folder_path):
+        os.mkdir(image_folder_path, 0755)
+    window = MainController(folder_path)
+    ########################################
+    # folder = None
+    window = MainController(folder_path)
     window.show()
     sys.exit(app.exec_())

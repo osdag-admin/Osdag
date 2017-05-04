@@ -71,11 +71,12 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.main_controller = parent
         self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        #self.ui.comboConnLoc.currentIndexChanged[str].connect(self.setimage_connection)
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
 
     def save_designPref_para(self):
@@ -87,6 +88,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -96,7 +98,9 @@ class DesignPreferences(QDialog):
             designPref["weld"]["safety_factor"] = float(1.25)
         else:
             designPref["weld"]["safety_factor"] = float(1.5)
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
         designPref["weld"]["weld_fu"] = str(self.ui.txt_weldFu.text())
+
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -109,6 +113,10 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["gap"] = int(20)
         else:
             designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
 
         self.saved = True
 
@@ -123,7 +131,6 @@ class DesignPreferences(QDialog):
         '''
         uiObj = self.main_controller.getuser_inputs()
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-        print "#boltDia#=",boltDia
         bolt_grade = (uiObj["Bolt"]["Grade"])
         clearance = str(self.get_clearance(boltDia))
         bolt_fu = str(self.get_boltFu(bolt_grade))
@@ -136,12 +143,16 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.ui.combo_slipfactor.setCurrentIndex(8)
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
         designPref["weld"]["safety_factor"] = float(1.25)
+        self.ui.txt_weldFu.setText(str(410))
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -150,6 +161,11 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        self.ui.combo_detailing_memebers.setCurrentIndex(0)
+        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
 
         return designPref
@@ -248,7 +264,7 @@ class MyPopupDialog(QDialog):
         input_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
         input_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
         input_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
-        # input_summary["Method"] = str(self.ui.comboBox_method.currentText())
+        input_summary["Client"] = str(self.ui.lineEdit_client.text())
 
         return input_summary
 
@@ -1047,8 +1063,8 @@ class MainController(QMainWindow):
         # self.ui.txtPlateThick.clear()
         self.ui.txtplate_ht.clear()
         self.ui.txtplate_width.clear()
-        self.ui.txtExtMomnt.clear()
-        self.ui.txtMomntCapacity.clear()
+        # self.ui.txtExtMomnt.clear()
+        # self.ui.txtMomntCapacity.clear()
 
         # self.ui.txtWeldThick.clear()
         self.ui.txtResltShr.clear()
@@ -1491,9 +1507,9 @@ class MainController(QMainWindow):
         self.display_output(self.resultObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
         if isempty[0] == True:
-            self.callend2D_Drawing("All")
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+            self.callend2D_Drawing("All")
         else:
             pass
             # self.display.EraseAll()
@@ -1811,7 +1827,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_workspace\end_plate"
+    workspace_folder_path = "Z:\Osdag_workspace\end_plate"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

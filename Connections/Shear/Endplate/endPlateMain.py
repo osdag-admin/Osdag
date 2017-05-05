@@ -98,7 +98,9 @@ class DesignPreferences(QDialog):
             designPref["weld"]["safety_factor"] = float(1.25)
         else:
             designPref["weld"]["safety_factor"] = float(1.5)
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
         designPref["weld"]["weld_fu"] = str(self.ui.txt_weldFu.text())
+
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -111,6 +113,8 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["gap"] = int(20)
         else:
             designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
         designPref["design"] = {}
         designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
 
@@ -147,6 +151,8 @@ class DesignPreferences(QDialog):
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
         designPref["weld"]["safety_factor"] = float(1.25)
+        self.ui.txt_weldFu.setText(str(410))
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(20))
@@ -155,6 +161,9 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(20)
+        self.ui.combo_detailing_memebers.setCurrentIndex(0)
+        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
         designPref["design"] = {}
         designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
@@ -1054,8 +1063,8 @@ class MainController(QMainWindow):
         # self.ui.txtPlateThick.clear()
         self.ui.txtplate_ht.clear()
         self.ui.txtplate_width.clear()
-        self.ui.txtExtMomnt.clear()
-        self.ui.txtMomntCapacity.clear()
+        # self.ui.txtExtMomnt.clear()
+        # self.ui.txtMomntCapacity.clear()
 
         # self.ui.txtWeldThick.clear()
         self.ui.txtResltShr.clear()
@@ -1818,7 +1827,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_workspace\end_plate"
+    workspace_folder_path = "Z:\Osdag_workspace\end_plate"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

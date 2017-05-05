@@ -45,7 +45,7 @@ class ConnectionCalculations(object):
         """Calculate bolt hole clearance.
 
         Args:
-            bolt_hole_type (int)
+            bolt_hole_type (string)
             bolt_diameter (int)
             custom_hole_clearance (int)
 
@@ -59,7 +59,7 @@ class ConnectionCalculations(object):
         """
         # TODO : Update bolt diameters in all modules (UI and calculations).
         hole_clearance = 0
-        if bolt_hole_type == 1:  # standard hole
+        if bolt_hole_type == "Standard":  # standard hole
             hole_clearance = {
                 12: 1,
                 16: 2,
@@ -70,7 +70,7 @@ class ConnectionCalculations(object):
                 30: 3,
                 36: 3
             }[bolt_diameter]
-        elif bolt_hole_type == 0:  # over size hole
+        elif bolt_hole_type == "Over-sized":  # over sized hole
             hole_clearance = {
                 12: 3,
                 16: 4,
@@ -129,7 +129,7 @@ class ConnectionCalculations(object):
              bolt_fu (int) - ultimate stress of bolt Fu
              mu_f(float) - coefficient of friction/ slip factor
              n_e (int) - number of effective interfaces offering resistance to slip
-             bolt_hole_type (int) - 1 for standard hole, 0 for oversize hole
+             bolt_hole_type (string) - "Standard" or "Over-sized"
 
         Returns:
             v_db - Factored shear capacity of HSFG bolt as float
@@ -161,8 +161,8 @@ class ConnectionCalculations(object):
         # proof load (Kn)(minimum bolt tension)
         F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
         k_h = {
-            1: 1.0,
-            0: 0.85
+            "Standard": 1.0,
+            "Over-sized": 0.85
         }[bolt_hole_type]
         v_nsf = mu_f * n_e * k_h * F_0  # nominal shear capacity of bolt
         v_dsf = v_nsf / gamma_mf
@@ -215,7 +215,7 @@ class ConnectionCalculations(object):
             bolt_hole_diameter (int)
             min_edge_multiplier (float)
             thickness_governing_min (float)
-            is_environ_corrosive (boolean)
+            is_environ_corrosive (string) -- "Yes" or "No"
 
         Returns:
             None
@@ -258,5 +258,5 @@ class ConnectionCalculations(object):
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
-        if is_environ_corrosive is True:
+        if is_environ_corrosive == "Yes":
             self.max_edge_dist = min(self.max_edge_dist, 40 + 4 * thickness_governing_min)

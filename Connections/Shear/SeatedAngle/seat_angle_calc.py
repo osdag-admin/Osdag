@@ -55,12 +55,12 @@ class SeatAngleCalculation(ConnectionCalculations):
         gamma_mb (float): partial safety factor for material - resistance of connection - bolts
         gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
-        bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
+        bolt_hole_type (string): 'Standard' or 'Over-sized'
         custom_hole_clearance (float): user defined hole clearance, if any
         beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
         root_clearance (int): clearance of bolt row from the root of seated angle
-        is_environ_corrosive (boolean): True if members are under corrosive influences (used for max edge distance)
+        is_environ_corrosive (string): "Yes" if members are under corrosive influences (used for max edge distance)
         is_hsfg (boolean): True if the bolt is to be designed as HSFG with slip not permitted at ultimate load
 
         top_angle (string)
@@ -136,9 +136,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_mb = 0.0
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
-        self.bolt_hole_type = 1
+        self.bolt_hole_type = 'Standard'
         self.custom_hole_clearance = None
-        self.is_environ_corrosive = False
+        self.is_environ_corrosive = "No"
         self.is_hsfg = False
         self.n_e = 1  # interfaces offering friction - for HSFG design
         self.mu_f = 0.4  # slip factor - for HSFG design
@@ -281,15 +281,20 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_mb = 1.25  # partial safety factor for material - resistance of connection - bolts
         self.gamma_m0 = 1.1  # partial safety factor for material - resistance governed by yielding or buckling
         self.gamma_m1 = 1.25  # partial safety factor for material - resistance governed by ultimate stress
-        self.bolt_hole_type = 1  # 1 if standard bolt hole; 0 for oversize bolt hole
-        self.custom_hole_clearance = None  # user defined hole clearance, if any
-        self.beam_col_clear_gap = 5 + 5  # clearance + tolerance
+
+
+        self.bolt_hole_type = input_dict['bolt']['bolt_hole_type'] # "Standard" or "Over-sized"
+        self.custom_hole_clearance = input_dict['bolt']['bolt_hole_clrnce']  # user defined hole clearance, if any
+        self.beam_col_clear_gap = input_dict['detailing']['gap']  # clearance + tolerance
         # min edge distance multiplier based on edge type (Cl 10.2.4.2)
-        self.min_edge_multiplier = 1.5  # rolled, machine-flame cut, sawn and planed edges
-        # self.min_edge_multiplier = 1.7  # sheared or hand flame cut edges
-        self.is_environ_corrosive = False  # set to True, if environment is corrosive
-        self.is_hsfg = False  # set to True, if bolt is HSFG with no slip at ultimate load
-        self.mu_f = 0.4  # slip factor - for HSFG design
+        self.min_edge_multiplier = input_dict['detailing']['min_edgend_dist']
+        # input_dict['detailing']['min_edgend_dist'] is 1.5 for rolled, machine-flame cut, sawn and planed edges
+        # input_dict['detailing']['min_edgend_dist'] is 1.7  # sheared or hand flame cut edges
+        self.is_environ_corrosive = input_dict['detailing']['is_env_corrosive']  # set to "Yes", if environment is corrosive
+        self.is_hsfg = False
+        if input_dict['Bolt']['Type'] == "HSFG":
+            self.is_hsfg = True  # set to True, if bolt is HSFG with no slip at ultimate load
+        self.mu_f = input_dict['bolt']['slip_factor']  # slip factor - for HSFG design
 
         self.top_angle = input_dict['Angle']['TopAngleSection']
         self.connectivity = input_dict['Member']['Connectivity']

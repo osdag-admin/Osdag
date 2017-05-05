@@ -489,23 +489,28 @@ class Fin2DCreatorFront(object):
         # self.B1 = np.array([ptB1x,ptB1y])
         self.ptB1 = np.array([ptB1x, ptB1y])
 
-        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        #ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptC2y = ptC1y + self.dataObj.plate_ht
         self.C2 = (ptC2x, ptC2y)
 
-        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        #ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptA5y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A5 = ptA5x, ptA5y
 
-        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        #ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptA4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A4 = (ptA4x, ptA4y)
 
-        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        #ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptB4y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B4 = (ptB4x, ptB4y)
 
-        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
+        #ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
+        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + self.dataObj.gap
         ptBy5 = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B5 = (ptBx5, ptBy5)
 

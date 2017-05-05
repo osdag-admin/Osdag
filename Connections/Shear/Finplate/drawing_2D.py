@@ -641,7 +641,10 @@ class Fin2DCreatorFront(object):
         self.BA3 = self.BA4 + (self.dataObj.beam_L - self.dataObj.notch_L) * np.array([1, 0])
         self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
         self.BB3 = self.BB2 + self.dataObj.beam_T * np.array([0, -1])
-        self.BB1 = self.BB2 + (self.dataObj.beam_L + 10) * np.array([-1, 0])
+        #self.BB1 = self.BB2 + (self.dataObj.beam_L + 10) * np.array([-1, 0])
+        self.BB1 =self.BB5 + (self.dataObj.D_beam-(self.dataObj.plate_ht + self.dataObj.notch_ht)) * np.array([0,1])
+        #self.BB1 = self.BB2 + (self.dataObj.beam_L ) * np.array([-1, 0])
+        #self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
         self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
         self.B1 = self.BA5 + 80 * np.array([0, 1])
         self.BC2 = self.BA6 + self.dataObj.col_R1 * np.array([-1, 0])
@@ -771,7 +774,8 @@ class Fin2DCreatorFront(object):
 
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
-        ptC2 = ptC1 + 20 * np.array([0, 1])
+        #ptC2 = ptC1 + 20 * np.array([0, 1])
+        ptC2 = ptC1 + self.dataObj.gap * np.array([0, 1])
         #ptC2 = ptC1 + float(str(self.dataObj.gap)) * np.array([0, 1])
         self.dataObj.drawFaintLine(ptC1, ptC2, dwg)
 

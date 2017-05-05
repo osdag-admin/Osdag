@@ -477,9 +477,13 @@ class MainController(QMainWindow):
         Returns:
 
         """
+        loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
+        if loc == "Beam-Beam":
+            self.ui.comboColSec.addItems(beamdata)
+        else:
+            self.ui.combo_Beam.addItems(beamdata)
         self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
@@ -547,7 +551,7 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
-            self.get_columndata()
+            self.get_beamdata()
             #self.ui.comboColSec.addItems(get_beamcombolist())
             self.ui.combo_Beam.setCurrentIndex(0)
 

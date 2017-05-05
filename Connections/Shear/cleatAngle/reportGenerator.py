@@ -83,13 +83,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     bolt_grade_fu = str(float(uiobj["bolt"]["bolt_fu"]))
     slip_factor = str(float(uiobj["bolt"]["slip_factor"]))
 
-    typeof_weld = str(uiobj["weld"]["typeof_weld"])
-    safety_factor = str(float(uiobj["weld"]["safety_factor"]))
-    fu_overwrite = str(float(uiobj["weld"]["fu_overwrite"]))
-
     typeof_edge = str(uiobj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiobj["detailing"]["min_edgend_dist"]))
-    detail_gap = str(float(uiobj["detailing"]["gap"]))
+    gap = str(float(uiobj["detailing"]["gap"]))
 
     design_method = str(uiobj["design"]["design_method"])
 
@@ -213,7 +209,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     gauge_c = str(output_obj['cleat']['guage'])
     bolt_grp_capacity_c = str(output_obj['cleat']['boltgrpcapacity'])
     thinner_c = str(output_obj['cleat']['thinner'])
-    gap = '20'
+    # gap = '20'
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Header of the pdf fetched from dialogbox
@@ -697,23 +693,6 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
-    # --------------------------------      WELD      -----------------------------------------------------------------------------------------------
-    row = [0, "Weld ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "Type of Weld", typeof_weld]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "Material Grade (MPa)", fu_overwrite]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
 
     # --------------------------------      DETAILING      -----------------------------------------------------------------------------------------------
     row = [0, "Detailing ", " "]
@@ -733,7 +712,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Gap (mm)", detail_gap]
+    row = [0, "Gap (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

@@ -93,7 +93,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     typeof_edge = str(uiobj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiobj["detailing"]["min_edgend_dist"]))
-    detail_gap = str(float(uiobj["detailing"]["gap"]))
+    gap = str(float(uiobj["detailing"]["gap"]))
 
     design_method = str(uiobj["design"]["design_method"])
 
@@ -586,7 +586,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Gap (mm)", detail_gap]
+    row = [0, "Gap (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -836,8 +836,11 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-
-    row = [0, "Plate thickness (mm)", "&#8805;  " + minplatethk, plate_thickness, " <p align=left style=color:green><b>Pass</b></p> "]
+    if int(minplatethk) > int(plate_thickness):
+        row = [0, "Plate thickness (mm)", "&#8805;  " + minplatethk, plate_thickness,
+               " <p align=left style=color:red><b>Fail</b></p> "]
+    else:
+        row = [0, "Plate thickness (mm)", "&#8805;  " + minplatethk, plate_thickness, " <p align=left style=color:green><b>Pass</b></p> "]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -895,7 +898,11 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Weld strength (kN/mm)","&#8730;[(18100*6)/(2*288)<sup>2</sup>]<sup>2</sup> + [140/(2*288)]<sup>2</sup> <br>=0.699","<i>f</i><sub>v</sub>=(0.7*6*410)/(&#8730;3*1.25)<br>= 0.795<br>[cl. 10.5.7]"," <p align=right style=color:green><b>Pass</b></p>"]
-    row = [0, "Weld strength (kN/mm)", weld_shear, "<i>f</i><sub>v</sub> =(0.7*" + weld_size + "*" + weld_fu + ")/(&#8730;3*1.25*1000)<br> = " + weld_strength +
+    if float(weld_shear) > float(weld_strength):
+        row = [0, "Weld strength (kN/mm)", weld_shear, "<i>f</i><sub>v</sub> =(0.7*" + weld_size + "*" + weld_fu + ")/(&#8730;3*1.25*1000)<br> = " + weld_strength +
+               "<br>[cl. 10.5.7]", " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Weld strength (kN/mm)", weld_shear, "<i>f</i><sub>v</sub> =(0.7*" + weld_size + "*" + weld_fu + ")/(&#8730;3*1.25*1000)<br> = " + weld_strength +
            "<br>[cl. 10.5.7]", " <p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')

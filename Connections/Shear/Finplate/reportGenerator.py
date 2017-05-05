@@ -96,7 +96,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     typeof_edge = str(uiObj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"]))
-    detail_gap = str(float(uiObj["detailing"]["gap"]))
+    gap = str(float(uiObj["detailing"]["gap"]))
 
     design_method = str(uiObj["design"]["design_method"])
 
@@ -122,7 +122,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     end = str(int(round(outObj['Bolt']['enddist'], 1)))
     weld_strength = str(round(float(outObj['Weld']['weldstrength'] / 1000), 3))
     moment_demand = str(outObj['Plate']['externalmoment'])
-    gap = '20'
+    # gap = '20'
     beam_tw = str(float(dictBeamData["tw"]))
 
     bolt_fu = str(outObj['Bolt']['bolt_fu'])
@@ -596,7 +596,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Gap (mm)", detail_gap]
+    row = [0, "Gap (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

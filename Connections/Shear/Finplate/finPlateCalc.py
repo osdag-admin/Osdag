@@ -143,6 +143,9 @@ def finConn(uiObj):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
+    # add gap from design preferences
+    designP_gap = int(uiObj["detailing"]["gap"])
+
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
@@ -451,7 +454,7 @@ def finConn(uiObj):
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
-            Ecc = min_edge_dist + 20
+            Ecc = min_edge_dist + designP_gap   #20
             # Moment due to shear external force
             M1 = shear_load * Ecc;
              
@@ -478,7 +481,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + 20   
+                Ecc = min_edge_dist + min_gauge / 2 +designP_gap    #20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -539,7 +542,7 @@ def finConn(uiObj):
         elif web_plate_l == 0 and web_plate_w == 0:
             if bolt_line == 1:
                 # Moment due to shear external force
-                Ecc = min_edge_dist + 20
+                Ecc = min_edge_dist + designP_gap # 20
                 M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
@@ -553,7 +556,7 @@ def finConn(uiObj):
                     moment_demand = round(moment_demand * 0.001, 3)
             elif bolt_line == 2:        
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + 20
+                Ecc = min_edge_dist + min_gauge / 2 + designP_gap # 20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -641,22 +644,22 @@ def finConn(uiObj):
         if boltParameters['numofcol'] == 1:
             edge_dist = boltParameters['enddist']
             plate_edge = web_plate_w - edge_dist       
-            web_plate_w_req = 2 * boltParameters['enddist'] + 20
+            web_plate_w_req = 2 * boltParameters['enddist'] + designP_gap  #20
         if boltParameters['numofcol'] == 2:
             edge_dist = boltParameters['enddist']
             plate_edge = web_plate_w - boltParameters['gauge'] - boltParameters['enddist']    
-            web_plate_w_req = boltParameters['gauge'] + 2 * boltParameters['enddist'] + 20
+            web_plate_w_req = boltParameters['gauge'] + 2 * boltParameters['enddist'] + designP_gap  #20
             
             
     if web_plate_w == 0:   
         if boltParameters['numofcol'] == 1:
             edge_dist = boltParameters['enddist']
-            plate_edge = edge_dist + 20      
+            plate_edge = edge_dist + designP_gap  #20
             web_plate_w_req = plate_edge + boltParameters['enddist'];
             web_plate_w_opt = web_plate_w_req
         if boltParameters['numofcol'] == 2:
             edge_dist = boltParameters['enddist'] 
-            plate_edge = edge_dist + 20 
+            plate_edge = edge_dist + designP_gap   #20
             web_plate_w_req = boltParameters['gauge'] + plate_edge + boltParameters['enddist'];
             web_plate_w_opt = web_plate_w_req;      
 
@@ -988,99 +991,103 @@ def finConn(uiObj):
     outputObj['Weld']['effectiveWeldlength'] = weld_l
     
 #     return outputObj
-# ## Checks  to delete dictionary
-# Delete the dictionary when shear force is 0
-    if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
-         for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-        
-#     Delete dictionary for unsafe design for user defined plate height and width
-    if web_plate_l != 0 and web_plate_w != 0 :
-        if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-            for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-            if boltParameters['numofcol'] == 1:
-                if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-                elif moment_capacity < boltParameters['moment']:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-                elif Tdb < shear_load:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-            
-            elif boltParameters['numofcol'] == 2:
-                if boltParameters['pitch'] < boltParameters['minpitch']:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-                elif web_plate_l == min_plate_height or web_plate_l == max_plate_height or web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req or weld_t_req > weld_t or weld_strength < Vr:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-                elif moment_capacity < boltParameters['moment']:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-                elif Tdb < shear_load:
-                    for k in outputObj.keys():
-                        for key in outputObj[k].keys():
-                            outputObj[k][key] = ""
-        else:
-            pass
-    
-#   Delete dictionary for user defined plate height but optional width 
-    elif web_plate_l != 0 and web_plate_w == 0:
-        if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_l < web_plate_l_req or web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-            for k in outputObj.keys():
-                for key in outputObj[k].keys():
-                    outputObj[k][key] = ""
-        elif moment_capacity < boltParameters['moment']:
-            for k in outputObj.keys():
-                for key in outputObj[k].keys():
-                    outputObj[k][key] = ""
-        elif boltParameters['numofcol'] == 2:
-            if boltParameters['pitch'] < boltParameters['minpitch']:
-                for k in outputObj.keys():
-                    for key in outputObj[k].keys():
-                        outputObj[k][key] = ""
-        elif Tdb < shear_load:
-                for k in outputObj.keys():
-                    for key in outputObj[k].keys():
-                        outputObj[k][key] = ""
+# # #######################################   Checks  to delete dictionary   ##################################################################
+# # Delete the dictionary when shear force is 0
+#     if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
+#          for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#
+# #     Delete dictionary for unsafe design for user defined plate height and width
+#     if web_plate_l != 0 and web_plate_w != 0 :
+#         if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
+#             for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#             if boltParameters['numofcol'] == 1:
+#                 if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#                 elif moment_capacity < boltParameters['moment']:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#                 elif Tdb < shear_load:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#
+#             elif boltParameters['numofcol'] == 2:
+#                 if boltParameters['pitch'] < boltParameters['minpitch']:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#                 elif web_plate_l == min_plate_height or web_plate_l == max_plate_height or web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req or weld_t_req > weld_t or weld_strength < Vr:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#                 elif moment_capacity < boltParameters['moment']:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#                 elif Tdb < shear_load:
+#                     for k in outputObj.keys():
+#                         for key in outputObj[k].keys():
+#                             outputObj[k][key] = ""
+#         else:
+#             pass
+#
+# #   Delete dictionary for user defined plate height but optional width
+#     elif web_plate_l != 0 and web_plate_w == 0:
+#         if web_plate_l < min_plate_height or web_plate_l > max_plate_height or web_plate_l < web_plate_l_req or web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
+#             for k in outputObj.keys():
+#                 for key in outputObj[k].keys():
+#                     outputObj[k][key] = ""
+#         elif moment_capacity < boltParameters['moment']:
+#             for k in outputObj.keys():
+#                 for key in outputObj[k].keys():
+#                     outputObj[k][key] = ""
+#         elif boltParameters['numofcol'] == 2:
+#             if boltParameters['pitch'] < boltParameters['minpitch']:
+#                 for k in outputObj.keys():
+#                     for key in outputObj[k].keys():
+#                         outputObj[k][key] = ""
+#         elif Tdb < shear_load:
+#                 for k in outputObj.keys():
+#                     for key in outputObj[k].keys():
+#                         outputObj[k][key] = ""
+#
+# #   Delete dictionary for optional plate height but user defined width
+#     elif web_plate_l == 0 and web_plate_w != 0:
+#         if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or web_plate_l_opt < web_plate_l_req or web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
+#             for k in outputObj.keys():
+#                 for key in outputObj[k].keys():
+#                     outputObj[k][key] = ""
+#         elif moment_capacity < boltParameters['moment']:
+#             for k in outputObj.keys():
+#                 for key in outputObj[k].keys():
+#                     outputObj[k][key] = ""
+#         elif boltParameters['numofcol'] == 2:
+#             if boltParameters['pitch'] < boltParameters['minpitch']:
+#                 for k in outputObj.keys():
+#                     for key in outputObj[k].keys():
+#                         outputObj[k][key] = ""
+#         elif Tdb < shear_load:
+#                 for k in outputObj.keys():
+#                     for key in outputObj[k].keys():
+#                         outputObj[k][key] = ""
+#
+# #   Delete dictionary for unsafe design for user defined plate height    (BUG)
+#     else:
+#         if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
+#             for k in outputObj.keys():
+#                 for key in outputObj[k].keys():
+#                     outputObj[k][key] = ""
 
-#   Delete dictionary for optional plate height but user defined width 
-    elif web_plate_l == 0 and web_plate_w != 0:
-        if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or web_plate_l_opt < web_plate_l_req or web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-            for k in outputObj.keys():
-                for key in outputObj[k].keys():
-                    outputObj[k][key] = ""
-        elif moment_capacity < boltParameters['moment']:
-            for k in outputObj.keys():
-                for key in outputObj[k].keys():
-                    outputObj[k][key] = ""
-        elif boltParameters['numofcol'] == 2:
-            if boltParameters['pitch'] < boltParameters['minpitch']:
-                for k in outputObj.keys():
-                    for key in outputObj[k].keys():
-                        outputObj[k][key] = ""
-        elif Tdb < shear_load:
-                for k in outputObj.keys():
-                    for key in outputObj[k].keys():
-                        outputObj[k][key] = ""
-    
-#   Delete dictionary for unsafe design for user defined plate height    (BUG)
-    else:
-        if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
-            for k in outputObj.keys():
-                for key in outputObj[k].keys():
-                    outputObj[k][key] = ""
+
+
+
 #         if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or web_plate_l_opt < web_plate_l_req or web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
 #             for k in outputObj.keys():
 #                 for key in outputObj[k].keys():

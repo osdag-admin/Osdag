@@ -82,17 +82,18 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     weld_size = str(uiobj["Weld"]['Size (mm)'])
 
     # Design Preferences
-    bolt_hole_clrnce = float(str(uiobj["bolt"]["bolt_hole_clrnce"]))
+    bolt_hole_clrnce = str(float(uiobj["bolt"]["bolt_hole_clrnce"]))
     bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
-    bolt_fu = float(str(uiobj["bolt"]["bolt_fu"]))
-    slip_factor = float(str(uiobj["bolt"]["slip_factor"]))
+    bolt_grade_fu = str(float(uiobj["bolt"]["bolt_fu"]))
+    slip_factor = str(float(uiobj["bolt"]["slip_factor"]))
 
     typeof_weld = str(uiobj["weld"]["typeof_weld"])
-    safety_factor = float(str(uiobj["weld"]["safety_factor"]))
+    safety_factor = str(float(uiobj["weld"]["safety_factor"]))
+    fu_overwrite = str(float(uiobj["weld"]["fu_overwrite"]))
 
     typeof_edge = str(uiobj["detailing"]["typeof_edge"])
-    min_edgend_dist = float(str(uiobj["detailing"]["min_edgend_dist"]))
-    gap = float(str(uiobj["detailing"]["gap"]))
+    min_edgend_dist = str(float(uiobj["detailing"]["min_edgend_dist"]))
+    detail_gap = str(float(uiobj["detailing"]["gap"]))
 
     design_method = str(uiobj["design"]["design_method"])
 
@@ -128,18 +129,6 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     # bearingcapacity = str(round(outobj['Bolt']['bearingcapacity'], 4))
     bearingcapacity = str(outobj['Bolt']['bearingcapacity'])
     critical_shear = str(round(outobj['Bolt']['critshear'], 3))
-
-
-    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    # Design Preferences
-    bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
-    bolt_hole_clrnce = str(uiobj['bolt']['bolt_hole_clrnce'])
-    bolt_mtrl_grade = str(uiobj["bolt"]["bolt_fu"])
-    weld_type = str(uiobj["weld"]["typeof_weld"])
-    weld_mtrl_grade = str(uiobj["weld"]["safety_factor"])
-    edge_type = str(uiobj["detailing"]["typeof_edge"])
-    detail_edgend_dist = str(uiobj["detailing"]["min_edgend_dist"])
-    detail_gap = str(uiobj["detailing"]["gap"])
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
@@ -549,32 +538,31 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Material Grade (MPa)", bolt_mtrl_grade]
+    row = [0, "Material Grade (MPa)", bolt_grade_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    # TODO add slip factor
-    # slip = 0.55
-    # row = [0, "Slip factor", slip]
-    # rstr += t('tr')
-    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    # rstr += t('td class="detail2"') + row[2] + t('/td')
-    # rstr += t('/tr')
+    row = [0, "Slip factor", slip_factor]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
     # --------------------------------      WELD      -----------------------------------------------------------------------------------------------
     row = [0, "Weld ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Type of Weld", weld_type]
+    row = [0, "Type of Weld", typeof_weld]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Material Grade (MPa)", weld_mtrl_grade]
+    row = [0, "Material Grade (MPa)", fu_overwrite]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -586,13 +574,13 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Type of Edges", edge_type]
+    row = [0, "Type of Edges", typeof_edge]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Minimum Edge-End Distance", detail_edgend_dist]
+    row = [0, "Minimum Edge-End Distance", min_edgend_dist]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -617,7 +605,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Design Method", "Limit State Design "]
+    row = [0, "Design Method", design_method]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

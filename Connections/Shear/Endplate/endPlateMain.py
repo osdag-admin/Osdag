@@ -1102,8 +1102,8 @@ class MainController(QMainWindow):
         # self.ui.txtPlateThick.clear()
         self.ui.txtplate_ht.clear()
         self.ui.txtplate_width.clear()
-        self.ui.txtExtMomnt.clear()
-        self.ui.txtMomntCapacity.clear()
+        # self.ui.txtExtMomnt.clear()
+        # self.ui.txtMomntCapacity.clear()
 
         # self.ui.txtWeldThick.clear()
         self.ui.txtResltShr.clear()
@@ -1853,7 +1853,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_workspace\end_plate"
+    workspace_folder_path = "Z:\Osdag_workspace\end_plate"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

@@ -69,7 +69,7 @@ class SeatCommonData(object):
         self.angle_length = output_dict['SeatAngle']['Length (mm)']
         self.col_length = 1000
         self.beam_length = 500
-        self.gap = 20  # Clear distance between column and beam
+        self.gap = input_dict["detailing"]["gap"] # Clear distance between column and beam
         # self.notch_L = (self.col_width - (self.col_web_thk + 40)) / 2.0
         # self.notch_ht = self.col_flange_thk + self.col_R1
 

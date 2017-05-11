@@ -42,13 +42,13 @@ class EndCommonData(object):
         self.col_R1 = float(dict_column_data["R1"])
         self.plate_ht = ouput_obj['Plate']['height']
         self.plate_thick = int(input_obj['Plate']["Thickness (mm)"])
-        self.bolt_grade = input_obj['Bolt']['Grade']
-        self.bolt_type = input_obj['Bolt']['Type']
+        self.bolt_grade = float(input_obj['Bolt']['Grade'])
+        self.bolt_type = str(input_obj['Bolt']['Type'])
         self.plate_width = ouput_obj['Plate']['width']
         self.weld_len = ouput_obj['Weld']['weldlength']
         self.weld_thick = int(input_obj['Weld']['Size (mm)'])
         self.bolt_dia = int(input_obj["Bolt"]["Diameter (mm)"])
-        self.hole_dia = ouput_obj['Bolt']['dia_hole']
+        self.dia_hole = int(ouput_obj['Bolt']['dia_hole'])
         self.connectivity = input_obj['Member']['Connectivity']
         self.pitch = ouput_obj['Bolt']["pitch"]
         self.gauge = ouput_obj['Bolt']["gauge"]
@@ -793,8 +793,12 @@ class End2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[-1])
         theta = 65
         offset = (self.dataObj.D_beam/1.4)
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + str(self.dataObj.bolt_type) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SE", offset, text_up, text_down, element="")
 
         # Plate Information
@@ -974,8 +978,11 @@ class End2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[0])
         theta = 65
         offset = (self.dataObj.D_beam * 3 + 400) / 8
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) +  u'\u00d8'  + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) +  str(self.dataObj.bolt_type) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) +  u'\u00d8'  + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down, element="")
 
         # Plate Information
@@ -1136,8 +1143,12 @@ class End2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.D_beam * 3 + 400) / 8
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + str(self.dataObj.bolt_type) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down, element="")
 
         # Beam Information
@@ -1479,8 +1490,12 @@ class End2DCreatorTop(object):
         bltPt = np.array(pt_list[0])
         theta = 75
         offset = (self.beam_beam_length / 2) + 25
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bltPt, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information
@@ -1635,8 +1650,12 @@ class End2DCreatorTop(object):
         bltPt = self.FP5 + (50 - self.dataObj.beam_tw / 2) * np.array([0, -1]) - self.dataObj.col_T * np.array([1, 0])
         theta = 45
         offset = (self.dataObj.beam_B) + 50
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bltPt, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information
@@ -1787,8 +1806,12 @@ class End2DCreatorTop(object):
         bltPt = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.beam_B) + 75
-        text_up = str(self.dataObj.no_of_rows) + " rows " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " rows " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bltPt, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information
@@ -2076,8 +2099,12 @@ class End2DCreatorSide(object):
         bolt_pt_x = np.array(pt_list[0])
         theta = 45
         offset = self.dataObj.notch_offset + self.dataObj.end_dist + 50
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information
@@ -2238,8 +2265,12 @@ class End2DCreatorSide(object):
         bolt_pt_x = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.D_col - self.dataObj.plate_width) / 2 + self.dataObj.end_dist + 50
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information
@@ -2395,8 +2426,12 @@ class End2DCreatorSide(object):
         bolt_pt_x = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.col_B - self.dataObj.plate_width) / 2 + self.dataObj.end_dist + 50
-        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.hole_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.bolt_grade) + ")"
+        text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down, element="")
 
         # Weld Information

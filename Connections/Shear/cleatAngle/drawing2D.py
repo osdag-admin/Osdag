@@ -53,8 +53,9 @@ class cleatCommonData(object):
         # self.cleat_thk = ouput_obj['Plate']['height']
         # self.cleat_thk = ouput_obj['Weld']['thickness']
         self.bolt_dia = int(input_obj["Bolt"]["Diameter (mm)"])
-        self.bolt_type = input_obj["Bolt"]["Type"]
-        self.bolt_grade = input_obj['Bolt']['Grade']
+        self.dia_hole = (ouput_obj['Bolt']['diahole'])
+        self.bolt_type = str(input_obj["Bolt"]["Type"])
+        self.bolt_grade = float(input_obj['Bolt']['Grade'])
         self.connectivity = input_obj['Member']['Connectivity']
         self.pitch = ouput_obj['Bolt']["pitch"]
         self.gauge = ouput_obj['Bolt']["gauge"]
@@ -834,9 +835,13 @@ class Cleat2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[0][0])
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
 
         # Primary BEAM Bolt GROUP  Information
@@ -844,9 +849,13 @@ class Cleat2DCreatorFront(object):
         bolt_pt = np.array(pt_list_c[-1])
         theta = 60
         offset = (self.dataObj.beam_B / 2 + 10)  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "SW", offset, text_up, text_down)
 
         # cleat angle information
@@ -1089,9 +1098,13 @@ class Cleat2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[0][0])
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M " + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M " + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
 
         # Bolt Information for column part
@@ -1099,9 +1112,13 @@ class Cleat2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list_c[-1])
         theta = 45
         offset = (self.dataObj.D_col + 10)
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M " + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M " + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "SW", offset, text_up, text_down)
 
         # cleat angle information
@@ -1228,16 +1245,23 @@ class Cleat2DCreatorFront(object):
         bolt_pt_x = np.array(pt_list[0][0])
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
-        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
 
         # column bolt marking Arrow
         no_of_cbolts = self.dataObj.no_of_crows * self.dataObj.no_of_ccol * 2
         theta = 45
         offset = (self.dataObj.col_B * 3) / 4
-        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, np.array(pt_list_c[0]), theta, "NW", offset, text_up, text_down)
 
         # Included cleat height and pitch details of column bolt group
@@ -1653,8 +1677,11 @@ class Cleat2DCreatorTop(object):
         bolt_pt = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.beam_B) + 100
-        text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
 
         # Bolt information for column connectivity
@@ -1662,9 +1689,13 @@ class Cleat2DCreatorTop(object):
         weld_pt = np.array(pt_list_c1[-1])
         theta = 30
         offset = (self.beam_beam_length - 2 * self.dataObj.cleat_legsize) / 2 + 25
-        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "SE", offset, text_up, text_down)
+
         # Gap Informatoin
         ptG1 = self.BC + 100 * np.array([0, 1])
         ptG2 = ptG1 + 20 * np.array([1, 0])
@@ -1854,8 +1885,12 @@ class Cleat2DCreatorTop(object):
         bolt_pt = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.beam_B) + 50
-        text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
 
         # Bolt information for column connectivity
@@ -1863,8 +1898,12 @@ class Cleat2DCreatorTop(object):
         weld_pt = np.array(pt_list_c[0])
         theta = 40
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 80
-        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NW", offset, text_up, text_down)
         # Gap Informatoin
         ptG1 = self.FG + 50 * np.array([0, 1])
@@ -2052,8 +2091,11 @@ class Cleat2DCreatorTop(object):
         bolt_pt = np.array(pt_list[0])
         theta = 45
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 100
-        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "NE", offset, text_up, text_down)
 
         # column bolt information
@@ -2062,8 +2104,11 @@ class Cleat2DCreatorTop(object):
         weld_pt = np.array(pt_list_c[0])
         theta = 45
         offset = self.dataObj.D_col * 3 / 4 + 50
-        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NE", offset, text_up, text_down)
 
         # Gap Informatoin
@@ -2405,9 +2450,13 @@ class Cleat2DCreatorSide(object):
         bolt_pt_x = np.array(pitch_pts_c1[0][0])
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt_x, theta, "NE", offset, text_up, text_down)
 
         # secondary BEAM Bolt GROUP  Information
@@ -2416,9 +2465,13 @@ class Cleat2DCreatorSide(object):
         bolt_pt = np.array(pitch_pts[0])
         theta = 70
         offset = (self.beam_beam_length / 2 + 50)  # #
-        text_up = str(no_of_bolts) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
-            self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
+        #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "NW", offset, text_up, text_down)
 
         # cleat angle information
@@ -2643,17 +2696,24 @@ class Cleat2DCreatorSide(object):
         boltPt = np.array(pitch_pts[0])
         theta = 45
         offset = (self.dataObj.D_col) / 2 + 10
-        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NW", offset, text_up, text_down)
+
         #       column bolt information
         no_of_cbolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
 
         boltPt = np.array(pitch_pts_c1[0][0])
         theta = 45
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + self.dataObj.cend_dist + 10
-        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NE", offset, text_up, text_down)
 
         # 2D view name
@@ -2867,16 +2927,24 @@ class Cleat2DCreatorSide(object):
         boltPt = np.array(pitch_pts[0])
         theta = 45
         offset = (self.dataObj.col_B) / 2 + 70
-        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NW", offset, text_up, text_down)
         # column bolt information
         no_of_cbolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         boltPt = np.array(pitch_pts_c1[0][0])
         theta = 45
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + self.dataObj.cend_dist + 50
-        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
+        text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
+        else:
+            text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
+        # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NE", offset, text_up, text_down)
 
         # 2D view name

@@ -7,6 +7,8 @@ comment
 import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget,QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
 from OCC import IGESControl
@@ -88,7 +90,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
@@ -108,12 +110,12 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        if self.ui.txt_detailingGap.text().isEmpty():
-
-            designPref["detailing"]["gap"] = int(20)
-        else:
-            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
-        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        # if self.ui.txt_detailingGap.text() == '':
+        #
+        #     designPref["detailing"]["gap"] = int(20)
+        # else:
+        #     designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         designPref["design"] = {}
         designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
@@ -155,7 +157,7 @@ class DesignPreferences(QDialog):
         designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        self.ui.txt_detailingGap.setText(str(20))
+        #self.ui.txt_detailingGap.setText(str(20))
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -293,13 +295,13 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.ui.combo_Beam.addItems(get_beamcombolist())
-        self.ui.comboColSec.addItems(get_columncombolist())
+        self.get_columndata()
+        self.get_beamdata()
 
         self.ui.inputDock.setFixedSize(310, 710)
         self.folder = folder
-        
-        
+
+
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 10.9, 12.9]}
@@ -414,6 +416,43 @@ class MainController(QMainWindow):
         self.result_obj = None
         self.uiobj = None
         self.designPrefDialog = DesignPreferences(self)
+
+    def get_columndata(self):
+        """Fetch  old and new column sections from "Intg_osdag" database.
+        Returns:
+
+        """
+        columndata = get_columncombolist()
+        old_colList = get_oldcolumncombolist()
+        self.ui.comboColSec.addItems(columndata)
+        self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
+
+    def get_beamdata(self):
+        """Fetch old and new beam sections from "Intg_osdag" database
+        Returns:
+
+        """
+        beamdata = get_beamcombolist()
+        old_beamList = get_oldbeamcombolist()
+        self.ui.combo_Beam.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+
+    def color_oldDB_sections(self, old_section, intg_section, combo_section):
+        """display old sections in red color.
+
+        Args:
+            old_section(str): Old sections from IS 808 1984
+            intg_section(str): Revised sections from IS 808 2007
+            combo_section(QcomboBox): Beam/Column dropdown list
+
+        Returns:
+
+        """
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
@@ -1464,6 +1503,7 @@ class MainController(QMainWindow):
         '''
         This routine returns the neccessary design parameters.
         '''
+        self.designPrefDialog.saved = False
         self.uiobj = self.getuser_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
@@ -1485,8 +1525,12 @@ class MainController(QMainWindow):
         return [self.uiobj, dictbeamdata, dictcoldata, dict_angle_data, dict_topangle_data, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
-        '''
-        '''
+        """
+
+        Returns:
+
+        """
+        self.display.EraseAll()
         self.alist = self.designParameters()
 
         self.validate_inputs_on_design_button()
@@ -1601,24 +1645,6 @@ class MainController(QMainWindow):
 
         self.fuse_model = None
         QMessageBox.about(self, 'Information', "File saved")
-
-    # def display_2d_model_original(self, final_model, view_name):
-    #
-    #     self.display, _ = self.init_display()
-    #     self.display.EraseAll()
-    #     # self.display.SetModeWireFrame()
-    #
-    #     self.display.DisplayShape(final_model, update=True)
-    #     self.display.SetModeHLR()
-    #
-    #     if (view_name == "Front"):
-    #         self.display.View_Front()
-    #     elif (view_name == "Top"):
-    #         self.display.View_Top()
-    #     elif (view_name == "Right"):
-    #         self.display.View_Right()
-    #     else:
-    #         pass
 
 
     def call_desired_view(self, filename, view):

@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_ShearDesignPreferences(object):
+class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(769, 523)
@@ -247,32 +247,22 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_6.addWidget(self.line_11, 1, 0, 1, 1)
         self.gridLayout_4 = QtWidgets.QGridLayout()
         self.gridLayout_4.setObjectName("gridLayout_4")
-        self.label_39 = QtWidgets.QLabel(self.tab_Detailing)
-        self.label_39.setObjectName("label_39")
-        self.gridLayout_4.addWidget(self.label_39, 0, 0, 1, 1)
+        self.label_40 = QtWidgets.QLabel(self.tab_Detailing)
+        self.label_40.setObjectName("label_40")
+        self.gridLayout_4.addWidget(self.label_40, 1, 0, 1, 1)
         self.combo_detailingEdgeType = QtWidgets.QComboBox(self.tab_Detailing)
         self.combo_detailingEdgeType.setObjectName("combo_detailingEdgeType")
         self.combo_detailingEdgeType.addItem("")
         self.combo_detailingEdgeType.addItem("")
         self.gridLayout_4.addWidget(self.combo_detailingEdgeType, 0, 1, 1, 2)
-        self.label_29 = QtWidgets.QLabel(self.tab_Detailing)
-        self.label_29.setObjectName("label_29")
-        self.gridLayout_4.addWidget(self.label_29, 1, 0, 1, 1)
-        self.txt_detailingGap = QtWidgets.QLineEdit(self.tab_Detailing)
-        self.txt_detailingGap.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-        self.txt_detailingGap.setObjectName("txt_detailingGap")
-        self.gridLayout_4.addWidget(self.txt_detailingGap, 1, 1, 1, 1)
-        self.label_36 = QtWidgets.QLabel(self.tab_Detailing)
-        self.label_36.setObjectName("label_36")
-        self.gridLayout_4.addWidget(self.label_36, 1, 2, 1, 1)
-        self.label_40 = QtWidgets.QLabel(self.tab_Detailing)
-        self.label_40.setObjectName("label_40")
-        self.gridLayout_4.addWidget(self.label_40, 2, 0, 1, 1)
         self.combo_detailing_memebers = QtWidgets.QComboBox(self.tab_Detailing)
         self.combo_detailing_memebers.setObjectName("combo_detailing_memebers")
         self.combo_detailing_memebers.addItem("")
         self.combo_detailing_memebers.addItem("")
-        self.gridLayout_4.addWidget(self.combo_detailing_memebers, 2, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.combo_detailing_memebers, 1, 1, 1, 1)
+        self.label_39 = QtWidgets.QLabel(self.tab_Detailing)
+        self.label_39.setObjectName("label_39")
+        self.gridLayout_4.addWidget(self.label_39, 0, 0, 1, 1)
         self.gridLayout_6.addLayout(self.gridLayout_4, 2, 0, 2, 1)
         spacerItem7 = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_6.addItem(spacerItem7, 3, 1, 1, 1)
@@ -294,7 +284,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -459,16 +449,13 @@ class Ui_ShearDesignPreferences(object):
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"))
-        self.label_39.setText(_translate("Dialog", "Type of edges"))
-        self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut"))
-        self.combo_detailingEdgeType.setItemText(1, _translate("Dialog", "b - Rolled, machine-flame cut, sawn and planed"))
-        self.label_29.setText(_translate("Dialog", "Gap between beam & support"))
-        self.txt_detailingGap.setText(_translate("Dialog", "10"))
-        self.label_36.setText(_translate("Dialog", "mm"))
         self.label_40.setText(_translate("Dialog", "Are the members exposed to\n"
 "corrosive influences?"))
+        self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut"))
+        self.combo_detailingEdgeType.setItemText(1, _translate("Dialog", "b - Rolled, machine-flame cut, sawn and planed"))
         self.combo_detailing_memebers.setItemText(0, _translate("Dialog", "No"))
         self.combo_detailing_memebers.setItemText(1, _translate("Dialog", "Yes"))
+        self.label_39.setText(_translate("Dialog", "Type of edges"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("Dialog", "Detailing"))
         self.label_19.setText(_translate("Dialog", "Design Method"))
         self.combo_design_method.setItemText(0, _translate("Dialog", "Limit State Design"))
@@ -481,7 +468,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_ShearDesignPreferences()
+    ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

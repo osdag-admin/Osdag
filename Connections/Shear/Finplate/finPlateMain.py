@@ -91,8 +91,7 @@ class DesignPreferences(QDialog):
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
     def save_designPref_para(self):
-        """
-        This routine is responsible for saving all design preferences selected by the user
+        """This routine is responsible for saving all design preferences selected by the user
         """
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
@@ -136,8 +135,11 @@ class DesignPreferences(QDialog):
         # self.main_controller.call_designPref(designPref)
 
     def set_default_para(self):
-        '''
-        '''
+        """
+
+        Returns:
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
             pass
@@ -491,10 +493,17 @@ class MainController(QMainWindow):
         Returns:
 
         """
+        print "old section",old_section
+        print "form intg",intg_section
+        indx = 0
+        # duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+
         for col in old_section:
             if col in intg_section:
+
                 indx = intg_section.index(str(col))
                 combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                indx += 1
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
@@ -539,7 +548,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_beamcombolist())
+            self.get_columndata()
+            #self.ui.comboColSec.addItems(get_beamcombolist())
             self.ui.combo_Beam.setCurrentIndex(0)
 
             self.ui.txtFu.clear()
@@ -586,7 +596,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setText("Column")
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_columncombolist())
+            self.get_columndata()
+            #self.ui.comboColSec.addItems(get_columncombolist())
             self.ui.comboColSec.setCurrentIndex(0)
             self.ui.combo_Beam.setCurrentIndex(0)
 

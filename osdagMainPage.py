@@ -56,7 +56,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
         self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
-        self.ui.btn_start.clicked.connect(self.show_desgin_connection)
+        self.ui.btn_start.clicked.connect(self.show_design_connection)
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
@@ -109,7 +109,7 @@ class OsdagMainWindow(QMainWindow):
 
         self.ui.myStackedWidget.setCurrentIndex(current)
 
-    def show_desgin_connection(self):
+    def show_design_connection(self):
 
         options = QFileDialog.Options()
         folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)

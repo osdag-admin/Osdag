@@ -183,7 +183,7 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         designPref["design"] = {}
-        designPref["design"]["design _method"] = str(self.ui.combo_design_method.currentText())
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
 
         return designPref

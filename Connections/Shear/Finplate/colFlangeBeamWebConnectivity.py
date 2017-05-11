@@ -55,7 +55,7 @@ class ColFlangeBeamWeb(object):
         self.beam.place(beamOrigin, uDir, wDir)
 
     def createButtWeld(self):
-        passg
+        pass
         # plateThickness = 10
         # uDir3 = numpy.array([0, 1.0, 0])
         # wDir3 = numpy.array([1.0, 0, 0.0])
@@ -135,5 +135,5 @@ class ColFlangeBeamWeb(object):
             finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
         return finalBeam
     
-    def get_column_model(self):
+    def get_columnModel(self):
         return self.columnModel

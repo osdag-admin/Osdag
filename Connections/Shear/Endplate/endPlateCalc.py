@@ -691,15 +691,17 @@ def end_connection(ui_obj):
     output_obj['Plate']['blockshear'] = float(Tdb)
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
 
-    if bolts_required == 0:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
 
-    if design_check is False:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
+
+    # if bolts_required == 0:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
+    #
+    # if design_check is False:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
 
 #     output_obj = {}
     if output_obj['Bolt']['status'] is True:

@@ -10,10 +10,16 @@ class ReportGenerator(SeatAngleCalculation):
         gamma_mb (float): partial safety factor for material - resistance of connection - bolts
         gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
-        bolt_hole_type (boolean): bolt hole type - 1 for standard; 0 for oversize
-        custom_hole_clearance (float): user defined hole clearance, if any
-        beam_col_clear_gap (int): clearance + tolerance
+        beam_col_clear_gap (int): design preference 
+        bolt_hole_clearance (float)
+        custom_hole_clearance (float): design preference, if specified
+        bolt_hole_type (string): "Standard" or "Over-sized"
+        bolt_fu_overwrite (float)
+        mu_f (float): slip factor for HSFG bolt calculations
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
+        type_of_edge (string): The type is used in determining the min_edge_distance 
+        is_environ_corrosive (string): 'Yes' or 'No'
+        design_method (string)
         root_clearance (int): clearance of bolt row from the root of seated angle
 
         top_angle (string)
@@ -22,17 +28,18 @@ class ReportGenerator(SeatAngleCalculation):
         column_section (string)
         beam_fu (float)
         beam_fy (float)
+        column_fu (float)
+        column_fy (float)        
         angle_fy (float)
         angle_fu (float)
         shear_force (float)
         bolt_diameter (int)
         bolt_type (string)
         bolt_grade (float)
-        bolt_fu (int)
-        bolt_diameter (int)
+        bolt_fu (int)        
         bolt_hole_diameter (int)
-        angle_sec
-        dict_angle_data = model.get_angledata(angle_sec)
+        angle_sec (string)
+        dict_angle_data (dictionary) = model.get_angledata(angle_sec)
         beam_w_t (float): beam web thickness
         beam_f_t (float): beam flange thickness
         beam_d  (float): beam depth
@@ -51,9 +58,10 @@ class ReportGenerator(SeatAngleCalculation):
         safe (Boolean) : status of connection, True if safe
         output_dict (dictionary)
 
-        moment_cap_high_shear (boolean): denotes if the shear fails in high shear [Cl 8.2.1]
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding leg of seated angle
+        is_shear_high (boolean): True if the seated angle leg is in high shear [Cl 8.2.1]
+        
         leg_moment_d (float): Moment capacity of outstanding leg of seated angle with low shear
         outstanding_leg_shear_capacity (float)
         beam_shear_strength (float)
@@ -99,15 +107,21 @@ class ReportGenerator(SeatAngleCalculation):
             None
         """
         super(ReportGenerator, self).__init__()
-        self.max_spacing = sa_calc_object.max_spacing
         self.gamma_mb = sa_calc_object.gamma_mb
         self.gamma_m0 = sa_calc_object.gamma_m0
         self.gamma_m1 = sa_calc_object.gamma_m1
-        self.bolt_hole_type = sa_calc_object.bolt_hole_type
-        self.custom_hole_clearance = sa_calc_object.custom_hole_clearance
         self.beam_col_clear_gap = sa_calc_object.beam_col_clear_gap
+        self.bolt_hole_clearance = sa_calc_object.bolt_hole_clearance_value
+        self.custom_hole_clearance = sa_calc_object.custom_hole_clearance
+        self.bolt_hole_type = sa_calc_object.bolt_hole_type
+        self.bolt_fu_overwrite = sa_calc_object.bolt_fu_overwrite
+        self.mu_f = sa_calc_object.mu_f
         self.min_edge_multiplier = sa_calc_object.min_edge_multiplier
+        self.type_of_edge = sa_calc_object.type_of_edge
+        self.is_environ_corrosive = sa_calc_object.is_environ_corrosive
+        self.design_method = sa_calc_object.design_method
         self.root_clearance = sa_calc_object.root_clearance
+
         self.top_angle = sa_calc_object.top_angle
         self.connectivity = sa_calc_object.connectivity
         self.beam_section = sa_calc_object.beam_section
@@ -123,7 +137,6 @@ class ReportGenerator(SeatAngleCalculation):
         self.bolt_type = sa_calc_object.bolt_type
         self.bolt_grade = sa_calc_object.bolt_grade
         self.bolt_fu = sa_calc_object.bolt_fu
-        self.bolt_diameter = sa_calc_object.bolt_diameter
         self.bolt_hole_diameter = sa_calc_object.bolt_hole_diameter
         self.angle_sec = sa_calc_object.angle_sec
         self.dict_angle_data = sa_calc_object.dict_angle_data
@@ -153,10 +166,6 @@ class ReportGenerator(SeatAngleCalculation):
         self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
         self.beam_shear_strength = sa_calc_object.beam_shear_strength
         self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
-        if sa_calc_object.bolt_hole_type == 1:
-            self.bolt_hole_type = "STD"
-        elif sa_calc_object.bolt_hole_type == 0:
-            self.bolt_hole_type = "OVS"
         self.k_b = sa_calc_object.k_b
         self.bolt_bearing_capacity = sa_calc_object.bolt_bearing_capacity
         self.bolt_value = sa_calc_object.bolt_value
@@ -242,23 +251,28 @@ class ReportGenerator(SeatAngleCalculation):
         column_sec = str(self.column_section)
         column_fu = str(self.column_fu)
         beam_sec = str(self.beam_section)
-        beam_col_clear_gap = str(self.beam_col_clear_gap)
-
-        bolt_grade = str(self.bolt_grade)
-        bolt_diameter = str(self.bolt_diameter)
-        bolt_hole_type = str(self.bolt_hole_type)
-
-        # beam_depth = str(self.beam_d)
-        # beam_flange_thickness = str(self.beam_f_t)
-        # beam_root_radius = str(self.beam_R1)
-        # col_flange_thickness = str(self.column_f_t)
-        # col_root_radius = str(self.column_R1)
-
         seated_angle_section = str(self.angle_sec)
         top_angle_section = str(self.top_angle)
         angle_fu = str(self.angle_fu)
-        # angle_fy = str(self.angle_fy)
 
+        bolt_type = str(self.bolt_type)
+        is_hsfg = str(self.is_hsfg)
+        bolt_grade = str(self.bolt_grade)
+        bolt_diameter = str(self.bolt_diameter)
+        bolt_fu = str(self.bolt_fu)
+
+        # Design Preferences
+        beam_col_clear_gap = str(self.beam_col_clear_gap)
+        bolt_hole_clearance = str(self.bolt_hole_clearance)
+        bolt_hole_type = str(self.bolt_hole_type)
+        bolt_fu_overwrite = self.bolt_fu_overwrite
+        slip_factor_mu_f = self.mu_f
+        min_edge_multiplier = self.min_edge_multiplier
+        type_of_edge = self.type_of_edge
+        is_environ_corrosive = self.is_environ_corrosive
+        design_method = self.design_method
+
+        # Calculation outputs
         bolts_provided = str(self.bolts_provided)
         bolts_required = str(self.bolts_required)
 
@@ -272,9 +286,6 @@ class ReportGenerator(SeatAngleCalculation):
         # gap = '20'
         # TODO replace hardcoded gap value
 
-        bolt_fu = str(self.bolt_fu)
-        bolt_type = str(self.bolt_type)
-        bolt_dia = str(self.bolt_diameter)
         kb = str(self.k_b)
         beam_w_t = str(self.beam_w_t)
         beam_fu = str(self.beam_fu)
@@ -348,7 +359,6 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
 
-
         # TODO add Design Preferences here
 
         # -----------------------------------------------------------------------------------
@@ -372,15 +382,15 @@ class ReportGenerator(SeatAngleCalculation):
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
         req_field = " "
-        prov_field = "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" \
-                     + bolt_dia + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
+        prov_field = "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_diameter + "*" \
+                     + bolt_diameter + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
         req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k<sub>b</sub> * bolt_diameter * critical_thickness * <br>" \
                     + space(3) + " <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> " \
                     + "[Cl. 10.3.4]"
-        prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_w_t + "*" \
+        prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" \
                      + beam_fu + ")/(1.25*1000)  <br>" + space(2) + " =" + bearing_capacity + " kN"
         # TODO incorrect value of bolt_bearing capacity
         rstr += design_check_row("Bolt bearing capacity (kN)", req_field, prov_field, "")
@@ -401,16 +411,16 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, check_pass)
 
         # Bolt pitch (mm)
-        min_pitch = str(int(2.5 * float(bolt_dia)))
+        min_pitch = str(int(2.5 * float(bolt_diameter)))
         max_pitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5* " + bolt_dia + " = " + min_pitch + ",  &#8804; Min(32*" + beam_w_t + \
+        req_field = " &#8805; 2.5* " + bolt_diameter + " = " + min_pitch + ",  &#8804; Min(32*" + beam_w_t + \
                     ", 300) = " + max_pitch + "<br> [cl. 10.2.2]"
         rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, check_pass)
 
         # Bolt gauge (mm)
-        min_gauge = str(int(2.5 * float(bolt_dia)))
+        min_gauge = str(int(2.5 * float(bolt_diameter)))
         max_gauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5*" + bolt_dia + " = " + min_gauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " \
+        req_field = " &#8805; 2.5*" + bolt_diameter + " = " + min_gauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " \
                     + max_gauge + " <br> [cl. 10.2.2]"
         rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, check_pass)
 

@@ -101,6 +101,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         report_summary["ProjectTitle"] = "Connection modules development"
         report_summary["Subtitle"] = "Seated angle connection"
         report_summary["JobNumber"] = sa_connection_id
+        report_summary["Client"] = "Osdag Reviewer"
         report_summary["AdditionalComments"] = "Add more comments here."
         report_summary["Method"] = "Limit State Design (No Earthquake Load)"
         return report_summary

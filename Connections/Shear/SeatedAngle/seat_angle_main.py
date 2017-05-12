@@ -1102,7 +1102,6 @@ class MainController(QMainWindow):
         # TODO input validation
         self.display.EraseAll()
         self.alist = self.designParameters()
-        print "DP =", self.alist[0]
         # self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()

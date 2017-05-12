@@ -285,16 +285,17 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.bolt_hole_type = input_dict['bolt']['bolt_hole_type'] # "Standard" or "Over-sized"
         self.custom_hole_clearance = input_dict['bolt']['bolt_hole_clrnce']  # user defined hole clearance, if any
-        self.beam_col_clear_gap = input_dict['detailing']['gap']  # clearance + tolerance
-        # min edge distance multiplier based on edge type (Cl 10.2.4.2)
-        self.min_edge_multiplier = input_dict['detailing']['min_edgend_dist']
-        # input_dict['detailing']['min_edgend_dist'] is 1.5 for rolled, machine-flame cut, sawn and planed edges
-        # input_dict['detailing']['min_edgend_dist'] is 1.7  # sheared or hand flame cut edges
-        self.is_environ_corrosive = input_dict['detailing']['is_env_corrosive']  # set to "Yes", if environment is corrosive
         self.is_hsfg = False
         if input_dict['Bolt']['Type'] == "HSFG":
             self.is_hsfg = True  # set to True, if bolt is HSFG with no slip at ultimate load
         self.mu_f = input_dict['bolt']['slip_factor']  # slip factor - for HSFG design
+        self.bolt_fu_overwrite = input_dict['bolt']['bolt_fu']  # F_u overwrite for bolt material
+        self.beam_col_clear_gap = input_dict['detailing']['gap']  # clearance + tolerance
+        # min edge distance multiplier based on edge type (Cl 10.2.4.2)
+        self.min_edge_multiplier = input_dict['detailing']['min_edgend_dist']
+        self.type_of_edge = input_dict['detailing']['typeof_edge']
+        self.is_environ_corrosive = input_dict['detailing']['is_env_corrosive']  # set to "Yes", if environment is corrosive
+        self.design_method = str(input_dict['design']['design_method'])
 
         self.top_angle = input_dict['Angle']['TopAngleSection']
         self.connectivity = input_dict['Member']['Connectivity']
@@ -451,9 +452,9 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         """
         self.root_clearance = 10
-        self.bolt_hole_diameter = self.bolt_diameter + 2 * self.bolt_hole_clearance(self.bolt_hole_type,
-                                                                                    self.bolt_diameter,
-                                                                                    self.custom_hole_clearance)
+        self.bolt_hole_clearance_value = self.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter,
+                                                                       self.custom_hole_clearance)
+        self.bolt_hole_diameter = self.bolt_diameter + self.bolt_hole_clearance_value
 
         thickness_governing_min = min(self.column_f_t, self.angle_t)
         self.calculate_distances(self.bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier,

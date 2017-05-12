@@ -107,24 +107,24 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
 
     def test_bolt_hole_clearance(self):
         # standard hole
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 12, None), 1)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 16, None), 2)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 20, None), 2)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 24, None), 2)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 30, None), 3)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(1, 36, None), 3)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 12, None), 1)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 16, None), 2)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 20, None), 2)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 24, None), 2)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 30, None), 3)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Standard", 36, None), 3)
 
         # oversize hole
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 12, None), 3)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 16, None), 4)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 20, None), 4)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 24, None), 6)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 30, None), 8)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 36, None), 8)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 12, None), 3)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 16, None), 4)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 20, None), 4)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 24, None), 6)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 30, None), 8)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value("Over-sized", 36, None), 8)
 
         # #custom hole clearance
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 12, 2), 2)
-        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance(0, 24, 8), 8)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value(0, 12, 2), 2)
+        self.assertEqual(self.sa_calc_instance.bolt_hole_clearance_value(0, 24, 8), 8)
 
     def test_bolt_design(self):
         self.sa_calc_instance.bolt_diameter = 12
@@ -134,7 +134,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.sa_calc_instance.min_edge_multiplier = 1.5
         self.assertEqual(self.sa_calc_instance.min_end_dist, 25)
         self.assertEqual(self.sa_calc_instance.min_edge_dist, 25)
-        self.assertEqual(self.sa_calc_instance.k_b, 0.464)
+        self.assertEqual(self.sa_calc_instance.k_b, 0.375) # 0.464
         self.assertEqual(round(self.sa_calc_instance.bolt_shear_capacity, 1), 15.6)
         self.assertEqual(round(self.sa_calc_instance.bolt_bearing_capacity, 1), 54.8)
         self.assertEqual(round(self.sa_calc_instance.bolts_required, 1), math.ceil(100 / 15.6))
@@ -180,7 +180,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
 
 
 def create_sample_ui_input_sa(sa_connection_id):
-    input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}}
+    input_dict = {'Member': {}, 'Load': {}, 'Bolt': {}, 'Angle': {}, 'bolt': {}, 'detailing':{}, 'design':{}}
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
     if sa_connection_id == "SA_0":
@@ -193,6 +193,15 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Grade'] = "4.6"
         input_dict['Angle']["AngleSection"] = "150 75 X 12"
         input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+        input_dict['bolt']['bolt_hole_type'] = 'Standard'
+        input_dict['bolt']['bolt_hole_clrnce'] = 2.0
+        input_dict['bolt']['slip_factor'] = 0.55
+        input_dict['bolt']['bolt_fu'] = 400
+        input_dict['design']['design_method'] = 'Limit State Design'
+        input_dict['detailing']['typeof_edge'] = 'b - Machine flame cut'
+        input_dict['detailing']['gap'] = 20
+        input_dict['detailing']['min_edgend_dist'] = 1.5
+        input_dict['detailing']['is_env_corrosive'] = 'No'
     elif sa_connection_id == "SA_2":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
@@ -203,6 +212,15 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['bolt']['bolt_hole_type'] = 'Standard'
+        input_dict['bolt']['bolt_hole_clrnce'] = 2.0
+        input_dict['bolt']['slip_factor'] = 0.55
+        input_dict['bolt']['bolt_fu'] = 500
+        input_dict['design']['design_method'] = 'Limit State Design'
+        input_dict['detailing']['typeof_edge'] = 'a - Sheared or hand flame cut'
+        input_dict['detailing']['gap'] = 20
+        input_dict['detailing']['min_edgend_dist'] = 1.7
+        input_dict['detailing']['is_env_corrosive'] = 'No'
     elif sa_connection_id == "SA_3":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
@@ -213,6 +231,15 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['bolt']['bolt_hole_type'] = 'Standard'
+        input_dict['bolt']['bolt_hole_clrnce'] = 2.0
+        input_dict['bolt']['slip_factor'] = 0.55
+        input_dict['bolt']['bolt_fu'] = 500
+        input_dict['design']['design_method'] = 'Limit State Design'
+        input_dict['detailing']['typeof_edge'] = 'a - Sheared or hand flame cut'
+        input_dict['detailing']['gap'] = 20
+        input_dict['detailing']['min_edgend_dist'] = 1.7
+        input_dict['detailing']['is_env_corrosive'] = 'No'
     elif sa_connection_id == "SA_4":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 200"
@@ -223,6 +250,15 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Grade'] = "6.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['bolt']['bolt_hole_type'] = 'Over-sized'
+        input_dict['bolt']['bolt_hole_clrnce'] = 3.0
+        input_dict['bolt']['slip_factor'] = 0.55
+        input_dict['bolt']['bolt_fu'] = 600
+        input_dict['design']['design_method'] = 'Limit State Design'
+        input_dict['detailing']['typeof_edge'] = 'a - Sheared or hand flame cut'
+        input_dict['detailing']['gap'] = 20
+        input_dict['detailing']['min_edgend_dist'] = 1.7
+        input_dict['detailing']['is_env_corrosive'] = 'No'
     elif sa_connection_id == "SA_6":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
@@ -233,6 +269,16 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['bolt']['bolt_hole_type'] = 'Standard'
+        input_dict['bolt']['bolt_hole_clrnce'] = 1.0
+        input_dict['bolt']['slip_factor'] = 0.55
+        input_dict['bolt']['bolt_fu'] = 500
+        input_dict['design']['design_method'] = 'Limit State Design'
+        input_dict['detailing']['typeof_edge'] = 'a - Sheared or hand flame cut'
+        input_dict['detailing']['gap'] = 20
+        input_dict['detailing']['min_edgend_dist'] = 1.7
+        input_dict['detailing']['is_env_corrosive'] = 'No'
+
     return input_dict
 
 

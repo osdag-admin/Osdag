@@ -354,11 +354,34 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
 
-        # TODO add Design Preferences here
+        # -----------------------------------------------------------------------------------
+        rstr += self.design_report_header()
+        # -----------------------------------------------------------------------------------
+
+        # Design Preferences
+        rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ') + nl()
+
+        rstr += design_summary_row(0, "Design Preferences", "detail", col_span="2")
+        rstr += design_summary_row(0, "Bolt ", "detail1", col_span="2")
+        rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type)+" Hole")
+        rstr += design_summary_row(1, "Hole Clearance (mm)", "detail2", text_two=str(bolt_hole_clearance))
+        rstr += design_summary_row(1, "Material Grade Fu (MPa) (overwrite)", "detail2", text_two=str(bolt_fu_overwrite))
+        rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
+        rstr += design_summary_row(0, "Detailing", "detail1", col_span="2")
+        rstr += design_summary_row(1, "Type of Edge", "detail2", text_two=str(type_of_edge)[4:])
+        rstr += design_summary_row(1, "Minimum Edge Distance check multiplier", "detail2", text_two = str(min_edge_multiplier)+" * bolt_hole_diameter")
+        rstr += design_summary_row(1, "Gap between Beam and Column (mm)", "detail2", text_two=str(beam_col_clear_gap))
+        rstr += design_summary_row(0, "Design", "detail1", col_span="2")
+        rstr += design_summary_row(1, "Design Method", "detail2", text_two=str(design_method))
+
+        rstr += " " + nl() + t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
 
         # -----------------------------------------------------------------------------------
         rstr += self.design_report_header()
         # -----------------------------------------------------------------------------------
+
         # DESIGN CHECK
         # TODO IMPORTANT Remove calculations from below lines of code
 

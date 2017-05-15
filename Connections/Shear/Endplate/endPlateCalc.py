@@ -692,7 +692,7 @@ def end_connection(ui_obj):
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
 
 
-
+    # TODO commented in order to execute faulty report
     # if bolts_required == 0:
     #     for k in output_obj.keys():
     #         for key in output_obj[k].keys():

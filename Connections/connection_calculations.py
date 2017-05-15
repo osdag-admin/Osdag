@@ -254,6 +254,9 @@ class ConnectionCalculations(object):
         self.max_pitch = math.ceil(min(100 + 4 * thickness_governing_min, self.max_pitch))
 
         # Max spacing IS 800 Cl 10.2.4.3
+        self.max_end_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)))
+
+        # Max spacing IS 800 Cl 10.2.4.3
         self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)))
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed

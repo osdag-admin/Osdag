@@ -54,6 +54,7 @@ class ReportGenerator(SeatAngleCalculation):
         angle_B  (float): shorter leg of unequal angle
         angle_R1 (float)
         angle_l (float)
+        thickness_governing_min (float): minimum of angle leg and column web/flange thickness
 
         safe (Boolean) : status of connection, True if safe
 
@@ -151,6 +152,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.angle_B = sa_calc_object.angle_B
         self.angle_R1 = sa_calc_object.angle_R1
         self.angle_l = sa_calc_object.angle_l
+        self.thickness_governing_min = sa_calc_object.thickness_governing_min
 
         self.safe = sa_calc_object.safe
         self.output_dict = sa_calc_object.output_dict
@@ -181,6 +183,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.edge_dist = sa_calc_object.edge_dist
         self.max_spacing = sa_calc_object.max_spacing
         self.max_edge_dist = sa_calc_object.max_edge_dist
+        self.max_end_dist = sa_calc_object.max_end_dist
 
         self.company_name = ""
         self.company_logo = ""
@@ -363,13 +366,16 @@ class ReportGenerator(SeatAngleCalculation):
 
         rstr += design_summary_row(0, "Design Preferences", "detail", col_span="2")
         rstr += design_summary_row(0, "Bolt ", "detail1", col_span="2")
-        rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type)+" Hole")
+        rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type) + " Hole")
         rstr += design_summary_row(1, "Hole Clearance (mm)", "detail2", text_two=str(bolt_hole_clearance))
         rstr += design_summary_row(1, "Material Grade Fu (MPa) (overwrite)", "detail2", text_two=str(bolt_fu_overwrite))
         rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
         rstr += design_summary_row(0, "Detailing", "detail1", col_span="2")
         rstr += design_summary_row(1, "Type of Edge", "detail2", text_two=str(type_of_edge)[4:])
-        rstr += design_summary_row(1, "Minimum Edge Distance check multiplier", "detail2", text_two = str(min_edge_multiplier)+" * bolt_hole_diameter")
+        rstr += design_summary_row(1, "Minimum Edge Distance check multiplier", "detail2",
+                                   text_two=str(min_edge_multiplier) + " * bolt_hole_diameter")
+        rstr += design_summary_row(1, "Are members exposed to corrosive influences?", "detail2",
+                                   text_two=str(is_environ_corrosive))
         rstr += design_summary_row(1, "Gap between Beam and Column (mm)", "detail2", text_two=str(beam_col_clear_gap))
         rstr += design_summary_row(0, "Design", "detail1", col_span="2")
         rstr += design_summary_row(1, "Design Method", "detail2", text_two=str(design_method))
@@ -392,68 +398,79 @@ class ReportGenerator(SeatAngleCalculation):
                                  text_two_css="header1", text_three_css="header1", text_four_css="header1")
 
         check_pass = "<p align=left style=color:green><b>Pass</b></p>"
+        check_fail = "<p align=left style=color:red><b>Fail</b></p>"
 
         # Bolt
-        rstr += design_check_row("Bolt " + str(self.bolt_diameter) + "dia", "", "", "", col_span="4",
-                                 text_one_css="detail1")
+        rstr += design_check_row("Bolt Checks", "", "", "", col_span="4", text_one_css="detail1")
 
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
-        req_field = " "
-        prov_field = "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_diameter + "*" \
-                     + bolt_diameter + ")/ <br>(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]"
+        req_field = "<i>V</i><sub>dsb</sub> = bolt_fu*(pi*0.78/4)*bolt_diameter^2/(&#8730;3)/" \
+                    "<i>gamma<sub>mb</sub></i>/1000<br> [cl. 10.3.3]"
+        prov_field = "<i>V</i><sub>dsb</sub> = " + bolt_fu + "*(" + const + ")*" + bolt_diameter + "^2/" \
+                     + "(&#8730;3)/1.25/1000 <br> " + space(2) + "= " + shear_capacity + " kN"
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
-        req_field = "<i>V<sub>dpb</sub></i> = 2.5 * k<sub>b</sub> * bolt_diameter * critical_thickness * <br>" \
-                    + space(3) + " <i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i> <br> " \
-                    + "[Cl. 10.3.4]"
-        prov_field = "<i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" \
-                     + beam_fu + ")/(1.25*1000)  <br>" + space(2) + " =" + bearing_capacity + " kN"
+        req_field = "<i>V<sub>dpb</sub></i> = 2.5*k<sub>b</sub>*bolt_diameter*critical_thickness*" \
+                    "<i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i>/1000<br> [Cl. 10.3.4]"
+        prov_field = "<i>V</i><sub>dpb</sub> = 2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" \
+                     + beam_fu + "/1.25/1000)  <br>" + space(2) + " = " + bearing_capacity + " kN"
         # TODO incorrect value of bolt_bearing capacity
         rstr += design_check_row("Bolt bearing capacity (kN)", req_field, prov_field, "")
 
         # Bolt capacity (kN)
-        prov_field = "Min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = " \
+        req_field = "min (bolt_shear_capacity, bolt_bearing_capacity)"
+        prov_field = "min (" + str(self.bolt_shear_capacity) + ", " + str(self.bolt_bearing_capacity) + ") = " \
                      + str(self.bolt_value)
-        rstr += design_check_row("Bolt capacity (kN)", " ", prov_field, "")
+        rstr += design_check_row("Bolt capacity (kN)", req_field, prov_field, "")
 
         # No. of bolts
         # bolts = str(round(float(shear_force) / float(str(self.bolt_value)), 1))
-        # TODO Jayant resolve no. of bolts
-        bolts = "4"
-        req_field = shear_force + "/" + str(self.bolt_value) + " = " + bolts
+        req_field = "shear_force/ bolt_value = " + str(shear_force) + "/" + str(self.bolt_value) + " = " \
+                    + str(int(math.ceil(float(shear_force) / self.bolt_value)))
         rstr += design_check_row("No. of bolts", req_field, bolts_provided, check_pass)
 
         rstr += design_check_row("No. of columns", " ", number_of_cols, check_pass)
         rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, check_pass)
 
         # Bolt pitch (mm)
-        min_pitch = str(int(2.5 * float(bolt_diameter)))
-        max_pitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5* " + bolt_diameter + " = " + min_pitch + ",  &#8804; Min(32*" + beam_w_t + \
-                    ", 300) = " + max_pitch + "<br> [cl. 10.2.2]"
+        req_field = " &#8805; 2.5*bolt_diameter ,  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
+        req_field += " &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",  &#8804; min(32*" + str(
+            self.thickness_governing_min) + \
+                     ", 300) = " + str(self.max_spacing)
         rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, check_pass)
 
         # Bolt gauge (mm)
-        min_gauge = str(int(2.5 * float(bolt_diameter)))
-        max_gauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
-        req_field = " &#8805; 2.5*" + bolt_diameter + " = " + min_gauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " \
-                    + max_gauge + " <br> [cl. 10.2.2]"
+        req_field = " &#8805; 2.5*bolt_diameter ,  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
+        req_field += " &#8805; 2.5*" + bolt_diameter + " = " + str(self.min_gauge) + ", &#8804; min(32*" + str(
+            self.thickness_governing_min) + \
+                     ", 300) = " + str(self.max_spacing)
         rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, check_pass)
 
         # End distance (mm)
-        min_end = str(1.7 * float(dia_hole))
-        max_end = str(12 * float(beam_w_t))
-        req_field = " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_w_t + " = " + max_end + \
-                    " <br> [cl. 10.2.4]"
+        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
+        req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
+        req_field+=" <br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [cl. 10.2.4.3]"
+        req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/"+str(self.angle_fy)+\
+                         " = " + str(self.max_end_dist)
         rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
 
         # Edge distance (mm)
-        min_edge = str(1.7 * float(dia_hole))
-        max_edge = str(12 * float(beam_w_t))
-        req_field = " &#8805; 1.7*" + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_w_t + " = " + max_edge + \
-                    "<br> [Cl. 10.2.4]"
+        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter," + " [cl. 10.2.4.2]<br>"
+        req_field += " &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_edge_dist)
+        # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
+        # 40mm plus 4t, where t is the thickness of the thinner connected plate.
+        if is_environ_corrosive == "Yes":
+            req_field += "<br><br> As the members are exposed to corrosive influences: "
+            req_field += "<br> &#8804; min(12*thickness_governing_min*sqrt(250/f_y),<br>"+space(2)+"  40+4*thickness_governing_min)"
+            req_field += " [Cl 10.2.4.3]"
+            req_field += "<br> &#8804; min(12*" + str(self.thickness_governing_min) + "*sqrt(250/"+str(self.angle_fy)\
+                         + "), 40 + 4*"+str(self.thickness_governing_min)+") = "+str(self.max_edge_dist)
+        elif is_environ_corrosive == "No":
+            req_field += "<br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [Cl 10.2.4.3]"
+            req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/"+str(self.angle_fy)+\
+                         ") = " + str(self.max_edge_dist)
         rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
         # Seated angle

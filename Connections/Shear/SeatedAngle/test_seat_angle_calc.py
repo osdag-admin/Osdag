@@ -189,7 +189,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Member']['ColumnSection'] = "SC 200"
         input_dict['Load']['ShearForce (kN)'] = 100
         input_dict['Bolt']['Diameter (mm)'] = 20
-        input_dict['Bolt']['Type'] = "Black Bolt"
+        input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "4.6"
         input_dict['Angle']["AngleSection"] = "150 75 X 12"
         input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
@@ -201,7 +201,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['detailing']['typeof_edge'] = 'b - Machine flame cut'
         input_dict['detailing']['gap'] = 15
         input_dict['detailing']['min_edgend_dist'] = 1.5
-        input_dict['detailing']['is_env_corrosive'] = 'No'
+        input_dict['detailing']['is_env_corrosive'] = 'Yes'
     elif sa_connection_id == "SA_2":
         input_dict['Member']['Connectivity'] = "Column flange-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"

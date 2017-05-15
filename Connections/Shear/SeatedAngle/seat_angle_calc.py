@@ -132,7 +132,6 @@ class SeatAngleCalculation(ConnectionCalculations):
     def __init__(self):
         """Initialize all attributes."""
         super(SeatAngleCalculation, self).__init__()
-        self.max_spacing = 0.0
         self.gamma_mb = 0.0
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
@@ -456,9 +455,10 @@ class SeatAngleCalculation(ConnectionCalculations):
                                                                        self.custom_hole_clearance)
         self.bolt_hole_diameter = self.bolt_diameter + self.bolt_hole_clearance_value
 
-        thickness_governing_min = min(self.column_f_t, self.angle_t)
+        self.thickness_governing_min = min(self.column_f_t, self.angle_t)
         self.calculate_distances(self.bolt_diameter, self.bolt_hole_diameter, self.min_edge_multiplier,
-                                 thickness_governing_min, self.is_environ_corrosive)
+                                 self.thickness_governing_min, self.is_environ_corrosive)
+        self.max_spacing = min(self.max_spacing, 32 * self.thickness_governing_min)
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         # pitch is calculated in the seat_angle_connection Method. The minimum pitch is used for kb (bearing) calcs.
@@ -467,13 +467,12 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.calculate_kb()
 
         # Bolt capacity
-        thickness_governing_min = min(self.column_f_t, self.angle_t)
         if self.is_hsfg is False:
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter=self.bolt_diameter,
                                                                          number_of_bolts=1, bolt_fu=self.bolt_fu)
             self.bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter=self.bolt_diameter,
                                                                              number_of_bolts=1,
-                                                                             thickness_plate=thickness_governing_min,
+                                                                             thickness_plate=self.thickness_governing_min,
                                                                              k_b=self.k_b, plate_fu=self.beam_fu)
             self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
         elif self.is_hsfg is True:

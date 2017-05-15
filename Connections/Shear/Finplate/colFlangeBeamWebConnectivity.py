@@ -55,7 +55,7 @@ class ColFlangeBeamWeb(object):
         self.beam.place(beamOrigin, uDir, wDir)
 
     def createButtWeld(self):
-        passg
+        pass
         # plateThickness = 10
         # uDir3 = numpy.array([0, 1.0, 0])
         # wDir3 = numpy.array([1.0, 0, 0.0])

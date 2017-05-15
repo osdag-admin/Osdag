@@ -1025,6 +1025,7 @@ def finConn(uiObj):
     outputObj['Weld']['effectiveWeldlength'] = weld_l
     
 #     return outputObj
+ # TODO commented in order to execute faulty report
 # # #######################################   Checks  to delete dictionary   ##################################################################
 # # Delete the dictionary when shear force is 0
 #     if new_bolt_param['numofbolts'] == 0 or shear_load == 0:

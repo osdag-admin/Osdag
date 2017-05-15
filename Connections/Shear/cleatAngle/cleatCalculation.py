@@ -851,17 +851,19 @@ def cleat_connection(ui_obj):
     output_obj['cleat']['blockshear'] = round(Tdb_C, 3)
     output_obj['cleat']['critshear'] = round(critboltshear_c, 3)
 
-    if bolts_required == 0 or bolts_required_c == 0:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
-                
-    if design_check is False:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
+    # TODO commented in order to execute faulty report
+    # if bolts_required == 0 or bolts_required_c == 0:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
+    #
+    # if design_check is False:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
                     
-    if design_check is True:
+    # if design_check is True:
+    if output_obj['Bolt']['status'] == True:
         logger.info(": Overall cleat Angle connection design is safe \n")
         logger.debug(" :=========End Of design===========")
           

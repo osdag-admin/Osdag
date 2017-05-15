@@ -56,7 +56,6 @@ class ReportGenerator(SeatAngleCalculation):
         angle_l (float)
 
         safe (Boolean) : status of connection, True if safe
-        output_dict (dictionary)
 
         moment_at_root_angle (float)
         moment_capacity_angle (float): Moment capacity of outstanding leg of seated angle
@@ -81,8 +80,6 @@ class ReportGenerator(SeatAngleCalculation):
         min_gauge (int)
         end_dist (int)
         edge_dist (int)
-        pitch (float)
-        gauge (float)
         max_spacing (int)
         max_edge_dist (int)
 
@@ -182,8 +179,6 @@ class ReportGenerator(SeatAngleCalculation):
         self.min_gauge = sa_calc_object.min_gauge
         self.end_dist = sa_calc_object.end_dist
         self.edge_dist = sa_calc_object.edge_dist
-        self.pitch = sa_calc_object.pitch
-        self.gauge = sa_calc_object.gauge
         self.max_spacing = sa_calc_object.max_spacing
         self.max_edge_dist = sa_calc_object.max_edge_dist
 
@@ -443,11 +438,11 @@ class ReportGenerator(SeatAngleCalculation):
                                  text_one_css="detail1")
 
         # Seated angle length
-        if connectivity == "Column flange-Beam web":
+        if connectivity == "Column flange-Beam flange":
             req_field = "= min(supported_beam_width, supporting_column_width) <br> = min(" + str(
                 self.beam_w_f) + ", " + str(self.column_w_f) + ")"
             prov_field = str(self.angle_l)
-        elif connectivity == "Column web-Beam web":
+        elif connectivity == "Column web-Beam flange":
             req_field = "=width of supported beam <br> =" + str(self.beam_w_f)
             prov_field = str(self.angle_l)
         rstr += design_check_row("Length (mm)", req_field, prov_field, check_pass)

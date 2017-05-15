@@ -1564,6 +1564,7 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+
             self.callFin2D_Drawing("All")
         else:
             pass
@@ -1648,9 +1649,7 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-        #                                  self.alist[5], self.alist[6], self.alist[7],
-        #                                  self.alist[8],self.alist[9], self.display, self.folder, self.connection)
+
         if view != 'All':
 
             if view == "Front":
@@ -1669,14 +1668,7 @@ class MainController(QMainWindow):
             fname = ''
             self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
-    # def save_2D_images(self, view):
-    #
-    #     fileName = QFileDialog.getSaveFileName(self,
-    #                                                  "Save as PNG", str(self.folder) + '/untitled.png',
-    #                                                  "PNG files (*.png)")
-    #     f = open(self.callFin2D_Drawing(view), 'w')
-    #     f.close()
-    #     QMessageBox.about(self, 'Information', "Image Saved")
+
 
     def closeEvent(self, event):
         '''

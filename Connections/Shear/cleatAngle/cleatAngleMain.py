@@ -981,8 +981,8 @@ class MainController(QMainWindow):
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
-            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
+            #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
         options = {

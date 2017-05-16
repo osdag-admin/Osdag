@@ -146,12 +146,12 @@ class DesignPreferences(QDialog):
     def get_clearance(self, boltDia):
 
         standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
-        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+        oversized_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
             clearance = standard_clrnce[boltDia]
         else:
-            clearance = overhead_clrnce[boltDia]
+            clearance = oversized_clrnce[boltDia]
 
         return clearance
 
@@ -193,7 +193,6 @@ class MyAboutOsdag(QDialog):
         self.mainController = parent
 
 
-# below class was previously MyPopupDialog in the other modules
 class DesignReportDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -375,7 +374,6 @@ class MainController(QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.connection = "SeatedAngle"
-        self.sa_calc_object = seat_angle_calc.SeatAngleCalculation()
         self.designPrefDialog = DesignPreferences(self)
 
     def osdag_header(self):
@@ -683,19 +681,16 @@ class MainController(QMainWindow):
 
         return outObj
 
-    def show_design_report_dialog(self):
+    def create_design_report(self):
         design_report_dialog = DesignReportDialog(self)
         design_report_dialog.show()
-
-    def create_design_report(self):
-        self.show_design_report_dialog()
 
     def save_design(self, report_summary):
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
         self.call_seatangle2D_Drawing("All")
 
-        report_generator_instance = report_generator.ReportGenerator(self.sa_calc_object)
+        report_generator_instance = report_generator.ReportGenerator(self.commLogicObj.sa_calc_obj)
         report_generator_instance.save_html(report_summary, file_name, self.folder)
 
         # Creates PDF
@@ -1120,7 +1115,7 @@ class MainController(QMainWindow):
         if isempty[0] is True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            # self.call_seatangle2D_Drawing("All")
+            self.call_seatangle2D_Drawing("All")
         else:
             pass
 

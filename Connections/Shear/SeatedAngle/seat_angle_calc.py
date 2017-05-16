@@ -79,6 +79,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         bolt_grade (float)
         bolt_fu (int)
         bolt_diameter (int)
+        bolt_hole_clearance_value (float)
         bolt_hole_diameter (int)
         angle_sec
         dict_angle_data = model.get_angledata(angle_sec)
@@ -163,7 +164,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_grade = ""
         self.bolt_fu = 0
         self.bolt_diameter = 1
-        self.bolt_hole_diameter = 1 # TODO Jayant  bolt_hole_diameter output is wrong- clearance
+        self.bolt_hole_diameter = 1
+        self.bolt_hole_clearance_value = 1.0
         self.angle_sec = ""
         self.dict_angle_data = {}
         self.beam_w_t = 1

@@ -451,9 +451,9 @@ class ReportGenerator(SeatAngleCalculation):
         # End distance (mm)
         req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
         req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
-        req_field+=" <br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [cl. 10.2.4.3]"
-        req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/"+str(self.angle_fy)+\
-                         " = " + str(self.max_end_dist)
+        req_field += " <br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [cl. 10.2.4.3]"
+        req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" + str(self.angle_fy) + \
+                     " = " + str(self.max_end_dist)
         rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
 
         # Edge distance (mm)
@@ -463,13 +463,14 @@ class ReportGenerator(SeatAngleCalculation):
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
         if is_environ_corrosive == "Yes":
             req_field += "<br><br> As the members are exposed to corrosive influences: "
-            req_field += "<br> &#8804; min(12*thickness_governing_min*sqrt(250/f_y),<br>"+space(2)+"  40+4*thickness_governing_min)"
+            req_field += "<br> &#8804; min(12*thickness_governing_min*sqrt(250/f_y),<br>" + space(
+                2) + "  40+4*thickness_governing_min)"
             req_field += " [Cl 10.2.4.3]"
-            req_field += "<br> &#8804; min(12*" + str(self.thickness_governing_min) + "*sqrt(250/"+str(self.angle_fy)\
-                         + "), 40 + 4*"+str(self.thickness_governing_min)+") = "+str(self.max_edge_dist)
+            req_field += "<br> &#8804; min(12*" + str(self.thickness_governing_min) + "*sqrt(250/" + str(self.angle_fy) \
+                         + "), 40 + 4*" + str(self.thickness_governing_min) + ") = " + str(self.max_edge_dist)
         elif is_environ_corrosive == "No":
             req_field += "<br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [Cl 10.2.4.3]"
-            req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/"+str(self.angle_fy)+\
+            req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" + str(self.angle_fy) + \
                          ") = " + str(self.max_edge_dist)
         rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
 
@@ -483,12 +484,21 @@ class ReportGenerator(SeatAngleCalculation):
                 self.beam_w_f) + ", " + str(self.column_w_f) + ")"
             prov_field = str(self.angle_l)
         elif connectivity == "Column web-Beam flange":
-            req_field = "=width of supported beam <br> =" + str(self.beam_w_f)
+            # limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
+            # self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
+            req_field = "= min(width of supported beam, <br>" \
+                        +space(2)+"column_depth - 2*column_flange_thickness<br>"+space(2)+" - 2*column_R1 - root_clearance)" \
+                        +"<br> = min(" + str(self.beam_w_f)\
+                        + ", "+str(self.column_d)+" - 2*"+str(self.column_f_t)\
+                        +" - 2*"+str(self.column_R1)+" - "+str(self.root_clearance)+")"
             prov_field = str(self.angle_l)
         rstr += design_check_row("Length (mm)", req_field, prov_field, check_pass)
 
         # Length of outstanding leg
-        req_field = "b = R * " + sub("gamma", "m0") + "/" + sub("t", "w") + sub("f", "yw") + "<br> [Cl. 8.7.4]"
+        req_field = "b = (R*" + sub("gamma", "m0") + "/("+sub("f", "yw")+"*beam_web_thickness))<br>" +space(2)+"+ beam_column_clear_gap"
+        req_field += "<br>[Cl. 8.7.4]"
+        req_field += "<br> = ("+str(self.shear_force)+"*1000*"+str(self.gamma_m0)+"/("+str(self.beam_fy)\
+                     +"*"+str(self.beam_w_t)+")) + "+str(self.beam_col_clear_gap)
         prov_field = str(self.angle_B)
         rstr += design_check_row("Outstanding leg length (mm)", req_field, prov_field, check_pass)
 
@@ -496,9 +506,9 @@ class ReportGenerator(SeatAngleCalculation):
         # Shear capacity of outstanding leg
         req_field = sub("V", "dp") + " &#8805 V <br>"
         req_field += sub("V", "dp") + " &#8805 " + str(self.shear_force) + "kN <br> [Cl. 8.4.1]"
-        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/<br> &#8730 3 *" + sub("gamma", "m0")
-        prov_field += "(" + str(self.angle_l) + "*" + str(self.angle_t) + ") * " + str(
-            self.angle_fy) + "/<br> &#8730 3 *" + str(self.gamma_m0) + "<br>=" + str(
+        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/ (&#8730 3 *" + sub("gamma", "m0")+")"
+        prov_field += "<br>"+space(2)+"= (" + str(self.angle_l) + "*" + str(self.angle_t) + ")*" + str(
+            self.angle_fy) + "/ (&#8730 3 *" + str(self.gamma_m0) + ")<br>"+space(2)+"= " + str(
             self.outstanding_leg_shear_capacity)
         rstr += design_check_row("Shear capacity of outstanding <br>" + space(1) + " leg (kN)", req_field, prov_field,
                                  check_pass)

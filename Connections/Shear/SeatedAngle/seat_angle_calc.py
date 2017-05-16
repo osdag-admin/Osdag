@@ -613,7 +613,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         bearing_length = round((float(self.shear_force) * 1000) * self.gamma_m0 / self.beam_w_t / self.angle_fy, 3)
         # logger.info(": Length of bearing required at the root line of beam = " + str(bearing_length))
 
-        # Required length of outstanding leg = bearing length + beam_col_clear_gap,
+        # Required length of outstanding leg = bearing length + beam_col_clear_gap - beam_flange_thickness
+        # (-beam_flange_thickness) comes from the 45 degree dispersion, but is conservatively not taken into account
+        # while calculating the outstanding_leg_length
         outstanding_leg_length_required = bearing_length + self.beam_col_clear_gap
         # logger.info(": Outstanding leg length = " + str(outstanding_leg_length_required))
 

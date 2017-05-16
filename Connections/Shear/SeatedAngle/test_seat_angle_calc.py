@@ -184,7 +184,7 @@ def create_sample_ui_input_sa(sa_connection_id):
     input_dict['Member']['fu (MPa)'] = 410
     input_dict['Member']['fy (MPa)'] = 250
     if sa_connection_id == "SA_0":
-        input_dict['Member']['Connectivity'] = "Column flange-Beam web"
+        input_dict['Member']['Connectivity'] = "Column web-Beam flange"
         input_dict['Member']['BeamSection'] = "MB 300"
         input_dict['Member']['ColumnSection'] = "SC 200"
         input_dict['Load']['ShearForce (kN)'] = 100

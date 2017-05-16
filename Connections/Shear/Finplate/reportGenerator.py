@@ -547,7 +547,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Hole Clearance", bolt_hole_clrnce]
+    row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -1056,17 +1056,21 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     front = folder + "/images_html/finFront.png"
     datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
-    row = [0, datapng, datatop]
-    rstr += t('tr')
-    rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-    rstr += t('/tr')
+    if status == 'True':
+        row = [0, datapng, datatop]
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        rstr += t('/tr')
 
-    row = [0, dataside, datafront]
-    rstr += t('tr')
-    rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+        row = [0, dataside, datafront]
+        rstr += t('tr')
+        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+        rstr += t('/tr')
+
+    else:
+        pass
 
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break

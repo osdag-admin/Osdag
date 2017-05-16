@@ -64,6 +64,7 @@ class ReportGenerator(SeatAngleCalculation):
         
         leg_moment_d (float): Moment capacity of outstanding leg of seated angle with low shear
         outstanding_leg_shear_capacity (float)
+        outstanding_leg_length_required (float)
         beam_shear_strength (float)
         bolt_shear_capacity (float)
         k_b (float)
@@ -119,6 +120,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.is_environ_corrosive = sa_calc_object.is_environ_corrosive
         self.design_method = sa_calc_object.design_method
         self.root_clearance = sa_calc_object.root_clearance
+        self.is_hsfg = sa_calc_object.is_hsfg
 
         self.top_angle = sa_calc_object.top_angle
         self.connectivity = sa_calc_object.connectivity
@@ -163,6 +165,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.moment_high_shear_beta = sa_calc_object.moment_high_shear_beta
         self.leg_moment_d = sa_calc_object.leg_moment_d
         self.outstanding_leg_shear_capacity = sa_calc_object.outstanding_leg_shear_capacity
+        self.outstanding_leg_length_required = sa_calc_object.outstanding_leg_length_required
         self.beam_shear_strength = sa_calc_object.beam_shear_strength
         self.bolt_shear_capacity = sa_calc_object.bolt_shear_capacity
         self.k_b = sa_calc_object.k_b
@@ -254,7 +257,7 @@ class ReportGenerator(SeatAngleCalculation):
         angle_fu = str(self.angle_fu)
 
         bolt_type = str(self.bolt_type)
-        is_hsfg = str(self.is_hsfg)
+        is_hsfg = self.is_hsfg
         bolt_grade = str(self.bolt_grade)
         bolt_diameter = str(self.bolt_diameter)
         bolt_fu = str(self.bolt_fu)
@@ -280,9 +283,6 @@ class ReportGenerator(SeatAngleCalculation):
         gauge = str(self.gauge)
         pitch = str(self.pitch)
         end = str(self.end_dist)
-        # moment_demand = str(self.moment_at_root_angle)
-        # gap = '20'
-        # TODO replace hardcoded gap value
 
         kb = str(self.k_b)
         beam_w_t = str(self.beam_w_t)
@@ -369,7 +369,8 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type) + " Hole")
         rstr += design_summary_row(1, "Hole Clearance (mm)", "detail2", text_two=str(bolt_hole_clearance))
         rstr += design_summary_row(1, "Material Grade Fu (MPa) (overwrite)", "detail2", text_two=str(bolt_fu_overwrite))
-        rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
+        if is_hsfg:
+            rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
         rstr += design_summary_row(0, "Detailing", "detail1", col_span="2")
         rstr += design_summary_row(1, "Type of Edge", "detail2", text_two=str(type_of_edge)[4:])
         rstr += design_summary_row(1, "Minimum Edge Distance check multiplier", "detail2",
@@ -388,9 +389,7 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += self.design_report_header()
         # -----------------------------------------------------------------------------------
 
-        # DESIGN CHECK
-        # TODO IMPORTANT Remove calculations from below lines of code
-
+        # DESIGN CHECKS
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
         rstr += design_check_row("Design Check", "", "", "", col_span="4", text_one_css="detail")
 
@@ -405,10 +404,23 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
-        req_field = "<i>V</i><sub>dsb</sub> = bolt_fu*(pi*0.78/4)*bolt_diameter^2/(&#8730;3)/" \
-                    "<i>gamma<sub>mb</sub></i>/1000<br> [cl. 10.3.3]"
-        prov_field = "<i>V</i><sub>dsb</sub> = " + bolt_fu + "*(" + const + ")*" + bolt_diameter + "^2/" \
-                     + "(&#8730;3)/1.25/1000 <br> " + space(2) + "= " + shear_capacity + " kN"
+        if is_hsfg == False:
+            req_field = "<i>V</i><sub>dsb</sub> = bolt_fu*(pi*0.78/4)*bolt_diameter^2/(&#8730;3)/" \
+                        "<i>gamma<sub>mb</sub></i>/1000<br> [cl. 10.3.3]"
+            prov_field = "<i>V</i><sub>dsb</sub> = " + bolt_fu + "*(" + const + ")*" + bolt_diameter + "^2/" \
+                         + "(&#8730;3)/1.25/1000 <br> " + space(2) + "= " + shear_capacity
+        elif is_hsfg == True:
+            if bolt_hole_type == "Standard":
+                K_h = str(1.0)
+            elif bolt_hole_type == "Oversized":
+                K_h = str(0.85)
+            req_field = "HSFG bolt shear capacity:"
+            req_field += "<br> <i>V</i><sub>dsf</sub> = mu_f*n_e*K_h*A_nb*f_0/<i>gamma<sub>mb</sub></i>/1000"
+            req_field += "<br> [cl. 10.3.3]"
+            prov_field = "<i>V</i><sub>dsf</sub> = ("
+            prov_field += str(
+                slip_factor_mu_f) + ")*(1)*(" + K_h + ")*(" + const + "*" + bolt_diameter + "^2)<br>" + space(2) + \
+                          "*(0.70*" + bolt_fu + ")" + "/1.25/1000 <br> " + space(2) + "= " + shear_capacity
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
@@ -427,36 +439,58 @@ class ReportGenerator(SeatAngleCalculation):
 
         # No. of bolts
         # bolts = str(round(float(shear_force) / float(str(self.bolt_value)), 1))
+        bolts_req_based_on_force = (math.ceil(float(shear_force) / self.bolt_value))
+        if bolts_req_based_on_force > self.bolts_provided:
+            remark = check_fail
+        else:
+            remark = check_pass
         req_field = "shear_force/ bolt_value = " + str(shear_force) + "/" + str(self.bolt_value) + " = " \
-                    + str(int(math.ceil(float(shear_force) / self.bolt_value)))
-        rstr += design_check_row("No. of bolts", req_field, bolts_provided, check_pass)
+                    + str(bolts_req_based_on_force)
+        rstr += design_check_row("No. of bolts", req_field, bolts_provided, remark)
 
-        rstr += design_check_row("No. of columns", " ", number_of_cols, check_pass)
-        rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, check_pass)
+        rstr += design_check_row("No. of columns", " ", number_of_cols, " ")
+        rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, " ")
 
         # Bolt pitch (mm)
+        # TODO Resolve pitch for SA_0 and SA_2
+        if self.pitch >= self.min_pitch and self.pitch <= self.max_spacing:
+            remark = check_pass
+        elif self.pitch < self.min_pitch or self.pitch > self.max_spacing:
+            remark = check_fail
         req_field = " &#8805; 2.5*bolt_diameter ,  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
         req_field += " &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",  &#8804; min(32*" + str(
             self.thickness_governing_min) + \
                      ", 300) = " + str(self.max_spacing)
-        rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, check_pass)
+        rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, remark)
 
         # Bolt gauge (mm)
+        if self.gauge >= self.min_gauge and self.gauge <= self.max_spacing:
+            remark = check_pass
+        elif self.gauge < self.min_gauge or self.gauge > self.max_spacing:
+            remark = check_fail
         req_field = " &#8805; 2.5*bolt_diameter ,  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
         req_field += " &#8805; 2.5*" + bolt_diameter + " = " + str(self.min_gauge) + ", &#8804; min(32*" + str(
             self.thickness_governing_min) + \
                      ", 300) = " + str(self.max_spacing)
-        rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, check_pass)
+        rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, remark)
 
         # End distance (mm)
+        if self.end_dist >= self.min_end_dist and self.end_dist <= self.max_end_dist:
+            remark = check_pass
+        elif self.end_dist < self.min_end_dist or self.end_dist > self.max_end_dist:
+            remark = check_fail
         req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
         req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
         req_field += " <br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [cl. 10.2.4.3]"
         req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" + str(self.angle_fy) + \
                      " = " + str(self.max_end_dist)
-        rstr += design_check_row("End distance (mm)", req_field, end, check_pass)
+        rstr += design_check_row("End distance (mm)", req_field, end, remark)
 
         # Edge distance (mm)
+        if self.edge_dist >= self.min_edge_dist and self.edge_dist <= self.max_edge_dist:
+            remark = check_pass
+        elif self.edge_dist < self.min_edge_dist or self.edge_dist > self.max_edge_dist:
+            remark = check_fail
         req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter," + " [cl. 10.2.4.2]<br>"
         req_field += " &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_edge_dist)
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
@@ -472,7 +506,7 @@ class ReportGenerator(SeatAngleCalculation):
             req_field += "<br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [Cl 10.2.4.3]"
             req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" + str(self.angle_fy) + \
                          ") = " + str(self.max_edge_dist)
-        rstr += design_check_row("Edge distance (mm)", req_field, edge, check_pass)
+        rstr += design_check_row("Edge distance (mm)", req_field, edge, remark)
 
         # Seated angle
         rstr += design_check_row("Seated Angle " + str(self.angle_sec), "", "", "", col_span="4",
@@ -487,69 +521,84 @@ class ReportGenerator(SeatAngleCalculation):
             # limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
             # self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
             req_field = "= min(width of supported beam, <br>" \
-                        +space(2)+"column_depth - 2*column_flange_thickness<br>"+space(2)+" - 2*column_R1 - root_clearance)" \
-                        +"<br> = min(" + str(self.beam_w_f)\
-                        + ", "+str(self.column_d)+" - 2*"+str(self.column_f_t)\
-                        +" - 2*"+str(self.column_R1)+" - "+str(self.root_clearance)+")"
+                        + space(2) + "column_depth - 2*column_flange_thickness<br>" + space(
+                2) + " - 2*column_R1 - root_clearance)" \
+                        + "<br> = min(" + str(self.beam_w_f) \
+                        + ", " + str(self.column_d) + " - 2*" + str(self.column_f_t) \
+                        + " - 2*" + str(self.column_R1) + " - " + str(self.root_clearance) + ")"
             prov_field = str(self.angle_l)
-        rstr += design_check_row("Length (mm)", req_field, prov_field, check_pass)
+        # As the seated angle length is a determined/calculated parameter, there is no design 'check' remark
+        rstr += design_check_row("Length (mm)", req_field, prov_field, " ")
 
         # Length of outstanding leg
-        req_field = "b = (R*" + sub("gamma", "m0") + "/("+sub("f", "yw")+"*beam_web_thickness))<br>" +space(2)+"+ beam_column_clear_gap"
+        if self.outstanding_leg_length_required < self.angle_B:
+            remark = check_pass
+        elif self.outstanding_leg_length_required > self.angle_B:
+            remark = check_fail
+        req_field = "b = (R*" + sub("gamma", "m0") + "/(" + sub("f", "yw") + "*beam_web_thickness))<br>" + space(
+            2) + "+ beam_column_clear_gap"
         req_field += "<br>[Cl. 8.7.4]"
-        req_field += "<br> = ("+str(self.shear_force)+"*1000*"+str(self.gamma_m0)+"/("+str(self.beam_fy)\
-                     +"*"+str(self.beam_w_t)+")) + "+str(self.beam_col_clear_gap)
+        req_field += "<br> = (" + str(self.shear_force) + "*1000*" + str(self.gamma_m0) + "/(" + str(self.beam_fy) \
+                     + "*" + str(self.beam_w_t) + ")) + " + str(self.beam_col_clear_gap)
         prov_field = str(self.angle_B)
-        rstr += design_check_row("Outstanding leg length (mm)", req_field, prov_field, check_pass)
+        rstr += design_check_row("Outstanding leg length (mm)", req_field, prov_field, remark)
 
         # For angle thickness
         # Shear capacity of outstanding leg
+        if self.outstanding_leg_shear_capacity > self.shear_force:
+            remark = check_pass
+        elif self.outstanding_leg_shear_capacity < self.shear_force:
+            remark = check_fail
         req_field = sub("V", "dp") + " &#8805 V <br>"
         req_field += sub("V", "dp") + " &#8805 " + str(self.shear_force) + "kN <br> [Cl. 8.4.1]"
-        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/ (&#8730 3 *" + sub("gamma", "m0")+")"
-        prov_field += "<br>"+space(2)+"= (" + str(self.angle_l) + "*" + str(self.angle_t) + ")*" + str(
-            self.angle_fy) + "/ (&#8730 3 *" + str(self.gamma_m0) + ")<br>"+space(2)+"= " + str(
+        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/ (&#8730 3 *" + sub("gamma", "m0") + ")"
+        prov_field += "<br>" + space(2) + "= (" + str(self.angle_l) + "*" + str(self.angle_t) + ")*" + str(
+            self.angle_fy) + "/ (&#8730 3 *" + str(self.gamma_m0) + ")<br>" + space(2) + "= " + str(
             self.outstanding_leg_shear_capacity)
         rstr += design_check_row("Shear capacity of outstanding <br>" + space(1) + " leg (kN)", req_field, prov_field,
-                                 check_pass)
+                                 remark)
 
         # Moment capacity of outstanding leg
-        prov_field = sub("M", "d") + "=" + sub("beta", "b") + sub("Z", "p") + sub("f", "y")
-        prov_field += "/" + sub("gamma", "m0")
-        prov_field += "<br> = 1.0* " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/4)*"
-        prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0) + "<br>"
-
-        if self.is_shear_high is False:
+        if self.is_shear_high == False:
             req_field = "As V &#8804 0.6 " + sub("V", "d")
             req_field += ",<br>[Cl 8.2.1.2] is applicable <br>"
-
             req_field += sub("M", "d") + " &#8805 Moment at root of angle"
-            req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
-            prov_field += "<br>=" + str(self.moment_capacity_angle)
+            req_field += "<br>" + sub("M", "d") + " &#8805 " + str(self.moment_at_root_angle)
+            prov_field = sub("M", "d") + " = min(" + sub("beta", "b") + sub("Z", "e") + sub("f", "y")
+            prov_field += "/" + sub("gamma", "m0") + ", <br>" + space(2) + " 1.5" + sub("Z", "e") + sub("f",
+                                                                                                        "y") + "/" + sub(
+                "gamma", "m0") + ")"
+            prov_field += "<br>" + space(2) + " = min(1.0* " + str(self.angle_l) + "*(" + str(self.angle_t) + "^2/6)*"
+            prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0) + ",<br>" + space(2) + " 1.5*" + str(
+                self.angle_l) + "*(" + str(self.angle_t) + "^2/6)*"
+            prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0) + ")"
+            prov_field += "<br>" + space(2) + "= " + str(self.moment_capacity_angle)
+
         elif self.is_shear_high == True:
             req_field = "As V &#8805 0.6 " + sub("V", "d")
-            req_field += ",<br>[Cl 8.2.1.3] is applicable <br>"
-
+            req_field += ",<br>[Cl 8.2.1.3] is applicable"
             req_field += "<br>" + sub("M", "dv") + " &#8805 Moment at root of angle"
             req_field += "<br>" + sub("M", "dv") + " &#8805 " + str(self.moment_at_root_angle) + "<br>"
-
-            prov_field += "=" + str(round(self.leg_moment_d, 2)) + "<br>"
-            prov_field += "<br>" + sub("M", "dv") + "= min("
-            prov_field += " (1 - beta)" + sub("M", "d") + " , "
+            prov_field = sub("M", "dv") + "= min((1 - beta)" + sub("M", "d") + " , "
             prov_field += "1.2 " + sub("Z", "e") + sub("f", "y") + "/" + sub("gamma", "m0")
-            prov_field += " ) <br>"
-            prov_field += space(2) + "beta = ((2V/" + sub("V", "d") + ")-1)^2 = " + str(
-                self.moment_high_shear_beta) + "<br>"
-            prov_field += "<br>" + sub("M", "dv") + " = " + str(self.moment_capacity_angle)
+            prov_field += ") <br>"
+            prov_field += space(2) + "where, <br>" + space(3) + "beta = ((2V/" + sub("V", "d") + ")-1)^2 = " + str(
+                round(self.moment_high_shear_beta, 4)) + "<br>"
+            prov_field += "<br>" + sub("M", "dv") + " = " + "min((1 - " + str(
+                round(self.moment_high_shear_beta, 4)) + ")<br>" + space(3) + "*1.0*(" + str(self.angle_l) + "*" + str(
+                self.angle_t) + "^2/6)*"
+            prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0) + " , "
+            prov_field += "<br>" + space(2) + "1.2*(" + str(self.angle_l) + "*" + str(self.angle_t) + "^2/6)*"
+            prov_field += str(self.angle_fy) + "/" + str(self.gamma_m0)
+            prov_field += ")"
+            prov_field += "<br>" + space(2) + " = " + str(self.moment_capacity_angle)
 
-        req_field += "<br>" + "To avoid irreversible deformation under service loads,"
-        req_field += "<br>" + sub("M", "d") + " &#8804 1.5" + sub("Z", "e") + sub("f", "y")
-        req_field += "/" + sub("gamma", "m0") + "<br>"
-
+        if self.moment_capacity_angle > self.moment_at_root_angle:
+            remark = check_pass
+        elif self.moment_capacity_angle < self.moment_at_root_angle:
+            remark = check_fail
         rstr += design_check_row("Moment capacity of outstanding <br>" + space(1) + " leg (kN-mm)", req_field,
-                                 prov_field, check_pass)
-
-        # TODO Add other checks to the list
+                                 prov_field, remark)
 
         rstr += t('/table')
         rstr += t('h1 style="page-break-before:always"')

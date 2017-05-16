@@ -467,7 +467,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.calculate_kb()
 
         # Bolt capacity
-        if self.is_hsfg is False:
+        if self.is_hsfg == False:
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter=self.bolt_diameter,
                                                                          number_of_bolts=1, bolt_fu=self.bolt_fu)
             self.bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter=self.bolt_diameter,
@@ -475,10 +475,11 @@ class SeatAngleCalculation(ConnectionCalculations):
                                                                              thickness_plate=self.thickness_governing_min,
                                                                              k_b=self.k_b, plate_fu=self.beam_fu)
             self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
-        elif self.is_hsfg is True:
-            self.bolt_value = ConnectionCalculations.bolt_shear_hsfg(self.bolt_diameter, self.bolt_fu, self.mu_f,
+        elif self.is_hsfg:
+            self.bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(self.bolt_diameter, self.bolt_fu, self.mu_f,
                                                                      self.n_e,
                                                                      self.bolt_hole_type)
+            self.bolt_value = self.bolt_shear_capacity
         # Check for long joints is not applicable for seated angle connection
         self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
         if self.connectivity == "Column flange-Beam flange" and self.bolts_required % 2 == 1:
@@ -616,13 +617,13 @@ class SeatAngleCalculation(ConnectionCalculations):
         # Required length of outstanding leg = bearing length + beam_col_clear_gap - beam_flange_thickness
         # (-beam_flange_thickness) comes from the 45 degree dispersion, but is conservatively not taken into account
         # while calculating the outstanding_leg_length
-        outstanding_leg_length_required = bearing_length + self.beam_col_clear_gap
-        # logger.info(": Outstanding leg length = " + str(outstanding_leg_length_required))
+        self.outstanding_leg_length_required = bearing_length + self.beam_col_clear_gap
+        # logger.info(": Outstanding leg length = " + str(self.outstanding_leg_length_required))
 
-        if outstanding_leg_length_required > self.angle_B:
+        if self.outstanding_leg_length_required > self.angle_B:
             self.safe = False
             logger.error(": Length of outstanding leg of angle is less than required bearing length [Cl 8.7.4]")
-            logger.warning(": Outstanding leg length should be more than %2.2f mm" % outstanding_leg_length_required)
+            logger.warning(": Outstanding leg length should be more than %2.2f mm" % self.outstanding_leg_length_required)
             logger.info(": Select seated angle with longer outstanding leg")
 
         """ comparing 0.6*shear strength (0.6*V_d) vs shear force V for calling moment capacity routine
@@ -674,7 +675,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         """
         Assumption
             1) beta_b (in the equation in Cl 8.2.1.2) = 1.0 as the outstanding leg is plastic section
-            2) using Z_p (plastic section modulus) for moment capacity
+            2) using Z_e (Elastic section modulus) for moment capacity
         """
         self.leg_moment_d = (self.angle_fy / self.gamma_m0) * (self.angle_l * self.angle_t ** 2 / 6) / 1000
 

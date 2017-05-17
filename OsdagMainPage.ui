@@ -25,68 +25,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="1">
-     <widget class="QPushButton" name="btn_help">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton::hover
-{
-   background-color: #d97f7f;
-   color:#000000 ;
-}
-
-QPushButton
-{
-background-color: #925a5b;
-color:#ffffff;
-}</string>
-      </property>
-      <property name="text">
-       <string>Help</string>
-      </property>
-      <property name="autoDefault">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="btn_openfile">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton::hover
-{
-   background-color: #d97f7f;
-   color:#000000 ;
-}
-
-QPushButton
-{
-background-color: #925a5b;
-color:#ffffff;
-}</string>
-      </property>
-      <property name="text">
-       <string>Open file</string>
-      </property>
-      <property name="autoDefault">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0" colspan="2">
      <widget class="QListWidget" name="myListWidget">
       <property name="minimumSize">
@@ -269,7 +207,7 @@ background-color: #abc250 ;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -504,6 +442,9 @@ border-bottom-right-radius: 0px ;
                   <bold>true</bold>
                  </font>
                 </property>
+                <property name="toolTip">
+                 <string>Shift+F</string>
+                </property>
                 <property name="text">
                  <string>Finplate</string>
                 </property>
@@ -574,6 +515,9 @@ border-bottom-right-radius: 0px ;
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="toolTip">
+                 <string>Shift+C</string>
                 </property>
                 <property name="text">
                  <string>Cleat Angle</string>
@@ -662,6 +606,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
                   <bold>true</bold>
                  </font>
                 </property>
+                <property name="toolTip">
+                 <string>Shift+E</string>
+                </property>
                 <property name="text">
                  <string>Endplate</string>
                 </property>
@@ -728,6 +675,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
                   <weight>75</weight>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="toolTip">
+                 <string>Shift+S</string>
                 </property>
                 <property name="text">
                  <string>Seated Angle</string>
@@ -836,6 +786,9 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
               <property name="focusPolicy">
                <enum>Qt::TabFocus</enum>
               </property>
+              <property name="toolTip">
+               <string>Ctrl+S</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">QPushButton::hover
 {
@@ -851,6 +804,9 @@ color:#ffffff;
               </property>
               <property name="text">
                <string>Start</string>
+              </property>
+              <property name="shortcut">
+               <string>Ctrl+S</string>
               </property>
               <property name="checkable">
                <bool>false</bool>
@@ -916,6 +872,107 @@ color:#ffffff;
       <widget class="QWidget" name="page"/>
      </widget>
     </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="comboBox_help">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QComboBox
+{
+background-color: #925a5b;
+color:#ffffff;
+}
+
+</string>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>Help</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Video Tutorials</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sample Design Report</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Sample Problems</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Ask Us a Question</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>About Osdag</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QPushButton" name="btn_openfile">
+      <property name="font">
+       <font>
+        <family>Arial</family>
+        <pointsize>11</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QPushButton
+{
+background-color: #925a5b;
+color:#ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Open file</string>
+      </property>
+      <property name="autoDefault">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
    <widget class="QPushButton" name="btn_connection">
     <property name="geometry">
@@ -943,6 +1000,9 @@ color:#ffffff;
     <property name="contextMenuPolicy">
      <enum>Qt::ActionsContextMenu</enum>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+C</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -959,6 +1019,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Connection</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+C</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -984,6 +1047,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+T</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1000,6 +1066,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Tension Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+T</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1022,6 +1091,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+M</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1038,6 +1110,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Compression Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+M</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1060,6 +1135,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+F</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1075,6 +1153,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Flexural Member</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+F</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1097,6 +1178,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+B</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1112,6 +1196,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Beam-Column</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+B</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1134,6 +1221,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+P</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1149,6 +1239,9 @@ color:#ffffff;
     </property>
     <property name="text">
      <string>Plate Girder</string>
+    </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+P</string>
     </property>
     <property name="autoDefault">
      <bool>true</bool>
@@ -1171,6 +1264,9 @@ color:#ffffff;
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Ctrl+Shift+G</string>
+    </property>
     <property name="styleSheet">
      <string notr="true">QPushButton::hover
 {
@@ -1187,14 +1283,15 @@ color:#ffffff;
     <property name="text">
      <string>Gantry Girder</string>
     </property>
+    <property name="shortcut">
+     <string>Ctrl+Shift+G</string>
+    </property>
     <property name="autoDefault">
      <bool>true</bool>
     </property>
    </widget>
    <zorder>myListWidget</zorder>
    <zorder>myStackedWidget</zorder>
-   <zorder>btn_openfile</zorder>
-   <zorder>btn_help</zorder>
    <zorder>btn_connection</zorder>
    <zorder>btn_tension</zorder>
    <zorder>btn_compression</zorder>
@@ -1202,6 +1299,8 @@ color:#ffffff;
    <zorder>btn_beamCol</zorder>
    <zorder>btn_plate</zorder>
    <zorder>btn_gantry</zorder>
+   <zorder>comboBox_help</zorder>
+   <zorder>btn_openfile</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1234,8 +1333,6 @@ color:#ffffff;
   <tabstop>btn_beamCol</tabstop>
   <tabstop>btn_plate</tabstop>
   <tabstop>btn_gantry</tabstop>
-  <tabstop>btn_openfile</tabstop>
-  <tabstop>btn_help</tabstop>
   <tabstop>rdbtn_seat</tabstop>
   <tabstop>rdbtn_finplate</tabstop>
   <tabstop>rdbtn_cleat</tabstop>

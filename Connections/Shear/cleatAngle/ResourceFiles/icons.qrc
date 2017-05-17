@@ -1,10 +1,10 @@
 <RCC>
   <qresource prefix="newPrefix">
+    <file>images/image3487.png</file>
     <file>images/colF2.png</file>
     <file>images/cleatwindow.png</file>
     <file>images/colW3.png</file>
     <file>images/colW1.png</file>
-    <file>images/colFlange.svg</file>
     <file>images/colww.png</file>
     <file>images/colFF.png</file>
     <file>images/download1.png</file>

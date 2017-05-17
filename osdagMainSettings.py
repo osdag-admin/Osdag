@@ -1,4 +1,5 @@
 
 
 def backend_name():
-    return "pyqt4"
+    return "qt-pyqt5"
+

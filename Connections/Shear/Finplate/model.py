@@ -4,13 +4,13 @@ Created on 09-Sep-2014
 @author: deepa
 '''
 import sys
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtSql import *
+from PyQt5.QtSql import QSqlDatabase, QSqlQuery
+from PyQt5.QtWidgets import QMessageBox, qApp
 import logging
 import os
 
-
 # logging.basicConfig(filename = 'finlog.html',filemode = 'w',level = logging.DEBUG)
+
 logger = None
 
 
@@ -18,19 +18,19 @@ def set_databaseconnection():
     '''
     Setting connection with SQLite
     '''
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Osdag')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
     # db.open()
     if not db.open():
 
-        QtGui.QMessageBox.critical(None, QtGui.qApp.tr("Cannot open database"),
-                                   QtGui.qApp.tr("Unable to establish a database connection.\n"
+        QMessageBox.critical(None, qApp.tr("Cannot open database"),
+                                   qApp.tr("Unable to establish a database connection.\n"
                                                  "This example needs SQLite support. Please read "
                                                  "the Qt SQL driver documentation for information"
                                                  "how to build it.\n\n"
                                                  "Click Cancel to exit."),
-                                   QtGui.QMessageBox.Cancel)
+                                   QMessageBox.Cancel)
         return False
 
 
@@ -53,6 +53,7 @@ def module_setup():
     set_databaseconnection()
 
 
+
 def get_beamcombolist():
     '''(None) -> (List)
     This function returns list of Indian Standard Beam Designation.
@@ -61,7 +62,7 @@ def get_beamcombolist():
     beamQuery = QSqlQuery("Select Designation from Beams")
     comboList.append("Select section")
     while(beamQuery.next()):
-        comboList.append(beamQuery.value(0).toString())
+        comboList.append(beamQuery.value(0))
     return comboList
 
 
@@ -81,11 +82,37 @@ def get_beamdata(sect):
     while(designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
-
-    # print(retDict[QString("tw")])
+            retDict[colName] = designQuery.value(i)
 
     return retDict
+
+def get_oldbeamcombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    while(columnQuery.next()):
+        old_columnList.append(columnQuery.value(0))
+
+    return old_columnList
+
+
+def get_oldcolumncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    #comboList.append("Select section")
+    while(columnQuery.next()):
+        old_columnList.append(columnQuery.value(0))
+
+    return old_columnList
 
 
 def get_columncombolist():
@@ -94,11 +121,11 @@ def get_columncombolist():
     '''
     comboList = []
     columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
+    a = columnQuery.size()
 
     comboList.append("Select section")
     while(columnQuery.next()):
-        comboList.append(columnQuery.value(0).toString())
-    print comboList
+        comboList.append(columnQuery.value(0))
     return comboList
 
 
@@ -119,7 +146,7 @@ def get_columndata(sect):
     while(designQuery.next()):
         for i in range(0, record.count()):
             colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i).toString()
+            retDict[colName] = designQuery.value(i)
 
     return retDict
 

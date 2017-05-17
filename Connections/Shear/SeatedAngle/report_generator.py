@@ -461,15 +461,25 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("No. of row(s)", " &#8804; 2", number_of_rows, " ")
 
         # Bolt pitch (mm)
-        # TODO Resolve pitch for SA_0 and SA_2
         if self.pitch >= self.min_pitch and self.pitch <= self.max_spacing:
             remark = check_pass
+            req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
+            req_field += "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",<br>  &#8804; min(32*" + \
+                         str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
+            prov_field = pitch
         elif self.pitch < self.min_pitch or self.pitch > self.max_spacing:
-            remark = check_fail
-        req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
-        req_field += "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",<br>  &#8804; min(32*" + \
-                     str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
-        rstr += design_check_row("Bolt pitch (mm)", req_field, pitch, remark)
+            if self.num_rows == 1:
+                remark = " "
+                req_field = "N/A"
+                prov_field = "N/A"
+            else:
+                remark = check_fail
+                req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
+                req_field += "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(
+                    self.min_pitch) + ",<br>  &#8804; min(32*" + \
+                             str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
+                prov_field = pitch
+        rstr += design_check_row("Bolt pitch (mm)", req_field, prov_field, remark)
 
         # Bolt gauge (mm)
         if self.gauge >= self.min_gauge and self.gauge <= self.max_spacing:

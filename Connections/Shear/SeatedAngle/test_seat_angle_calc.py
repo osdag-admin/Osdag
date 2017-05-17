@@ -199,7 +199,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['bolt']['bolt_fu'] = 400
         input_dict['design']['design_method'] = 'Limit State Design'
         input_dict['detailing']['typeof_edge'] = 'b - Machine flame cut'
-        input_dict['detailing']['gap'] = 15
+        input_dict['detailing']['gap'] = 10
         input_dict['detailing']['min_edgend_dist'] = 1.5
         input_dict['detailing']['is_env_corrosive'] = 'Yes'
     elif sa_connection_id == "SA_2":

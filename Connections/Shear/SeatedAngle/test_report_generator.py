@@ -76,7 +76,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         sa_calc_obj = SeatAngleCalculation()
         sa_calc_obj.seat_angle_connection(sa_sample_ui_input)
         report_summary = self.create_sample_report_summary(sa_connection_id)
-        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"  # Add dummy images of views here.
+        folder_location = "F:\Osdag_workspace\seated_angle\one\\"  # Add dummy images of views here.
         file_name = folder_location + "design_report_" + sa_connection_id + ".html"
         report_generator_instance = ReportGenerator(sa_calc_obj)
         report_generator_instance.save_html(report_summary, file_name,

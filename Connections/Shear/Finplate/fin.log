@@ -1,26 +1,76 @@
 <link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>
-<link rel="stylesheet" type="text/css" href="Connections/Shear/cleatAngle/log.css"/>
-an>
+
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:13:08</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:13:08</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
+    <div  class="LOG INFO">
+        <span class="DATE">Wed, 17 May 2017 11:13:08</span>
         <span class="LEVEL">INFO</span>
         <span class="MSG">: Overall finplate connection design is safe 
 </span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 23 Mar 2017 16:50:45</span>
+        <span class="DATE">Wed, 17 May 2017 11:13:08</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>
 
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:14:03</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:14:03</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
     <div  class="LOG INFO">
-        <span class="DATE">Thu, 23 Mar 2017 16:51:41</span>
+        <span class="DATE">Wed, 17 May 2017 11:14:03</span>
         <span class="LEVEL">INFO</span>
-        <span class="MSG">: Overall cleat Angle connection design is safe 
+        <span class="MSG">: Overall finplate connection design is safe 
 </span>
     </div>
 
     <div  class="LOG DEBUG">
-        <span class="DATE">Thu, 23 Mar 2017 16:51:41</span>
+        <span class="DATE">Wed, 17 May 2017 11:14:03</span>
+        <span class="LEVEL">DEBUG</span>
+        <span class="MSG"> :=========End Of design===========</span>
+    </div>
+
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:16:49</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
+    <div  class="LOG WARNING">
+        <span class="DATE">Wed, 17 May 2017 11:16:49</span>
+        <span class="LEVEL">WARNING</span>
+        <span class="MSG"> : You are using section (in red color) that is not available in latest version of IS 808</span>
+    </div>
+
+    <div  class="LOG INFO">
+        <span class="DATE">Wed, 17 May 2017 11:16:49</span>
+        <span class="LEVEL">INFO</span>
+        <span class="MSG">: Overall finplate connection design is safe 
+</span>
+    </div>
+
+    <div  class="LOG DEBUG">
+        <span class="DATE">Wed, 17 May 2017 11:16:49</span>
         <span class="LEVEL">DEBUG</span>
         <span class="MSG"> :=========End Of design===========</span>
     </div>

@@ -401,7 +401,7 @@ class CommonDesignLogic(object):
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
         nut_Ht = 12.2  #
-        gap = str(self.uiObj['detailing']['gap'])
+        gap = int(str(self.uiObj['detailing']['gap']))
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
@@ -429,16 +429,19 @@ class CommonDesignLogic(object):
             colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
 
         elif self.connection == "Endplate":
+            # TODO JP: DC, the below statement overwrites the DP gap value
             gap = column_T + int(plate_thick) + nut_T
             nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, gap)
             colflangeconn = endColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
 
         elif self.connection == "cleatAngle":
+            # TODO JP: DC, the below statement overwrites the DP gap value
             gap = beam_tw + 2 * cleat_thick + nut_T
             cgap = column_T + cleat_thick + nut_T
             nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
             colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
         else:
+            # TODO JP: DC, the below statement overwrites the DP gap value
             gap = beam_tw + seat_thick + nut_T
             bgap = beam_tw + topangle_thick + nut_T
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)

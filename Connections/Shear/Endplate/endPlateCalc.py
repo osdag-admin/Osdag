@@ -98,14 +98,14 @@ def end_plate_t_min(beam_depth, grade_bolt, dia):
 
 
 # BOLT: Determination of factored design force of HSFG bolts Vsf = Vnsf / Ymf = uf * ne * Kh * Fo where Vnsf: The nominal shear capacity of bolt
-def HSFG_bolt_shear(uf, dia, n, fu):
-    Anb = math.pi * dia * dia * 0.25 * 0.78  # threaded area(Anb) = 0.78 x shank area
-    Fo = Anb * 0.7 * fu 
-    Kh = 1  # Assuming fastners in Clearence hole
-    Ymf = 1.25  # Ymf = 1.25 if Slip resistance is designed at ultimate load
-    Vsf = uf * n * Kh * Fo / (Ymf * 1000)
-    Vsf = round(Vsf, 3)
-    return Vsf
+# def HSFG_bolt_shear(uf, dia, n, fu):
+#     Anb = math.pi * dia * dia * 0.25 * 0.78  # threaded area(Anb) = 0.78 x shank area
+#     Fo = Anb * 0.7 * fu
+#     Kh = 1  # Assuming fastners in Clearence hole
+#     Ymf = 1.25  # Ymf = 1.25 if Slip resistance is designed at ultimate load
+#     Vsf = uf * n * Kh * Fo / (Ymf * 1000)
+#     Vsf = round(Vsf, 3)
+#     return Vsf
 
 # ############ CRITICAL BOLT SHEAR CAPACITY ###################
 
@@ -184,7 +184,10 @@ def end_connection(ui_obj):
 
     bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
+    mu_f = float(ui_obj["bolt"]["slip_factor"])
     bolt_grade = float(ui_obj['Bolt']['Grade'])
+
+    gamma_mw = float(ui_obj["weld"]["safety_factor"])
               
     end_plate_t = float(ui_obj['Plate']['Thickness (mm)'])
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
@@ -285,8 +288,8 @@ def end_connection(ui_obj):
     max_spacing = int(min(100 + 4 * end_plate_t, 200))  # clause 10.2.3.3 is800
 
     # ############ END AND EDGE DISTANCES ###################
-    if ui_obj["detailing"]["typeof_edge"] == "a - Shear or hand flame cut":
-        min_end_dist = int(1.7 * (dia_hole))
+    if ui_obj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+        min_end_dist = int(float(1.7 * (dia_hole)))
     else:
         min_end_dist = int(1.5 * (dia_hole))
     min_edge_dist = min_end_dist
@@ -303,14 +306,12 @@ def end_connection(ui_obj):
 
     if bolt_type == 'HSFG':
         # TODO Set parameters based on updated design preferences input from GUI
-        mu_f = 0.55
+        muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
         bolt_hole_type = 1 # 1 - standard hole, 0 - oversize hole
-        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, bolt_hole_type)
+        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
         bolt_bearing_capacity = 'N/A'
         bolt_capacity = bolt_shear_capacity
-        # TODO GUI - disable bearing capacity in output doc
-        # TODO update design report
 
     elif bolt_type == "Bearing Bolt" :
         bolt_shear_capacity = black_bolt_shear(bolt_dia, bolt_planes, bolt_fu)
@@ -648,7 +649,7 @@ def end_connection(ui_obj):
     weld_l = end_plate_l - 2 * weld_t
     Vy1 = (shear_load) / float(2 * weld_l)
     Vy1 = round(Vy1, 3)
-    weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * 1250)
+    weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * 1000 * gamma_mw)
     weld_strength = round(weld_strength, 3);
     if Vy1 > weld_strength:
         design_check = False

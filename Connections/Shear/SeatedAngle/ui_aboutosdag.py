@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'about_osdag.ui'
+# Form implementation generated from reading ui file 'ui_about_osdag.ui'
 #
 # Created by: PyQt5 UI code generator 5.6
 #

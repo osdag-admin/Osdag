@@ -78,8 +78,7 @@ class ISection(object):
                        self.c2, self.b2, self.a2,
                        self.a3, self.b3, self.c3,
                        self.c4, self.b4, self.a4]
-        #self.points = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]  
-        
+
     def createModel(self):
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
@@ -88,6 +87,3 @@ class ISection(object):
         prism =  makePrismFromFace(aFace, extrudeDir)
         
         return prism
-    
-        
-        

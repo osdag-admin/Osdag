@@ -20,15 +20,13 @@ from OCC.StlAPI import StlAPI_Writer
 from model import *
 
 from svg_window import SvgWindow
-import report_generator
 from ui_design_preferences import Ui_ShearDesignPreferences
 from ui_seat_angle import Ui_MainWindow
-from ui_summary_popup import Ui_Dialog
+from ui_design_summary import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.common_logic import CommonDesignLogic
-import seat_angle_calc
 
 
 class DesignPreferences(QDialog):
@@ -56,7 +54,6 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        #self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
 
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())

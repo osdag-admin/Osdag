@@ -7,8 +7,7 @@ import numpy
 from ModelUtils import *
 import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
-from OCC.BRepAlgo import BRepAlgo_BooleanOperations
-from OCC.gp import gp_Pnt, gp_Dir, gp_Pln, gp_Ax2
+from OCC.gp import gp_Ax2
 from OCC.BRepAlgoAPI import  BRepAlgoAPI_Fuse
 from OCC.BRepFilletAPI import BRepFilletAPI_MakeFillet
 from OCC.TopAbs import TopAbs_EDGE
@@ -33,8 +32,7 @@ class Bolt(object):
         self.a5 = None
         self.a6 = None
         self.points = []        
-        #self.computeParams()
-    
+
     def place(self, origin, uDir, shaftDir):
         self.origin = origin
         self.uDir = uDir
@@ -56,8 +54,6 @@ class Bolt(object):
         self.a6 = self.getPoint(300)
         self.points = [self.a1, self.a2, self.a3, self.a4, self.a5, self.a6]
        
-    
-        
     def createModel(self):
         
         edges = makeEdgesFromPoints(self.points)
@@ -80,7 +76,3 @@ class Bolt(object):
         mkFillet = BRepFilletAPI_MakeFillet(whole_Bolt)
         
         return whole_Bolt
-
-        
-    
-            

@@ -4,7 +4,7 @@ Created on 29-Nov-2014
 @author: deepa
 '''
 import numpy
-from ModelUtils import *
+from CAD_ModelUtils import *
 import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.gp import gp_Ax2

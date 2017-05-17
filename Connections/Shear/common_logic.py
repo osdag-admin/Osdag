@@ -36,7 +36,7 @@ from Connections.Component.angle import Angle
 from Connections.Shear.Finplate.nutBoltPlacement import NutBoltArray as finNutBoltArray
 from Connections.Shear.Endplate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 from Connections.Shear.cleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
-from Connections.Shear.SeatedAngle.nut_bolt_placement import NutBoltArray as seatNutBoltArray
+from Connections.Shear.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
 from utilities import osdag_display_shape
 
 import OCC.V3d

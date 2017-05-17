@@ -629,7 +629,7 @@ class MainController(QMainWindow):
         """(Dictionary)--> None
 
         """
-        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "sa_input.txt")
         inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -642,7 +642,7 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "sa_input.txt")
 
         if os.path.isfile(file_name):
             fileObject = open(file_name, 'r')

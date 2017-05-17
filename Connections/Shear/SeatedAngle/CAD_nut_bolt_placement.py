@@ -4,10 +4,10 @@ Created on 07-Jun-2015
 @author: deepa
 '''
 import numpy
-from bolt import Bolt
-from nut import Nut
+from CAD_bolt import Bolt
+from CAD_nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from ModelUtils import getGpPt
+from CAD_ModelUtils import getGpPt
 
 class NutBoltArray():
     def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):

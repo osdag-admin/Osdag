@@ -8,7 +8,6 @@ from bolt import Bolt
 from nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from ModelUtils import getGpPt
-#from cups import modelSort
 
 class NutBoltArray():
     def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):
@@ -54,8 +53,7 @@ class NutBoltArray():
         self.bpositions = []
         self.topclippositions = []
         self.topclipbpositions = []
-        #self.calculatePositions()
-        
+
         self.models = []
         
     def initialiseNutBolts(self):
@@ -81,7 +79,6 @@ class NutBoltArray():
         self.pitch = boltPlaceObj['Bolt']["Pitch Distance (mm)"]
         self.gauge = boltPlaceObj['Bolt']["Gauge Distance (mm)"]
         self.gauge_two_bolt = boltPlaceObj['Bolt']["Gauge Two Bolt (mm)"]
-        #self.gauge = 30
         self.edge = boltPlaceObj['Bolt']["Edge Distance (mm)"]
         self.end = boltPlaceObj['Bolt']["End Distance (mm)"]
         self.row = boltPlaceObj['Bolt']["No. of Row"]
@@ -93,23 +90,17 @@ class NutBoltArray():
         self.topclipcol= 2
         self.topclipbrow = 1
         self.topclipbcol= 2
-        #self.row = 3
-        #self.col = 2
-         
+
     def calculatePositions(self):
         self.positions = []
         for rw in  range(self.row):
             for col in range(self.col):
                 pos = self.origin 
-                #pos = pos + self.end * self.gaugeDir
                 pos = pos + self.edge * self.gaugeDir
                 pos = pos + col * self.gauge * self.gaugeDir 
-                #pos = pos + self.edge * self.pitchDir 
-                pos = pos + self.end * self.pitchDir 
+                pos = pos + self.end * self.pitchDir
                 pos = pos + rw * self.pitch * self.pitchDir
-                
                 self.positions.append(pos)
-        
     
     def calculatebPositions(self):       
         self.bpositions = []
@@ -120,9 +111,7 @@ class NutBoltArray():
                 pos = pos + col * self.gauge_two_bolt * self.bgaugeDir 
                 pos = pos + self.edge * self.bpitchDir 
                 pos = pos + rw * self.pitch * self.bpitchDir
-                
                 self.bpositions.append(pos)
-    
     
     def calculatetopclipPositions(self):
         self.topclippositions = []
@@ -133,9 +122,7 @@ class NutBoltArray():
                 pos = pos + col * self.gauge_two_bolt * self.topclipgaugeDir 
                 pos = pos + self.edge * self.topclippitchDir 
                 pos = pos + rw * self.pitch * self.topclippitchDir
-                
                 self.topclippositions.append(pos)
-        
     
     def calculatetopclipbPositions(self):       
         self.topclipbpositions = []
@@ -146,16 +133,13 @@ class NutBoltArray():
                 pos = pos + col * self.gauge_two_bolt * self.topclipbgaugeDir 
                 pos = pos + self.end * self.topclipbpitchDir 
                 pos = pos + rw * self.pitch * self.topclipbpitchDir
-                
                 self.topclipbpositions.append(pos)
-    
     
     def place(self, origin, gaugeDir, pitchDir, boltDir,borigin,bgaugeDir,bpitchDir,bboltDir, topcliporigin,topclipgaugeDir, topclippitchDir, topclipboltDir,topclipborigin,topclipbgaugeDir,topclipbpitchDir,topclipbboltDir):
         self.origin = origin
         self.gaugeDir = gaugeDir
         self.pitchDir = pitchDir
         self.boltDir = boltDir
-                
         self.calculatePositions()
         
         for index, pos in enumerate (self.positions):
@@ -166,9 +150,7 @@ class NutBoltArray():
         self.bgaugeDir = bgaugeDir
         self.bpitchDir = bpitchDir
         self.bboltDir = bboltDir
-        
         self.calculatebPositions()
-        
         
         for index, pos in enumerate (self.bpositions):
             self.bbolts[index].place(pos, bgaugeDir, bboltDir)
@@ -178,25 +160,21 @@ class NutBoltArray():
         self.topclipgaugeDir = topclipgaugeDir
         self.topclippitchDir = topclippitchDir
         self.topclipboltDir = topclipboltDir
-                
         self.calculatetopclipPositions()
         
         for index, pos in enumerate (self.topclippositions):
             self.topclipbolts[index].place(pos, topclipgaugeDir, topclipboltDir)
             self.topclipnuts[index].place((pos + self.bgap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
-        
         self.topclipborigin = topclipborigin
         self.topclipbgaugeDir = topclipbgaugeDir
         self.topclipbpitchDir = topclipbpitchDir
         self.topclipbboltDir = topclipbboltDir
-        
         self.calculatetopclipbPositions()
         
         for index, pos in enumerate (self.topclipbpositions):
             self.topclipbbolts[index].place(pos, topclipbgaugeDir, topclipbboltDir)
             self.topclipbnuts[index].place((pos + self.gap * topclipbboltDir), topclipbgaugeDir, -topclipbboltDir)
-    
-        
+
     def createModel(self):
         for bolt in self.bolts:
             self.models.append(bolt.createModel())        
@@ -233,7 +211,6 @@ class NutBoltArray():
             
         dbg = self.dbgSphere(self.topclipborigin)
         self.models.append(dbg)
-        
     
     def get_beam_bolts(self):
         boltlist = []

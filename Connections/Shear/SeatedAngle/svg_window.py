@@ -12,13 +12,11 @@ import shutil
 import os
 
 
-
 class SvgWindow(object):
 
     def call_svgwindow(self, filename, view, folder):
         self.folder = folder
         self.svgWidget = QtSvg.QSvgWidget()
-        # self.svgWidget.renderer().load(filename)
 
         self.label = QLabel(self.svgWidget)
         self.label.setFrameShape(QFrame.Box)
@@ -36,9 +34,6 @@ class SvgWindow(object):
         spaceritem2 = QSpacerItem(260, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
         self.gridlayout.addItem(spaceritem2, 1, 2, 1, 1)
         self.svgWidget.setFixedSize(900, 700)
-
-        # spaceritem1 = QSpacerItem(18, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # self.horizontallayout.addItem(spaceritem1)
 
         self.btn_save_png = QPushButton('Save as PNG', self.svgWidget)
         self.btn_save_png.setToolTip('Saves 2D Image as PNG')

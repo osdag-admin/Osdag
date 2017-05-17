@@ -3,17 +3,10 @@ Created on 17-Oct-2016
 
 @author: deepa
 '''
-from PyQt4.uic.Compiler.qtproxies import QtGui
-import sys
-import __main__
-from PyQt4.Qt import QWidget
-from libxml2mod import parent
 from OCC.Quantity  import Quantity_Color, Quantity_NOC_SADDLEBROWN
 
 from OCC.BRepFilletAPI import BRepFilletAPI_MakeFillet
 from OCC.GC import GC_MakeArcOfCircle
-from OCC.ShapeConstruct import shapeconstruct, \
-   ShapeConstruct_CompBezierCurves2dToBSplineCurve2d
 from OCC.TopExp import TopExp_Explorer
 from OCC.TopoDS import topods
 from OCC.TopAbs import TopAbs_EDGE
@@ -22,8 +15,6 @@ import numpy
 
 from ModelUtils import *
 
-
- 
 L = 140
 A = 150
 B = 75
@@ -107,27 +98,6 @@ while anEdgeExplorer.More():
     anEdgeExplorer.Next()
          
 prism = mkFillet.Shape()
-
-# wire = BRepBuilderAPI_MakeWire(edge1.Edge(),edge2.Edge(),edge3.Edge(),edge4.Edge())
-# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge5.Edge())
-# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge6.Edge())
-# wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge7.Edge())
-# #wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge8.Edge())
-# #wire = BRepBuilderAPI_MakeWire(wire.Wire(),edge9.Edge())
-#  
-# aFace = makeFaceFromWire(wire.Wire())
-# extrudeDir = L * wDir # extrudeDir is a numpy array
-#  
-# prism =  makePrismFromFace(aFace, extrudeDir)
-# mkFillet = BRepFilletAPI_MakeFillet(prism)
-# anEdgeExplorer = TopExp_Explorer(prism, TopAbs_EDGE)
-# while anEdgeExplorer.More():
-#     aEdge = topods.Edge(anEdgeExplorer.Current())
-#     mkFillet.Add(T / 17. , aEdge)
-#     anEdgeExplorer.Next()
-#          
-# prism = mkFillet.Shape()
-
 
 display, start_display, add_menu, add_function_to_menu = init_display()
 display.DisplayColoredShape(prism,Quantity_Color(Quantity_NOC_SADDLEBROWN), update=True)

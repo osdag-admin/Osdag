@@ -3,16 +3,7 @@ Created on 11-May-2015
 
 @author: deepa
 '''
-
 import numpy
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-from bolt import Bolt
-from nut import Nut 
-from ModelUtils import *
-import copy
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from OCC.gp import gp_Pnt
-from nut_bolt_placement import NutBoltArray
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 import math
 
@@ -49,7 +40,6 @@ class ColWebBeamWeb(object):
         column_uDir = numpy.array([1.0, 0, 0])
         wDir1 = numpy.array([0.0, 0, 1.0])
         self.column.place(columnOrigin, column_uDir, wDir1)
-        
                 
     def createBeamGeometry(self):
         beamorigin = self.column.sec_origin + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir)
@@ -78,12 +68,6 @@ class ColWebBeamWeb(object):
         boltDir = -self.angle.uDir
         
         #=======================================================================
-        # nutboltArrayOrigin = self.angle.secOrigin 
-        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.T * self.angle.uDir  
-        # nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir
-        #=======================================================================
-        
         root2 = math.sqrt(2)
         nutboltArrayOrigin = self.angle.sec_origin
         nutboltArrayOrigin = nutboltArrayOrigin + self.angle.A * self.angle.vDir 
@@ -102,12 +86,6 @@ class ColWebBeamWeb(object):
         bnutboltArrayOrigin = bnutboltArrayOrigin - self.angle.R2/root2*self.angle.uDir
         
         #=======================================================================
-        # bnutboltArrayOrigin = self.angle.secOrigin 
-        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.L/4 * self.angle.wDir  
-        # bnutboltArrayOrigin = bnutboltArrayOrigin + self.angle.T * self.angle.vDir  
-        # bnutboltArrayOrigin = bnutboltArrayOrigin + (self.angle.B) * self.angle.uDir
-        #=======================================================================
-        
         topclipgaugeDir = -self.topclipangle.wDir
         topclippitchDir = -self.topclipangle.uDir
         topclipboltDir = -self.topclipangle.vDir
@@ -120,12 +98,6 @@ class ColWebBeamWeb(object):
         topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
         
         #=======================================================================
-        # topclipnutboltArrayOrigin = self.topclipangle.secOrigin 
-        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
-        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.uDir  
-        # topclipnutboltArrayOrigin = topclipnutboltArrayOrigin + self.topclipangle.A * self.topclipangle.vDir
-        #=======================================================================
-        
         topclipbgaugeDir = -self.topclipangle.wDir
         topclipbpitchDir = -self.topclipangle.vDir
         topclipbboltDir = -self.topclipangle.uDir
@@ -138,12 +110,6 @@ class ColWebBeamWeb(object):
         topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L * self.topclipangle.wDir
         
         #=======================================================================
-        # topclipbnutboltArrayOrigin = self.topclipangle.secOrigin 
-        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.L/4 * self.topclipangle.wDir  
-        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + self.topclipangle.T * self.topclipangle.vDir  
-        # topclipbnutboltArrayOrigin = topclipbnutboltArrayOrigin + (self.topclipangle.B) * self.topclipangle.uDir
-        #=======================================================================
-                  
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir, bnutboltArrayOrigin, bgaugeDir, bpitchDir,
                                 bboltDir, topclipnutboltArrayOrigin, topclipgaugeDir, topclippitchDir, topclipboltDir, topclipbnutboltArrayOrigin,
                                 topclipbgaugeDir, topclipbpitchDir, topclipbboltDir)
@@ -174,6 +140,3 @@ class ColWebBeamWeb(object):
         for bolt in nutBoltlist:
             finalcol = BRepAlgoAPI_Cut(finalcol,bolt).Shape()
         return finalcol
-
-                
-                

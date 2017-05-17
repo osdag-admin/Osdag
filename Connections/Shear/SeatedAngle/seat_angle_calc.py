@@ -44,8 +44,6 @@ logger = logging.getLogger("osdag.SeatAngleCalc")
 
 
 # TODO bolts_provided and bolts_required in UI and output_dict
-# TODO pitch and gauge rounding off issues
-# TODO sum of edge_dist+gauge*(num_cols-1)+edge_dist != angle_l due to rounding off
 
 
 class SeatAngleCalculation(ConnectionCalculations):
@@ -481,12 +479,10 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(self.bolt_diameter, self.bolt_fu, self.mu_f,
                                                                      self.n_e,
                                                                      self.bolt_hole_type)
+            self.bolt_bearing_capacity = 0.01
             self.bolt_value = self.bolt_shear_capacity
         # Check for long joints is not applicable for seated angle connection
         self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
-        if self.connectivity == "Column flange-Beam flange" and self.bolts_required % 2 == 1:
-            self.bolts_required = self.bolts_required + 1
-        self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
     def seat_angle_connection(self, input_dict):
         """ Perform design and detailing checks based for seated angle connection.
@@ -508,6 +504,24 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.sa_params(input_dict)
         self.bolt_design()
 
+        if self.connectivity == "Column flange-Beam flange":
+            if self.bolts_required == 3:
+                self.bolts_required = 4
+            elif self.bolts_required == 5:
+                self.bolts_required = 8
+                logger.warning(": 5 bolts are required but 8 are being provided.")
+                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+            elif self.bolts_required == 6:
+                self.bolts_required = 8
+                logger.warning(": 6 bolts are required but 8 are being provided.")
+                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+            elif self.bolts_required == 7:
+                self.bolts_required = 8
+                logger.warning(": 7 bolts are required but 8 are being provided.")
+                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+
+        self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
+
         if self.connectivity == "Column web-Beam flange":
             limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
 
@@ -528,7 +542,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.num_rows = 1
         self.num_cols = max(self.bolts_required, 2)
         self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))), 3)
-        # TODO verify gauge for: bolt should not pass through column web in beam to column flange connectivity
         # TODO verify gauge for: bolt should not pass through beam web in any connectivity
 
         if self.gauge < self.min_gauge:
@@ -752,7 +765,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         bwlb_P_d = (bwlb_b1 + bwlb_n1) * bwlb_f_cd
         self.beam_web_local_buckling_capacity = bwlb_P_d
 
-        # TODO: Uncomment below block after CAD and report is resolved
         if self.beam_web_local_buckling_capacity < self.shear_force:
             self.safe = False
             logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")

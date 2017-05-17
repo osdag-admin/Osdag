@@ -283,7 +283,6 @@ def create_sample_ui_input_sa(sa_connection_id):
 
 
 def create_sample_ui_output_sa():
-    # TODO : Update the output cases
     output_dict = {'SeatAngle': {}, 'Bolt': {}}
     output_dict['SeatAngle'] = {
         "Length (mm)": 140,

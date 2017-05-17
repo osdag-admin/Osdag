@@ -11,7 +11,7 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
 from Connections.Shear.cleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
-from Connections.Shear.SeatedAngle.col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
+from Connections.Shear.SeatedAngle.CAD_col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
 
 from Connections.Shear.Finplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as finBeamWebBeamWeb
 from Connections.Shear.Endplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as endBeamWebBeamWeb
@@ -20,7 +20,7 @@ from Connections.Shear.cleatAngle.beamWebBeamWebConnectivity import BeamWebBeamW
 from Connections.Shear.Finplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as finColFlangeBeamWeb
 from Connections.Shear.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as endColFlangeBeamWeb
 from Connections.Shear.cleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
-from Connections.Shear.SeatedAngle.col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
+from Connections.Shear.SeatedAngle.CAD_col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
 
 from Connections.Shear.Finplate.finPlateCalc import finConn
 from Connections.Shear.Endplate.endPlateCalc import end_connection
@@ -51,7 +51,7 @@ from Connections.Shear.SeatedAngle.drawing_2D import SeatCommonData
 from Connections.Shear.Finplate.reportGenerator import save_html as fin_save_html
 from Connections.Shear.Endplate.reportGenerator import save_html as end_save_html
 from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
-from Connections.Shear.SeatedAngle.report_generator import ReportGenerator
+from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
 import json
 from Connections.Component.ModelUtils import *

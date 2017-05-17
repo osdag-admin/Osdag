@@ -256,9 +256,6 @@ class SeatAngleCalculation(ConnectionCalculations):
                      100: "100 100 X 10",
                      "100 65 X 8": "100 65 X 8"
                      }[top_angle_side]
-        # TODO User specified top angle should overwrite calculated top angle.
-        # logger should display message as warning/info. use dictionary to execute this.
-
         return top_angle
 
     def sa_params(self, input_dict):
@@ -335,7 +332,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_R1 = float(self.dict_angle_data["R1"])
 
         self.pitch = 0
-        self.top_angle = self.top_angle_section()
+        self.top_angle_recommended = self.top_angle_section()
         self.safe = True
 
     def print_section_properties(self):
@@ -509,16 +506,16 @@ class SeatAngleCalculation(ConnectionCalculations):
                 self.bolts_required = 4
             elif self.bolts_required == 5:
                 self.bolts_required = 8
-                logger.warning(": 5 bolts are required but 8 are being provided.")
-                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+                logger.info(": 5 bolts are required but 8 are being provided.")
+                logger.info(": It is recommended to increase the bolt grade or bolt diameter")
             elif self.bolts_required == 6:
                 self.bolts_required = 8
-                logger.warning(": 6 bolts are required but 8 are being provided.")
-                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+                logger.info(": 6 bolts are required but 8 are being provided.")
+                logger.info(": It is recommended to increase the bolt grade or bolt diameter")
             elif self.bolts_required == 7:
                 self.bolts_required = 8
-                logger.warning(": 7 bolts are required but 8 are being provided.")
-                logger.warning(": It is recommended to increase the bolt grade or bolt diameter")
+                logger.info(": 7 bolts are required but 8 are being provided.")
+                logger.info(": It is recommended to increase the bolt grade or bolt diameter")
 
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
@@ -770,6 +767,10 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
             logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
             logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
+
+        if self.top_angle_recommended != self.top_angle:
+            logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
+                           self.top_angle_recommended, self.beam_section)
 
         # End of calculation
         # ---------------------------------------------------------------------------

@@ -804,9 +804,9 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
-    min_end = str(1.7 * float(dia_hole))
-    max_end = str(12 * float(beam_tw))
-    row = [0, "End distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_tw + " = " + max_end + " <br> [cl. 10.2.4]", end,
+    min_end = str(int(float(min_edgend_dist) * float(dia_hole)))
+    max_end = str(float(12 * float(beam_tw)))
+    row = [0, "End distance (mm)", " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_tw + " = " + max_end + " <br> [cl. 10.2.4]", end,
            "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -816,9 +816,9 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
-    min_edge = str(1.7 * float(dia_hole))
-    max_edge = str(12 * float(beam_tw))
-    row = [0, "Edge distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_tw + " = " + max_edge + "<br> [cl. 10.2.4]", edge,
+    min_edge = str(int(float(min_edgend_dist) * float(dia_hole)))
+    max_edge = str(float(12 * float(beam_tw)))
+    row = [0, "Edge distance (mm)", " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_tw + " = " + max_edge + "<br> [cl. 10.2.4]", edge,
            " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

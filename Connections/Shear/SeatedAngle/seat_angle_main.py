@@ -334,7 +334,7 @@ class MainController(QMainWindow):
 
         # Graphics menu
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
-        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
+        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn) # TODO Exit code 1 on call_3DColumn
         self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
         self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
@@ -690,8 +690,7 @@ class MainController(QMainWindow):
         file_name = str(filename)
         self.call_seatangle2D_Drawing("All")
 
-        report_generator_instance = report_generator.ReportGenerator(self.commLogicObj.sa_calc_obj)
-        report_generator_instance.save_html(report_summary, file_name, self.folder)
+        self.commLogicObj.call_designReport(file_name, report_summary)
 
         # Creates PDF
         if sys.platform == ("win32" or "win64"):

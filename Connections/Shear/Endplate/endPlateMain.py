@@ -36,6 +36,7 @@ from model import *
 from ui_endplate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
+# from Connections.Shear.common_logic import CommonDesignLogic
 #from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 
@@ -85,46 +86,48 @@ class DesignPreferences(QDialog):
         '''
         This routine is responsible for saving all design preferences selected by the user
         '''
-        designPref = {}
-        designPref["bolt"] = {}
-        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
-        designPref["weld"] = {}
+
+        self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
-        designPref["weld"]["typeof_weld"] = weldType
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
         
         if weldType == "Shop weld":
-            designPref["weld"]["safety_factor"] = float(1.25)
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
         else:
-            designPref["weld"]["safety_factor"] = float(1.5)
-        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
-        designPref["weld"]["weld_fu"] = str(self.ui.txt_weldFu.text())
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+        self.saved_designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
+        self.saved_designPref["weld"]["weld_fu"] = str(self.ui.txt_weldFu.text())
 
-        designPref["detailing"] = {}
+        self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
-        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
         if typeOfEdge == "a - Sheared or hand flame cut":
-            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
-            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         # if self.ui.txt_detailingGap.text() == '':
         #
         #     designPref["detailing"]["gap"] = int(20)
         # else:
         #     designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
-        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["detailing"]["gap"] = int(20)
 
-        designPref["design"] = {}
-        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
 
         self.saved = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
-        return designPref
+        return self.saved_designPref
 
         #self.main_controller.call_designPref(designPref)
 
@@ -132,6 +135,20 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
+
+        # if uiObj ["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
+        #     pass
+        # else:
+        #     boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        #     clearance = str(self.get_clearance(boltDia))
+        #     self.ui.txt_boltHoleClearance.setText(clearance)
+        # if uiObj ["Bolt"]["Grade"] == '':
+        #     pass
+        # else:
+        #     bolt_grade = float(uiObj["Bolt"]["Grade"])
+        #     bolt_fu = str(self.get_boltFu(bolt_grade))
+        #     self.ui.txt_boltFu.setText(bolt_fu)
+
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         bolt_grade = (uiObj["Bolt"]["Grade"])
         clearance = str(self.get_clearance(boltDia))
@@ -161,7 +178,10 @@ class DesignPreferences(QDialog):
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
-        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            designPref["detailing"]["min_edgend_dist"] = float(1.5)
         designPref["detailing"]["gap"] = int(20)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
@@ -1503,12 +1523,12 @@ class MainController(QMainWindow):
         '''
         This routine returns the neccessary design parameters.
         '''
-        self.designPrefDialog.saved = False
+        # self.designPrefDialog.saved = False
         self.uiobj = self.getuser_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
         else:
-            design_pref = self.designPrefDialog.save_designPref_para()
+            design_pref = self.designPrefDialog.saved_designPref
         self.uiobj.update(design_pref)
 
         dictbeamdata = self.fetch_beam_param()
@@ -1532,6 +1552,7 @@ class MainController(QMainWindow):
         """
         self.display.EraseAll()
         self.alist = self.designParameters()
+        print "design preference printing", self.alist[0]
 
         self.validate_inputs_on_design_button()
         self.ui.outputDock.setFixedSize(310, 710)

@@ -43,9 +43,6 @@ from Connections.connection_calculations import ConnectionCalculations
 logger = logging.getLogger("osdag.SeatAngleCalc")
 
 
-# TODO bolts_provided and bolts_required in UI and output_dict
-
-
 class SeatAngleCalculation(ConnectionCalculations):
     """Perform design and detailing checks for seated angle connection.
 
@@ -94,6 +91,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         angle_A  (float): longer leg of unequal angle
         angle_B  (float): shorter leg of unequal angle
         angle_R1 (float)
+        angle_R2 (float)
         angle_l (float)
 
         safe (Boolean) : status of connection, True if safe
@@ -182,6 +180,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_A = 1
         self.angle_B = 1
         self.angle_R1 = 1
+        self.angle_R2 = 1
         self.angle_l = 1
 
         self.safe = True
@@ -334,6 +333,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.angle_A = int(seat_legsizes.split('x')[0]) # longer leg of unequal angle
         self.angle_B = int(seat_legsizes.split('x')[1]) # shorter leg of unequal angle
         self.angle_R1 = float(self.dict_angle_data["R1"])
+        self.angle_R2 = float(self.dict_angle_data["R2"])
 
         self.pitch = 0
         self.top_angle_recommended = self.top_angle_section()
@@ -363,7 +363,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         print self.angle_t, "Angle thickness"
         print self.angle_A, "Longer leg of unequal angle"
         print self.angle_B, "Shorter leg of unequal angle"
-        print self.angle_R1, "Root radius of angle"
+        print self.angle_R1, "Root radius R1 of angle"
+        print self.angle_R2, "Root radius R2 of angle"
 
     def sa_output(self):
         """Create and return dictionary of output parameters."""
@@ -520,9 +521,13 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.top_angle_A = int(top_angle_legsizes.split('x')[0]) # longer leg of unequal angle
         self.top_angle_B = int(top_angle_legsizes.split('x')[1]) # shorter leg of unequal angle
         self.top_angle_R1 = float(self.dict_top_angle_data["R1"])
-        self.top_angle_end_dist_column = float(self.top_angle_A) / 2
-        self.top_angle_end_dist_beam = float(self.top_angle_B) / 2
-        self.seat_angle_end_dist_beam = float(self.angle_B) / 2
+        self.top_angle_R2 = float(self.dict_top_angle_data["R2"])
+        self.top_angle_end_dist_column = (float(self.top_angle_A) - self.top_angle_t-self.top_angle_R1\
+                                          - self.top_angle_R2)/ 2 +  self.top_angle_R2
+        self.top_angle_end_dist_beam = (float(self.top_angle_B) - self.top_angle_t -self.top_angle_R1\
+                                        - self.top_angle_R2) / 2 + self.top_angle_R2
+        self.seat_angle_end_dist_beam = (float(self.angle_B) - self.angle_t - self.angle_R1\
+                                         -self.angle_R2)/ 2 + self.angle_R2
 
         if self.top_angle_end_dist_column < self.min_end_dist:
             self.safe = False

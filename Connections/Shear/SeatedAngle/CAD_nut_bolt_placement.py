@@ -86,7 +86,6 @@ class NutBoltArray():
         self.TAEDC = boltPlaceObj['Bolt']['top_angle_end_dist_column']
         self.TAEDB = boltPlaceObj['Bolt']['top_angle_end_dist_beam']
         self.SAEDB = boltPlaceObj['Bolt']['seat_angle_end_dist_beam']
-        print "printing TAEDC",self.TAEDC
         self.brow = 1
         self.bcol= 2
         

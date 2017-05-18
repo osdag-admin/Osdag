@@ -54,7 +54,9 @@ class ColWebBeamWeb(object):
         uDir = numpy.array([1.0, 0.0, 0.0])
         self.angle.place(angleOrigin, uDir, wDir)
                  
-        topclipangleOrigin =((self.column.sec_origin)*self.column.vDir)+((self.column.length/2+self.beam.D/2) * self.column.wDir)+(self.topclipangle.L/2 * (self.column.vDir))
+        topclipangleOrigin =((self.column.sec_origin)*self.column.vDir)+\
+                            ((self.column.length/2+self.beam.D/2) * self.column.wDir)+\
+                            (self.topclipangle.L/2 * (self.column.vDir))
 
         wDir = numpy.array([0.0, -1.0, 0.0])
         uDir = numpy.array([1.0, 0.0, 0.0])

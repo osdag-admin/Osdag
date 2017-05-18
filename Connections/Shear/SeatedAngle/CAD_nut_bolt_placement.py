@@ -83,6 +83,10 @@ class NutBoltArray():
         self.end = boltPlaceObj['Bolt']["End Distance (mm)"]
         self.row = boltPlaceObj['Bolt']["No. of Row"]
         self.col = boltPlaceObj['Bolt']["No. of Column"]
+        self.TAEDC = boltPlaceObj['Bolt']['top_angle_end_dist_column']
+        self.TAEDB = boltPlaceObj['Bolt']['top_angle_end_dist_beam']
+        self.SAEDB = boltPlaceObj['Bolt']['seat_angle_end_dist_beam']
+        print "printing TAEDC",self.TAEDC
         self.brow = 1
         self.bcol= 2
         
@@ -107,9 +111,9 @@ class NutBoltArray():
         for rw in  range(self.brow):
             for col in range(self.bcol):
                 pos = self.borigin 
-                pos = pos + self.end * self.bgaugeDir
+                pos = pos + self.edge * self.bgaugeDir
                 pos = pos + col * self.gauge_two_bolt * self.bgaugeDir 
-                pos = pos + self.edge * self.bpitchDir 
+                pos = pos + self.SAEDB * self.bpitchDir
                 pos = pos + rw * self.pitch * self.bpitchDir
                 self.bpositions.append(pos)
     
@@ -118,9 +122,9 @@ class NutBoltArray():
         for rw in  range(self.topcliprow):
             for col in range(self.topclipcol):
                 pos = self.topcliporigin 
-                pos = pos + self.end * self.topclipgaugeDir
+                pos = pos + self.edge * self.topclipgaugeDir
                 pos = pos + col * self.gauge_two_bolt * self.topclipgaugeDir 
-                pos = pos + self.edge * self.topclippitchDir 
+                pos = pos + self.TAEDB * self.topclippitchDir
                 pos = pos + rw * self.pitch * self.topclippitchDir
                 self.topclippositions.append(pos)
     
@@ -131,7 +135,7 @@ class NutBoltArray():
                 pos = self.topclipborigin 
                 pos = pos + self.edge * self.topclipbgaugeDir
                 pos = pos + col * self.gauge_two_bolt * self.topclipbgaugeDir 
-                pos = pos + self.end * self.topclipbpitchDir 
+                pos = pos + self.TAEDC * self.topclipbpitchDir
                 pos = pos + rw * self.pitch * self.topclipbpitchDir
                 self.topclipbpositions.append(pos)
     

@@ -158,7 +158,7 @@ class DesignPreferences(QDialog):
         """
         # TODO : change grade to 10.9; also update UI
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
-                  12.9: 1220}
+                  10.9:940, 12.9: 1220}
         boltGrd = float(boltGrade)
         return boltFu[boltGrd]
 

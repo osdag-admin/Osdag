@@ -125,6 +125,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         min_gauge (int)
         max_spacing (int)
         max_edge_dist (int)
+        top_angle_end_dist_column (float)
+        top_angle_end_dist_beam (float)
+        seat_angle_end_dist_beam (float)
 
     """
 
@@ -212,6 +215,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gauge = 1
         self.max_spacing = 1
         self.max_edge_dist = 1
+        self.top_angle_end_dist_column = 1.0
+        self.top_angle_end_dist_beam = 1.0
+        self.seat_angle_end_dist_beam = 1.0
 
     def top_angle_section(self):
         """Identify appropriate top angle size based on beam depth.
@@ -325,10 +331,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.column_R1 = float(self.dict_column_data["R1"])  # column root radius
         self.angle_t = float(self.dict_angle_data["t"])  # angle thickness
         seat_legsizes = str(self.dict_angle_data["AXB"])
-        self.angle_A = int(seat_legsizes.split('x')[0])
-        self.angle_B = int(seat_legsizes.split('x')[1])
-        # self.angle_A = float(self.dict_angle_data["A"])  # longer leg of unequal angle
-        # self.angle_B = float(self.dict_angle_data["B"])  # shorter leg of unequal angle
+        self.angle_A = int(seat_legsizes.split('x')[0]) # longer leg of unequal angle
+        self.angle_B = int(seat_legsizes.split('x')[1]) # shorter leg of unequal angle
         self.angle_R1 = float(self.dict_angle_data["R1"])
 
         self.pitch = 0
@@ -390,6 +394,10 @@ class SeatAngleCalculation(ConnectionCalculations):
             "Gauge Two Bolt (mm)": self.gauge_two_bolt,
             "End Distance (mm)": self.end_dist,
             "Edge Distance (mm)": self.edge_dist,
+            # Use below distances only for generating 2D drawings and CAD
+            "top_angle_end_dist_column":self.top_angle_end_dist_column,
+            "top_angle_end_dist_beam":self.top_angle_end_dist_beam,
+            "seat_angle_end_dist_beam":self.seat_angle_end_dist_beam,
 
             # output dictionary items for design report
             "bolt_fu": self.bolt_fu,
@@ -501,6 +509,43 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.sa_params(input_dict)
         self.bolt_design()
 
+        if self.top_angle_recommended != self.top_angle:
+            logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
+                           self.top_angle_recommended, self.beam_section)
+
+        model.set_databaseconnection()
+        self.dict_top_angle_data = get_angledata(self.top_angle)
+        self.top_angle_t = float(self.dict_top_angle_data["t"])  # angle thickness
+        top_angle_legsizes = str(self.dict_top_angle_data["AXB"])
+        self.top_angle_A = int(top_angle_legsizes.split('x')[0]) # longer leg of unequal angle
+        self.top_angle_B = int(top_angle_legsizes.split('x')[1]) # shorter leg of unequal angle
+        self.top_angle_R1 = float(self.dict_top_angle_data["R1"])
+        self.top_angle_end_dist_column = float(self.top_angle_A) / 2
+        self.top_angle_end_dist_beam = float(self.top_angle_B) / 2
+        self.seat_angle_end_dist_beam = float(self.angle_B) / 2
+
+        if self.top_angle_end_dist_column < self.min_end_dist:
+            self.safe = False
+            logger.error(": Detailing failure for top angle")
+            logger.warning(": Minimum end distance for selected bolt is %2.2f mm [Cl 10.2.2] " % self.min_end_dist)
+            logger.info(": Select bolt with lower grade/diameter to reduce minimum end distances")
+            logger.info(": or Increase leg A of top angle")
+
+        if self.top_angle_end_dist_beam < self.min_end_dist:
+            self.safe = False
+            logger.error(": Detailing failure for top angle")
+            logger.warning(": Minimum end distance for selected bolt is %2.2f mm [Cl 10.2.2] " % self.min_end_dist)
+            logger.info(": Select bolt with lower grade/diameter to reduce minimum end distances")
+            logger.info(": or Increase leg B of top angle")
+
+        if self.seat_angle_end_dist_beam < self.min_end_dist:
+            self.safe = False
+            logger.error(": Detailing failure for seat angle")
+            logger.warning(": Minimum end distance for selected bolt is %2.2f mm [Cl 10.2.2] " % self.min_end_dist)
+            logger.info(": Select bolt with lower grade/diameter to reduce minimum end distances")
+            logger.info(": or Increase leg B of seated angle")
+
+        # To avoid bolts intersecting the column web in CFBF connectivity:
         if self.connectivity == "Column flange-Beam flange":
             if self.bolts_required == 3:
                 self.bolts_required = 4
@@ -767,10 +812,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.error(": Local buckling capacity of web of supported beam is less than shear force Cl 8.7.3.1")
             logger.warning(": Local buckling capacity is %2.2f kN-mm" % self.beam_web_local_buckling_capacity)
             logger.info(": Increase length of outstanding leg of seated angle to increase the stiff bearing length")
-
-        if self.top_angle_recommended != self.top_angle:
-            logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
-                           self.top_angle_recommended, self.beam_section)
 
         # End of calculation
         # ---------------------------------------------------------------------------

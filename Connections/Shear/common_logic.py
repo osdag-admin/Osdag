@@ -6,6 +6,7 @@ Created on 18-Nov-2016
 
 import os
 
+import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
 from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
@@ -318,9 +319,17 @@ class CommonDesignLogic(object):
 
             colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array)
         else:
-            gap = column_tw + seat_thick + nut_T
-            bgap = beam_T + topangle_thick + nut_T
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
+            root2 = math.sqrt(2)
+            # gap = column_tw + seat_thick + nut_T
+            # bgap = beam_T + topangle_thick + nut_T
+            # self.topclipangle.R2*(1-1/root2)
+            sgap = column_tw + seat_thick  + nut_T
+            sbgap = beam_T + seat_thick + nut_T
+            tgap = beam_T + topangle_thick + nut_T
+            tbgap = column_tw + topangle_thick + nut_T
+
+            #nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap,tgap,tbgap)
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
         colwebconn.create_3dmodel()

@@ -1716,7 +1716,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    workspace_folder_path = "F:\OSDAG_workspace"
+    workspace_folder_path = "D:\Osdag_Workspace\Cleatangle"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

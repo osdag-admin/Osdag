@@ -685,16 +685,16 @@ def end_connection(ui_obj):
     #     weld_t_req = weld_t_req
 
     if weld_t < weld_t_req:
+        design_check = False
         logger.error(": Weld thickness is not sufficient [cl. 10.5.2.3 and Table 21; IS 800:2007]")
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
         logger.info(": Increase the weld thickness or length of weld/Endplate")
 
 
-
     # End of calculation
     output_obj = {}
     output_obj['Bolt'] = {}
-    output_obj['Bolt']['status'] = True
+    output_obj['Bolt']['status'] = design_check
     output_obj['Bolt']['shearcapacity'] = bolt_shear_capacity
     output_obj['Bolt']['bearingcapacity'] = bolt_bearing_capacity
     output_obj['Bolt']['boltcapacity'] = bolt_capacity

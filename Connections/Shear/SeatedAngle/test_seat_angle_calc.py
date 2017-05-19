@@ -32,7 +32,7 @@ class TestSeatAngleCalculation(unittest.TestCase, SeatAngleCalculation):
         self.assertEqual(self.sa_calc_instance.beam_w_t, 7.7)
         self.assertEqual(self.sa_calc_instance.beam_f_t, 13.1)
         self.assertEqual(self.sa_calc_instance.beam_d, 300)
-        self.assertEqual(self.sa_calc_instance.beam_w_f, 140)
+        self.assertEqual(self.sa_calc_instance.beam_b, 140)
         self.assertEqual(self.sa_calc_instance.beam_R1, 14)
         self.assertEqual(self.sa_calc_instance.column_f_t, 15)
         self.assertEqual(self.sa_calc_instance.angle_t, 12)
@@ -211,7 +211,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 2.0
         input_dict['bolt']['slip_factor'] = 0.55
@@ -230,7 +230,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 2.0
         input_dict['bolt']['slip_factor'] = 0.55
@@ -249,7 +249,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "6.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
         input_dict['bolt']['bolt_hole_type'] = 'Over-sized'
         input_dict['bolt']['bolt_hole_clrnce'] = 3.0
         input_dict['bolt']['slip_factor'] = 0.55
@@ -268,7 +268,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 150 10"
+        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 1.0
         input_dict['bolt']['slip_factor'] = 0.55

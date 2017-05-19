@@ -3,6 +3,9 @@ import math
 from seat_angle_calc import SeatAngleCalculation
 
 
+# TODO add top angle detailing checks to report
+
+
 class ReportGenerator(SeatAngleCalculation):
     """Generate Design Report for Seated Angle Connection.
 
@@ -143,11 +146,11 @@ class ReportGenerator(SeatAngleCalculation):
         self.beam_w_t = sa_calc_object.beam_w_t
         self.beam_f_t = sa_calc_object.beam_f_t
         self.beam_d = sa_calc_object.beam_d
-        self.beam_w_f = sa_calc_object.beam_w_f
+        self.beam_w_f = sa_calc_object.beam_b
         self.beam_R1 = sa_calc_object.beam_R1
         self.column_f_t = sa_calc_object.column_f_t
         self.column_d = sa_calc_object.column_d
-        self.column_w_f = sa_calc_object.column_w_f
+        self.column_w_f = sa_calc_object.column_b
         self.column_R1 = sa_calc_object.column_R1
         self.angle_t = sa_calc_object.angle_t
         self.angle_A = sa_calc_object.angle_A

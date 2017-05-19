@@ -23,7 +23,8 @@ class ReportGenerator(SeatAngleCalculation):
         type_of_edge (string): The type is used in determining the min_edge_distance 
         is_environ_corrosive (string): 'Yes' or 'No'
         design_method (string)
-        root_clearance (int): clearance of bolt row from the root of seated angle
+        root_clearance_sa (int): clearance of first bolt from the root of seated angle
+        root_clearance_col (int): clearance of first bolt from the root of supporting column
 
         top_angle (string)
         connectivity (string)
@@ -122,7 +123,8 @@ class ReportGenerator(SeatAngleCalculation):
         self.type_of_edge = sa_calc_object.type_of_edge
         self.is_environ_corrosive = sa_calc_object.is_environ_corrosive
         self.design_method = sa_calc_object.design_method
-        self.root_clearance = sa_calc_object.root_clearance
+        self.root_clearance_sa = sa_calc_object.root_clearance_sa
+        self.root_clearance_col = sa_calc_object.root_clearance_col
         self.is_hsfg = sa_calc_object.is_hsfg
 
         self.top_angle = sa_calc_object.top_angle
@@ -189,7 +191,6 @@ class ReportGenerator(SeatAngleCalculation):
         self.edge_dist = sa_calc_object.edge_dist
         self.max_spacing = sa_calc_object.max_spacing
         self.max_edge_dist = sa_calc_object.max_edge_dist
-        self.max_end_dist = sa_calc_object.max_end_dist
 
         self.company_name = ""
         self.company_logo = ""
@@ -495,15 +496,12 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, remark)
 
         # End distance (mm)
-        if self.end_dist >= self.min_end_dist and self.end_dist <= self.max_end_dist:
+        if self.end_dist >= self.min_end_dist:
             remark = check_pass
-        elif self.end_dist < self.min_end_dist or self.end_dist > self.max_end_dist:
+        elif self.end_dist < self.min_end_dist:
             remark = check_fail
         req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
         req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
-        req_field += " <br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) <br>[cl. 10.2.4.3]"
-        req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" + str(self.angle_fy) + \
-                     " = " + str(self.max_end_dist)
         rstr += design_check_row("End distance (mm)", req_field, end, remark)
 
         # Edge distance (mm)
@@ -538,13 +536,13 @@ class ReportGenerator(SeatAngleCalculation):
                 self.beam_w_f) + ", " + str(self.column_w_f) + ")"
             prov_field = str(self.angle_l)
         elif connectivity == "Column web-Beam flange":
-            # limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
+            # limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance_col
             # self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
             req_field = "= min(width of supported beam, <br>" + space(2) + \
                         "column_depth - 2*column_flange_thickness<br>" + space(2) +\
-                        " - 2*column_R1 - root_clearance)" + "<br> = min(" + str(self.beam_w_f) \
+                        " - 2*column_R1 - root_clearance_col)" + "<br> = min(" + str(self.beam_w_f) \
                         + ", " + str(self.column_d) + " - 2*" + str(self.column_f_t) \
-                        + " - 2*" + str(self.column_R1) + " - " + str(self.root_clearance) + ")"
+                        + " - 2*" + str(self.column_R1) + " - " + str(self.root_clearance_col) + ")"
             prov_field = str(self.angle_l)
         # As the seated angle length is a determined/calculated parameter, there is no design 'check' remark
         rstr += design_check_row("Length (mm)", req_field, prov_field, " ")

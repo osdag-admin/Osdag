@@ -212,6 +212,7 @@ class ConnectionCalculations(object):
             round_up_distance (float): bolt distance in mm, multiple of 5 mm.
 
         """
+        round_up_distance = distance
         if distance % 5 != 0:
             round_up_distance = ((distance / 5) + 1) * 5 - distance % 5
         return round_up_distance
@@ -251,9 +252,6 @@ class ConnectionCalculations(object):
         # Max pitch of outer line of bolts IS 800 Cl 10.2.3.3
         # assuming that this limit applies to the pitch of interior bolts as well
         self.max_pitch = math.ceil(min(100 + 4 * thickness_governing_min, self.max_pitch))
-
-        # Max spacing IS 800 Cl 10.2.4.3
-        self.max_end_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)))
 
         # Max spacing IS 800 Cl 10.2.4.3
         self.max_edge_dist = math.ceil((12 * thickness_governing_min * math.sqrt(250 / self.angle_fy)))

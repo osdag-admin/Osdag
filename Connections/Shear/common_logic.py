@@ -319,16 +319,11 @@ class CommonDesignLogic(object):
 
             colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array)
         else:
-            root2 = math.sqrt(2)
-            # gap = column_tw + seat_thick + nut_T
-            # bgap = beam_T + topangle_thick + nut_T
-            # self.topclipangle.R2*(1-1/root2)
             sgap = column_tw + seat_thick  + nut_T
             sbgap = beam_T + seat_thick + nut_T
             tgap = beam_T + topangle_thick + nut_T
             tbgap = column_tw + topangle_thick + nut_T
 
-            #nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
             nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap,tgap,tbgap)
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
@@ -448,9 +443,12 @@ class CommonDesignLogic(object):
             nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
             colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
         else:
-            gap = beam_tw + seat_thick + nut_T
-            bgap = beam_tw + topangle_thick + nut_T
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
+            sgap = column_T + seat_thick + nut_T
+            sbgap = beam_T + seat_thick + nut_T
+            tgap = beam_T + topangle_thick + nut_T
+            tbgap = column_T + topangle_thick + nut_T
+
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap, tgap, tbgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
         colflangeconn.create_3dmodel()
@@ -493,7 +491,7 @@ class CommonDesignLogic(object):
             osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
                                 update=True)
             osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 

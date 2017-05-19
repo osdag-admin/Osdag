@@ -633,7 +633,7 @@ class MainController(QMainWindow):
         ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum 
         or of a Single Run Fillet Weld)
         '''
-        if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
+        if str(self.ui.comboPlateThick_2.currentText()) == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return

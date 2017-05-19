@@ -903,7 +903,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     # row =[0,"Effective weld length (mm)","","300 - 2*6 = 288"]
     effWeldLen = str(int(float(plateLength) - (2 * float(weld_Thick))))
-    row = [0, "Effective weld length (mm)", "", plateLength + "-2*" + weld_Thick + " = " + effWeldLen, ""]
+    row = [0, "Effective weld length on each side (mm)", "", plateLength + "-2*" + weld_Thick + " = " + effWeldLen, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

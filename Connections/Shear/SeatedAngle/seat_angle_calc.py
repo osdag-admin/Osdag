@@ -54,7 +54,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         custom_hole_clearance (float): user defined hole clearance, if any
         beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
-        root_clearance (int): clearance of bolt row from the root of seated angle
+        root_clearance_sa (int): clearance of first bolt from the root of seated angle
+        root_clearance_col (int): clearance of first bolt from the root of supporting column
         is_environ_corrosive (string): "Yes" if members are under corrosive influences (used for max edge distance)
         is_hsfg (boolean): True if the bolt is to be designed as HSFG with slip not permitted at ultimate load
 
@@ -81,12 +82,14 @@ class SeatAngleCalculation(ConnectionCalculations):
         beam_w_t (float): beam web thickness
         beam_f_t (float): beam flange thickness
         beam_d  (float): beam depth
-        beam_w_f  (float): beam width
+        beam_b  (float): beam width
         beam_R1 (float): beam root radius
         column_f_t (float): column flange thickness
+        column_w_t (float): column web thickness
         column_d (float): column depth
-        column_w_f (float): column width
-        column_R1 (float): column root radius
+        column_b (float): column width        
+        column_R1 (float): column root radius R1
+        column_R2 (float): column root radius R2
         angle_t (float): angle thickness
         angle_A  (float): longer leg of unequal angle
         angle_B  (float): shorter leg of unequal angle
@@ -144,7 +147,8 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.beam_col_clear_gap = 0
         self.min_edge_multiplier = 1
-        self.root_clearance = 0
+        self.root_clearance_sa = 0
+        self.root_clearance_col = 0
         self.top_angle = ""
         self.connectivity = ""
         self.beam_section = ""
@@ -170,12 +174,14 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.beam_w_t = 1
         self.beam_f_t = 1
         self.beam_d = 1
-        self.beam_w_f = 1
+        self.beam_b = 1
         self.beam_R1 = 1
         self.column_f_t = 1
+        self.column_w_t = 1
         self.column_d = 1
-        self.column_w_f = 1
+        self.column_b = 1
         self.column_R1 = 1
+        self.column_R2 = 1
         self.angle_t = 1
         self.angle_A = 1
         self.angle_B = 1
@@ -322,18 +328,27 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.beam_w_t = float(self.dict_beam_data["tw"])  # beam web thickness
         self.beam_f_t = float(self.dict_beam_data["T"])  # beam flange thickness
         self.beam_d = float(self.dict_beam_data["D"])  # beam depth
-        self.beam_w_f = float(self.dict_beam_data["B"])  # beam width
+        self.beam_b = float(self.dict_beam_data["B"])  # beam width
         self.beam_R1 = float(self.dict_beam_data["R1"])  # beam root radius
         self.column_f_t = float(self.dict_column_data["T"])  # column flange thickness
+        self.column_w_t = float(self.dict_column_data["tw"])  # column web thickness
         self.column_d = float(self.dict_column_data["D"])  # column depth
-        self.column_w_f = float(self.dict_column_data["B"])  # column width
-        self.column_R1 = float(self.dict_column_data["R1"])  # column root radius
+        self.column_b = float(self.dict_column_data["B"])  # column width
+        self.column_R1 = float(self.dict_column_data["R1"])  # column root radius R1
+        self.column_R2 = float(self.dict_column_data["R2"])  # column root radius R2
         self.angle_t = float(self.dict_angle_data["t"])  # angle thickness
         seat_legsizes = str(self.dict_angle_data["AXB"])
         self.angle_A = int(seat_legsizes.split('x')[0]) # longer leg of unequal angle
         self.angle_B = int(seat_legsizes.split('x')[1]) # shorter leg of unequal angle
         self.angle_R1 = float(self.dict_angle_data["R1"])
         self.angle_R2 = float(self.dict_angle_data["R2"])
+        self.dict_top_angle_data = get_angledata(self.top_angle)
+        self.top_angle_t = float(self.dict_top_angle_data["t"])  # angle thickness
+        top_angle_legsizes = str(self.dict_top_angle_data["AXB"])
+        self.top_angle_A = int(top_angle_legsizes.split('x')[0]) # longer leg of unequal angle
+        self.top_angle_B = int(top_angle_legsizes.split('x')[1]) # shorter leg of unequal angle
+        self.top_angle_R1 = float(self.dict_top_angle_data["R1"])
+        self.top_angle_R2 = float(self.dict_top_angle_data["R2"])
 
         self.pitch = 0
         self.top_angle_recommended = self.top_angle_section()
@@ -351,7 +366,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         print self.beam_w_t, "Beam web thickness"
         print self.beam_f_t, "Beam flange thickness"
         print self.beam_d, "Beam depth"
-        print self.beam_w_f, "Beam width"
+        print self.beam_b, "Beam width"
         print self.beam_R1, " Beam root radius"
         print "\nColumn section ", self.column_section
         print self.column_f_t, "Column flange thickness"
@@ -456,7 +471,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         Returns:
 
         """
-        self.root_clearance = 10
+        self.root_clearance_sa = 1.5*self.bolt_diameter
+        self.root_clearance_col = 1.5*self.bolt_diameter
         self.bolt_hole_clearance_value = self.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter,
                                                                        self.custom_hole_clearance)
         self.bolt_hole_diameter = self.bolt_diameter + self.bolt_hole_clearance_value
@@ -514,14 +530,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
                            self.top_angle_recommended, self.beam_section)
 
-        model.set_databaseconnection()
-        self.dict_top_angle_data = get_angledata(self.top_angle)
-        self.top_angle_t = float(self.dict_top_angle_data["t"])  # angle thickness
-        top_angle_legsizes = str(self.dict_top_angle_data["AXB"])
-        self.top_angle_A = int(top_angle_legsizes.split('x')[0]) # longer leg of unequal angle
-        self.top_angle_B = int(top_angle_legsizes.split('x')[1]) # shorter leg of unequal angle
-        self.top_angle_R1 = float(self.dict_top_angle_data["R1"])
-        self.top_angle_R2 = float(self.dict_top_angle_data["R2"])
         self.top_angle_end_dist_column = (float(self.top_angle_A) - self.top_angle_t-self.top_angle_R1\
                                           - self.top_angle_R2)/ 2 +  self.top_angle_R2
         self.top_angle_end_dist_beam = (float(self.top_angle_B) - self.top_angle_t -self.top_angle_R1\
@@ -570,11 +578,11 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_group_capacity = round(self.bolts_required * self.bolt_value, 1)
 
         if self.connectivity == "Column web-Beam flange":
-            limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance
+            limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance_col
 
-            self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
+            self.angle_l = int(math.ceil(min(self.beam_b, limiting_angle_length)))
         elif self.connectivity == "Column flange-Beam flange":
-            self.angle_l = int(math.ceil(min(self.beam_w_f, self.column_w_f)))
+            self.angle_l = int(math.ceil(min(self.beam_b, self.column_b)))
 
         if self.angle_t < 6:
             logger.warning(": Minimum thickness of 6 mm is recommended for seated angle.")
@@ -589,7 +597,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.num_rows = 1
         self.num_cols = max(self.bolts_required, 2)
         self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))), 3)
-        # TODO verify gauge for: bolt should not pass through beam web in any connectivity
 
         if self.gauge < self.min_gauge:
             self.num_rows = 2
@@ -597,7 +604,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                 self.bolts_provided = self.bolts_required + 1
             else:
                 self.bolts_provided = self.bolts_required
-            self.num_cols = self.bolts_provided / self.num_rows
+            self.num_cols = self.bolts_provided / 2
             if self.num_cols == 1:
                 self.safe = False
                 logger.error(": Detailing failure")
@@ -612,7 +619,8 @@ class SeatAngleCalculation(ConnectionCalculations):
                 self.gauge = int(math.ceil(length_avail / (self.num_cols - 1)))
                 if self.gauge < self.min_gauge:
                     self.safe = False
-                    logger.error(": Bolt gauge is less than minimum gauge distance [Cl 10.2.2]")
+                    logger.error(": Detailing failure")
+                    logger.error(": Bolt gauge %2.0f is less than minimum gauge distance [Cl 10.2.2]" % self.gauge)
                     logger.warning(": Bolt gauge should be more than  %2.2f mm " % self.min_gauge)
                     logger.warning(": Maximum gauge distance allowed is %2.2f mm " % self.max_spacing)
                     logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
@@ -633,11 +641,17 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.num_cols = int(math.ceil((length_avail / self.gauge) + 1))
             self.gauge = round(int(math.ceil(length_avail / (self.num_cols - 1))), 3)
 
-        if self.pitch > self.max_pitch:
+        # if self.connectivity == "Column flange-Beam flange":
+        #     if self.gauge < self.column_w_t + 2*self.column_R1:
+        #         self.safe = False
+        #         logger.error(": Detailing failure")
+        #         logger.warning(": Bolt intersects the column root radius")
+        #         logger.info(": Increase the bolt gauge by reducing the number of bolts")
+
+        if self.min_pitch > self.max_pitch:
             """
-            Assumption: This unlikely case occurs when the pitch (which is set to the nearest minimum pitch and
-            governed by the bolt diameter), is greater than the maximum pitch (which is governed by thickness of
-            connected member).
+            Assumption: This unlikely case could occur when the minimum pitch (which is governed by the bolt diameter), 
+            is greater than the maximum pitch (which is governed by thickness of connected member(s)).
             It is recommended to decrease the bolt diameter or increase the thickness of the connected members.
             """
             logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
@@ -648,14 +662,24 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         self.bolts_provided = self.num_cols * self.num_rows
         self.bolt_group_capacity = round(self.bolts_provided * self.bolt_value, 1)
-        self.pitch = int(math.ceil((self.num_rows - 1) * (self.angle_A - self.end_dist
-                                                          - self.angle_t - self.angle_R1 - 1.5 * self.bolt_diameter)))
-        if self.pitch < self.min_pitch and self.num_rows == 2:
-            self.safe = False
-            logger.error(": Bolt pitch calculated is less than minimum pitch [Cl 10.2.2]")
-            logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
-            logger.info(": Select angle with longer vertical leg OR")
-            logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
+
+        if self.num_rows == 1:
+            self.pitch = 0
+        elif self.num_rows == 2:
+            self.pitch = self.min_pitch
+        self.end_dist = self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.pitch
+        if self.end_dist < self.min_end_dist:
+            logger.error(": Detailing error")
+            logger.error(": Calculated bolt end distance is smaller than minimum end distance")
+            logger.warning(": End distance should be more than  %2.2f mm " % self.min_end_dist)
+            logger.info(": Select bolt with smaller bolt diameter OR")
+            logger.info(": Select seat angle with longer vertical leg.)")
+
+        # elif self.num_rows == 1 and self.end_dist > self.max_end_dist:
+        #     logger.warning(": End distance should be less than  %2.2f mm " % self.max_end_dist)
+        #     logger.warning(": Reduce the seated angle leg A length, to avoid a detailing failure")
+        #     self.num_rows = 2
+        #     add code for updating distances
 
         root_3 = math.sqrt(3)
 

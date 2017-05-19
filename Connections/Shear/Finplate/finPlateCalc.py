@@ -469,7 +469,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 +gap    #20
+                Ecc = min_edge_dist + min_gauge / 2 + gap    #20
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -813,7 +813,7 @@ def finConn(uiObj):
     
     if weld_t < weld_t_req:
         logger.error(": Weld thickness is not sufficient [cl. 10.5.7; Insdag Detailing Manual, 2002]")
-        logger.warning(": Minimum weld thickness is required is %2.2f mm " % (weld_t_req))
+        logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
         logger.info(": Increase the weld thickness or length of weld/finplate")
     

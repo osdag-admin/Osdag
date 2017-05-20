@@ -6,12 +6,13 @@ Created on 18-Nov-2016
 
 import os
 
+import math
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 
 from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
 from Connections.Shear.cleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
-from Connections.Shear.SeatedAngle.col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
+from Connections.Shear.SeatedAngle.CAD_col_web_beam_web_connectivity import ColWebBeamWeb as seatColWebBeamWeb
 
 from Connections.Shear.Finplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as finBeamWebBeamWeb
 from Connections.Shear.Endplate.beamWebBeamWebConnectivity import BeamWebBeamWeb as endBeamWebBeamWeb
@@ -20,7 +21,7 @@ from Connections.Shear.cleatAngle.beamWebBeamWebConnectivity import BeamWebBeamW
 from Connections.Shear.Finplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as finColFlangeBeamWeb
 from Connections.Shear.Endplate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as endColFlangeBeamWeb
 from Connections.Shear.cleatAngle.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as cleatColFlangeBeamWeb
-from Connections.Shear.SeatedAngle.col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
+from Connections.Shear.SeatedAngle.CAD_col_flange_beam_web_connectivity import ColFlangeBeamWeb as seatColFlangeBeamWeb
 
 from Connections.Shear.Finplate.finPlateCalc import finConn
 from Connections.Shear.Endplate.endPlateCalc import end_connection
@@ -36,7 +37,7 @@ from Connections.Component.angle import Angle
 from Connections.Shear.Finplate.nutBoltPlacement import NutBoltArray as finNutBoltArray
 from Connections.Shear.Endplate.nutBoltPlacement import NutBoltArray as endNutBoltArray
 from Connections.Shear.cleatAngle.nutBoltPlacement import NutBoltArray as cleatNutBoltArray
-from Connections.Shear.SeatedAngle.nut_bolt_placement import NutBoltArray as seatNutBoltArray
+from Connections.Shear.SeatedAngle.CAD_nut_bolt_placement import NutBoltArray as seatNutBoltArray
 from utilities import osdag_display_shape
 
 import OCC.V3d
@@ -51,7 +52,7 @@ from Connections.Shear.SeatedAngle.drawing_2D import SeatCommonData
 from Connections.Shear.Finplate.reportGenerator import save_html as fin_save_html
 from Connections.Shear.Endplate.reportGenerator import save_html as end_save_html
 from Connections.Shear.cleatAngle.reportGenerator import save_html as cleat_save_html
-from Connections.Shear.SeatedAngle.report_generator import ReportGenerator
+from Connections.Shear.SeatedAngle.design_report_generator import ReportGenerator
 # ----------------------------------------- from reportGenerator import save_html
 import json
 from Connections.Component.ModelUtils import *
@@ -318,9 +319,12 @@ class CommonDesignLogic(object):
 
             colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array)
         else:
-            gap = column_tw + seat_thick + nut_T
-            bgap = beam_T + topangle_thick + nut_T
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
+            sgap = column_tw + seat_thick  + nut_T
+            sbgap = beam_T + seat_thick + nut_T
+            tgap = beam_T + topangle_thick + nut_T
+            tbgap = column_tw + topangle_thick + nut_T
+
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap,tgap,tbgap)
             colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
         colwebconn.create_3dmodel()
@@ -439,9 +443,12 @@ class CommonDesignLogic(object):
             nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
             colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
         else:
-            gap = beam_tw + seat_thick + nut_T
-            bgap = beam_tw + topangle_thick + nut_T
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, gap, bgap)
+            sgap = column_T + seat_thick + nut_T
+            sbgap = beam_T + seat_thick + nut_T
+            tgap = beam_T + topangle_thick + nut_T
+            tbgap = column_T + topangle_thick + nut_T
+
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap, tgap, tbgap)
             colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
 
         colflangeconn.create_3dmodel()
@@ -484,7 +491,7 @@ class CommonDesignLogic(object):
             osdag_display_shape(self.display, self.connectivityObj.topclipangleModel, color=Quantity_NOC_BLUE1,
                                 update=True)
             osdag_display_shape(self.display, self.connectivityObj.angleModel, color=Quantity_NOC_BLUE1, update=True)
-            nutboltlist = self.connectivityObj.nutBoltArray.getModels()
+            nutboltlist = self.connectivityObj.nut_bolt_array.get_models()
             for nutbolt in nutboltlist:
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -611,7 +618,6 @@ class CommonDesignLogic(object):
             cleat_save_html(self.resultObj,self.uiObj,self.dictbeamdata,self.dictcoldata,self.dictangledata,
                             profileSummary,htmlfilename, self.folder)
         else:
-            # TODO ReportGenerator object is getting a default initialized sa_calc_obj
             self.sa_report = ReportGenerator(self.sa_calc_obj)
             self.sa_report.save_html(profileSummary,htmlfilename,self.folder)
 

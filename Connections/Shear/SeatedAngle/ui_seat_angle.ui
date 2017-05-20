@@ -481,6 +481,7 @@ QMenu::item:selected {
     <addaction name="actionSave_log_messages"/>
     <addaction name="actionCreate_design_report"/>
     <addaction name="actionQuit_fin_plate_design"/>
+    <addaction name="actionQuit_seat_angle_design"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="styleSheet">
@@ -518,6 +519,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="actionDesign_preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -588,13 +590,11 @@ QMenu::item:selected {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionOsdag_Manual"/>
+    <addaction name="actionVideo_Tutorials"/>
     <addaction name="actionSample_Reports"/>
     <addaction name="actionSampe_Problems"/>
-    <addaction name="actionVideo_Tutorials"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="actionFAQ"/>
     <addaction name="separator"/>
     <addaction name="actionAbout_Osdag"/>
    </widget>
@@ -695,7 +695,7 @@ QMenu::item:selected {
     <number>1</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
-    <widget class="QLineEdit" name="txtFy">
+    <widget class="QLineEdit" name="txt_fy">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -737,7 +737,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Column section *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboConnLoc">
+    <widget class="QComboBox" name="combo_connectivity">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -761,16 +761,16 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>Column flange-Beam web</string>
+       <string>Column flange-Beam flange</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Column web-Beam web</string>
+       <string>Column web-Beam flange</string>
       </property>
      </item>
     </widget>
-    <widget class="QLineEdit" name="txtFu">
+    <widget class="QLineEdit" name="txt_fu">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -891,7 +891,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;f&lt;/span&gt;&lt;span style=&quot; font-style:italic; vertical-align:sub;&quot;&gt;u &lt;/span&gt;(MPa) * &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboColSec">
+    <widget class="QComboBox" name="combo_column_section">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -978,7 +978,7 @@ QMenu::item:selected {
       <string>Shear force (kN)*</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtShear">
+    <widget class="QLineEdit" name="txt_shear_force">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1020,7 +1020,7 @@ QMenu::item:selected {
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboType">
+    <widget class="QComboBox" name="combo_bolt_type">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1062,7 +1062,7 @@ QMenu::item:selected {
       <string>Grade *</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboGrade">
+    <widget class="QComboBox" name="combo_bolt_grade">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1128,7 +1128,7 @@ QMenu::item:selected {
       <string>Type *</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboDaimeter">
+    <widget class="QComboBox" name="combo_bolt_diameter">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1154,26 +1154,6 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>Diameter of Bolt</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>5</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>6</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10</string>
       </property>
      </item>
      <item>
@@ -2938,7 +2918,7 @@ QMenu::item:selected {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBeamSec">
+    <widget class="QComboBox" name="combo_beam_section">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -3020,7 +3000,7 @@ QMenu::item:selected {
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboAngleSec">
+    <widget class="QComboBox" name="combo_angle_section">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -3065,10 +3045,10 @@ QMenu::item:selected {
       <string>Angle section *</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_txtanglethickness">
+    <widget class="QLabel" name="lbl_topanglesection">
      <property name="geometry">
       <rect>
-       <x>6</x>
+       <x>0</x>
        <y>490</y>
        <width>151</width>
        <height>25</height>
@@ -3083,10 +3063,62 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Thickness (mm)*</string>
+      <string>Top angle section</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtanglethickness">
+    <widget class="QPushButton" name="btn_Reset">
+     <property name="geometry">
+      <rect>
+       <x>41</x>
+       <y>570</y>
+       <width>93</width>
+       <height>33</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Reset Inputs</string>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+     <property name="shortcut">
+      <string>Alt+R</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_Design">
+     <property name="geometry">
+      <rect>
+       <x>141</x>
+       <y>570</y>
+       <width>93</width>
+       <height>33</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Design Connection</string>
+     </property>
+     <property name="text">
+      <string>Design</string>
+     </property>
+     <property name="shortcut">
+      <string>Alt+D</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="combo_topangle_section">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -3103,58 +3135,12 @@ QMenu::item:selected {
        <bold>false</bold>
       </font>
      </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>50</x>
-       <y>540</y>
-       <width>195</width>
-       <height>35</height>
-      </rect>
+     <property name="styleSheet">
+      <string notr="true">QComboBox { combobox-popup: 0; }</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="btn_Reset">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Reset Inputs</string>
-        </property>
-        <property name="text">
-         <string>Reset</string>
-        </property>
-        <property name="shortcut">
-         <string>Alt+R</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_Design">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Design Connection</string>
-        </property>
-        <property name="text">
-         <string>Design</string>
-        </property>
-        <property name="shortcut">
-         <string>Alt+D</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="maxVisibleItems">
+      <number>5</number>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -3192,7 +3178,7 @@ QMenu::item:selected {
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
-    <widget class="QLineEdit" name="txtNoBolts">
+    <widget class="QLineEdit" name="txt_no_bolts">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3230,10 +3216,10 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>No. of bolts required</string>
+      <string>No. of bolts provided</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtShearrCapacity">
+    <widget class="QLineEdit" name="txt_bolt_shear_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3256,7 +3242,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtPitch">
+    <widget class="QLineEdit" name="txt_bolt_pitch">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3276,7 +3262,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtGuage">
+    <widget class="QLineEdit" name="txt_bolt_gauge">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3296,7 +3282,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtBoltCapacity">
+    <widget class="QLineEdit" name="txt_bolt_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3316,7 +3302,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_col">
+    <widget class="QLineEdit" name="txt_bolt_cols">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3336,7 +3322,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_row">
+    <widget class="QLineEdit" name="txt_bolt_rows">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3398,7 +3384,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Capacity of bolt (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtBearingCapacity">
+    <widget class="QLineEdit" name="txt_bolt_bearing_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3481,7 +3467,7 @@ QMenu::item:selected {
       <string>Pitch (mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtEdgeDist">
+    <widget class="QLineEdit" name="txt_edge_distance">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3564,7 +3550,7 @@ QMenu::item:selected {
       <string>Shear capacity (kN)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtEndDist">
+    <widget class="QLineEdit" name="txt_end_distance">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3644,10 +3630,10 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Moment capacity (kNm)</string>
+      <string>Moment capacity (kN-mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtMomntCapacity">
+    <widget class="QLineEdit" name="txt_moment_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3667,7 +3653,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtExtMomnt">
+    <widget class="QLineEdit" name="txt_moment_demand">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3708,7 +3694,7 @@ QMenu::item:selected {
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moment demand (kNm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moment demand (kN-mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_txtShearDemand">
@@ -3729,10 +3715,10 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear demand (kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear demand (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtShearDemand">
+    <widget class="QLineEdit" name="txt_seat_shear_demand">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3773,7 +3759,7 @@ QMenu::item:selected {
       <string>Length (mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtSeatLength">
+    <widget class="QLineEdit" name="txt_seat_length">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3814,7 +3800,7 @@ QMenu::item:selected {
       <string>Bolt group capacity (kN)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtBoltGroupCapacity">
+    <widget class="QLineEdit" name="txt_bolt_group_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3855,7 +3841,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Seat Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtShearCapacity">
+    <widget class="QLineEdit" name="txt_seat_shear_capacity">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3893,10 +3879,10 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear capacity(kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Angle shear capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtBeamShearStrength">
+    <widget class="QLineEdit" name="txt_beam_shear_strength">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -3934,40 +3920,81 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear Strength (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beam shear strength (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QLineEdit" name="txt_top_angle">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>610</y>
-       <width>192</width>
-       <height>69</height>
+       <x>200</x>
+       <y>580</y>
+       <width>100</width>
+       <height>25</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QPushButton" name="btn_SaveMessages">
-        <property name="toolTip">
-         <string>Save Log Messages</string>
-        </property>
-        <property name="text">
-         <string>Save messages</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_CreateDesign">
-        <property name="toolTip">
-         <string>Create Design Report</string>
-        </property>
-        <property name="text">
-         <string>Create design report</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_175">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>580</y>
+       <width>171</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Top Angle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_SaveMessages">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>613</y>
+       <width>190</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Save Log Messages</string>
+     </property>
+     <property name="text">
+      <string>Save messages</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_CreateDesign">
+     <property name="geometry">
+      <rect>
+       <x>51</x>
+       <y>650</y>
+       <width>190</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Create Design Report</string>
+     </property>
+     <property name="text">
+      <string>Create design report</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -4227,7 +4254,7 @@ QMenu::item:selected {
   </action>
   <action name="actionSample_Reports">
    <property name="text">
-    <string>Sample Reports</string>
+    <string>Sample Design Reports</string>
    </property>
   </action>
   <action name="actionSampe_Problems">
@@ -4250,19 +4277,28 @@ QMenu::item:selected {
     <string>FAQ</string>
    </property>
   </action>
+  <action name="actionQuit_seat_angle_design">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionDesign_preferences">
+   <property name="text">
+    <string>Design preferences</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
-  <tabstop>comboConnLoc</tabstop>
-  <tabstop>comboBeamSec</tabstop>
-  <tabstop>comboColSec</tabstop>
-  <tabstop>txtFu</tabstop>
-  <tabstop>txtFy</tabstop>
-  <tabstop>txtShear</tabstop>
-  <tabstop>comboDaimeter</tabstop>
-  <tabstop>comboType</tabstop>
-  <tabstop>comboGrade</tabstop>
-  <tabstop>comboAngleSec</tabstop>
-  <tabstop>txtanglethickness</tabstop>
+  <tabstop>combo_connectivity</tabstop>
+  <tabstop>combo_beam_section</tabstop>
+  <tabstop>combo_column_section</tabstop>
+  <tabstop>txt_fu</tabstop>
+  <tabstop>txt_fy</tabstop>
+  <tabstop>txt_shear_force</tabstop>
+  <tabstop>combo_bolt_diameter</tabstop>
+  <tabstop>combo_bolt_type</tabstop>
+  <tabstop>combo_bolt_grade</tabstop>
+  <tabstop>combo_angle_section</tabstop>
   <tabstop>btn_Design</tabstop>
   <tabstop>btn_Reset</tabstop>
   <tabstop>btn_SaveMessages</tabstop>
@@ -4276,12 +4312,12 @@ QMenu::item:selected {
   <tabstop>chkBxBeam</tabstop>
   <tabstop>chkBxCol</tabstop>
   <tabstop>chkBxSeatAngle</tabstop>
-  <tabstop>txtSeatLength</tabstop>
-  <tabstop>txtExtMomnt</tabstop>
-  <tabstop>txtMomntCapacity</tabstop>
-  <tabstop>txtShearDemand</tabstop>
-  <tabstop>txtShearCapacity</tabstop>
-  <tabstop>txtBeamShearStrength</tabstop>
+  <tabstop>txt_seat_length</tabstop>
+  <tabstop>txt_moment_demand</tabstop>
+  <tabstop>txt_moment_capacity</tabstop>
+  <tabstop>txt_seat_shear_demand</tabstop>
+  <tabstop>txt_seat_shear_capacity</tabstop>
+  <tabstop>txt_beam_shear_strength</tabstop>
   <tabstop>txtNoBolts_3</tabstop>
   <tabstop>txtPitch_3</tabstop>
   <tabstop>txtGuage_3</tabstop>
@@ -4336,21 +4372,21 @@ QMenu::item:selected {
   <tabstop>btnReset_2</tabstop>
   <tabstop>pushButton_2</tabstop>
   <tabstop>btnDesign_2</tabstop>
-  <tabstop>txtShearrCapacity</tabstop>
-  <tabstop>txtBearingCapacity</tabstop>
+  <tabstop>txt_bolt_shear_capacity</tabstop>
+  <tabstop>txt_bolt_bearing_capacity</tabstop>
   <tabstop>lineEdit_4</tabstop>
   <tabstop>txtWeldThick_2</tabstop>
   <tabstop>txtShrCapacity_3</tabstop>
   <tabstop>txtbearCapacity_3</tabstop>
-  <tabstop>txtBoltCapacity</tabstop>
-  <tabstop>txtNoBolts</tabstop>
-  <tabstop>txtGuage</tabstop>
-  <tabstop>txtEndDist</tabstop>
-  <tabstop>txtEdgeDist</tabstop>
-  <tabstop>txtBoltGroupCapacity</tabstop>
-  <tabstop>txt_row</tabstop>
-  <tabstop>txt_col</tabstop>
-  <tabstop>txtPitch</tabstop>
+  <tabstop>txt_bolt_capacity</tabstop>
+  <tabstop>txt_no_bolts</tabstop>
+  <tabstop>txt_bolt_gauge</tabstop>
+  <tabstop>txt_end_distance</tabstop>
+  <tabstop>txt_edge_distance</tabstop>
+  <tabstop>txt_bolt_group_capacity</tabstop>
+  <tabstop>txt_bolt_rows</tabstop>
+  <tabstop>txt_bolt_cols</tabstop>
+  <tabstop>txt_bolt_pitch</tabstop>
  </tabstops>
  <resources>
   <include location="ResourceFiles/icons.qrc"/>

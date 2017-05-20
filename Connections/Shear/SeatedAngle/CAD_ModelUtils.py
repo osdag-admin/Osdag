@@ -3,10 +3,8 @@ Created on 29-Nov-2014
 
 @author: deepa
 '''
-from OCC.Display.SimpleGui import init_display
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox, BRepPrimAPI_MakeSphere,\
-    BRepPrimAPI_MakePrism
-from OCC.gp import gp_Pnt, gp_Dir, gp_Pln, gp_Vec
+from OCC.BRepPrimAPI import BRepPrimAPI_MakePrism
+from OCC.gp import gp_Pnt, gp_Dir, gp_Vec
 from OCC.BRepBuilderAPI import BRepBuilderAPI_MakeFace
 from OCC.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge,
                                 BRepBuilderAPI_MakeVertex,
@@ -15,7 +13,6 @@ from OCC.BRepFill import BRepFill_Filling
 from OCC.GeomAbs import GeomAbs_C0
 from OCC.GeomAPI import GeomAPI_PointsToBSpline
 from OCC.TColgp import TColgp_Array1OfPnt
-from OCC.Quantity import Quantity_NOC_BLACK
 
     
 def make_edge(*args):
@@ -91,5 +88,3 @@ def makeEdgesFromPoints(points):
 
 def makePrismFromFace(aFace, eDir):
     return BRepPrimAPI_MakePrism(aFace, gp_Vec(gp_Pnt(0., 0., 0.),gp_Pnt(eDir[0], eDir[1], eDir[2]))).Shape()
-    #return BRepPrimAPI_MakePrism(aFace, gpDir, False).Shape()
-

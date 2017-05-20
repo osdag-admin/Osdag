@@ -91,6 +91,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_9.addWidget(self.label_11, 2, 2, 1, 1)
         self.txt_boltFu = QtWidgets.QLineEdit(self.tab_Bolt)
         self.txt_boltFu.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.txt_boltFu.setReadOnly(True)
         self.txt_boltFu.setObjectName("txt_boltFu")
         self.gridLayout_9.addWidget(self.txt_boltFu, 2, 1, 1, 1)
         self.combo_boltHoleType = QtWidgets.QComboBox(self.tab_Bolt)
@@ -101,6 +102,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_9.addWidget(self.combo_boltHoleType, 0, 1, 1, 1)
         self.txt_boltHoleClearance = QtWidgets.QLineEdit(self.tab_Bolt)
         self.txt_boltHoleClearance.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.txt_boltHoleClearance.setReadOnly(True)
         self.txt_boltHoleClearance.setObjectName("txt_boltHoleClearance")
         self.gridLayout_9.addWidget(self.txt_boltHoleClearance, 1, 1, 1, 1)
         self.label_9 = QtWidgets.QLabel(self.tab_Bolt)
@@ -284,7 +286,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 

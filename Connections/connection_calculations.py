@@ -45,7 +45,7 @@ class ConnectionCalculations(object):
         """Calculate bolt hole clearance.
 
         Args:
-            bolt_hole_type (int)
+            bolt_hole_type (string)
             bolt_diameter (int)
             custom_hole_clearance (int)
 
@@ -57,27 +57,22 @@ class ConnectionCalculations(object):
             IS 800, Table 19 (Cl 10.2.1) : Clearances for Fastener Holes
 
         """
-        # TODO : Update bolt diameters in all modules (UI and calculations).
         hole_clearance = 0
-        if bolt_hole_type == 1:  # standard hole
+        if bolt_hole_type == "Standard":  # standard hole
             hole_clearance = {
                 12: 1,
                 16: 2,
                 20: 2,
-                # 22: 2,
                 24: 2,
-                # 27: 3,
                 30: 3,
                 36: 3
             }[bolt_diameter]
-        elif bolt_hole_type == 0:  # over size hole
+        elif bolt_hole_type == "Over-sized":  # over sized hole
             hole_clearance = {
                 12: 3,
                 16: 4,
                 20: 4,
-                # 22: 4,
                 24: 6,
-                # 27: 8,
                 30: 8,
                 36: 8
             }[bolt_diameter]
@@ -129,7 +124,7 @@ class ConnectionCalculations(object):
              bolt_fu (int) - ultimate stress of bolt Fu
              mu_f(float) - coefficient of friction/ slip factor
              n_e (int) - number of effective interfaces offering resistance to slip
-             bolt_hole_type (int) - 1 for standard hole, 0 for oversize hole
+             bolt_hole_type (string) - "Standard" or "Over-sized"
 
         Returns:
             v_db - Factored shear capacity of HSFG bolt as float
@@ -161,8 +156,8 @@ class ConnectionCalculations(object):
         # proof load (Kn)(minimum bolt tension)
         F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
         k_h = {
-            1: 1.0,
-            0: 0.85
+            "Standard": 1.0,
+            "Over-sized": 0.85
         }[bolt_hole_type]
         v_nsf = mu_f * n_e * k_h * F_0  # nominal shear capacity of bolt
         v_dsf = v_nsf / gamma_mf
@@ -206,6 +201,22 @@ class ConnectionCalculations(object):
                                         * thickness_plate * plate_fu / 1000
         return round(bolt_nominal_bearing_capacity / gamma_mb, 1)
 
+    @staticmethod
+    def round_up_5(distance):
+        """Calculate and return the nearest multiple of 5 greater than input variable.
+        
+        Args:
+            distance (float): bolt distance in mm
+
+        Returns:
+            round_up_distance (float): bolt distance in mm, multiple of 5 mm.
+
+        """
+        round_up_distance = distance
+        if distance % 5 != 0:
+            round_up_distance = ((distance / 5) + 1) * 5 - distance % 5
+        return round_up_distance
+
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
                             is_environ_corrosive):
         """Calculate minimum pitch, gauge, end and edge distances.
@@ -215,7 +226,7 @@ class ConnectionCalculations(object):
             bolt_hole_diameter (int)
             min_edge_multiplier (float)
             thickness_governing_min (float)
-            is_environ_corrosive (boolean)
+            is_environ_corrosive (string) -- "Yes" or "No"
 
         Returns:
             None
@@ -232,17 +243,6 @@ class ConnectionCalculations(object):
         self.min_end_dist = int(math.ceil(min_edge_multiplier * bolt_hole_diameter))
         self.min_edge_dist = int(math.ceil(min_edge_multiplier * bolt_hole_diameter))
 
-        # TODO: rethink rounding off of MINIMUM distances
-        # round off the actual distances and check against minimum
-        if self.min_pitch % 5 != 0:
-            self.min_pitch = ((self.min_pitch / 5) + 1) * 5 - self.min_pitch % 5
-        if self.min_gauge % 5 != 0:
-            self.min_gauge = ((self.min_gauge / 5) + 1) * 5 - self.min_gauge % 5
-        if self.min_edge_dist % 5 != 0:
-            self.min_edge_dist = int((int(self.min_edge_dist / 5) + 1) * 5)
-        if self.min_end_dist % 5 != 0:
-            self.min_end_dist = int((int(self.min_end_dist / 5) + 1) * 5)
-
         # Max spacing IS 800 Cl 10.2.3.1
         self.max_spacing = math.ceil(min(32 * thickness_governing_min, 300))
 
@@ -258,5 +258,5 @@ class ConnectionCalculations(object):
 
         # Cl 10.2.4.3 in case of corrosive influences, the maximum edge distance shall not exceed
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
-        if is_environ_corrosive is True:
+        if is_environ_corrosive == "Yes":
             self.max_edge_dist = min(self.max_edge_dist, 40 + 4 * thickness_governing_min)

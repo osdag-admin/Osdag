@@ -7,6 +7,7 @@ Created on 25-Mar-2016
 import math
 from model import *
 import logging
+from Connections.connection_calculations import ConnectionCalculations
 flag = 1
 logger = None
 
@@ -182,6 +183,8 @@ def cleat_connection(ui_obj):
     bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
+    bolt_HSFG_slip_factor = ui_obj["bolt"]["slip_factor"]
+    # TODO: Danish to update design preferences in calculations
    
     cleat_length = str(ui_obj['cleat']['Height (mm)'])
     if cleat_length == '':
@@ -189,6 +192,9 @@ def cleat_connection(ui_obj):
     cleat_fu = float(ui_obj['Member']['fu (MPa)'])
     cleat_fy = float(ui_obj['Member']['fy (MPa)'])
     cleat_sec = ui_obj['cleat']['section']
+
+
+
               
     dictbeamdata = get_beamdata(beam_sec)
     beam_w_t = float(dictbeamdata["tw"])
@@ -270,7 +276,7 @@ def cleat_connection(ui_obj):
     t_thinner_b = min(beam_w_t.real, cleat_thk.real)
     bolt_shear_capacity = 0
     if bolt_type == 'HSFG':
-        bolt_shear_capacity = HSFG_bolt_shear(0.48, bolt_dia, 2, bolt_fu)
+        bolt_shear_capacity = HSFG_bolt_shear(bolt_HSFG_slip_factor, bolt_dia, 2, bolt_fu)
     if bolt_type == 'Bearing Bolt':
         bolt_shear_capacity = black_bolt_shear(bolt_dia, 2, bolt_fu)
         

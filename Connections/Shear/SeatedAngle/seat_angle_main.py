@@ -65,8 +65,7 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
-
-            self.saved_designPref["detailing"]["gap"] = int(20)
+            self.saved_designPref["detailing"]["gap"] = int(10)
         else:
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
 
@@ -108,12 +107,12 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        self.ui.txt_detailingGap.setText(str(20))
+        self.ui.txt_detailingGap.setText(str(10))
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(20)
+        designPref["detailing"]["gap"] = int(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -336,8 +335,8 @@ class MainController(QMainWindow):
 
         # Graphics menu
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
-        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn) # TODO Deepa-CAD Exit1 on call_3DColumn in CFBF
-        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle) # TODO Deepa-CAD Exit1 in CFBF and CWBF
+        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
+        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
         self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel(True))
         self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
 
@@ -385,8 +384,8 @@ class MainController(QMainWindow):
         """
         columndata = get_columncombolist()
         old_colList = get_oldcolumncombolist()
-        self.ui.comboColSec.addItems(columndata)
-        self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
+        self.ui.combo_column_section.addItems(columndata)
+        self.color_oldDB_sections(old_colList, columndata, self.ui.combo_column_section)
 
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
@@ -395,8 +394,8 @@ class MainController(QMainWindow):
         """
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
-        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+        self.ui.combo_beam_section.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_beam_section)
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
         """display old sections in red color.
@@ -1052,6 +1051,7 @@ class MainController(QMainWindow):
         :param: boolean
         :return:
         """
+        self.display.EraseAll()
         if self.ui.btn3D.isChecked:
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1062,6 +1062,7 @@ class MainController(QMainWindow):
         """
         Creating and displaying 3D Beam
         """
+        self.display.EraseAll()
         self.ui.chkBxBeam.setChecked(Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
@@ -1074,6 +1075,7 @@ class MainController(QMainWindow):
     def call_3DColumn(self):
         """
         """
+        self.display.EraseAll()
         self.ui.chkBxCol.setChecked(Qt.Checked)
         if self.ui.chkBxCol.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1085,6 +1087,7 @@ class MainController(QMainWindow):
     def call_3DSeatAngle(self):
         """Displaying Seat Angle in 3D
         """
+        self.display.EraseAll()
         self.ui.chkBxSeatAngle.setChecked(Qt.Checked)
         if self.ui.chkBxSeatAngle.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)

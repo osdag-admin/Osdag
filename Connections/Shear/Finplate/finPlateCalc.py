@@ -996,87 +996,87 @@ def finConn(uiObj):
     outputObj['Weld']['weld_fu'] = weld_fu
     outputObj['Weld']['effectiveWeldlength'] = weld_l
 
-    # Set design_status = False for various cases of failed design:
-    # When shear force is 0
-    if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
-        design_status = False
-
-    # Failed design for user defined plate height and width
-    if web_plate_l != 0 and web_plate_w != 0 :
-        if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
-                        web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or\
-                        web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-            design_status = False
-
-            if boltParameters['numofcol'] == 1:
-                if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
-                                web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req:
-                    design_status = False
-                elif moment_capacity < boltParameters['moment']:
-                    design_status = False
-                elif Tdb < shear_load:
-                    design_status = False
-
-            elif boltParameters['numofcol'] == 2:
-                if boltParameters['pitch'] < boltParameters['minpitch']:
-                    design_status = False
-                elif web_plate_l == min_plate_height or web_plate_l == max_plate_height or\
-                                web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req or\
-                                weld_t_req > weld_t or weld_strength < Vr:
-                    design_status = False
-                elif moment_capacity < boltParameters['moment']:
-                    design_status = False
-                elif Tdb < shear_load:
-                    design_status = False
-        else:
-            pass
-
-    # Failed design for user defined plate height but optional width
-    elif web_plate_l != 0 and web_plate_w == 0:
-        if web_plate_l < min_plate_height or web_plate_l > max_plate_height or\
-                        web_plate_l < web_plate_l_req or web_plate_w_opt < web_plate_w_req or\
-                        web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
-                        weld_t_req > weld_t or weld_strength < Vr:
-            design_status = False
-        elif moment_capacity < boltParameters['moment']:
-            design_status = False
-        elif boltParameters['numofcol'] == 2:
-            if boltParameters['pitch'] < boltParameters['minpitch']:
-                design_status = False
-        elif Tdb < shear_load:
-            design_status = False
-
-    # Failed design for optional plate height but user defined width
-    elif web_plate_l == 0 and web_plate_w != 0:
-        if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
-                        web_plate_l_opt < web_plate_l_req or web_plate_w < web_plate_w_req or\
-                        web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
-                        weld_t_req > weld_t or weld_strength < Vr:
-            design_status = False
-        elif moment_capacity < boltParameters['moment']:
-            design_status = False
-        elif boltParameters['numofcol'] == 2:
-            if boltParameters['pitch'] < boltParameters['minpitch']:
-                design_status = False
-        elif Tdb < shear_load:
-            design_status = False
-    # Failed design for for user defined plate height (BUG)
-    else:
-        if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
-            design_status = False
-
-        if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
-                        web_plate_l_opt < web_plate_l_req or \
-                        web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or\
-                        web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-            design_status = False
-        elif moment_capacity < boltParameters['moment']:
-            design_status = False
-        elif boltParameters['numofcol']==2:
-            if boltParameters['pitch'] < boltParameters['minpitch']:
-                design_status = False
-        elif Tdb < shear_load:
-            design_status = False
+    # # Set design_status = False for various cases of failed design:
+    # # When shear force is 0
+    # if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
+    #     design_status = False
+    #
+    # # Failed design for user defined plate height and width
+    # if web_plate_l != 0 and web_plate_w != 0 :
+    #     if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
+    #                     web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or\
+    #                     web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
+    #         design_status = False
+    #
+    #         if boltParameters['numofcol'] == 1:
+    #             if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
+    #                             web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req:
+    #                 design_status = False
+    #             elif moment_capacity < boltParameters['moment']:
+    #                 design_status = False
+    #             elif Tdb < shear_load:
+    #                 design_status = False
+    #
+    #         elif boltParameters['numofcol'] == 2:
+    #             if boltParameters['pitch'] < boltParameters['minpitch']:
+    #                 design_status = False
+    #             elif web_plate_l == min_plate_height or web_plate_l == max_plate_height or\
+    #                             web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req or\
+    #                             weld_t_req > weld_t or weld_strength < Vr:
+    #                 design_status = False
+    #             elif moment_capacity < boltParameters['moment']:
+    #                 design_status = False
+    #             elif Tdb < shear_load:
+    #                 design_status = False
+    #     else:
+    #         pass
+    #
+    # # Failed design for user defined plate height but optional width
+    # elif web_plate_l != 0 and web_plate_w == 0:
+    #     if web_plate_l < min_plate_height or web_plate_l > max_plate_height or\
+    #                     web_plate_l < web_plate_l_req or web_plate_w_opt < web_plate_w_req or\
+    #                     web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
+    #                     weld_t_req > weld_t or weld_strength < Vr:
+    #         design_status = False
+    #     elif moment_capacity < boltParameters['moment']:
+    #         design_status = False
+    #     elif boltParameters['numofcol'] == 2:
+    #         if boltParameters['pitch'] < boltParameters['minpitch']:
+    #             design_status = False
+    #     elif Tdb < shear_load:
+    #         design_status = False
+    #
+    # # Failed design for optional plate height but user defined width
+    # elif web_plate_l == 0 and web_plate_w != 0:
+    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
+    #                     web_plate_l_opt < web_plate_l_req or web_plate_w < web_plate_w_req or\
+    #                     web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
+    #                     weld_t_req > weld_t or weld_strength < Vr:
+    #         design_status = False
+    #     elif moment_capacity < boltParameters['moment']:
+    #         design_status = False
+    #     elif boltParameters['numofcol'] == 2:
+    #         if boltParameters['pitch'] < boltParameters['minpitch']:
+    #             design_status = False
+    #     elif Tdb < shear_load:
+    #         design_status = False
+    # # Failed design for for user defined plate height (BUG)
+    # else:
+    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
+    #         design_status = False
+    #
+    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
+    #                     web_plate_l_opt < web_plate_l_req or \
+    #                     web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or\
+    #                     web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
+    #         design_status = False
+    #     elif moment_capacity < boltParameters['moment']:
+    #         design_status = False
+    #     elif boltParameters['numofcol']==2:
+    #         if boltParameters['pitch'] < boltParameters['minpitch']:
+    #             design_status = False
+    #     elif Tdb < shear_load:
+    #         design_status = False
 
 # Log message for safe/failed design
 

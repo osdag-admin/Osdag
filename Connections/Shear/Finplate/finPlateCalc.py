@@ -168,7 +168,7 @@ def finConn(uiObj):
     if column_sec in old_col_section:
         logger.warning(" : You are using section (in red color) that is not available in latest version of IS 808")
 
-
+    design_status = True
     #####################################################################################
 
 # Hard-code input data required to check overall calculation as independent file  
@@ -221,6 +221,8 @@ def finConn(uiObj):
         web_plate_t = beam_w_t
         logger.error(": Chosen web plate thickness is not sufficient")
         logger.warning(" : Minimum required thickness %2.2f mm" % (beam_w_t))
+        design_status = False
+
 
     # # Plate height check
 
@@ -244,10 +246,12 @@ def finConn(uiObj):
                 logger.error(": Height of plate is more than the clear depth of the secondary beam")
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height)) 
                 logger.info(": Reduce the plate height")
+                design_status = False
             else:
                 logger.error(": Height of plate is more than the clear depth of the beam")
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height)) 
                 logger.info(": Reduce the plate height")
+                design_status = False
                   
         elif min_plate_height > max_plate_height:
             if connectivity == "Beam-Beam":
@@ -255,16 +259,20 @@ def finConn(uiObj):
                 logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height))
                 logger.info(": Increase the plate height")
+                design_status = False
             else:
                 logger.error(": Minimum required plate height is more than the clear depth of the beam")
                 logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height))
                 logger.info(": Increase the plate height")
+                design_status = False
                 
         elif min_plate_height >= web_plate_l:
             logger.error(": Plate height provided is less than the minimum required ")
             logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
             logger.info(": Increase the plate height")
+            design_status = False
+
         
     
     ########################################################################
@@ -379,18 +387,23 @@ def finConn(uiObj):
                 if web_plate_l_opt > max_plate_height :
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
+                    design_status = False
+
                   
             elif min_plate_height > max_plate_height:
                 logger.error(": Minimum required plate height is more than the clear depth of the beam")
                 logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height))
                 logger.info(": Increase the plate height")
+                design_status = False
+
                 
             elif min_plate_height > web_plate_l_opt:
                 web_plate_l_opt = min_plate_height
                 length_avail = (web_plate_l_opt - 2 * min_end_dist);
                 pitch = (web_plate_l_opt - 2 * min_end_dist) / (bolts_required - 1)
-                pitch = round(pitch, 3) 
+                pitch = round(pitch, 3)
+
         
         # # Calculation of minimum plate thickness and maximum end/edge distance
         if web_plate_l != 0:
@@ -451,6 +464,8 @@ def finConn(uiObj):
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
                     moment_demand = 0.0
+                    design_status = False
+
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
@@ -503,6 +518,8 @@ def finConn(uiObj):
                     logger.error(": Bolt strength is insufficient to carry the shear force")
                     logger.warning (": Increase bolt diameter and/or bolt grade")
                     moment_demand = 0.0
+                    design_status = False
+
                     
         # Moment demand calculation for optional height and user given width input (3rd case)
         elif web_plate_l == 0 and web_plate_w != 0:
@@ -680,11 +697,13 @@ def finConn(uiObj):
         else:
             web_plate_l_mom = boltParameters['plateheightoptional']
     if web_plate_l != 0:
-        if moment_capacity > boltParameters['moment']:
+        if moment_capacity >= boltParameters['moment']:
             pass
         else:
             logger.error(": Plate moment capacity is less than the moment demand [cl. 8.2.1.2]")
             logger.warning(": Re-design with increased plate dimensions")
+            design_status = False
+
     
     # Calculation of plate height based on both minimum height and moment criteria (for optional input)
     if web_plate_l == 0:
@@ -697,6 +716,8 @@ def finConn(uiObj):
             logger.error(": Plate height provided is more than the maximum required height")
             logger.warning(": Maximum plate height required is %2.2f mm " % (max_plate_height))
             logger.info("Try to increase the plate thickness")
+            design_status = False
+
     
     # Calculation for maximum/minimum plate thickness
     max_plate_thk = fin_max_thk(bolt_dia);
@@ -720,6 +741,8 @@ def finConn(uiObj):
            logger.error(": The plate height required is more than the maximum height possible")
            logger.warning(": Maximum plate height  required is %2.2f mm " % (max_plate_height))
            logger.info("Try to increase the plate thickness")
+           design_status = False
+
    ##############
         
     # # Calculation of plate height and thickness and checks for extreme values 
@@ -728,11 +751,14 @@ def finConn(uiObj):
         if web_plate_t < min_plate_thk:
             logger.error(": Plate thickness provided is less than the minimum required [Ref. Owens and Cheal, 1989]")
             logger.warning(": Minimum plate thickness required is %2.2f mm " % (min_plate_thk))
+            design_status = False
+
         elif web_plate_t > max_plate_thk:
             logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
             logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_thk)) 
-            logger.info(": Select a higher depth secondary beam section") 
-    
+            logger.info(": Select a higher depth secondary beam section")
+            design_status = False
+
     # Calculation of plate height required (for optional input) 
     web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));
     web_plate_l_req1 = round(web_plate_l_req1, 3)
@@ -759,12 +785,17 @@ def finConn(uiObj):
         if web_plate_l < web_plate_l_req:
             logger.error(": Plate height provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_l_req))
+            design_status = False
+
             
     if web_plate_w != 0:
         if web_plate_w < web_plate_w_req: 
            
             logger.error(": Plate width provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_w_req))
+            design_status = False
+
+
     else:
         pass
                 
@@ -778,6 +809,8 @@ def finConn(uiObj):
         logger.error(": The block shear capacity of the plate is lass than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is " % (shear_load))
         logger.info(": Increase the plate thickness")
+        design_status = False
+
         
     ##################################################################################
     
@@ -828,14 +861,15 @@ def finConn(uiObj):
         logger.warning(": Minimum weld thickness is required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
         logger.info(": Increase the weld thickness or length of weld/finplate")
-    
+        design_status = False
+
     
     # End of calculation
     # Output for user given fin plate height
     if web_plate_l != 0 and web_plate_w != 0:
         outputObj = {}
         outputObj['Bolt'] = {}
-        outputObj['Bolt']['status'] = True
+        outputObj['Bolt']['status'] = design_status
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
         outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
@@ -868,7 +902,7 @@ def finConn(uiObj):
     elif web_plate_l == 0 and web_plate_w != 0:
         outputObj = {}
         outputObj['Bolt'] = {}
-        outputObj['Bolt']['status'] = True
+        outputObj['Bolt']['status'] = design_status
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
         outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
@@ -901,7 +935,7 @@ def finConn(uiObj):
     elif web_plate_l != 0 and web_plate_w == 0:
         outputObj = {}
         outputObj['Bolt'] = {}
-        outputObj['Bolt']['status'] = True
+        outputObj['Bolt']['status'] = design_status
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
         outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
@@ -934,7 +968,7 @@ def finConn(uiObj):
     else:
         outputObj = {}
         outputObj['Bolt'] = {}
-        outputObj['Bolt']['status'] = True
+        outputObj['Bolt']['status'] = design_status
         outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
         outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
@@ -991,6 +1025,7 @@ def finConn(uiObj):
     outputObj['Weld']['effectiveWeldlength'] = weld_l
     
 #     return outputObj
+ # TODO commented in order to execute faulty report
 # # #######################################   Checks  to delete dictionary   ##################################################################
 # # Delete the dictionary when shear force is 0
 #     if new_bolt_param['numofbolts'] == 0 or shear_load == 0:

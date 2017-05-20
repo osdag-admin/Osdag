@@ -240,14 +240,14 @@ def cleat_connection(ui_obj):
     
 
 ##################################################################
-    design_check = True   
+    design_status = True
     if connectivity == 'Column flange-Beam web':
         avbl_space = column_B 
         # required_space = 2 * cleat_legsize_1 + beam_w_t
         required_space = 2 * cleat_legsize_B + beam_w_t
         max_leg_size = int((avbl_space - beam_w_t) / 10) * 5
         if avbl_space < required_space:
-            design_check = False
+            design_status = False
             logger.error(':Column cannot accommodate the given cleat agle due to space restriction  ')
             logger.warning(':Cleat legsize of the cleat angle should be less than or equal to %2.2f mm' % (max_leg_size))
             logger.info(':Decrease the cleat legsize')
@@ -258,7 +258,7 @@ def cleat_connection(ui_obj):
         required_space = 2 * cleat_legsize_B + beam_w_t
         max_leg_size = int((avbl_space - beam_w_t) / 10) * 5
         if avbl_space < required_space:
-            design_check = False
+            design_status = False
             logger.error(':Column cannot accommodate the given cleat agle due to space restriction')
             logger.warning(':Cleat legsize of the cleat angle should be less than or equal to %2.2f mm' % (max_leg_size))
             logger.info(':Decrease the cleat legsize')
@@ -268,7 +268,7 @@ def cleat_connection(ui_obj):
     ################################################################################
       
 # Bolt design:
-#     design_check = True
+#     design_status = True
 # I: Check for number of bolts -------------------
     bolt_fu = int(bolt_grade) * 100
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
@@ -292,7 +292,7 @@ def cleat_connection(ui_obj):
     else:
         bolts_required = 0
         while bolts_required == 0:
-            design_check = False  
+            design_status = False
             break
     if (bolts_required < 3) and (bolts_required > 0):
         bolts_required = 3
@@ -417,7 +417,7 @@ def cleat_connection(ui_obj):
                             pitch = avbl_length / (no_row - 1)
                             crit_shear = critical_bolt_shear(shear_load, eccentricity, pitch, gauge, no_row)
                         if pitch < min_pitch:
-                            design_check = False
+                            design_status = False
                             logger.error(':Critical shear force on the bolts due to loading is exceeding the bolt capacity')    
                             logger.warning(':Bolt capacity of the critical bolt should be greater than %2.2f KN' % (crit_shear))   
                             logger.info(':Re-design with increased bolt diameter or bolt grade')                        
@@ -518,7 +518,7 @@ def cleat_connection(ui_obj):
                         pitch = avbl_length / (no_row - 1)
                         crit_shear = column_critical_shear(shear_load, eccentricity, pitch, gauge, no_row, min_edge_dist)
                     if pitch < min_pitch:
-                        design_check = False
+                        design_status = False
                         logger.error(':Critical shear force on the bolts due to loading is exceeding the bolt capacity')    
                         logger.warning(':Bolt capacity of the critical bolt should be greater than %2.2f KN' % (crit_shear))   
                         logger.info(':Re-design with increased bolt diameter or bolt grade')        
@@ -603,7 +603,7 @@ def cleat_connection(ui_obj):
                             cleat_length = cleat_length + pitch
                             crit_shear = critical_bolt_shear(shear_load, eccentricity, pitch, gauge, no_row)
                         if cleat_length > max_cleat_length:
-                            design_check = False
+                            design_status = False
                             logger.error(':Critical shear force on the bolts due to loading is exceeding the bolt capacity')    
                             logger.warning(':Bolt capacity of the critical bolt should be greater than %2.2f KN' % (crit_shear))   
                             logger.info(':Re-design with increased bolt diameter or bolt grade')        
@@ -719,7 +719,7 @@ def cleat_connection(ui_obj):
                         cleat_length = cleat_length + pitch
                         crit_shear = column_critical_shear(shear_load, eccentricity, pitch, gauge, no_row, edge_dist)
                     if cleat_length > max_cleat_length:
-                        design_check = False
+                        design_status = False
                         logger.error(':Shear force on the critical bolt due to external load is exceeding the bolt capacity') 
                         logger.warning(':Bolt capacity of the critical bolt should be greater than %2.2f KN' % (crit_shear))   
                         logger.info(':Re-design with increased bolt diameter or bolt grade')        
@@ -753,7 +753,7 @@ def cleat_connection(ui_obj):
     #b_end_distance = cleat_legsize - (20 + min_edge_dist + gauge_b)
     b_end_distance = cleat_legsize_A - (20 + min_edge_dist + gauge_b)
     if b_end_distance < min_edge_dist:  # is it neccessary to treat single and double line seperately?
-        design_check = False
+        design_status = False
         logger.error(':Edge distance in the beam web is less than the minimum edge distance as per IS 800:2007[cl.10.2.4.2]')    
         logger.warning(':Minimum leg size of the cleat Angle required is %s mm' % (str(2 * min_edge_dist + 20 + gauge_b)))
         logger.info(':Increase the cleat leg size')  # change reference
@@ -765,13 +765,13 @@ def cleat_connection(ui_obj):
 
     if b_gauge < 90:
         
-        design_check = False
+        design_status = False
         logger.error(':Cross center distance between bolt lines in %s on either side of the supported beam is less than the specified gauge '
                      '[reference-JSC:ch.4 check-1]' % (str(connection)))
         logger.warning(':Minimum specified cross center gauge is 90 mm')
         logger.info(':Increase the cleat leg size')
     if b_gauge > 140:
-        design_check = False
+        design_status = False
         logger.error(':Cross center distance between bolt lines in %s on either side of supported the beam is greater than the specified gauge'
                      '[reference-JSC:ch.4 check-1]' % (str(connection)))
         logger.warning(':Maximum specified cross center gauge is 140 mm')
@@ -783,7 +783,7 @@ def cleat_connection(ui_obj):
     
     Tdb = min(Tdb_B, Tdb_C)
     if Tdb_B <= shear_load or Tdb_C <= shear_load:
-        design_check = False
+        design_status = False
         logger.error(": The block shear capacity of the cleat Angle is lass than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is %2.2f KN " % (shear_load))
         logger.info(":Block shear capacity of the cleat angle is %2.2f KN" % (Tdb))
@@ -792,19 +792,19 @@ def cleat_connection(ui_obj):
     moment_demand_c = 0.5 * shear_load * c_eccentricity / 1000
     moment_capacity_c = 1.2 * cleat_fy * cleat_thk * cleat_length * cleat_length / 1000000
     if moment_capacity_c < moment_demand_c:
-        design_check = False
+        design_status = False
         logger.error(":Moment capacity of the cleat angle leg  is less than the moment demand [cl. 8.2.1.2]")
         logger.info(":Re-design with increased plate dimensions")
     moment_demand_b = 0.5 * shear_load * b_eccentricity / 1000
     moment_capacity_b = 1.2 * cleat_fy * cleat_thk * cleat_length * cleat_length / 1000000
     if moment_capacity_b < moment_demand_b:
-        design_check = False
+        design_status = False
         logger.error(":Moment capacity of the cleat angle leg  is less than the moment demand [cl. 8.2.1.2]")
         logger.info(":Re-design with increased plate dimensions")
     # ########################feeding output to array ###############
     output_obj ={}
     output_obj['Bolt'] = {}
-    output_obj['Bolt']['status'] = True
+    output_obj['Bolt']['status'] = design_status
     output_obj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
     output_obj['Bolt']['bearingcapacity'] = round(bearing_capacity_b, 3)
     output_obj['Bolt']['bearingcapacitybeam'] = round(bearing_capacity_beam, 3)
@@ -857,17 +857,19 @@ def cleat_connection(ui_obj):
     output_obj['cleat']['blockshear'] = round(Tdb_C, 3)
     output_obj['cleat']['critshear'] = round(critboltshear_c, 3)
 
-    if bolts_required == 0 or bolts_required_c == 0:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
-                
-    if design_check is False:
-        for k in output_obj.keys():
-            for key in output_obj[k].keys():
-                output_obj[k][key] = ""
+    # TODO commented in order to execute faulty report
+    # if bolts_required == 0 or bolts_required_c == 0:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
+    #
+    # if design_status is False:
+    #     for k in output_obj.keys():
+    #         for key in output_obj[k].keys():
+    #             output_obj[k][key] = ""
                     
-    if design_check is True:
+    # if design_status is True:
+    if output_obj['Bolt']['status'] == True:
         logger.info(": Overall cleat Angle connection design is safe \n")
         logger.debug(" :=========End Of design===========")
           

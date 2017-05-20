@@ -119,22 +119,14 @@ class BeamWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        # + self.nut_bolt_array.getnutboltModels()
         return [self.columnModel, self.plateModel, self.weldModelLeft, self.weldModelRight,
                 self.beamModel] + self.nut_bolt_array.get_models()
 
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
-        # return self.nut_bolt_array.getboltModels()
-    
-    # def get_column_model(self):
-    #     final_beam = self.columnModel
-    #     nut_bolt_list = self.nut_bolt_array.get_models()
-    #     for bolt in nut_bolt_list[:]:
-    #         final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
-    #     return final_beam
 
-    def get_column_model(self):
+
+    def get_columnModel(self):
         final_column = self.columnModel
         bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:

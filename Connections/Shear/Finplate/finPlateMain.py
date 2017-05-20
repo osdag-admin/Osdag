@@ -91,8 +91,7 @@ class DesignPreferences(QDialog):
             index = regex.indexIn(self.ui.textBrowser.toPlainText(), pos)
 
     def save_designPref_para(self):
-        """
-        This routine is responsible for saving all design preferences selected by the user
+        """This routine is responsible for saving all design preferences selected by the user
         """
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
@@ -136,8 +135,11 @@ class DesignPreferences(QDialog):
         # self.main_controller.call_designPref(designPref)
 
     def set_default_para(self):
-        '''
-        '''
+        """
+
+        Returns:
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
             pass
@@ -181,7 +183,7 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         designPref["design"] = {}
-        designPref["design"]["design _method"] = str(self.ui.combo_design_method.currentText())
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = False
 
         return designPref
@@ -475,9 +477,13 @@ class MainController(QMainWindow):
         Returns:
 
         """
+        loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
+        if loc == "Beam-Beam":
+            self.ui.comboColSec.addItems(beamdata)
+        else:
+            self.ui.combo_Beam.addItems(beamdata)
         self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
@@ -495,6 +501,11 @@ class MainController(QMainWindow):
             if col in intg_section:
                 indx = intg_section.index(str(col))
                 combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+        duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+        for i in duplicate:
+            combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
+
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
@@ -528,6 +539,7 @@ class MainController(QMainWindow):
         """
 
         self.display.EraseAll()
+        self.designPrefDialog.set_default_para()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.lbl_beam.setText(" Secondary beam *")
@@ -539,7 +551,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_beamcombolist())
+            self.get_beamdata()
+            #self.ui.comboColSec.addItems(get_beamcombolist())
             self.ui.combo_Beam.setCurrentIndex(0)
 
             self.ui.txtFu.clear()
@@ -586,7 +599,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setText("Column")
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_columncombolist())
+            self.get_columndata()
+            #self.ui.comboColSec.addItems(get_columncombolist())
             self.ui.comboColSec.setCurrentIndex(0)
             self.ui.combo_Beam.setCurrentIndex(0)
 
@@ -1550,6 +1564,7 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
+
             self.callFin2D_Drawing("All")
         else:
             pass
@@ -1634,9 +1649,7 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
-        # commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
-        #                                  self.alist[5], self.alist[6], self.alist[7],
-        #                                  self.alist[8],self.alist[9], self.display, self.folder, self.connection)
+
         if view != 'All':
 
             if view == "Front":
@@ -1655,14 +1668,7 @@ class MainController(QMainWindow):
             fname = ''
             self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
-    # def save_2D_images(self, view):
-    #
-    #     fileName = QFileDialog.getSaveFileName(self,
-    #                                                  "Save as PNG", str(self.folder) + '/untitled.png',
-    #                                                  "PNG files (*.png)")
-    #     f = open(self.callFin2D_Drawing(view), 'w')
-    #     f.close()
-    #     QMessageBox.about(self, 'Information', "Image Saved")
+
 
     def closeEvent(self, event):
         '''

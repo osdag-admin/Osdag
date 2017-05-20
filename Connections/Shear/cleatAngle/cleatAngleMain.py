@@ -9,6 +9,8 @@ import pickle
 import subprocess
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5.QtGui import QBrush
+from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog,QDesktopWidget
@@ -336,8 +338,9 @@ class MainController(QMainWindow):
         self.ui.setupUi(self)
         self.folder = folder
 
-        self.ui.combo_Beam.addItems(get_beamcombolist())
-        self.ui.comboColSec.addItems(get_columncombolist())
+        self.get_columndata()
+        self.get_beamdata()
+
         self.ui.comboCleatSection.addItems(get_anglecombolist())
 
         self.ui.inputDock.setFixedSize(310, 710)
@@ -443,6 +446,43 @@ class MainController(QMainWindow):
         self.ui_obj = None
         self.commLogicObj = None
         self.designPrefDialog = DesignPreferences(self)
+
+    def get_columndata(self):
+        """Fetch  old and new column sections from "Intg_osdag" database.
+        Returns:
+
+        """
+        columndata = get_columncombolist()
+        old_colList = get_oldcolumncombolist()
+        self.ui.comboColSec.addItems(columndata)
+        self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
+
+    def get_beamdata(self):
+        """Fetch old and new beam sections from "Intg_osdag" database
+        Returns:
+
+        """
+        beamdata = get_beamcombolist()
+        old_beamList = get_oldbeamcombolist()
+        self.ui.combo_Beam.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+
+    def color_oldDB_sections(self, old_section, intg_section, combo_section):
+        """display old sections in red color.
+
+        Args:
+            old_section(str): Old sections from IS 808 1984
+            intg_section(str): Revised sections from IS 808 2007
+            combo_section(QcomboBox): Beam/Column dropdown list
+
+        Returns:
+
+        """
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))
@@ -941,8 +981,8 @@ class MainController(QMainWindow):
         if sys.platform == ("win32" or "win64"):
             path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
         else:
-            path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
-            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
+            #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
+            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
         config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
 
         options = {

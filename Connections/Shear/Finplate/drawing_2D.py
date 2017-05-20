@@ -47,7 +47,9 @@ class FinCommonData(object):
         self.plateEdge_dist = float(ouputObj['Plate']["plateedge"])
         self.weld_thick = float(ouputObj['Weld']['thickness'])
         self.bolt_dia = int(inputObj["Bolt"]["Diameter (mm)"])
+        self.dia_hole = int(ouputObj['Bolt']['dia_hole'])
         self.grade = float(inputObj["Bolt"]["Grade"])
+        self.bolt_type = str(inputObj["Bolt"]["Type"])
         self.connectivity = str(inputObj['Member']['Connectivity'])
         self.pitch = float(ouputObj['Bolt']["pitch"])
         self.gauge =float(ouputObj['Bolt']["gauge"])
@@ -489,23 +491,28 @@ class Fin2DCreatorFront(object):
         # self.B1 = np.array([ptB1x,ptB1y])
         self.ptB1 = np.array([ptB1x, ptB1y])
 
-        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        #ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptC2y = ptC1y + self.dataObj.plate_ht
         self.C2 = (ptC2x, ptC2y)
 
-        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        #ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptA5y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A5 = ptA5x, ptA5y
 
-        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        #ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptA4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A4 = (ptA4x, ptA4y)
 
-        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        #ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptB4y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B4 = (ptB4x, ptB4y)
 
-        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
+        #ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
+        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + self.dataObj.gap
         ptBy5 = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B5 = (ptBx5, ptBy5)
 
@@ -636,7 +643,7 @@ class Fin2DCreatorFront(object):
         self.BA3 = self.BA4 + (self.dataObj.beam_L - self.dataObj.notch_L) * np.array([1, 0])
         self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
         self.BB3 = self.BB2 + self.dataObj.beam_T * np.array([0, -1])
-        self.BB1 = self.BB2 + (self.dataObj.beam_L + 10) * np.array([-1, 0])
+        self.BB1 =self.BB5 + (self.dataObj.D_beam-(self.dataObj.plate_ht + self.dataObj.notch_ht)) * np.array([0,1])
         self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
         self.B1 = self.BA5 + 80 * np.array([0, 1])
         self.BC2 = self.BA6 + self.dataObj.col_R1 * np.array([-1, 0])
@@ -766,7 +773,8 @@ class Fin2DCreatorFront(object):
 
         # Draw Faint line for Gap Distance
         ptC1 = self.FC
-        ptC2 = ptC1 + 20 * np.array([0, 1])
+        #ptC2 = ptC1 + 20 * np.array([0, 1])
+        ptC2 = ptC1 + self.dataObj.gap * np.array([0, 1])
         #ptC2 = ptC1 + float(str(self.dataObj.gap)) * np.array([0, 1])
         self.dataObj.drawFaintLine(ptC1, ptC2, dwg)
 
@@ -818,8 +826,8 @@ class Fin2DCreatorFront(object):
         ptx = self.dataObj.D_col / 2
         pty = 0
         pt = self.FA + 10 * np.array([1, 0])  # np.array([ptx,pty])
-        theta = 30
-        offset = 40  # self.dataObj.col_L /7
+        theta = 90
+        offset = self.dataObj.D_col / 2  # self.dataObj.col_L /7
 
         textUp = "Column " + self.dataObj.col_Designation
         textDown = ""
@@ -830,7 +838,7 @@ class Fin2DCreatorFront(object):
 #         weldPtx = (self.dataObj.D_col)
 #         weldPty = ((self.dataObj.col_L - self.dataObj.D_beam)/2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         weldPt = self.ptFP + 6 * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1])
-        theta = 60
+        theta = 55
         offset = self.dataObj.col_B + 100
         textUp = "         z " + str(int(self.dataObj.weld_thick)) + " mm"
         textDown = ""  # u"\u25C1"
@@ -839,10 +847,14 @@ class Fin2DCreatorFront(object):
 
         # Bolt Information
         bltPtx = self.FP + self.dataObj.plateEdge_dist * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1]) + (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0])
-        theta = 45
+        theta = 50
         offset = (self.dataObj.D_beam * 3) / 8
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(int(self.dataObj.bolt_dia)) + u'\u00d8' + " holes"
-        textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " bolts (grade" + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPtx, theta, "NE", offset, textUp, textDown, element)
 
@@ -1043,8 +1055,12 @@ class Fin2DCreatorFront(object):
         bltPtx = self.ptP + self.dataObj.plateEdge_dist * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1]) + (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0])
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPtx, theta, "NE", offset, textUp, textDown, element)
 
@@ -1242,8 +1258,12 @@ class Fin2DCreatorFront(object):
         bltPtx = np.array(gaugePts[-1])
         theta = 45
         offset = self.dataObj.end_dist + self.dataObj.notch_ht + 50
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPtx, theta, "NE", offset, textUp, textDown, element)
 
@@ -1518,8 +1538,12 @@ class Fin2DCreatorTop(object):
         bltPt = self.FP5 + self.dataObj.plateEdge_dist * np.array([1, 0]) + (nc - 1) * self.dataObj.gauge * np.array([1, 0]) 
         theta = 55
         offset = (self.dataObj.beam_B) + 130
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPt, theta, "NE", offset, textUp, textDown, element)
 
@@ -1663,8 +1687,12 @@ class Fin2DCreatorTop(object):
         bltPt = self.A5 + self.dataObj.plateEdge_dist * np.array([1, 0]) + (nc - 1) * self.dataObj.gauge * np.array([1, 0]) 
         theta = 60
         offset = (self.dataObj.beam_B) + 160
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M" + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPt, theta, "NE", offset, textUp, textDown, element)
 
@@ -1815,8 +1843,12 @@ class Fin2DCreatorTop(object):
         bltPt = self.BBB + self.dataObj.plateEdge_dist * np.array([1, 0]) + (nc - 1) * self.dataObj.gauge * np.array([1, 0]) 
         theta = 60
         offset = (self.dataObj.beam_B) + 160
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, bltPt, theta, "NE", offset, textUp, textDown, element)
 
@@ -2034,8 +2066,12 @@ class Fin2DCreatorSide(object):
         boltPt = self.P1
         theta = 45
         offset = self.dataObj.weld_thick + self.dataObj.plate_thick + self.dataObj.beam_B / 2 + 80
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, boltPt, theta, "NE", offset, textUp, textDown, element)
 
@@ -2140,8 +2176,12 @@ class Fin2DCreatorSide(object):
         boltPt = self.FP1
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, boltPt, theta, "NE", offset, textUp, textDown, element)
 
@@ -2247,8 +2287,12 @@ class Fin2DCreatorSide(object):
         theta = 30
         offset = self.dataObj.col_L / 3.0
 
-        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.bolt_dia) + u'\u00d8' + " holes"
-        textDown = "for M " + str(self.dataObj.bolt_dia) + " bolts (grade " + str(self.dataObj.grade) + ")"
+        textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+        if str(self.dataObj.bolt_type) == "HSFG":
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
+                self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
+        else:
+            textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + str(self.dataObj.grade) + ")"
         element = ""
         self.dataObj.drawOrientedArrow(dwg, boltPt, theta, "SE", offset, textUp, textDown, element)
 

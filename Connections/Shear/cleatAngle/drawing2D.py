@@ -643,7 +643,7 @@ class Cleat2DCreatorFront(object):
         v_height = self.dataObj.D_col + 850
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
         #         dwg = svgwrite.Drawing(filename, size=('1200mm', '1225mm'), viewBox=('-500 -250 1500 1225'))
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -350 1300 ' + str(v_height)))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-350 -350 1300 ' + str(v_height)))
 
         # ################ Cross section A-A ##################
         ptSecA = self.BA + (320 * np.array([0, -1]))
@@ -747,6 +747,7 @@ class Cleat2DCreatorFront(object):
         bb1 = np.array(pt_list[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 150) * np.array([1, 0])
         self.dataObj.draw_faint_line(bb1, bb2, dwg)
+
         # ###### drawing outer arrow on beam bolt group to represent pitch and end distance ##########
         # pitch @ no_of_beam_bolt_row
         params = {"offset": self.dataObj.beam_L + 150, "textoffset": 10, "lineori": "left", "endlinedim": 10}
@@ -783,6 +784,7 @@ class Cleat2DCreatorFront(object):
         offset = ((v_offset) + 180)  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC     
         params = {"offset": offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BR, BR_left, str(int(self.dataObj.end_dist)), params)
+
         # ##################COLUMN CONNECTIVITY MARKING#####################
         # Draw Faint Line To Represent Distance Between Beam Flange and Cleat Angle.
         length = (self.dataObj.beam_B - self.dataObj.beam_tw) / 2
@@ -795,6 +797,7 @@ class Cleat2DCreatorFront(object):
         # #Arrow Dimension NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC  
         params = {"offset": 30, "textoffset": 50, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, self.BA, BA_down, str(int(v_offset)), params)
+
         # Draw Faint Line To Represent column pitch and end Distance.
         self.dataObj.draw_faint_line(self.BP, self.BP - (length + 30 + self.dataObj.beam_tw) * np.array([1, 0]), dwg)
         self.dataObj.draw_faint_line(np.array(pt_list_c[0]), np.array(pt_list_c[0]) - (length + 30) * np.array([1, 0]), dwg)
@@ -816,24 +819,25 @@ class Cleat2DCreatorFront(object):
         # ##################### BEAM designation and number bolt information ##############
         # SUPORTED BEAM Designation
         beam_pt = self.BB2
-        theta = 30
-        offset = 50
+        theta = 90
+        offset = 1
         text_up = "Beam " + self.dataObj.beam_Designation  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # SUPORTING BEAM Designation
-        theta = 45
+        beam_pt1 = self.BA
+        theta = 90
         offset = 100
         text_up = "Beam " + self.dataObj.col_Designation
         text_down = ""
-        self.dataObj.draw_oriented_arrow(dwg, self.BA, theta, "NW", offset, text_up, text_down)
+        self.dataObj.draw_oriented_arrow(dwg, beam_pt1, theta, "NW", offset, text_up, text_down)
 
         #  Secondary BEAM Bolt GROUP  Information
         no_of_bolts = self.dataObj.no_of_rows * self.dataObj.no_of_col
 
         bolt_pt_x = np.array(pt_list[0][0])
-        theta = 45
+        theta = 55
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -847,8 +851,8 @@ class Cleat2DCreatorFront(object):
         # Primary BEAM Bolt GROUP  Information
         no_of_bolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         bolt_pt = np.array(pt_list_c[-1])
-        theta = 60
-        offset = (self.dataObj.beam_B / 2 + 10)  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        theta = 70
+        offset = (self.dataObj.beam_B *3 )  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -856,21 +860,21 @@ class Cleat2DCreatorFront(object):
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(
         #     self.dataObj.bolt_grade) + ')'  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
-        self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "SW", offset, text_up, text_down)
+        self.dataObj.draw_oriented_arrow(dwg, bolt_pt, theta, "SE", offset, text_up, text_down)
 
         # cleat angle information
         cleat_pt = self.BR1
-        theta = 75
-        offset = (self.dataObj.D_beam - self.dataObj.cleat_ht - self.dataObj.notch_offset) + 100
-        text_up = "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
-        text_down = ""
+        theta = 60
+        offset = (self.dataObj.D_beam/2)
+        text_up = ""
+        text_down =  "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
         self.dataObj.draw_oriented_arrow(dwg, cleat_pt, theta, "SE", offset, text_up, text_down)
 
         # 2D view name
-        ptx = self.BA + 50 * np.array([1, 0]) + (v_height - 700) * np.array([0, 1])
+        ptx = self.BH + (self.dataObj.beam_B * 2) * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx = self.BA + 330 * np.array([1, 0]) + (v_height - 700) * np.array([0, 1])
+        ptx = self.BH + (self.dataObj.beam_B * 2+ 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
@@ -1077,17 +1081,17 @@ class Cleat2DCreatorFront(object):
         # Beam Information
         beam_pt = self.FA1 + self.dataObj.D_beam * np.array([0, 1])
         theta = 45
-        offset = (self.dataObj.D_beam - self.dataObj.cleat_ht) / 2 + 60.0
+        offset = (self.dataObj.D_beam / 2 )
         text_up = "Beam " + self.dataObj.beam_Designation
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # Column Designation
-        ptx = self.dataObj.D_col / 2
+        ptx = self.dataObj.D_col / 3
         pty = 0
         pt = np.array([ptx, pty])
-        theta = 30
-        offset = self.dataObj.col_L / 10
+        theta = 90
+        offset = self.dataObj.col_B / 3
         text_up = "Column " + self.dataObj.col_Designation
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down)
@@ -1110,7 +1114,7 @@ class Cleat2DCreatorFront(object):
         # Bolt Information for column part
         no_of_bolts = self.dataObj.no_of_crows * self.dataObj.no_of_ccol * 2
         bolt_pt_x = np.array(pt_list_c[-1])
-        theta = 45
+        theta = 60
         offset = (self.dataObj.D_col + 10)
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -1132,10 +1136,10 @@ class Cleat2DCreatorFront(object):
         self.dataObj.draw_oriented_arrow(dwg, plate_pt, theta, "SE", offset, text_up, text_down)
 
         # 2D view name
-        ptx = self.FA + 50 * np.array([1, 0]) + 1000 * np.array([0, 1])  # 1150
+        ptx = self.FG + (self.dataObj.col_B/2) * np.array([0, 1])  # 1150
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx = ptx + 300 * np.array([1, 0]) # + 2000 * np.array([0, 1])  # 1150
+        ptx = self.FG + (self.dataObj.col_B/2 + 40) * np.array([0, 1])   # + 2000 * np.array([0, 1])  # 1150
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
@@ -1223,7 +1227,7 @@ class Cleat2DCreatorFront(object):
         self.dataObj.draw_oriented_arrow(dwg, plate_pt, theta, "SE", offset, text_up, text_down)
 
         # Column Designation
-        ptx = self.dataObj.col_B / 2
+        ptx = self.dataObj.col_B / 3
         pty = 0
         pt = np.array([ptx, pty])
         theta = 90
@@ -1254,7 +1258,7 @@ class Cleat2DCreatorFront(object):
 
         # column bolt marking Arrow
         no_of_cbolts = self.dataObj.no_of_crows * self.dataObj.no_of_ccol * 2
-        theta = 45
+        theta = 65
         offset = (self.dataObj.col_B * 3) / 4
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -1272,9 +1276,11 @@ class Cleat2DCreatorFront(object):
         rb1 = rt1 + self.dataObj.cleat_ht * np.array([0, 1])
         rb2 = rt2 + self.dataObj.cleat_ht * np.array([0, 1])
         self.dataObj.draw_faint_line(rb1, rb2, dwg)
+
         # drawing inner arrow for the above drawn faint lines
         params = {"offset": self.dataObj.beam_L, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, rt1, rb1, str(int(self.dataObj.cleat_ht)), params)
+
         # Drawing faint lines at bolt groups on column
         bt1 = np.array(pt_list[0][0])
         bt2 = bt1 + (self.dataObj.beam_L + 275) * np.array([1, 0])
@@ -1282,6 +1288,7 @@ class Cleat2DCreatorFront(object):
         bb1 = np.array(pt_list[-1][0])
         bb2 = bb1 + (self.dataObj.beam_L + 275) * np.array([1, 0])
         self.dataObj.draw_faint_line(bb1, bb2, dwg)
+
         # drawing outer arrow beam bolt group
         params = {"offset": self.dataObj.beam_L + 275, "textoffset": 10, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, bt1, bb1, str(len(pt_list) - 1) + "@" + str(int(self.dataObj.pitch)) + " c/c", params)
@@ -1301,6 +1308,7 @@ class Cleat2DCreatorFront(object):
         ptBy = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         ptB = (ptBx, ptBy)
         self.dataObj.draw_faint_line(ptA, ptB, dwg)
+
         # Faint lines for column bolt group and edge distances  
         pt1 = np.array(pt_list_c[0])
         ptBx = -30
@@ -1343,6 +1351,7 @@ class Cleat2DCreatorFront(object):
         self.dataObj.draw_faint_line(rt_left, rt_left_top, dwg)
         params = {"offset": (self.dataObj.col_B - self.dataObj.col_tw) / 2 + 60, "textoffset": 10, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, rt, rt_left, str(int(self.dataObj.end_dist)), params)
+
         # faint lines and outer arrow for beam gauge representation for double lines of bolts
         if self.dataObj.no_of_col > 1:
             rt_left_left = rt_left - self.dataObj.gauge * np.array([1, 0])  # make center line of bolts
@@ -1352,10 +1361,10 @@ class Cleat2DCreatorFront(object):
             self.dataObj.draw_dimension_outer_arrow(dwg, rt_left, rt_left_left, str(int(self.dataObj.gauge)), params)
 
         # 2D view name
-        ptx = self.A + 50 * np.array([1, 0]) + 1010 * np.array([0, 1])  # 1090
+        ptx = self.D + (self.dataObj.beam_B) * np.array([0, 1])  # 1090
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx2 = ptx + 300 * np.array([1, 0])
+        ptx2 = self.D + (self.dataObj.beam_B + 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -1533,6 +1542,7 @@ class Cleat2DCreatorTop(object):
         ptSecD = ptSecC + (50 * np.array([0, -1]))
         txt_pt = ptSecD + (20 * np.array([-1, 0])) + (20 * np.array([0, -1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
+
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BE), (self.BF)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
@@ -1711,9 +1721,9 @@ class Cleat2DCreatorTop(object):
         self.dataObj.draw_faint_line(ptC, ptD, dwg)
 
         # 2D view name
-        ptx = self.FA + (140) * np.array([1, 0]) + (640) * np.array([0, 1])  # 640
+        ptx = self.BD + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 640
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        ptx = ptx + 300 * np.array([1, 0])
+        ptx = self.BD + (self.dataObj.beam_B * 2+ 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
@@ -1883,8 +1893,8 @@ class Cleat2DCreatorTop(object):
 
         # Bolt Information for beam connectivity
         bolt_pt = np.array(pt_list[0])
-        theta = 45
-        offset = (self.dataObj.beam_B) + 50
+        theta = 70
+        offset = (self.dataObj.beam_B) + 70
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1896,7 +1906,7 @@ class Cleat2DCreatorTop(object):
         # Bolt information for column connectivity
         no_of_bolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         weld_pt = np.array(pt_list_c[0])
-        theta = 40
+        theta = 70
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 80
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -1905,12 +1915,14 @@ class Cleat2DCreatorTop(object):
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NW", offset, text_up, text_down)
+
         # Gap Informatoin
         ptG1 = self.FG + 50 * np.array([0, 1])
         ptG2 = ptG1 + 20 * np.array([1, 0])
         offset = 1
         params = {"offset": offset, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 50}
         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
+
         # Draw Faint Lines to representation of Gap distance 
         ptA = self.FG
         ptB = ptG1
@@ -1920,9 +1932,9 @@ class Cleat2DCreatorTop(object):
         self.dataObj.draw_faint_line(ptC, ptD, dwg)
 
         # 2D view name
-        ptx = self.FA + 180 * np.array([1, 0]) + 700 * np.array([0, 1])  # 740
+        ptx = self.FG + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 740
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        ptx = ptx + 300 * np.array([1, 0])
+        ptx = self.FG + (self.dataObj.beam_B * 2 + 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
@@ -2037,6 +2049,7 @@ class Cleat2DCreatorTop(object):
         self.dataObj.draw_faint_line(self.Q3, pt_down, dwg)
         params = {"offset": dim_offset, "textoffset": 20, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pt_list[0]), self.Q3, str(int(self.dataObj.end_dist)), params)
+
         # #####Faint lines for column connectivity  edge(end) distance outer arrow
         dim_offset = self.dataObj.beam_B / 2 + self.dataObj.col_tw + 100
         pt_left = np.array(pt_list_c[0]) - dim_offset * np.array([1, 0])
@@ -2087,10 +2100,9 @@ class Cleat2DCreatorTop(object):
 
         # beam Bolt Information
         no_of_bbolts = self.dataObj.no_of_rows * self.dataObj.no_of_col
-
         bolt_pt = np.array(pt_list[0])
         theta = 45
-        offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 100
+        offset = (self.dataObj.beam_B)
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2100,10 +2112,9 @@ class Cleat2DCreatorTop(object):
 
         # column bolt information
         no_of_cbolts = self.dataObj.no_of_crows * self.dataObj.no_of_ccol * 2
-
         weld_pt = np.array(pt_list_c[0])
         theta = 45
-        offset = self.dataObj.D_col * 3 / 4 + 50
+        offset = self.dataObj.beam_B + 50
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2117,18 +2128,19 @@ class Cleat2DCreatorTop(object):
         offset = 100
         params = {"offset": offset, "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 50}
         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.gap), params)
+
         # Draw Faint Lines to representation of Gap distance #
         ptA = self.D
-        ptB = ptA + (200) * np.array([0, -1])
+        ptB = ptA + (150) * np.array([0, -1])
         self.dataObj.draw_faint_line(ptA, ptB, dwg)
         ptC = self.A1
-        ptD = ptC + (200) * np.array([0, -1]) - (self.dataObj.D_col - 2 * self.dataObj.col_T - self.dataObj.beam_B) / 2 * np.array([0, 1])
+        ptD = ptC + (150) * np.array([0, -1]) - (self.dataObj.D_col - 2 * self.dataObj.col_T - self.dataObj.beam_B) / 2 * np.array([0, 1])
         self.dataObj.draw_faint_line(ptC, ptD, dwg)
 
         # 2D view name
-        ptx = self.A + 80 * np.array([1, 0]) + 700 * np.array([0, 1])  # 1090
+        ptx = self.G + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 1090
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
-        ptx = ptx + 300 * np.array([1, 0])
+        ptx = self.G + (self.dataObj.beam_B * 2+ 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2250,7 +2262,7 @@ class Cleat2DCreatorSide(object):
         self.BZ1 = self.BZ + self.dataObj.cleat_ht * np.array([0, 1])
 
     def call_BWBW_side(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 1500 1400'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-540 -400 1500 1400'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BI), (self.BJ), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BG), (self.BH)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BF), (self.BE)).stroke('blue', width=2.5, linecap='square'))
@@ -2438,17 +2450,17 @@ class Cleat2DCreatorSide(object):
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # SUPORTING BEAM Designation
-        theta = 90
-        offset = 0.0
+        theta = 55
+        offset = 60
         text_up = "Beam " + self.dataObj.col_Designation
         text_down = ""
-        self.dataObj.draw_oriented_arrow(dwg, self.BA, theta, "NW", offset, text_up, text_down)
+        self.dataObj.draw_oriented_arrow(dwg, self.BG, theta, "SW", offset, text_up, text_down)
 
         #  primary BEAM Bolt GROUP  Information
         no_of_bolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
 
         bolt_pt_x = np.array(pitch_pts_c1[0][0])
-        theta = 45
+        theta = 60
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -2463,7 +2475,7 @@ class Cleat2DCreatorSide(object):
         no_of_bolts = self.dataObj.no_of_rows * self.dataObj.no_of_col  # Double Angle cleat
 
         bolt_pt = np.array(pitch_pts[0])
-        theta = 70
+        theta = 75
         offset = (self.beam_beam_length / 2 + 50)  # #
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -2476,17 +2488,17 @@ class Cleat2DCreatorSide(object):
 
         # cleat angle information
         cleat_pt = self.BZ1
-        theta = 30
-        offset = (self.beam_beam_length - self.dataObj.cleat_legsize_1 * 2 - self.dataObj.beam_tw / (3.46))  # beam_tw
+        theta = 55
+        offset = (self.dataObj.beam_B +10)   # beam_tw
         text_up = "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, cleat_pt, theta, "SW", offset, text_up, text_down)
 
         # 2D view name
-        ptx = self.BA + 10 * np.array([1, 0]) + 800 * np.array([0, 1])  # 980
+        ptx = self.BG + (self.dataObj.beam_B * 3) * np.array([0, 1])  # 980
         dwg.add(dwg.text('Side View (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx = ptx + 300 * np.array([1, 0])
+        ptx = self.BG + (self.dataObj.beam_B * 3+ 40) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2591,7 +2603,7 @@ class Cleat2DCreatorSide(object):
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts_c1[-1][0]), pt_down, str(int(self.dataObj.cedge_dist)), params)
 
         # ###########Vertical column marking ###############
-        v_length = self.dataObj.col_L / 2 + self.dataObj.cleat_ht / 2
+        v_length = self.dataObj.col_L / 2
         ptY = self.X + self.dataObj.cleat_ht * np.array([0, 1])
         ptY1 = self.X1 + self.dataObj.cleat_ht * np.array([0, 1])
         ptY_down = ptY + v_length * np.array([0, 1])
@@ -2643,10 +2655,11 @@ class Cleat2DCreatorSide(object):
 
         # ###################### Faint Lines and outer arrow for beam connectivity ############
 
-        length = self.dataObj.D_col / 2 - self.dataObj.beam_tw / 2 - self.dataObj.cleat_thk
+        length = self.dataObj.D_col / 2 - self.dataObj.beam_tw / 2
         ptQ1 = self.P - self.dataObj.cleat_thk * np.array([1, 0])
         pt_left = ptQ1 - (length + 100) * np.array([1, 0])
         self.dataObj.draw_faint_line(ptQ1, pt_left, dwg)
+
         pt = ptQ1 + self.dataObj.cleat_ht * np.array([0, 1])
         pt_left = pt - (length + 100) * np.array([1, 0])
         self.dataObj.draw_faint_line(pt, pt_left, dwg)
@@ -2661,24 +2674,24 @@ class Cleat2DCreatorSide(object):
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts[0]), np.array(pitch_pts[-1]),
                                                 str(len(pitch_pts) - 1) + "@" + str(int(self.dataObj.pitch)) + " c/c", params)
 
-        params = {"offset": offset, "textoffset": 50, "lineori": "left", "endlinedim": 10}
+        params = {"offset": offset, "textoffset": 60, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts[0]), ptQ1, str(int(self.dataObj.edge_dist)), params)
 
-        params = {"offset": offset, "textoffset": 50, "lineori": "right", "endlinedim": 10}
+        params = {"offset": offset, "textoffset": 60, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts[-1]), pt, str(int(self.dataObj.edge_dist)), params)
 
         # ################ Beam Information ##############################################
         beam_pt = self.A2
         theta = 45
-        offset = (self.dataObj.col_L - self.dataObj.D_beam) / 2
+        offset = (self.dataObj.D_beam) / 3
         text_up = "Beam " + self.dataObj.beam_Designation
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         #       column  Information
         col_pt = self.A
-        theta = 45
-        offset = 50
+        theta = 90
+        offset = self.dataObj.beam_B/2
         text_up = "Column " + self.dataObj.col_Designation
         text_down = " "
         self.dataObj.draw_oriented_arrow(dwg, col_pt, theta, "NW", offset, text_up, text_down)
@@ -2694,7 +2707,7 @@ class Cleat2DCreatorSide(object):
         #       beam bolt information
         no_of_bbolts = self.dataObj.no_of_rows * self.dataObj.no_of_col
         boltPt = np.array(pitch_pts[0])
-        theta = 45
+        theta = 60
         offset = (self.dataObj.D_col) / 2 + 10
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -2717,17 +2730,17 @@ class Cleat2DCreatorSide(object):
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NE", offset, text_up, text_down)
 
         # 2D view name
-        ptx = self.A + 1200 * np.array([0, 1]) + 50 * np.array([1, 0])
+        ptx = self.G + (self.dataObj.beam_B + 50) * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx2 = ptx + 300 * np.array([1, 0])
+        ptx2 = self.G + (self.dataObj.beam_B + 90) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CFBW_side(self, filename):
         '''
         '''
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox='-430 -300 1200 1600')
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox='-400 -300 1200 1600')
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(
             points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11),
@@ -2886,7 +2899,7 @@ class Cleat2DCreatorSide(object):
         pt_left = np.array(pitch_pts[-1]) - (length + 100) * np.array([1, 0])
         self.dataObj.draw_faint_line(np.array(pitch_pts[-1]), pt_left, dwg)
 
-        offset = length + 100
+        offset = length + 150
         params = {"offset": offset, "textoffset": 150, "lineori": "right", "endlinedim": 10}
         self.dataObj.draw_dimension_outer_arrow(dwg, np.array(pitch_pts[0]), np.array(pitch_pts[-1]),
                                                 str(len(pitch_pts) - 1) + "@" + str(int(self.dataObj.pitch)) + " c/c", params)
@@ -2901,14 +2914,14 @@ class Cleat2DCreatorSide(object):
         ##### Beam Information
         beam_pt = (self.FA2 + self.FA1) / 2
         theta = 90
-        offset = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + 25
+        offset = (self.dataObj.col_L - self.dataObj.D_beam) / 2 + 50
         text_up = "Beam " + self.dataObj.beam_Designation
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "NE", offset, text_up, text_down)
 
         # column  Information
         col_pt = self.FA
-        theta = 45
+        theta = 90
         offset = 50
         text_up = "Column " + self.dataObj.col_Designation
         text_down = " "
@@ -2916,7 +2929,7 @@ class Cleat2DCreatorSide(object):
 
         # cleat Angle Information
         beam_pt = (self.FX3)
-        theta = 30
+        theta = 40
         offset = self.dataObj.cleat_ht / 2
         text_up = "ISA. " + str(int(self.dataObj.cleat_legsize)) + 'x' + str(int(self.dataObj.cleat_legsize_1)) + 'x' + str(int(self.dataObj.cleat_thk))
         text_down = ""
@@ -2925,20 +2938,21 @@ class Cleat2DCreatorSide(object):
         # beam bolt information
         no_of_bbolts = self.dataObj.no_of_rows * self.dataObj.no_of_col
         boltPt = np.array(pitch_pts[0])
-        theta = 45
-        offset = (self.dataObj.col_B) / 2 + 70
+        theta = 55
+        offset = (self.dataObj.col_B) / 2 + 100
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
         # text_down = "for M" + str(self.dataObj.bolt_dia) + 'bolts' + '(grade ' + str(self.dataObj.bolt_grade) + ')'
-        self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NW", offset, text_up, text_down)
+        self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NE", offset, text_up, text_down)
+
         # column bolt information
         no_of_cbolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         boltPt = np.array(pitch_pts_c1[0][0])
         theta = 45
-        offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + self.dataObj.cend_dist + 50
+        offset =  (self.dataObj.col_B) / 2
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2948,9 +2962,9 @@ class Cleat2DCreatorSide(object):
         self.dataObj.draw_oriented_arrow(dwg, boltPt, theta, "NE", offset, text_up, text_down)
 
         # 2D view name
-        ptx = self.A + 1000 * np.array([0, 1]) + 50 * np.array([1, 0])  # 1190
+        ptx = self.G + (self.dataObj.beam_B + 50) * np.array([0, 1])  # 1190
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
-        ptx2 = ptx + 290 * np.array([1, 0])
+        ptx2 = self.G + (self.dataObj.beam_B + 90) * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()

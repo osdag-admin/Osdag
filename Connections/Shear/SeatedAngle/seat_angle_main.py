@@ -22,15 +22,13 @@ from OCC.StlAPI import StlAPI_Writer
 from model import *
 
 from svg_window import SvgWindow
-import report_generator
 from ui_design_preferences import Ui_ShearDesignPreferences
 from ui_seat_angle import Ui_MainWindow
-from ui_summary_popup import Ui_Dialog
+from ui_design_summary import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import Ui_AskQuestion
 from Connections.Shear.common_logic import CommonDesignLogic
-import seat_angle_calc
 
 
 class DesignPreferences(QDialog):
@@ -58,7 +56,6 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
-        #self.saved_designPref["bolt"]["ultimate_load"] = str(self.ui.combo_ultimat_load.currentText())
 
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
@@ -68,8 +65,7 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
-
-            self.saved_designPref["detailing"]["gap"] = int(20)
+            self.saved_designPref["detailing"]["gap"] = int(10)
         else:
             self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
 
@@ -111,12 +107,12 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        self.ui.txt_detailingGap.setText(str(20))
+        self.ui.txt_detailingGap.setText(str(10))
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(20)
+        designPref["detailing"]["gap"] = int(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -148,12 +144,12 @@ class DesignPreferences(QDialog):
     def get_clearance(self, boltDia):
 
         standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
-        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+        oversized_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
 
         if self.ui.combo_boltHoleType.currentText() == "Standard":
             clearance = standard_clrnce[boltDia]
         else:
-            clearance = overhead_clrnce[boltDia]
+            clearance = oversized_clrnce[boltDia]
 
         return clearance
 
@@ -163,7 +159,7 @@ class DesignPreferences(QDialog):
         """
         # TODO : change grade to 10.9; also update UI
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
-                  12.9: 1220}
+                  10.9: 940, 12.9: 1220}
         boltGrd = float(boltGrade)
         return boltFu[boltGrd]
 
@@ -195,7 +191,6 @@ class MyAboutOsdag(QDialog):
         self.mainController = parent
 
 
-# below class was previously MyPopupDialog in the other modules
 class DesignReportDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -380,7 +375,6 @@ class MainController(QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.connection = "SeatedAngle"
-        self.sa_calc_object = seat_angle_calc.SeatAngleCalculation()
         self.designPrefDialog = DesignPreferences(self)
 
     def get_columndata(self):
@@ -390,8 +384,8 @@ class MainController(QMainWindow):
         """
         columndata = get_columncombolist()
         old_colList = get_oldcolumncombolist()
-        self.ui.comboColSec.addItems(columndata)
-        self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
+        self.ui.combo_column_section.addItems(columndata)
+        self.color_oldDB_sections(old_colList, columndata, self.ui.combo_column_section)
 
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
@@ -400,8 +394,8 @@ class MainController(QMainWindow):
         """
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
-        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+        self.ui.combo_beam_section.addItems(beamdata)
+        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_beam_section)
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
         """display old sections in red color.
@@ -676,7 +670,7 @@ class MainController(QMainWindow):
         """(Dictionary)--> None
 
         """
-        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "sa_input.txt")
         inputFile = QFile(file_name)
         if not inputFile.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -689,7 +683,7 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "saveINPUT.txt")
+        file_name = os.path.join("Connections", "Shear", "SeatedAngle", "sa_input.txt")
 
         if os.path.isfile(file_name):
             fileObject = open(file_name, 'r')
@@ -725,20 +719,16 @@ class MainController(QMainWindow):
 
         return outObj
 
-    def show_design_report_dialog(self):
+    def create_design_report(self):
         design_report_dialog = DesignReportDialog(self)
         design_report_dialog.show()
-
-    def create_design_report(self):
-        self.show_design_report_dialog()
 
     def save_design(self, report_summary):
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
         self.call_seatangle2D_Drawing("All")
 
-        report_generator_instance = report_generator.ReportGenerator(self.sa_calc_object)
-        report_generator_instance.save_html(report_summary, file_name, self.folder)
+        self.commLogicObj.call_designReport(file_name, report_summary)
 
         # Creates PDF
         if sys.platform == ("win32" or "win64"):
@@ -1061,6 +1051,7 @@ class MainController(QMainWindow):
         :param: boolean
         :return:
         """
+        self.display.EraseAll()
         if self.ui.btn3D.isChecked:
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1071,6 +1062,7 @@ class MainController(QMainWindow):
         """
         Creating and displaying 3D Beam
         """
+        self.display.EraseAll()
         self.ui.chkBxBeam.setChecked(Qt.Checked)
         if self.ui.chkBxBeam.isChecked():
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
@@ -1083,6 +1075,7 @@ class MainController(QMainWindow):
     def call_3DColumn(self):
         """
         """
+        self.display.EraseAll()
         self.ui.chkBxCol.setChecked(Qt.Checked)
         if self.ui.chkBxCol.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1094,6 +1087,7 @@ class MainController(QMainWindow):
     def call_3DSeatAngle(self):
         """Displaying Seat Angle in 3D
         """
+        self.display.EraseAll()
         self.ui.chkBxSeatAngle.setChecked(Qt.Checked)
         if self.ui.chkBxSeatAngle.isChecked():
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
@@ -1144,7 +1138,6 @@ class MainController(QMainWindow):
         # TODO input validation
         self.display.EraseAll()
         self.alist = self.designParameters()
-        print "DP =", self.alist[0]
         # self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
@@ -1163,7 +1156,7 @@ class MainController(QMainWindow):
         if isempty[0] is True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            # self.call_seatangle2D_Drawing("All")
+            self.call_seatangle2D_Drawing("All")
         else:
             pass
 

@@ -6,7 +6,7 @@ Created on Oct 25, 2016
 import sys
 import model
 from PyQt5 import QtWidgets
-from report_generator import ReportGenerator
+from design_report_generator import ReportGenerator
 from seat_angle_calc import SeatAngleCalculation
 import test_seat_angle_calc
 import unittest
@@ -76,7 +76,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         sa_calc_obj = SeatAngleCalculation()
         sa_calc_obj.seat_angle_connection(sa_sample_ui_input)
         report_summary = self.create_sample_report_summary(sa_connection_id)
-        folder_location = "F:\Osdag\Osdag\Osdag_Workspace\one\\"  # Add dummy images of views here.
+        folder_location = "F:\Osdag_workspace\seated_angle\one\\"  # Add dummy images of views here.
         file_name = folder_location + "design_report_" + sa_connection_id + ".html"
         report_generator_instance = ReportGenerator(sa_calc_obj)
         report_generator_instance.save_html(report_summary, file_name,
@@ -101,6 +101,7 @@ class TestReportGenerator(unittest.TestCase, ReportGenerator):
         report_summary["ProjectTitle"] = "Connection modules development"
         report_summary["Subtitle"] = "Seated angle connection"
         report_summary["JobNumber"] = sa_connection_id
+        report_summary["Client"] = "Osdag Reviewer"
         report_summary["AdditionalComments"] = "Add more comments here."
         report_summary["Method"] = "Limit State Design (No Earthquake Load)"
         return report_summary

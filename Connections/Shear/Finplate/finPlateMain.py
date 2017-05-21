@@ -1023,8 +1023,6 @@ class MainController(QMainWindow):
 
         fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
         fileName = str(fileName)
-        self.callFin2D_Drawing("All")
-
         self.commLogicObj.call_designReport(fileName, popup_summary)
 
         # Creates pdf
@@ -1584,8 +1582,10 @@ class MainController(QMainWindow):
         if isempty[0] == True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
-
-            self.callFin2D_Drawing("All")
+            if status is True:
+                self.callFin2D_Drawing("All")
+            else:
+                pass
         else:
             pass
             # self.display.EraseAll()
@@ -1669,26 +1669,28 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+            if view != 'All':
 
-        if view != 'All':
+                if view == "Front":
+                    filename = os.path.join(self.folder, "images_html", "finFront.svg")
 
-            if view == "Front":
-                filename = os.path.join(self.folder, "images_html", "finFront.svg")
+                elif view == "Side":
+                    filename = os.path.join(self.folder, "images_html", "finSide.svg")
 
-            elif view == "Side":
-                filename = os.path.join(self.folder, "images_html", "finSide.svg")
+                else:
+                    filename = os.path.join(self.folder, "images_html", "finTop.svg")
+
+                svg_file = SvgWindow()
+                svg_file.call_svgwindow(filename, view, self.folder)
 
             else:
-                filename = os.path.join(self.folder, "images_html", "finTop.svg")
-
-            svg_file = SvgWindow()
-            svg_file.call_svgwindow(filename, view, self.folder)
+                fname = ''
+                self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
         else:
-            fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
-
-
+            pass
 
     def closeEvent(self, event):
         '''
@@ -1819,7 +1821,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    folder_path = "/home/deepa-c/Osdag_workspace"
+    folder_path = "D:\Osdag_Workspace\drawing"
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0755)
     image_folder_path = os.path.join(folder_path, 'images_html')

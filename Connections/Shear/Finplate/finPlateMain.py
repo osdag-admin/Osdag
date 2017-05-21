@@ -1348,37 +1348,58 @@ class MainController(QMainWindow):
 
     def validateInputsOnDesignBtn(self):
 
+        flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.information(self, "Information", "Please select connectivity")
+            flag = False
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
+                    QMessageBox.information(self, "Information", "Please select column section")
+                    flag = False
+
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
+                    QMessageBox.information(self, "Information", "Please select beam section")
+                    flag = False
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Primary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
+                    flag = False
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Secondary beam  section")
-
+                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
+                    flag = False
         if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
+            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
+            flag = False
 
         elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
+            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
+            flag = False
 
-        elif self.ui.txtShear.text() == '' or float(str(self.ui.txtShear.text())) == str(0):
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
+        elif self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Factored shear load")
+            flag = False
 
         elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
+            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
+            flag = False
 
         elif self.ui.comboType.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of  bolt")
+            QMessageBox.information(self, "Information", "Please select Type of  bolt")
+            flag = False
 
-    # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        elif self.ui.comboPlateThick_2.currentIndex() == 0:
+            QMessageBox.information(self, "information", "Please select Plate thickness")
+            flag = False
+
+        elif self.ui.comboWldSize.currentIndex() == 0:
+            QMessageBox.information(self, "information", "Please select Weld thickness")
+            flag = False
+
+        return flag
+
+
     def boltHeadThick_Calculation(self, boltDia):
         '''
         This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
@@ -1447,7 +1468,6 @@ class MainController(QMainWindow):
 
         return nutDia[boltDia]
 
-    # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     def call_3DModel(self):
         '''
@@ -1543,10 +1563,10 @@ class MainController(QMainWindow):
         '''
         '''
         self.display.EraseAll()
+        if self.validateInputsOnDesignBtn() is not True:
+            return
         self.alist = self.designParameters()
         print "printing design para with DP =", self.alist[0]
-
-        self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()

@@ -1235,35 +1235,58 @@ class MainController(QMainWindow):
 
     def validate_inputs_on_design_button(self):
 
+        flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.information(self, "Information", "Please select connectivity")
+            flag = False
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
+                    QMessageBox.information(self, "Information", "Please select column section")
+                    flag = False
+
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
+                    QMessageBox.information(self, "Information", "Please select beam section")
+                    flag = False
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Primary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
+                    flag = False
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Secondary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
+                    flag = False
+        if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
+            flag = False
 
-        if self.ui.txtFu.text() == ' ' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
+        elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
+            flag = False
 
-        elif self.ui.txtFy.text() == ' ' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
+        elif self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Factored shear load")
+            flag = False
 
-        elif self.ui.txtShear.text() == ' ' or float(str(self.ui.txtShear.text())) == 0:
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
-            
-        elif self.ui.comboDiameter.currentIndex() == 0 :
-            QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
+        elif self.ui.comboDiameter.currentIndex() == 0:
+            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
+            flag = False
 
         elif self.ui.comboType.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of  bolt")
+            QMessageBox.information(self, "Information", "Please select Type of  bolt")
+            flag = False
+
+        elif self.ui.comboPlateThick_2.currentIndex() == 0:
+            QMessageBox.information(self,"information", "Please select Plate thickness")
+            flag = False
+
+        elif self.ui.comboWldSize.currentIndex() == 0:
+            QMessageBox.information(self, "information", "Please select Weld thickness")
+            flag = False
+
+        return flag
+
+
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
@@ -1272,17 +1295,6 @@ class MainController(QMainWindow):
 
         used_backend = load_backend(backend_str)
 
-        # if os.name == 'nt':
-        #
-        #     global display, start_display, app, _
-        #
-        #     from OCC.Display.backend import get_loaded_backend
-        #     lodedbkend = get_loaded_backend()
-        #     from OCC.Display.backend import get_backend, have_backend
-        #     from osdagMainSettings import backend_name
-        #     if (not have_backend() and backend_name() == "pyqt5"):
-        #         get_backend("qt-pyqt5")
-        # else:
 
         global display, start_display, app, _, USED_BACKEND
         if 'qt' in used_backend:
@@ -1531,9 +1543,11 @@ class MainController(QMainWindow):
 
         """
         self.display.EraseAll()
+
+        if self.validate_inputs_on_design_button() is not True:
+            return
         self.alist = self.designParameters()
 
-        self.validate_inputs_on_design_button()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
         self.unchecked_all_checkbox()

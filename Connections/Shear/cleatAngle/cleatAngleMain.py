@@ -1427,10 +1427,11 @@ class MainController(QMainWindow):
         '''
 
         self.display.EraseAll()
-        self.alist = self.designParameters()
 
         if self.validate_inputs_on_design_button() is not True:
             return
+        self.alist = self.designParameters()
+
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
         self.unchecked_all_checkbox()

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1332</width>
+    <width>1455</width>
     <height>839</height>
    </rect>
   </property>
@@ -431,7 +431,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1332</width>
+     <width>1455</width>
      <height>26</height>
     </rect>
    </property>
@@ -4326,6 +4326,9 @@ QMenu::item:selected {
    <property name="text">
     <string>Design preferences</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
+   </property>
   </action>
  </widget>
  <tabstops>
@@ -4339,6 +4342,7 @@ QMenu::item:selected {
   <tabstop>combo_bolt_type</tabstop>
   <tabstop>combo_bolt_grade</tabstop>
   <tabstop>combo_angle_section</tabstop>
+  <tabstop>combo_topangle_section</tabstop>
   <tabstop>btn_Design</tabstop>
   <tabstop>btn_Reset</tabstop>
   <tabstop>btn_SaveMessages</tabstop>
@@ -4352,7 +4356,6 @@ QMenu::item:selected {
   <tabstop>chkBxBeam</tabstop>
   <tabstop>chkBxCol</tabstop>
   <tabstop>chkBxSeatAngle</tabstop>
-  <tabstop>txt_seat_length</tabstop>
   <tabstop>txt_moment_demand</tabstop>
   <tabstop>txt_moment_capacity</tabstop>
   <tabstop>txt_seat_shear_demand</tabstop>
@@ -4427,6 +4430,9 @@ QMenu::item:selected {
   <tabstop>txt_bolt_rows</tabstop>
   <tabstop>txt_bolt_cols</tabstop>
   <tabstop>txt_bolt_pitch</tabstop>
+  <tabstop>txt_seat_length</tabstop>
+  <tabstop>txt_top_angle</tabstop>
+  <tabstop>txt_seat_angle</tabstop>
  </tabstops>
  <resources>
   <include location="ResourceFiles/icons.qrc"/>

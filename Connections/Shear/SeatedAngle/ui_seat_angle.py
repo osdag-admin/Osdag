@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1332, 839)
+        MainWindow.resize(1455, 839)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/newPrefix/images/download1.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -169,7 +169,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.splitter, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1332, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1455, 26))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setStyleSheet("QMenu {\n"
@@ -1672,7 +1672,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.combo_bolt_diameter, self.combo_bolt_type)
         MainWindow.setTabOrder(self.combo_bolt_type, self.combo_bolt_grade)
         MainWindow.setTabOrder(self.combo_bolt_grade, self.combo_angle_section)
-        MainWindow.setTabOrder(self.combo_angle_section, self.btn_Design)
+        MainWindow.setTabOrder(self.combo_angle_section, self.combo_topangle_section)
+        MainWindow.setTabOrder(self.combo_topangle_section, self.btn_Design)
         MainWindow.setTabOrder(self.btn_Design, self.btn_Reset)
         MainWindow.setTabOrder(self.btn_Reset, self.btn_SaveMessages)
         MainWindow.setTabOrder(self.btn_SaveMessages, self.btn_CreateDesign)
@@ -1685,8 +1686,7 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.btn3D, self.chkBxBeam)
         MainWindow.setTabOrder(self.chkBxBeam, self.chkBxCol)
         MainWindow.setTabOrder(self.chkBxCol, self.chkBxSeatAngle)
-        MainWindow.setTabOrder(self.chkBxSeatAngle, self.txt_seat_length)
-        MainWindow.setTabOrder(self.txt_seat_length, self.txt_moment_demand)
+        MainWindow.setTabOrder(self.chkBxSeatAngle, self.txt_moment_demand)
         MainWindow.setTabOrder(self.txt_moment_demand, self.txt_moment_capacity)
         MainWindow.setTabOrder(self.txt_moment_capacity, self.txt_seat_shear_demand)
         MainWindow.setTabOrder(self.txt_seat_shear_demand, self.txt_seat_shear_capacity)
@@ -1760,6 +1760,9 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.txt_bolt_group_capacity, self.txt_bolt_rows)
         MainWindow.setTabOrder(self.txt_bolt_rows, self.txt_bolt_cols)
         MainWindow.setTabOrder(self.txt_bolt_cols, self.txt_bolt_pitch)
+        MainWindow.setTabOrder(self.txt_bolt_pitch, self.txt_seat_length)
+        MainWindow.setTabOrder(self.txt_seat_length, self.txt_top_angle)
+        MainWindow.setTabOrder(self.txt_top_angle, self.txt_seat_angle)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -1972,6 +1975,7 @@ class Ui_MainWindow(object):
         self.actionFAQ.setText(_translate("MainWindow", "FAQ"))
         self.actionQuit_seat_angle_design.setText(_translate("MainWindow", "Quit"))
         self.actionDesign_preferences.setText(_translate("MainWindow", "Design preferences"))
+        self.actionDesign_preferences.setShortcut(_translate("MainWindow", "Alt+P"))
 
 import icons_rc
 

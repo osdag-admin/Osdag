@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1332</width>
-    <height>767</height>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -197,7 +197,7 @@
         <rect>
          <x>590</x>
          <y>0</y>
-         <width>121</width>
+         <width>151</width>
          <height>29</height>
         </rect>
        </property>
@@ -217,7 +217,7 @@
         <string>Seat Angle only</string>
        </property>
        <property name="text">
-        <string>Seat Angle</string>
+        <string>Seated Angle</string>
        </property>
       </widget>
       <widget class="QToolButton" name="btn_front">
@@ -3190,6 +3190,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3210,7 +3211,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3231,6 +3232,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3254,6 +3256,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3274,6 +3277,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3294,6 +3298,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3314,6 +3319,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3334,6 +3340,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3354,7 +3361,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3375,7 +3382,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3396,6 +3403,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3416,7 +3424,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3437,7 +3445,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3458,7 +3466,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3479,6 +3487,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3499,7 +3508,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3520,7 +3529,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3541,7 +3550,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3562,6 +3571,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3603,7 +3613,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3617,14 +3627,14 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>460</y>
-       <width>191</width>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3645,6 +3655,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3665,6 +3676,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3685,7 +3697,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3709,7 +3721,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3730,6 +3742,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3750,7 +3763,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3771,6 +3784,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3791,7 +3805,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3812,6 +3826,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3825,7 +3840,7 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>365</y>
-       <width>111</width>
+       <width>141</width>
        <height>31</height>
       </rect>
      </property>
@@ -3838,7 +3853,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Seat Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Seated Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_seat_shear_capacity">
@@ -3853,6 +3868,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3873,7 +3889,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3894,6 +3910,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3907,14 +3924,14 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>550</y>
-       <width>171</width>
+       <width>191</width>
        <height>21</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>11</pointsize>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3935,6 +3952,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
+       <pointsize>10</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3949,7 +3967,7 @@ QMenu::item:selected {
        <x>0</x>
        <y>580</y>
        <width>171</width>
-       <height>21</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
@@ -3957,11 +3975,12 @@ QMenu::item:selected {
        <family>Arial</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Top Angle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Top Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_SaveMessages">
@@ -3994,6 +4013,27 @@ QMenu::item:selected {
      </property>
      <property name="text">
       <string>Create design report</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_seat_angle">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>370</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </widget>

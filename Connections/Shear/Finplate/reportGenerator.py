@@ -95,7 +95,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     fu_overwrite = str(float(uiObj["weld"]["fu_overwrite"]))
 
     typeof_edge = str(uiObj["detailing"]["typeof_edge"])
-    min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"]))
+    min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"])) # factor: 1.7 or 1.5 depending on type of edge, IS 800- Cl 10.2.4.2
     gap = str(float(uiObj["detailing"]["gap"]))
 
     design_method = str(uiObj["design"]["design_method"])
@@ -541,25 +541,28 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Hole Type", bolt_hole_type]
+    row = [0, "Hole Type", bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
+    row = [0, "Hole Clearance", bolt_hole_clrnce]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Material Grade (MPa)", bolt_grade_fu]
+    row = [0, "Material Grade (MPa)", bolt_grade_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Slip Factor", slip_factor]
+    if boltType == "HSFG":
+        row = [0, "Slip factor", slip_factor]
+    else:
+        row = [0, "Slip factor", "N/A"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -570,13 +573,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Type of Weld", typeof_weld]
+    row = [0, "Type of Weld", typeof_weld]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Material Grade (MPa)", fu_overwrite]
+    row = [0, "Material Grade (MPa)", fu_overwrite]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -588,19 +591,19 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Type of Edges", typeof_edge[4:]]
+    row = [0, "Type of Edges", typeof_edge]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Minimum Edge-End Distance", min_edgend_dist + " times the hole diameter"]
+    row = [0, "Minimum Edge-End Distance", min_edgend_dist]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Gap between beam & support (mm)", gap]
+    row = [0, "Gap (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -619,7 +622,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Design Method",  design_method]
+    row = [0, "Design Method",  design_method]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -811,23 +814,21 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     rstr += t('tr')
-    # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
-    minEnd = str(1.7 * float(dia_hole))
-    maxEnd = str(12 * float(beam_tw))
-    row = [0, "End distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]", end,
+    minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
+    maxEnd = str(float(12 * float(beam_tw)))
+    row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",end,
            "  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
-
     rstr += t('tr')
-    # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
-    minEdge = str(1.7 * float(dia_hole))
-    maxEdge = str(12 * float(beam_tw))
-    row = [0, "Edge distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + "<br> [cl. 10.2.4]", edge,
-           " <p align=left style=color:green><b>Pass</b></p>"]
+
+    minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
+    maxEdge = str(float(12 * float(beam_tw)))
+    row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               end,"  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -909,7 +910,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     # row =[0,"Effective weld length (mm)","","300 - 2*6 = 288"]
     effWeldLen = str(int(float(plateLength) - (2 * float(weld_Thick))))
-    row = [0, "Effective weld length (mm)", "", plateLength + "-2*" + weld_Thick + " = " + effWeldLen, ""]
+    row = [0, "Effective weld length on each side (mm)", "", plateLength + "-2*" + weld_Thick + " = " + effWeldLen, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -948,7 +949,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 #     maxweld = str(9) if str((float( platethk)*0.8)) > str(9) else str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2))
 #     maxWeld = str(9) if str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2)) == 9 else str((float( platethk)*0.8))
 #     row =[0,"Weld thickness (mm)","Max(("+resultant_shear+"*&#8730;3*1.25)/(0.7*"+weld_fu+")"+", 0.8*"+platethk+") = "+ maxWeld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",weldSize,"<p align=right style=color:green><b>Pass</b></p>"]
-    if float(maxweld) <= int(weld_Thick):
+    if float(maxweld) < int(weld_Thick):
         row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
                "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick,
                "<p align=left style=color:green><b>Pass</b></p>"]

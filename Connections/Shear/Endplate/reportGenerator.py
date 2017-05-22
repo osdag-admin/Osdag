@@ -544,7 +544,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Slip factor", slip_factor]
+    if bolt_type == "HSFG":
+        row = [0, "Slip factor", slip_factor]
+    else:
+        row = [0, "Slip factor", "N/A"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -581,12 +584,6 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     row = [0, "Minimum Edge-End Distance", min_edgend_dist]
-    rstr += t('tr')
-    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "Gap (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

@@ -555,7 +555,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Slip Factor", slip_factor]
+    if boltType == "HSFG":
+        row = [0, "Slip factor", slip_factor]
+    else:
+        row = [0, "Slip factor", "N/A"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -942,7 +945,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 #     maxweld = str(9) if str((float( platethk)*0.8)) > str(9) else str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2))
 #     maxWeld = str(9) if str(round((float(resultant_shear) * 1000*(math.sqrt(3) * 1.25))/(0.7 * float(weld_fu)),2)) == 9 else str((float( platethk)*0.8))
 #     row =[0,"Weld thickness (mm)","Max(("+resultant_shear+"*&#8730;3*1.25)/(0.7*"+weld_fu+")"+", 0.8*"+platethk+") = "+ maxWeld + "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]",weldSize,"<p align=right style=color:green><b>Pass</b></p>"]
-    if float(maxweld) <= int(weld_Thick):
+    if float(maxweld) < int(weld_Thick):
         row = [0, "Weld thickness (mm)", "Max((" + resultant_shear + "*1000*&#8730;3* 1.25)/(0.7 * " + weld_fu + ")" + "," + platethk + "* 0.8" + ") = " + maxweld +
                "<br>[cl. 10.5.7, Insdag Detailing Manual, 2002]", weld_Thick,
                "<p align=left style=color:green><b>Pass</b></p>"]

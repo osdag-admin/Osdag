@@ -637,6 +637,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         elif self.num_rows == 2:
             self.pitch = self.min_pitch
         self.end_dist = self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.pitch
+        self.end_dist = ConnectionCalculations.round_down_5(self.end_dist)
+        self.pitch = (self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.end_dist) * \
+                     (self.num_rows - 1)
         if self.end_dist < self.min_end_dist:
             logger.error(": Detailing error")
             logger.error(": Calculated bolt end distance is smaller than minimum end distance")

@@ -218,6 +218,23 @@ class ConnectionCalculations(object):
             round_up_distance = ((int_distance / 5) + 1) * 5
         return round_up_distance
 
+    @staticmethod
+    def round_down_5(distance):
+        """Calculate and return the nearest multiple of 5 lower than input variable.
+
+        Args:
+            distance (float): bolt distance in mm
+
+        Returns:
+            round_up_distance (float): bolt distance in mm, multiple of 5 mm.
+
+        """
+        int_distance = int(distance)
+        round_up_distance = int_distance
+        if int_distance % 5 != 0:
+            round_up_distance = ((int_distance / 5)) * 5
+        return round_up_distance
+
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
                             is_environ_corrosive):
         """Calculate minimum pitch, gauge, end and edge distances.

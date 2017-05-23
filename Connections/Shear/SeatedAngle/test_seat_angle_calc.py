@@ -191,7 +191,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Diameter (mm)'] = 20
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "4.6"
-        input_dict['Angle']["AngleSection"] = "150 75 X 12"
+        input_dict['Angle']["AngleSection"] = "150 150 X 15"
         input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 2.0
@@ -211,7 +211,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+        input_dict['Angle']["TopAngleSection"] = "150 150 X 10"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 2.0
         input_dict['bolt']['slip_factor'] = 0.55
@@ -230,7 +230,7 @@ def create_sample_ui_input_sa(sa_connection_id):
         input_dict['Bolt']['Type'] = "Bearing Bolt"
         input_dict['Bolt']['Grade'] = "5.8"
         input_dict['Angle']["AngleSection"] = "150 150 X 15"
-        input_dict['Angle']["TopAngleSection"] = "150 75 X 12"
+        input_dict['Angle']["TopAngleSection"] = "150 150 X 10"
         input_dict['bolt']['bolt_hole_type'] = 'Standard'
         input_dict['bolt']['bolt_hole_clrnce'] = 2.0
         input_dict['bolt']['slip_factor'] = 0.55

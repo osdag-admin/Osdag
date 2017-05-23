@@ -47,7 +47,7 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.ui.tabWidget.removeTab(1)
         int_validator = QIntValidator()
-        self.ui.txt_boltHoleClearance.setValidator(int_validator)
+        #self.ui.txt_boltHoleClearance.setValidator(int_validator)
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
@@ -66,7 +66,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        #designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -113,7 +113,7 @@ class DesignPreferences(QDialog):
         else:
             boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
             clearance = str(self.get_clearance(boltDia))
-            self.ui.txt_boltHoleClearance.setText(clearance)
+            #self.ui.txt_boltHoleClearance.setText(clearance)
         if uiObj["Bolt"]["Grade"] == '':
             pass
         else:
@@ -125,7 +125,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())#flat
+        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#flat
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
         self.ui.combo_slipfactor.setCurrentIndex(8)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))

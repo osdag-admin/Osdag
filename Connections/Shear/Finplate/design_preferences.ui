@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>808</width>
-    <height>523</height>
+    <height>515</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,13 +16,6 @@
   <layout class="QGridLayout" name="gridLayout_5">
    <item row="1" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="1">
-      <widget class="QPushButton" name="btn_defaults">
-       <property name="text">
-        <string>Defaults</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_save">
        <property name="text">
@@ -37,19 +30,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>28</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item row="0" column="4">
       <spacer name="horizontalSpacer_6">
        <property name="orientation">
@@ -63,6 +43,26 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>28</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_defaults">
+       <property name="text">
+        <string>Defaults</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="0" column="0">
@@ -74,16 +74,132 @@
       <attribute name="title">
        <string>Bolt</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_16">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_15">
-         <item row="1" column="0">
-          <layout class="QGridLayout" name="gridLayout_14">
-           <item row="0" column="1">
-            <layout class="QGridLayout" name="gridLayout_12">
-             <item row="2" column="0">
+      <layout class="QGridLayout" name="gridLayout_22">
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" rowspan="2">
+        <layout class="QGridLayout" name="gridLayout_21">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_16">
+           <item row="1" column="0">
+            <layout class="QGridLayout" name="gridLayout_14">
+             <item row="0" column="0" colspan="2">
+              <layout class="QGridLayout" name="gridLayout_9">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Bolt hole type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1" rowspan="2">
+                <layout class="QGridLayout" name="gridLayout">
+                 <item row="0" column="1">
+                  <widget class="QComboBox" name="combo_boltHoleType">
+                   <property name="focusPolicy">
+                    <enum>Qt::TabFocus</enum>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Standard</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Over-sized</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_8">
+                   <property name="text">
+                    <string>Fu</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="txt_boltFu">
+                   <property name="text">
+                    <string>800</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="readOnly">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Material grade overwrite (MPa)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="0">
+              <layout class="QGridLayout" name="gridLayout_12">
+               <item row="0" column="0">
+                <spacer name="verticalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>168</width>
+                   <height>13</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_7">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>HSFG bolt design parameters:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>Slip factor (µ_f)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="1" column="1">
               <layout class="QGridLayout" name="gridLayout_11">
                <item row="0" column="0">
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>128</width>
+                   <height>28</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="0">
                 <widget class="QComboBox" name="combo_slipfactor">
                  <property name="minimumSize">
                   <size>
@@ -149,146 +265,21 @@
                </item>
               </layout>
              </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>203</width>
-                 <height>13</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayout_9">
-               <item row="2" column="2">
-                <widget class="QLabel" name="label_11">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="txt_boltFu">
-                 <property name="text">
-                  <string>800</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QComboBox" name="combo_boltHoleType">
-                 <property name="focusPolicy">
-                  <enum>Qt::TabFocus</enum>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>Standard</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Over-sized</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="txt_boltHoleClearance">
-                 <property name="text">
-                  <string>2</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QLabel" name="label_9">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_8">
-                 <property name="text">
-                  <string>Fu</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
             </layout>
            </item>
            <item row="0" column="0">
-            <layout class="QGridLayout" name="gridLayout_25">
+            <layout class="QGridLayout" name="gridLayout_15">
              <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayout">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Bolt hole type</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Bolt hole clearance (custom) (mm)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Material grade overwrite (MPa)</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_6">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>233</width>
-                 <height>28</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_7">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
+              <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>HSFG bolt design parameters:</string>
+                <string>Inputs</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_15">
-               <property name="text">
-                <string>Slip factor (µ_f)</string>
+             <item row="1" column="0">
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
@@ -296,17 +287,70 @@
            </item>
           </layout>
          </item>
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_27">
+         <item row="1" column="0">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>17</width>
+             <height>150</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="0">
+          <layout class="QGridLayout" name="gridLayout_20">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="label_note">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>50</weight>
+               <italic>false</italic>
+               <bold>false</bold>
+              </font>
+             </property>
              <property name="text">
-              <string>Inputs</string>
+              <string>NOTE : If slip is permitted under the design load, design the bolt as a bearing
+bolt and select corresponding (higher) blot grade.</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="Line" name="line">
+            <spacer name="verticalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>75</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1" rowspan="2" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_19">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_8">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="Line" name="line_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -314,25 +358,7 @@
            </item>
           </layout>
          </item>
-        </layout>
-       </item>
-       <item row="0" column="1" rowspan="4">
-        <layout class="QGridLayout" name="gridLayout_8">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Description</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
-          <widget class="Line" name="line_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
           <widget class="QTextBrowser" name="textBrowser">
            <property name="minimumSize">
             <size>
@@ -447,47 +473,12 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
-       <item row="3" column="0">
-        <spacer name="verticalSpacer_10">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>158</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_note">
-         <property name="font">
-          <font>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
+       <item row="2" column="2">
+        <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>NOTE : If slip is permitted under the design load, design the bolt as a bearing
-bolt and select corresponding (higher) blot grade.</string>
+          <string/>
          </property>
         </widget>
-       </item>
-       <item row="1" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>54</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

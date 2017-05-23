@@ -93,7 +93,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
+        #self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -400,11 +400,11 @@ class MainController(QMainWindow):
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
-        self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_curren_image_as.triggered.connect(self.save_cadImages)
+        self.ui.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.ui.actionSave_current_image.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
         self.ui.action_savedesign.triggered.connect(self.saveDesign_inputs)
-        self.ui.action_open_design.triggered.connect(self.openDesign_inputs)
+        self.ui.action_load_design.triggered.connect(self.openDesign_inputs)
         # graphics
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
         self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
@@ -687,9 +687,17 @@ class MainController(QMainWindow):
 
         # Disable Menubar
         # self.ui.menubar.setEnabled(False)
-        self.ui.menuFile.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
+        #self.ui.menuFile.setEnabled(False)
+        self.ui.action_savedesign.setEnabled(False)
+        self.ui.actionSave_log_messages.setEnabled(False)
+        self.ui.actionCreate_design_report.setEnabled(False)
+        self.ui.actionSave_3D_model.setEnabled(False)
+        self.ui.actionSave_current_image.setEnabled(False)
+        self.ui.actionSave_Front_View.setEnabled(False)
+        self.ui.actionSave_Top_View.setEnabled(False)
+        self.ui.actionSave_Side_View.setEnabled(False)
+        #self.ui.menuEdit.setEnabled(False)
+        #self.ui.menuView.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
 
         # self.ui.menuHelp.setEnabled(False)
@@ -1586,7 +1594,7 @@ class MainController(QMainWindow):
         else:
             pass
             # self.display.EraseAll()
-
+        self.designPrefDialog.saved = False
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
         '''

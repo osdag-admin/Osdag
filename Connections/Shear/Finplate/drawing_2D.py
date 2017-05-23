@@ -697,12 +697,14 @@ class Fin2DCreatorFront(object):
                                                str(int(self.dataObj.pitch)) + " mm c/c", params)
 
         # Cross section A-A
-        ptSecA = self.FA + (350 * np.array([0, -1]))
+        # ptSecA = self.FA + (350 * np.array([0, -1]))
+        ptSecA = self.FA + (50 * np.array([0, -1])) + (self.dataObj.beam_B + 90 ) * np.array([0, -1])
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.FA2 + (500 * np.array([0, -1]))
+        # ptSecC = self.FA2 + (50 * np.array([0, -1]))
+        ptSecC = ptSecA +  (self.dataObj.D_col + self.dataObj.gap +self.dataObj.beam_L ) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -740,14 +742,13 @@ class Fin2DCreatorFront(object):
                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1])
         pt1B = self.ptFP + self.dataObj.plateEdge_dist * np.array([1, 0]) + \
                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1])
-        offset = self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 3
-        params = {"offset": self.dataObj.D_col + self.dataObj.plateEdge_dist , "textoffset": 20, "lineori": "left", "endlinedim":10}
+        params = {"offset": self.dataObj.D_col  , "textoffset": 20, "lineori": "left", "endlinedim":10}
         self.dataObj.draw_dimension_outerArrow(dwg, pt1A, pt1B, str(int(self.dataObj.edge_dist)) + " mm" , params)   
 
         # Faint line for Edge distance dimension
         ptB1 = self.ptFP + self.dataObj.plateEdge_dist * np.array([1, 0]) + \
                (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0]) + self.dataObj.edge_dist * np.array([1, 0])
-        ptB2 = ptB1 + ((self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 115) * np.array([0, -1])    
+        ptB2 = ptB1 + ((self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + 200) * np.array([0, -1])
         self.dataObj.drawFaintLine(ptB1, ptB2, dwg)
 
         # Gauge Distance
@@ -827,7 +828,7 @@ class Fin2DCreatorFront(object):
         pty = 0
         pt = self.FA + 10 * np.array([1, 0])  # np.array([ptx,pty])
         theta = 90
-        offset = self.dataObj.D_col / 2  # self.dataObj.col_L /7
+        offset = self.dataObj.D_col / 4  # self.dataObj.col_L /7
 
         textUp = "Column " + self.dataObj.col_Designation
         textDown = ""
@@ -838,17 +839,17 @@ class Fin2DCreatorFront(object):
 #         weldPtx = (self.dataObj.D_col)
 #         weldPty = ((self.dataObj.col_L - self.dataObj.D_beam)/2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3)
         weldPt = self.ptFP + 6 * np.array([1, 0]) + self.dataObj.end_dist * np.array([0, 1])
-        theta = 55
-        offset = self.dataObj.col_B + 100
+        theta = 70
+        offset = self.dataObj.col_L /2.5
         textUp = "         z " + str(int(self.dataObj.weld_thick)) + " mm"
         textDown = ""  # u"\u25C1"
         element = "weld"
-        self.dataObj.drawOrientedArrow(dwg, weldPt, theta, "NW", offset, textUp, textDown, element)
+        self.dataObj.drawOrientedArrow(dwg, weldPt, theta, "NE", offset, textUp, textDown, element)
 
         # Bolt Information
         bltPtx = self.FP + self.dataObj.plateEdge_dist * np.array([1, 0]) + self.dataObj.end_dist * np.array ([0, 1]) + (self.dataObj.no_of_col - 1) * self.dataObj.gauge * np.array([1, 0])
-        theta = 50
-        offset = (self.dataObj.D_beam * 3) / 8
+        theta = 70
+        offset = (self.dataObj.beam_B)
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
@@ -862,10 +863,10 @@ class Fin2DCreatorFront(object):
         pltPtx = self.dataObj.D_col + self.dataObj.plate_width / 2
         pltPty = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + (self.dataObj.beam_T + self.dataObj.beam_R1 + 3) + self.dataObj.plate_ht
         pltPt = np.array([pltPtx, pltPty])
-        theta = 45
+        theta = 55
         offset = (self.dataObj.D_beam) / 2
-        textUp = "PLT. " + str(int(self.dataObj.plate_ht)) + "X" + str(int(self.dataObj.plate_width)) + "X" + str(int(self.dataObj.plate_thick))
-        textDown = ""
+        textUp = ""
+        textDown = "PLT. " + str(int(self.dataObj.plate_ht)) + "X" + str(int(self.dataObj.plate_width)) + "X" + str(int(self.dataObj.plate_thick))
         element = ""
         self.dataObj.drawOrientedArrow(dwg, pltPt, theta, "SE", offset, textUp, textDown, element)
 
@@ -879,12 +880,14 @@ class Fin2DCreatorFront(object):
 
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-410 -350 1250 1280'))
 
-        ptSecA = self.A + (330 * np.array([0, -1]))
+        # ptSecA = self.A + (330 * np.array([0, -1]))
+        ptSecA = self.A + (50 * np.array([0, -1])) + (self.dataObj.beam_B + 90 ) * np.array([0, -1])
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.A3 + (472 * np.array([0, -1]))
+        # ptSecC = self.A3 + (472 * np.array([0, -1]))
+        ptSecC = ptSecA +  (self.dataObj.D_col/2 +self.dataObj.beam_L ) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -1133,12 +1136,14 @@ class Fin2DCreatorFront(object):
         self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' + str(int(self.dataObj. pitch)) + " mm c/c", params)    
 
         # Sectional arrow
-        ptSecA = self.BA + (320 * np.array([0, -1])) + 10 * np.array([-1, 0])
+        # ptSecA = self.BA + (320 * np.array([0, -1])) + 10 * np.array([-1, 0])
+        ptSecA = self.BA + (50 * np.array([0, -1])) + (self.dataObj.beam_B + 90 ) * np.array([0, -1])
         ptSecB = ptSecA + (50 * np.array([0, 1]))
         txtpt = ptSecB + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         txt = "A"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.BA2 + (320 * np.array([0, -1])) + 10 * np.array([1, 0])
+        # ptSecC = self.BA2 + (320 * np.array([0, -1])) + 10 * np.array([1, 0])
+        ptSecC = ptSecA + (self.dataObj.col_B  +self.dataObj.beam_L ) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, 1]))
         txtpt = ptSecD + (10 * np.array([-1, 0])) + (80 * np.array([0, 1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -1244,11 +1249,11 @@ class Fin2DCreatorFront(object):
 
 
         # Column Designation
-        ptx = self.dataObj.col_B / 2
+        ptx = self.dataObj.col_B / 3
         pty = 0
         pt = np.array([ptx, pty])
-        theta = 30
-        offset = self.dataObj.D_col / 10
+        theta = 90
+        offset = self.dataObj.col_B / 3
         textUp = "Beam " + self.dataObj.col_Designation
         textDown = ""
         element = ""
@@ -1450,12 +1455,13 @@ class Fin2DCreatorTop(object):
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
         ############ C-C section #################
-        ptSecA = self.FA4 + ((self.dataObj.gap + self.dataObj.D_col) * np.array([-1, 0])) + 230 * np.array([0, 1])
+        # ptSecA = self.FA4 + ((self.dataObj.gap + self.dataObj.D_col) * np.array([-1, 0])) + 260 * np.array([0, 1])
+        ptSecA = self.FC + 50 * np.array([-1, 0]) + (self.dataObj.col_B + 50) * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txtpt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         txt = "C"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = self.FA3 + (230 * np.array([0, 1])) + 100 * np.array([1, 0])
+        ptSecC = ptSecA +  (self.dataObj.D_col + self.dataObj.gap + self.dataObj.beam_L +50) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, -1]))
         txtpt = ptSecD + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
@@ -1517,7 +1523,7 @@ class Fin2DCreatorTop(object):
         # Column Information
 
         ptSecA = self.FJ + ((self.dataObj.D_col / 2.5) * np.array([1, 0]))
-        ptSecB = ptSecA + (120 * np.array([0, 1]))
+        ptSecB = ptSecA + (self.dataObj.col_B/1.5 * np.array([0, 1]))
         txtpt = ptSecB + (120 * np.array([-1, 0])) + (30 * np.array([0, 1]))
         line = dwg.add(dwg.line((ptSecA), (ptSecB)).stroke('black', width=2.5, linecap='square'))
         start_arrow = self.dataObj.addEMarker(dwg)
@@ -1571,7 +1577,7 @@ class Fin2DCreatorTop(object):
         self.dataObj.drawFaintLine(ptC, ptD, dwg)
 
         # 2D view name
-        ptx = self.FG + 270 * np.array([0, 1])
+        ptx = self.FG + (self.dataObj.col_B /1.5 -15) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30)) 
         dwg.save()
 
@@ -1624,14 +1630,15 @@ class Fin2DCreatorTop(object):
 
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
-        ptSecA = self.I + (07 * np.array([0, -1])) + (0 * np.array([-1, 0]))
+        # ptSecA = self.I + (07 * np.array([0, -1])) + (0 * np.array([-1, 0]))
+        ptSecA = self.I +  (self.dataObj.beam_L ) * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
-        txtpt = ptSecB + (50 * np.array([0, -1])) + (15 * np.array([-1, 0]))
+        txtpt = ptSecB + (20 * np.array([0, -1])) + (40 * np.array([-1, 0]))
         txt = "C"
         self.dataObj.draw_cross_section(dwg, ptSecA, ptSecB, txtpt, txt)
-        ptSecC = ptSecA + (530 * np.array([1, 0]))
+        ptSecC = ptSecA + (self.dataObj.col_B + self.dataObj.beam_L/ 1.5) * np.array([1, 0])
         ptSecD = ptSecC + (50 * np.array([0, -1]))
-        txtpt = ptSecD + (50 * np.array([0, -1])) + (25 * np.array([-1, 0]))
+        txtpt = ptSecD + (20 * np.array([0, -1])) + (40 * np.array([0, -1]))
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txtpt, txt)
 
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
@@ -1685,7 +1692,7 @@ class Fin2DCreatorTop(object):
 
         # Bolt Information
         bltPt = self.A5 + self.dataObj.plateEdge_dist * np.array([1, 0]) + (nc - 1) * self.dataObj.gauge * np.array([1, 0]) 
-        theta = 60
+        theta = 70
         offset = (self.dataObj.beam_B) + 160
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":

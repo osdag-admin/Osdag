@@ -546,6 +546,8 @@ class MainController(QMainWindow):
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
+            self.ui.actionBeam_2.setText("show SBeam")
+            self.ui.actionColumn_2.setText("show PBeam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
             self.get_beamdata()

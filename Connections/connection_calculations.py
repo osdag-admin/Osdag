@@ -212,9 +212,10 @@ class ConnectionCalculations(object):
             round_up_distance (float): bolt distance in mm, multiple of 5 mm.
 
         """
-        round_up_distance = distance
-        if distance % 5 != 0:
-            round_up_distance = ((distance / 5) + 1) * 5 - distance % 5
+        int_distance = int(distance)
+        round_up_distance = int_distance
+        if int_distance % 5 != 0:
+            round_up_distance = ((int_distance / 5) + 1) * 5
         return round_up_distance
 
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,

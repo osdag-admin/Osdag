@@ -447,6 +447,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         self.pitch = self.min_pitch
+        self.edge_dist = ConnectionCalculations.round_up_5(self.edge_dist)
+        self.end_dist = ConnectionCalculations.round_up_5(self.end_dist)
 
         self.calculate_kb()
 
@@ -498,6 +500,10 @@ class SeatAngleCalculation(ConnectionCalculations):
                                         - self.top_angle_R2) / 2 + self.top_angle_R2
         self.seat_angle_end_dist_beam = (float(self.angle_B) - self.angle_t - self.angle_R1
                                          - self.angle_R2) / 2 + self.angle_R2
+
+        self.top_angle_end_dist_column = ConnectionCalculations.round_up_5(self.top_angle_end_dist_column)
+        self.top_angle_end_dist_beam = ConnectionCalculations.round_up_5(self.top_angle_end_dist_beam)
+        self.seat_angle_end_dist_beam = ConnectionCalculations.round_up_5(self.seat_angle_end_dist_beam)
 
         if self.top_angle_end_dist_column < self.min_end_dist:
             self.safe = False

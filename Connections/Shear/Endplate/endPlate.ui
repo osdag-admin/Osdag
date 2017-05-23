@@ -382,7 +382,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -447,7 +456,7 @@
      <x>0</x>
      <y>0</y>
      <width>1403</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="nativeMenuBar">
@@ -485,8 +494,12 @@ QMenu::item:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_2"/>
-    <addaction name="actionOpen_design"/>
+    <addaction name="separator"/>
+    <addaction name="action_load_input"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_input"/>
+    <addaction name="actionSave_log_messages_2"/>
+    <addaction name="actionCreate_design_report_2"/>
     <addaction name="separator"/>
     <addaction name="actionSave_3D_model"/>
     <addaction name="actionSave_CAD_image"/>
@@ -494,11 +507,6 @@ QMenu::item:selected {
     <addaction name="actionSave_front_view"/>
     <addaction name="actionSave_top_view"/>
     <addaction name="actionSave_side_view"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave_log_messages_2"/>
-    <addaction name="actionCreate_design_report_2"/>
-    <addaction name="actionSave_design"/>
-    <addaction name="actionLoad_input"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -655,7 +663,7 @@ QMenu::item:selected {
     <addaction name="separator"/>
     <addaction name="actionShow_beam"/>
     <addaction name="actionShow_column"/>
-    <addaction name="actionShoe_end_plate"/>
+    <addaction name="actionShow_end_plate"/>
     <addaction name="actionShow_all"/>
     <addaction name="separator"/>
     <addaction name="actionChange_background"/>
@@ -4290,9 +4298,9 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpen_design">
+  <action name="actionLoad_input_2">
    <property name="text">
-    <string>Open design</string>
+    <string>Load input</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -4354,9 +4362,12 @@ QMenu::item:selected {
     <string>Alt+C</string>
    </property>
   </action>
-  <action name="actionSave_design">
+  <action name="action_save_input">
    <property name="text">
-    <string>Save design</string>
+    <string>Save input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionShow_beam">
@@ -4375,7 +4386,7 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionShoe_end_plate">
+  <action name="actionShow_end_plate">
    <property name="text">
     <string>Show endplate</string>
    </property>
@@ -4430,6 +4441,9 @@ QMenu::item:selected {
    <property name="text">
     <string>Design Preferences</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
+   </property>
   </action>
   <action name="actionLoad_input">
    <property name="text">
@@ -4439,6 +4453,25 @@ QMenu::item:selected {
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_load_input">
+   <property name="text">
+    <string>Load input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionSave_input">
+   <property name="text">
+    <string>Save input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

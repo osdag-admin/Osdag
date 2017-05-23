@@ -450,10 +450,12 @@ QMenu::item:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="action_load_design"/>
-    <addaction name="action_savedesign"/>
+    <addaction name="action_load_input"/>
+    <addaction name="separator"/>
+    <addaction name="action_save_input"/>
     <addaction name="actionSave_log_messages"/>
     <addaction name="actionCreate_design_report"/>
+    <addaction name="separator"/>
     <addaction name="actionSave_3D_model"/>
     <addaction name="actionSave_current_image"/>
     <addaction name="separator"/>
@@ -4177,9 +4179,9 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="action_load_design">
+  <action name="action_load_input">
    <property name="text">
-    <string>Load design</string>
+    <string>Load input</string>
    </property>
    <property name="font">
     <font>
@@ -4188,12 +4190,15 @@ QMenu::item:selected {
     </font>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string>Ctrl+L</string>
    </property>
   </action>
-  <action name="action_savedesign">
+  <action name="action_save_input">
    <property name="text">
-    <string>Save design</string>
+    <string>Save input</string>
+   </property>
+   <property name="iconText">
+    <string>Save input</string>
    </property>
    <property name="font">
     <font>
@@ -4580,6 +4585,9 @@ QMenu::item:selected {
     <font>
      <family>DejaVu Serif</family>
     </font>
+   </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
    </property>
   </action>
   <action name="actionfinPlate_quit">

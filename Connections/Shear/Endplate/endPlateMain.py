@@ -33,7 +33,7 @@ from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from endPlateCalc import end_connection
 from model import *
-from ui_endplate import Ui_MainWindow
+from ui_endPlate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
 #from Connections.Shear.commonlogic import CommonDesignLogic
@@ -368,13 +368,13 @@ class MainController(QMainWindow):
         self.ui.actionSave_front_view.triggered.connect(lambda: self.callend2D_Drawing("Front"))
         self.ui.actionSave_side_view.triggered.connect(lambda: self.callend2D_Drawing("Side"))
         self.ui.actionSave_top_view.triggered.connect(lambda: self.callend2D_Drawing("Top"))
-        self.ui.actionSave_design.triggered.connect(self.saveDesign_inputs)
-        self.ui.actionOpen_design.triggered.connect(self.openDesign_inputs)
+        self.ui.actionSave_input.triggered.connect(self.saveDesign_inputs)
+        self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
         self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
         self.ui.actionShow_column.triggered.connect(self.call_3d_column)
-        self.ui.actionShoe_end_plate.triggered.connect(self.call_3d_endplate)
+        self.ui.actionShow_end_plate.triggered.connect(self.call_3d_endplate)
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model(True))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
@@ -516,11 +516,18 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setEnabled(False)
         self.ui.chkBxCol.setEnabled(False)
         self.ui.chkBxEndplate.setEnabled(False)
-        # self.ui.menubar.setEnabled(False)
-        self.ui.menuFile.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
+
+        # Disable Menubar
+        self.ui.actionSave_input.setEnabled(False)
+        self.ui.actionSave_log_messages_2.setEnabled(False)
+        self.ui.actionCreate_design_report_2.setEnabled(False)
+        self.ui.actionSave_3D_model.setEnabled(False)
+        self.ui.actionSave_CAD_image.setEnabled(False)
+        self.ui.actionSave_front_view.setEnabled(False)
+        self.ui.actionSave_top_view.setEnabled(False)
+        self.ui.actionSave_side_view.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
+
 
         self.ui.btn_SaveMessages.setEnabled(False)
         self.ui.btn_CreateDesign.setEnabled(False)
@@ -675,8 +682,10 @@ class MainController(QMainWindow):
             self.ui.lbl_column.setText("Primary beam *")
  
             self.ui.chkBxBeam.setText("SBeam")
+            self.ui.actionShow_beam.setText("Show SBeam")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
+            self.ui.actionShow_column.setText("Show PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
  
             self.ui.comboColSec.clear()
@@ -719,8 +728,10 @@ class MainController(QMainWindow):
             self.ui.lbl_beam.setText("Beam section *")
  
             self.ui.chkBxBeam.setText("Beam")
+            self.ui.actionShow_beam.setText("Show beam")
             self.ui.chkBxBeam.setToolTip("Beam only")
             self.ui.chkBxCol.setText("Column")
+            self.ui.actionShow_column.setText("Show column")
             self.ui.chkBxCol.setToolTip("Column only")
  
             self.ui.comboColSec.clear()

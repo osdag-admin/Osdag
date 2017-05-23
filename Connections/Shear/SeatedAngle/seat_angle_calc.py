@@ -697,10 +697,10 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
-        b1 = bearing_length - self.beam_f_t - self.beam_R1
+        b1 = max(bearing_length - self.beam_f_t - self.beam_R1, bearing_length/2)
 
-        # Distance from the end of bearing on cleat to root angle OR A TO B = b2
-        b2 = b1 + self.beam_col_clear_gap - self.angle_t - self.angle_R1
+        # Distance from the end of bearing on cleat to root angle OR A TO B in Fig 5.31 in Subramanian's book
+        b2 = max(b1 + self.beam_col_clear_gap - self.angle_t - self.angle_R1, 0)
 
         """Check moment capacity of outstanding leg
 
@@ -713,8 +713,19 @@ class SeatAngleCalculation(ConnectionCalculations):
             use appropriate moment capacity equation
         """
 
-        self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
-        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt '200 150 x 16'
+        if b1 > 0.1 :
+            self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
+
+        if self.shear_force * self.shear_force < 1  or b2 == 0 or b1 < 0.1 or self.moment_at_root_angle < 0:
+            logger.warning(": The calculated moment demand on the angle leg is %s " % self.moment_at_root_angle)
+            logger.debug(": The algorithm used to calculate this moment could give erroneous values due to one or " +
+                           "more of the following:")
+            logger.debug(": a) Very low value of shear force ")
+            logger.debug(": b) Large seated angle section and low value of gap between beam and column")
+            logger.debug(": c) Large beam section and low value of shear force")
+            logger.debug(": Please verify the results manually ")
+            self.moment_at_root_angle = 0.0
+            self.safe = False
 
         """
         Assumption

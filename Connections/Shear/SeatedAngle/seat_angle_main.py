@@ -726,7 +726,6 @@ class MainController(QMainWindow):
     def save_design(self, report_summary):
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
-        self.call_seatangle2D_Drawing("All")
 
         self.commLogicObj.call_designReport(file_name, report_summary)
 
@@ -1156,7 +1155,10 @@ class MainController(QMainWindow):
         if isempty[0] is True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            self.call_seatangle2D_Drawing("All")
+            if status is True:
+                self.call_seatangle2D_Drawing("All")
+            else:
+                pass
         else:
             pass
 
@@ -1220,24 +1222,27 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
+        status = self.resultObj['SeatAngle']['status']
+        if status is True:
+            if view != 'All':
 
-        if view != 'All':
+                if view == "Front":
+                    filename = os.path.join(self.folder, "images_html", "seatFront.svg")
 
-            if view == "Front":
-                filename = os.path.join(self.folder, "images_html", "seatFront.svg")
+                elif view == "Side":
+                    filename = os.path.join(self.folder, "images_html", "seatSide.svg")
 
-            elif view == "Side":
-                filename = os.path.join(self.folder, "images_html", "seatSide.svg")
+                else:
+                    filename = os.path.join(self.folder, "images_html", "seatTop.svg")
+
+                svg_file = SvgWindow()
+                svg_file.call_svgwindow(filename, view, self.folder)
 
             else:
-                filename = os.path.join(self.folder, "images_html", "seatTop.svg")
-
-            svg_file = SvgWindow()
-            svg_file.call_svgwindow(filename, view, self.folder)
-
+                fname = ''
+                self.commLogicObj.call2D_Drawing(view, fname, self.folder)
         else:
-            fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
+            pass
 
     def closeEvent(self, event):
         """

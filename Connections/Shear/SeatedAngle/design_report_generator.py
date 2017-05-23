@@ -630,29 +630,33 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('/tr')
         rstr += design_summary_row(0, "Views", "detail", col_span="2")
 
-        png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png
+        if self.safe is True:
+            png = folder + "/images_html/3D_Model.png"
+            datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png
 
-        side = folder + "/images_html/seatSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+            side = folder + "/images_html/seatSide.png"
+            dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
 
-        top = folder + "/images_html/seatTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+            top = folder + "/images_html/seatTop.png"
+            datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
 
-        front = folder + "/images_html/seatFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+            front = folder + "/images_html/seatFront.png"
+            datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
-        row = [0, datapng, datatop]
-        rstr += t('tr') + nl()
-        rstr += html_space(4) + t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(4) + t('td  align="center" class=" header2"') + row[2] + t('/td') + nl()
-        rstr += t('/tr' + nl())
+            row = [0, datapng, datatop]
+            rstr += t('tr') + nl()
+            rstr += html_space(4) + t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+            rstr += html_space(4) + t('td  align="center" class=" header2"') + row[2] + t('/td') + nl()
+            rstr += t('/tr' + nl())
 
-        row = [0, dataside, datafront]
-        rstr += t('tr') + nl()
-        rstr += html_space(4) + t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(4) + t('td align="center" class=" header2 "') + row[2] + t('/td') + nl()
-        rstr += t('/tr') + nl()
+            row = [0, dataside, datafront]
+            rstr += t('tr') + nl()
+            rstr += html_space(4) + t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+            rstr += html_space(4) + t('td align="center" class=" header2 "') + row[2] + t('/td') + nl()
+            rstr += t('/tr') + nl()
+
+        else:
+            pass
 
         rstr += t('/table') + nl() + " " + nl()
         rstr += t('h1 style="page-break-before:always"')

@@ -268,33 +268,33 @@ class SeatAngleCalculation(ConnectionCalculations):
                 Select the nearest available equal angle as the top angle.
                 Equal angles satisfying both these thumb rules are selected for this function from steel tables
         """
+        # minimum length of leg of top angle is twice edge distance + angle thickness.
+        # as the side length is rounded up in the next step, ignoring angle thickness while calculating
+        # minimum length of side
+        top_angle_side_minimum = 2 * self.min_edge_multiplier * self.bolt_hole_diameter  # twice edge distance
+        top_angle_side = max(float(self.beam_d) / 4, top_angle_side_minimum)
+        # round up to nearest 5 mm. '+2' for conservative round up.
+        top_angle_side = ConnectionCalculations.round_up_5(top_angle_side + 2)
+
         try:
-            # minimum length of leg of top angle is twice edge distance + angle thickness.
-            # as the side length is rounded up in the next step, ignoring angle thickness while calculating
-            # minimum length of side
-            top_angle_side_minimum = 2 * 1.5 * self.bolt_hole_diameter  # twice edge distance
-            top_angle_side = max(float(self.beam_d) / 4, top_angle_side_minimum)
-            # round up to nearest 5 mm. '+2' for conservative round up.
-            top_angle_side = int(round((int(top_angle_side) + 2) / 5.0) * 5.0)
-        except ValueError:
-            top_angle_side = "100 65 X 8"
-        top_angle = {20: "20 20 X 3",  # does not satisfy min edge dist req for 12 mm bolt
-                     25: "25 25 X 3",  # does not satisfy min edge dist req for 12 mm bolt
-                     30: "30 30X3",  # does not satisfy min edge dist req for 12 mm bolt
-                     35: "35 35 X 4",  # does not satisfy min edge dist req for 12 mm bolt
-                     40: "40 40 X 4",
-                     45: "45 45 X 5",
-                     50: "50 50 X 5",
-                     55: "55 55 X 6",
-                     60: "60 60 X 6",
-                     65: "65 65 X 6",
-                     70: "70 70 X 7",
-                     75: "75 75 X 8",
-                     80: "80 80 X 8",
-                     90: "90 90 X 10",
-                     100: "100 100 X 10",
-                     "100 65 X 8": "100 65 X 8"
-                     }[top_angle_side]
+            top_angle = {20: "20 20 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         25: "25 25 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         30: "30 30 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         35: "35 35 X 4",  # does not satisfy min edge dist req for 12 mm bolt
+                         40: "40 40 X 4",
+                         45: "45 45 X 5",
+                         50: "50 50 X 5",
+                         55: "55 55 X 6",
+                         60: "60 60 X 6",
+                         65: "65 65 X 6",
+                         70: "70 70 X 7",
+                         75: "75 75 X 8",
+                         80: "80 80 X 8",
+                         90: "90 90 X 10",
+                         100: "100 100 X 10"
+                         }[top_angle_side]
+        except KeyError:
+            top_angle = " cannot compute"
         return top_angle
 
     def sa_params(self, input_dict):

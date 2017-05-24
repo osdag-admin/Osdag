@@ -1,3 +1,4 @@
+import json
 import os.path
 import sys
 import subprocess
@@ -323,22 +324,24 @@ class MainController(QMainWindow):
             lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
 
         # Menu Bar and File Menu
-        self.ui.actionSave_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
-        self.ui.actionSave_side_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Side"))
-        self.ui.actionSave_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
+        self.ui.action_save_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
+        self.ui.action_save_side_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Side"))
+        self.ui.action_save_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
 
-        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(qApp.quit)
+        self.ui.action_quit_sa_design.setShortcut('Ctrl+Q')
+        self.ui.action_quit_sa_design.setStatusTip('Exit application')
+        self.ui.action_quit_sa_design.triggered.connect(qApp.quit)
 
-        self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
-        self.ui.actionSave_log_messages.triggered.connect(self.save_log)
+        self.ui.action_create_design_report.triggered.connect(self.create_design_report)
+        self.ui.action_save_log_messages.triggered.connect(self.save_log)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
-        self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_current_2D_image_as.triggered.connect(self.save_cadImages)
+        self.ui.action_save_3D_model.triggered.connect(self.save3DcadImages)
+        self.ui.action_save_CAD_image.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
+        self.ui.action_save_input.triggered.connect(self.save_design_inputs)
+        self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 
         # Graphics menu
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
@@ -372,7 +375,7 @@ class MainController(QMainWindow):
         from osdagMainSettings import backend_name
 
         self.display, _ = self.init_display(backend_str=backend_name())
-        self.ui.actionDesign_preferences.triggered.connect(self.design_preferences)
+        self.ui.action_design_preferences.triggered.connect(self.design_preferences)
 
         # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 
@@ -497,10 +500,15 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menuFile.setEnabled(False)
+        self.ui.action_save_input.setEnabled(False)
+        self.ui.action_save_log_messages.setEnabled(False)
+        self.ui.action_create_design_report.setEnabled(False)
+        self.ui.action_save_3D_model.setEnabled(False)
+        self.ui.action_save_CAD_image.setEnabled(False)
+        self.ui.action_save_front_view.setEnabled(False)
+        self.ui.action_save_top_view.setEnabled(False)
+        self.ui.action_save_side_view.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
 
     def enableViewButtons(self):
         """
@@ -517,6 +525,14 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(True)
 
         self.ui.menuFile.setEnabled(True)
+        self.ui.action_save_input.setEnabled(True)
+        self.ui.action_save_log_messages.setEnabled(True)
+        self.ui.action_create_design_report.setEnabled(True)
+        self.ui.action_save_3D_model.setEnabled(True)
+        self.ui.action_save_CAD_image.setEnabled(True)
+        self.ui.action_save_front_view.setEnabled(True)
+        self.ui.action_save_top_view.setEnabled(True)
+        self.ui.action_save_side_view.setEnabled(True)
         self.ui.menuGraphics.setEnabled(True)
         self.ui.menuView.setEnabled(True)
         self.ui.menuEdit.setEnabled(True)
@@ -674,6 +690,45 @@ class MainController(QMainWindow):
         uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
 
         return uiObj
+
+    def save_design_inputs(self):
+
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiObj, out_file)
+
+        out_file.close()
+
+        pass
+
+    def load_design_inputs(self):
+
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+        uiObj = json.load(in_file)
+        self.setDictToUserInputs(uiObj)
 
     def save_inputs(self, uiObj):
         """(Dictionary)--> None

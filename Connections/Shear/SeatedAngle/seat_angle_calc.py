@@ -623,6 +623,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             is greater than the maximum pitch (which is governed by thickness of connected member(s)).
             It is recommended to decrease the bolt diameter or increase the thickness of the connected members.
             """
+            self.safe = False
             logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
             logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
             logger.warning(": Bolt pitch should be less than  %2.2f mm " % self.max_pitch)
@@ -641,6 +642,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.pitch = (self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.end_dist) * \
                      (self.num_rows - 1)
         if self.end_dist < self.min_end_dist:
+            self.safe = False
             logger.error(": Detailing error")
             logger.error(": Calculated bolt end distance is smaller than minimum end distance")
             logger.warning(": End distance should be more than  %2.2f mm " % self.min_end_dist)
@@ -720,6 +722,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
 
         if self.shear_force * self.shear_force < 1  or b2 == 0 or b1 < 0.1 or self.moment_at_root_angle < 0:
+            self.safe = False
             logger.warning(": The calculated moment demand on the angle leg is %s " % self.moment_at_root_angle)
             logger.debug(": The algorithm used to calculate this moment could give erroneous values due to one or " +
                            "more of the following:")
@@ -728,7 +731,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.debug(": c) Large beam section and low value of shear force")
             logger.debug(": Please verify the results manually ")
             self.moment_at_root_angle = 0.0
-            self.safe = False
+
 
         """
         Assumption

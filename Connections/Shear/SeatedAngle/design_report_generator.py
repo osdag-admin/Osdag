@@ -621,7 +621,7 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Top angle
         rstr += design_check_row("Top Angle", "", "", "", col_span="4", text_one_css="detail")
-        req_field = "Recommended size: " + str(self.top_angle_recommended)
+        req_field = "Recommended size (based on stability only): " + str(self.top_angle_recommended)
         prov_field = "User selected size: " + str(self.top_angle)
         rstr += design_check_row("Section ", req_field, prov_field, " ")
 

@@ -465,7 +465,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                                                                               self.mu_f,
                                                                               self.n_e,
                                                                               self.bolt_hole_type)
-            self.bolt_bearing_capacity = 0.01
+            self.bolt_bearing_capacity = 0.000
             self.bolt_value = self.bolt_shear_capacity
         # Check for long joints is not applicable for seated angle connection
         self.bolts_required = int(math.ceil(float(self.shear_force) / self.bolt_value))
@@ -598,7 +598,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                 if self.gauge < self.min_gauge:
                     self.safe = False
                     logger.error(": Detailing failure")
-                    logger.error(": Bolt gauge %2.0f is less than minimum gauge distance [Cl 10.2.2]" % self.gauge)
+                    logger.error(": Bolt gauge %2.0f mm is less than minimum gauge distance [Cl 10.2.2]" % self.gauge)
                     logger.warning(": Bolt gauge should be more than  %2.2f mm " % self.min_gauge)
                     logger.warning(": Maximum gauge distance allowed is %2.2f mm " % self.max_spacing)
                     logger.info(": Select bolt with higher grade/diameter to reduce number of bolts)")
@@ -657,11 +657,11 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.error(": Calculated bolt end distance is smaller than minimum end distance")
             logger.warning(": End distance should be more than  %2.2f mm " % self.min_end_dist)
             logger.info(": Select bolt with smaller bolt diameter OR")
-            logger.info(": Select seat angle with longer vertical leg.)")
+            logger.info(": Select seat angle with longer vertical leg.")
 
         root_3 = math.sqrt(3)
 
-        # shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl8.4.1
+        # Approximate shear capacity of beam, Vd = A_v*F_yw/root_3/gamma_m0 Cl 8.4.1
         self.beam_shear_strength = round(
             self.beam_d * self.beam_w_t * float(self.beam_fy) / root_3 / self.gamma_m0 / 1000,
             1)

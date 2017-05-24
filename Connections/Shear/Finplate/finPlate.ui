@@ -331,7 +331,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -399,7 +408,7 @@
      <x>0</x>
      <y>0</y>
      <width>1328</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -441,20 +450,18 @@ QMenu::item:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="action_open_design"/>
+    <addaction name="action_load_input"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_3D_model_as"/>
-    <addaction name="actionSave_curren_image_as"/>
+    <addaction name="action_save_input"/>
+    <addaction name="actionSave_log_messages"/>
+    <addaction name="actionCreate_design_report"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_3D_model"/>
+    <addaction name="actionSave_current_image"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Front_View"/>
     <addaction name="actionSave_Top_View"/>
     <addaction name="actionSave_Side_View"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave_log_messages"/>
-    <addaction name="actionCreate_design_report"/>
-    <addaction name="action_savedesign"/>
-    <addaction name="actio_load_input"/>
     <addaction name="separator"/>
     <addaction name="actionfinPlate_quit"/>
    </widget>
@@ -4172,9 +4179,9 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="action_open_design">
+  <action name="action_load_input">
    <property name="text">
-    <string>Open design</string>
+    <string>Load input</string>
    </property>
    <property name="font">
     <font>
@@ -4183,12 +4190,15 @@ QMenu::item:selected {
     </font>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string>Ctrl+L</string>
    </property>
   </action>
-  <action name="action_savedesign">
+  <action name="action_save_input">
    <property name="text">
-    <string>Save design</string>
+    <string>Save input</string>
+   </property>
+   <property name="iconText">
+    <string>Save input</string>
    </property>
    <property name="font">
     <font>
@@ -4368,7 +4378,7 @@ QMenu::item:selected {
     <string>Reduce font size</string>
    </property>
   </action>
-  <action name="actionSave_3D_model_as">
+  <action name="actionSave_3D_model">
    <property name="text">
     <string>Save 3D model </string>
    </property>
@@ -4381,7 +4391,7 @@ QMenu::item:selected {
     <string>Alt+3</string>
    </property>
   </action>
-  <action name="actionSave_curren_image_as">
+  <action name="actionSave_current_image">
    <property name="text">
     <string>Save CAD image </string>
    </property>
@@ -4575,6 +4585,9 @@ QMenu::item:selected {
     <font>
      <family>DejaVu Serif</family>
     </font>
+   </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
    </property>
   </action>
   <action name="actionfinPlate_quit">

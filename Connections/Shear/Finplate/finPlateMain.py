@@ -22,7 +22,6 @@ from ui_ask_question import Ui_AskQuestion
 from ui_design_preferences import Ui_ShearDesignPreferences
 from model import *
 from Connections.Shear.common_logic import CommonDesignLogic
-# from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -49,8 +48,6 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
-        int_validator = QIntValidator()
-        self.ui.txt_boltHoleClearance.setValidator(int_validator)
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
@@ -96,7 +93,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
+        #self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(str(self.ui.txt_boltHoleClearance.text()))
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -146,7 +143,7 @@ class DesignPreferences(QDialog):
         else:
             boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
             clearance = str(self.get_clearance(boltDia))
-            self.ui.txt_boltHoleClearance.setText(clearance)
+            #self.ui.txt_boltHoleClearance.setText(clearance)
         if uiObj["Bolt"]["Grade"] == '':
             pass
         else:
@@ -158,7 +155,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.ui.combo_slipfactor.setCurrentIndex(8)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -193,7 +190,7 @@ class DesignPreferences(QDialog):
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         if boltDia != "Diameter of Bolt":
             clearance = self.get_clearance(int(boltDia))
-            self.ui.txt_boltHoleClearance.setText(str(clearance))
+            #self.ui.txt_boltHoleClearance.setText(str(clearance))
         else:
             pass
 
@@ -403,11 +400,11 @@ class MainController(QMainWindow):
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
-        self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_curren_image_as.triggered.connect(self.save_cadImages)
+        self.ui.actionSave_3D_model.triggered.connect(self.save3DcadImages)
+        self.ui.actionSave_current_image.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
-        self.ui.action_savedesign.triggered.connect(self.saveDesign_inputs)
-        self.ui.action_open_design.triggered.connect(self.openDesign_inputs)
+        self.ui.action_save_input.triggered.connect(self.saveDesign_inputs)
+        self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
         # graphics
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
         self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
@@ -549,6 +546,8 @@ class MainController(QMainWindow):
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
+            self.ui.actionBeam_2.setText("Show SBeam")
+            self.ui.actionColumn_2.setText("Show PBeam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
             self.get_beamdata()
@@ -595,8 +594,10 @@ class MainController(QMainWindow):
             self.ui.lbl_column.setText("Column Section *")
             self.ui.lbl_beam.setText("Beam section *")
             self.ui.chkBxBeam.setText("Beam")
+            self.ui.actionBeam_2.setText("Show beam")
             self.ui.chkBxBeam.setToolTip("Beam only")
             self.ui.chkBxCol.setText("Column")
+            self.ui.actionColumn_2.setText("Show column")
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
             self.get_columndata()
@@ -690,9 +691,17 @@ class MainController(QMainWindow):
 
         # Disable Menubar
         # self.ui.menubar.setEnabled(False)
-        self.ui.menuFile.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
+        #self.ui.menuFile.setEnabled(False)
+        self.ui.action_save_input.setEnabled(False)
+        self.ui.actionSave_log_messages.setEnabled(False)
+        self.ui.actionCreate_design_report.setEnabled(False)
+        self.ui.actionSave_3D_model.setEnabled(False)
+        self.ui.actionSave_current_image.setEnabled(False)
+        self.ui.actionSave_Front_View.setEnabled(False)
+        self.ui.actionSave_Top_View.setEnabled(False)
+        self.ui.actionSave_Side_View.setEnabled(False)
+        #self.ui.menuEdit.setEnabled(False)
+        #self.ui.menuView.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
 
         # self.ui.menuHelp.setEnabled(False)
@@ -712,6 +721,14 @@ class MainController(QMainWindow):
         self.ui.chkBxFinplate.setEnabled(True)
         # self.ui.menubar.setEnabled(True)
         self.ui.menuFile.setEnabled(True)
+        self.ui.action_save_input.setEnabled(True)
+        self.ui.actionSave_log_messages.setEnabled(True)
+        self.ui.actionCreate_design_report.setEnabled(True)
+        self.ui.actionSave_3D_model.setEnabled(True)
+        self.ui.actionSave_current_image.setEnabled(True)
+        self.ui.actionSave_Front_View.setEnabled(True)
+        self.ui.actionSave_Top_View.setEnabled(True)
+        self.ui.actionSave_Side_View.setEnabled(True)
         self.ui.menuEdit.setEnabled(True)
         self.ui.menuView.setEnabled(True)
         self.ui.menuGraphics.setEnabled(True)
@@ -1346,37 +1363,58 @@ class MainController(QMainWindow):
 
     def validateInputsOnDesignBtn(self):
 
+        flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select connectivity")
+            QMessageBox.information(self, "Information", "Please select connectivity")
+            flag = False
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
+                    QMessageBox.information(self, "Information", "Please select column section")
+                    flag = False
+
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
+                    QMessageBox.information(self, "Information", "Please select beam section")
+                    flag = False
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Primary beam  section")
+                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
+                    flag = False
                 elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select Secondary beam  section")
-
+                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
+                    flag = False
         if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of  steel")
+            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
+            flag = False
 
         elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yeild  strength of  steel")
+            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
+            flag = False
 
-        elif self.ui.txtShear.text() == '' or float(str(self.ui.txtShear.text())) == str(0):
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
+        elif self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
+            QMessageBox.information(self, "Information", "Please select Factored shear load")
+            flag = False
 
         elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Diameter of  bolt")
+            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
+            flag = False
 
         elif self.ui.comboType.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of  bolt")
+            QMessageBox.information(self, "Information", "Please select Type of  bolt")
+            flag = False
 
-    # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+        elif self.ui.comboPlateThick_2.currentIndex() == 0:
+            QMessageBox.information(self, "information", "Please select Plate thickness")
+            flag = False
+
+        elif self.ui.comboWldSize.currentIndex() == 0:
+            QMessageBox.information(self, "information", "Please select Weld thickness")
+            flag = False
+
+        return flag
+
+
     def boltHeadThick_Calculation(self, boltDia):
         '''
         This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
@@ -1445,7 +1483,6 @@ class MainController(QMainWindow):
 
         return nutDia[boltDia]
 
-    # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
     def call_3DModel(self):
         '''
@@ -1541,10 +1578,10 @@ class MainController(QMainWindow):
         '''
         '''
         self.display.EraseAll()
+        if self.validateInputsOnDesignBtn() is not True:
+            return
         self.alist = self.designParameters()
         print "printing design para with DP =", self.alist[0]
-
-        self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
@@ -1569,6 +1606,7 @@ class MainController(QMainWindow):
         else:
             pass
             # self.display.EraseAll()
+        self.designPrefDialog.saved = False
 
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component

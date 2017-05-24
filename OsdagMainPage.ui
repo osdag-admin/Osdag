@@ -348,9 +348,6 @@ background-color: #abc250 ;
           <property name="focusPolicy">
            <enum>Qt::ClickFocus</enum>
           </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;Shear Connection&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
           <property name="styleSheet">
            <string notr="true">QTabBar::tab {
     margin-right: 10;
@@ -380,6 +377,15 @@ border-bottom-right-radius: 0px ;
           </property>
           <property name="currentIndex">
            <number>0</number>
+          </property>
+          <property name="documentMode">
+           <bool>false</bool>
+          </property>
+          <property name="tabsClosable">
+           <bool>false</bool>
+          </property>
+          <property name="movable">
+           <bool>false</bool>
           </property>
           <widget class="QWidget" name="tab1_shearconnection">
            <property name="font">
@@ -841,6 +847,9 @@ color:#ffffff;
            <attribute name="title">
             <string>Moment Connection</string>
            </attribute>
+           <attribute name="whatsThis">
+            <string>This connection is under development</string>
+           </attribute>
           </widget>
          </widget>
         </item>
@@ -872,7 +881,7 @@ color:#ffffff;
       <widget class="QWidget" name="page"/>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="1" column="0" colspan="2">
      <widget class="QComboBox" name="comboBox_help">
       <property name="font">
        <font>
@@ -940,37 +949,6 @@ color:#ffffff;
         <string>About Osdag</string>
        </property>
       </item>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="btn_openfile">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton::hover
-{
-   background-color: #d97f7f;
-   color:#000000 ;
-}
-
-QPushButton
-{
-background-color: #925a5b;
-color:#ffffff;
-}</string>
-      </property>
-      <property name="text">
-       <string>Open file</string>
-      </property>
-      <property name="autoDefault">
-       <bool>true</bool>
-      </property>
      </widget>
     </item>
    </layout>
@@ -1300,7 +1278,6 @@ color:#ffffff;
    <zorder>btn_plate</zorder>
    <zorder>btn_gantry</zorder>
    <zorder>comboBox_help</zorder>
-   <zorder>btn_openfile</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

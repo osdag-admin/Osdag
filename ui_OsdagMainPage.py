@@ -169,6 +169,9 @@ class Ui_MainWindow(object):
 "}\n"
 " ")
         self.mytabWidget.setTabShape(QtWidgets.QTabWidget.Triangular)
+        self.mytabWidget.setDocumentMode(False)
+        self.mytabWidget.setTabsClosable(False)
+        self.mytabWidget.setMovable(False)
         self.mytabWidget.setObjectName("mytabWidget")
         self.tab1_shearconnection = QtWidgets.QWidget()
         font = QtGui.QFont()
@@ -240,9 +243,9 @@ class Ui_MainWindow(object):
         self.rdbtn_cleat.setFont(font)
         self.rdbtn_cleat.setFocusPolicy(QtCore.Qt.TabFocus)
         self.rdbtn_cleat.setLayoutDirection(QtCore.Qt.LeftToRight)
-        # self.rdbtn_cleat.setStyleSheet("QRadioButton {\n"
-#"text-shadow : black 0.1em 0.1em 0.2em  ;\n"
-#"}")
+        self.rdbtn_cleat.setStyleSheet("QRadioButton {\n"
+"text-shadow : black 0.1em 0.1em 0.2em  ;\n"
+"}")
         self.rdbtn_cleat.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("ResourceFiles/images/cleatAngle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -397,28 +400,7 @@ class Ui_MainWindow(object):
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
         self.comboBox_help.addItem("")
-        self.gridLayout.addWidget(self.comboBox_help, 1, 1, 1, 1)
-        self.btn_openfile = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(11)
-        font.setBold(True)
-        font.setWeight(75)
-        self.btn_openfile.setFont(font)
-        self.btn_openfile.setStyleSheet("QPushButton::hover\n"
-"{\n"
-"   background-color: #d97f7f;\n"
-"   color:#000000 ;\n"
-"}\n"
-"\n"
-"QPushButton\n"
-"{\n"
-"background-color: #925a5b;\n"
-"color:#ffffff;\n"
-"}")
-        self.btn_openfile.setAutoDefault(True)
-        self.btn_openfile.setObjectName("btn_openfile")
-        self.gridLayout.addWidget(self.btn_openfile, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.comboBox_help, 1, 0, 1, 2)
         self.btn_connection = QtWidgets.QPushButton(self.centralwidget)
         self.btn_connection.setGeometry(QtCore.QRect(60, 120, 200, 35))
         font = QtGui.QFont()
@@ -583,7 +565,6 @@ class Ui_MainWindow(object):
         self.btn_plate.raise_()
         self.btn_gantry.raise_()
         self.comboBox_help.raise_()
-        self.btn_openfile.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1410, 26))
@@ -621,7 +602,6 @@ class Ui_MainWindow(object):
         item = self.myListWidget.item(0)
         item.setText(_translate("MainWindow", " Design :"))
         self.myListWidget.setSortingEnabled(__sortingEnabled)
-        self.mytabWidget.setToolTip(_translate("MainWindow", "<html><head/><body><p><a href=\"#\">Shear Connection</a></p></body></html>"))
         self.label_2.setToolTip(_translate("MainWindow", "Shift+F"))
         self.label_2.setText(_translate("MainWindow", "Finplate"))
         self.rdbtn_finplate.setShortcut(_translate("MainWindow", "Shift+F"))
@@ -646,7 +626,6 @@ class Ui_MainWindow(object):
         self.comboBox_help.setItemText(3, _translate("MainWindow", "Sample Problems"))
         self.comboBox_help.setItemText(4, _translate("MainWindow", "Ask Us a Question"))
         self.comboBox_help.setItemText(5, _translate("MainWindow", "About Osdag"))
-        self.btn_openfile.setText(_translate("MainWindow", "Open file"))
         self.btn_connection.setToolTip(_translate("MainWindow", "Ctrl+Shift+C"))
         self.btn_connection.setText(_translate("MainWindow", "Connection"))
         self.btn_connection.setShortcut(_translate("MainWindow", "Ctrl+Shift+C"))

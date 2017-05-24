@@ -2988,7 +2988,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="lbl_angle">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>1</x>
        <y>430</y>
        <width>150</width>
        <height>30</height>
@@ -3003,7 +3003,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Angle sections&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -3051,7 +3051,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Angle section *</string>
+      <string>Seated angle *</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_topanglesection">
@@ -3072,7 +3072,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Top angle section</string>
+      <string> Top angle *</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_Reset">

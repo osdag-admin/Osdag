@@ -240,9 +240,7 @@ class Ui_MainWindow(object):
         self.rdbtn_cleat.setFont(font)
         self.rdbtn_cleat.setFocusPolicy(QtCore.Qt.TabFocus)
         self.rdbtn_cleat.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.rdbtn_cleat.setStyleSheet("QRadioButton {\n"
-"text-shadow : black 0.1em 0.1em 0.2em  ;\n"
-"}")
+        self.rdbtn_cleat.setStyleSheet("QRadioButton ")
         self.rdbtn_cleat.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("ResourceFiles/images/cleatAngle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)

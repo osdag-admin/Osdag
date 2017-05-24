@@ -806,7 +806,7 @@ color:#ffffff;
                <string>Start</string>
               </property>
               <property name="shortcut">
-               <string>Ctrl+S</string>
+               <string>Return</string>
               </property>
               <property name="checkable">
                <bool>false</bool>
@@ -1308,7 +1308,7 @@ color:#ffffff;
      <x>0</x>
      <y>0</y>
      <width>1410</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>

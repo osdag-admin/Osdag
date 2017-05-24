@@ -4,6 +4,7 @@ comment
 
 @author: aravind
 '''
+import json
 import os.path
 import pickle
 import subprocess
@@ -85,7 +86,7 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        if self.ui.txt_detailingGap.text().isEmpty():
+        if self.ui.txt_detailingGap.text() == '':
 
             designPref["detailing"]["gap"] = int(20)
         else:
@@ -125,7 +126,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#flat
+        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
         self.ui.combo_slipfactor.setCurrentIndex(8)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -397,12 +398,17 @@ class MainController(QMainWindow):
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialog)
         self.ui.actionZoom_in.triggered.connect(self.call_zoom_in)
         self.ui.actionZoom_out.triggered.connect(self.call_zoom_out)
-        self.ui.actionSave_3D_model_as.triggered.connect(self.save_3d_cad_images)
+        self.ui.actionPan.triggered.connect(self.call_panning)
+        self.ui.actionSave_3D_model.triggered.connect(self.save_3d_cad_images)
         self.ui.actionSave_CAD_image.triggered.connect(self.save_cadImages)
+        self.ui.actionCleat_quit.setStatusTip('Exit application')
+        self.ui.actionCleat_quit.triggered.connect(qApp.quit)
+        self.ui.actionSave_input.triggered.connect(self.saveDesign_inputs)
+        self.ui.actionLoad_input.triggered.connect(self.openDesign_inputs)
+
         self.ui.actionSave_Front_View.triggered.connect(lambda: self.callCleat2D_drawing("Front"))
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.callCleat2D_drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callCleat2D_drawing("Top"))
-        self.ui.actionPan.triggered.connect(self.call_panning)
 
         self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
         self.ui.actionShow_column.triggered.connect(self.call_3d_column)
@@ -530,7 +536,9 @@ class MainController(QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.beamSection_lbl.setText(" Secondary beam *")
+            self.ui.actionShow_beam.setText("Show SBeam")
             self.ui.columnSection_lbl.setText("Primary beam *")
+            self.ui.actionShow_column.setText("Show PBeam")
 
             self.ui.chkBxBeam.setText("SBeam")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
@@ -585,7 +593,9 @@ class MainController(QMainWindow):
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
             self.ui.columnSection_lbl.setText("Column Section *")
+            self.ui.actionShow_column.setText("Show column")
             self.ui.beamSection_lbl.setText("Beam section *")
+            self.ui.actionShow_beam.setText("Show beam")
 
             self.ui.chkBxBeam.setText("Beam")
             self.ui.chkBxBeam.setToolTip("Beam only")
@@ -805,10 +815,18 @@ class MainController(QMainWindow):
         Disables the all buttons in toolbar
         '''
         # self.ui.menubar.setEnabled(False)
-        self.ui.menuFile.setEnabled(False)
+        #self.ui.menuFile.setEnabled(False)
+        self.ui.actionSave_input.setEnabled(False)
+        self.ui.actionSave_log_message.setEnabled(False)
+        self.ui.actionCreate_design_report.setEnabled(False)
+        self.ui.actionSave_3D_model.setEnabled(False)
+        self.ui.actionSave_CAD_image.setEnabled(False)
+        self.ui.actionSave_Front_View.setEnabled(False)
+        self.ui.actionSave_Top_View.setEnabled(False)
+        self.ui.actionSave_Side_View.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
+        #self.ui.menuView.setEnabled(False)
+        #self.ui.menuEdit.setEnabled(False)
 
         self.ui.btn_capacity.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
@@ -838,6 +856,15 @@ class MainController(QMainWindow):
 
         # self.ui.menubar.setEnabled(True)
         self.ui.menuFile.setEnabled(True)
+        self.ui.actionSave_input.setEnabled(True)
+        self.ui.actionSave_log_message.setEnabled(True)
+        self.ui.actionCreate_design_report.setEnabled(True)
+        self.ui.actionSave_3D_model.setEnabled(True)
+        self.ui.actionSave_CAD_image.setEnabled(True)
+        self.ui.actionSave_Front_View.setEnabled(True)
+        self.ui.actionSave_Top_View.setEnabled(True)
+        self.ui.actionSave_Side_View.setEnabled(True)
+
         self.ui.menuEdit.setEnabled(True)
         self.ui.menuView.setEnabled(True)
         self.ui.menuGraphics.setEnabled(True)
@@ -910,6 +937,45 @@ class MainController(QMainWindow):
             picmap.scaledToWidth(50)
             self.ui.lbl_connectivity.setPixmap(picmap)
         return True
+
+    def saveDesign_inputs(self):
+
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiObj, out_file)
+
+        out_file.close()
+
+        pass
+
+    def openDesign_inputs(self):
+
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+        uiObj = json.load(in_file)
+        self.setDictToUserInputs(uiObj)
 
     def getuser_inputs(self):
         '''(nothing) -> Dictionary
@@ -1459,7 +1525,7 @@ class MainController(QMainWindow):
         else:
             pass
 
-
+        self.designPrefDialog.saved = False
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
         '''
@@ -1467,7 +1533,7 @@ class MainController(QMainWindow):
             final_model = self.commLogicObj.connectivityObj.get_beamModel()
 
         elif self.commLogicObj.component == "Column":
-            final_model = self.commLogicObj.connectivityObj.get_column_model()
+            final_model = self.commLogicObj.connectivityObj.get_columnModel()
 
         elif self.commLogicObj.component == "cleatAngle":
             cadlist = [self.commLogicObj.connectivityObj.angleModel,

@@ -27,6 +27,7 @@ class ReportGenerator(SeatAngleCalculation):
         root_clearance_col (int): clearance of first bolt from the root of supporting column
 
         top_angle (string)
+        top_angle_recommended (string)
         connectivity (string)
         beam_section (string)
         column_section (string)
@@ -88,6 +89,8 @@ class ReportGenerator(SeatAngleCalculation):
         edge_dist (int)
         max_spacing (int)
         max_edge_dist (int)
+        top_angle_end_dist_beam (int)
+        top_angle_end_dist_column (int)
 
         company_name (string)
         company_logo (string)
@@ -128,6 +131,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.is_hsfg = sa_calc_object.is_hsfg
 
         self.top_angle = sa_calc_object.top_angle
+        self.top_angle_recommended = sa_calc_object.top_angle_recommended
         self.connectivity = sa_calc_object.connectivity
         self.beam_section = sa_calc_object.beam_section
         self.column_section = sa_calc_object.column_section
@@ -191,6 +195,8 @@ class ReportGenerator(SeatAngleCalculation):
         self.edge_dist = sa_calc_object.edge_dist
         self.max_spacing = sa_calc_object.max_spacing
         self.max_edge_dist = sa_calc_object.max_edge_dist
+        self.top_angle_end_dist_beam = sa_calc_object.top_angle_end_dist_beam
+        self.top_angle_end_dist_column = sa_calc_object.top_angle_end_dist_column
 
         self.company_name = ""
         self.company_logo = ""
@@ -613,6 +619,25 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Moment capacity of outstanding leg (kN-mm)", req_field,
                                  prov_field, remark)
 
+        # Top angle
+        rstr += design_check_row("Top Angle", "", "", "", col_span="4", text_one_css="detail")
+        req_field = "Recommended size: " + str(self.top_angle_recommended)
+        prov_field = "User selected size: " + str(self.top_angle)
+        rstr += design_check_row("Section ", req_field, prov_field, " ")
+
+        # End distance (mm)
+        if self.top_angle_end_dist_beam <= self.min_end_dist or \
+            self.top_angle_end_dist_column <= self.min_end_dist:
+            remark = check_fail
+        else:
+            remark = check_pass
+        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
+        req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
+        prov_field = " on leg connected to Beam: " + str(self.top_angle_end_dist_beam)
+        prov_field += "<br> on leg connected to Column: " + str(self.top_angle_end_dist_column)
+        rstr += design_check_row("End distance (mm)", req_field, prov_field, remark)
+
+
         rstr += t('/table')
         rstr += t('h1 style="page-break-before:always"')
         rstr += t('/h1')
@@ -630,29 +655,33 @@ class ReportGenerator(SeatAngleCalculation):
         # rstr += t('/tr')
         rstr += design_summary_row(0, "Views", "detail", col_span="2")
 
-        png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png
+        if self.safe is True:
+            png = folder + "/images_html/3D_Model.png"
+            datapng = '<object type="image/PNG" data= %s width ="450"></object">' % png
 
-        side = folder + "/images_html/seatSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+            side = folder + "/images_html/seatSide.png"
+            dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
 
-        top = folder + "/images_html/seatTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+            top = folder + "/images_html/seatTop.png"
+            datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
 
-        front = folder + "/images_html/seatFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+            front = folder + "/images_html/seatFront.png"
+            datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
-        row = [0, datapng, datatop]
-        rstr += t('tr') + nl()
-        rstr += html_space(4) + t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(4) + t('td  align="center" class=" header2"') + row[2] + t('/td') + nl()
-        rstr += t('/tr' + nl())
+            row = [0, datapng, datatop]
+            rstr += t('tr') + nl()
+            rstr += html_space(4) + t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+            rstr += html_space(4) + t('td  align="center" class=" header2"') + row[2] + t('/td') + nl()
+            rstr += t('/tr' + nl())
 
-        row = [0, dataside, datafront]
-        rstr += t('tr') + nl()
-        rstr += html_space(4) + t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
-        rstr += html_space(4) + t('td align="center" class=" header2 "') + row[2] + t('/td') + nl()
-        rstr += t('/tr') + nl()
+            row = [0, dataside, datafront]
+            rstr += t('tr') + nl()
+            rstr += html_space(4) + t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td') + nl()
+            rstr += html_space(4) + t('td align="center" class=" header2 "') + row[2] + t('/td') + nl()
+            rstr += t('/tr') + nl()
+
+        else:
+            pass
 
         rstr += t('/table') + nl() + " " + nl()
         rstr += t('h1 style="page-break-before:always"')

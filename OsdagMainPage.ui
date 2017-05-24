@@ -550,9 +550,7 @@ border-bottom-right-radius: 0px ;
                  <enum>Qt::LeftToRight</enum>
                 </property>
                 <property name="styleSheet">
-                 <string notr="true">QRadioButton {
-text-shadow : black 0.1em 0.1em 0.2em  ;
-}</string>
+                 <string notr="true">QRadioButton </string>
                 </property>
                 <property name="text">
                  <string/>
@@ -793,7 +791,7 @@ text-shadow : black 0.1em 0.1em 0.2em  ;
                <enum>Qt::TabFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Ctrl+S</string>
+               <string>Enter</string>
               </property>
               <property name="styleSheet">
                <string notr="true">QPushButton::hover
@@ -812,7 +810,7 @@ color:#ffffff;
                <string>Start</string>
               </property>
               <property name="shortcut">
-               <string>Ctrl+S</string>
+               <string>Return</string>
               </property>
               <property name="checkable">
                <bool>false</bool>

@@ -1,3 +1,4 @@
+import json
 import os.path
 import sys
 import subprocess
@@ -284,8 +285,8 @@ class MainController(QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
 
-        self.grade_type = {'Please Select Type': '',  # TODO HSFG 10.9
-                           'HSFG': [8.8, 10.8],
+        self.grade_type = {'Please Select Type': '',
+                           'HSFG': [8.8, 10.9],
                            'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
@@ -323,22 +324,24 @@ class MainController(QMainWindow):
             lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
 
         # Menu Bar and File Menu
-        self.ui.actionSave_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
-        self.ui.actionSave_side_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Side"))
-        self.ui.actionSave_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
+        self.ui.action_save_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
+        self.ui.action_save_side_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Side"))
+        self.ui.action_save_top_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Top"))
 
-        self.ui.actionQuit_fin_plate_design.setShortcut('Ctrl+Q')
-        self.ui.actionQuit_fin_plate_design.setStatusTip('Exit application')
-        self.ui.actionQuit_fin_plate_design.triggered.connect(qApp.quit)
+        self.ui.action_quit_sa_design.setShortcut('Ctrl+Q')
+        self.ui.action_quit_sa_design.setStatusTip('Exit application')
+        self.ui.action_quit_sa_design.triggered.connect(qApp.quit)
 
-        self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
-        self.ui.actionSave_log_messages.triggered.connect(self.save_log)
+        self.ui.action_create_design_report.triggered.connect(self.create_design_report)
+        self.ui.action_save_log_messages.triggered.connect(self.save_log)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.actionZoom_in.triggered.connect(self.callZoomin)
         self.ui.actionZoom_out.triggered.connect(self.callZoomout)
-        self.ui.actionSave_3D_model_as.triggered.connect(self.save3DcadImages)
-        self.ui.actionSave_current_2D_image_as.triggered.connect(self.save_cadImages)
+        self.ui.action_save_3D_model.triggered.connect(self.save3DcadImages)
+        self.ui.action_save_CAD_image.triggered.connect(self.save_cadImages)
         self.ui.actionPan.triggered.connect(self.call_Pannig)
+        self.ui.action_save_input.triggered.connect(self.save_design_inputs)
+        self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 
         # Graphics menu
         self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
@@ -372,7 +375,7 @@ class MainController(QMainWindow):
         from osdagMainSettings import backend_name
 
         self.display, _ = self.init_display(backend_str=backend_name())
-        self.ui.actionDesign_preferences.triggered.connect(self.design_preferences)
+        self.ui.action_design_preferences.triggered.connect(self.design_preferences)
 
         # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 
@@ -497,10 +500,15 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        self.ui.menuFile.setEnabled(False)
+        self.ui.action_save_input.setEnabled(False)
+        self.ui.action_save_log_messages.setEnabled(False)
+        self.ui.action_create_design_report.setEnabled(False)
+        self.ui.action_save_3D_model.setEnabled(False)
+        self.ui.action_save_CAD_image.setEnabled(False)
+        self.ui.action_save_front_view.setEnabled(False)
+        self.ui.action_save_top_view.setEnabled(False)
+        self.ui.action_save_side_view.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-        self.ui.menuView.setEnabled(False)
-        self.ui.menuEdit.setEnabled(False)
 
     def enableViewButtons(self):
         """
@@ -517,6 +525,14 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(True)
 
         self.ui.menuFile.setEnabled(True)
+        self.ui.action_save_input.setEnabled(True)
+        self.ui.action_save_log_messages.setEnabled(True)
+        self.ui.action_create_design_report.setEnabled(True)
+        self.ui.action_save_3D_model.setEnabled(True)
+        self.ui.action_save_CAD_image.setEnabled(True)
+        self.ui.action_save_front_view.setEnabled(True)
+        self.ui.action_save_top_view.setEnabled(True)
+        self.ui.action_save_side_view.setEnabled(True)
         self.ui.menuGraphics.setEnabled(True)
         self.ui.menuView.setEnabled(True)
         self.ui.menuEdit.setEnabled(True)
@@ -554,6 +570,7 @@ class MainController(QMainWindow):
             self.ui.txt_seat_shear_demand.clear()
             self.ui.txt_beam_shear_strength.clear()
             self.ui.txt_top_angle.clear()
+            self.ui.txt_seat_angle.clear()
         else:
             self.ui.combo_beam_section.setCurrentIndex(0)
             self.ui.combo_column_section.setCurrentIndex(0)
@@ -585,6 +602,7 @@ class MainController(QMainWindow):
             self.ui.txt_seat_shear_demand.clear()
             self.ui.txt_beam_shear_strength.clear()
             self.ui.txt_top_angle.clear()
+            self.ui.txt_seat_angle.clear()
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
@@ -673,6 +691,45 @@ class MainController(QMainWindow):
 
         return uiObj
 
+    def save_design_inputs(self):
+
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiObj, out_file)
+
+        out_file.close()
+
+        pass
+
+    def load_design_inputs(self):
+
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+        uiObj = json.load(in_file)
+        self.setDictToUserInputs(uiObj)
+
     def save_inputs(self, uiObj):
         """(Dictionary)--> None
 
@@ -699,33 +756,6 @@ class MainController(QMainWindow):
         else:
             return None
 
-    def outputdict(self):
-        """Returns the output of design in dictionary object.
-        """
-        outObj = {'SeatAngle': {}}
-        outObj['SeatAngle']["Length (mm)"] = float(self.ui.txt_seat_length.text())
-        outObj['SeatAngle']["Moment Demand (kN-mm)"] = float(self.ui.txt_moment_demand.text())
-        outObj['SeatAngle']["Moment Capacity (kN-mm)"] = float(self.ui.txt_moment_capacity.text())
-        outObj['SeatAngle']["Shear Demand (kN)"] = float(self.ui.txt_seat_shear_demand.text())
-        outObj['SeatAngle']["Shear Capacity (kN)"] = float(self.ui.txt_seat_shear_capacity.text())
-        outObj['SeatAngle']["Beam Shear Strength (kN)"] = float(self.ui.txt_beam_shear_strength.text())
-        outObj['SeatAngle']["Top Angle"] = float(self.ui.txt_top_angle.text())
-
-        outObj['Bolt'] = {}
-        outObj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txt_bolt_shear_capacity.text())
-        outObj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txt_bolt_bearing_capacity.text())
-        outObj['Bolt']["Capacity of Bolt (kN)"] = float(self.ui.txt_bolt_capacity.text())
-        outObj['Bolt']["Bolt group capacity (kN)"] = float(self.ui.txt_bolt_group_capacity.text())
-        outObj['Bolt']["No. of Bolts Provided"] = float(self.ui.txt_no_bolts.text())
-        outObj['Bolt']["No. of Row"] = int(self.ui.txt_bolt_rows.text())
-        outObj['Bolt']["No. of Column"] = int(self.ui.txt_bolt_cols.text())
-        outObj['Bolt']["Pitch Distance (mm)"] = float(self.ui.txt_bolt_pitch.text())
-        outObj['Bolt']["Gauge Distance (mm)"] = float(self.ui.txt_bolt_gauge.text())
-        outObj['Bolt']["End Distance (mm)"] = float(self.ui.txt_end_distance.text())
-        outObj['Bolt']["Edge Distance (mm)"] = float(self.ui.txt_edge_distance.text())
-
-        return outObj
-
     def create_design_report(self):
         design_report_dialog = DesignReportDialog(self)
         design_report_dialog.show()
@@ -733,7 +763,6 @@ class MainController(QMainWindow):
     def save_design(self, report_summary):
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
-        self.call_seatangle2D_Drawing("All")
 
         self.commLogicObj.call_designReport(file_name, report_summary)
 
@@ -801,6 +830,7 @@ class MainController(QMainWindow):
         self.ui.txt_seat_shear_capacity.clear()
         self.ui.txt_beam_shear_strength.clear()
         self.ui.txt_top_angle.clear()
+        self.ui.txt_seat_angle.clear()
 
         self.ui.txt_bolt_shear_capacity.clear()
         self.ui.txt_bolt_bearing_capacity.clear()
@@ -920,6 +950,9 @@ class MainController(QMainWindow):
 
         top_angle = resultObj['SeatAngle']['Top Angle']
         self.ui.txt_top_angle.setText(str(top_angle))
+
+        seat_angle = self.uiObj['Angle']["AngleSection"]
+        self.ui.txt_seat_angle.setText(str(seat_angle))
 
     def displaylog_totextedit(self, commLogicObj):
         """
@@ -1110,6 +1143,52 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
 
+    def validate_inputs_on_design_button(self):
+        flag = True
+        if self.ui.combo_connectivity.currentIndex() == 0:
+            QMessageBox.about(self,"Information", "Please select connectivity")
+            flag = False
+        state = self.setimage_connection()
+        if state is True:
+            if self.ui.combo_connectivity.currentText() == "Column flange-Beam flange" or self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
+                if self.ui.combo_beam_section.currentIndex() == 0:
+                    QMessageBox.about(self, "Information", "Please select beam section")
+                    flag = False
+                if self.ui.combo_column_section.currentIndex() == 0:
+                    QMessageBox.about(self, "Information", "Please select column section")
+                    flag = False
+            else:
+                pass
+
+        if self.ui.txt_fu.text() == '' or float(self.ui.txt_fu.text()) == 0:
+            QMessageBox.about(self, "Information", "Please select Ultimate strength of steel")
+            flag = False
+
+        elif self.ui.txt_fy.text() == '' or float(self.ui.txt_fy.text()) == 0:
+            QMessageBox.about(self, "Information", "Please select Yield strength of steel")
+            flag = False
+
+        elif self.ui.txt_shear_force.text() == '' or float(self.ui.txt_shear_force.text()) == str(0):
+            QMessageBox.about(self, "Information", "Please select Factored shear load")
+            flag = False
+
+        elif self.ui.combo_bolt_diameter.currentIndex() == 0:
+            QMessageBox.about(self, "Information", "Please select Diameter of bolt")
+            flag = False
+
+        elif self.ui.combo_bolt_type.currentIndex() == 0:
+            QMessageBox.about(self, "Information", "Please select Type of bolt")
+            flag = False
+
+        elif self.ui.combo_angle_section.currentIndex() == 0:
+            QMessageBox.about(self, "Information", "Please select Angle section")
+            flag = False
+
+        elif self.ui.combo_topangle_section.currentIndex() ==0:
+            QMessageBox.about(self, "Information", "Please select Top angle section")
+            flag = False
+        return flag
+
     def designParameters(self):
         """
         This routine returns the necessary design parameters.
@@ -1142,10 +1221,10 @@ class MainController(QMainWindow):
     def design_btnclicked(self):
         """
         """
-        # TODO input validation
         self.display.EraseAll()
+        if self.validate_inputs_on_design_button() is not True:
+            return
         self.alist = self.designParameters()
-        # self.validateInputsOnDesignBtn()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
@@ -1163,7 +1242,10 @@ class MainController(QMainWindow):
         if isempty[0] is True:
             status = self.resultObj['SeatAngle']['status']
             self.commLogicObj.call_3DModel(status)
-            self.call_seatangle2D_Drawing("All")
+            if status is True:
+                self.call_seatangle2D_Drawing("All")
+            else:
+                pass
         else:
             pass
 
@@ -1227,24 +1309,27 @@ class MainController(QMainWindow):
         self.ui.chkBxBeam.setChecked(Qt.Unchecked)
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.btn3D.setChecked(Qt.Unchecked)
+        status = self.resultObj['SeatAngle']['status']
+        if status is True:
+            if view != 'All':
 
-        if view != 'All':
+                if view == "Front":
+                    filename = os.path.join(self.folder, "images_html", "seatFront.svg")
 
-            if view == "Front":
-                filename = os.path.join(self.folder, "images_html", "seatFront.svg")
+                elif view == "Side":
+                    filename = os.path.join(self.folder, "images_html", "seatSide.svg")
 
-            elif view == "Side":
-                filename = os.path.join(self.folder, "images_html", "seatSide.svg")
+                else:
+                    filename = os.path.join(self.folder, "images_html", "seatTop.svg")
+
+                svg_file = SvgWindow()
+                svg_file.call_svgwindow(filename, view, self.folder)
 
             else:
-                filename = os.path.join(self.folder, "images_html", "seatTop.svg")
-
-            svg_file = SvgWindow()
-            svg_file.call_svgwindow(filename, view, self.folder)
-
+                fname = ''
+                self.commLogicObj.call2D_Drawing(view, fname, self.folder)
         else:
-            fname = ''
-            self.commLogicObj.call2D_Drawing(view, fname, self.folder)
+            pass
 
     def closeEvent(self, event):
         """
@@ -1368,7 +1453,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName('Select Workspace Directory', "F:\Osdag_workspace")
-    workspace_folder_path = 'F:\Osdag_workspace\seated_angle'
+    workspace_folder_path = 'D:\Osdag_workspace\seated_angle'
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

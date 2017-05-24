@@ -721,6 +721,14 @@ class MainController(QMainWindow):
         self.ui.chkBxFinplate.setEnabled(True)
         # self.ui.menubar.setEnabled(True)
         self.ui.menuFile.setEnabled(True)
+        self.ui.action_save_input.setEnabled(True)
+        self.ui.actionSave_log_messages.setEnabled(True)
+        self.ui.actionCreate_design_report.setEnabled(True)
+        self.ui.actionSave_3D_model.setEnabled(True)
+        self.ui.actionSave_current_image.setEnabled(True)
+        self.ui.actionSave_Front_View.setEnabled(True)
+        self.ui.actionSave_Top_View.setEnabled(True)
+        self.ui.actionSave_Side_View.setEnabled(True)
         self.ui.menuEdit.setEnabled(True)
         self.ui.menuView.setEnabled(True)
         self.ui.menuGraphics.setEnabled(True)
@@ -1599,6 +1607,7 @@ class MainController(QMainWindow):
             pass
             # self.display.EraseAll()
         self.designPrefDialog.saved = False
+
     def create2Dcad(self):
         ''' Returns the 3D model of finplate depending upon component
         '''

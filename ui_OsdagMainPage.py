@@ -243,9 +243,7 @@ class Ui_MainWindow(object):
         self.rdbtn_cleat.setFont(font)
         self.rdbtn_cleat.setFocusPolicy(QtCore.Qt.TabFocus)
         self.rdbtn_cleat.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.rdbtn_cleat.setStyleSheet("QRadioButton {\n"
-"text-shadow : black 0.1em 0.1em 0.2em  ;\n"
-"}")
+        self.rdbtn_cleat.setStyleSheet("QRadioButton ")
         self.rdbtn_cleat.setText("")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap("ResourceFiles/images/cleatAngle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -614,9 +612,9 @@ class Ui_MainWindow(object):
         self.label_5.setToolTip(_translate("MainWindow", "Shift+S"))
         self.label_5.setText(_translate("MainWindow", "Seated Angle"))
         self.rdbtn_seat.setShortcut(_translate("MainWindow", "Shift+S"))
-        self.btn_start.setToolTip(_translate("MainWindow", "Ctrl+S"))
+        self.btn_start.setToolTip(_translate("MainWindow", "Enter"))
         self.btn_start.setText(_translate("MainWindow", "Start"))
-        self.btn_start.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.btn_start.setShortcut(_translate("MainWindow", "Return"))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab1_shearconnection), _translate("MainWindow", "Shear Connection"))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab2_momentconnection), _translate("MainWindow", "Moment Connection"))
         self.label.setText(_translate("MainWindow", "Coming Soon ..."))

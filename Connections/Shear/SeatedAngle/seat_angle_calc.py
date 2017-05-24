@@ -487,7 +487,17 @@ class SeatAngleCalculation(ConnectionCalculations):
             4) Determine shear strength of outstanding leg and compare with capacity
 
         """
+
         self.sa_params(input_dict)
+
+        self.clear_col_space = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - 2 * self.root_clearance_col
+        if self.connectivity == "Column web-Beam flange" and self.beam_b > self.clear_col_space:
+            self.safe = False
+            logger.error(": Compatibility failure")
+            logger.warning(": Beam width %s mm is greater than clear space " + \
+                           " between column flanges %s mm" % self.clear_col_space, self.beam_b)
+            logger.info(": Select compatible beam and column sizes")
+
         self.bolt_design()
 
         if self.top_angle_recommended != self.top_angle:

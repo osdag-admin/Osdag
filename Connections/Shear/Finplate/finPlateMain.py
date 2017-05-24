@@ -138,8 +138,8 @@ class DesignPreferences(QDialog):
 
         """
         uiObj = self.main_controller.getuser_inputs()
-        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
-            pass
+        if str(uiObj["Bolt"]["Diameter (mm)"]) == 'Diameter of Bolt':
+            clearance = 0
         else:
             boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
             clearance = str(self.get_clearance(boltDia))
@@ -1037,6 +1037,16 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
+
+        self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+
+        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+
+        self.display.ExportToImage(data)
+
+        # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        self.display.View_Iso()
+        self.display.FitAll()
 
         fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
         fileName = str(fileName)

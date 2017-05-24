@@ -4311,7 +4311,7 @@ QMenu::item:selected {
   </action>
   <action name="actionSampe_Problems">
    <property name="text">
-    <string>Sampe Problems</string>
+    <string>Sample Problems</string>
    </property>
   </action>
   <action name="actionVideo_Tutorials">

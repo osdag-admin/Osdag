@@ -93,8 +93,8 @@ class DesignPreferences(QDialog):
 
         """
         uiObj = self.main_controller.getuser_inputs()
-        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
-            pass
+        if str(uiObj["Bolt"]["Diameter (mm)"]) == 'Diameter of Bolt':
+            clearance = 0
         else:
             boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
             clearance = str(self.get_clearance(boltDia))

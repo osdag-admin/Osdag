@@ -268,33 +268,33 @@ class SeatAngleCalculation(ConnectionCalculations):
                 Select the nearest available equal angle as the top angle.
                 Equal angles satisfying both these thumb rules are selected for this function from steel tables
         """
+        # minimum length of leg of top angle is twice edge distance + angle thickness.
+        # as the side length is rounded up in the next step, ignoring angle thickness while calculating
+        # minimum length of side
+        top_angle_side_minimum = 2 * self.min_edge_multiplier * self.bolt_hole_diameter  # twice edge distance
+        top_angle_side = max(float(self.beam_d) / 4, top_angle_side_minimum)
+        # round up to nearest 5 mm. '+2' for conservative round up.
+        top_angle_side = ConnectionCalculations.round_up_5(top_angle_side + 2)
+
         try:
-            # minimum length of leg of top angle is twice edge distance + angle thickness.
-            # as the side length is rounded up in the next step, ignoring angle thickness while calculating
-            # minimum length of side
-            top_angle_side_minimum = 2 * 1.5 * self.bolt_hole_diameter  # twice edge distance
-            top_angle_side = max(float(self.beam_d) / 4, top_angle_side_minimum)
-            # round up to nearest 5 mm. '+2' for conservative round up.
-            top_angle_side = int(round((int(top_angle_side) + 2) / 5.0) * 5.0)
-        except ValueError:
-            top_angle_side = "100 65 X 8"
-        top_angle = {20: "20 20 X 3",  # does not satisfy min edge dist req for 12 mm bolt
-                     25: "25 25 X 3",  # does not satisfy min edge dist req for 12 mm bolt
-                     30: "30 30X3",  # does not satisfy min edge dist req for 12 mm bolt
-                     35: "35 35 X 4",  # does not satisfy min edge dist req for 12 mm bolt
-                     40: "40 40 X 4",
-                     45: "45 45 X 5",
-                     50: "50 50 X 5",
-                     55: "55 55 X 6",
-                     60: "60 60 X 6",
-                     65: "65 65 X 6",
-                     70: "70 70 X 7",
-                     75: "75 75 X 8",
-                     80: "80 80 X 8",
-                     90: "90 90 X 10",
-                     100: "100 100 X 10",
-                     "100 65 X 8": "100 65 X 8"
-                     }[top_angle_side]
+            top_angle = {20: "20 20 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         25: "25 25 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         30: "30 30 X 3",  # does not satisfy min edge dist req for 12 mm bolt
+                         35: "35 35 X 4",  # does not satisfy min edge dist req for 12 mm bolt
+                         40: "40 40 X 4",
+                         45: "45 45 X 5",
+                         50: "50 50 X 5",
+                         55: "55 55 X 6",
+                         60: "60 60 X 6",
+                         65: "65 65 X 6",
+                         70: "70 70 X 7",
+                         75: "75 75 X 8",
+                         80: "80 80 X 8",
+                         90: "90 90 X 10",
+                         100: "100 100 X 10"
+                         }[top_angle_side]
+        except KeyError:
+            top_angle = " cannot compute"
         return top_angle
 
     def sa_params(self, input_dict):
@@ -447,6 +447,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.edge_dist = self.min_edge_dist
         self.end_dist = self.min_end_dist
         self.pitch = self.min_pitch
+        self.edge_dist = ConnectionCalculations.round_up_5(self.edge_dist)
+        self.end_dist = ConnectionCalculations.round_up_5(self.end_dist)
 
         self.calculate_kb()
 
@@ -485,7 +487,17 @@ class SeatAngleCalculation(ConnectionCalculations):
             4) Determine shear strength of outstanding leg and compare with capacity
 
         """
+
         self.sa_params(input_dict)
+
+        self.clear_col_space = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - 2 * self.root_clearance_col
+        if self.connectivity == "Column web-Beam flange" and self.beam_b > self.clear_col_space:
+            self.safe = False
+            logger.error(": Compatibility failure")
+            logger.warning(": Beam width %s mm is greater than clear space " + \
+                           " between column flanges %s mm" % self.clear_col_space, self.beam_b)
+            logger.info(": Select compatible beam and column sizes")
+
         self.bolt_design()
 
         if self.top_angle_recommended != self.top_angle:
@@ -498,6 +510,10 @@ class SeatAngleCalculation(ConnectionCalculations):
                                         - self.top_angle_R2) / 2 + self.top_angle_R2
         self.seat_angle_end_dist_beam = (float(self.angle_B) - self.angle_t - self.angle_R1
                                          - self.angle_R2) / 2 + self.angle_R2
+
+        self.top_angle_end_dist_column = ConnectionCalculations.round_up_5(self.top_angle_end_dist_column)
+        self.top_angle_end_dist_beam = ConnectionCalculations.round_up_5(self.top_angle_end_dist_beam)
+        self.seat_angle_end_dist_beam = ConnectionCalculations.round_up_5(self.seat_angle_end_dist_beam)
 
         if self.top_angle_end_dist_column < self.min_end_dist:
             self.safe = False
@@ -617,6 +633,7 @@ class SeatAngleCalculation(ConnectionCalculations):
             is greater than the maximum pitch (which is governed by thickness of connected member(s)).
             It is recommended to decrease the bolt diameter or increase the thickness of the connected members.
             """
+            self.safe = False
             logger.error(": Calculated maximum pitch is greater than calculated (rounded) minimum pitch")
             logger.warning(": Bolt pitch should be more than  %2.2f mm " % self.min_pitch)
             logger.warning(": Bolt pitch should be less than  %2.2f mm " % self.max_pitch)
@@ -631,7 +648,11 @@ class SeatAngleCalculation(ConnectionCalculations):
         elif self.num_rows == 2:
             self.pitch = self.min_pitch
         self.end_dist = self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.pitch
+        self.end_dist = ConnectionCalculations.round_down_5(self.end_dist)
+        self.pitch = (self.angle_A - self.angle_t - self.angle_R1 - self.root_clearance_sa - self.end_dist) * \
+                     (self.num_rows - 1)
         if self.end_dist < self.min_end_dist:
+            self.safe = False
             logger.error(": Detailing error")
             logger.error(": Calculated bolt end distance is smaller than minimum end distance")
             logger.warning(": End distance should be more than  %2.2f mm " % self.min_end_dist)
@@ -691,10 +712,10 @@ class SeatAngleCalculation(ConnectionCalculations):
 
         # based on 45 degree dispersion Cl 8.7.1.3, stiff bearing length (b1) is calculated as
         # (stiff) bearing length on cleat (b1) = b - T_f (beam flange thickness) - r_b (root radius of beam flange)
-        b1 = bearing_length - self.beam_f_t - self.beam_R1
+        b1 = max(bearing_length - self.beam_f_t - self.beam_R1, bearing_length/2)
 
-        # Distance from the end of bearing on cleat to root angle OR A TO B = b2
-        b2 = b1 + self.beam_col_clear_gap - self.angle_t - self.angle_R1
+        # Distance from the end of bearing on cleat to root angle OR A TO B in Fig 5.31 in Subramanian's book
+        b2 = max(b1 + self.beam_col_clear_gap - self.angle_t - self.angle_R1, 0)
 
         """Check moment capacity of outstanding leg
 
@@ -707,8 +728,20 @@ class SeatAngleCalculation(ConnectionCalculations):
             use appropriate moment capacity equation
         """
 
-        self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
-        # TODO moment demand negative. resolve issue. MB550 SC200 80kN 20dia3.6Bolt '200 150 x 16'
+        if b1 > 0.1 :
+            self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
+
+        if self.shear_force * self.shear_force < 1  or b2 == 0 or b1 < 0.1 or self.moment_at_root_angle < 0:
+            self.safe = False
+            logger.warning(": The calculated moment demand on the angle leg is %s " % self.moment_at_root_angle)
+            logger.debug(": The algorithm used to calculate this moment could give erroneous values due to one or " +
+                           "more of the following:")
+            logger.debug(": a) Very low value of shear force ")
+            logger.debug(": b) Large seated angle section and low value of gap between beam and column")
+            logger.debug(": c) Large beam section and low value of shear force")
+            logger.debug(": Please verify the results manually ")
+            self.moment_at_root_angle = 0.0
+
 
         """
         Assumption

@@ -144,7 +144,8 @@ class Ui_Dialog(object):
         Dialog.setTabOrder(self.btn_saveProfile, self.lineEdit_projectTitle)
         Dialog.setTabOrder(self.lineEdit_projectTitle, self.lineEdit_subtitle)
         Dialog.setTabOrder(self.lineEdit_subtitle, self.lineEdit_jobNumber)
-        Dialog.setTabOrder(self.lineEdit_jobNumber, self.txt_additionalComments)
+        Dialog.setTabOrder(self.lineEdit_jobNumber, self.lineEdit_client)
+        Dialog.setTabOrder(self.lineEdit_client, self.txt_additionalComments)
         Dialog.setTabOrder(self.txt_additionalComments, self.buttonBox)
 
     def retranslateUi(self, Dialog):

@@ -66,8 +66,6 @@ class OsdagMainWindow(QMainWindow):
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
 
-
-
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
         if loc == "Sample Design Report":

@@ -352,7 +352,7 @@ class MainController(QMainWindow):
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.gradeType = {'Select Bolt Type': '',
-                          'HSFG': [8.8, 10.8],
+                          'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.comboBoltType.addItems(self.gradeType.keys())
         self.ui.comboBoltType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)

@@ -358,10 +358,11 @@ class MainController(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
         # self.ui.btn_2D.clicked.connect(self.call2D_Drawing)
-        self.ui.btn3D.clicked.connect(self.call_3DModel)
-        self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
-        self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
-        self.ui.chkBxFinplate.clicked.connect(self.call_3DFinplate)
+        #self.ui.btn3D.clicked.connect(self.call_3DModel)
+        self.ui.btn3D.clicked.connect(lambda:self.call_3DModel("gradient_bg"))
+        self.ui.chkBxBeam.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
+        self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
+        self.ui.chkBxFinplate.clicked.connect(lambda:self.call_3DFinplate("gradient_bg"))
 
         validator = QIntValidator()
         self.ui.txtFu.setValidator(validator)
@@ -406,10 +407,10 @@ class MainController(QMainWindow):
         self.ui.action_save_input.triggered.connect(self.saveDesign_inputs)
         self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
         # graphics
-        self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
-        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
-        self.ui.actionFinplate_2.triggered.connect(self.call_3DFinplate)
-        self.ui.actionShow_all.triggered.connect(self.call_3DModel)
+        self.ui.actionBeam_2.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
+        self.ui.actionColumn_2.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
+        self.ui.actionFinplate_2.triggered.connect(lambda:self.call_3DFinplate("gradient_bg"))
+        self.ui.actionShow_all.triggered.connect(lambda:self.call_3DModel("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -1027,8 +1028,8 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
-        self.call_3DModel()
-        self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+        self.call_3DModel("white_bg")
+        #self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
 
@@ -1487,7 +1488,7 @@ class MainController(QMainWindow):
         return nutDia[boltDia]
 
 
-    def call_3DModel(self):
+    def call_3DModel(self, bgcolor):
         '''
         This routine responsible for diasplaying 3D Cad model
         :param flag: boolean
@@ -1497,9 +1498,9 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
             self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
-        self.commLogicObj.display_3DModel("Model")
+        self.commLogicObj.display_3DModel("Model",bgcolor)
 
-    def call_3DBeam(self):
+    def call_3DBeam(self,bgcolor):
         '''
         Creating and displaying 3D Beam
         '''
@@ -1510,9 +1511,9 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Beam")
+        self.commLogicObj.display_3DModel("Beam",bgcolor)
 
-    def call_3DColumn(self):
+    def call_3DColumn(self,bgcolor):
         '''
         '''
         self.ui.chkBxCol.setChecked(Qt.Checked)
@@ -1521,9 +1522,9 @@ class MainController(QMainWindow):
             self.ui.chkBxFinplate.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("Column")
+        self.commLogicObj.display_3DModel("Column",bgcolor)
 
-    def call_3DFinplate(self):
+    def call_3DFinplate(self,bgcolor):
         '''
         Displaying FinPlate in 3D
         '''
@@ -1534,7 +1535,7 @@ class MainController(QMainWindow):
             self.ui.mytabWidget.setCurrentIndex(0)
             self.ui.btn3D.setChecked(Qt.Unchecked)
 
-        self.commLogicObj.display_3DModel("Plate")
+        self.commLogicObj.display_3DModel("Plate",bgcolor)
 
     def unchecked_allChkBox(self):
         '''

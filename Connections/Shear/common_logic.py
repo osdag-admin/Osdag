@@ -459,7 +459,7 @@ class CommonDesignLogic(object):
         self.component = component
 
         self.display.EraseAll()
-        # self.display.View_Iso()
+        self.display.View_Iso()
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()
@@ -554,15 +554,15 @@ class CommonDesignLogic(object):
         if view == "All":
 
             self.callDesired_View(fileName, view, folder)
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-
-            data = os.path.join(str(folder), "images_html", "3D_Model.png")
-
-            self.display.ExportToImage(data)
-
-            # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-            self.display.View_Iso()
-            self.display.FitAll()
+            # self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+            #
+            # data = os.path.join(str(folder), "images_html", "3D_Model.png")
+            #
+            # self.display.ExportToImage(data)
+            #
+            # # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            # self.display.View_Iso()
+            # self.display.FitAll()
 
         else:
 

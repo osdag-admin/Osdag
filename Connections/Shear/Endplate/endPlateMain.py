@@ -1057,10 +1057,14 @@ class MainController(QMainWindow):
         }
         file_type = "PDF (*.pdf)"
         fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
-        pdfkit.from_file(filename, fname, configuration=config, options=options)
-
-        #pdfkit.from_file(filename, str(QFileDialog.getSaveFileName(self,"Save File As", self.folder + "/", "PDF (*.pdf)")), configuration=config, options=options)
-        QMessageBox.about(self, 'Information', "Report Saved")
+        fname = str(fname)
+        flag = True
+        if fname =='':
+            flag = False
+            return flag
+        else:
+            pdfkit.from_file(filename, fname, configuration=config, options=options)
+            QMessageBox.about(self, 'Information', "Report Saved")
 
     def save_log(self):
 

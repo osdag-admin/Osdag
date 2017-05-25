@@ -51,7 +51,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         gamma_m0 (float): partial safety factor for material - resistance governed by yielding or buckling
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
         bolt_hole_type (string): 'Standard' or 'Over-sized'
-        custom_hole_clearance (float): user defined hole clearance, if any
         beam_col_clear_gap (int): clearance + tolerance
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
         root_clearance_sa (int): clearance of first bolt from the root of seated angle
@@ -155,7 +154,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_m0 = 0.0
         self.gamma_m1 = 0.0
         self.bolt_hole_type = 'Standard'
-        self.custom_hole_clearance = None
         self.beam_col_clear_gap = 0
         self.min_edge_multiplier = 1
         self.root_clearance_sa = 0
@@ -318,7 +316,6 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_m1 = 1.25  # partial safety factor for material - resistance governed by ultimate stress
 
         self.bolt_hole_type = input_dict['bolt']['bolt_hole_type']  # "Standard" or "Over-sized"
-        self.custom_hole_clearance = input_dict['bolt']['bolt_hole_clrnce']  # user defined hole clearance, if any
         self.is_hsfg = False
         if input_dict['Bolt']['Type'] == "HSFG":
             self.is_hsfg = True  # set to True, if bolt is HSFG with no slip at ultimate load
@@ -436,8 +433,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         """
         self.root_clearance_sa = 1.5 * self.bolt_diameter
         self.root_clearance_col = 1.5 * self.bolt_diameter
-        self.bolt_hole_clearance_value = self.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter,
-                                                                  self.custom_hole_clearance)
+        self.bolt_hole_clearance_value = self.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter)
         self.bolt_hole_diameter = self.bolt_diameter + self.bolt_hole_clearance_value
 
         self.thickness_governing_min = min(self.column_f_t, self.angle_t)

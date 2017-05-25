@@ -136,7 +136,7 @@ class ColWebBeamWeb(object):
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam
     
-    def get_column_model(self):
+    def get_columnModel(self):
 
         final_col = self.columnModel
         nut_bolt_list = self.nut_bolt_array.get_colbolts()

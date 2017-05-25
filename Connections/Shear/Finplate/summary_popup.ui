@@ -269,6 +269,7 @@ p, li { white-space: pre-wrap; }
   <tabstop>lineEdit_projectTitle</tabstop>
   <tabstop>lineEdit_subtitle</tabstop>
   <tabstop>lineEdit_jobNumber</tabstop>
+  <tabstop>lineEdit_client</tabstop>
   <tabstop>txt_additionalComments</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>

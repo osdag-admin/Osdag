@@ -367,7 +367,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -432,7 +441,7 @@
      <x>0</x>
      <y>0</y>
      <width>1455</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -468,20 +477,20 @@ QMenu::item:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionOpen"/>
+    <addaction name="action_load_input"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_3D_model_as"/>
-    <addaction name="actionSave_current_2D_image_as"/>
+    <addaction name="action_save_input"/>
+    <addaction name="action_save_log_messages"/>
+    <addaction name="action_create_design_report"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_front_view"/>
-    <addaction name="actionSave_top_view"/>
-    <addaction name="actionSave_side_view"/>
+    <addaction name="action_save_3D_model"/>
+    <addaction name="action_save_CAD_image"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_log_messages"/>
-    <addaction name="actionCreate_design_report"/>
-    <addaction name="actionQuit_fin_plate_design"/>
-    <addaction name="actionQuit_seat_angle_design"/>
+    <addaction name="action_save_front_view"/>
+    <addaction name="action_save_top_view"/>
+    <addaction name="action_save_side_view"/>
+    <addaction name="separator"/>
+    <addaction name="action_quit_sa_design"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="styleSheet">
@@ -519,7 +528,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
-    <addaction name="actionDesign_preferences"/>
+    <addaction name="action_design_preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -2979,7 +2988,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="lbl_angle">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>1</x>
        <y>430</y>
        <width>150</width>
        <height>30</height>
@@ -2994,7 +3003,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Angle&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Angle sections&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -3042,7 +3051,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Angle section *</string>
+      <string>Seated angle *</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_topanglesection">
@@ -3063,7 +3072,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Top angle section</string>
+      <string> Top angle *</string>
      </property>
     </widget>
     <widget class="QPushButton" name="btn_Reset">
@@ -4067,12 +4076,12 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="action_load_input">
    <property name="text">
-    <string>Open</string>
+    <string>Load input</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+O</string>
+    <string>Ctrl+L</string>
    </property>
   </action>
   <action name="actionSave">
@@ -4213,7 +4222,7 @@ QMenu::item:selected {
     <string>Reduce font size</string>
    </property>
   </action>
-  <action name="actionSave_3D_model_as">
+  <action name="action_save_3D_model">
    <property name="text">
     <string>Save 3D model</string>
    </property>
@@ -4221,7 +4230,7 @@ QMenu::item:selected {
     <string>Alt+3</string>
    </property>
   </action>
-  <action name="actionSave_current_2D_image_as">
+  <action name="action_save_CAD_image">
    <property name="text">
     <string>Save CAD image</string>
    </property>
@@ -4229,7 +4238,7 @@ QMenu::item:selected {
     <string>Alt+I</string>
    </property>
   </action>
-  <action name="actionSave_log_messages">
+  <action name="action_save_log_messages">
    <property name="text">
     <string>Save log messages</string>
    </property>
@@ -4237,7 +4246,7 @@ QMenu::item:selected {
     <string>Alt+M</string>
    </property>
   </action>
-  <action name="actionCreate_design_report">
+  <action name="action_create_design_report">
    <property name="text">
     <string>Create design report</string>
    </property>
@@ -4245,12 +4254,15 @@ QMenu::item:selected {
     <string>Alt+C</string>
    </property>
   </action>
-  <action name="actionQuit_fin_plate_design">
+  <action name="action_save_input">
    <property name="text">
-    <string>Save design</string>
+    <string>Save input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSave_front_view">
+  <action name="action_save_front_view">
    <property name="text">
     <string>Save front view</string>
    </property>
@@ -4258,7 +4270,7 @@ QMenu::item:selected {
     <string>Alt+Shift+F</string>
    </property>
   </action>
-  <action name="actionSave_top_view">
+  <action name="action_save_top_view">
    <property name="text">
     <string>Save top view</string>
    </property>
@@ -4266,7 +4278,7 @@ QMenu::item:selected {
     <string>Alt+Shift+T</string>
    </property>
   </action>
-  <action name="actionSave_side_view">
+  <action name="action_save_side_view">
    <property name="text">
     <string>Save side view</string>
    </property>
@@ -4299,7 +4311,7 @@ QMenu::item:selected {
   </action>
   <action name="actionSampe_Problems">
    <property name="text">
-    <string>Sampe Problems</string>
+    <string>Sample Problems</string>
    </property>
   </action>
   <action name="actionVideo_Tutorials">
@@ -4317,12 +4329,15 @@ QMenu::item:selected {
     <string>FAQ</string>
    </property>
   </action>
-  <action name="actionQuit_seat_angle_design">
+  <action name="action_quit_sa_design">
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
-  <action name="actionDesign_preferences">
+  <action name="action_design_preferences">
    <property name="text">
     <string>Design preferences</string>
    </property>

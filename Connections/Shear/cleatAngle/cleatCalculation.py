@@ -784,7 +784,7 @@ def cleat_connection(ui_obj):
     Tdb = min(Tdb_B, Tdb_C)
     if Tdb_B <= shear_load or Tdb_C <= shear_load:
         design_status = False
-        logger.error(": The block shear capacity of the cleat Angle is lass than the applied shear force [cl. 6.4.1]")
+        logger.error(": The block shear capacity of the cleat Angle is less than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is %2.2f KN " % (shear_load))
         logger.info(":Block shear capacity of the cleat angle is %2.2f KN" % (Tdb))
         logger.info(": Increase the cleat angle thickness")  

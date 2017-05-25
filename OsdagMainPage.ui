@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1410</width>
+    <width>1326</width>
     <height>1110</height>
    </rect>
   </property>
@@ -348,9 +348,6 @@ background-color: #abc250 ;
           <property name="focusPolicy">
            <enum>Qt::ClickFocus</enum>
           </property>
-          <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;#&quot;&gt;Shear Connection&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
           <property name="styleSheet">
            <string notr="true">QTabBar::tab {
     margin-right: 10;
@@ -380,6 +377,15 @@ border-bottom-right-radius: 0px ;
           </property>
           <property name="currentIndex">
            <number>0</number>
+          </property>
+          <property name="documentMode">
+           <bool>false</bool>
+          </property>
+          <property name="tabsClosable">
+           <bool>false</bool>
+          </property>
+          <property name="movable">
+           <bool>false</bool>
           </property>
           <widget class="QWidget" name="tab1_shearconnection">
            <property name="font">
@@ -785,7 +791,7 @@ border-bottom-right-radius: 0px ;
                <enum>Qt::TabFocus</enum>
               </property>
               <property name="toolTip">
-               <string>Ctrl+S</string>
+               <string>Enter</string>
               </property>
               <property name="styleSheet">
                <string notr="true">QPushButton::hover
@@ -839,6 +845,14 @@ color:#ffffff;
            <attribute name="title">
             <string>Moment Connection</string>
            </attribute>
+           <attribute name="whatsThis">
+            <string>This connection is under development</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="tab3_trussconnection">
+           <attribute name="title">
+            <string>Truss Connection</string>
+           </attribute>
           </widget>
          </widget>
         </item>
@@ -870,8 +884,207 @@ color:#ffffff;
       <widget class="QWidget" name="page"/>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="1" column="0" colspan="2">
      <widget class="QComboBox" name="comboBox_help">
+      <property name="palette">
+       <palette>
+        <active>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Text">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Highlight">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </active>
+        <inactive>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Text">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Highlight">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </inactive>
+        <disabled>
+         <colorrole role="WindowText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Button">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Text">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="ButtonText">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>255</red>
+            <green>255</green>
+            <blue>255</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Base">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Window">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>146</red>
+            <green>90</green>
+            <blue>91</blue>
+           </color>
+          </brush>
+         </colorrole>
+         <colorrole role="Highlight">
+          <brush brushstyle="SolidPattern">
+           <color alpha="255">
+            <red>0</red>
+            <green>120</green>
+            <blue>215</blue>
+           </color>
+          </brush>
+         </colorrole>
+        </disabled>
+       </palette>
+      </property>
       <property name="font">
        <font>
         <family>Arial</family>
@@ -938,37 +1151,6 @@ color:#ffffff;
         <string>About Osdag</string>
        </property>
       </item>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QPushButton" name="btn_openfile">
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>11</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QPushButton::hover
-{
-   background-color: #d97f7f;
-   color:#000000 ;
-}
-
-QPushButton
-{
-background-color: #925a5b;
-color:#ffffff;
-}</string>
-      </property>
-      <property name="text">
-       <string>Open file</string>
-      </property>
-      <property name="autoDefault">
-       <bool>true</bool>
-      </property>
      </widget>
     </item>
    </layout>
@@ -1298,15 +1480,14 @@ color:#ffffff;
    <zorder>btn_plate</zorder>
    <zorder>btn_gantry</zorder>
    <zorder>comboBox_help</zorder>
-   <zorder>btn_openfile</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1410</width>
-     <height>19</height>
+     <width>1326</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>
@@ -1331,6 +1512,7 @@ color:#ffffff;
   <tabstop>btn_beamCol</tabstop>
   <tabstop>btn_plate</tabstop>
   <tabstop>btn_gantry</tabstop>
+  <tabstop>comboBox_help</tabstop>
   <tabstop>rdbtn_seat</tabstop>
   <tabstop>rdbtn_finplate</tabstop>
   <tabstop>rdbtn_cleat</tabstop>

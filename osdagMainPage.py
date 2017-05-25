@@ -66,8 +66,6 @@ class OsdagMainWindow(QMainWindow):
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
 
-
-
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
         if loc == "Sample Design Report":
@@ -115,12 +113,20 @@ class OsdagMainWindow(QMainWindow):
         folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
         folder = str(folder)
         if not os.path.exists(folder):
-            os.mkdir(folder, 0755)
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0755)
 
         root_path = folder
         images_html_folder = ['images_html']
+        flag = True
         for create_folder in images_html_folder:
-            os.mkdir(os.path.join(root_path, create_folder))
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
             launchFinPlateController(self, folder)

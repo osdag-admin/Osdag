@@ -454,17 +454,20 @@ class CommonDesignLogic(object):
         colflangeconn.create_3dmodel()
         return colflangeconn
 
-    def display_3DModel(self, component):
+    def display_3DModel(self, component,bgcolor):
 
         self.component = component
 
         self.display.EraseAll()
-        # self.display.View_Iso()
+        self.display.View_Iso()
         self.display.FitAll()
 
         self.display.DisableAntiAliasing()
+        if bgcolor =="gradient_bg":
 
-        self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        else:
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         if self.loc == "Column flange-Beam web" and self.connection == "Finplate":
             self.display.View.SetProj(OCC.V3d.V3d_XnegYnegZpos)
@@ -504,6 +507,7 @@ class CommonDesignLogic(object):
                 osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
         elif self.component == "Model":
+
             osdag_display_shape(self.display, self.connectivityObj.columnModel, update=True)
             osdag_display_shape(self.display, self.connectivityObj.beamModel, material=Graphic3d_NOT_2D_ALUMINUM,
                                 update=True)
@@ -540,7 +544,7 @@ class CommonDesignLogic(object):
             else:
                 self.connectivityObj = self.create3DBeamWebBeamWeb()
 
-            self.display_3DModel("Model")
+            self.display_3DModel("Model","gradient_bg")
         else:
             self.display.EraseAll()
 
@@ -554,15 +558,15 @@ class CommonDesignLogic(object):
         if view == "All":
 
             self.callDesired_View(fileName, view, folder)
-            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
-
-            data = os.path.join(str(folder), "images_html", "3D_Model.png")
-
-            self.display.ExportToImage(data)
-
-            # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-            self.display.View_Iso()
-            self.display.FitAll()
+            # self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+            #
+            # data = os.path.join(str(folder), "images_html", "3D_Model.png")
+            #
+            # self.display.ExportToImage(data)
+            #
+            # # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+            # self.display.View_Iso()
+            # self.display.FitAll()
 
         else:
 

@@ -413,7 +413,6 @@ class MainController(QMainWindow):
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-        #self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo("combo_Beam"))
         self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo)
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
@@ -551,7 +550,6 @@ class MainController(QMainWindow):
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
             self.get_beamdata()
-            #self.ui.comboColSec.addItems(get_beamcombolist())
             self.ui.combo_Beam.setCurrentIndex(0)
 
             self.ui.txtFu.clear()
@@ -560,7 +558,6 @@ class MainController(QMainWindow):
 
             self.ui.comboDiameter.blockSignals(True)
             self.ui.comboDiameter.setCurrentIndex(0)
-            # self.ui.comboType.blockSignals(True)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.blockSignals(True)
             self.ui.comboGrade.setCurrentIndex((0))
@@ -601,7 +598,6 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
             self.get_columndata()
-            #self.ui.comboColSec.addItems(get_columncombolist())
             self.ui.comboColSec.setCurrentIndex(0)
             self.ui.combo_Beam.setCurrentIndex(0)
 
@@ -690,8 +686,6 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(False)
 
         # Disable Menubar
-        # self.ui.menubar.setEnabled(False)
-        #self.ui.menuFile.setEnabled(False)
         self.ui.action_save_input.setEnabled(False)
         self.ui.actionSave_log_messages.setEnabled(False)
         self.ui.actionCreate_design_report.setEnabled(False)
@@ -700,11 +694,7 @@ class MainController(QMainWindow):
         self.ui.actionSave_Front_View.setEnabled(False)
         self.ui.actionSave_Top_View.setEnabled(False)
         self.ui.actionSave_Side_View.setEnabled(False)
-        #self.ui.menuEdit.setEnabled(False)
-        #self.ui.menuView.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-
-        # self.ui.menuHelp.setEnabled(False)
 
     def enableViewButtons(self):
         """Enable the all buttons in toolbar
@@ -1037,15 +1027,13 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
-
+        self.call_3DModel()
         self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
 
         self.display.ExportToImage(data)
 
-        # self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
-        self.display.View_Iso()
         self.display.FitAll()
 
         fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
@@ -1573,7 +1561,6 @@ class MainController(QMainWindow):
         dictcoldata = self.fetchColumnPara()
         dict_angle_data = {}
         dict_topangledata = {}
-        dict_topangledata = {}
         loc = str(self.ui.comboConnLoc.currentText())
         component = "Model"
         bolt_dia = int(self.uiObj["Bolt"]["Diameter (mm)"])
@@ -1591,7 +1578,7 @@ class MainController(QMainWindow):
         if self.validateInputsOnDesignBtn() is not True:
             return
         self.alist = self.designParameters()
-        print "printing design para with DP =", self.alist[0]
+
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
@@ -1615,7 +1602,6 @@ class MainController(QMainWindow):
                 pass
         else:
             pass
-            # self.display.EraseAll()
         self.designPrefDialog.saved = False
 
     def create2Dcad(self):

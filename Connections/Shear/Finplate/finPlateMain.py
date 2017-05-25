@@ -1854,7 +1854,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    folder_path = "D:\Osdag_Workspace\drawing"
+    folder_path = "F:\Osdag_Workspace\\finplate"
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0755)
     image_folder_path = os.path.join(folder_path, 'images_html')

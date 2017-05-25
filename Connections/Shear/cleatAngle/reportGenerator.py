@@ -700,7 +700,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Slip factor", slip_factor]
+    if bolt_type == "HSFG":
+        row = [0, "Slip factor", slip_factor]
+    else:
+        row = [0, "Slip factor", "N/A"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

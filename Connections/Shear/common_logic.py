@@ -407,7 +407,7 @@ class CommonDesignLogic(object):
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
         nut_Ht = 12.2  #
-        gap = self.uiObj['detailing']['gap']
+        gap = int(str(self.uiObj['detailing']['gap']))
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)

@@ -10,7 +10,7 @@ from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 class BeamWebBeamWeb(object):
 
-    def __init__(self, column, beam, notch, plate, Fweld, nut_bolt_array):
+    def __init__(self, column, beam, notch, plate, Fweld, nut_bolt_array,gap):
         self.column = column
         self.beam = beam
         self.weldLeft = Fweld
@@ -18,6 +18,7 @@ class BeamWebBeamWeb(object):
         self.plate = plate
         self.nut_bolt_array = nut_bolt_array
         self.notch = notch
+        self.gap = gap
         self.columnModel = None
         self.beamModel = None
         self.weldModelLeft = None
@@ -51,7 +52,7 @@ class BeamWebBeamWeb(object):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         shiftOrigin = (self.column.D / 2 - self.beam.D / 2)
-        origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.clearDist * self.column.uDir) 
+        origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.gap * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
 
 #     def createButtWeld(self):
@@ -73,7 +74,7 @@ class BeamWebBeamWeb(object):
                        self.beam.t / 2 * (-self.beam.uDir) +
                        self.plate.L / 2 * (-self.beam.vDir) +
                        self.plate.T / 2 * (-self.beam.uDir) +
-                       self.clearDist * (-self.beam.wDir))
+                       self.gap * (-self.beam.wDir))
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         self.plate.place(plateOrigin, uDir, wDir)

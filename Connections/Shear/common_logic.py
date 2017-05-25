@@ -165,6 +165,7 @@ class CommonDesignLogic(object):
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
+        gap = self.uiObj['detailing']['gap']
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
@@ -195,20 +196,20 @@ class CommonDesignLogic(object):
         nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
         if self.connection == "Finplate":  # finBeamWebBeamWeb/endBeamWebBeamWeb
-            gap = sBeam_tw + plate_thick + nut_T
-            nutBoltArray = finNutBoltArray(self.resultObj, nut, bolt, gap)
-            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray)
+            nut_space = sBeam_tw + plate_thick + nut_T
+            nutBoltArray = finNutBoltArray(self.resultObj, nut, bolt, nut_space)
+            beamwebconn = finBeamWebBeamWeb(column, beam, notchObj, plate, Fweld1, nutBoltArray,gap)
             # column, beam, notch, plate, Fweld, nut_bolt_array
         elif self.connection == "Endplate":
-            gap = sBeam_tw + plate_thick + nut_T
-            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, gap)
+            nut_space = sBeam_tw + plate_thick + nut_T
+            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
             beamwebconn = endBeamWebBeamWeb(column, beam, notchObj, Fweld1, plate, nutBoltArray)
 
         elif self.connection == "cleatAngle":
-            gap = sBeam_tw + 2 * cleat_thick + nut_T
-            cgap = pBeam_tw + cleat_thick + nut_T
-            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
-            beamwebconn = cleatBeamWebBeamWeb(column, beam, notchObj, angle, nut_bolt_array)
+            nut_space = sBeam_tw + 2 * cleat_thick + nut_T
+            cnut_space = pBeam_tw + cleat_thick + nut_T
+            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
+            beamwebconn = cleatBeamWebBeamWeb(column, beam, notchObj, angle, nut_bolt_array,gap)
 
         beamwebconn.create_3dmodel()
 
@@ -285,6 +286,7 @@ class CommonDesignLogic(object):
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
+        gap = self.uiObj['detailing']['gap']
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
@@ -304,28 +306,28 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":  # finColWebBeamWeb
             nut_space = beam_tw + int(plate_thick) + nut_T
             nutBoltArray = finNutBoltArray(self.resultObj, nut, bolt, nut_space)
-            colwebconn = finColWebBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
+            colwebconn = finColWebBeamWeb(column, beam, Fweld1, plate, nutBoltArray,gap)
 
         elif self.connection == "Endplate":
-            gap = column_tw + int(plate_thick) + nut_T
-            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, gap)
+            nut_space = column_tw + int(plate_thick) + nut_T
+            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
             colwebconn = endColWebBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
 
         elif self.connection == "cleatAngle":
-            gap = beam_tw + 2 * cleat_thick + nut_T
-            cgap = column_tw + cleat_thick + nut_T
+            nut_space = beam_tw + 2 * cleat_thick + nut_T
+            cnut_space = column_tw + cleat_thick + nut_T
 
-            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
+            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
 
-            colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array)
+            colwebconn = cleatColWebBeamWeb(column, beam, angle, nut_bolt_array,gap)
         else:
-            sgap = column_tw + seat_thick  + nut_T
-            sbgap = beam_T + seat_thick + nut_T
-            tgap = beam_T + topangle_thick + nut_T
-            tbgap = column_tw + topangle_thick + nut_T
+            snut_space = column_tw + seat_thick  + nut_T
+            sbnut_space = beam_T + seat_thick + nut_T
+            tnut_space = beam_T + topangle_thick + nut_T
+            tbnut_space = column_tw + topangle_thick + nut_T
 
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap,tgap,tbgap)
-            colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, snut_space, sbnut_space,tnut_space,tbnut_space)
+            colwebconn = seatColWebBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray,gap)
 
         colwebconn.create_3dmodel()
         return colwebconn
@@ -433,23 +435,23 @@ class CommonDesignLogic(object):
             colflangeconn = finColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray, gap)
 
         elif self.connection == "Endplate":
-            gap = column_T + int(plate_thick) + nut_T
-            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, gap)
+            nut_space = column_T + int(plate_thick) + nut_T
+            nutBoltArray = endNutBoltArray(self.resultObj, nut, bolt, nut_space)
             colflangeconn = endColFlangeBeamWeb(column, beam, Fweld1, plate, nutBoltArray)
 
         elif self.connection == "cleatAngle":
-            gap = beam_tw + 2 * cleat_thick + nut_T
-            cgap = column_T + cleat_thick + nut_T
-            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, gap, cgap)
-            colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array)
+            nut_space = beam_tw + 2 * cleat_thick + nut_T
+            cnut_space = column_T + cleat_thick + nut_T
+            nut_bolt_array = cleatNutBoltArray(self.resultObj, nut, bolt, nut_space, cnut_space)
+            colflangeconn = cleatColFlangeBeamWeb(column, beam, angle, nut_bolt_array,gap)
         else:
-            sgap = column_T + seat_thick + nut_T
-            sbgap = beam_T + seat_thick + nut_T
-            tgap = beam_T + topangle_thick + nut_T
-            tbgap = column_T + topangle_thick + nut_T
+            snut_space = column_T + seat_thick + nut_T
+            sbnut_space = beam_T + seat_thick + nut_T
+            tnut_space = beam_T + topangle_thick + nut_T
+            tbnut_space = column_T + topangle_thick + nut_T
 
-            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, sgap, sbgap, tgap, tbgap)
-            colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray)
+            nutBoltArray = seatNutBoltArray(self.resultObj, nut, bolt, snut_space, sbnut_space, tnut_space, tbnut_space)
+            colflangeconn = seatColFlangeBeamWeb(column, beam, seatangle, topclipangle, nutBoltArray,gap)
 
         colflangeconn.create_3dmodel()
         return colflangeconn

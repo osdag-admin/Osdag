@@ -28,7 +28,6 @@ from ui_summary_popup import Ui_Dialog
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_tutorial import Ui_Tutorial
 from ui_ask_question import  Ui_AskQuestion
-# from ui_ask_a_question import Ui_AskQuestion
 from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from endPlateCalc import end_connection
@@ -36,7 +35,6 @@ from model import *
 from ui_endPlate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
-#from Connections.Shear.commonlogic import CommonDesignLogic
 from Svg_Window import SvgWindow
 
 
@@ -117,11 +115,6 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        # if self.ui.txt_detailingGap.text() == '':
-        #
-        #     designPref["detailing"]["gap"] = int(20)
-        # else:
-        #     designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         designPref["design"] = {}
@@ -168,7 +161,10 @@ class DesignPreferences(QDialog):
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
-        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            designPref["detailing"]["min_edgend_dist"] = float(1.5)
         designPref["detailing"]["gap"] = int(20)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
@@ -636,7 +632,7 @@ class MainController(QMainWindow):
         ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum 
         or of a Single Run Fillet Weld)
         '''
-        if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
+        if str(self.ui.comboPlateThick_2.currentText()) == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return

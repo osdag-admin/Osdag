@@ -3,9 +3,6 @@ import math
 from seat_angle_calc import SeatAngleCalculation
 
 
-# TODO add top angle detailing checks to report
-
-
 class ReportGenerator(SeatAngleCalculation):
     """Generate Design Report for Seated Angle Connection.
 
@@ -15,7 +12,6 @@ class ReportGenerator(SeatAngleCalculation):
         gamma_m1 (float): partial safety factor for material - resistance governed by ultimate stress
         beam_col_clear_gap (int): design preference 
         bolt_hole_clearance (float)
-        custom_hole_clearance (float): design preference, if specified
         bolt_hole_type (string): "Standard" or "Over-sized"
         bolt_fu_overwrite (float)
         mu_f (float): slip factor for HSFG bolt calculations
@@ -118,7 +114,6 @@ class ReportGenerator(SeatAngleCalculation):
         self.gamma_m1 = sa_calc_object.gamma_m1
         self.beam_col_clear_gap = sa_calc_object.beam_col_clear_gap
         self.bolt_hole_clearance = sa_calc_object.bolt_hole_clearance_value
-        self.custom_hole_clearance = sa_calc_object.custom_hole_clearance
         self.bolt_hole_type = sa_calc_object.bolt_hole_type
         self.bolt_fu_overwrite = sa_calc_object.bolt_fu_overwrite
         self.mu_f = sa_calc_object.mu_f
@@ -381,7 +376,6 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(0, "Design Preferences", "detail", col_span="2")
         rstr += design_summary_row(0, "Bolt ", "detail1", col_span="2")
         rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type) + " Hole")
-        rstr += design_summary_row(1, "Hole Clearance (mm)", "detail2", text_two=str(bolt_hole_clearance))
         rstr += design_summary_row(1, "Material Grade Fu (MPa) (overwrite)", "detail2", text_two=str(bolt_fu_overwrite))
         if is_hsfg:
             rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
@@ -621,7 +615,7 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Top angle
         rstr += design_check_row("Top Angle", "", "", "", col_span="4", text_one_css="detail")
-        req_field = "Recommended size: " + str(self.top_angle_recommended)
+        req_field = "Recommended size (based on stability only): " + str(self.top_angle_recommended)
         prov_field = "User selected size: " + str(self.top_angle)
         rstr += design_check_row("Section ", req_field, prov_field, " ")
 

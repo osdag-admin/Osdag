@@ -1660,37 +1660,41 @@ class MainController(QMainWindow):
         # filename = QFileDialog.getSaveFileName(self, 'Export', str(self.folder) + "/untitled.igs", files_types)
         #
         # filename = str(filename)
-
-        file_extension = fName.split(".")[-1]
-
-        if file_extension == 'igs':
-            IGESControl.IGESControl_Controller().Init()
-            iges_writer = IGESControl.IGESControl_Writer()
-            iges_writer.AddShape(shape)
-            iges_writer.Write(fName)
-
-        elif file_extension == 'brep':
-
-            BRepTools.breptools.Write(shape, fName)
-
-        elif file_extension == 'stp':
-            # initialize the STEP exporter
-            step_writer = STEPControl_Writer()
-            Interface_Static_SetCVal("write.step.schema", "AP203")
-
-            # transfer shapes and write file
-            step_writer.Transfer(shape, STEPControl_AsIs)
-            status = step_writer.Write(fName)
-
-            assert(status == IFSelect_RetDone)
-
+        flag = True
+        if fName == '':
+            flag = False
+            return flag
         else:
-            stl_writer = StlAPI_Writer()
-            stl_writer.SetASCIIMode(True)
-            stl_writer.Write(shape, fName)
+            file_extension = fName.split(".")[-1]
 
-        self.fuse_model = None
-        QMessageBox.about(self, 'Information', "File saved")
+            if file_extension == 'igs':
+                IGESControl.IGESControl_Controller().Init()
+                iges_writer = IGESControl.IGESControl_Writer()
+                iges_writer.AddShape(shape)
+                iges_writer.Write(fName)
+
+            elif file_extension == 'brep':
+
+                BRepTools.breptools.Write(shape, fName)
+
+            elif file_extension == 'stp':
+                # initialize the STEP exporter
+                step_writer = STEPControl_Writer()
+                Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                # transfer shapes and write file
+                step_writer.Transfer(shape, STEPControl_AsIs)
+                status = step_writer.Write(fName)
+
+                assert(status == IFSelect_RetDone)
+
+            else:
+                stl_writer = StlAPI_Writer()
+                stl_writer.SetASCIIMode(True)
+                stl_writer.Write(shape, fName)
+
+            self.fuse_model = None
+            QMessageBox.about(self, 'Information', "File saved")
 
 
     def call_desired_view(self, filename, view):

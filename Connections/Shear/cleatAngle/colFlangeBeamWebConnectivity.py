@@ -17,12 +17,13 @@ import numpy
 
 class ColFlangeBeamWeb(object):
     
-    def __init__(self, column, beam, angle, nut_bolt_array):
+    def __init__(self, column, beam, angle, nut_bolt_array,gap):
         self.column = column
         self.beam = beam
         self.angle = angle
         self.angleLeft = copy.deepcopy(angle)
         self.nut_bolt_array = nut_bolt_array
+        self.gap = gap
         self.columnModel = None
         self.beamModel = None
         self.angleModel = None
@@ -51,14 +52,14 @@ class ColFlangeBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
         
     def create_beam_geometry(self):
-        beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.clearDist * (-self.column.vDir))
+        beam_origin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + (self.column.length / 2 * self.column.wDir) + (self.gap * (-self.column.vDir))
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         self.beam.place(beam_origin, uDir, wDir)
     
     def create_angle_geometry(self):
         angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5) * (self.beam.vDir) +
-                         (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
+                         (self.beam.t / 2 * self.beam.uDir) + self.gap * (-self.beam.wDir))
 
         # uDir0 = numpy.array([0, 0, 1.0])
         # wDir0 = numpy.array([0, -1.0, 0])

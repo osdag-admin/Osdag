@@ -11,13 +11,14 @@ from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 class ColWebBeamWeb(object):
 
-    def __init__(self, column, beam, Fweld, plate, nutBoltArray):
+    def __init__(self, column, beam, Fweld, plate, nutBoltArray,gap):
         self.column = column
         self.beam = beam
         self.weldLeft = Fweld
         self.weldRight = copy.deepcopy(Fweld)
         self.plate = plate
         self.nut_bolt_array = nutBoltArray
+        self.gap  = gap
         self.columnModel = None
         self.beamModel = None
         self.weldModelLeft = None
@@ -49,7 +50,8 @@ class ColWebBeamWeb(object):
     def createBeamGeometry(self):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
-        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.clearDist * self.column.uDir) 
+        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + \
+                  (self.gap * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
 
     def createButtWeld(self):

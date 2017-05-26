@@ -46,7 +46,8 @@ class ColWebBeamWeb(object):
     def create_beam_geometry(self):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
-        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) +\
+        origin2 = self.column.sec_origin + (self.column.t / 2 * self.column.uDir) + \
+                  (self.column.length / 2 * self.column.wDir) +\
                   (self.gap * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
 

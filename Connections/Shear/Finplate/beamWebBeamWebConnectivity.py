@@ -52,7 +52,9 @@ class BeamWebBeamWeb(object):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         shiftOrigin = (self.column.D / 2 - self.beam.D / 2)
-        origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.gap * self.column.uDir)
+        origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + \
+                  (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir)\
+                  + (self.gap * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
 
 #     def createButtWeld(self):

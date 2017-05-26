@@ -1046,13 +1046,14 @@ class MainController(QMainWindow):
 
     def save_design(self, popup_summary):
 
-        self.call_3d_model("white_bg")
-
-        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-
-        self.display.ExportToImage(data)
-
-        self.display.FitAll()
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+            self.call_3d_model("white_bg")
+            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+            self.display.ExportToImage(data)
+            self.display.FitAll()
+        else:
+            pass
 
         fileName = os.path.join(self.folder, "images_html","Html_Report.html")
         fileName = str(fileName)

@@ -758,14 +758,14 @@ class MainController(QMainWindow):
         design_report_dialog.show()
 
     def save_design(self, report_summary):
-
-        self.call_3DModel("white_bg")
-
-        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-
-        self.display.ExportToImage(data)
-
-        self.display.FitAll()
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+            self.call_3DModel("white_bg")
+            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+            self.display.ExportToImage(data)
+            self.display.FitAll()
+        else:
+            pass
 
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)

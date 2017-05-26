@@ -9,7 +9,7 @@ import numpy
 
 
 class ColFlangeBeamWeb(object):
-    def __init__(self, column, beam, angle, topclipangle, nutBoltArray):
+    def __init__(self, column, beam, angle, topclipangle, nutBoltArray,gap):
         self.column = column
         self.beam = beam
         self.angle = angle
@@ -20,7 +20,7 @@ class ColFlangeBeamWeb(object):
         self.angleModel = None
         self.topclipangleModel = None
         self.sphereModel = None
-        self.clearDist = 20.0  # This distance between edge of the column web/flange and beam cross section
+        self.gap = gap  # This distance between edge of the column web/flange and beam cross section
 
     def create_3dmodel(self):
         self.creatColumGeometry()
@@ -43,7 +43,7 @@ class ColFlangeBeamWeb(object):
 
     def createBeamGeometry(self):
         beamOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + \
-                     (self.column.length / 2 * self.column.wDir) + (self.clearDist * (-self.column.vDir))
+                     (self.column.length / 2 * self.column.wDir) + (self.gap * (-self.column.vDir))
         uDir = numpy.array([1.0, 0.0, 0])
         wDir = numpy.array([0.0, -1.0, 0.0])
         self.beam.place(beamOrigin, uDir, wDir)

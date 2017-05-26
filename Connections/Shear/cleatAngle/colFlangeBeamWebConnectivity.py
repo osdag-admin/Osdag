@@ -67,7 +67,7 @@ class ColFlangeBeamWeb(object):
         wDir0 = numpy.array([0, 0, -1.0])
         self.angle.place(angle0_origin, uDir0, wDir0)
 
-        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5 - self.angle.L) * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5 - self.angle.L) * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.gap * (-self.beam.wDir))
         uDir1 = numpy.array([0, -1.0, 0])
         wDir1 = numpy.array([0, 0, 1.0])
         # uDir1 = numpy.array([1.0, 0.0, 0])
@@ -154,6 +154,13 @@ class ColFlangeBeamWeb(object):
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam
     
+    def get_columnModel(self):
+        final_beam = self.columnModel
+        nut_bolt_list = self.nut_bolt_array.get_models()
+        for bolt in nut_bolt_list[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
+        return final_beam
+
     def get_columnModel(self):
         final_beam = self.columnModel
         nut_bolt_list = self.nut_bolt_array.get_models()

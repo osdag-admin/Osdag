@@ -138,7 +138,7 @@ class DesignPreferences(QDialog):
         designPref["weld"]["safety_factor"] = float(1.25)
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        self.ui.txt_detailingGap.setText(str(20))
+        self.ui.txt_detailingGap.setText(str(10))
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge

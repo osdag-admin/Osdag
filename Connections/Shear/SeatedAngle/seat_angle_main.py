@@ -102,7 +102,7 @@ class DesignPreferences(QDialog):
         designPref = {"bolt": {}}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        self.ui.combo_slipfactor.setCurrentIndex(8)
+        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)

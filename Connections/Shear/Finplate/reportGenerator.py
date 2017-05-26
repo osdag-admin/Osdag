@@ -97,6 +97,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     typeof_edge = str(uiObj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"])) # factor: 1.7 or 1.5 depending on type of edge, IS 800- Cl 10.2.4.2
     gap = str(float(uiObj["detailing"]["gap"]))
+    corrosive = str(uiObj["detailing"]["is_env_corrosive"])
 
     design_method = str(uiObj["design"]["design_method"])
 
@@ -591,13 +592,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Type of Edges", typeof_edge]
+    row = [0, "Type of Edges", typeof_edge[4:]]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Minimum Edge-End Distance", min_edgend_dist]
+    row = [0, "Minimum Edge-End Distance", min_edgend_dist+" times the hole diameter"]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -609,12 +610,11 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    # TODO add yes or no option??
-    # row = [0, "Corrosive influences", " "]
-    # rstr += t('tr')
-    # rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    # rstr += t('td class="detail2"') + row[2] + t('/td')
-    # rstr += t('/tr')
+    row = [0, "Corrosive influences", corrosive]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
 
     # --------------------------------      DESIGN      -----------------------------------------------------------------------------------------------
     row = [0, "Design ", " "]

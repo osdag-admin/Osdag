@@ -355,16 +355,6 @@
         <bool>true</bool>
        </property>
       </widget>
-      <zorder>btnInput</zorder>
-      <zorder>btnOutput</zorder>
-      <zorder>btn3D</zorder>
-      <zorder>chkBxBeam</zorder>
-      <zorder>chkBxCol</zorder>
-      <zorder>chkBxEndplate</zorder>
-      <zorder>btn_front</zorder>
-      <zorder>btn_top</zorder>
-      <zorder>btn_side</zorder>
-      <zorder>splitter</zorder>
      </widget>
     </item>
     <item>
@@ -392,7 +382,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -457,8 +456,11 @@
      <x>0</x>
      <y>0</y>
      <width>1403</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>false</bool>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="styleSheet">
@@ -492,8 +494,12 @@ QMenu::item:selected {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_2"/>
-    <addaction name="actionOpen_2"/>
+    <addaction name="separator"/>
+    <addaction name="action_load_input"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_input"/>
+    <addaction name="actionSave_log_messages_2"/>
+    <addaction name="actionCreate_design_report_2"/>
     <addaction name="separator"/>
     <addaction name="actionSave_3D_model"/>
     <addaction name="actionSave_CAD_image"/>
@@ -502,9 +508,7 @@ QMenu::item:selected {
     <addaction name="actionSave_top_view"/>
     <addaction name="actionSave_side_view"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_log_messages_2"/>
-    <addaction name="actionCreate_design_report_2"/>
-    <addaction name="actionSave_design"/>
+    <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="styleSheet">
@@ -541,6 +545,7 @@ QMenu::item:selected {
     <addaction name="actionCut"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
+    <addaction name="actionDesign_Preferences"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="styleSheet">
@@ -609,7 +614,15 @@ QMenu::item:selected {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_Osdag"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionVideo_Tutorials"/>
+    <addaction name="actionSample_Report"/>
+    <addaction name="actionSample_Problems"/>
+    <addaction name="separator"/>
+    <addaction name="actionAsk_Us_a_Question"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout_Osdag_2"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
     <property name="styleSheet">
@@ -650,7 +663,7 @@ QMenu::item:selected {
     <addaction name="separator"/>
     <addaction name="actionShow_beam"/>
     <addaction name="actionShow_column"/>
-    <addaction name="actionShoe_end_plate"/>
+    <addaction name="actionShow_end_plate"/>
     <addaction name="actionShow_all"/>
     <addaction name="separator"/>
     <addaction name="actionChange_background"/>
@@ -728,7 +741,7 @@ QMenu::item:selected {
       <string>000.0</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="lbl_column">
      <property name="geometry">
       <rect>
        <x>6</x>
@@ -961,7 +974,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Factored load&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Factored shear load&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_shear">
@@ -981,7 +994,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Shear force(kN) *</string>
+      <string>Vert. Shear (kN) *</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtShear">
@@ -1126,7 +1139,7 @@ QMenu::item:selected {
       <string>Type *</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboDaimeter">
+    <widget class="QComboBox" name="comboDiameter">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -1152,16 +1165,6 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>Diameter of Bolt</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10</string>
       </property>
      </item>
      <item>
@@ -3323,7 +3326,7 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
+    <widget class="QLabel" name="lbl_beam">
      <property name="geometry">
       <rect>
        <x>6</x>
@@ -4081,7 +4084,7 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weld Length(mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txtWeldStrng_5">
+    <widget class="QLineEdit" name="txtWeld_length">
      <property name="geometry">
       <rect>
        <x>190</x>
@@ -4184,7 +4187,7 @@ QMenu::item:selected {
   </action>
   <action name="actionAbout_Osdag">
    <property name="text">
-    <string>About Endplate</string>
+    <string>Osdag Manual</string>
    </property>
   </action>
   <action name="actionBeam">
@@ -4295,9 +4298,9 @@ QMenu::item:selected {
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpen_2">
+  <action name="actionLoad_input_2">
    <property name="text">
-    <string>Open</string>
+    <string>Load input</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -4359,9 +4362,12 @@ QMenu::item:selected {
     <string>Alt+C</string>
    </property>
   </action>
-  <action name="actionSave_design">
+  <action name="action_save_input">
    <property name="text">
-    <string>Save design</string>
+    <string>Save input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionShow_beam">
@@ -4380,7 +4386,7 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionShoe_end_plate">
+  <action name="actionShow_end_plate">
    <property name="text">
     <string>Show endplate</string>
    </property>
@@ -4401,6 +4407,73 @@ QMenu::item:selected {
     <string>Change background</string>
    </property>
   </action>
+  <action name="actionSample_Report">
+   <property name="text">
+    <string>Sample Design Report</string>
+   </property>
+  </action>
+  <action name="actionSample_Problems">
+   <property name="text">
+    <string>Sample Problems</string>
+   </property>
+  </action>
+  <action name="actionVideo_Tutorials">
+   <property name="text">
+    <string>Video Tutorials</string>
+   </property>
+  </action>
+  <action name="actionAsk_Us_a_Question">
+   <property name="text">
+    <string>Ask Us a Question</string>
+   </property>
+  </action>
+  <action name="actionFAQ">
+   <property name="text">
+    <string>FAQ</string>
+   </property>
+  </action>
+  <action name="actionAbout_Osdag_2">
+   <property name="text">
+    <string>About Osdag</string>
+   </property>
+  </action>
+  <action name="actionDesign_Preferences">
+   <property name="text">
+    <string>Design Preferences</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+P</string>
+   </property>
+  </action>
+  <action name="actionLoad_input">
+   <property name="text">
+    <string>Load input</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_load_input">
+   <property name="text">
+    <string>Load input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionSave_input">
+   <property name="text">
+    <string>Save input</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
  </widget>
  <tabstops>
   <tabstop>comboConnLoc</tabstop>
@@ -4409,7 +4482,7 @@ QMenu::item:selected {
   <tabstop>txtFu</tabstop>
   <tabstop>txtFy</tabstop>
   <tabstop>txtShear</tabstop>
-  <tabstop>comboDaimeter</tabstop>
+  <tabstop>comboDiameter</tabstop>
   <tabstop>comboType</tabstop>
   <tabstop>comboGrade</tabstop>
   <tabstop>comboPlateThick_2</tabstop>
@@ -4493,7 +4566,7 @@ QMenu::item:selected {
   <tabstop>txtplate_ht</tabstop>
   <tabstop>txtplate_width</tabstop>
   <tabstop>txtboltgrpcapacity</tabstop>
-  <tabstop>txtWeldStrng_5</tabstop>
+  <tabstop>txtWeld_length</tabstop>
   <tabstop>txtShrCapacity_4</tabstop>
   <tabstop>txtEdgeDist_2</tabstop>
   <tabstop>txtPlateThick_2</tabstop>

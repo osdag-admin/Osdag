@@ -1,0 +1,27 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>images/image3487.png</file>
+    <file>images/colF2.png</file>
+    <file>images/colW3.png</file>
+    <file>images/colW1.png</file>
+    <file>images/colFlange.svg</file>
+    <file>images/colww.png</file>
+    <file>images/colFF.png</file>
+    <file>images/download1.png</file>
+    <file>images/beam2.jpg</file>
+    <file>images/favicon.png</file>
+    <file>images/rotate-ccw.png</file>
+    <file>images/rotate-cw.png</file>
+    <file>images/beam2.jpg</file>
+    <file>images/save.png</file>
+    <file>images/output.png</file>
+    <file>images/input.png</file>
+    <file>images/zoom_in_01.png</file>
+    <file>images/zoom_out_01.png</file>
+    <file>images/logo.jpg</file>
+    <file>images/beam.jpg</file>
+    <file>images/X-Y.png</file>
+    <file>images/Z-X.png</file>
+    <file>images/Z-Y.png</file>
+  </qresource>
+</RCC>

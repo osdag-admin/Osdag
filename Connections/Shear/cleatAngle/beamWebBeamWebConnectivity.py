@@ -10,148 +10,167 @@ Created on 11-May-2015
 '''
 
 import numpy
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-
 import copy
-from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
-from OCC.gp import gp_Pnt
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class BeamWebBeamWeb(object):
   
-    def __init__(self, column, beam, notch, angle, nutBoltArray):
+    def __init__(self, column, beam, notch, angle, nut_bolt_array,gap):
         self.column = column
         self.beam = beam
         self.notch = notch
         self.angle = angle
         self.angleLeft = copy.deepcopy(angle)
-        self.nutBoltArray = nutBoltArray
+        self.nut_bolt_array = nut_bolt_array
+        self.gap = gap
         self.columnModel = None
         self.beamModel = None
         self.angleModel = None
         self.angleLeftModel = None
-#         self.notchModel = None
         self.clearDist = 20.0  # This distance between edge of the column web/flange and beam cross section
         
     def create_3dmodel(self):
-        self.creatColumGeometry()
-        self.createBeamGeometry()
-        self.createAngleGeometry()
-        self.createNutBoltArray()
-#         self.createNotchGeometry()
-        
-        # Call for createModel
-        self.columnModel = self.column.createModel()
-        self.beamModel = self.beam.createModel()
-        self.angleModel = self.angle.createModel()
-        self.angleLeftModel = self.angleLeft.createModel()
-        self.nutboltArrayModels = self.nutBoltArray.createModel()
-#         self.notchModel = self.notch.createModel()
+        self.create_column_geometry()
+        self.create_beam_geometry()
+        self.create_angle_geometry()
+        self.create_nut_bolt_array()
+
+        # Call for create_model
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.angleModel = self.angle.create_model()
+        self.angleLeftModel = self.angleLeft.create_model()
+        self.nutboltArrayModels = self.nut_bolt_array.create_model()
+#         self.notchModel = self.notch.create_model()
 #         return self.beamModel
     
-#     def creatColumGeometry(self):
-#         columnOrigin = numpy.array([0, 0, 0])
-#         column_uDir = numpy.array([1.0, 0, 0])
+#     def create_column_geometry(self):
+#         column_origin = numpy.array([0, 0, 0])
+#         column_u_dir = numpy.array([1.0, 0, 0])
 #         wDir1 = numpy.array([0.0, 1.0, 0.0])
-#         self.column.place(columnOrigin, column_uDir, wDir1)
+#         self.column.place(column_origin, column_u_dir, wDir1)
 #         
-#     def createBeamGeometry(self):
+#     def create_beam_geometry(self):
 #         uDir = numpy.array([0, 1.0, 0])
 #         wDir = numpy.array([1.0, 0, 0.0])
 #         shiftOrigin = (self.column.D/2 - self.beam.D/2)
-#         origin2 = self.column.secOrigin + (-shiftOrigin) * self.column.vDir + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir) 
+#         origin2 = self.column.sec_origin + (-shiftOrigin) * self.column.vDir + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.gap * self.column.uDir)
 #         self.beam.place(origin2, uDir, wDir)
         
-    def creatColumGeometry(self):
-         
-        columnOrigin = numpy.array([0, 0, 0])
-        column_uDir = numpy.array([1.0, 0, 0])
+    def create_column_geometry(self):
+
+        column_origin = numpy.array([0, 0, 0])
+        column_u_dir = numpy.array([1.0, 0, 0])
         wDir1 = numpy.array([0.0, -1.0, 0.0])
-        self.column.place(columnOrigin, column_uDir, wDir1)
+        self.column.place(column_origin, column_u_dir, wDir1)
          
-    def createBeamGeometry(self):
-        beamOrigin = ((self.column.secOrigin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + ((self.column.t / 2 + 20) * self.column.uDir) + (self.column.length / 2 * (self.column.wDir))
+    def create_beam_geometry(self):
+        # beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) +\
+        #               ((self.column.t / 2 + 20) * self.column.uDir) + \
+        #               (self.column.length / 2 * (self.column.wDir))
+        beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + \
+                      ((self.column.t / 2 + self.gap) * self.column.uDir) + \
+                      (self.column.length / 2 * (self.column.wDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])
-        self.beam.place(beamOrigin, uDir, wDir)
+        self.beam.place(beam_origin, uDir, wDir)
         
 #     def createNotchGeometry(self):
-#         notchOrigin = (self.beam.secOrigin)*(self.beam.wDir)
+#         notchOrigin = (self.beam.sec_origin)*(self.beam.wDir)
 #         uDir = numpy.array([-1.0, 0.0, 0])
 #         wDir = numpy.array([0.0, 1.0, 0.0])
-#         self.notch.place(notchOrigin,uDir,wDir) 
-        
+#         self.notch.place(notchOrigin,uDir,wDir)
     
-    def createAngleGeometry(self):
-        angle0Origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.notch.height - self.angle.L) * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
-        uDir0 = numpy.array([1.0, 0.0, 0])
-        wDir0 = numpy.array([0.0, -1.0, 0])
-        self.angleLeft.place(angle0Origin, uDir0, wDir0)
-        
-        angle1Origin = (self.beam.secOrigin + (self.beam.D / 2.0 - self.notch.height) * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.clearDist * (-self.beam.wDir))
-        uDir1 = numpy.array([1.0, 0.0, 0])
-        wDir1 = numpy.array([0.0, 1.0, 0])
-        self.angle.place(angle1Origin, uDir1, wDir1) 
-        
+    def create_angle_geometry(self):
+        angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
+                         * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.gap
+                         * (-self.beam.wDir))
+        # (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5)
+        #  * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
+        #  self.gap * (-self.beam.wDir))
+        # uDir0 = numpy.array([1.0, 0.0, 0])
+        # wDir0 = numpy.array([0.0, -1.0, 0])
+        uDir0 = numpy.array([0, -1.0, 0])
+        wDir0 = numpy.array([0.0, 0, 1.0])
+        # uDir0 = numpy.array([0, 1.0, 0])
+        # wDir0 = numpy.array([0, 0, 1.0])
+        self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
-    def createNutBoltArray(self):
-        nutboltArrayOrigin = self.angleLeft.secOrigin 
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angleLeft.T * self.angleLeft.wDir  
-        nutboltArrayOrigin = nutboltArrayOrigin + self.angleLeft.A * self.angleLeft.uDir
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height)
+                         * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.gap
+                         * (-self.beam.wDir))
+        # uDir1 = numpy.array([1.0, 0.0, 0])
+        # wDir1 = numpy.array([0.0, 1.0, 0])
+        uDir1 = numpy.array([0, 1.0, 0])
+        wDir1 = numpy.array([0, 0, -1.0])
+        self.angle.place(angle1_origin, uDir1, wDir1)
+
+    def create_nut_bolt_array(self):
+        nut_bolt_array_origin = self.angleLeft.sec_origin
+        nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.uDir
+        nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.vDir
+
+        gauge_dir = self.angleLeft.vDir
+        pitch_dir = self.angleLeft.wDir
+        bolt_dir = -self.angleLeft.uDir
+
+        # c_nutbolt_array_origin = self.angle.sec_origin
+        # c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.uDir
+        # c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.wDir
+        #
+        # c_gauge_dir = self.angle.wDir
+        # c_pitch_dir = self.angle.vDir
+        # c_bolt_dir = -self.angle.uDir
+        c_nutbolt_array_origin = self.angle.sec_origin
+        c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.vDir
+        c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.uDir
+
+        c_gauge_dir = self.angle.uDir
+        c_pitch_dir = self.angle.wDir
+        c_bolt_dir = -self.angle.vDir
+
+        # c_nutbolt_array_origin1 = self.angleLeft.sec_origin
+        # c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.uDir
+        # c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.wDir
+        # c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + (self.angle.L * self.angle.vDir)
+        #
+        # c_gauge_dir1 = self.angle.wDir
+        # c_pitch_dir1 = self.angle.vDir
+        # c_bolt_dir1 = -self.angle.uDir
+        c_nutbolt_array_origin1 = self.angleLeft.sec_origin
+        c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.vDir
+        c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.uDir
+        c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + (self.angle.L * self.angle.wDir)
+
+        c_gauge_dir1 = self.angle.uDir
+        c_pitch_dir1 = self.angle.wDir
+        c_bolt_dir1 = -self.angle.vDir
         
-        gaugeDir = self.angleLeft.uDir
-        pitchDir = self.angleLeft.vDir
-        boltDir = -self.angleLeft.wDir
-        
-        cNutboltArrayOrigin = self.angle.secOrigin
-        cNutboltArrayOrigin = cNutboltArrayOrigin + self.angle.T * self.angle.uDir
-        cNutboltArrayOrigin = cNutboltArrayOrigin + self.angle.B * self.angle.wDir
-        
-        cguageDir = self.angle.wDir
-        cpitchDir = self.angle.vDir
-        cboltDir = -self.angle.uDir
-        
-        cNutboltArrayOrigin1 = self.angleLeft.secOrigin
-        cNutboltArrayOrigin1 = cNutboltArrayOrigin1 + self.angle.T * self.angle.uDir
-        cNutboltArrayOrigin1 = cNutboltArrayOrigin - (self.beam.t + self.angle.B) * self.angle.wDir
-        cNutboltArrayOrigin1 = cNutboltArrayOrigin1 + (self.angle.L * self.angle.vDir)
-        
-        cguageDir1 = self.angle.wDir
-        cpitchDir1 = self.angle.vDir
-        cboltDir1 = -self.angle.uDir
-        
-        
-        
-        self.nutBoltArray.place(nutboltArrayOrigin, -gaugeDir, pitchDir, boltDir, cNutboltArrayOrigin, -cguageDir, cpitchDir, cboltDir, cNutboltArrayOrigin1, cguageDir1, cpitchDir1, cboltDir1)
-    
-    
+        self.nut_bolt_array.place(nut_bolt_array_origin, -gauge_dir, pitch_dir, bolt_dir, c_nutbolt_array_origin, -c_gauge_dir, c_pitch_dir, c_bolt_dir,
+                                  c_nutbolt_array_origin1, c_gauge_dir1, c_pitch_dir1, c_bolt_dir1)
+
     def get_models(self):
         '''Returning 3D models
         '''
-        return [self.columnModel, self.beamModel
-                , self.angleModel] + self.nutBoltArray.getModels()
+        return [self.columnModel, self.beamModel, self.angleModel] + self.nut_bolt_array.get_model()
              
     def get_nutboltmodels(self):
         
-        return self.nutBoltArray.getModels()
-        # return self.nutBoltArray.getboltModels() 
+        return self.nut_bolt_array.get_models()
+        # return self.nut_bolt_array.getboltModels()
          
     def get_beamModel(self):
-        finalBeam = self.beamModel
-        nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[0:(len(nutBoltlist) // 2)]:
-            finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
-        return finalBeam
-    
-    
+        final_beam = self.beamModel
+        nut_bolt_list = self.nut_bolt_array.get_models()
+        for bolt in nut_bolt_list[0:(len(nut_bolt_list) // 2)]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
+        return final_beam
+
+
     def get_columnModel(self):
-        finalBeam = self.columnModel
-        nutBoltlist = self.nutBoltArray.getModels()
-        for bolt in nutBoltlist[:]:
-            finalBeam = BRepAlgoAPI_Cut(finalBeam, bolt).Shape()
-        return finalBeam
-    
-    
-    
-        
+        final_beam = self.columnModel
+        nut_bolt_list = self.nut_bolt_array.get_models()
+        for bolt in nut_bolt_list[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
+        return final_beam

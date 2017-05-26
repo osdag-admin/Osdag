@@ -1087,7 +1087,7 @@ def finConn(uiObj):
             logger.warning(" : Minimum recommended weld thickness for shop weld is 6mm")
     else:
         if weld_t < 8:
-            logger.warning(" : Minimum recemmended weld thickness for field weld is 8mm")
+            logger.warning(" : Minimum recommended weld thickness for field weld is 8mm")
 
 
     if  design_status == True:

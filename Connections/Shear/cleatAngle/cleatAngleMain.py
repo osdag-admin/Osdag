@@ -64,44 +64,44 @@ class DesignPreferences(QDialog):
         '''
         This routine is responsible for saving all design preferences selected by the user
         '''
-        designPref = {}
-        designPref["bolt"] = {}
-        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         #designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
-        designPref["weld"] = {}
+        self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
-        designPref["weld"]["typeof_weld"] = weldType
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
         if weldType == "Shop weld":
-            designPref["weld"]["safety_factor"] = float(1.25)
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
         else:
-            designPref["weld"]["safety_factor"] = float(1.5)
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
 
-        designPref["detailing"] = {}
+        self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
-        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
         if typeOfEdge == "a - Sheared or hand flame cut":
-            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
-            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            designPref["detailing"]["gap"] = int(20)
+            self.saved_designPref["detailing"]["gap"] = int(10)
         else:
-            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
-        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
-        designPref["design"] = {}
+        self.saved_designPref["design"] = {}
         self.ui.combo_design_method.setCurrentIndex(0)
-        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
+        self.saved_designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
 
         self.saved = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
-        return designPref
+        return self.saved_designPref
 
 
     def set_default_para(self):
@@ -128,7 +128,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
-        self.ui.combo_slipfactor.setCurrentIndex(8)
+        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
@@ -143,7 +143,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(20)
+        designPref["detailing"]["gap"] = int(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -893,6 +893,12 @@ class MainController(QMainWindow):
                 self.ui.beamSection_lbl.setText('Secondary beam *')
                 self.ui.columnSection_lbl.setText('Primary beam *')
                 self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(ui_obj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(ui_obj['Member']['ColumSection']))
@@ -1046,13 +1052,14 @@ class MainController(QMainWindow):
 
     def save_design(self, popup_summary):
 
-        self.call_3d_model("white_bg")
-
-        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-
-        self.display.ExportToImage(data)
-
-        self.display.FitAll()
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+            self.call_3d_model("white_bg")
+            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+            self.display.ExportToImage(data)
+            self.display.FitAll()
+        else:
+            pass
 
         fileName = os.path.join(self.folder, "images_html","Html_Report.html")
         fileName = str(fileName)
@@ -1491,7 +1498,7 @@ class MainController(QMainWindow):
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
         else:
-            design_pref = self.designPrefDialog.save_designPref_para()
+            design_pref = self.designPrefDialog.saved_designPref
         self.uiObj.update(design_pref)
 
         dictbeamdata = self.fetch_beam_param()

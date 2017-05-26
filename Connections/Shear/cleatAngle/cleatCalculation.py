@@ -751,16 +751,13 @@ def cleat_connection(ui_obj):
         edge_dist_b = (cleat_length - (no_row_b - 1) * pitch_b) / 2
         
 # ###########################################All the checks########################################################
-    #b_end_distance = cleat_legsize - (20 + min_edge_dist + gauge_b)
-    #b_end_distance = cleat_legsize_A - (20 + min_edge_dist + gauge_b)
+
     b_end_distance = cleat_legsize_A - (gap + min_edge_dist + gauge_b)
     if b_end_distance < min_edge_dist:  # is it neccessary to treat single and double line seperately?
         design_status = False
         logger.error(':Edge distance in the beam web is less than the minimum edge distance as per IS 800:2007[cl.10.2.4.2]')    
-        #logger.warning(':Minimum leg size of the cleat Angle required is %s mm' % (str(2 * min_edge_dist + 20 + gauge_b)))
         logger.warning(':Minimum leg size of the cleat Angle required is %s mm' % (str(2 * min_edge_dist + gap + gauge_b)))
         logger.info(':Increase the cleat leg size')  # change reference
-    #b_gauge = (2 * cleat_legsize_1 + beam_w_t) - 2 * (end_dist_c + gauge_c)
     b_gauge = (2 * cleat_legsize_B + beam_w_t) - 2 * (end_dist_c + gauge_c)
     connection = "column"
     if connectivity == "Beam-Beam":

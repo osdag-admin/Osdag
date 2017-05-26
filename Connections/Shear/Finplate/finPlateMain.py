@@ -162,7 +162,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        self.ui.combo_slipfactor.setCurrentIndex(8)
+        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
@@ -845,6 +845,12 @@ class MainController(QMainWindow):
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
                 self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionBeam_2.setText("Show SBeam")
+                self.ui.actionColumn_2.setText("Show PBeam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
@@ -1034,14 +1040,14 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
-
-        self.call_3DModel("white_bg")
-
-        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-
-        self.display.ExportToImage(data)
-
-        self.display.FitAll()
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+            self.call_3DModel("white_bg")
+            data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+            self.display.ExportToImage(data)
+            self.display.FitAll()
+        else:
+            pass
 
         fileName = os.path.join(self.folder, "images_html", "Html_Report.html")
         fileName = str(fileName)

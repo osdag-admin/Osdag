@@ -71,7 +71,8 @@ class cleatCommonData(object):
         self.cend_dist = ouput_obj['cleat']['end']
         self.col_L = 800
         self.beam_L = 350
-        self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        # self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        self.gap = input_obj["detailing"]["gap"]
         self.notch_L = (self.col_B / 2 - self.col_tw / 2) + 10
         self.notch_offset = (self.col_T + self.col_R1)
 

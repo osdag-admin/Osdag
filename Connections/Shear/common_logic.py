@@ -141,7 +141,7 @@ class CommonDesignLogic(object):
         sBeam_alpha = float(self.dictbeamdata["FlangeSlope"])
         sBeam_R1 = float(self.dictbeamdata["R1"])
         sBeam_R2 = float(self.dictbeamdata["R2"])
-        cleardist = float(self.uiObj['detailing']['gap'])
+        #cleardist = float(self.uiObj['detailing']['gap'])
 
         if self.connection == "cleatAngle":
             cleat_length = self.resultObj['cleat']['height']

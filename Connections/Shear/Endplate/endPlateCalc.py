@@ -189,6 +189,8 @@ def end_connection(ui_obj):
     mu_f = float(ui_obj["bolt"]["slip_factor"])
     dp_bolt_hole_type = str(ui_obj['bolt']['bolt_hole_type'])
     gamma_mw = float(ui_obj["weld"]["safety_factor"])
+    weld_type = ui_obj['weld']['typeof_weld']
+    print "weld type",weld_type
               
     end_plate_t = float(ui_obj['Plate']['Thickness (mm)'])
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
@@ -742,6 +744,14 @@ def end_connection(ui_obj):
     #             output_obj[k][key] = ""
 
 #     output_obj = {}
+
+    if weld_type == 'Shop weld':
+        if weld_t < 6:
+            logger.warning(" : Minimum recommended weld thickness for shop weld is 6mm")
+    else:
+        if weld_t < 8:
+            logger.warning(" : Minimum recommended weld thickness for field weld is 8mm")
+
     if output_obj['Bolt']['status'] is True:
 
         logger.info(": Overall endplate connection design is safe \n")

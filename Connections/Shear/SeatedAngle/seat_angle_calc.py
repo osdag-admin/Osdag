@@ -346,7 +346,8 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_fu = int(float(self.bolt_grade)) * 100
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
-        model.set_databaseconnection()
+        # TODO for test_calc and test_report, uncomment the below line
+        # model.set_databaseconnection()
         self.dict_beam_data = get_beamdata(self.beam_section)
         self.dict_column_data = get_columndata(self.column_section)
         self.dict_angle_data = get_angledata(self.angle_sec)

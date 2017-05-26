@@ -1042,7 +1042,7 @@ class MainController(QMainWindow):
         
     def save_design(self, popup_summary):
 
-        self.call_3DModel("white_bg")
+        self.call_3d_model("white_bg")
 
         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
 

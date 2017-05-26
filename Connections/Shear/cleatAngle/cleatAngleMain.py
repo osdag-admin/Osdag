@@ -317,7 +317,9 @@ class myDialog(QDialog):
         self.ui.setupUi(self)
         self.setWindowTitle("Capacity Details")
         self.mainController = parent
-        ui_obj = self.mainController.getuser_inputs()
+        ui_obj = self.mainController.alist[0]
+        #ui_obj = self.mainController.getuser_inputs()
+        print "ui_obj form capacity deatials",ui_obj
         x = cleat_connection(ui_obj)
 
         self.ui.shear_b.setText(str(x['Bolt']['shearcapacity']))
@@ -370,10 +372,10 @@ class MainController(QMainWindow):
         self.ui.btn_top.clicked.connect(lambda: self.callCleat2D_drawing("Top"))
         self.ui.btn_side.clicked.connect(lambda: self.callCleat2D_drawing("Side"))
 
-        self.ui.btn3D.clicked.connect(self.call_3d_model)
-        self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
-        self.ui.chkBxCol.clicked.connect(self.call_3d_column)
-        self.ui.checkBoxCleat.clicked.connect(self.call_3d_cleatangle)
+        self.ui.btn3D.clicked.connect(lambda:self.call_3d_model("gradient_bg"))
+        self.ui.chkBxBeam.clicked.connect(lambda:self.call_3d_beam("gradient_bg"))
+        self.ui.chkBxCol.clicked.connect(lambda:self.call_3d_column("gradient_bg"))
+        self.ui.checkBoxCleat.clicked.connect(lambda:self.call_3d_cleatangle("gradient_bg"))
 
         validator = QIntValidator()
         self.ui.txtFu.setValidator(validator)
@@ -410,10 +412,10 @@ class MainController(QMainWindow):
         self.ui.actionSave_Side_View.triggered.connect(lambda: self.callCleat2D_drawing("Side"))
         self.ui.actionSave_Top_View.triggered.connect(lambda: self.callCleat2D_drawing("Top"))
 
-        self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
-        self.ui.actionShow_column.triggered.connect(self.call_3d_column)
-        self.ui.actionShow_cleat_angle.triggered.connect(self.call_3d_cleatangle)
-        self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model(True))
+        self.ui.actionShow_beam.triggered.connect(lambda:self.call_3d_beam("gradient_bg"))
+        self.ui.actionShow_column.triggered.connect(lambda:self.call_3d_column("gradient_bg"))
+        self.ui.actionShow_cleat_angle.triggered.connect(lambda:self.call_3d_cleatangle("gradient_bg"))
+        self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # populate cleat section and secondary beam according to user input
@@ -1043,6 +1045,15 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
+
+        self.call_3d_model("white_bg")
+
+        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+
+        self.display.ExportToImage(data)
+
+        self.display.FitAll()
+
         fileName = os.path.join(self.folder, "images_html","Html_Report.html")
         fileName = str(fileName)
         self.commLogicObj.call_designReport(fileName, popup_summary)
@@ -1413,7 +1424,7 @@ class MainController(QMainWindow):
         return nut_dia[bolt_diameter]
 
 
-    def call_3d_model(self):
+    def call_3d_model(self,bgcolor):
         """
 
         :return:
@@ -1423,10 +1434,10 @@ class MainController(QMainWindow):
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.checkBoxCleat.setChecked(Qt.Unchecked)
-        self.commLogicObj.display_3DModel("Model")
+        self.commLogicObj.display_3DModel("Model",bgcolor)
 
 
-    def call_3d_beam(self):
+    def call_3d_beam(self,bgcolor):
         '''
         Creating and displaying 3D Beam
         '''
@@ -1437,11 +1448,11 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Beam")
+        self.commLogicObj.display_3DModel("Beam",bgcolor)
 
 
 
-    def call_3d_column(self):
+    def call_3d_column(self,bgcolor):
         """
 
         :return:
@@ -1452,10 +1463,10 @@ class MainController(QMainWindow):
             self.ui.checkBoxCleat.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("Column")
+        self.commLogicObj.display_3DModel("Column",bgcolor)
 
 
-    def call_3d_cleatangle(self):
+    def call_3d_cleatangle(self,bgcolor):
         '''Displaying FinPlate in 3D
         '''
         self.ui.checkBoxCleat.setChecked(Qt.Checked)
@@ -1464,7 +1475,7 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("cleatAngle")
+        self.commLogicObj.display_3DModel("cleatAngle",bgcolor)
 
 
     def designParameters(self):
@@ -1501,6 +1512,7 @@ class MainController(QMainWindow):
         if self.validate_inputs_on_design_button() is not True:
             return
         self.alist = self.designParameters()
+        print "uiobj=:",self.alist[0]
 
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()

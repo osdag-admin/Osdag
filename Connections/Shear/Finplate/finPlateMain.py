@@ -1034,8 +1034,8 @@ class MainController(QMainWindow):
         self.show_dialog()
 
     def save_design(self, popup_summary):
+
         self.call_3DModel("white_bg")
-        #self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
 

@@ -328,10 +328,10 @@ class MainController(QMainWindow):
         self.ui.btn_top.clicked.connect(lambda: self.callend2D_Drawing("Top"))
         self.ui.btn_side.clicked.connect(lambda: self.callend2D_Drawing("Side"))
 
-        self.ui.btn3D.clicked.connect(lambda: self.call_3d_model(True))
-        self.ui.chkBxBeam.clicked.connect(self.call_3d_beam)
-        self.ui.chkBxCol.clicked.connect(self.call_3d_column)
-        self.ui.chkBxEndplate.clicked.connect(self.call_3d_endplate)
+        self.ui.btn3D.clicked.connect(lambda: self.call_3d_model("gradient_bg"))
+        self.ui.chkBxBeam.clicked.connect(lambda:self.call_3d_beam("gradient_bg"))
+        self.ui.chkBxCol.clicked.connect(lambda:self.call_3d_column("gradient_bg"))
+        self.ui.chkBxEndplate.clicked.connect(lambda:self.call_3d_endplate("gradient_bg"))
 
         validator = QIntValidator()
         self.ui.txtFu.setValidator(validator)
@@ -372,10 +372,10 @@ class MainController(QMainWindow):
         self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
         self.ui.actionPan.triggered.connect(self.call_panning)
 
-        self.ui.actionShow_beam.triggered.connect(self.call_3d_beam)
-        self.ui.actionShow_column.triggered.connect(self.call_3d_column)
-        self.ui.actionShow_end_plate.triggered.connect(self.call_3d_endplate)
-        self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model(True))
+        self.ui.actionShow_beam.triggered.connect(lambda:self.call_3d_beam("gradient_bg"))
+        self.ui.actionShow_column.triggered.connect(lambda:self.call_3d_column("gradient_bg"))
+        self.ui.actionShow_end_plate.triggered.connect(lambda:self.call_3d_endplate("gradient_bg"))
+        self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # self.ui.combo_Beam.addItems(get_beamcombolist())
@@ -1041,6 +1041,15 @@ class MainController(QMainWindow):
             self.commLogicObj.call2D_Drawing(view, fname,  self.folder)
         
     def save_design(self, popup_summary):
+
+        self.call_3DModel("white_bg")
+
+        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+
+        self.display.ExportToImage(data)
+
+        self.display.FitAll()
+
         filename = os.path.join(self.folder, "images_html", "Html_Report.html")
         filename = str(filename)
         self.commLogicObj.call_designReport(filename, popup_summary)
@@ -1486,15 +1495,15 @@ class MainController(QMainWindow):
         return nut_dia[bolt_diameter]
 
     
-    def call_3d_model(self, flag):
+    def call_3d_model(self, bgcolor):
         self.ui.btn3D.setChecked(Qt.Checked)
         if self.ui.btn3D.isChecked():
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxEndplate.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
-        self.commLogicObj.display_3DModel("Model")
+        self.commLogicObj.display_3DModel("Model",bgcolor)
         
-    def call_3d_beam(self):
+    def call_3d_beam(self,bgcolor):
         '''
         Creating and displaying 3D Beam
         '''
@@ -1505,9 +1514,9 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Beam")
+        self.commLogicObj.display_3DModel("Beam",bgcolor)
 
-    def call_3d_column(self):
+    def call_3d_column(self,bgcolor):
         '''
         '''
         self.ui.chkBxCol.setChecked(Qt.Checked)
@@ -1516,9 +1525,9 @@ class MainController(QMainWindow):
             self.ui.chkBxEndplate.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("Column")
+        self.commLogicObj.display_3DModel("Column",bgcolor)
 
-    def call_3d_endplate(self):
+    def call_3d_endplate(self,bgcolor):
         '''Displaying EndPlate in 3D
         '''
         self.ui.chkBxEndplate.setChecked(Qt.Checked)
@@ -1528,7 +1537,7 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Plate")
+        self.commLogicObj.display_3DModel("Plate",bgcolor)
 
     def unchecked_all_checkbox(self):
 

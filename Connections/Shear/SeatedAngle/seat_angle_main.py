@@ -44,7 +44,6 @@ class DesignPreferences(QDialog):
         self.ui.tabWidget.removeTab(1)
         self.set_default_para()
         #int_validator = QIntValidator()
-        #self.ui.txt_boltHoleClearance.setValidator(int_validator)
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
@@ -61,7 +60,6 @@ class DesignPreferences(QDialog):
         """
         self.saved_designPref = {"bolt": {}}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        #self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -93,12 +91,6 @@ class DesignPreferences(QDialog):
 
         """
         uiObj = self.main_controller.getuser_inputs()
-        if str(uiObj["Bolt"]["Diameter (mm)"]) == 'Diameter of Bolt':
-            clearance = 0
-        else:
-            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-            clearance = str(self.get_clearance(boltDia))
-            #self.ui.txt_boltHoleClearance.setText(clearance)
         if uiObj["Bolt"]["Grade"] == '':
             pass
         else:
@@ -109,7 +101,6 @@ class DesignPreferences(QDialog):
         self.ui.combo_boltHoleType.setCurrentIndex(0)
         designPref = {"bolt": {}}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.ui.combo_slipfactor.setCurrentIndex(8)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -136,7 +127,6 @@ class DesignPreferences(QDialog):
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         if boltDia != "Diameter of Bolt":
             clearance = self.get_clearance(int(boltDia))
-            #self.ui.txt_boltHoleClearance.setText(str(clearance))
         else:
             pass
 
@@ -300,10 +290,14 @@ class MainController(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
-        self.ui.btn3D.clicked.connect(self.call_3DModel)
-        self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
-        self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
-        self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
+        #self.ui.btn3D.clicked.connect(self.call_3DModel)
+        self.ui.btn3D.clicked.connect(lambda:self.call_3DModel("gradient_bg"))
+        #self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
+        self.ui.chkBxBeam.clicked.connect(lambda:self.call_3DBeam("gradient_bg"))
+        #self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
+        self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
+        #self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
+        self.ui.chkBxSeatAngle.clicked.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
 
         validator = QIntValidator()
         self.ui.txt_fu.setValidator(validator)
@@ -344,10 +338,13 @@ class MainController(QMainWindow):
         self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 
         # Graphics menu
-        self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
-        self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
-        self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
-        self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel(True))
+        #self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
+        self.ui.actionBeam_2.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
+        #self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
+        self.ui.actionColumn_2.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
+        #self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
+        self.ui.actionSeatAngle_2.triggered.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
+        self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
         self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
 
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
@@ -761,6 +758,15 @@ class MainController(QMainWindow):
         design_report_dialog.show()
 
     def save_design(self, report_summary):
+
+        self.call_3DModel("white_bg")
+
+        data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+
+        self.display.ExportToImage(data)
+
+        self.display.FitAll()
+
         filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
         file_name = str(filename)
 
@@ -1091,7 +1097,7 @@ class MainController(QMainWindow):
         b = colorTup[2]
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-    def call_3DModel(self):
+    def call_3DModel(self,bgcolor):
         """
         This routine responsible for displaying 3D Cad model
         :param: boolean
@@ -1102,9 +1108,9 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.chkBxBeam.setChecked(Qt.Unchecked)
             self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
-        self.commLogicObj.display_3DModel("Model")
+        self.commLogicObj.display_3DModel("Model",bgcolor)
 
-    def call_3DBeam(self):
+    def call_3DBeam(self,bgcolor):
         """
         Creating and displaying 3D Beam
         """
@@ -1116,9 +1122,9 @@ class MainController(QMainWindow):
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
 
-        self.commLogicObj.display_3DModel("Beam")
+        self.commLogicObj.display_3DModel("Beam",bgcolor)
 
-    def call_3DColumn(self):
+    def call_3DColumn(self,bgcolor):
         """
         """
         self.display.EraseAll()
@@ -1128,9 +1134,9 @@ class MainController(QMainWindow):
             self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("Column")
+        self.commLogicObj.display_3DModel("Column",bgcolor)
 
-    def call_3DSeatAngle(self):
+    def call_3DSeatAngle(self,bgcolor):
         """Displaying Seat Angle in 3D
         """
         self.display.EraseAll()
@@ -1140,7 +1146,7 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setChecked(Qt.Unchecked)
             self.ui.btn3D.setChecked(Qt.Unchecked)
             self.ui.mytabWidget.setCurrentIndex(0)
-        self.commLogicObj.display_3DModel("SeatAngle")
+        self.commLogicObj.display_3DModel("SeatAngle", bgcolor)
 
     def unchecked_allChkBox(self):
 
@@ -1459,7 +1465,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName('Select Workspace Directory', "F:\Osdag_workspace")
-    workspace_folder_path = 'D:\Osdag_workspace\seated_angle'
+    workspace_folder_path = 'F:\Osdag_workspace\seated_angle'
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

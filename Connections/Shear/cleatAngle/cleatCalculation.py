@@ -184,6 +184,7 @@ def cleat_connection(ui_obj):
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
     bolt_HSFG_slip_factor = ui_obj["bolt"]["slip_factor"]
+    gap = ui_obj["detailing"]["gap"]
     # TODO: Danish to update design preferences in calculations
    
     cleat_length = str(ui_obj['cleat']['Height (mm)'])

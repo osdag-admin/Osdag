@@ -10,12 +10,13 @@ import math
 
 class ColWebBeamWeb(object):
     
-    def __init__(self,column,beam,angle,topclipangle,nutBoltArray):
+    def __init__(self,column,beam,angle,topclipangle,nutBoltArray,gap):
         self.column = column
         self.beam = beam
         self.angle = angle
         self.topclipangle = topclipangle
         self.nut_bolt_array = nutBoltArray
+        self.gap = gap
         self.columnModel = None
         self.beamModel = None
         self.angleModel= None
@@ -42,7 +43,8 @@ class ColWebBeamWeb(object):
         self.column.place(columnOrigin, column_uDir, wDir1)
                 
     def createBeamGeometry(self):
-        beamorigin = self.column.sec_origin + (self.column.t/2 * self.column.uDir) + (self.column.length/2 * self.column.wDir) + (self.clearDist * self.column.uDir)
+        beamorigin = self.column.sec_origin + (self.column.t/2 * self.column.uDir) + \
+                     (self.column.length/2 * self.column.wDir) + (self.gap * self.column.uDir)
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         self.beam.place(beamorigin, uDir, wDir)

@@ -41,13 +41,12 @@ class ConnectionCalculations(object):
         self.pitch = 1.0
 
     @staticmethod
-    def bolt_hole_clearance(bolt_hole_type, bolt_diameter, custom_hole_clearance):
+    def bolt_hole_clearance(bolt_hole_type, bolt_diameter):
         """Calculate bolt hole clearance.
 
         Args:
             bolt_hole_type (string)
-            bolt_diameter (int)
-            custom_hole_clearance (int)
+            bolt_diameter (int)            
 
         Returns:
             hole_clearance (int)
@@ -76,8 +75,7 @@ class ConnectionCalculations(object):
                 30: 8,
                 36: 8
             }[bolt_diameter]
-        if custom_hole_clearance is not None:
-            hole_clearance = custom_hole_clearance  # units: mm
+
         return hole_clearance  # units: mm
 
     @staticmethod

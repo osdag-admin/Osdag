@@ -175,21 +175,6 @@ background-color: #abc250 ;
       <property name="midLineWidth">
        <number>2</number>
       </property>
-      <item>
-       <property name="text">
-        <string> Design :</string>
-       </property>
-       <property name="toolTip">
-        <string/>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-      </item>
      </widget>
     </item>
     <item row="0" column="2">

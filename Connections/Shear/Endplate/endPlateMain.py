@@ -113,6 +113,7 @@ class DesignPreferences(QDialog):
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["gap"] = int(0)
         if typeOfEdge == "a - Sheared or hand flame cut":
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
@@ -165,7 +166,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(20)
+        designPref["detailing"]["gap"] = int(0)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -1555,7 +1556,7 @@ class MainController(QMainWindow):
         '''
         This routine returns the neccessary design parameters.
         '''
-        self.designPrefDialog.saved = False
+        #self.designPrefDialog.saved = False
         self.uiobj = self.getuser_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
@@ -1587,6 +1588,7 @@ class MainController(QMainWindow):
         if self.validate_inputs_on_design_button() is not True:
             return
         self.alist = self.designParameters()
+        print "################",self.alist[0]
 
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()

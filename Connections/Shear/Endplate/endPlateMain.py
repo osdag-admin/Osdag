@@ -117,11 +117,7 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        # if self.ui.txt_detailingGap.text() == '':
-        #
-        #     designPref["detailing"]["gap"] = int(20)
-        # else:
-        #     designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         designPref["design"] = {}
@@ -837,6 +833,12 @@ class MainController(QMainWindow):
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
                 self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiobj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiobj['Member']['ColumSection']))

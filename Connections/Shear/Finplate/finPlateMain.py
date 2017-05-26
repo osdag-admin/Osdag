@@ -845,6 +845,12 @@ class MainController(QMainWindow):
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
                 self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionBeam_2.setText("Show SBeam")
+                self.ui.actionColumn_2.setText("Show PBeam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))

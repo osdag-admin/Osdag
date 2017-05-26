@@ -88,7 +88,7 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            designPref["detailing"]["gap"] = int(20)
+            designPref["detailing"]["gap"] = int(10)
         else:
             designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
@@ -128,7 +128,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
-        self.ui.combo_slipfactor.setCurrentIndex(8)
+        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
@@ -143,7 +143,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(20)
+        designPref["detailing"]["gap"] = int(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -893,6 +893,12 @@ class MainController(QMainWindow):
                 self.ui.beamSection_lbl.setText('Secondary beam *')
                 self.ui.columnSection_lbl.setText('Primary beam *')
                 self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(ui_obj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(ui_obj['Member']['ColumSection']))

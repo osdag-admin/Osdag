@@ -56,8 +56,8 @@ def fin_min_h(beam_d):
 # [Source: Subramanian's book, page: 373]
 
 
-def fin_min_thk(shear_load, bolt_fy, web_plate_l):
-    min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l)
+def fin_min_thk(shear_load, beam_fy, web_plate_l):
+    min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
     return min_plate_thk;
 
 # PLATE THICKNESS: maximum thickness of fin plate
@@ -139,6 +139,7 @@ def finConn(uiObj):
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
+    weld_type = uiObj['weld']['typeof_weld']
 
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
@@ -392,7 +393,7 @@ def finConn(uiObj):
         
         # # Calculation of minimum plate thickness and maximum end/edge distance
         if web_plate_l != 0:
-            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l)
+            min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         elif web_plate_l == 0:
             min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
@@ -790,7 +791,7 @@ def finConn(uiObj):
     
     # # Weld design
     # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) [source: Subramanian's book]
-    weld_fu = 410;
+    weld_fu = 410; #TODO weld_fu should fetch from DP of Finplate
     weld_fy = 250;
     
 #     Effective length of the weld required (Note: Weld is assumed to be provided for full length of the plate)
@@ -836,7 +837,7 @@ def finConn(uiObj):
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
         logger.info(": Increase the weld thickness or length of weld/finplate")
-    
+
     
     # End of calculation
     # Output for user given fin plate height
@@ -1081,8 +1082,16 @@ def finConn(uiObj):
     #         design_status = False
 
 # Log message for safe/failed design
+    if weld_type == 'Shop weld':
+        if weld_t < 6:
+            logger.warning(" : Minimum recommended weld thickness for shop weld is 6mm")
+    else:
+        if weld_t < 8:
+            logger.warning(" : Minimum recemmended weld thickness for field weld is 8mm")
+
 
     if  design_status == True:
+
         logger.info(": Overall finplate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:

@@ -16,13 +16,14 @@ from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 class BeamWebBeamWeb(object):
   
-    def __init__(self, column, beam, notch, angle, nut_bolt_array):
+    def __init__(self, column, beam, notch, angle, nut_bolt_array,gap):
         self.column = column
         self.beam = beam
         self.notch = notch
         self.angle = angle
         self.angleLeft = copy.deepcopy(angle)
         self.nut_bolt_array = nut_bolt_array
+        self.gap = gap
         self.columnModel = None
         self.beamModel = None
         self.angleModel = None
@@ -65,7 +66,12 @@ class BeamWebBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
          
     def create_beam_geometry(self):
-        beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + ((self.column.t / 2 + 20) * self.column.uDir) + (self.column.length / 2 * (self.column.wDir))
+        # beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) +\
+        #               ((self.column.t / 2 + 20) * self.column.uDir) + \
+        #               (self.column.length / 2 * (self.column.wDir))
+        beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + \
+                      ((self.column.t / 2 + self.gap) * self.column.uDir) + \
+                      (self.column.length / 2 * (self.column.wDir))
         uDir = numpy.array([0.0, 1.0, 0])
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam.place(beam_origin, uDir, wDir)
@@ -78,7 +84,7 @@ class BeamWebBeamWeb(object):
     
     def create_angle_geometry(self):
         angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
-                         * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.clearDist
+                         * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.gap
                          * (-self.beam.wDir))
         # (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5)
         #  * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
@@ -92,7 +98,7 @@ class BeamWebBeamWeb(object):
         self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
         angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height)
-                         * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.clearDist
+                         * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.gap
                          * (-self.beam.wDir))
         # uDir1 = numpy.array([1.0, 0.0, 0])
         # wDir1 = numpy.array([0.0, 1.0, 0])

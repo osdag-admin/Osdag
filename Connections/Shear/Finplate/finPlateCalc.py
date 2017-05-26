@@ -1084,10 +1084,10 @@ def finConn(uiObj):
 # Log message for safe/failed design
     if weld_type == 'Shop weld':
         if weld_t < 6:
-            logger.warning(" : Minimum recommended weld thickness for shop weld is 6mm")
+            logger.warning(" : Minimum recommended weld thickness for shop weld is 6 mm")
     else:
         if weld_t < 8:
-            logger.warning(" : Minimum recommended weld thickness for field weld is 8mm")
+            logger.warning(" : Minimum recommended weld thickness for field weld is 8 mm")
 
 
     if  design_status == True:

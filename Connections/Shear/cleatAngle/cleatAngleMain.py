@@ -64,44 +64,44 @@ class DesignPreferences(QDialog):
         '''
         This routine is responsible for saving all design preferences selected by the user
         '''
-        designPref = {}
-        designPref["bolt"] = {}
-        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         #designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
-        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
-        designPref["weld"] = {}
+        self.saved_designPref["weld"] = {}
         weldType = str(self.ui.combo_weldType.currentText())
-        designPref["weld"]["typeof_weld"] = weldType
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
         if weldType == "Shop weld":
-            designPref["weld"]["safety_factor"] = float(1.25)
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
         else:
-            designPref["weld"]["safety_factor"] = float(1.5)
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
 
-        designPref["detailing"] = {}
+        self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
-        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
         if typeOfEdge == "a - Sheared or hand flame cut":
-            designPref["detailing"]["min_edgend_dist"] = float(1.7)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
-            designPref["detailing"]["min_edgend_dist"] = float(1.5)
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = int(10)
         else:
-            designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
-        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
-        designPref["design"] = {}
+        self.saved_designPref["design"] = {}
         self.ui.combo_design_method.setCurrentIndex(0)
-        designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
+        self.saved_designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
 
         self.saved = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
-        return designPref
+        return self.saved_designPref
 
 
     def set_default_para(self):
@@ -1492,7 +1492,7 @@ class MainController(QMainWindow):
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.set_default_para()
         else:
-            design_pref = self.designPrefDialog.save_designPref_para()
+            design_pref = self.designPrefDialog.saved_designPref
         self.uiObj.update(design_pref)
 
         dictbeamdata = self.fetch_beam_param()

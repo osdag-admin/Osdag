@@ -86,6 +86,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     typeof_edge = str(uiobj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiobj["detailing"]["min_edgend_dist"]))
     gap = str(float(uiobj["detailing"]["gap"]))
+    corrosive = str(uiobj["detailing"]["is_env_corrosive"])
 
     design_method = str(uiobj["design"]["design_method"])
 
@@ -694,7 +695,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Material Grade (MPa)", bolt_grade_fu]
+    row = [1, "Material Grade (MPa) (overwrite)", bolt_grade_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -730,12 +731,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    # TODO add yes or no option??
-    # row = [0, "Corrosive influences", " "]
-    # rstr += t('tr')
-    # rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    # rstr += t('td class="detail2"') + row[2] + t('/td')
-    # rstr += t('/tr')
+    row = [0, "Are members exposed to corrosive influences?", corrosive]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
 
     # --------------------------------      DESIGN      -----------------------------------------------------------------------------------------------
     row = [0, "Design ", " "]

@@ -322,15 +322,18 @@ class myDialog(QDialog):
         print "ui_obj form capacity deatials",ui_obj
         x = cleat_connection(ui_obj)
 
-        self.ui.shear_b.setText(str(x['Bolt']['shearcapacity']))
-        self.ui.bearing_b.setText(str(x['Bolt']['bearingcapacity']))
-        self.ui.capacity_b.setText(str(x['Bolt']['boltcapacity']))
-        self.ui.boltGrp_b.setText(str(x['Bolt']['boltgrpcapacity']))
-        # Column
+        # Column - Supporting member
         self.ui.shear.setText(str(x['cleat']['shearcapacity']))
         self.ui.bearing.setText(str(x['cleat']['bearingcapacity']))
         self.ui.capacity.setText(str(x['cleat']['boltcapacity']))
         self.ui.boltGrp.setText(str(x['cleat']['boltgrpcapacity']))
+
+        # Beam - Supported member
+        self.ui.shear_b.setText(str(x['Bolt']['shearcapacity']))
+        self.ui.bearing_b.setText(str(x['Bolt']['bearingcapacity']))
+        self.ui.capacity_b.setText(str(x['Bolt']['boltcapacity']))
+        self.ui.boltGrp_b.setText(str(x['Bolt']['boltgrpcapacity']))
+
         # Cleat
         self.ui.mDemand.setText(str(x['cleat']['externalmoment']))
         self.ui.mCapacity.setText(str(x['cleat']['momentcapacity']))

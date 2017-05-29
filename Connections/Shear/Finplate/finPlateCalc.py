@@ -71,12 +71,12 @@ def fin_max_thk(bolt_dia):
 # Function for block shear capacity calculation
 
 
-def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
+def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
     if numcol == 1:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * edge_dist
-        Atn = platethk * (edge_dist - 0.5 * dia_hole)
+        Avg = thk * ((numrow - 1) * pitch + end_dist)
+        Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        Atg = thk * edge_dist
+        Atn = thk * (edge_dist - 0.5 * dia_hole)
 
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
@@ -84,10 +84,10 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
 
     elif numcol == 2:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * (edge_dist + gauge)
-        Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        Avg = thk * ((numrow - 1) * pitch + end_dist)
+        Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        Atg = thk * (edge_dist + gauge)
+        Atn = thk * (edge_dist + gauge - 0.5 * dia_hole)
 
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
@@ -95,6 +95,10 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
 
     return Tdb
+
+### Check for shear yeilding###
+# def shear_yeilding_b(beam_w_t,h_o,beam_fy):
+#     V_p = ( beam_w_t * h_o ) / ( math.sqrt(3) * 1.10 )
 
 
 def fetchBeamPara(self):
@@ -143,14 +147,10 @@ def finConn(uiObj):
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
         web_plate_w  = 0
-    else:
-        web_plate_w = int(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
-    else:
-        web_plate_l = int(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
@@ -398,7 +398,7 @@ def finConn(uiObj):
             min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         elif web_plate_l == 0:
-            min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l_opt)
+            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         
         # Moment demand calculation for user defined plate height and width (1st case)
@@ -430,7 +430,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = web_plate_w - min_gauge - min_edge_dist
+                Ecc = web_plate_w - min_gauge - min_edge_dist        
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -512,7 +512,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = web_plate_w - min_edge_dist
-                M1 = shear_load * Ecc;
+                M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -546,7 +546,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = min_edge_dist + gap # 20
-                M1 = shear_load * Ecc;
+                M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -778,11 +778,11 @@ def finConn(uiObj):
         pass
                 
     # Block shear capacity of plate
-    
+    min_thk = min(web_plate_t,beam_w_t)
     Tdb = blockshear(boltParameters['numofrow'], boltParameters['numofcol'], boltParameters['dia_hole'], \
                      beam_fy, beam_fu, boltParameters['enddist'], \
                      boltParameters['enddist'], boltParameters['pitch'], \
-                     boltParameters['gauge'], web_plate_t) 
+                     boltParameters['gauge'], min_thk)
     if Tdb < shear_load:
         design_status = False
         logger.error(": The block shear capacity of the plate is lass than the applied shear force [cl. 6.4.1]")

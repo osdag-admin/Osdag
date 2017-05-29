@@ -54,17 +54,19 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
-            #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
-            b.H = float(b.T + self.gap)
+            bolt_len_required = float(b.T + self.gap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
     # Newly added
         for i in range(self.cRow * self.cCol):
-            b.H = float(b.T + self.cGap)
+            bolt_len_required = float(b.T + self.cGap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.cBolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.cNuts.append(Nut(n.R, n.T, n.H, n.r1))
         for i in range(self.cRow * self.cCol):
-            b.H = float(b.T + self.cGap)
+            bolt_len_required = float(b.T + self.cGap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.cBolts1.append(Bolt(b.R, b.T, b.H, b.r))
             self.cNuts1.append(Nut(n.R, n.T, n.H, n.r1))
         

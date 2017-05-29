@@ -408,12 +408,6 @@ class CommonDesignLogic(object):
         bolt_T = self.bolt_T
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
-        #bolt_len_required = float(bolt_T + 2*(cleat_thick) + beam_tw + nut_T)
-        #print  bolt_len_required
-        #if bolt_Ht < bolt_len_required:
-            #bolt_Ht = bolt_len_required + (5-bolt_len_required)% 5
-        #print bolt_Ht
-
         nut_Ht = 12.2  #
         gap = int(str(self.uiObj['detailing']['gap']))
 

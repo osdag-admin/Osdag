@@ -64,10 +64,8 @@ def fin_min_thk(shear_load, beam_fy, web_plate_l):
 # [Source: INSDAG detailing manual, page: 5-7]
 
 
-# def fin_max_thk(bolt_dia):
-def fin_max_thk(beam_d):
-    # max_plate_thk = 0.5 * bolt_dia
-    max_plate_thk = 0.5 * beam_d
+def fin_max_thk(bolt_dia):
+    max_plate_thk = 0.5 * bolt_dia
     return max_plate_thk
 
 # Function for block shear capacity calculation
@@ -145,10 +143,14 @@ def finConn(uiObj):
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
         web_plate_w  = 0
+    else:
+        web_plate_w = int(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
+    else:
+        web_plate_l = int(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
@@ -396,7 +398,7 @@ def finConn(uiObj):
             min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         elif web_plate_l == 0:
-            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
+            min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l_opt)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         
         # Moment demand calculation for user defined plate height and width (1st case)
@@ -428,7 +430,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = web_plate_w - min_gauge - min_edge_dist        
+                Ecc = web_plate_w - min_gauge - min_edge_dist
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -510,7 +512,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = web_plate_w - min_edge_dist
-                M1 = shear_load * Ecc; 
+                M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -544,7 +546,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = min_edge_dist + gap # 20
-                M1 = shear_load * Ecc; 
+                M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -736,7 +738,7 @@ def finConn(uiObj):
         elif web_plate_t > max_plate_thk:
             design_status = False
             logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
-            logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_thk)) 
+            logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
             logger.info(": Select a higher depth secondary beam section") 
     
     # Calculation of plate height required (for optional input) 

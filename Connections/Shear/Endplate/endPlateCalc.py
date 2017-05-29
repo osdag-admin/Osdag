@@ -196,10 +196,14 @@ def end_connection(ui_obj):
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
     if end_plate_w == '':
         end_plate_w = 0
+    else:
+        end_plate_w = float(end_plate_w)
         
     end_plate_l = str(ui_obj['Plate']['Height (mm)'])
     if end_plate_l == '':
         end_plate_l = 0
+    else:
+        end_plate_l = int(end_plate_l)
         
     web_plate_fu = float(ui_obj['Member']['fu (MPa)'])
     web_plate_fy = float(ui_obj['Member']['fy (MPa)'])

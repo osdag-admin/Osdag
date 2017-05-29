@@ -458,6 +458,9 @@ class MainController(QMainWindow):
                 indx = intg_section.index(str(col))
                 combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
+        duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+        for i in duplicate:
+            combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
 
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join( "ResourceFiles", "Osdag_header.png")))

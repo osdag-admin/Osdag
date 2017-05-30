@@ -1616,13 +1616,13 @@ class MainController(QMainWindow):
             if status is True:
                 self.callend2D_Drawing("All")
             else:
+                self.ui.btn3D.setEnabled(False)
                 self.ui.chkBxBeam.setEnabled(False)
                 self.ui.chkBxCol.setEnabled(False)
                 self.ui.chkBxEndplate.setEnabled(False)
-                self.ui.btn3D.setEnabled(False)
-                self.ui.actionShow_column.setEnabled(False)
-                self.ui.actionShow_beam.setEnabled(False)
                 self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
                 self.ui.actionShow_end_plate.setEnabled(False)
         else:
             pass

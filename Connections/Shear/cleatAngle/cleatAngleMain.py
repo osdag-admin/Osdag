@@ -419,7 +419,7 @@ class MainController(QMainWindow):
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # populate cleat section and secondary beam according to user input
-        self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fill_cleatsection_combo())
+        self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight))
@@ -819,8 +819,6 @@ class MainController(QMainWindow):
         '''
         Disables the all buttons in toolbar
         '''
-        # self.ui.menubar.setEnabled(False)
-        #self.ui.menuFile.setEnabled(False)
         self.ui.actionSave_input.setEnabled(False)
         self.ui.actionSave_log_message.setEnabled(False)
         self.ui.actionCreate_design_report.setEnabled(False)
@@ -830,8 +828,6 @@ class MainController(QMainWindow):
         self.ui.actionSave_Top_View.setEnabled(False)
         self.ui.actionSave_Side_View.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-        #self.ui.menuView.setEnabled(False)
-        #self.ui.menuEdit.setEnabled(False)
 
         self.ui.btn_capacity.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
@@ -1548,7 +1544,15 @@ class MainController(QMainWindow):
             if status is True:
                 self.callCleat2D_drawing("All")
             else:
-                pass
+                self.ui.btn3D.setEnabled(False)
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.checkBoxCleat.setEnabled(False)
+                self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_cleat_angle.setEnabled(False)
+
         else:
             pass
 

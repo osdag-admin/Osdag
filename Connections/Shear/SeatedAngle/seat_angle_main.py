@@ -267,9 +267,6 @@ class MainController(QMainWindow):
 
         self.get_columndata()
         self.get_beamdata()
-
-        #self.ui.combo_beam_section.addItems(get_beamcombolist())
-        #self.ui.combo_column_section.addItems(get_columncombolist())
         self.ui.combo_angle_section.addItems(get_anglecombolist())
         self.ui.combo_topangle_section.addItems(get_anglecombolist())
 
@@ -1261,7 +1258,14 @@ class MainController(QMainWindow):
             if status is True:
                 self.call_seatangle2D_Drawing("All")
             else:
-                pass
+                self.ui.btn3D.setEnabled(False)
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.chkBxSeatAngle.setEnabled(False)
+                self.ui.actionShow_All.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_seatAngle.setEnabled(False)
         else:
             pass
 

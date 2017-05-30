@@ -618,9 +618,9 @@ QMenu::item:selected {
     <addaction name="actionPan"/>
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
-    <addaction name="actionBeam_2"/>
-    <addaction name="actionColumn_2"/>
-    <addaction name="actionFinplate_2"/>
+    <addaction name="actionShow_beam"/>
+    <addaction name="actionShow_column"/>
+    <addaction name="actionShow_finplate"/>
     <addaction name="actionShow_all"/>
     <addaction name="separator"/>
     <addaction name="actionChange_background"/>
@@ -4484,7 +4484,7 @@ QMenu::item:selected {
     </font>
    </property>
   </action>
-  <action name="actionBeam_2">
+  <action name="actionShow_beam">
    <property name="text">
     <string>Show beam</string>
    </property>
@@ -4498,7 +4498,7 @@ QMenu::item:selected {
     <string>Alt+Shift+B</string>
    </property>
   </action>
-  <action name="actionColumn_2">
+  <action name="actionShow_column">
    <property name="text">
     <string>Show column</string>
    </property>
@@ -4511,7 +4511,7 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionFinplate_2">
+  <action name="actionShow_finplate">
    <property name="text">
     <string>Show finplate</string>
    </property>

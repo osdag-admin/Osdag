@@ -89,7 +89,9 @@ class CommonDesignLogic(object):
         self.bolt_R = bolt_R
         self.bolt_T = bolt_T
         self.bolt_Ht = bolt_Ht
+
         self.nut_T = nut_T
+
         self.display = display
         self.connection = connection
         self.resultObj = self.call_calculation()
@@ -411,9 +413,11 @@ class CommonDesignLogic(object):
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
+            #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
         elif self.connection == 'SeatedAngle':
             seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
                               R2=seatangle_r2)
+            #bolt_len_required = float(bolt_T + (seat_thick) + beam_tw + nut_T)
             topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
                                  R2=topangle_r2)
         else:

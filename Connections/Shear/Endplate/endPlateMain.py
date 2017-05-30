@@ -379,10 +379,10 @@ class MainController(QMainWindow):
         # self.ui.combo_Beam.addItems(get_beamcombolist())
         # self.ui.comboColSec.addItems(get_columncombolist())
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fill_plate_thick_combo())
+        self.ui.combo_Beam.currentIndexChanged[int].connect(self.fill_plate_thick_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
-        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(lambda: self.populate_weld_thick_combo())
+        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populate_weld_thick_combo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
@@ -1616,7 +1616,14 @@ class MainController(QMainWindow):
             if status is True:
                 self.callend2D_Drawing("All")
             else:
-                pass
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.chkBxEndplate.setEnabled(False)
+                self.ui.btn3D.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_end_plate.setEnabled(False)
         else:
             pass
         self.designPrefDialog.saved = False

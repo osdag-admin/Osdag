@@ -420,12 +420,12 @@ class MainController(QMainWindow):
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo)
+        self.ui.combo_Beam.currentIndexChanged[int].connect(self.fillPlateThickCombo)
+
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
-        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
-            lambda: self.populateWeldThickCombo)
+        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populateWeldThickCombo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
@@ -1619,7 +1619,13 @@ class MainController(QMainWindow):
             if status is True:
                 self.callFin2D_Drawing("All")
             else:
-                pass
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.chkBxFinplate.setEnabled(False)
+                self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_finplate.setEnabled(False)
         else:
             pass
         self.designPrefDialog.saved = False

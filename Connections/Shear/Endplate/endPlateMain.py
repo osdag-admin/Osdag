@@ -1653,15 +1653,6 @@ class MainController(QMainWindow):
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
-        
-    # def create_2d_cad(self, connectivity):
-    #     ''' Returns the fuse model of endplate
-    #     '''
-    #     cadlist = self.connectivity.get_models()
-    #     final_model = cadlist[0]
-    #     for model in cadlist[1:]:
-    #         final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-    #     return final_model
 
     # Export to IGS,STEP,STL,BREP
     def save_3d_cad_images(self):

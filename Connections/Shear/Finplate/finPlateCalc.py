@@ -96,9 +96,19 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
 
     return Tdb
 
-### Check for shear yeilding###
-# def shear_yeilding_b(beam_w_t,h_o,beam_fy):
-#     V_p = ( beam_w_t * h_o ) / ( math.sqrt(3) * 1.10 )
+### Check for shear yeilding ###
+
+def shear_yeilding_b(A_v, beam_fy):
+    V_p = ( 0.6 * A_v * beam_fy ) / ( math.sqrt(3) * 1.10 * 1000 ) # kN
+    return V_p
+
+### Check for shear rupture ###
+
+def shear_rupture_b(A_vn, beam_fu ):
+    R_n = (0.6 * beam_fu * A_vn) / 1000  #kN
+    return R_n
+
+
 
 
 def fetchBeamPara(self):
@@ -790,7 +800,32 @@ def finConn(uiObj):
         logger.info(": Increase the plate thickness")
         
     ##################################################################################
-    
+    ### Shear yeilding check ###
+
+    h_0 = beam_d - beam_f_t - beam_R1
+    A_v = h_0 * beam_w_t  ## shear area of secondry beam
+    V_d = shear_yeilding_b(A_v, beam_fy)
+    if connectivity == "Beam-Beam":
+        if V_d < shear_load:
+            design_status = False
+            logger.error(": The secondry beam fails in shear yeilding [cl. 8.4.1]/ AISC design manual")
+            logger.warning(": Minimum shear yeilding capacity required is %2.2f kN" % (shear_load))
+            logger.info(": Use a higher section for secondry beam")
+
+    #### Check for shear rupture ###
+
+    A_vn = beam_w_t * (h_0 - (boltParameters['numofbolts'] * boltParameters['dia_hole']))
+    if A_vn <=  ((beam_fy / beam_fu)*(1.25 / 1.10)*(A_v / 0.9)):
+        A_vn =  ((beam_fy / beam_fu)*(1.25 / 1.10)*(A_v / 0.9))
+    R_n = shear_rupture_b(A_vn, beam_fu)
+    if connectivity == "Beam-Beam":
+        if R_n < shear_load:
+            design_status = False
+            logger.error(": The capacity of secondry beam in shear rupture is less than the applied shear force AISC design manual/[cl.8.4.1.1]")
+            logger.warning(": Minimum shear rupture capacity required is %2.2f kN" % (shear_load))
+            logger.info(" : Use a higher section for secondry beam")
+
+
     # # Weld design
     # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) [source: Subramanian's book]
     weld_fu = 410; #TODO weld_fu should fetch from DP of Finplate

@@ -55,6 +55,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
         root_clearance_sa (int): clearance of first bolt from the root of seated angle
         root_clearance_col (int): clearance of first bolt from the root of supporting column
+        clear_col_space (int): for CWBF, clear space between the column flanges
         type_of_edge (string)
         is_environ_corrosive (string): "Yes" if members are under corrosive influences (used for max edge distance)
         design_method (string)
@@ -158,6 +159,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.min_edge_multiplier = 1
         self.root_clearance_sa = 0
         self.root_clearance_col = 0
+        self.clear_col_space = 0
         self.type_of_edge = "b - Machine flame cut"
         self.is_environ_corrosive = "No"
         self.design_method = "Limit State Design"
@@ -450,7 +452,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.calculate_kb()
 
         # Bolt capacity
-        if self.is_hsfg == False:
+        if self.is_hsfg is False:
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter=self.bolt_diameter,
                                                                          number_of_bolts=1, bolt_fu=self.bolt_fu)
             self.bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter=self.bolt_diameter,
@@ -725,10 +727,10 @@ class SeatAngleCalculation(ConnectionCalculations):
             use appropriate moment capacity equation
         """
 
-        if b1 > 0.1 :
+        if b1 > 0.1:
             self.moment_at_root_angle = round(float(self.shear_force) * (b2 / b1) * (b2 / 2), 1)
 
-        if self.shear_force * self.shear_force < 1  or b2 == 0 or b1 < 0.1 or self.moment_at_root_angle < 0:
+        if self.shear_force * self.shear_force < 1 or b2 == 0 or b1 < 0.1 or self.moment_at_root_angle < 0:
             self.safe = False
             logger.warning(": The calculated moment demand on the angle leg is %s " % self.moment_at_root_angle)
             logger.debug(": The algorithm used to calculate this moment could give erroneous values due to one or " +
@@ -738,7 +740,6 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.debug(": c) Large beam section and low value of shear force")
             logger.debug(": Please verify the results manually ")
             self.moment_at_root_angle = 0.0
-
 
         """
         Assumption

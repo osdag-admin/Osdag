@@ -4,14 +4,14 @@ Created on 07-Jun-2015
 @author: deepa
 '''
 import numpy
-from CAD_bolt import Bolt
-from CAD_nut import Nut
+from Connections.Component.bolt import Bolt
+from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from CAD_ModelUtils import getGpPt
 
 class NutBoltArray():
-    #def __init__(self,boltPlaceObj,nut,bolt,gap,bgap):
-    def __init__(self,boltPlaceObj,nut,bolt,sgap, sbgap,tgap,tbgap):
+    #def __init__(self,boltPlaceObj,nut,bolt,sgap, sbgap,tgap,tbgap):
+    def __init__(self,boltPlaceObj,nut,bolt,snut_space, sbnut_space,tnut_space,tbnut_space):
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
@@ -36,12 +36,10 @@ class NutBoltArray():
         
         self.bolt = bolt
         self.nut = nut
-        # self.gap = gap
-        # self.bgap = bgap
-        self.sgap = sgap
-        self.sbgap = sbgap
-        self.tgap = tgap
-        self.tbgap = tbgap
+        self.sgap = snut_space
+        self.sbgap = sbnut_space
+        self.tgap = tnut_space
+        self.tbgap = tbnut_space
          
         self.bolts = []
         self.nuts = []
@@ -65,18 +63,26 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
+            bolt_len_required = float(b.T + self.sgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T,n.H, n.r1))
         
         for i in range(self.brow * self.bcol):
+            bolt_len_required = float(b.T + self.sbgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.bnuts.append(Nut(n.R, n.T,n.H, n.r1))
             
         for i in range(self.topcliprow * self.topclipcol):
+            bolt_len_required= float(b.T + self.tgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.topclipbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.topclipnuts.append(Nut(n.R, n.T,n.H, n.r1))
         
         for i in range(self.topclipbrow * self.topclipbcol):
+            bolt_len_required = float(b.T + self.tbgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.topclipbbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.topclipbnuts.append(Nut(n.R, n.T,n.H, n.r1))
         
@@ -175,7 +181,7 @@ class NutBoltArray():
         self.topclippitchDir = topclippitchDir
         self.topclipboltDir = topclipboltDir
         self.calculatetopclipPositions()
-        
+
         # for index, pos in enumerate (self.topclippositions):
         #     self.topclipbolts[index].place(pos, topclipgaugeDir, topclipboltDir)
         #     self.topclipnuts[index].place((pos + self.bgap * topclipboltDir), topclipgaugeDir, -topclipboltDir)
@@ -207,38 +213,39 @@ class NutBoltArray():
             self.topclipbnuts[index].place((pos + self.tbgap * topclipbboltDir), topclipbgaugeDir, -topclipbboltDir)
 
     def createModel(self):
+
         for bolt in self.bolts:
-            self.models.append(bolt.createModel())        
-        
+            self.models.append(bolt.create_model())
+
         for nut in self.nuts:
-            self.models.append(nut.createModel())
+            self.models.append(nut.create_model())
             
         dbg = self.dbgSphere(self.origin)
         self.models.append(dbg)
         
         for bolt in self.bbolts:
-            self.models.append(bolt.createModel())        
-        
+            self.models.append(bolt.create_model())
+
         for nut in self.bnuts:
-            self.models.append(nut.createModel())
+            self.models.append(nut.create_model())
             
         dbg = self.dbgSphere(self.borigin)
         self.models.append(dbg)
         
         for bolt in self.topclipbolts:
-            self.models.append(bolt.createModel())        
+            self.models.append(bolt.create_model())
         
         for nut in self.topclipnuts:
-            self.models.append(nut.createModel())
+            self.models.append(nut.create_model())
             
         dbg = self.dbgSphere(self.topcliporigin)
         self.models.append(dbg)
         
         for bolt in self.topclipbbolts:
-            self.models.append(bolt.createModel())        
+            self.models.append(bolt.create_model())
         
         for nut in self.topclipbnuts:
-            self.models.append(nut.createModel())
+            self.models.append(nut.create_model())
             
         dbg = self.dbgSphere(self.topclipborigin)
         self.models.append(dbg)
@@ -246,17 +253,17 @@ class NutBoltArray():
     def get_beam_bolts(self):
         boltlist = []
         for bolt in self.bbolts:
-            boltlist.append(bolt.createModel())
+            boltlist.append(bolt.create_model())
         for bolt in self.topclipbolts:
-            boltlist.append(bolt.createModel())
+            boltlist.append(bolt.create_model())
         return boltlist
     
     def get_column_bolts(self):
         boltlist = []
         for bolt in self.bolts:
-            boltlist.append(bolt.createModel())
+            boltlist.append(bolt.create_model())
         for bolt in self.topclipbbolts:
-            boltlist.append(bolt.createModel())
+            boltlist.append(bolt.create_model())
         return boltlist
         
     def dbgSphere(self, pt):

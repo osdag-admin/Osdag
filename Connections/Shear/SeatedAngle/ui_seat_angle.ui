@@ -644,9 +644,9 @@ QMenu::item:selected {
     <addaction name="actionPan"/>
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
-    <addaction name="actionBeam_2"/>
-    <addaction name="actionColumn_2"/>
-    <addaction name="actionSeatAngle_2"/>
+    <addaction name="actionShow_beam"/>
+    <addaction name="actionShow_column"/>
+    <addaction name="actionShow_seatAngle"/>
     <addaction name="actionShow_All"/>
     <addaction name="separator"/>
     <addaction name="actionChange_Background"/>
@@ -4183,7 +4183,7 @@ QMenu::item:selected {
     <string>Rotate 3D model</string>
    </property>
   </action>
-  <action name="actionBeam_2">
+  <action name="actionShow_beam">
    <property name="text">
     <string>Show beam</string>
    </property>
@@ -4191,7 +4191,7 @@ QMenu::item:selected {
     <string>Alt+Shift+B</string>
    </property>
   </action>
-  <action name="actionColumn_2">
+  <action name="actionShow_column">
    <property name="text">
     <string>Show column</string>
    </property>
@@ -4199,7 +4199,7 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionSeatAngle_2">
+  <action name="actionShow_seatAngle">
    <property name="text">
     <string>Show seat angle</string>
    </property>

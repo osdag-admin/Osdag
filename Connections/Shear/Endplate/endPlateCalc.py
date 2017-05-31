@@ -145,12 +145,12 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
 
 # #################### Block shear capacity of plates/members ##########################333
 
-def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
+def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
     if numcol == 1:
-        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        area_tension_gross = platethk * edge_dist
-        area_tension_net = platethk * (edge_dist - 0.5 * dia_hole)
+        area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_tension_gross = thk * edge_dist
+        area_tension_net = thk * (edge_dist - 0.5 * dia_hole)
         
         Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
         Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_tension_gross * fy / 1.1)
@@ -158,10 +158,10 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
         
     elif numcol == 2:
-        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        area_tension_gross = platethk * (edge_dist + gauge)
-        area_tension_net = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_tension_gross = thk * (edge_dist + gauge)
+        area_tension_net = thk * (edge_dist + gauge - 0.5 * dia_hole)
         
         Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
         Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_tension_gross * fy / 1.1)
@@ -631,8 +631,8 @@ def end_connection(ui_obj):
         logger.info(": Increase the end plate height if given else increase the beam section")
 
 # ################ CHECK 3: BLOCK SHEAR ####################
-
-    Tdb = blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, end_plate_t)
+    min_thk = min(end_plate_t,beam_w_t)
+    Tdb = blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, min_thk)
 
     if Tdb < shear_load:
         design_check = False

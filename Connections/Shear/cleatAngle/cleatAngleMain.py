@@ -67,7 +67,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        #designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        # designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -126,7 +126,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
+        # designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -422,7 +422,7 @@ class MainController(QMainWindow):
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
         # populate cleat section and secondary beam according to user input
-        self.ui.comboColSec.currentIndexChanged[int].connect(lambda: self.fill_cleatsection_combo())
+        self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight))
@@ -498,6 +498,9 @@ class MainController(QMainWindow):
             if col in intg_section:
                 indx = intg_section.index(str(col))
                 combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+        duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+        for i in duplicate:
+            combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
 
 
     def osdag_header(self):
@@ -819,8 +822,6 @@ class MainController(QMainWindow):
         '''
         Disables the all buttons in toolbar
         '''
-        # self.ui.menubar.setEnabled(False)
-        #self.ui.menuFile.setEnabled(False)
         self.ui.actionSave_input.setEnabled(False)
         self.ui.actionSave_log_message.setEnabled(False)
         self.ui.actionCreate_design_report.setEnabled(False)
@@ -830,8 +831,6 @@ class MainController(QMainWindow):
         self.ui.actionSave_Top_View.setEnabled(False)
         self.ui.actionSave_Side_View.setEnabled(False)
         self.ui.menuGraphics.setEnabled(False)
-        #self.ui.menuView.setEnabled(False)
-        #self.ui.menuEdit.setEnabled(False)
 
         self.ui.btn_capacity.setEnabled(False)
         self.ui.btn_SaveMessages.setEnabled(False)
@@ -1548,7 +1547,15 @@ class MainController(QMainWindow):
             if status is True:
                 self.callCleat2D_drawing("All")
             else:
-                pass
+                self.ui.btn3D.setEnabled(False)
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.checkBoxCleat.setEnabled(False)
+                self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_cleat_angle.setEnabled(False)
+
         else:
             pass
 

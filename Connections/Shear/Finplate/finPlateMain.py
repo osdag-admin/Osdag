@@ -413,19 +413,19 @@ class MainController(QMainWindow):
         self.ui.action_save_input.triggered.connect(self.saveDesign_inputs)
         self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
         # graphics
-        self.ui.actionBeam_2.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
-        self.ui.actionColumn_2.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
-        self.ui.actionFinplate_2.triggered.connect(lambda:self.call_3DFinplate("gradient_bg"))
+        self.ui.actionShow_beam.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
+        self.ui.actionShow_column.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
+        self.ui.actionShow_finplate.triggered.connect(lambda:self.call_3DFinplate("gradient_bg"))
         self.ui.actionShow_all.triggered.connect(lambda:self.call_3DModel("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.showColorDialog)
         # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(lambda: self.fillPlateThickCombo)
+        self.ui.combo_Beam.currentIndexChanged[int].connect(self.fillPlateThickCombo)
+
 
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkBeam_B)
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.checkBeam_B)
-        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(
-            lambda: self.populateWeldThickCombo)
+        self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populateWeldThickCombo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
@@ -1619,7 +1619,14 @@ class MainController(QMainWindow):
             if status is True:
                 self.callFin2D_Drawing("All")
             else:
-                pass
+                self.ui.btn3D.setEnabled(False)
+                self.ui.chkBxBeam.setEnabled(False)
+                self.ui.chkBxCol.setEnabled(False)
+                self.ui.chkBxFinplate.setEnabled(False)
+                self.ui.actionShow_all.setEnabled(False)
+                self.ui.actionShow_beam.setEnabled(False)
+                self.ui.actionShow_column.setEnabled(False)
+                self.ui.actionShow_finplate.setEnabled(False)
         else:
             pass
         self.designPrefDialog.saved = False

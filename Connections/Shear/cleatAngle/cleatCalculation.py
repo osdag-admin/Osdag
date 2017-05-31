@@ -143,13 +143,13 @@ def column_critical_shear(load, eccentricity, pitch, gauge, bolts_one_line, c_ed
 # Block shear capacity of plates/members
 
 
-def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
+def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
     Tdb = 0.0
     if numcol == 1:
-        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        area_shear_gross = platethk * edge_dist
-        area_tension_net = platethk * (edge_dist - 0.5 * dia_hole)
+        area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_shear_gross = thk * edge_dist
+        area_tension_net = thk * (edge_dist - 0.5 * dia_hole)
         
         Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
         Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_shear_gross * fy / 1.1)
@@ -157,17 +157,29 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
         
     elif numcol == 2:
-        area_shear_gross = platethk * ((numrow - 1) * pitch + end_dist)
-        area_shear_net = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        area_shear_gross = platethk * (edge_dist + gauge)
-        area_tension_net = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
+        area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        area_shear_gross = thk * (edge_dist + gauge)
+        area_tension_net = thk * (edge_dist + gauge - 0.5 * dia_hole)
         
         Tdb1 = (area_shear_gross * fy / (math.sqrt(3) * 1.1) + 0.9 * area_tension_net * fu / 1.25)
         Tdb2 = (0.9 * area_shear_net * fu / (math.sqrt(3) * 1.25) + area_shear_gross * fy / 1.1)
         Tdb = min(Tdb1, Tdb2)
         Tdb = round(Tdb / 1000, 3)
         
-    return Tdb  
+    return Tdb
+
+#### Check for shear yeilding ####
+
+def shear_yeilding_b(A_v, beam_fy):
+    V_p = (0.6 * A_v * beam_fy) / (math.sqrt(3) * 1.10 * 1000)  # kN
+    return V_p
+
+### Check for shear rupture ###
+
+def shear_rupture_b(A_vn, beam_fu):
+    R_n = (0.6* beam_fu * A_vn) / 1000 # kN
+    return R_n
 
 
 def cleat_connection(ui_obj):
@@ -193,6 +205,9 @@ def cleat_connection(ui_obj):
     cleat_length = str(ui_obj['cleat']['Height (mm)'])
     if cleat_length == '':
         cleat_length = 0
+    else:
+        cleat_length = int(cleat_length)
+
     cleat_fu = float(ui_obj['Member']['fu (MPa)'])
     cleat_fy = float(ui_obj['Member']['fy (MPa)'])
     cleat_sec = ui_obj['cleat']['section']
@@ -799,6 +814,10 @@ def cleat_connection(ui_obj):
         logger.info(':Decrease the cleat leg size')
         
     # block shear
+    
+    min_thk_b = min(beam_w_t, cleat_thk)
+    min_thk_c = min(column_w_t, cleat_thk)
+
     Tdb_B = blockshear(no_row_b, no_col_b, dia_hole, beam_fy, beam_fu, end_dist_b, edge_dist_b, pitch_b, gauge_b, cleat_thk)
     Tdb_C = blockshear(no_row_c, no_col_c, dia_hole, beam_fy, beam_fu, end_dist_c, edge_dist_c, pitch_c, gauge_c, cleat_thk)  
     
@@ -822,6 +841,34 @@ def cleat_connection(ui_obj):
         design_status = False
         logger.error(":Moment capacity of the cleat angle leg  is less than the moment demand [cl. 8.2.1.2]")
         logger.info(":Re-design with increased plate dimensions")
+
+
+
+    ##### Shear yeild check #####
+
+    h_0 = beam_d - beam_f_t - beam_R1
+    A_v = h_0 * beam_w_t # shear area of secondry beam
+    V_d = shear_yeilding_b(A_v, beam_fy)
+    if connectivity == "Beam-Beam":
+        if V_d < shear_load:
+            design_status = False
+            logger.error(": The secondry beam fails in shear yeilding [cl. 8.4.1]/ AISC design manual")
+            logger.warning(": Minimum shear yeilding capacity required is %2.2f kN" % (shear_load))
+            logger.info(": Use a higher section for secondry beam")
+
+    ### Check for shear rupture ##
+
+    A_vn = beam_w_t * (h_0 - (bolts_required * dia_hole))
+    if A_vn <= ((beam_fy / beam_fu) * (1.25 / 1.10) * (A_v / 0.9)):
+        A_vn = ((beam_fy / beam_fu) * (1.25 / 1.10) * (A_v / 0.9))
+    R_n = shear_rupture_b(A_vn, beam_fu)
+    if connectivity == "Beam-Beam":
+        if R_n < shear_load:
+            design_status = False
+            logger.error(": The capacity of secondry beam in shear rupture is less than the applied shear force AISC design manual/[cl.8.4.1.1]")
+            logger.warning(": Minimum shear rupture capacity required is %2.2f kN" % (shear_load))
+            logger.info(" : Use a higher section for secondry beam")
+
     # ########################feeding output to array ###############
     output_obj ={}
     output_obj['Bolt'] = {}

@@ -53,7 +53,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    # FinPlate Main Data
+    # CleatAngle Main Data
     beam_sec = str(uiobj['Member']['BeamSection'])
     column_sec = str(uiobj['Member']['ColumSection'])
     connectivity = str(uiobj['Member']['Connectivity'])
@@ -78,7 +78,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     cleat_sec = str(uiobj['cleat']['section'])
 
     # Design Preferences
-    bolt_hole_clrnce = str(float(uiobj["bolt"]["bolt_hole_clrnce"]))
+    # bolt_hole_clrnce = str(float(uiobj["bolt"]["bolt_hole_clrnce"]))
     bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
     bolt_grade_fu = str(float(uiobj["bolt"]["bolt_fu"]))
     slip_factor = str(float(uiobj["bolt"]["slip_factor"]))
@@ -689,11 +689,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
 
     row = [1, "Material Grade (MPa) (overwrite)", bolt_grade_fu]
     rstr += t('tr')

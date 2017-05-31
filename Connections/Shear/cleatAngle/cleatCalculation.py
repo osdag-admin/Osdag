@@ -185,7 +185,10 @@ def cleat_connection(ui_obj):
     bolt_grade = float(ui_obj['Bolt']['Grade'])
     bolt_HSFG_slip_factor = ui_obj["bolt"]["slip_factor"]
     gap = ui_obj["detailing"]["gap"]
-    # TODO: Danish to update design preferences in calculations
+
+    mu_f = float(ui_obj["bolt"]["slip_factor"])
+    dp_bolt_hole_type =  ui_obj["bolt"]["bolt_hole_type"]
+
    
     cleat_length = str(ui_obj['cleat']['Height (mm)'])
     if cleat_length == '':
@@ -252,7 +255,7 @@ def cleat_connection(ui_obj):
         max_leg_size = int((avbl_space - beam_w_t) / 10) * 5
         if avbl_space < required_space:
             design_status = False
-            logger.error(':Column cannot accommodate the given cleat agle due to space restriction  ')
+            logger.error(':Column cannot accommodate the given cleat angle due to space restriction  ')
             logger.warning(':Cleat legsize of the cleat angle should be less than or equal to %2.2f mm' % (max_leg_size))
             logger.info(':Decrease the cleat legsize')
         
@@ -263,7 +266,7 @@ def cleat_connection(ui_obj):
         max_leg_size = int((avbl_space - beam_w_t) / 10) * 5
         if avbl_space < required_space:
             design_status = False
-            logger.error(':Column cannot accommodate the given cleat agle due to space restriction')
+            logger.error(':Column cannot accommodate the given cleat angle due to space restriction')
             logger.warning(':Cleat legsize of the cleat angle should be less than or equal to %2.2f mm' % (max_leg_size))
             logger.info(':Decrease the cleat legsize')
     else:
@@ -279,17 +282,28 @@ def cleat_connection(ui_obj):
     
     t_thinner_b = min(beam_w_t.real, cleat_thk.real)
     bolt_shear_capacity = 0
+
     if bolt_type == 'HSFG':
-        bolt_shear_capacity = HSFG_bolt_shear(bolt_HSFG_slip_factor, bolt_dia, 2, bolt_fu)
-    if bolt_type == 'Bearing Bolt':
+        # bolt_shear_capacity = HSFG_bolt_shear(bolt_HSFG_slip_factor, bolt_dia, 2, bolt_fu)
+        mu_f = mu_f
+        n_e = 1
+        bolt_hole_type = dp_bolt_hole_type
+        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, bolt_hole_type)
+        bearing_capacity_b = 'N/A'
+        bolt_bearing_capacity = 'N/A'
+        bearing_capacity_beam = 'N/A'
+        bearing_capacity_plt = 'N/A'
+        bolt_capacity = bolt_shear_capacity
+
+    elif bolt_type == 'Bearing Bolt':
         bolt_shear_capacity = black_bolt_shear(bolt_dia, 2, bolt_fu)
-        
-    bolt_bearing_capacity = bearing_capacity(bolt_dia, beam_w_t, bolt_fu, beam_fu)
-    bearing_capacity_beam = bearing_capacity(bolt_dia, beam_w_t, beam_fu, beam_fu)
-    bearing_capacity_plt = bearing_capacity(bolt_dia, cleat_thk, cleat_fu, beam_fu)
-    bearing_capacity_b = min(bolt_bearing_capacity, bearing_capacity_beam, bearing_capacity_plt)
-    bolt_capacity = min(bolt_shear_capacity, bearing_capacity_b)
-    bolt_capacity = (bolt_capacity / 2.0)
+
+        bolt_bearing_capacity = bearing_capacity(bolt_dia, beam_w_t, bolt_fu, beam_fu)
+        bearing_capacity_beam = bearing_capacity(bolt_dia, beam_w_t, beam_fu, beam_fu)
+        bearing_capacity_plt = bearing_capacity(bolt_dia, cleat_thk, cleat_fu, beam_fu)
+        bearing_capacity_b = min(bolt_bearing_capacity, bearing_capacity_beam, bearing_capacity_plt)
+        bolt_capacity = min(bolt_shear_capacity, bearing_capacity_b)
+        bolt_capacity = (bolt_capacity / 2.0)
     
     if shear_load != 0:
         bolts_required = int(math.ceil(shear_load / (2 * bolt_capacity)))
@@ -323,13 +337,20 @@ def cleat_connection(ui_obj):
         bolt_bearing_capacity_c = bearing_capacity(bolt_dia, thinner, bolt_fu, beam_fu)
         bearing_capacity_column = bearing_capacity(bolt_dia, column_w_t, beam_fu, beam_fu)
         bearing_capacity_cleat_c = bearing_capacity(bolt_dia, cleat_thk, beam_fu, beam_fu)
-        bearing_capacity_c = min(bolt_bearing_capacity_c, bearing_capacity_column, bearing_capacity_cleat_c)
+        if bolt_type == 'HSFG':
+            bearing_capacity_c = 'N/A'
+        else:
+            bearing_capacity_c = min(bolt_bearing_capacity_c, bearing_capacity_column, bearing_capacity_cleat_c)
+
     else:
         thinner = min(column_f_t, cleat_thk)
         bolt_bearing_capacity_c = bearing_capacity(bolt_dia, thinner, bolt_fu, beam_fu)
         bearing_capacity_column = bearing_capacity(bolt_dia, column_f_t, beam_fu, beam_fu)
         bearing_capacity_cleat_c = bearing_capacity(bolt_dia, cleat_thk, beam_fu, beam_fu)
-        bearing_capacity_c = min(bolt_bearing_capacity_c, bolt_bearing_capacity_c, bearing_capacity_column)
+        if bolt_type == 'HSFG':
+            bearing_capacity_c = 'N/A'
+        else:
+            bearing_capacity_c = min(bolt_bearing_capacity_c, bolt_bearing_capacity_c, bearing_capacity_column)
 
     bolt_capacity_c = min(bolt_shear_capacity_c, bearing_capacity_c)
     
@@ -806,19 +827,29 @@ def cleat_connection(ui_obj):
     output_obj['Bolt'] = {}
     output_obj['Bolt']['status'] = design_status
     output_obj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-    output_obj['Bolt']['bearingcapacity'] = round(bearing_capacity_b, 3)
-    output_obj['Bolt']['bearingcapacitybeam'] = round(bearing_capacity_beam, 3)
-    output_obj['Bolt']['bearingcapacitycleat'] = round(bearing_capacity_plt, 3)
-    output_obj['Bolt']['boltcapacity'] = round(2 * bolt_capacity, 3)
-    output_obj['Bolt']['boltbearingcapacity'] = round(bolt_bearing_capacity, 3)
+
+    if bolt_type == "HSFG":
+        output_obj['Bolt']['bearingcapacity'] = str(bearing_capacity_b)
+        output_obj['Bolt']['bearingcapacitybeam'] = str(bearing_capacity_beam)
+        output_obj['Bolt']['bearingcapacitycleat'] = str(bearing_capacity_plt)
+        output_obj['Bolt']['boltbearingcapacity'] = str(bolt_bearing_capacity)
+        output_obj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)  # removed 2 to display only bolt_capacity in capacity details of supported member
+        output_obj['Bolt']['boltgrpcapacity'] = round(bolt_capacity * no_row_b * no_col_b, 3) # mulipled by 2
+
+    else:
+        output_obj['Bolt']['bearingcapacity'] = round(bearing_capacity_b, 3)
+        output_obj['Bolt']['bearingcapacitybeam'] = round(bearing_capacity_beam, 3)
+        output_obj['Bolt']['bearingcapacitycleat'] = round(bearing_capacity_plt, 3)
+        output_obj['Bolt']['boltbearingcapacity'] = round(bolt_bearing_capacity, 3)
+        output_obj['Bolt']['boltcapacity'] = round(2 * bolt_capacity, 3) #multiple by 2
+        output_obj['Bolt']['boltgrpcapacity'] = round(2 * bolt_capacity * no_row_b * no_col_b, 3) # mulipled by 2
+
     output_obj['Bolt']['externalmoment'] = round(moment_demand_b, 3)
     output_obj['Bolt']['momentcapacity'] = round(moment_capacity_b, 3)
 
     output_obj['Bolt']['blockshear'] = round(Tdb_B, 3)
     output_obj['Bolt']['critshear'] = round(critboltshear_b, 3)
-
     output_obj['Bolt']['numofbolts'] = no_row_b * no_col_b
-    output_obj['Bolt']['boltgrpcapacity'] = round(2 * bolt_capacity * no_row_b * no_col_b, 3)
     output_obj['Bolt']['numofrow'] = int(no_row_b)
     output_obj['Bolt']['numofcol'] = int(no_col_b)
     output_obj['Bolt']['pitch'] = int(pitch_b)
@@ -848,7 +879,12 @@ def cleat_connection(ui_obj):
     output_obj['cleat']['thinner'] = float(thinner)
 
     output_obj['cleat']['shearcapacity'] = round(bolt_shear_capacity_c, 3)
-    output_obj['cleat']['bearingcapacity'] = round(bearing_capacity_c, 3)
+
+    if bolt_type == 'HSFG':
+        output_obj['cleat']['bearingcapacity'] = str(bearing_capacity_c)
+    else:
+        output_obj['cleat']['bearingcapacity'] = round(bearing_capacity_c, 3)
+
     output_obj['cleat']['boltcapacity'] = round(bolt_capacity_c, 3)
     output_obj['cleat']['bearingcapacitycolumn'] = round(bearing_capacity_column, 3)
     output_obj['cleat']['bearingcapacitycleat'] = round(bearing_capacity_cleat_c, 3)

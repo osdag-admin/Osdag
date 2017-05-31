@@ -300,25 +300,22 @@ def cleat_connection(ui_obj):
             break
     if (bolts_required < 3) and (bolts_required > 0):
         bolts_required = 3
-    
-    if bolt_dia == 12 or bolt_dia == 14:
-        dia_hole = bolt_dia + 1
-    elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
-        dia_hole = bolt_dia + 2
-    else:
-        dia_hole = bolt_dia + 3 
+
+    dia_hole = ui_obj["bolt"]["bolt_hole_clrnce"] + bolt_dia
+
           
     min_pitch = int(2.5 * bolt_dia)
     min_gauge = int(2.5 * bolt_dia)
     min_edge_dist = int(1.7 * dia_hole)
     max_edge_dist = int((12 * t_thinner_b * math.sqrt(250 / bolt_fy))) - 1
-    
+
     kbchk1 = min_edge_dist / float(3 * dia_hole)
     kbchk2 = min_pitch / float(3 * dia_hole) - 0.25
     kbchk3 = bolt_fu / float(beam_fu)
     kbchk4 = 1
     kb = min(kbchk1, kbchk2, kbchk3, kbchk4)
     kb = round(kb, 3)
+
     # ##########################Capacity Details for column bolts #######################################
     bolt_shear_capacity_c = bolt_shear_capacity / 2
     if connectivity == 'Column web-Beam web' or connectivity == "Beam-Beam":

@@ -48,7 +48,6 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.ui.tabWidget.removeTab(1)
         int_validator = QIntValidator()
-        #self.ui.txt_boltHoleClearance.setValidator(int_validator)
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
@@ -58,7 +57,7 @@ class DesignPreferences(QDialog):
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
     def save_designPref_para(self):
         '''
@@ -67,7 +66,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        #designPref["bolt"]["bolt_hole_clrnce"] = float(self.ui.txt_boltHoleClearance.text())
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -109,11 +108,11 @@ class DesignPreferences(QDialog):
         '''
 
         uiObj = self.main_controller.getuser_inputs()
-        if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
-            pass
-        else:
-            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-            clearance = str(self.get_clearance(boltDia))
+        # if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
+        #     pass
+        # else:
+        #     boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
+        #     clearance = str(self.get_clearance(boltDia))
             #self.ui.txt_boltHoleClearance.setText(clearance)
         if uiObj["Bolt"]["Grade"] == '':
             pass
@@ -126,7 +125,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)#float
+        designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -154,14 +153,15 @@ class DesignPreferences(QDialog):
 
         return designPref
 
-    def set_bolthole_clernce(self):
-        uiObj = self.main_controller.getuser_inputs()
-        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-        if boltDia != "Diameter of Bolt":
-            clearance = self.get_clearance(int(boltDia))
-            self.ui.txt_boltHoleClearance.setText(str(clearance))
-        else:
-            pass
+    # def set_bolthole_clernce(self):
+    #     uiObj = self.main_controller.getuser_inputs()
+    #     boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+    #     if boltDia != "Diameter of Bolt":
+    #         clearance = self.get_clearance(int(boltDia))
+    #         #self.ui.txt_boltHoleClearance.setText(str(clearance))
+    #     else:
+    #         pass
+    #     return clearance
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
@@ -172,16 +172,19 @@ class DesignPreferences(QDialog):
         else:
             pass
 
-    def get_clearance(self, boltDia):
-        if boltDia !=  'Diameter of Bolt':
+    def get_clearance(self):
+
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != 'Diameter of Bolt':
 
             standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
             overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
-
-            if self.ui.combo_boltHoleType.currentText() == "Standard":
-                clearance = standard_clrnce[boltDia]
+            boltHoleType = str(self.ui.combo_boltHoleType.currentText())
+            if boltHoleType == "Standard":
+                clearance = standard_clrnce[int(boltDia)]
             else:
-                clearance = overhead_clrnce[boltDia]
+                clearance = overhead_clrnce[int(boltDia)]
 
             return clearance
         else:
@@ -1753,8 +1756,8 @@ class MainController(QMainWindow):
     def design_preferences(self):
         self.designPrefDialog.show()
 
-    def bolt_hole_clearace(self):
-        self.designPrefDialog.set_bolthole_clernce()
+    # def bolt_hole_clearace(self):
+    #     self.designPrefDialog.set_bolthole_clernce()
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()

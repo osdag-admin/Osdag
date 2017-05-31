@@ -71,12 +71,12 @@ def fin_max_thk(bolt_dia):
 # Function for block shear capacity calculation
 
 
-def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, platethk):
+def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
     if numcol == 1:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * edge_dist
-        Atn = platethk * (edge_dist - 0.5 * dia_hole)
+        Avg = thk * ((numrow - 1) * pitch + end_dist)
+        Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        Atg = thk * edge_dist
+        Atn = thk * (edge_dist - 0.5 * dia_hole)
 
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
@@ -84,10 +84,10 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
 
     elif numcol == 2:
-        Avg = platethk * ((numrow - 1) * pitch + end_dist)
-        Avn = platethk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
-        Atg = platethk * (edge_dist + gauge)
-        Atn = platethk * (edge_dist + gauge - 0.5 * dia_hole)
+        Avg = thk * ((numrow - 1) * pitch + end_dist)
+        Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
+        Atg = thk * (edge_dist + gauge)
+        Atn = thk * (edge_dist + gauge - 0.5 * dia_hole)
 
         Tdb1 = (Avg * fy / (math.sqrt(3) * 1.1) + 0.9 * Atn * fu / 1.25)
         Tdb2 = (0.9 * Avn * fu / (math.sqrt(3) * 1.25) + Atg * fy / 1.1)
@@ -95,6 +95,20 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
         Tdb = round(Tdb / 1000, 3)
 
     return Tdb
+
+### Check for shear yeilding ###
+
+def shear_yeilding_b(A_v, beam_fy):
+    V_p = ( 0.6 * A_v * beam_fy ) / ( math.sqrt(3) * 1.10 * 1000 ) # kN
+    return V_p
+
+### Check for shear rupture ###
+
+def shear_rupture_b(A_vn, beam_fu ):
+    R_n = (0.6 * beam_fu * A_vn) / 1000  #kN
+    return R_n
+
+
 
 
 def fetchBeamPara(self):
@@ -143,14 +157,10 @@ def finConn(uiObj):
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
         web_plate_w  = 0
-    else:
-        web_plate_w = int(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
-    else:
-        web_plate_l = int(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
@@ -398,7 +408,7 @@ def finConn(uiObj):
             min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         elif web_plate_l == 0:
-            min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l_opt)
+            min_plate_thk = (5 * shear_load * 1000) / (bolt_fy * web_plate_l_opt)
             max_edge_dist = int((12 * min_plate_thk * math.sqrt(250 / beam_fy)).real) - 1
         
         # Moment demand calculation for user defined plate height and width (1st case)
@@ -430,7 +440,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = web_plate_w - min_gauge - min_edge_dist
+                Ecc = web_plate_w - min_gauge - min_edge_dist        
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 
@@ -512,7 +522,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = web_plate_w - min_edge_dist
-                M1 = shear_load * Ecc;
+                M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -546,7 +556,7 @@ def finConn(uiObj):
             if bolt_line == 1:
                 # Moment due to shear external force
                 Ecc = min_edge_dist + gap # 20
-                M1 = shear_load * Ecc;
+                M1 = shear_load * Ecc; 
                 # Moment demand for single line of bolts due to its shear capacity
                 gauge = 0;
                 bolts_one_line = bolts_required;
@@ -778,11 +788,11 @@ def finConn(uiObj):
         pass
                 
     # Block shear capacity of plate
-    
+    min_thk = min(web_plate_t,beam_w_t)
     Tdb = blockshear(boltParameters['numofrow'], boltParameters['numofcol'], boltParameters['dia_hole'], \
                      beam_fy, beam_fu, boltParameters['enddist'], \
                      boltParameters['enddist'], boltParameters['pitch'], \
-                     boltParameters['gauge'], web_plate_t) 
+                     boltParameters['gauge'], min_thk)
     if Tdb < shear_load:
         design_status = False
         logger.error(": The block shear capacity of the plate is lass than the applied shear force [cl. 6.4.1]")
@@ -790,7 +800,32 @@ def finConn(uiObj):
         logger.info(": Increase the plate thickness")
         
     ##################################################################################
-    
+    ### Shear yeilding check ###
+
+    h_0 = beam_d - beam_f_t - beam_R1
+    A_v = h_0 * beam_w_t  ## shear area of secondry beam
+    V_d = shear_yeilding_b(A_v, beam_fy)
+    if connectivity == "Beam-Beam":
+        if V_d < shear_load:
+            design_status = False
+            logger.error(": The secondry beam fails in shear yeilding [cl. 8.4.1]/ AISC design manual")
+            logger.warning(": Minimum shear yeilding capacity required is %2.2f kN" % (shear_load))
+            logger.info(": Use a higher section for secondry beam")
+
+    #### Check for shear rupture ###
+
+    A_vn = beam_w_t * (h_0 - (boltParameters['numofbolts'] * boltParameters['dia_hole']))
+    if A_vn <=  ((beam_fy / beam_fu)*(1.25 / 1.10)*(A_v / 0.9)):
+        A_vn =  ((beam_fy / beam_fu)*(1.25 / 1.10)*(A_v / 0.9))
+    R_n = shear_rupture_b(A_vn, beam_fu)
+    if connectivity == "Beam-Beam":
+        if R_n < shear_load:
+            design_status = False
+            logger.error(": The capacity of secondry beam in shear rupture is less than the applied shear force AISC design manual/[cl.8.4.1.1]")
+            logger.warning(": Minimum shear rupture capacity required is %2.2f kN" % (shear_load))
+            logger.info(" : Use a higher section for secondry beam")
+
+
     # # Weld design
     # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) [source: Subramanian's book]
     weld_fu = 410; #TODO weld_fu should fetch from DP of Finplate

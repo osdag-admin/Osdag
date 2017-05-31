@@ -6,6 +6,8 @@ Created on 16-Mar-2016
 import time
 import math
 
+from Connections.connection_calculations import ConnectionCalculations
+
 
 def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data, reportsummary, filename, folder):
     print output_obj
@@ -53,7 +55,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-    # FinPlate Main Data
+    # CleatAngle Main Data
     beam_sec = str(uiobj['Member']['BeamSection'])
     column_sec = str(uiobj['Member']['ColumSection'])
     connectivity = str(uiobj['Member']['Connectivity'])
@@ -78,7 +80,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     cleat_sec = str(uiobj['cleat']['section'])
 
     # Design Preferences
-    bolt_hole_clrnce = str(float(uiobj["bolt"]["bolt_hole_clrnce"]))
+    # bolt_hole_clrnce = str(float(uiobj["bolt"]["bolt_hole_clrnce"]))
     bolt_hole_type = str(uiobj["bolt"]["bolt_hole_type"])
     bolt_grade_fu = str(float(uiobj["bolt"]["bolt_fu"]))
     slip_factor = str(float(uiobj["bolt"]["slip_factor"]))
@@ -89,6 +91,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     corrosive = str(uiobj["detailing"]["is_env_corrosive"])
 
     design_method = str(uiobj["design"]["design_method"])
+
+    # To call k_h value from hsfg calculations
+    bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
+    # To call F_0 value from hsfg calculations
+    bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=bolt_dia, bolt_fu=bolt_grade_fu)
 
     #     dict_beam_data  = get_beamdata(beam_sec)
     beam_tw = str(float(dict_beam_data["tw"]))
@@ -689,11 +696,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + row[2] + t('/td')
+    # rstr += t('/tr')
 
     row = [1, "Material Grade (MPa) (overwrite)", bolt_grade_fu]
     rstr += t('tr')
@@ -841,9 +848,15 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
+    n_e = 2
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
-    row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = ((2*" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
-           ")/(&#8730;3*1.25*1000) = " + shear_capacity_b + "<br> [cl. 10.3.3]", ""]
+    if bolt_type == "HSFG":
+        row = [0, "Bolt shear capacity (kN)", " ",
+               "<i>V</i><sub>dsf</sub> = (" + slip_factor + "*" + n_e + "*" + bolt_param_k_h + "*" + bolt_param_F_0 +
+               ")/(1.25*1000) = " + shear_capacity_b + "<br> [cl. 10.4.3]", ""]
+    else:
+        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = ((2*" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+               ")/(&#8730;3*1.25*1000) = " + shear_capacity_b + "<br> [cl. 10.3.3]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -852,8 +865,12 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_b + "*" + bolt_fu +
-           ")/(1.25*1000)  = " + boltbearingcapacity_b + "<br> [cl. 10.3.4]", ""]
+    if bolt_type == "HSFG":
+        row = [0, "Bolt bearing capaciy (kN)", "", "N/A"]
+    else:
+        row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_b + "*" + bolt_fu +
+        ")/(1.25*1000)  = " + boltbearingcapacity_b + "<br> [cl. 10.3.4]", ""]
+
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -862,8 +879,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity of beam web (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    row = [0, "Bearing capacity of beam web (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu +
-           ")/(1.25*1000)  = " + bearingcapacitybeam_b + "<br> [cl. 10.3.4]", ""]
+    if bolt_type ==  "HSFG":
+        row = [0, "Bearing capacity of beam web (kN)", "", "N/A"]
+    else:
+        row = [0, "Bearing capacity of beam web (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu +
+               ")/(1.25*1000)  = " + bearingcapacitybeam_b + "<br> [cl. 10.3.4]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -872,7 +892,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
+    if bolt_type == "HSFG":
+        row = [0, "Bearing capacity of cleat (kN)", "", "N/A"]
+    else:
+        row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
            ")/(1.25*1000)  = " + bearingcapacitycleat_b + "<br> [cl. 10.3.4]", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -882,8 +905,11 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    bearcapacity = str(min(float(boltbearingcapacity_b), float(bearingcapacitybeam_b), float(bearingcapacitycleat_b)))
-    row = [0, "Bearing capacity (kN)", "", "Min (" + boltbearingcapacity_b + ", " + bearingcapacitybeam_b + ", " + bearingcapacitycleat_b + ") = " +
+    if bolt_type == 'HSFG':
+        row = [0, "Bearing capacity (kN)", "", "N/A"]
+    else:
+        bearcapacity = str(min(float(boltbearingcapacity_b), float(bearingcapacitybeam_b), float(bearingcapacitycleat_b)))
+        row = [0, "Bearing capacity (kN)", "", "Min (" + boltbearingcapacity_b + ", " + bearingcapacitybeam_b + ", " + bearingcapacitycleat_b + ") = " +
            bearcapacity, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

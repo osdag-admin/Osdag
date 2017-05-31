@@ -44,7 +44,7 @@ pDir      |      |       | End distance  |
 
     '''
 
-    def __init__(self, boltPlaceObj, nut, bolt, gap):
+    def __init__(self, boltPlaceObj, nut, bolt, nut_space):
 
         self.origin = None
         self.gaugeDir = None
@@ -55,7 +55,7 @@ pDir      |      |       | End distance  |
 
         self.bolt = bolt
         self.nut = nut
-        self.gap = gap
+        self.gap = nut_space
 
         self.bolts = []
         self.nuts = []
@@ -73,6 +73,8 @@ pDir      |      |       | End distance  |
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
+            bolt_len_required = float(b.T + self.gap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 

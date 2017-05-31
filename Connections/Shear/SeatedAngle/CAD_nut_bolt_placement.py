@@ -10,7 +10,8 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from CAD_ModelUtils import getGpPt
 
 class NutBoltArray():
-    def __init__(self,boltPlaceObj,nut,bolt,sgap, sbgap,tgap,tbgap):
+    #def __init__(self,boltPlaceObj,nut,bolt,sgap, sbgap,tgap,tbgap):
+    def __init__(self,boltPlaceObj,nut,bolt,snut_space, sbnut_space,tnut_space,tbnut_space):
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
@@ -35,10 +36,10 @@ class NutBoltArray():
         
         self.bolt = bolt
         self.nut = nut
-        self.sgap = sgap
-        self.sbgap = sbgap
-        self.tgap = tgap
-        self.tbgap = tbgap
+        self.sgap = snut_space
+        self.sbgap = sbnut_space
+        self.tgap = tnut_space
+        self.tbgap = tbnut_space
          
         self.bolts = []
         self.nuts = []
@@ -62,18 +63,26 @@ class NutBoltArray():
         b = self.bolt
         n = self.nut
         for i in range(self.row * self.col):
+            bolt_len_required = float(b.T + self.sgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T,n.H, n.r1))
         
         for i in range(self.brow * self.bcol):
+            bolt_len_required = float(b.T + self.sbgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.bbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.bnuts.append(Nut(n.R, n.T,n.H, n.r1))
             
         for i in range(self.topcliprow * self.topclipcol):
+            bolt_len_required= float(b.T + self.tgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.topclipbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.topclipnuts.append(Nut(n.R, n.T,n.H, n.r1))
         
         for i in range(self.topclipbrow * self.topclipbcol):
+            bolt_len_required = float(b.T + self.tbgap)
+            b.H = bolt_len_required + (5 - bolt_len_required) % 5
             self.topclipbbolts.append(Bolt(b.R,b.T, b.H, b.r))
             self.topclipbnuts.append(Nut(n.R, n.T,n.H, n.r1))
         

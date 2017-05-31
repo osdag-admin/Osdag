@@ -408,22 +408,16 @@ class CommonDesignLogic(object):
         bolt_T = self.bolt_T
         bolt_Ht = self.bolt_Ht
         nut_T = self.nut_T
-        #bolt_len_required = float(bolt_T + 2*(cleat_thick) + beam_tw + nut_T)
-        #print  bolt_len_required
-        #if bolt_Ht < bolt_len_required:
-            #bolt_Ht = bolt_len_required + (5-bolt_len_required)% 5
-        #print bolt_Ht
-
         nut_Ht = 12.2  #
         gap = int(str(self.uiObj['detailing']['gap']))
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
-            bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
+            #bolt_len_required = float(bolt_T + 2 * (cleat_thick) + beam_tw + nut_T)
         elif self.connection == 'SeatedAngle':
             seatangle = Angle(L=seat_length, A=seatangle_A, B=seatangle_B, T=seat_thick, R1=seatangle_r1,
                               R2=seatangle_r2)
-            bolt_len_required = float(bolt_T + (seat_thick) + beam_tw + nut_T)
+            #bolt_len_required = float(bolt_T + (seat_thick) + beam_tw + nut_T)
             topclipangle = Angle(L=topangle_length, A=topangle_A, B=topangle_B, T=topangle_thick, R1=topangle_r1,
                                  R2=topangle_r2)
         else:

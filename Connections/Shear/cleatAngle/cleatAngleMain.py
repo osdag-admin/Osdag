@@ -108,12 +108,7 @@ class DesignPreferences(QDialog):
         '''
 
         uiObj = self.main_controller.getuser_inputs()
-        # if uiObj["Bolt"]["Diameter (mm)"] == 'Diameter of Bolt':
-        #     pass
-        # else:
-        #     boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        #     clearance = str(self.get_clearance(boltDia))
-            #self.ui.txt_boltHoleClearance.setText(clearance)
+
         if uiObj["Bolt"]["Grade"] == '':
             pass
         else:
@@ -153,15 +148,13 @@ class DesignPreferences(QDialog):
 
         return designPref
 
-    # def set_bolthole_clernce(self):
-    #     uiObj = self.main_controller.getuser_inputs()
-    #     boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-    #     if boltDia != "Diameter of Bolt":
-    #         clearance = self.get_clearance(int(boltDia))
-    #         #self.ui.txt_boltHoleClearance.setText(str(clearance))
-    #     else:
-    #         pass
-    #     return clearance
+    def set_bolthole_clernce(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != "Diameter of Bolt":
+            clearance = self.get_clearance(int(boltDia))
+        else:
+            pass
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
@@ -1756,11 +1749,12 @@ class MainController(QMainWindow):
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
                     subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+
     def design_preferences(self):
         self.designPrefDialog.show()
 
-    # def bolt_hole_clearace(self):
-    #     self.designPrefDialog.set_bolthole_clernce()
+    def bolt_hole_clearace(self):
+        self.designPrefDialog.set_bolthole_clernce()
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()

@@ -298,7 +298,7 @@ def cleat_connection(ui_obj):
     if bolt_type == 'HSFG':
         # bolt_shear_capacity = HSFG_bolt_shear(bolt_HSFG_slip_factor, bolt_dia, 2, bolt_fu)
         mu_f = mu_f
-        n_e = 1
+        n_e = 2
         bolt_hole_type = dp_bolt_hole_type
         bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, bolt_hole_type)
         bearing_capacity_b = 'N/A'

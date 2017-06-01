@@ -8,11 +8,8 @@ from ModelUtils import *
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 #from notch import Notch
 from Connections.Component.notch import Notch
-
-
-class ISection(object):
-    '''
-                              ^ v
+"""
+                          ^ v
                               |
             c2                .                c1
      ---    +-----------------|-----------------+     ---
@@ -39,6 +36,12 @@ class ISection(object):
              +----------------.-----------------+     ---
              c3               B                 c4
              |<-------------------------------->|
+
+"""
+
+class ISection(object):
+    '''
+
 
     '''
 

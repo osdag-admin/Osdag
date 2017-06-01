@@ -36,6 +36,9 @@ import os.path
 import pickle
 import shutil
 
+import ConfigParser
+
+
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):

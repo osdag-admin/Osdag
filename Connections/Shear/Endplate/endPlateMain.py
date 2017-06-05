@@ -585,7 +585,7 @@ class MainController(QMainWindow):
         self.ui.comboPlateThick_2.clear()
         for i in newlist[:]:
             self.ui.comboPlateThick_2.addItem(str(i))
-        self.ui.comboPlateThick_2.setCurrentIndex(1)
+        self.ui.comboPlateThick_2.setCurrentIndex(0)
 
     def check_plate_height(self, widget):
         loc = self.ui.comboConnLoc.currentText()

@@ -598,10 +598,10 @@ class MainController(QMainWindow):
             self.ui.lbl_column.setText("Column Section *")
             self.ui.lbl_beam.setText("Beam section *")
             self.ui.chkBxBeam.setText("Beam")
-            self.ui.actionBeam_2.setText("Show beam")
+            self.ui.actionShow_beam.setText("Show beam")
             self.ui.chkBxBeam.setToolTip("Beam only")
             self.ui.chkBxCol.setText("Column")
-            self.ui.actionColumn_2.setText("Show column")
+            self.ui.actionShow_column.setText("Show column")
             self.ui.chkBxCol.setToolTip("Column only")
             self.ui.comboColSec.clear()
             self.get_columndata()
@@ -1867,7 +1867,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    folder_path = "F:\Osdag_Workspace\\finplate"
+    folder_path = "D:\Osdag_Workspace\\finplate"
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0755)
     image_folder_path = os.path.join(folder_path, 'images_html')

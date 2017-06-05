@@ -1456,7 +1456,7 @@ class Fin2DCreatorTop(object):
 
         ############ C-C section #################
         # ptSecA = self.FA4 + ((self.dataObj.gap + self.dataObj.D_col) * np.array([-1, 0])) + 260 * np.array([0, 1])
-        ptSecA = self.FC + 50 * np.array([-1, 0]) + (self.dataObj.col_B + 50) * np.array([0, 1])
+        ptSecA = self.FC + 50 * np.array([-1, 0]) + (self.dataObj.col_B * 2) * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txtpt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         txt = "C"
@@ -1513,7 +1513,7 @@ class Fin2DCreatorTop(object):
 
         # Beam Information
         beam_pt = self.FA1 + (self.dataObj.beam_L / 2) * np.array([1, 0])
-        theta = 55
+        theta = 60
         offset = 80
         textUp = "Beam " + self.dataObj.beam_Designation
         textDown = ""
@@ -1542,7 +1542,7 @@ class Fin2DCreatorTop(object):
 
         # Bolt Information
         bltPt = self.FP5 + self.dataObj.plateEdge_dist * np.array([1, 0]) + (nc - 1) * self.dataObj.gauge * np.array([1, 0]) 
-        theta = 55
+        theta = 60
         offset = (self.dataObj.beam_B) + 130
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -1556,7 +1556,7 @@ class Fin2DCreatorTop(object):
         # Weld Information
         weldPt = self.FY
         theta = 60
-        offset = self.dataObj.weld_thick + self.dataObj.plate_thick + self.dataObj.beam_B / 2 + 80
+        offset = self.dataObj.weld_thick + self.dataObj.plate_thick + self.dataObj.beam_B / 2 + 130
         textUp = "          z " + str(int(self.dataObj.weld_thick)) + " mm"
         textDown = ""  # u"\u25C1"
         element = "weld"
@@ -1577,7 +1577,7 @@ class Fin2DCreatorTop(object):
         self.dataObj.drawFaintLine(ptC, ptD, dwg)
 
         # 2D view name
-        ptx = self.FG + (self.dataObj.col_B /1.5 -15) * np.array([0, 1])
+        ptx = self.FG + (self.dataObj.col_B ) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30)) 
         dwg.save()
 
@@ -2102,7 +2102,7 @@ class Fin2DCreatorSide(object):
         '''
         vb_width = str(float(4 * self.dataObj.D_col))
         vb_ht = str(float(1.4 * self.dataObj.col_L))
-        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-350 -100 ' + vb_width + ' ' + vb_ht))
+        dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-160 -100 ' + vb_width + ' ' + vb_ht))
 
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11), (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))

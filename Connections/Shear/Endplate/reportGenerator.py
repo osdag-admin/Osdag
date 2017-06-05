@@ -6,6 +6,8 @@ from __builtin__ import str
 import time
 import math
 
+from Connections.connection_calculations import ConnectionCalculations
+
 
 def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filename, folder):
 
@@ -97,6 +99,14 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     corrosive = str(uiobj["detailing"]["is_env_corrosive"])
 
     design_method = str(uiobj["design"]["design_method"])
+
+    # To call k_h value from hsfg calculations
+    bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
+    k_h = str(float(bolt_param_k_h))
+
+    # To call F_0 value from hsfg calculations
+    bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=bolt_diameter, bolt_fu=bolt_grade_fu)
+    F_0 = str(float(bolt_param_F_0))
 
     minplatethk = str(int(round(outobj['Plate']['MinThick'], 1)))
     blockshear = str(int(round(outobj['Plate']['blockshear'], 1)))
@@ -698,9 +708,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
+    n_e = str(1)
     if bearingcapacity == "N/A":
-        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + bolt_fu + "*" + const + "*" + bolt_dia + "*" +
-               bolt_dia + ")/(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]", ""]
+        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" +F_0 +
+               ")/(1.25)) = " + shear_capacity + "<br> [cl. 10.4.3]", ""]
     else:
         row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = ((" + bolt_fu + "*" + const + "*" + bolt_dia + "*" +
                bolt_dia + ")/(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]", ""]

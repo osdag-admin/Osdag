@@ -919,6 +919,8 @@ class MainController(QMainWindow):
 
             self.ui.txtInputCleatHeight.setText(str(ui_obj['cleat']['Height (mm)']))
             self.ui.comboCleatSection.setCurrentIndex(self.ui.comboCleatSection.findText(str(ui_obj['cleat']['section'])))
+        else:
+            pass
 
     def setimage_connection(self):
         '''

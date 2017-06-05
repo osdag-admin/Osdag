@@ -421,7 +421,7 @@ class MainController(QMainWindow):
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
-        # self.retrieve_prevstate()
+
 
         self.ui.btnFront.clicked.connect(lambda: self.callFin2D_Drawing("Front"))
         self.ui.btnSide.clicked.connect(lambda: self.callFin2D_Drawing("Side"))
@@ -738,6 +738,7 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
+            newlist.append("Select thickness")
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -745,7 +746,9 @@ class MainController(QMainWindow):
 
             self.ui.comboPlateThick_2.blockSignals(True)
             self.ui.comboPlateThick_2.clear()
+
             for i in newlist[:]:
+
                 self.ui.comboPlateThick_2.addItem(str(i))
 
             self.ui.comboPlateThick_2.setCurrentIndex(-1)
@@ -768,6 +771,7 @@ class MainController(QMainWindow):
 
         else:
             newlist = []
+            newlist.append("Select thickness")
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
             dictbeamdata = self.fetchBeamPara()
             beam_tw = float(dictbeamdata["tw"])
@@ -775,44 +779,48 @@ class MainController(QMainWindow):
             if column_sec == 'Select section':
                 return
             dictcoldata = self.fetchColumnPara()
-            plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = float(plate_thickness)
+            plate_thickness = str(self.ui.comboPlateThick_2.currentText())
+            if plate_thickness != "Select thickness":
+                plate_thick = float(plate_thickness)
 
-            if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
-                if str(self.ui.comboColSec.currentText()) == "Select section":
-                    self.ui.comboWldSize.clear()
-                    return
+
+                if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
+                    if str(self.ui.comboColSec.currentText()) == "Select section":
+                        self.ui.comboWldSize.clear()
+                        return
+                    else:
+                        column_tf = float(dictcoldata["T"])
+                        thickerPart = column_tf > plate_thick and column_tf or plate_thick
+
+                elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
+                    if str(self.ui.comboColSec.currentText()) == "Select section":
+                        self.ui.comboWldSize.clear()
+                        return
+                    else:
+                        column_tw = float(dictcoldata["tw"])
+                        thickerPart = column_tw > plate_thick and column_tw or plate_thick
                 else:
-                    column_tf = float(dictcoldata["T"])
-                    thickerPart = column_tf > plate_thick and column_tf or plate_thick
+                    PBeam_tw = float(dictcoldata["tw"])
+                    thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
 
-            elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
-                if str(self.ui.comboColSec.currentText()) == "Select section":
-                    self.ui.comboWldSize.clear()
-                    return
+                if thickerPart in range(0, 11):
+                    weld_index = weldlist.index(3)
+                    newlist.extend(weldlist[weld_index:])
+                elif thickerPart in range(11, 21):
+                    weld_index = weldlist.index(5)
+                    newlist.extend(weldlist[weld_index:])
+                elif thickerPart in range(21, 33):
+                    weld_index = weldlist.index(6)
+                    newlist.extend(weldlist[weld_index:])
                 else:
-                    column_tw = float(dictcoldata["tw"])
-                    thickerPart = column_tw > plate_thick and column_tw or plate_thick
-            else:
-                PBeam_tw = float(dictcoldata["tw"])
-                thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
+                    weld_index = weldlist.index(8)
+                    newlist.extend(weldlist[weld_index:])
 
-            if thickerPart in range(0, 11):
-                weld_index = weldlist.index(3)
-                newlist.extend(weldlist[weld_index:])
-            elif thickerPart in range(11, 21):
-                weld_index = weldlist.index(5)
-                newlist.extend(weldlist[weld_index:])
-            elif thickerPart in range(21, 33):
-                weld_index = weldlist.index(6)
-                newlist.extend(weldlist[weld_index:])
+                self.ui.comboWldSize.clear()
+                for element in newlist[:]:
+                    self.ui.comboWldSize.addItem(str(element))
             else:
-                weld_index = weldlist.index(8)
-                newlist.extend(weldlist[weld_index:])
-
-            self.ui.comboWldSize.clear()
-            for element in newlist[:]:
-                self.ui.comboWldSize.addItem(str(element))
+                pass
 
     def retrieve_prevstate(self):
         """Maintain previous session's data.
@@ -866,6 +874,8 @@ class MainController(QMainWindow):
             self.ui.txtPlateWidth.setText(str(uiObj['Plate']['Width (mm)']))
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
+        else:
+            pass
 
     def setimage_connection(self):
         '''

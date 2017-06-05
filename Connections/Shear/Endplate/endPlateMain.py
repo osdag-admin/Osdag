@@ -877,7 +877,8 @@ class MainController(QMainWindow):
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiobj['Weld']['Size (mm)'])))
 
-
+        else:
+            pass
     def setimage_connection(self):
         '''
         Setting image to connctivity.

@@ -1,8 +1,10 @@
+#!/home/deepa-c/miniconda2/bin/python
 '''
 Created on 31-Mar-2016
 
 @author: deepa
 '''
+
 import sys
 from PyQt5 import Qt
 

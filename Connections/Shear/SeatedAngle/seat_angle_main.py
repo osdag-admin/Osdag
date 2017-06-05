@@ -631,6 +631,8 @@ class MainController(QMainWindow):
             self.ui.combo_angle_section.setCurrentIndex(combo_seat_angle_index)
             combo_top_angle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
             self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
+        else:
+            pass
 
     def setimage_connection(self):
         """

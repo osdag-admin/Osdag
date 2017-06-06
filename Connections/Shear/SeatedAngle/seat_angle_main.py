@@ -335,12 +335,9 @@ class MainController(QMainWindow):
         self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 
         # Graphics menu
-        #self.ui.actionBeam_2.triggered.connect(self.call_3DBeam)
-        self.ui.actionBeam_2.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
-        #self.ui.actionColumn_2.triggered.connect(self.call_3DColumn)
-        self.ui.actionColumn_2.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
-        #self.ui.actionSeatAngle_2.triggered.connect(self.call_3DSeatAngle)
-        self.ui.actionSeatAngle_2.triggered.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
+        self.ui.actionShow_beam.triggered.connect(lambda:self.call_3DBeam("gradient_bg"))
+        self.ui.actionShow_column.triggered.connect(lambda:self.call_3DColumn("gradient_bg"))
+        self.ui.actionShow_seatAngle.triggered.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
         self.ui.actionShow_All.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
         self.ui.actionChange_Background.triggered.connect(self.showColorDialog)
 
@@ -634,6 +631,8 @@ class MainController(QMainWindow):
             self.ui.combo_angle_section.setCurrentIndex(combo_seat_angle_index)
             combo_top_angle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
             self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
+        else:
+            pass
 
     def setimage_connection(self):
         """

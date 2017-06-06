@@ -70,6 +70,40 @@ from OCC.TopAbs import TopAbs_EDGE
 from ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
     makeFaceFromWire, makePrismFromFace
 
+"""
+    +
+    |   a2  XXXXXXXXXX    a4
+    |       X          X
+    |       X           X   a5
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X
+    |       X           X              Angle Geometry
+A   |       X           X
+    |       X           X
+    |       X           X
+    |       X           X  a6
+    |       X            X                                  a9
+    |       X             X    a8
+    |       X         a7   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     a10
+    |       X                                                X
+    |       X                                                 X    a11
+    |       X                                                 X
+    |       X                                                 X
+    v       X                                                 X
+       a1   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    a12
+
+            +-------------------------------------------------->
+
+                                          B
+
+
+"""
 
 class Angle(object):
     def __init__(self, L, A, B, T, R1, R2):

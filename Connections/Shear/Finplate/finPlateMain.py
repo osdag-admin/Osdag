@@ -36,6 +36,9 @@ import os.path
 import pickle
 import shutil
 
+import ConfigParser
+
+
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
@@ -59,7 +62,7 @@ class DesignPreferences(QDialog):
         self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.set_bolthole_clernce)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
     def highlight_slipfactor_description(self):
         """Highlight the description of currosponding slipfactor on selection of inputs
@@ -95,9 +98,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-        clearance = str(self.get_clearance(boltDia))
-        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -132,23 +133,13 @@ class DesignPreferences(QDialog):
 
         return self.saved_designPref
 
-
-        # self.main_controller.call_designPref(designPref)
-
     def set_default_para(self):
         """
-
         Returns:
 
         """
-
         uiObj = self.main_controller.getuser_inputs()
-        if str(uiObj["Bolt"]["Diameter (mm)"]) == 'Diameter of Bolt':
-            clearance = 0
-        else:
-            boltDia = int(uiObj["Bolt"]["Diameter (mm)"])
-            clearance = str(self.get_clearance(boltDia))
-            #self.ui.txt_boltHoleClearance.setText(clearance)
+
         if uiObj["Bolt"]["Grade"] == '':
             pass
         else:
@@ -160,7 +151,7 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = float(clearance)
+        designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -190,16 +181,6 @@ class DesignPreferences(QDialog):
         return designPref
 
 
-
-    def set_bolthole_clernce(self):
-        uiObj = self.main_controller.getuser_inputs()
-        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-        if boltDia != "Diameter of Bolt":
-            clearance = self.get_clearance(int(boltDia))
-            #self.ui.txt_boltHoleClearance.setText(str(clearance))
-        else:
-            pass
-
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
@@ -209,17 +190,24 @@ class DesignPreferences(QDialog):
         else:
             pass
 
-    def get_clearance(self, boltDia):
+    def get_clearance(self):
 
-        standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
-        overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+        uiObj = self.main_controller.getuser_inputs()
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != 'Diameter of Bolt':
 
-        if self.ui.combo_boltHoleType.currentText() == "Standard":
-            clearance = standard_clrnce[boltDia]
+            standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+            overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+            boltHoleType = str(self.ui.combo_boltHoleType.currentText())
+            if boltHoleType == "Standard":
+                clearance = standard_clrnce[int(boltDia)]
+            else:
+                clearance = overhead_clrnce[int(boltDia)]
+
+            return clearance
         else:
-            clearance = overhead_clrnce[boltDia]
+            pass
 
-        return clearance
 
     def get_boltFu(self, boltGrade):
         '''
@@ -433,7 +421,7 @@ class MainController(QMainWindow):
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
-        # self.retrieve_prevstate()
+
 
         self.ui.btnFront.clicked.connect(lambda: self.callFin2D_Drawing("Front"))
         self.ui.btnSide.clicked.connect(lambda: self.callFin2D_Drawing("Side"))
@@ -552,8 +540,8 @@ class MainController(QMainWindow):
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
-            self.ui.actionBeam_2.setText("Show SBeam")
-            self.ui.actionColumn_2.setText("Show PBeam")
+            self.ui.actionShow_beam.setText("Show SBeam")
+            self.ui.actionShow_column.setText("Show PBeam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
             self.get_beamdata()
@@ -750,6 +738,7 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
+            newlist.append("Select thickness")
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -757,7 +746,9 @@ class MainController(QMainWindow):
 
             self.ui.comboPlateThick_2.blockSignals(True)
             self.ui.comboPlateThick_2.clear()
+
             for i in newlist[:]:
+
                 self.ui.comboPlateThick_2.addItem(str(i))
 
             self.ui.comboPlateThick_2.setCurrentIndex(-1)
@@ -780,6 +771,7 @@ class MainController(QMainWindow):
 
         else:
             newlist = []
+            newlist.append("Select thickness")
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
             dictbeamdata = self.fetchBeamPara()
             beam_tw = float(dictbeamdata["tw"])
@@ -787,44 +779,48 @@ class MainController(QMainWindow):
             if column_sec == 'Select section':
                 return
             dictcoldata = self.fetchColumnPara()
-            plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = float(plate_thickness)
+            plate_thickness = str(self.ui.comboPlateThick_2.currentText())
+            if plate_thickness != "Select thickness":
+                plate_thick = float(plate_thickness)
 
-            if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
-                if str(self.ui.comboColSec.currentText()) == "Select section":
-                    self.ui.comboWldSize.clear()
-                    return
+
+                if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
+                    if str(self.ui.comboColSec.currentText()) == "Select section":
+                        self.ui.comboWldSize.clear()
+                        return
+                    else:
+                        column_tf = float(dictcoldata["T"])
+                        thickerPart = column_tf > plate_thick and column_tf or plate_thick
+
+                elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
+                    if str(self.ui.comboColSec.currentText()) == "Select section":
+                        self.ui.comboWldSize.clear()
+                        return
+                    else:
+                        column_tw = float(dictcoldata["tw"])
+                        thickerPart = column_tw > plate_thick and column_tw or plate_thick
                 else:
-                    column_tf = float(dictcoldata["T"])
-                    thickerPart = column_tf > plate_thick and column_tf or plate_thick
+                    PBeam_tw = float(dictcoldata["tw"])
+                    thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
 
-            elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
-                if str(self.ui.comboColSec.currentText()) == "Select section":
-                    self.ui.comboWldSize.clear()
-                    return
+                if thickerPart in range(0, 11):
+                    weld_index = weldlist.index(3)
+                    newlist.extend(weldlist[weld_index:])
+                elif thickerPart in range(11, 21):
+                    weld_index = weldlist.index(5)
+                    newlist.extend(weldlist[weld_index:])
+                elif thickerPart in range(21, 33):
+                    weld_index = weldlist.index(6)
+                    newlist.extend(weldlist[weld_index:])
                 else:
-                    column_tw = float(dictcoldata["tw"])
-                    thickerPart = column_tw > plate_thick and column_tw or plate_thick
-            else:
-                PBeam_tw = float(dictcoldata["tw"])
-                thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
+                    weld_index = weldlist.index(8)
+                    newlist.extend(weldlist[weld_index:])
 
-            if thickerPart in range(0, 11):
-                weld_index = weldlist.index(3)
-                newlist.extend(weldlist[weld_index:])
-            elif thickerPart in range(11, 21):
-                weld_index = weldlist.index(5)
-                newlist.extend(weldlist[weld_index:])
-            elif thickerPart in range(21, 33):
-                weld_index = weldlist.index(6)
-                newlist.extend(weldlist[weld_index:])
+                self.ui.comboWldSize.clear()
+                for element in newlist[:]:
+                    self.ui.comboWldSize.addItem(str(element))
             else:
-                weld_index = weldlist.index(8)
-                newlist.extend(weldlist[weld_index:])
-
-            self.ui.comboWldSize.clear()
-            for element in newlist[:]:
-                self.ui.comboWldSize.addItem(str(element))
+                pass
 
     def retrieve_prevstate(self):
         """Maintain previous session's data.
@@ -849,8 +845,8 @@ class MainController(QMainWindow):
                 self.ui.chkBxBeam.setToolTip("Secondary  beam")
                 self.ui.chkBxCol.setText("PBeam")
                 self.ui.chkBxCol.setToolTip("Primary beam")
-                self.ui.actionBeam_2.setText("Show SBeam")
-                self.ui.actionColumn_2.setText("Show PBeam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
@@ -878,6 +874,8 @@ class MainController(QMainWindow):
             self.ui.txtPlateWidth.setText(str(uiObj['Plate']['Width (mm)']))
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
+        else:
+            pass
 
     def setimage_connection(self):
         '''
@@ -1801,7 +1799,7 @@ class MainController(QMainWindow):
         self.designPrefDialog.show()
 
     def bolt_hole_clearace(self):
-        self.designPrefDialog.set_bolthole_clernce()
+        self.designPrefDialog.get_clearance()
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()

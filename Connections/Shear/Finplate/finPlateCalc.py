@@ -151,6 +151,7 @@ def finConn(uiObj):
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
+    dia_hole = int(uiObj['bolt']['bolt_hole_clrnce'])+ bolt_dia
     weld_type = uiObj['weld']['typeof_weld']
 
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
@@ -288,13 +289,13 @@ def finConn(uiObj):
         bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
          
         # Spacing of bolts for web plate -------------------
-        if bolt_dia == 12 or bolt_dia == 14:
-            dia_hole = bolt_dia + 1
-        # elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
-        elif bolt_dia == 16 or bolt_dia == 20 or bolt_dia == 24:
-            dia_hole = bolt_dia + 2
-        else:
-            dia_hole = bolt_dia + 3    
+        # if bolt_dia == 12 or bolt_dia == 14:
+        #     dia_hole = bolt_dia + 1
+        # # elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
+        # elif bolt_dia == 16 or bolt_dia == 20 or bolt_dia == 24:
+        #     dia_hole = bolt_dia + 2
+        # else:
+        #     dia_hole = bolt_dia + 3
      
         # Minimum spacing
         min_pitch = int(2.5 * bolt_dia)

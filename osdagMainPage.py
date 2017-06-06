@@ -1,8 +1,10 @@
+#!/home/deepa-c/miniconda2/bin/python
 '''
 Created on 31-Mar-2016
 
 @author: deepa
 '''
+
 import sys
 from PyQt5 import Qt
 
@@ -60,7 +62,10 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
-        self.ui.btn_gantry.clicked.connect(self.unavailable)
+        self.ui.btn_truss.clicked.connect(self.unavailable)
+        self.ui.btn_2dframe.clicked.connect(self.unavailable)
+        self.ui.btn_3dframe.clicked.connect(self.unavailable)
+        self.ui.btn_groupdesign.clicked.connect(self.unavailable)
         self.ui.btn_tension.clicked.connect(self.unavailable)
         self.ui.btn_plate.clicked.connect(self.unavailable)
         self.ui.comboBox_help.setCurrentIndex(0)

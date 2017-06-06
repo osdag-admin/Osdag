@@ -32,7 +32,7 @@ from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from endPlateCalc import end_connection
 from model import *
-from ui_endPlate import Ui_MainWindow
+from ui_endplate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
 from Svg_Window import SvgWindow

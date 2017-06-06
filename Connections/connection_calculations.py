@@ -114,6 +114,45 @@ class ConnectionCalculations(object):
         return round(bolt_nominal_shear_capacity / gamma_mb, 1)
 
     @staticmethod
+    def proof_load_F_0(bolt_diameter, bolt_fu):
+        """
+
+        Args:
+            bolt_diameter:
+            bolt_fu:
+
+        Returns:
+
+        """
+        proof_stress = 0.7 *float( bolt_fu)  # proof stress
+        # bolt_area_threads - area of bolt at threads
+        bolt_area_threads = {
+            '12': 84.3,
+            '16': 157,
+            '20': 245,
+            '22': 303,
+            '24': 353,
+            '27': 459,
+            '30': 561,
+            '36': 817
+        }[str(bolt_diameter)]
+        F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
+        return F_0
+
+    @staticmethod
+    def calculate_k_h(bolt_hole_type):
+        """
+
+        Args:
+            bolt_hole_type (string):
+
+        Returns:
+
+        """
+        k_h = {"Standard": 1.0, "Over-sized": 0.85}
+        return k_h[bolt_hole_type]
+
+    @staticmethod
     def bolt_shear_hsfg(bolt_diameter, bolt_fu, mu_f, n_e, bolt_hole_type):
         """ Calculate design shear capacity of a single HSFG bolt(s) based on Cl 10.4.3
 
@@ -138,25 +177,15 @@ class ConnectionCalculations(object):
 
         """
         gamma_mf = 1.25  # factor of safety at ultimate load
-        proof_stress = 0.7 * bolt_fu  # proof stress
-        # bolt_area_threads - area of bolt at threads
-        bolt_area_threads = {
-            '12': 84.3,
-            '16': 157,
-            '20': 245,
-            '22': 303,
-            '24': 353,
-            '27': 459,
-            '30': 561,
-            '36': 817
-        }[str(bolt_diameter)]
         # F_0 - minimum bolt tension (proof load) at bolt installation
         # proof load (Kn)(minimum bolt tension)
-        F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
-        k_h = {
-            "Standard": 1.0,
-            "Over-sized": 0.85
-        }[bolt_hole_type]
+        # F_0 = bolt_area_threads * proof_stress / 1000  # (Kn)
+        # k_h = {
+        #     "Standard": 1.0,
+        #     "Over-sized": 0.85
+        # }[bolt_hole_type]
+        F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter, bolt_fu)
+        k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type)
         v_nsf = mu_f * n_e * k_h * F_0  # nominal shear capacity of bolt
         v_dsf = v_nsf / gamma_mf
         return v_dsf
@@ -224,14 +253,14 @@ class ConnectionCalculations(object):
             distance (float): bolt distance in mm
 
         Returns:
-            round_up_distance (float): bolt distance in mm, multiple of 5 mm.
+            round_down_distance (float): bolt distance in mm, multiple of 5 mm.
 
         """
         int_distance = int(distance)
-        round_up_distance = int_distance
+        round_down_distance = int_distance
         if int_distance % 5 != 0:
-            round_up_distance = ((int_distance / 5)) * 5
-        return round_up_distance
+            round_down_distance = (int(int_distance / 5)) * 5
+        return round_down_distance
 
     def calculate_distances(self, bolt_diameter, bolt_hole_diameter, min_edge_multiplier, thickness_governing_min,
                             is_environ_corrosive):

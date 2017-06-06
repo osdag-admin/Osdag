@@ -441,7 +441,7 @@
      <x>0</x>
      <y>0</y>
      <width>1455</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -949,8 +949,8 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>1</x>
-       <y>250</y>
-       <width>170</width>
+       <y>258</y>
+       <width>191</width>
        <height>25</height>
       </rect>
      </property>
@@ -970,7 +970,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>280</y>
+       <y>282</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -991,7 +991,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>280</y>
+       <y>282</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3220,7 +3220,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3370,7 +3370,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3391,7 +3391,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3433,7 +3433,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3454,7 +3454,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3475,7 +3475,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3517,7 +3517,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3538,7 +3538,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3559,7 +3559,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3622,7 +3622,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3643,7 +3643,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3699,14 +3699,14 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>430</y>
-       <width>191</width>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3730,7 +3730,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3772,7 +3772,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3814,7 +3814,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3847,7 +3847,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="lbl_SeatAngle">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>-1</x>
        <y>365</y>
        <width>141</width>
        <height>31</height>
@@ -3891,14 +3891,14 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>520</y>
-       <width>191</width>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3933,14 +3933,14 @@ QMenu::item:selected {
       <rect>
        <x>0</x>
        <y>550</y>
-       <width>191</width>
+       <width>201</width>
        <height>21</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3973,7 +3973,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="label_175">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>-1</x>
        <y>580</y>
        <width>171</width>
        <height>31</height>

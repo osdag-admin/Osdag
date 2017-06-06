@@ -66,6 +66,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
@@ -120,7 +121,8 @@ class DesignPreferences(QDialog):
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+
+        designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()#float
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())#int
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))

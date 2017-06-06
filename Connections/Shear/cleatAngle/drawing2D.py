@@ -481,23 +481,23 @@ class Cleat2DCreatorFront(object):
         self.B1 = np.array([ptB1x, ptB1y])
         self.ptB1 = np.array([ptB1x, ptB1y])
 
-        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptC2x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptC2y = ptC1y + self.dataObj.cleat_ht
         self.C2 = (ptC2x, ptC2y)
 
-        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20)
+        ptA5x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap)
         ptA5y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A5 = ptA5x, ptA5y
 
-        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptA4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptA4y = ((self.dataObj.col_L - self.dataObj.D_beam) / 2) + self.dataObj.beam_T
         self.A4 = (ptA4x, ptA4y)
 
-        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + 20) + self.dataObj.beam_L
+        ptB4x = ((self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap) + self.dataObj.beam_L
         ptB4y = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B4 = (ptB4x, ptB4y)
 
-        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + 20
+        ptBx5 = ((self.dataObj.col_B + self.dataObj.col_tw) / 2) + self.dataObj.gap
         ptBy5 = ((self.dataObj.col_L + self.dataObj.D_beam) / 2) - self.dataObj.beam_T
         self.B5 = (ptBx5, ptBy5)
 
@@ -1092,7 +1092,7 @@ class Cleat2DCreatorFront(object):
         pty = 0
         pt = np.array([ptx, pty])
         theta = 90
-        offset = self.dataObj.col_B / 3
+        offset = (self.dataObj.col_L - self.dataObj.beam_L) /5.5
         text_up = "Column " + self.dataObj.col_Designation
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, pt, theta, "NW", offset, text_up, text_down)
@@ -1160,16 +1160,16 @@ class Cleat2DCreatorFront(object):
         self.dataObj.draw_cross_section(dwg, ptSecC, ptSecD, txt_pt, txt)
 
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
-
         dwg.add(dwg.polyline(points=[(self.A2), (self.B), (self.A), (self.D), (self.C), (self.B2)], stroke='blue', fill='none', stroke_width=2.5))
+
         dwg.add(dwg.line((self.E), (self.H)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.F), (self.G)).stroke('blue', width=2.5, linecap='square'))
 
         # Diagonal Hatching to represent WELD
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(4, 4), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=0.7))
-        dwg.add(dwg.rect(insert=(self.P), size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill="none", stroke='blue', stroke_width=2.0))
 
+        dwg.add(dwg.rect(insert=(self.P), size=(self.dataObj.cleat_thk, self.dataObj.cleat_ht), fill="none", stroke='blue', stroke_width=2.0))
         dwg.add(dwg.rect(insert=(self.P), size=(self.dataObj.cleat_legsize, self.dataObj.cleat_ht), fill='none', stroke='blue', stroke_width=2.5))
 
         # C1,A1,A3,B3,B1,C2
@@ -1178,8 +1178,10 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.line((self.C1), (self.C2)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         # A2,B2
         dwg.add(dwg.line((self.A2), (self.B2)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+
         dwg.add(dwg.line((self.A5), (self.A4)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.B5), (self.B4)).stroke('blue', width=2.5, linecap='square'))
+
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col
         nr_c = self.dataObj.no_of_crows
@@ -1396,14 +1398,14 @@ class Cleat2DCreatorTop(object):
         self.A8 = self.A7 + (self.dataObj.beam_L) * np.array([1, 0])
         self.P1 = self.A1 + (self.dataObj.beam_B + self.dataObj.beam_tw) / 2 * np.array([0, 1])
         self.A6 = self.P1 + (self.dataObj.beam_L) * np.array([1, 0])
-        self.P = self.P1 - 20 * np.array([1, 0])
+        self.P = self.P1 - self.dataObj.gap * np.array([1, 0])
         self.P2 = self.P + (self.dataObj.cleat_legsize) * np.array([1, 0])
         self.P3 = self.P2 + (self.dataObj.cleat_thk) * np.array([0, 1])
         self.P6 = self.P3 - (self.dataObj.cleat_legsize - self.dataObj.cleat_thk) * np.array([1, 0])
         self.P5 = self.P6 + (self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk) * np.array([0, 1])
         self.P4 = self.P5 - (self.dataObj.cleat_thk) * np.array([1, 0])
         self.P7 = self.P1 + (self.dataObj.cleat_thk) * np.array([0, 1])
-        self.Q = self.P1 - 20 * np.array([1, 0]) - (self.dataObj.beam_tw) * np.array([0, 1])
+        self.Q = self.P1 - self.dataObj.gap * np.array([1, 0]) - (self.dataObj.beam_tw) * np.array([0, 1])
         self.Q1 = self.Q + (self.dataObj.gap) * np.array([1, 0])
         self.Q2 = self.Q + (self.dataObj.cleat_legsize) * np.array([1, 0])
         self.Q3 = self.Q2 - (self.dataObj.cleat_thk) * np.array([0, 1])
@@ -1447,14 +1449,14 @@ class Cleat2DCreatorTop(object):
         self.FA8 = self.FA7 + (self.dataObj.beam_L) * np.array([1, 0])
         self.FP1 = self.FA1 + (self.dataObj.beam_B + self.dataObj.beam_tw) / 2 * np.array([0, 1])
         self.FA6 = self.FP1 + (self.dataObj.beam_L) * np.array([1, 0])
-        self.FP = self.FP1 - 20 * np.array([1, 0])
+        self.FP = self.FP1 - self.dataObj.gap * np.array([1, 0])
         self.FP2 = self.FP + (self.dataObj.cleat_legsize) * np.array([1, 0])
         self.FP3 = self.FP2 + (self.dataObj.cleat_thk) * np.array([0, 1])
         self.FP6 = self.FP3 - (self.dataObj.cleat_legsize - self.dataObj.cleat_thk) * np.array([1, 0])
         self.FP5 = self.FP6 + (self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk) * np.array([0, 1])
         self.FP4 = self.FP5 - (self.dataObj.cleat_thk) * np.array([1, 0])
         self.FP7 = self.FP1 + (self.dataObj.cleat_thk) * np.array([0, 1])
-        self.FQN = self.FP1 - 20 * np.array([1, 0]) - (self.dataObj.beam_tw) * np.array([0, 1])
+        self.FQN = self.FP1 - self.dataObj.gap * np.array([1, 0]) - (self.dataObj.beam_tw) * np.array([0, 1])
         self.FQ1 = self.FQN + (self.dataObj.gap) * np.array([1, 0])
         self.FQ2 = self.FQN + (self.dataObj.cleat_legsize) * np.array([1, 0])
         self.FQ3 = self.FQ2 - (self.dataObj.cleat_thk) * np.array([0, 1])
@@ -1761,20 +1763,21 @@ class Cleat2DCreatorTop(object):
 
         dwg.add(dwg.polyline(
             points=[(self.FA), (self.FB), (self.FC), (self.FD), (self.FE), (self.FF), (self.FG), (self.FH), (self.FI), (self.FJ), (self.FK), (self.FL),
-                    (self.FA)], stroke='blue', fill='none', stroke_width=2.5))
+                    (self.FA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 
         dwg.add(dwg.rect(insert=(self.FA1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.FA7), (self.FA8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.FP1), (self.FA6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.line((self.FP), (self.FP1)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(
-            dwg.polyline(points=[(self.FP1), (self.FP2), (self.FP3), (self.FP7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.polyline(points=[(self.FP7), (self.FP6), (self.FP5), (self.FP4)], stroke='blue', fill='none', stroke_width=2.5))
 
+        dwg.add(dwg.line((self.FP), (self.FP1)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.FQN), (self.FQ1)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(
-            dwg.polyline(points=[(self.FQ1), (self.FQ2), (self.FQ3), (self.FQ7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+
+        dwg.add( dwg.polyline(points=[(self.FP1), (self.FP2), (self.FP3), (self.FP7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.polyline(points=[(self.FQ1), (self.FQ2), (self.FQ3), (self.FQ7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+
+        dwg.add(dwg.polyline(points=[(self.FP7), (self.FP6), (self.FP5), (self.FP4)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[(self.FQ7), (self.FQ6), (self.FQ5), (self.FQ4)], stroke='blue', fill='none', stroke_width=2.5))
+
 
         nc = self.dataObj.no_of_col
         nc_c = self.dataObj.no_of_ccol
@@ -1895,7 +1898,7 @@ class Cleat2DCreatorTop(object):
         # Bolt Information for beam connectivity
         bolt_pt = np.array(pt_list[0])
         theta = 70
-        offset = (self.dataObj.beam_B) + 70
+        offset = (self.dataObj.beam_B) + 80
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1920,8 +1923,8 @@ class Cleat2DCreatorTop(object):
         # Gap Informatoin
         ptG1 = self.FG + 50 * np.array([0, 1])
         ptG2 = ptG1 + 20 * np.array([1, 0])
-        offset = 1
-        params = {"offset": offset, "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 50}
+        offset = 10
+        params = {"offset": offset, "textoffset": 10, "lineori": "right", "endlinedim": 20, "arrowlen": 50}
         self.dataObj.draw_dimension_inner_arrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
 
         # Draw Faint Lines to representation of Gap distance 
@@ -1929,7 +1932,7 @@ class Cleat2DCreatorTop(object):
         ptB = ptG1
         self.dataObj.draw_faint_line(ptA, ptB, dwg)
         ptC = self.FA4
-        ptD = ptC + (self.dataObj.D_col - self.dataObj.beam_B) / 2 * np.array([0, 1])
+        ptD = ptC + (self.dataObj.D_col - self.dataObj.beam_B)/1.5  * np.array([0, 1])
         self.dataObj.draw_faint_line(ptC, ptD, dwg)
 
         # 2D view name
@@ -1973,17 +1976,19 @@ class Cleat2DCreatorTop(object):
 
         dwg.add(dwg.polyline(
             points=[(self.A), (self.B), (self.C), (self.D), (self.E), (self.F), (self.G), (self.H), (self.I), (self.J), (self.K), (self.L), (self.A)],
-            stroke='blue', fill='none', stroke_width=2.5))
+            stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A1), size=(self.dataObj.beam_L, self.dataObj.beam_B), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.A7), (self.A8)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.P1), (self.A6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line((self.P), (self.P1)).stroke('blue', width=2.5, linecap='square'))
+
         dwg.add(dwg.polyline(points=[(self.P1), (self.P2), (self.P3), (self.P7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+        dwg.add(dwg.polyline(points=[(self.Q1), (self.Q2), (self.Q3), (self.Q7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
+
         dwg.add(dwg.polyline(points=[(self.P7), (self.P6), (self.P5), (self.P4)], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[(self.Q7), (self.Q6), (self.Q5), (self.Q4)], stroke='blue', fill='none', stroke_width=2.5))
 
         dwg.add(dwg.line((self.Q), (self.Q1)).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.polyline(points=[(self.Q1), (self.Q2), (self.Q3), (self.Q7)], stroke='red', fill='none', stroke_width=2.5).dasharray(dasharray=([5, 5])))
-        dwg.add(dwg.polyline(points=[(self.Q7), (self.Q6), (self.Q5), (self.Q4)], stroke='blue', fill='none', stroke_width=2.5))
 
         nc = self.dataObj.no_of_col
         nc_c = self.dataObj.no_of_ccol
@@ -2741,11 +2746,11 @@ class Cleat2DCreatorSide(object):
     def call_CFBW_side(self, filename):
         '''
         '''
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox='-400 -300 1200 1600')
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox='-360 -300 1200 1600')
         dwg.add(dwg.rect(insert=(self.FA), size=(self.dataObj.col_B, self.dataObj.col_L), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(
             points=[(self.FA1), (self.FA2), (self.FA3), (self.FA4), (self.FA5), (self.FA6), (self.FA7), (self.FA8), (self.FA9), (self.FA10), (self.FA11),
-                    (self.FA12), (self.FA1)], stroke='blue', fill='none', stroke_width=2.5))
+                    (self.FA12), (self.FA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 
         dwg.add(dwg.rect(insert=(self.FX), size=((self.dataObj.cleat_legsize_1 - self.dataObj.cleat_thk), self.dataObj.cleat_ht), fill="none", stroke='blue',
                          stroke_width=2.5))
@@ -2939,7 +2944,7 @@ class Cleat2DCreatorSide(object):
         # beam bolt information
         no_of_bbolts = self.dataObj.no_of_rows * self.dataObj.no_of_col
         boltPt = np.array(pitch_pts[0])
-        theta = 55
+        theta = 60
         offset = (self.dataObj.col_B) / 2 + 100
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
@@ -2952,8 +2957,8 @@ class Cleat2DCreatorSide(object):
         # column bolt information
         no_of_cbolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         boltPt = np.array(pitch_pts_c1[0][0])
-        theta = 45
-        offset =  (self.dataObj.col_B) / 2
+        theta = 55
+        offset =  (self.dataObj.col_B) / 2.2
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"

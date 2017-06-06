@@ -1562,7 +1562,7 @@ class Seat2DCreatorTop(object):
     def call_CFBF_top(self, file_name):
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-400 -250 1500 1020'))
         dwg.add(dwg.polyline(points=[self.SA, self.SB, self.SC, self.SD, self.SE, self.SF, self.SG, self.SH, self.SI, self.SJ, self.SK,
-                                     self.SL, self.SA], stroke='blue', fill='none', stroke_width=2.5))
+                                     self.SL, self.SA], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SB1, self.SB4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line(self.SA2, self.SA5).stroke('blue', width=2.5, linecap='square'))
@@ -1756,7 +1756,7 @@ class Seat2DCreatorTop(object):
         # vb_ht = str(float(self.data_object.col_depth) + 750)
         dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-450 -300 1500 1200'))
         dwg.add(dwg.polyline(points=[self.SWA, self.SWB, self.SWC, self.SWD, self.SWE, self.SWF, self.SWG, self.SWH, self.SWI, self.SWJ, self.SWK, self.SWL,
-                                     self.SWA], stroke='blue', fill='none', stroke_width=2.5))
+                                     self.SWA], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SWA1, self.SWA3, self.SWA4, self.SWA6, self.SWA1], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SWA2, self.SWA5).stroke('blue', width=2.5, linecap='square'))
 
@@ -2247,7 +2247,7 @@ class Seat2DCreatorSide(object):
         dwg.add(dwg.line(self.SWF, self.SWG).stroke('blue', width=2.5, linecap='square'))
 
         dwg.add(dwg.polyline(points=[self.SWA1, self.SWA2, self.SWA3, self.SWA4, self.SWA5, self.SWA6, self.SWA7, self.SWA8, self.SWA9, self.SWA10,
-                                     self.SWA11, self.SWA12, self.SWA1], stroke='blue', fill='none', stroke_width=2.5))
+                                     self.SWA11, self.SWA12, self.SWA1], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SWB6, self.SWB2, self.SWB3, self.SWB5, self.SWB6], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SWB1, self.SWB4).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.SWB12, self.SWB8, self.SWB9, self.SWB11, self.SWB12], stroke='blue', fill='none', stroke_width=2.5))
@@ -2484,10 +2484,10 @@ class Seat2DCreatorSide(object):
         dwg.save()
 
     def call_CFBF_side(self, file_name):
-        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-510 -350 1200 1500'))
+        dwg = svgwrite.Drawing(file_name, size=('100%', '100%'), viewBox=('-520 -350 1200 1500'))
         dwg.add(dwg.rect(insert=self.SA, size=(self.data_object.col_width, self.data_object.col_length), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SA1, self.SA2, self.SA3, self.SA4, self.SA5, self.SA6, self.SA7, self.SA8, self.SA9, self.SA10, self.SA11,
-                                     self.SA12, self.SA1], stroke='blue', fill='none', stroke_width=2.5))
+                                     self.SA12, self.SA1], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SB1, self.SB2, self.SB3, self.SB4, self.SB5, self.SB6, self.SB1], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.SB7, self.SB8, self.SB9, self.SB10, self.SB11, self.SB12, self.SB7], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.SB1, self.SB4).stroke('blue', width=2.5, linecap='square'))
@@ -2504,7 +2504,7 @@ class Seat2DCreatorSide(object):
         # =================================  Column Information  ========================================
         beam_pt = self.SA + (self.data_object.col_width/5) * np.array([1, 0])
         theta = 90
-        offset = self.data_object.col_depth/4
+        offset = self.data_object.col_depth/3
         text_up = "Column " + self.data_object.col_designation
         text_down = ""
         self.data_object.draw_oriented_arrow(dwg, beam_pt, theta, "NW", offset, text_up, text_down)

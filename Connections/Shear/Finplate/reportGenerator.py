@@ -12,7 +12,7 @@ import os
 from os.path import exists
 import pickle
 
-
+from Connections.connection_calculations import ConnectionCalculations
 
 def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename, folder):
     fileName = (filename)
@@ -100,6 +100,14 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     corrosive = str(uiObj["detailing"]["is_env_corrosive"])
 
     design_method = str(uiObj["design"]["design_method"])
+
+    ## To call k_h value from hsfg calculations
+    bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
+    k_h = str(float(bolt_param_k_h))
+
+    ## To call F_0 value from hsfg calculations
+    bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=boltDia, bolt_fu=bolt_grade_fu)
+    F_0 = str(float(bolt_param_F_0))
 
     beamdepth = str(int(round(outObj['Plate']['beamdepth'], 1)))
     beamflangethk = str(int(round(outObj['Plate']['beamflangethk'], 1)))
@@ -717,9 +725,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('tr')
     const = str(round(math.pi / 4 * 0.78, 4))
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
+    n_e = str(1)
     if bearingcapacity == "N/A" :
-        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
-               ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
+        row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
+               ")/(1.25)) = " + shearCapacity + "<br> [cl. 10.4.3]", ""]
     else:
         row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
            ")/(&#8730;3*1.25*1000) = " + shearCapacity + "<br> [cl. 10.3.3]", ""]
@@ -814,6 +823,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     rstr += t('tr')
+
     minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEnd = str(float(12 * float(beam_tw)))
     row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",end,

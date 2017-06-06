@@ -68,7 +68,7 @@ from OCC.TopExp import TopExp_Explorer
 from OCC.TopoDS import topods
 from OCC.TopAbs import TopAbs_EDGE
 from ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
-    makeFaceFromWire, makePrismFromFace
+    makeFaceFromWire, makePrismFromFace,makeEdgesFromPoints
 
 """
     +
@@ -112,7 +112,8 @@ class Angle(object):
         self.B = B
         self.T = T
         self.R1 = R1
-        self.R2 = R2
+        #self.R2 = R2
+        self.R2 = 0.0
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -124,6 +125,7 @@ class Angle(object):
         self.uDir = uDir
         self.wDir = wDir
         self.computeParams()
+
 
     def computeParams(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)

@@ -158,10 +158,14 @@ def finConn(uiObj):
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
         web_plate_w  = 0
+    else:
+        web_plate_w =  int(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
+    else:
+        web_plate_l = int(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
@@ -467,7 +471,7 @@ def finConn(uiObj):
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
-            Ecc = min_edge_dist + gap   #20
+            Ecc = min_edge_dist + gap
             # Moment due to shear external force
             M1 = shear_load * Ecc;
              
@@ -494,7 +498,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + gap    #20
+                Ecc = min_edge_dist + min_gauge / 2 + gap
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 

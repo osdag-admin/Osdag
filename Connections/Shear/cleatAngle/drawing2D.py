@@ -820,8 +820,8 @@ class Cleat2DCreatorFront(object):
         # ##################### BEAM designation and number bolt information ##############
         # SUPORTED BEAM Designation
         beam_pt = self.BB2
-        theta = 90
-        offset = 1
+        theta = 60
+        offset = 20
         text_up = "Beam " + self.dataObj.beam_Designation  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
@@ -853,7 +853,7 @@ class Cleat2DCreatorFront(object):
         no_of_bolts = self.dataObj.no_of_crows * 2 * self.dataObj.no_of_ccol
         bolt_pt = np.array(pt_list_c[-1])
         theta = 70
-        offset = (self.dataObj.beam_B *3 )  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
+        offset = (self.dataObj.beam_B *2.2 )  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
         if str(self.dataObj.bolt_type) == "HSFG":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2449,17 +2449,17 @@ class Cleat2DCreatorSide(object):
         # ##################################################################################################################
         # SUPORTED BEAM Designation
         beam_pt = self.BG1
-        theta = 30
-        offset = (self.beam_beam_length - self.dataObj.beam_B) / 2 + 25  # beam_B
+        theta = 45
+        offset = (self.dataObj.beam_B * 1.4)   # beam_B
         text_up = "Beam " + self.dataObj.beam_Designation  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down)
 
         # SUPORTING BEAM Designation
-        theta = 55
-        offset = 60
-        text_up = "Beam " + self.dataObj.col_Designation
-        text_down = ""
+        theta = 75
+        offset = 200
+        text_up = ""
+        text_down =  "Beam " + self.dataObj.col_Designation
         self.dataObj.draw_oriented_arrow(dwg, self.BG, theta, "SW", offset, text_up, text_down)
 
         #  primary BEAM Bolt GROUP  Information
@@ -2495,7 +2495,7 @@ class Cleat2DCreatorSide(object):
         # cleat angle information
         cleat_pt = self.BZ1
         theta = 55
-        offset = (self.dataObj.beam_B +10)   # beam_tw
+        offset = (self.dataObj.beam_B * 1.2)   # beam_tw
         text_up = "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, cleat_pt, theta, "SW", offset, text_up, text_down)

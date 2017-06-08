@@ -22,6 +22,7 @@ from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_contro
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os.path
 import subprocess
+import shutil
 
 
 class MyTutorials(QDialog):
@@ -115,7 +116,8 @@ class OsdagMainWindow(QMainWindow):
     def show_design_connection(self):
 
         options = QFileDialog.Options()
-        folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
+        # folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', os.path.join('..', '..', ' '))
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':
@@ -131,7 +133,11 @@ class OsdagMainWindow(QMainWindow):
                 flag = False
                 return flag
             else:
-                os.mkdir(os.path.join(root_path, create_folder))
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
             launchFinPlateController(self, folder)

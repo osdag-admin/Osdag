@@ -472,14 +472,32 @@ class MainController(QMainWindow):
         self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
 
     def get_beamdata(self):
-        """Fetch old and new beam sections from "Intg_osdag" database
-        Returns:
+        # """Fetch old and new beam sections from "Intg_osdag" database
+        # Returns:
+        #
+        # """
+        # beamdata = get_beamcombolist()
+        # old_beamList = get_oldbeamcombolist()
+        # self.ui.combo_Beam.addItems(beamdata)
+        # self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
 
-        """
+        """Fetch old and new beam sections from "Intg_osdag" database
+                Returns:
+
+                """
+        loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
-        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+        combo_section = ''
+        if loc == "Beam-Beam":
+            self.ui.comboColSec.addItems(beamdata)
+            combo_section = self.ui.comboColSec
+        else:
+            self.ui.combo_Beam.addItems(beamdata)
+            combo_section = self.ui.combo_Beam
+
+        self.color_oldDB_sections(old_beamList, beamdata, combo_section)
+
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
         """display old sections in red color.
@@ -535,11 +553,10 @@ class MainController(QMainWindow):
 
     def convert_col_combo_to_beam(self):
         """
-
         :return:
         """
         self.display.EraseAll()
-        loc = self.ui.comboConnLoc.currentText()
+        loc = str(self.ui.comboConnLoc.currentText())
         if loc == "Beam-Beam":
             self.ui.beamSection_lbl.setText(" Secondary beam *")
             self.ui.actionShow_beam.setText("Show SBeam")
@@ -552,6 +569,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.comboColSec.blockSignals(True)
             self.ui.comboColSec.clear()
+            self.get_beamdata()
+            self.ui.combo_Beam.setCurrentIndex(0)
 
             font = QFont()
             font.setPointSize(11)
@@ -621,8 +640,11 @@ class MainController(QMainWindow):
             font.setWeight(75)
             self.ui.outputBoltLbl.setFont(font)
             self.ui.outputBoltLbl.setText("Beam")
+            self.ui.comboColSec.clear()
+            self.get_columndata()
+            self.ui.comboColSec.currentText()
 
-            self.ui.comboColSec.addItems(get_columncombolist())
+            # self.ui.comboColSec.addItems(get_columncombolist())
 
             self.ui.comboColSec.setCurrentIndex(0)
             self.ui.combo_Beam.setCurrentIndex(0)
@@ -655,12 +677,14 @@ class MainController(QMainWindow):
     def fill_cleatsection_combo(self):
         '''Populates the cleat section on the basis  beam section and column section
         '''
+        self.ui.combo_Beam.currentText()
+        self.ui.comboColSec.currentText()
 
-        if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section":
+        if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == '':
             return
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web" or "Column flange-Beam web":
-            loc = self.ui.comboConnLoc.currentText()
+
             dict_beam_data = self.fetch_beam_param()
             dict_column_data = self.fetch_column_param()
             angle_list = get_anglecombolist()
@@ -892,7 +916,9 @@ class MainController(QMainWindow):
             if ui_obj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.beamSection_lbl.setText('Secondary beam *')
                 self.ui.columnSection_lbl.setText('Primary beam *')
-                self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.comboColSec.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
                 self.ui.actionShow_beam.setText("Show SBeam")
                 self.ui.actionShow_column.setText("Show PBeam")
                 self.ui.chkBxBeam.setText("SBeam")

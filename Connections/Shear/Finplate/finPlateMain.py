@@ -471,11 +471,15 @@ class MainController(QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
+        combo_section = ''
         if loc == "Beam-Beam":
             self.ui.comboColSec.addItems(beamdata)
+            combo_section = self.ui.comboColSec
         else:
             self.ui.combo_Beam.addItems(beamdata)
-        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+            combo_section = self.ui.combo_Beam
+
+        self.color_oldDB_sections(old_beamList, beamdata,combo_section )
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
         """display old sections in red color.
@@ -840,7 +844,9 @@ class MainController(QMainWindow):
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
-                self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.comboColSec.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
                 self.ui.chkBxBeam.setText("SBeam")
                 self.ui.chkBxBeam.setToolTip("Secondary  beam")
                 self.ui.chkBxCol.setText("PBeam")

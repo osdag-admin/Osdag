@@ -175,16 +175,6 @@ class DesignPreferences(QDialog):
 
         return designPref
 
-    # def set_bolthole_clernce(self):
-    #     uiObj = self.main_controller.getuser_inputs()
-    #     boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-    #     if boltDia != "Diameter of Bolt":
-    #         clearance = self.get_clearance(boltDia)
-    #         #self.ui.txt_boltHoleClearance.setText(str(clearance))
-    #     else:
-    #         pass
-
-
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
@@ -218,7 +208,8 @@ class DesignPreferences(QDialog):
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
-        return boltFu[float(boltGrade)]
+        boltGrd = float(boltGrade)
+        return boltFu[boltGrd]
 
     def close_designPref(self):
         self.close()
@@ -437,15 +428,24 @@ class MainController(QMainWindow):
         self.ui.comboColSec.addItems(columndata)
         self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
 
+
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
-        Returns:
+                       Returns:
 
-        """
+                       """
+        loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        self.ui.combo_Beam.addItems(beamdata)
-        self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
+        combo_section = ''
+        if loc == "Beam-Beam":
+            self.ui.comboColSec.addItems(beamdata)
+            combo_section = self.ui.comboColSec
+        else:
+            self.ui.combo_Beam.addItems(beamdata)
+            combo_section = self.ui.combo_Beam
+
+        self.color_oldDB_sections(old_beamList, beamdata, combo_section)
 
     def color_oldDB_sections(self, old_section, intg_section, combo_section):
         """display old sections in red color.
@@ -690,7 +690,7 @@ class MainController(QMainWindow):
         return dict_col_data
 
 
-    def convert_col_combo_to_beam(self):# 
+    def convert_col_combo_to_beam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.lbl_beam.setText(" Secondary beam *")
@@ -704,6 +704,7 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Primary beam")
  
             self.ui.comboColSec.clear()
+            self.get_beamdata()
             self.ui.comboColSec.addItems(get_beamcombolist())
  
             self.ui.combo_Beam.setCurrentIndex((0))
@@ -750,7 +751,8 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setToolTip("Column only")
  
             self.ui.comboColSec.clear()
-            self.ui.comboColSec.addItems(get_columncombolist())
+            self.get_columndata()
+            #self.ui.comboColSec.addItems(get_columncombolist())
  
             self.ui.combo_Beam.setCurrentIndex(0)
             self.ui.comboColSec.setCurrentIndex(0)
@@ -842,7 +844,9 @@ class MainController(QMainWindow):
             if uiobj['Member']['Connectivity'] == 'Beam-Beam':
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
-                self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.comboColSec.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
                 self.ui.chkBxBeam.setText("SBeam")
                 self.ui.actionShow_beam.setText("Show SBeam")
                 self.ui.chkBxBeam.setToolTip("Secondary  beam")

@@ -223,6 +223,9 @@ def finConn(uiObj):
     PBeam_T = float(dictcolumndata["T"])
     PBeam_R1 = float(dictcolumndata["R1"])
 
+    notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
+    if notch_ht < (beam_d/5):
+        logger.warning(" : Depth of coping should preferably be less than D/5 (D: depth of secondary beam)")
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
 

@@ -617,11 +617,9 @@ QMenu::item:selected {
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionVideo_Tutorials"/>
-    <addaction name="actionSample_Report"/>
-    <addaction name="actionSample_Problems"/>
+    <addaction name="actionDesign_examples"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Osdag_2"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
@@ -4407,9 +4405,9 @@ QMenu::item:selected {
     <string>Change background</string>
    </property>
   </action>
-  <action name="actionSample_Report">
+  <action name="actionDesign_examples">
    <property name="text">
-    <string>Sample Design Report</string>
+    <string>Design Examples</string>
    </property>
   </action>
   <action name="actionSample_Problems">

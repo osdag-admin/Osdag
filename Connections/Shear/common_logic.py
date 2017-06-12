@@ -114,7 +114,7 @@ class CommonDesignLogic(object):
             pass
         return outputs
 
-    def get_notch_ht(self, PB_T,PB_R1, SB_T, SB_R1):
+    def get_notch_ht(self, PB_T, PB_R1, SB_T, SB_R1):
         """
         Args:
             PB_T: (Float)Flange thickness of Primary beam
@@ -198,7 +198,8 @@ class CommonDesignLogic(object):
         if self.connection == "Finplate":
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
-                             width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
+                             #width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
+                             width= (pBeam_B/2.0 - (pBeam_tw/2.0  + gap))+ gap,
                              length=sBeam_B)
 
         elif self.connection == "Endplate":

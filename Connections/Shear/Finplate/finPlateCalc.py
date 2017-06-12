@@ -215,7 +215,7 @@ def finConn(uiObj):
     else:
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_columndata(column_sec)
-    
+
     beam_w_t = float(dictbeamdata["tw"])
     beam_f_t = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
@@ -223,13 +223,16 @@ def finConn(uiObj):
     PBeam_T = float(dictcolumndata["T"])
     PBeam_R1 = float(dictcolumndata["R1"])
 
-    notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
-    if notch_ht < (beam_d/5):
-        logger.warning(" : Depth of coping should preferably be less than D/5 (D: depth of secondary beam)")
+    if connectivity == "Beam-Beam":
+        notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
+        print notch_ht
+        print beam_d/5
+        if notch_ht < (beam_d/5):
+            pass
+        else:
+            logger.warning(" : Depth of coping should preferably be less than D/5 (D: Secondary beam depth)")
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
-
-
 
     # Plate thickness check
     if web_plate_t < beam_w_t:

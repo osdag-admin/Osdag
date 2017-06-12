@@ -442,6 +442,7 @@ class MainController(QMainWindow):
 
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
 
+
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -452,6 +453,7 @@ class MainController(QMainWindow):
         self.resultObj = None
         self.uiObj = None
         self.designPrefDialog = DesignPreferences(self)
+
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
@@ -835,6 +837,7 @@ class MainController(QMainWindow):
         uiObj = self.get_prevstate()
         self.setDictToUserInputs(uiObj)
 
+
     def setDictToUserInputs(self, uiObj):
 
         if (uiObj is not None):
@@ -842,6 +845,7 @@ class MainController(QMainWindow):
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
+
                 self.ui.lbl_beam.setText('Secondary beam *')
                 self.ui.lbl_column.setText('Primary beam *')
                 self.ui.comboColSec.clear()
@@ -856,7 +860,6 @@ class MainController(QMainWindow):
 
             self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
             self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
-
             self.ui.txtFu.setText(str(uiObj['Member']['fu (MPa)']))
             self.ui.txtFy.setText(str(uiObj['Member']['fy (MPa)']))
 
@@ -880,6 +883,7 @@ class MainController(QMainWindow):
             self.ui.txtPlateWidth.setText(str(uiObj['Plate']['Width (mm)']))
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
+
         else:
             pass
 
@@ -1336,6 +1340,7 @@ class MainController(QMainWindow):
         self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
     def checkBeam_B(self):
+        check = True
         loc = str(self.ui.comboConnLoc.currentText())
         if loc == "Column web-Beam web":
             if self.ui.comboColSec.currentIndex() == -1 or str(
@@ -1357,6 +1362,7 @@ class MainController(QMainWindow):
                 self.disableViewButtons()
                 QMessageBox.about(self, 'Information',
                                   "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
                 self.enableViewButtons()
@@ -1378,10 +1384,13 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
                                   "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
+        return check
 
     def validateInputsOnDesignBtn(self):
+
 
         flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
@@ -1431,7 +1440,7 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-
+        flag = self.checkBeam_B()
         return flag
 
 

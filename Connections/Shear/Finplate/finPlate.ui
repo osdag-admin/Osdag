@@ -573,11 +573,9 @@ QMenu::item:selected {
      <string>Help</string>
     </property>
     <addaction name="actionSample_Tutorials"/>
-    <addaction name="actionSample_reports"/>
-    <addaction name="actionSample_Problems"/>
+    <addaction name="actionDesign_examples"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Osdag_2"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
@@ -4542,9 +4540,9 @@ QMenu::item:selected {
     <string>Alt+Shift+M</string>
    </property>
   </action>
-  <action name="actionSample_reports">
+  <action name="actionDesign_examples">
    <property name="text">
-    <string>Sample Design Reports</string>
+    <string>Design Examples</string>
    </property>
   </action>
   <action name="actionSample_Problems">

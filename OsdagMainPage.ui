@@ -303,12 +303,7 @@ color:#ffffff;
         </item>
         <item>
          <property name="text">
-          <string>Sample Design Report</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Sample Problems</string>
+          <string>Design Examples</string>
          </property>
         </item>
         <item>

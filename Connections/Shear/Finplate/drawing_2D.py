@@ -63,8 +63,11 @@ class FinCommonData(object):
         #self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
         self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else 50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
         self.beamToBeamDist = 10
-        self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
-        self.notch_ht = self.col_T + self.col_R1
+        #self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
+        self.notch_width = (self.col_B /2.0 - (self.col_tw/2.0 + self.gap))+ self.gap
+        #self.notch_ht = self.col_T + self.col_R1
+        #self.notch_ht = notch_ht = max([PB_T, SB_T]) + max([PB_R1, SB_R1]) + max([(PB_T/2), (SB_T/2),10])
+        self.notch_ht = max([self.col_T, self.beam_T]) + max([self.col_R1, self.beam_R1]) + max([(self.col_T/2), (self.beam_T/2),10])
 
         self.folder = folder
 
@@ -639,15 +642,18 @@ class Fin2DCreatorFront(object):
         self.BA1 = self.BB + 10 * np.array([1, 0])  # 10 mm is minimum distance between two beams in Beam-Beam connectivity.
         self.BA4 = self.BA1 + self.dataObj.beam_T * np.array([0, 1])
         self.BA6 = self.BA1 + self.dataObj.notch_ht * np.array([0, 1])
-        self.BA2 = self.BA1 + (self.dataObj.beam_L - self.dataObj.notch_L) * np.array([1, 0])
-        self.BA3 = self.BA4 + (self.dataObj.beam_L - self.dataObj.notch_L) * np.array([1, 0])
+        self.BA2 = self.BA1 + (self.dataObj.beam_L - self.dataObj.notch_width) * np.array([1, 0])
+        self.BA3 = self.BA4 + (self.dataObj.beam_L - self.dataObj.notch_width) * np.array([1, 0])
         self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
         self.BB3 = self.BB2 + self.dataObj.beam_T * np.array([0, -1])
         self.BB1 =self.BB5 + (self.dataObj.D_beam-(self.dataObj.plate_ht + self.dataObj.notch_ht)) * np.array([0,1])
         self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
         self.B1 = self.BA5 + 80 * np.array([0, 1])
-        self.BC2 = self.BA6 + self.dataObj.col_R1 * np.array([-1, 0])
-        self.BC1 = self.BA6 + self.dataObj.col_R1 * np.array([0, -1])
+        self.R1_max = max([self.dataObj.col_R1,self.dataObj.beam_R1,10])
+        # self.BC2 = self.BA6 + self.dataObj.col_R1 * np.array([-1, 0])
+        # self.BC1 = self.BA6 + self.dataObj.col_R1 * np.array([0, -1])
+        self.BC2 = self.BA6 + self.R1_max * np.array([-1, 0])
+        self.BC1 = self.BA6 + self.R1_max * np.array([0, -1])
 
     def callCFBWfront(self, fileName):
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-400 -380 1300 1300'))
@@ -1116,7 +1122,8 @@ class Fin2DCreatorFront(object):
         dwg.add(dwg.rect(insert=(self.BP), size=(self.dataObj.plate_width, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
         dwg.add(dwg.line((self.BA4), (self.BA3)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BB4), (self.BB3)).stroke('blue', width=2.5, linecap='square'))
-        curveList = ["M", self.BC1, "A", np.array([self.dataObj.col_R1, self.dataObj.col_R1]), "0", "0", "1", self.BC2]
+        #curveList = ["M", self.BC1, "A", np.array([self.dataObj.col_R1, self.dataObj.col_R1]), "0", "0", "1", self.BC2]
+        curveList = ["M", self.BC1,"A", np.array([self.R1_max, self.R1_max]) ,"0", "0", "1", self.BC2]
         dwg.add(dwg.path(d=curveList, stroke='blue', fill='none', stroke_width=2.5))
 
         nr = self.dataObj.no_of_rows
@@ -1177,7 +1184,7 @@ class Fin2DCreatorFront(object):
         ptBP = self.BP - (self.dataObj.notch_ht) * np.array([0, 1])
         offset = (self.dataObj.col_B + self.dataObj.col_tw) / 2 + self.dataObj.gap + 50
         params = {"offset":(self.dataObj.col_B + self.dataObj.col_tw) / 2 + 40, "textoffset": 125, "lineori": "left", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, self.BP, ptBP, str(int(self.dataObj.notch_L)) + " mm", params)
+        self.dataObj.draw_dimension_outerArrow(dwg, self.BP, ptBP, str(int(self.dataObj.notch_width)) + " mm", params)
 
         # Draw Faint line for dimensions
         ptNotch1 = self.BP

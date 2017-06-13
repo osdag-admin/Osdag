@@ -114,6 +114,23 @@ class CommonDesignLogic(object):
             pass
         return outputs
 
+    def get_notch_ht(self, PB_T, PB_R1, SB_T, SB_R1):
+        """
+        Args:
+            PB_T: (Float)Flange thickness of Primary beam
+            PB_R1: (Float) Root radius of Primary beam
+            SB_T: (Float) Flange thickness of Secondary beam
+            SB_R1: (Float) Root radius of Secondary beam
+
+        Returns: (Float)Height of the coping based on maximum of sectional properties of Primary beam and Secondary beam
+
+        """
+        notch_ht = max([PB_T, SB_T]) + max([PB_R1, SB_R1]) + max([(PB_T/2), (SB_T/2),10])
+
+        return notch_ht
+
+
+
     def create3DBeamWebBeamWeb(self):
         '''self,uiObj,resultObj,dictbeamdata,dictcoldata):
         creating 3d cad model with beam web beam web
@@ -168,6 +185,8 @@ class CommonDesignLogic(object):
         nut_T = self.nut_T
         nut_Ht = 12.2  # 150
         gap = self.uiObj['detailing']['gap']
+        notch_height = self.get_notch_ht(pBeam_T, sBeam_T, pBeam_R1, sBeam_R1)
+        notch_R1 = max([pBeam_R1, sBeam_R1, 10])
 
         if self.connection == "cleatAngle":
             angle = Angle(L=cleat_length, A=angle_A, B=angle_B, T=cleat_thick, R1=angle_r1, R2=angle_r2)
@@ -177,13 +196,22 @@ class CommonDesignLogic(object):
 
         # --Notch dimensions
         if self.connection == "Finplate":
-            notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 20)) / 2.0 + 10),
+            notchObj = Notch(R1=notch_R1,
+                             height=notch_height,
+                             #width= (pBeam_B/2.0 - (pBeam_tw/2.0 ))+ gap,
+                             width= (pBeam_B/2.0 - (pBeam_tw/2.0  + gap))+ gap,
                              length=sBeam_B)
+
         elif self.connection == "Endplate":
-            notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1),
-                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick) + 10), length=sBeam_B)
+            notchObj = Notch(R1=notch_R1, height=notch_height,
+                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 )) + plate_thick,
+                             length=sBeam_B)
+
         elif self.connection == "cleatAngle":
-            notchObj = Notch(R1=pBeam_R1, height=(pBeam_T + pBeam_R1), width=((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10),
+            #((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10)
+            notchObj = Notch(R1=notch_R1,
+                             height=notch_height,
+                             width= (pBeam_B / 2.0 - (pBeam_tw / 2.0)) + gap,
                              length=sBeam_B)
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)

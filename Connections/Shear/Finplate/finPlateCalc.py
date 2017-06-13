@@ -158,10 +158,14 @@ def finConn(uiObj):
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
     if web_plate_w == '':
         web_plate_w  = 0
+    else:
+        web_plate_w =  int(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
+    else:
+        web_plate_l = int(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])
@@ -211,7 +215,7 @@ def finConn(uiObj):
     else:
         dictbeamdata = get_beamdata(beam_sec)
         dictcolumndata = get_columndata(column_sec)
-    
+
     beam_w_t = float(dictbeamdata["tw"])
     beam_f_t = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
@@ -219,10 +223,16 @@ def finConn(uiObj):
     PBeam_T = float(dictcolumndata["T"])
     PBeam_R1 = float(dictcolumndata["R1"])
 
+    if connectivity == "Beam-Beam":
+        notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
+        print notch_ht
+        print beam_d/5
+        if notch_ht < (beam_d/5):
+            pass
+        else:
+            logger.warning(" : Depth of coping should preferably be less than D/5 (D: Secondary beam depth)")
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
-
-
 
     # Plate thickness check
     if web_plate_t < beam_w_t:
@@ -467,7 +477,7 @@ def finConn(uiObj):
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)
         if web_plate_l != 0 and web_plate_w == 0:
-            Ecc = min_edge_dist + gap   #20
+            Ecc = min_edge_dist + gap
             # Moment due to shear external force
             M1 = shear_load * Ecc;
              
@@ -494,7 +504,7 @@ def finConn(uiObj):
                   
                 pitch = round(length_avail / (bolts_one_line - 1), 3); 
                 gauge = min_gauge
-                Ecc = min_edge_dist + min_gauge / 2 + gap    #20
+                Ecc = min_edge_dist + min_gauge / 2 + gap
                 # Moment due to external shear force
                 M1 = shear_load * Ecc;
                 # Moment demand for single line of bolts due to its shear capacity 

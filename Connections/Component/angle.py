@@ -68,7 +68,7 @@ from OCC.TopExp import TopExp_Explorer
 from OCC.TopoDS import topods
 from OCC.TopAbs import TopAbs_EDGE
 from ModelUtils import getGpPt, make_edge, makeWireFromEdges, \
-    makeFaceFromWire, makePrismFromFace
+    makeFaceFromWire, makePrismFromFace,makeEdgesFromPoints
 
 """
     +
@@ -111,8 +111,10 @@ class Angle(object):
         self.A = A
         self.B = B
         self.T = T
-        self.R1 = R1
-        self.R2 = R2
+        #self.R1 = R1
+        self.R1 = 0.0
+        #self.R2 = R2
+        self.R2 = 0.0
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -124,6 +126,7 @@ class Angle(object):
         self.uDir = uDir
         self.wDir = wDir
         self.computeParams()
+
 
     def computeParams(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
@@ -151,7 +154,7 @@ class Angle(object):
 
         ######################################################
         edges = []
-        if self.R2 == 0.0:
+        if self.R2 == 0.0 or self.R1 == 0.0:
             self.a3 = self.a4 = self.a5
             edge1 = make_edge(getGpPt(self.a1), getGpPt(self.a2))
             edges.append(edge1)
@@ -159,15 +162,22 @@ class Angle(object):
             edges.append(edge2)
             edge3 = make_edge(getGpPt(self.a3), getGpPt(self.a6))
             edges.append(edge3)
-            arc2 = GC_MakeArcOfCircle(getGpPt(self.a6), getGpPt(self.a7), getGpPt(self.a8))
-            edge4 = make_edge(arc2.Value())
+            # arc2 = GC_MakeArcOfCircle(getGpPt(self.a6), getGpPt(self.a7), getGpPt(self.a8))
+            # edge4 = make_edge(arc2.Value())
+            # edges.append(edge4)
+            # edge5 = make_edge(getGpPt(self.a8), getGpPt(self.a9))
+            # edges.append(edge5)
+            # edge6 = make_edge(getGpPt(self.a9), getGpPt(self.a12))
+            # edges.append(edge6)
+            # edge7 = make_edge(getGpPt(self.a12), getGpPt(self.a1))
+            # edges.append(edge7)
+            edge4 = make_edge(getGpPt(self.a6), getGpPt(self.a9))
             edges.append(edge4)
-            edge5 = make_edge(getGpPt(self.a8), getGpPt(self.a9))
+            edge5 = make_edge(getGpPt(self.a9), getGpPt(self.a12))
             edges.append(edge5)
-            edge6 = make_edge(getGpPt(self.a9), getGpPt(self.a12))
+            edge6 = make_edge(getGpPt(self.a12), getGpPt(self.a1))
             edges.append(edge6)
-            edge7 = make_edge(getGpPt(self.a12), getGpPt(self.a1))
-            edges.append(edge7)
+
         else:
             edge1 = make_edge(getGpPt(self.a1), getGpPt(self.a2))
             edges.append(edge1)

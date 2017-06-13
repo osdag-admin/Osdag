@@ -204,7 +204,7 @@ class CommonDesignLogic(object):
 
         elif self.connection == "Endplate":
             notchObj = Notch(R1=notch_R1, height=notch_height,
-                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 )) + plate_thick,
+                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick)) + plate_thick,
                              length=sBeam_B)
 
         elif self.connection == "cleatAngle":

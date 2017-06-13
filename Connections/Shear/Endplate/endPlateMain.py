@@ -791,6 +791,7 @@ class MainController(QMainWindow):
 
     def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()
+        check = True
         if loc == "Column web-Beam web":
 
             if self.ui.combo_Beam.currentText()== "Select section" or self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentText()=='Select section':
@@ -807,8 +808,10 @@ class MainController(QMainWindow):
             if column_web_depth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
+
         elif loc == "Beam-Beam":
 
             if self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
@@ -825,10 +828,12 @@ class MainController(QMainWindow):
             if pri_beam_web_depth <= sec_beam_D:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
-                                        "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
 
+        return check
          
     def retrieve_prevstate(self):
         '''
@@ -884,6 +889,7 @@ class MainController(QMainWindow):
 
         else:
             pass
+
     def setimage_connection(self):
         '''
         Setting image to connctivity.
@@ -1339,6 +1345,7 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
+        flag = self.checkbeam_b()
 
         return flag
 

@@ -1000,9 +1000,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
-    min_end = str(1.7 * float(dia_hole))
+    min_end = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_end = str(12 * float(beam_tw))
-    row = [0, "End distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_tw + " = " + max_end + " <br> [cl. 10.2.4]", end_b,
+    row = [0, "End distance (mm)", " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_end + ", &#8804; 12*" + beam_tw + " = " + max_end + " <br> [cl. 10.2.4]", end_b,
            "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1012,9 +1012,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
-    min_edge = str(1.7 * float(dia_hole))
+    min_edge = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_edge = str(12 * float(beam_tw))
-    row = [0, "Edge distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_tw + " = " + max_edge + "<br> [cl. 10.2.4]", edge_b,
+    row = [0, "Edge distance (mm)", " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_edge + ", &#8804; 12*" + beam_tw + " = " + max_edge + "<br> [cl. 10.2.4]", edge_b,
            " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1041,10 +1041,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
         max_len = str(float(beam_D) - float(column_R1) - float(column_f_t) - float(beam_f_t) - float(beam_R1) - 5)
         str_max_len = "-" + beam_f_t + "-" + beam_R1 + "-" + column_f_t + "-" + column_R1 + "- 5"
     else:
-        max_len = str(float(beam_D) - 2 * (float(beam_f_t) + float(beam_R1) + 5))
+        max_len = str(float(beam_D) - 2 * (float(beam_f_t) + float(beam_R1) + 5 ))
         str_max_len = "-" + beam_f_t + "-" + beam_R1 + "-" + beam_f_t + "-" + beam_R1 + "- 10"
-    min_len = str(0.6 * float(beam_D))
 
+    min_len = str(0.6 * float(beam_D))
     if float(height_c) < float(min_len) or float(height_c) > float(max_len) :
         row = [0, "Cleat height (mm)", "&#8805; 0.6*" + beam_D + "=" + min_len + ", &#8804; " + beam_D + str_max_len + "=" + max_len +
                "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", height_c,
@@ -1343,15 +1343,15 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
-    min_end = str(1.7 * float(dia_hole))
+    min_end = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_end = str(12 * float(thinner_c))
     if end_c < min_end or end_c > max_end:
         row = [0, "End distance (mm)",
-               " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + thinner_c + " = " + max_end + " <br> [cl. 10.2.4]",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_end + ", &#8804; 12*" + thinner_c + " = " + max_end + " <br> [cl. 10.2.4]",
                end_c,
                "<p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "End distance (mm)", " &#8805; 1.7*" + dia_hole + " = " + min_end + ", &#8804; 12*" + thinner_c + " = " + max_end + " <br> [cl. 10.2.4]", end_c,
+        row = [0, "End distance (mm)", " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_end + ", &#8804; 12*" + thinner_c + " = " + max_end + " <br> [cl. 10.2.4]", end_c,
            "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1361,15 +1361,15 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
-    min_edge = str(1.7 * float(dia_hole))
+    min_edge = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_edge = str(12 * float(thinner_c))
     if edge_c < min_edge or edge_c > max_edge :
         row = [0, "Edge distance (mm)",
-           " &#8805;1.7*" + dia_hole + " = " + min_edge + ", &#8804;12*" + thinner_c + " = " + max_edge + "<br> [cl. 10.2.4]",
+           " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_edge + ", &#8804;12*" + thinner_c + " = " + max_edge + "<br> [cl. 10.2.4]",
            edge_c,
            " <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "Edge distance (mm)", " &#8805;1.7*" + dia_hole + " = " + min_edge + ", &#8804;12*" + thinner_c + " = " + max_edge + "<br> [cl. 10.2.4]", edge_c,
+        row = [0, "Edge distance (mm)", " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_edge + ", &#8804;12*" + thinner_c + " = " + max_edge + "<br> [cl. 10.2.4]", edge_c,
            " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

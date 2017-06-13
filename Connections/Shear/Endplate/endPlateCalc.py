@@ -196,7 +196,9 @@ def end_connection(ui_obj):
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
     if end_plate_w == '':
         end_plate_w = 0
-        
+    else:
+        end_plate_w = float(end_plate_w)
+
     end_plate_l = str(ui_obj['Plate']['Height (mm)'])
     if end_plate_l == '':
         end_plate_l = 0
@@ -270,12 +272,7 @@ def end_connection(ui_obj):
     # Spacing of bolts for web plate -------------------
     # ######## According to IS 800 - 2007, table 9, clause no. 10.2.1 ##########################
 
-    if bolt_dia == 12 or bolt_dia == 14:
-        dia_hole = bolt_dia + 1
-    elif bolt_dia == 16 or bolt_dia == 18 or bolt_dia == 20 or bolt_dia == 22 or bolt_dia == 24:
-        dia_hole = bolt_dia + 2
-    else:
-        dia_hole = bolt_dia + 3
+    dia_hole = ui_obj["bolt"]["bolt_hole_clrnce"] + bolt_dia
 
         # Minimum/maximum pitch and gauge
     min_pitch = int(2.5 * bolt_dia)

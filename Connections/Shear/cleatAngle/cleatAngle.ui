@@ -456,7 +456,7 @@
      <x>0</x>
      <y>0</y>
      <width>1329</width>
-     <height>19</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -819,7 +819,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="connectMembers">
      <property name="geometry">
       <rect>
-       <x>1</x>
+       <x>3</x>
        <y>15</y>
        <width>221</width>
        <height>21</height>
@@ -958,9 +958,9 @@ QMenu::item:selected {
     <widget class="QLabel" name="factoredLoad_lbl">
      <property name="geometry">
       <rect>
-       <x>1</x>
-       <y>240</y>
-       <width>170</width>
+       <x>3</x>
+       <y>250</y>
+       <width>191</width>
        <height>25</height>
       </rect>
      </property>
@@ -979,7 +979,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>270</y>
+       <y>275</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -999,7 +999,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>270</y>
+       <y>275</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1015,8 +1015,8 @@ QMenu::item:selected {
     <widget class="QLabel" name="inputBolt_lbl">
      <property name="geometry">
       <rect>
-       <x>1</x>
-       <y>300</y>
+       <x>3</x>
+       <y>305</y>
        <width>150</width>
        <height>25</height>
       </rect>
@@ -1199,7 +1199,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="cleatAngle_lbl">
      <property name="geometry">
       <rect>
-       <x>1</x>
+       <x>3</x>
        <y>420</y>
        <width>100</width>
        <height>25</height>
@@ -3217,7 +3217,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="noOfBoltsLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>270</y>
        <width>191</width>
        <height>25</height>
@@ -3313,7 +3313,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="beamGaugeLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>391</y>
        <width>130</width>
        <height>25</height>
@@ -3333,7 +3333,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="endDistLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>421</y>
        <width>179</width>
        <height>25</height>
@@ -3353,7 +3353,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="no_col_lbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>331</y>
        <width>130</width>
        <height>25</height>
@@ -3373,7 +3373,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="beamPitchLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>361</y>
        <width>130</width>
        <height>25</height>
@@ -3412,7 +3412,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="no_row_lbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>300</y>
        <width>130</width>
        <height>25</height>
@@ -3432,7 +3432,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="edgeDistLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>451</y>
        <width>179</width>
        <height>25</height>
@@ -3559,7 +3559,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="cleatHeightLbl">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>3</x>
        <y>509</y>
        <width>100</width>
        <height>22</height>
@@ -3676,7 +3676,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="no_row_lbl_4">
      <property name="geometry">
       <rect>
-       <x>4</x>
+       <x>3</x>
        <y>61</y>
        <width>130</width>
        <height>25</height>
@@ -3696,7 +3696,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="no_col_lbl_5">
      <property name="geometry">
       <rect>
-       <x>4</x>
+       <x>3</x>
        <y>92</y>
        <width>130</width>
        <height>25</height>
@@ -3735,7 +3735,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="beamPitchLbl_7">
      <property name="geometry">
       <rect>
-       <x>5</x>
+       <x>3</x>
        <y>122</y>
        <width>130</width>
        <height>25</height>
@@ -3774,7 +3774,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="beamGaugeLbl_7">
      <property name="geometry">
       <rect>
-       <x>6</x>
+       <x>3</x>
        <y>154</y>
        <width>130</width>
        <height>25</height>
@@ -3813,7 +3813,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="endDistLbl_8">
      <property name="geometry">
       <rect>
-       <x>6</x>
+       <x>3</x>
        <y>185</y>
        <width>179</width>
        <height>25</height>
@@ -3852,7 +3852,7 @@ QMenu::item:selected {
     <widget class="QLabel" name="edgeDistLbl_">
      <property name="geometry">
       <rect>
-       <x>7</x>
+       <x>3</x>
        <y>214</y>
        <width>179</width>
        <height>25</height>

@@ -269,9 +269,13 @@ class MyPopupDialog(QDialog):
 
         filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
 
-        infile = open(filename, 'w')
-        pickle.dump(input_data, infile)
-        infile.close()
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(input_data, infile)
+            infile.close()
 
     def get_design_report_inputs(self):
 

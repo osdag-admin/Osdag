@@ -222,9 +222,13 @@ class DesignReportDialog(QDialog):
         inputData = self.get_report_summary()
         filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
                                                   os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
-        infile = open(filename, 'w')
-        pickle.dump(inputData, infile)
-        infile.close()
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(inputData, infile)
+            infile.close()
 
     def get_report_summary(self):
         report_summary = {"ProfileSummary": {}}

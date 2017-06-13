@@ -266,7 +266,7 @@ class MyPopupDialog(QDialog):
 
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open File', " ",
+            self, 'Open File', " ../",
             'Images (*.png *.svg*.jpg)',
             None, QFileDialog.DontUseNativeDialog)
 
@@ -282,12 +282,17 @@ class MyPopupDialog(QDialog):
 
     def saveUserProfile(self):
 
+        flag = True
         inputData = self.getPopUpInputs()
         filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
                                                   os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
-        infile = open(filename, 'w')
-        pickle.dump(inputData, infile)
-        infile.close()
+        if filename =='':
+            flag =False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(inputData, infile)
+            infile.close()
 
     def getPopUpInputs(self):
         input_summary = {}

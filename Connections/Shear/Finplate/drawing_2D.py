@@ -60,13 +60,10 @@ class FinCommonData(object):
         self.col_L = 700
         self.beam_L = 350
         self.gap = float(str(inputObj['detailing']['gap'])) # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
-        #self.gap = float(20)  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
+        self.R1_max = max([self.col_R1, self.beam_R1, 10])
         self.plate_pos_dist = self.beam_T + self.beam_R1 + 5 if self.beam_T + self.beam_R1 + 5 > 50 else 50  # Joints in Steel construction simple connections Publication P212,chapter no4 name: double angle web cleats
         self.beamToBeamDist = 10
-        #self.notch_L = (self.col_B - (self.col_tw + 40)) / 2.0
         self.notch_width = (self.col_B /2.0 - (self.col_tw/2.0 + self.gap))+ self.gap
-        #self.notch_ht = self.col_T + self.col_R1
-        #self.notch_ht = notch_ht = max([PB_T, SB_T]) + max([PB_R1, SB_R1]) + max([(PB_T/2), (SB_T/2),10])
         self.notch_ht = max([self.col_T, self.beam_T]) + max([self.col_R1, self.beam_R1]) + max([(self.col_T/2), (self.beam_T/2),10])
 
         self.folder = folder
@@ -632,7 +629,7 @@ class Fin2DCreatorFront(object):
         self.BJ = self.BE - (self.dataObj.col_tw) * np.array([1, 0])
         self.BK = self.BD - (self.dataObj.col_tw) * np.array([1, 0])
         self.BL = self.BA + (self.dataObj.col_T) * np.array([0, 1])
-        self.BP = self.BD + self.dataObj.col_R1 * np.array([0, 1])
+        self.BP = self.BD + self.dataObj.col_T * np.array([0, -1]) + self.dataObj.notch_ht * np.array([0, 1])
         self.BS = self.BP + self.dataObj.plate_ht * np.array([0, 1])
         self.Bx = self.BP + 12 * np.array([1, 0])  # To represent weld in 2D, Osdag uses 12 mm thickness of weld instead of actual size produced by Osdag.
         self.BQ = self.BP + self.dataObj.plate_width * np.array([1, 0])
@@ -646,14 +643,12 @@ class Fin2DCreatorFront(object):
         self.BA3 = self.BA4 + (self.dataObj.beam_L - self.dataObj.notch_width) * np.array([1, 0])
         self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
         self.BB3 = self.BB2 + self.dataObj.beam_T * np.array([0, -1])
+
         self.BB1 =self.BB5 + (self.dataObj.D_beam-(self.dataObj.plate_ht + self.dataObj.notch_ht)) * np.array([0,1])
         self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
         self.B1 = self.BA5 + 80 * np.array([0, 1])
-        self.R1_max = max([self.dataObj.col_R1,self.dataObj.beam_R1,10])
-        # self.BC2 = self.BA6 + self.dataObj.col_R1 * np.array([-1, 0])
-        # self.BC1 = self.BA6 + self.dataObj.col_R1 * np.array([0, -1])
-        self.BC2 = self.BA6 + self.R1_max * np.array([-1, 0])
-        self.BC1 = self.BA6 + self.R1_max * np.array([0, -1])
+        self.BC2 = self.BA6 + self.dataObj.R1_max * np.array([-1, 0])
+        self.BC1 = self.BA6 + self.dataObj.R1_max * np.array([0, -1])
 
     def callCFBWfront(self, fileName):
         dwg = svgwrite.Drawing(fileName, size=('100%', '100%'), viewBox=('-400 -380 1300 1300'))
@@ -1123,7 +1118,7 @@ class Fin2DCreatorFront(object):
         dwg.add(dwg.line((self.BA4), (self.BA3)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BB4), (self.BB3)).stroke('blue', width=2.5, linecap='square'))
         #curveList = ["M", self.BC1, "A", np.array([self.dataObj.col_R1, self.dataObj.col_R1]), "0", "0", "1", self.BC2]
-        curveList = ["M", self.BC1,"A", np.array([self.R1_max, self.R1_max]) ,"0", "0", "1", self.BC2]
+        curveList = ["M", self.BC1,"A", np.array([self.dataObj.R1_max, self.dataObj.R1_max]) ,"0", "0", "1", self.BC2]
         dwg.add(dwg.path(d=curveList, stroke='blue', fill='none', stroke_width=2.5))
 
         nr = self.dataObj.no_of_rows

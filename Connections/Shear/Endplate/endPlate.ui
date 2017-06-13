@@ -617,11 +617,9 @@ QMenu::item:selected {
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionVideo_Tutorials"/>
-    <addaction name="actionSample_Report"/>
-    <addaction name="actionSample_Problems"/>
+    <addaction name="actionDesign_examples"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Osdag_2"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
@@ -892,7 +890,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Connectivity *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Connectivity *</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_fu">
@@ -1402,7 +1400,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thickness (mm) *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Thickness (mm) *</string>
      </property>
     </widget>
     <widget class="QFrame" name="outputFrame_2">
@@ -3575,7 +3573,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Capacity of bolt(kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Capacity of bolt(kN)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtbearCapacity">
@@ -3792,7 +3790,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bearing capacity(kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Bearing capacity(kN)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_161">
@@ -3849,7 +3847,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear demand(kN/mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Shear demand(kN/mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_164">
@@ -4081,7 +4079,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Weld Length(mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Weld Length(mm)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txtWeld_length">
@@ -4407,9 +4405,9 @@ QMenu::item:selected {
     <string>Change background</string>
    </property>
   </action>
-  <action name="actionSample_Report">
+  <action name="actionDesign_examples">
    <property name="text">
-    <string>Sample Design Report</string>
+    <string>Design Examples</string>
    </property>
   </action>
   <action name="actionSample_Problems">

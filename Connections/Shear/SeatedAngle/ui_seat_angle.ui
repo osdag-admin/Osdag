@@ -600,11 +600,9 @@ QMenu::item:selected {
      <string>Help</string>
     </property>
     <addaction name="actionVideo_Tutorials"/>
-    <addaction name="actionSample_Reports"/>
-    <addaction name="actionSampe_Problems"/>
+    <addaction name="actionDesign_examples"/>
     <addaction name="separator"/>
     <addaction name="actionAsk_Us_a_Question"/>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Osdag"/>
    </widget>
    <widget class="QMenu" name="menuGraphics">
@@ -3199,7 +3197,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3241,7 +3239,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3265,7 +3263,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3286,7 +3284,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3307,7 +3305,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3328,7 +3326,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3349,7 +3347,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3412,7 +3410,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3496,7 +3494,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3580,7 +3578,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3664,7 +3662,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3685,7 +3683,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3751,7 +3749,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3793,7 +3791,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3835,7 +3833,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3877,7 +3875,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3919,7 +3917,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -3961,7 +3959,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -4036,7 +4034,7 @@ QMenu::item:selected {
      <property name="font">
       <font>
        <family>Arial</family>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -4304,9 +4302,9 @@ QMenu::item:selected {
     <string>Osdag Manual</string>
    </property>
   </action>
-  <action name="actionSample_Reports">
+  <action name="actionDesign_examples">
    <property name="text">
-    <string>Sample Design Reports</string>
+    <string>Design Examples</string>
    </property>
   </action>
   <action name="actionSampe_Problems">

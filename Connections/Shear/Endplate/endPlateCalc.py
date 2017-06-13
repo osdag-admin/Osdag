@@ -190,8 +190,7 @@ def end_connection(ui_obj):
     dp_bolt_hole_type = str(ui_obj['bolt']['bolt_hole_type'])
     gamma_mw = float(ui_obj["weld"]["safety_factor"])
     weld_type = ui_obj['weld']['typeof_weld']
-    print "weld type",weld_type
-              
+
     end_plate_t = float(ui_obj['Plate']['Thickness (mm)'])
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
     if end_plate_w == '':
@@ -221,6 +220,14 @@ def end_connection(ui_obj):
     beam_depth = float(dictbeamdata["D"])
     beam_R1 = float(dictbeamdata["R1"])
 
+    old_beam_section = get_oldbeamcombolist()
+    old_col_section = get_oldcolumncombolist()
+
+    if beam_sec in old_beam_section:
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+    if column_sec in old_col_section:
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web":
         dictcolumndata = get_columndata(column_sec)
         column_w_t = float(dictcolumndata["tw"])
@@ -235,6 +242,13 @@ def end_connection(ui_obj):
         column_R1 = float(dictcolumndata["R1"])
         column_d = float(dictcolumndata["D"])
         column_b = float(dictcolumndata["B"])
+
+    if connectivity == "Beam-Beam":
+        notch_ht = max([column_f_t, beam_f_t]) + max([column_R1, beam_R1]) + max([(column_f_t / 2), (beam_f_t / 2), 10])
+        if notch_ht < (beam_depth/5):
+            pass
+        else:
+            logger.warning(" : Depth of coping should preferably be less than D/5 (D: Secondary beam depth)")
     
     design_check = True
 

@@ -1959,6 +1959,7 @@ class End2DCreatorSide(object):
         self.BX1 = self.BX + self.dataObj.plate_ht * np.array([0, 1])
         self.BY1 = self.BY + self.dataObj.plate_ht * np.array([0, 1])
         self.BZ1 = self.BZ + self.dataObj.plate_ht * np.array([0, 1])
+        self.BV = self.BP + self.dataObj.beam_tw * np.array([-1,0])
 
     def call_BWBW_side(self, filename):
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -200 1200 1000'))
@@ -1982,6 +1983,7 @@ class End2DCreatorSide(object):
 
         dwg.add(dwg.rect(insert=(self.BZ), size=((self.dataObj.plate_width / 2 - self.dataObj.beam_tw / 2), self.dataObj.plate_ht), fill='none', stroke='blue',
                          stroke_width=2.5))
+        dwg.add(dwg.line((self.BP), (self.BV)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([2, 3])))
 
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col / 2

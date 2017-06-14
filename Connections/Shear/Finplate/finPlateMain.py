@@ -170,7 +170,6 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(10)
-
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 

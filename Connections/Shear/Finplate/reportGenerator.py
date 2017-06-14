@@ -826,8 +826,14 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEnd = str(float(12 * float(beam_tw)))
-    row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",end,
-           "  <p align=left style=color:green><b>Pass</b></p>"]
+    if end < minEnd or end > maxEnd:
+        row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",end,
+           "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "End distance (mm)",
+           " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",
+           end, "  <p align=left style=color:green><b>Pass</b></p>"]
+
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -837,8 +843,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEdge = str(float(12 * float(beam_tw)))
-    row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + " <br> [cl. 10.2.4]",
-               end,"  <p align=left style=color:green><b>Pass</b></p>"]
+    if edge < minEdge or edge > maxEdge:
+        row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               edge,"  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Edge distance (mm)",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               edge, "  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

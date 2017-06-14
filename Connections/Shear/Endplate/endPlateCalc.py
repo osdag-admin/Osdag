@@ -297,11 +297,10 @@ def end_connection(ui_obj):
     if end_plate_t < min_end_plate_t:
         end_plate_t = min_end_plate_t
         design_check = False  
-        logger.error(": Chosen end plate thickness is less than the minimum plate thickness [Refer Subramanyam page no. 372]")
+        logger.error(": Chosen end plate thickness is less than the minimum plate thickness [Design of Steel Structures by N. Subramanian, OUP, 2014, page 372]")
         logger.warning(" : Minimum required thickness %2.2f mm" % (min_end_plate_t))
-        logger.info(" : Increase Plate Thickness")
+        logger.info(" : Increase plate thickness")
 
-    
 # ############# BOLT CAPACITY ###############
 #    0 def boltDesign(end_plate_l):
 # I: Check for number of bolts -------------------
@@ -466,7 +465,7 @@ def end_connection(ui_obj):
                         crit_shear = critical_bolt_shear(shear_load, eccentricity, pitch, gauge, no_row)
                     if pitch < min_pitch:
                         design_check = False
-                        logger.error(": Shear force on critical bolt due to external load is more than bolt capacity")
+                        logger.error(": Shear force on the critical bolt due to external load is more than the bolt capacity")
                         logger.warning(": Bolt capacity of the critical bolt is %2.2f" % (bolt_capacity))
                         logger.info(": Increase the diameter of the bolt or bolt grade")
 
@@ -478,14 +477,14 @@ def end_connection(ui_obj):
         # ############ check end plate length #################
 #         if end_plate_l > max_end_plate_l:
 #             design_check = False
-#             logger.error(": Given end plate length exceeds the depth of the beam")
+#             logger.error(": Selected end plate length exceeds the depth of the beam")
 #             logger.warning(": The maximum permissible end plate length is %2.2f" %(max_end_plate_l))
-#             logger.info(": Increase the beam Section or decrease length of end plate")
+#             logger.info(": Increase the beam section or decrease the length of the end plate")
 #         if end_plate_l < min_end_plate_l:
 #             design_check = False
-#             logger.error(": Given end plate length is less than minimum end plate length")
+#             logger.error(": Selected end plate length is less than the minimum end plate length")
 #             logger.warning(": The minimum end plate length is %2.2f" %(min_end_plate_l))
-#             logger.info(": Increase the beam Section or decrease length of end plate")
+#             logger.info(": Increase the beam section or decrease the length of the end plate")
 
         # ########### check end plate width ###################
 
@@ -505,7 +504,7 @@ def end_connection(ui_obj):
             if connectivity == "Column flange-Beam web":
                 if sectional_gauge < max(90, (column_w_t + (2 * column_R1) + (2*min_edge_dist))):
                     design_check = False
-                    logger.error(": Cross center distance between the bolt lines on either side of the beam is less than "
+                    logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is less than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
                     logger.warning(": Minimum required cross center gauge is %2.2f mm" % (max(90,(column_w_t + (2* column_R1) + (2* min_edge_dist)) )))
                     logger.info(": Increase the plate width")
@@ -523,9 +522,9 @@ def end_connection(ui_obj):
 
             if sectional_gauge > 140:
                 design_check = False
-                logger.error(": Cross center distance between the bolt lines on either side of the beam is greater than "
+                logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
-                logger.warning(": Maximum required cross center gauge is 140 mm")
+                logger.warning(": Maximum permissible cross center gauge is 140 mm")
                 logger.info(": Decrease the plate width")
 
 #             if end_plate_w > max_end_plate_w:
@@ -540,7 +539,7 @@ def end_connection(ui_obj):
             if connectivity != "Beam-Beam":
                 if min_end_plate_w > max_end_plate_w:
                     design_check = False
-                    logger.error(": Calculated width of end plate exceeds the width of the column")
+                    logger.error(": Calculated width of the end plate exceeds the width of the column")
                     logger.warning(": Minimum end plate width is %2.2f" % (min_end_plate_w))
 
     else:
@@ -628,8 +627,8 @@ def end_connection(ui_obj):
                             crit_shear = critical_bolt_shear(shear_load, eccentricity, pitch, gauge, no_row)
                         if end_plate_l > max_end_plate_l:
                             design_check = False
-                            logger.error(": Shear force on critical bolt due to external load is more than bolt capacity")
-                            logger.warning(": Bolt capacity of the critical bolt is %2.2f" % (bolt_capacity))
+                            logger.error(": Shear force on the critical bolt due to external load is more than the bolt capacity")
+                            logger.warning(": Capacity of the critical bolt is %2.2f" % (bolt_capacity))
                             logger.info(": Increase the diameter of the bolt or bolt grade")
                         elif bolt_capacity > crit_shear and end_plate_l <= max_end_plate_l:
                             pass
@@ -654,20 +653,20 @@ def end_connection(ui_obj):
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
             if sectional_gauge < 90:
                 design_check = False
-                logger.error(": Cross center distance between the bolt lines on either side of the beam is less than"
+                logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is less than"
                              " specified gauge [reference JSC : chap. 5 check 1]")
                 logger.warning(": Minimum required cross center gauge is 90 mm")
                 logger.info(": Increase the plate width")
 
             if sectional_gauge > 140:
                 design_check = False
-                logger.error(": Cross center distance between the bolt lines on either side of the beam is greater than "
+                logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
                 logger.warning(": Maximum required cross center gauge is 140 mm")
 #
 #             if end_plate_w > max_end_plate_w:
 #                 design_check = False
-#                 logger.error(": Width of plate exceeds the width of column")
+#                 logger.error(": Width of the plate exceeds the width of column")
 
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
@@ -677,9 +676,8 @@ def end_connection(ui_obj):
 
                 if min_end_plate_w > max_end_plate_w:
                     design_check = False
-                    logger.error(": Calculated width of end plate exceeds the width of the column")
+                    logger.error(": Calculated width of the end plate exceeds the width of the column")
                     logger.warning(": Minimum end plate width is %2.2f mm" % (min_end_plate_w))
-
 
 ######### Check for shear capacity of bolt after multiplying the reduction factors (beta_l_g and beta_l_j) #####
 
@@ -692,8 +690,8 @@ def end_connection(ui_obj):
     if shear_load > shear_capacity_beam:
         design_check = False
         logger.error(": Shear capacity of the beam web at the end plate is less than the external load")
-        logger.warning(": The shear capacity of the beam web is %2.2f KN" % (shear_capacity_beam))
-        logger.info(": Increase the end plate height if given else increase the beam section")
+        logger.warning(": Shear capacity of the beam web is %2.2f KN" % (shear_capacity_beam))
+        logger.info(": Increase the end plate height if possible, else select a deeper beam section")
 
 # ################ CHECK 3: BLOCK SHEAR ####################
     min_thk = min(end_plate_t,beam_w_t)
@@ -701,7 +699,7 @@ def end_connection(ui_obj):
 
     if Tdb < shear_load:
         design_check = False
-        logger.error(": The block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
+        logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is % 2.2f KN" % (shear_load))
         logger.info(": Increase the plate thickness")
 
@@ -721,9 +719,9 @@ def end_connection(ui_obj):
     weld_strength = round(weld_strength, 3);
     if Vy1 > weld_strength:
         design_check = False
-        logger.error(": Weld Strength is less than the Shear Demand [cl. 10.5.9]")
-        logger.warning(": Weld Strength should be greater than %2.2f KN/mm" % (weld_strength))
-        logger.info(": Increase the Weld Size")
+        logger.error(": Weld strength is less than the shear demand [cl. 10.5.9]")
+        logger.warning(": Weld strength should be greater than %2.2f kN/mm" % (weld_strength))
+        logger.info(": Increase the weld size")
 
     ############## Check for minimum weld thickness: Table 21; IS 800 ###########
     # Here t_thicker indicates thickness of thicker part
@@ -744,7 +742,6 @@ def end_connection(ui_obj):
     else:
         weld_t_min = int(10)
 
-
     weld_t_req = weld_t_min
 
     # if weld_t_req != int(weld_t_req):
@@ -754,13 +751,9 @@ def end_connection(ui_obj):
 
     if weld_t < weld_t_req:
         design_check = False
-        logger.error(": Weld thickness is not sufficient [cl. 10.5.2.3 and Table 21; IS 800:2007]")
+        logger.error(": Weld thickness is not sufficient [cl. 10.5.2.3 and Table 21]")
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
-        logger.info(": Increase the weld thickness or length of weld/Endplate")
-
-
-
-
+        logger.info(": Increase the weld thickness or the length of weld/end plate")
 
     # End of calculation
     output_obj = {}
@@ -799,8 +792,6 @@ def end_connection(ui_obj):
     output_obj['Plate']['blockshear'] = float(Tdb)
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
 
-
-
     # if bolts_required == 0:
     #     for k in output_obj.keys():
     #         for key in output_obj[k].keys():
@@ -822,7 +813,7 @@ def end_connection(ui_obj):
 
     if output_obj['Bolt']['status'] is True:
 
-        logger.info(": Overall endplate connection design is safe \n")
+        logger.info(": Overall end plate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
 
     else:

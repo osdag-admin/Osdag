@@ -156,7 +156,6 @@ class DesignPreferences(QDialog):
         """
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         """
-        # TODO : change grade to 10.9; also update UI
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
                   10.9: 940, 12.9: 1220}
         boltGrd = float(boltGrade)
@@ -288,13 +287,9 @@ class MainController(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
-        #self.ui.btn3D.clicked.connect(self.call_3DModel)
         self.ui.btn3D.clicked.connect(lambda:self.call_3DModel("gradient_bg"))
-        #self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxBeam.clicked.connect(lambda:self.call_3DBeam("gradient_bg"))
-        #self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
-        #self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
         self.ui.chkBxSeatAngle.clicked.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
 
         validator = QIntValidator()
@@ -361,8 +356,6 @@ class MainController(QMainWindow):
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
-        # self.ui.actionSample_Reports.triggered.connect(self.sample_report)
-        # self.ui.actionSampe_Problems.triggered.connect(self.sample_problem)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         from osdagMainSettings import backend_name

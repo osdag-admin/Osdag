@@ -128,11 +128,11 @@ class DesignPreferences(QDialog):
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
-        self.ui.combo_weldType.setCurrentIndex(0)
-        designPref["weld"] = {}
-        weldType = str(self.ui.combo_weldType.currentText())
-        designPref["weld"]["typeof_weld"] = weldType
-        designPref["weld"]["safety_factor"] = float(1.25)
+        # self.ui.combo_weldType.setCurrentIndex(0)
+        # designPref["weld"] = {}
+        # weldType = str(self.ui.combo_weldType.currentText())
+        # designPref["weld"]["typeof_weld"] = weldType
+        # designPref["weld"]["safety_factor"] = float(1.25)
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(10))
@@ -148,7 +148,6 @@ class DesignPreferences(QDialog):
         designPref["design"] = {}
         designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False
-
         return designPref
 
     def set_bolthole_clernce(self):
@@ -730,11 +729,11 @@ class MainController(QMainWindow):
             pass
 
     def checkbeam_b(self):
+        check = True
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
             if self.ui.comboColSec.currentIndex() == -1 or str(self.ui.combo_Beam.currentText()) == 'Select section' or str(self.ui.comboColSec.currentText()) == 'Select section':
                 return
-
 
             column = self.ui.comboColSec.currentText()
 
@@ -750,6 +749,7 @@ class MainController(QMainWindow):
             if column_web_depth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
 
@@ -770,8 +770,10 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
                                         "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
+        return check
 
     def check_cleat_height(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -1117,9 +1119,12 @@ class MainController(QMainWindow):
             pdfkit.from_file(fileName, fname, configuration=config, options=options)
             QMessageBox.about(self, 'Information', "Report Saved")
 
-
     def save_log(self):
+        """
+        Save log messages in user prefered text file at user prefered location.
+        Returns: (File) save_file
 
+        """
         filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder),  "Logmessages"), "Text files (*.txt)")
         return self.save_file(filename + ".txt")
 
@@ -1394,7 +1399,8 @@ class MainController(QMainWindow):
         elif self.ui.comboCleatSection.currentIndex() == 0:
             QMessageBox.information(self, "Information", "Please select Cleat angle")
             flag = False
-        return  flag
+        flag = self.checkbeam_b()
+        return flag
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''

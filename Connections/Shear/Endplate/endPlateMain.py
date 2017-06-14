@@ -4,13 +4,14 @@ comment
 
 @author: deepa
 '''
+import ConfigParser
 import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QDoubleValidator, QIntValidator,QPixmap, QPalette
-from PyQt5.QtWidgets import QMainWindow, QDesktopWidget,QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
+from PyQt5.QtWidgets import QMainWindow, QDialog, QMessageBox, QFontDialog, QApplication, QFileDialog, QColorDialog, qApp
 from OCC import IGESControl
 from OCC import BRepTools
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -134,12 +135,14 @@ class DesignPreferences(QDialog):
         '''
         '''
         uiObj = self.main_controller.getuser_inputs()
-
-        bolt_grade = (uiObj["Bolt"]["Grade"])
-        bolt_fu = str(self.get_boltFu(bolt_grade))
+        if uiObj["Bolt"]["Grade"] == '':
+            pass
+        else:
+            bolt_grade = (uiObj["Bolt"]["Grade"])
+            bolt_fu = str(self.get_boltFu(bolt_grade))
+            self.ui.txt_boltFu.setText(bolt_fu)
 
         self.ui.combo_boltHoleType.setCurrentIndex(0)
-        self.ui.txt_boltFu.setText(bolt_fu)
         designPref = {}
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
@@ -207,8 +210,12 @@ class DesignPreferences(QDialog):
         '''
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
+        if boltGrade == '':
+            return
+
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
         boltGrd = float(boltGrade)
+
         return boltFu[boltGrd]
 
     def close_designPref(self):
@@ -389,7 +396,7 @@ class MainController(QMainWindow):
         # Saving and Restoring the endPlate window state.
 
         #self.retrieve_prevstate()
-        self.designPrefDialog = DesignPreferences(self)
+        #self.designPrefDialog = DesignPreferences(self)
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
@@ -417,7 +424,8 @@ class MainController(QMainWindow):
         self.disable_view_buttons()
         self.result_obj = None
         self.uiobj = None
-        self.designPrefDialog = DesignPreferences(self)
+        self.designPrefDialog =DesignPreferences(self)
+
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
@@ -1078,12 +1086,12 @@ class MainController(QMainWindow):
         filename = str(filename)
         self.commLogicObj.call_designReport(filename, popup_summary)
 
-        if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            #path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
-            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
         options = {
                    'margin-bottom': '10mm',
                    'footer-right': '[page]'

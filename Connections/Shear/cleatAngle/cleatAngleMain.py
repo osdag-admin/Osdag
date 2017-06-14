@@ -4,6 +4,7 @@ comment
 
 @author: aravind
 '''
+import ConfigParser
 import json
 import os.path
 import pickle
@@ -1094,13 +1095,12 @@ class MainController(QMainWindow):
         fileName = str(fileName)
         self.commLogicObj.call_designReport(fileName, popup_summary)
         # Creates pdf
-        # TODO update wkhtmltopdf paths
-        if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
-            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
 
         options = {
             'margin-bottom': '10mm',

@@ -1,3 +1,4 @@
+import ConfigParser
 import json
 import os.path
 import sys
@@ -774,11 +775,12 @@ class MainController(QMainWindow):
         self.commLogicObj.call_designReport(file_name, report_summary)
 
         # Creates PDF
-        if sys.platform == ("win32" or "win64"):
-            path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            path_wkhtmltopdf = r'/usr/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'

@@ -4,8 +4,6 @@ comment
 
 @author: deepa
 '''
-import ConfigParser
-import json
 
 from PyQt5.QtCore import QFile,pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QBrush
@@ -19,10 +17,11 @@ from OCC.IFSelect import IFSelect_RetDone
 from OCC.Interface import Interface_Static_SetCVal
 from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 from OCC.StlAPI import StlAPI_Writer
+import ConfigParser
+import json
 import os.path
 import subprocess
 import pickle
-import icons_rc
 import pdfkit
 import shutil
 from ui_summary_popup import Ui_Dialog
@@ -75,8 +74,6 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         self.set_default_para()
-        int_validator = QIntValidator()
-        #self.ui.txt_boltHoleClearance.setValidator(int_validator)
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
@@ -88,6 +85,11 @@ class DesignPreferences(QDialog):
         self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
     def save_designPref_para(self):
+        """
+        Save user design preferances.
+        Returns: (dictionary) saved_designPref
+
+        """
         '''
         This routine is responsible for saving all design preferences selected by the user
         '''
@@ -129,11 +131,12 @@ class DesignPreferences(QDialog):
 
         return self.saved_designPref
 
-        #self.main_controller.call_designPref(designPref)
-
     def set_default_para(self):
-        '''
-        '''
+        """
+        Set default parameter to the design preferences dialog.
+        Returns:
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         if uiObj["Bolt"]["Grade"] == '':
             pass
@@ -160,7 +163,6 @@ class DesignPreferences(QDialog):
         designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
-        #self.ui.txt_detailingGap.setText(str(20))
         designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -179,6 +181,11 @@ class DesignPreferences(QDialog):
         return designPref
 
     def set_boltFu(self):
+        """
+        Set bolt strength based on bolt grade.
+        Returns:
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
         if boltGrade != '':
@@ -188,7 +195,12 @@ class DesignPreferences(QDialog):
             pass
 
     def get_clearance(self):
+        """
+        Calculte bolt hole clearance based on bolt diameter.
 
+        Returns: (float) bolt hole clearance.
+
+        """
         uiObj = self.main_controller.getuser_inputs()
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
         if boltDia != 'Diameter of Bolt':
@@ -207,9 +219,14 @@ class DesignPreferences(QDialog):
 
 
     def get_boltFu(self, boltGrade):
-        '''
-        This routine returns ultimate strength of bolt depending upon grade of bolt chosen
-        '''
+        """
+        Calculate ultimate strength of bolt based on grade of bolt chosen.
+        Args:
+            boltGrade: (float) grade of bolt
+
+        Returns: (int) ultimate strength of bolt.
+
+        """
         if boltGrade == '':
             return
 
@@ -379,9 +396,6 @@ class MainController(QMainWindow):
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
-        # self.ui.combo_Beam.addItems(get_beamcombolist())
-        # self.ui.comboColSec.addItems(get_columncombolist())
-
         self.ui.combo_Beam.currentIndexChanged[int].connect(self.fill_plate_thick_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
@@ -393,10 +407,6 @@ class MainController(QMainWindow):
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
-        # Saving and Restoring the endPlate window state.
-
-        #self.retrieve_prevstate()
-        #self.designPrefDialog = DesignPreferences(self)
         self.ui.btn_Reset.clicked.connect(self.resetbtn_clicked)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 
@@ -407,13 +417,11 @@ class MainController(QMainWindow):
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
-        # self.ui.actionSample_Report.triggered.connect(self.sample_report)
-        # self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
-        # Initialising the qtviewer
 
+        # Initialising the qtviewer
         from osdagMainSettings import backend_name
 
         self.display, _ = self.init_display(backend_str=backend_name())
@@ -426,7 +434,6 @@ class MainController(QMainWindow):
         self.uiobj = None
         self.designPrefDialog =DesignPreferences(self)
 
-
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
         Returns:
@@ -437,16 +444,13 @@ class MainController(QMainWindow):
         self.ui.comboColSec.addItems(columndata)
         self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
 
-
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
-                       Returns:
-
-                       """
+        Returns:
+        """
         loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
-        combo_section = ''
         if loc == "Beam-Beam":
             self.ui.comboColSec.addItems(beamdata)
             combo_section = self.ui.comboColSec

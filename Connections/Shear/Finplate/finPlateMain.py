@@ -266,7 +266,7 @@ class MyPopupDialog(QDialog):
 
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open File', " ../",
+            self, 'Open File', " ../../",
             'Images (*.png *.svg*.jpg)',
             None, QFileDialog.DontUseNativeDialog)
         flag = True

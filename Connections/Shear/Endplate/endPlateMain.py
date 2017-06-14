@@ -236,7 +236,7 @@ class MyPopupDialog(QDialog):
     def get_logo_file_path(self, lblwidget):
 
         self.ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
         base = os.path.basename(str(filename))
         lblwidget.setText(base)
         self.desired_location(filename)

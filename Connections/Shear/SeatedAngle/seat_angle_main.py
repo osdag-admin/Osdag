@@ -207,7 +207,7 @@ class DesignReportDialog(QDialog):
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None,
                                                   QFileDialog.DontUseNativeDialog)
         flag = True
         if filename == '':

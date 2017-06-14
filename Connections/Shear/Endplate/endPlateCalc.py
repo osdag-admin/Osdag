@@ -158,7 +158,7 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
     sigma = 0.0
     r_y = 0.0
     r_x = 0.0
-    moment = load / 2 * eccentricity
+    moment = load / (2 * eccentricity)
     n = int(bolts_one_line / 2)
     bolts_req = bolts_one_line
     if gauge == 0:

@@ -426,7 +426,7 @@ class ReportGenerator(SeatAngleCalculation):
             elif bolt_hole_type == "Oversized":
                 K_h = str(0.85)
             req_field = "HSFG bolt shear capacity:"
-            req_field += "<br> <i>V</i><sub>dsf</sub> = mu_f*n_e*K_h*A_nb*f_0/<i>gamma<sub>mb</sub></i>"
+            # req_field += "<br> <i>V</i><sub>dsf</sub> = mu_f*n_e*K_h*A_nb*f_0/<i>gamma<sub>mb</sub></i>"
             req_field += "<br> [cl. 10.3.3]"
             prov_field = "<i>V</i><sub>dsf</sub> = ("
             prov_field += str(
@@ -435,8 +435,9 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_check_row("Bolt shear capacity (kN)", req_field, prov_field, " ")
 
         # Bolt bearing capacity (kN)
-        req_field = "<i>V<sub>dpb</sub></i> = 2.5*k<sub>b</sub>*bolt_diameter*critical_thickness" \
-                    +"<br> *<i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i><br> [Cl. 10.3.4]"
+        # req_field = "<i>V<sub>dpb</sub></i> = 2.5*k<sub>b</sub>*bolt_diameter*critical_thickness" \
+        #             +"<br> *<i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i><br> [Cl. 10.3.4]"
+        req_field = "<i>V<sub>dpb</sub></i>:<br> [Cl. 10.3.4]"
         if is_hsfg == False:
             prov_field = "<i>V</i><sub>dpb</sub> = 2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" \
                         + beam_fu + "/1.25/1000)  <br>" + space(2) + " = " + bearing_capacity + " kN"
@@ -457,7 +458,8 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_fail
         else:
             remark = check_pass
-        req_field = "shear_force/ bolt_value = " + str(shear_force) + "/" + str(self.bolt_value) + " = " \
+        # req_field = "shear_force/ bolt_value = " + str(shear_force) + "/" + str(self.bolt_value) + " = " \
+        req_field = str(shear_force) + "/" + str(self.bolt_value) + " = " \
                     + str(bolts_req_based_on_force)
         rstr += design_check_row("No. of bolts", req_field, bolts_provided, remark)
 
@@ -467,9 +469,9 @@ class ReportGenerator(SeatAngleCalculation):
         # Bolt pitch (mm)
         if self.pitch >= self.min_pitch and self.pitch <= self.max_spacing:
             remark = check_pass
-            req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
-            req_field += "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",<br>  &#8804; min(32*" + \
-                         str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
+            # req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) "
+            req_field = "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(self.min_pitch) + ",<br>  &#8804; min(32*" + \
+                         str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing) + "<br> [cl. 10.2.2] <br>"
             prov_field = pitch
         elif self.pitch < self.min_pitch or self.pitch > self.max_spacing:
             if self.num_rows == 1:
@@ -478,10 +480,10 @@ class ReportGenerator(SeatAngleCalculation):
                 prov_field = "N/A"
             else:
                 remark = check_fail
-                req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
-                req_field += "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(
+                # req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300)"
+                req_field = "<br> &#8805; 2.5* " + bolt_diameter + " = " + str(
                     self.min_pitch) + ",<br>  &#8804; min(32*" + \
-                             str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
+                             str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing) + "<br> [cl. 10.2.2] <br>"
                 prov_field = pitch
         rstr += design_check_row("Bolt pitch (mm)", req_field, prov_field, remark)
 
@@ -490,9 +492,9 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_pass
         elif self.gauge < self.min_gauge or self.gauge > self.max_spacing:
             remark = check_fail
-        req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300) <br> [cl. 10.2.2] <br>"
-        req_field += "<br> &#8805; 2.5*" + bolt_diameter + " = " + str(self.min_gauge) + ",<br> &#8804; min(32*" + \
-                     str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing)
+        # req_field = " &#8805; 2.5*bolt_diameter ,<br>  &#8804; min(32*thickness_governing_min, 300)"
+        req_field = "<br> &#8805; 2.5*" + bolt_diameter + " = " + str(self.min_gauge) + ",<br> &#8804; min(32*" + \
+                     str(self.thickness_governing_min) + ", 300) = " + str(self.max_spacing) + "<br> [cl. 10.2.2] <br>"
         rstr += design_check_row("Bolt gauge (mm)", req_field, gauge, remark)
 
         # End distance (mm)
@@ -500,8 +502,8 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_pass
         elif self.end_dist < self.min_end_dist:
             remark = check_fail
-        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
-        req_field += "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
+        # req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter" + " [cl. 10.2.4.2]"
+        req_field = "<br> &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_end_dist)
         rstr += design_check_row("End distance (mm)", req_field, end, remark)
 
         # Edge distance (mm)
@@ -509,21 +511,21 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_pass
         elif self.edge_dist < self.min_edge_dist or self.edge_dist > self.max_edge_dist:
             remark = check_fail
-        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter," + " [cl. 10.2.4.2]<br>"
-        req_field += " &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_edge_dist)
+        # req_field = " &#8805;" + str(self.min_edge_multiplier) + "*bolt_hole_diameter,"
+        req_field = " &#8805;" + str(self.min_edge_multiplier) + "*" + dia_hole + " = " + str(self.min_edge_dist) + " [cl. 10.2.4.2]<br>"
         # Cl 10.2.4.3 if members are exposed to corrosive influences
         if is_environ_corrosive == "Yes":
             req_field += "<br><br> As the members are exposed to corrosive influences: "
-            req_field += "<br> &#8804; min(12*thickness_governing_min*sqrt(250/f_y),<br>" + space(
-                2) + "  40+4*thickness_governing_min)"
+            # req_field += "<br> &#8804; min(12*thickness_governing_min*sqrt(250/f_y),<br>" + space(
+            #     2) + "  40+4*thickness_governing_min)"
             req_field += "<br> [Cl 10.2.4.3]"
             req_field += "<br> &#8804; min(12*" + str(self.thickness_governing_min) + "*sqrt(250/" \
                          + str(self.angle_fy) + "), 40 + 4*" + str(self.thickness_governing_min)\
                          + ") = " + str(self.max_edge_dist)
         elif is_environ_corrosive == "No":
-            req_field += "<br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y) [Cl 10.2.4.3]"
+            # req_field += "<br><br> &#8804; 12*thickness_governing_min*sqrt(250/f_y)"
             req_field += "<br> &#8804; 12*" + str(self.thickness_governing_min) + "sqrt(250/" \
-                         + str(self.angle_fy) + ") = " + str(self.max_edge_dist)
+                         + str(self.angle_fy) + ") = " + str(self.max_edge_dist) + "[Cl 10.2.4.3]"
         rstr += design_check_row("Edge distance (mm)", req_field, edge, remark)
 
         # Seated angle
@@ -532,15 +534,16 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Seated angle length
         if connectivity == "Column flange-Beam flange":
-            req_field = "= min(supported_beam_width,<br>"+space(2)+"supporting_column_width) <br> = min(" + str(
-                self.beam_w_f) + ", " + str(self.column_w_f) + ")"
+            # req_field = "= min(supported_beam_width,<br>"+space(2)+"supporting_column_width)"
+            req_field = " <br> = min(" + str(self.beam_w_f) + ", " + str(self.column_w_f) + ")"
             prov_field = str(self.angle_l)
         elif connectivity == "Column web-Beam flange":
             # limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance_col
             # self.angle_l = int(math.ceil(min(self.beam_w_f, limiting_angle_length)))
-            req_field = "= min(width of supported beam, <br>" + space(2) + \
-                        "column_depth - 2*column_flange_thickness<br>" + space(2) +\
-                        " - 2*column_R1 - root_clearance_col)" + "<br> = min(" + str(self.beam_w_f) \
+            # req_field = "= min(width of supported beam, <br>" + space(2) + \
+            #             "column_depth - 2*column_flange_thickness<br>" + space(2) +\
+            #             " - 2*column_R1 - root_clearance_col)"
+            req_field = "<br> = min(" + str(self.beam_w_f) \
                         + ", " + str(self.column_d) + " - 2*" + str(self.column_f_t) \
                         + " - 2*" + str(self.column_R1) + " - " + str(self.root_clearance_col) + ")"
             prov_field = str(self.angle_l)
@@ -552,9 +555,9 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_pass
         elif self.outstanding_leg_length_required > self.angle_B:
             remark = check_fail
-        req_field = "b = (R*" + sub("gamma", "m0") + "/(" + sub("f", "yw") +\
-                    "*beam_web_thickness))<br>" + space(2) + "+ beam_column_clear_gap"
-        req_field += "<br>[Cl. 8.7.4]"
+        # req_field = "b = (R*" + sub("gamma", "m0") + "/(" + sub("f", "yw") +\
+        #             "*beam_web_thickness))<br>" + space(2) + "+ beam_column_clear_gap"
+        req_field = "<br>[Cl. 8.7.4]"
         req_field += "<br> = (" + str(self.shear_force) + "*1000*" + str(self.gamma_m0) + "/(" + str(self.beam_fy) \
                      + "*" + str(self.beam_w_t) + ")) + " + str(self.beam_col_clear_gap)
         prov_field = str(self.angle_B)
@@ -568,8 +571,8 @@ class ReportGenerator(SeatAngleCalculation):
             remark = check_fail
         req_field = sub("V", "dp") + " &#8805 V <br>"
         req_field += sub("V", "dp") + " &#8805 " + str(self.shear_force) + "kN <br> [Cl. 8.4.1]"
-        prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/ (&#8730 3 *" + sub("gamma", "m0") + ")"
-        prov_field += "<br>" + space(1) + "= (" + str(self.angle_l) + "*" + str(self.angle_t)\
+        # prov_field = sub("V", "dp") + "=" + sub("A", "v") + sub("f", "yw") + "/ (&#8730 3 *" + sub("gamma", "m0") + ")"
+        prov_field = "<br>" + space(1) + "= (" + str(self.angle_l) + "*" + str(self.angle_t)\
                       + ")*" + str(self.angle_fy) + "/ (&#8730 3 *" + str(self.gamma_m0)\
                       + ")<br>" + space(1) + "= " + str(self.outstanding_leg_shear_capacity)
         rstr += design_check_row("Shear capacity of outstanding leg (kN)", req_field, prov_field,

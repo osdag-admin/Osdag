@@ -256,10 +256,14 @@ class MyPopupDialog(QDialog):
 
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
-
-        base = os.path.basename(str(filename))
-        lblwidget.setText(base)
-        self.desired_location(filename)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            self.desired_location(filename)
 
     def desired_location(self, filename):
         shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))

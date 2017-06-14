@@ -269,10 +269,14 @@ class MyPopupDialog(QDialog):
             self, 'Open File', " ../",
             'Images (*.png *.svg*.jpg)',
             None, QFileDialog.DontUseNativeDialog)
-
-        base = os.path.basename(str(filename))
-        lblwidget.setText(base)
-        self.desired_location(filename)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            self.desired_location(filename)
 
         return str(filename)
 

@@ -821,7 +821,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     maxGauge = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
     if int(gauge) < int(minGauge) or int(gauge) > int(maxGauge):
         row = [0, "Bolt gauge (mm)", " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
-           gauge, "<p align=left style=color:red><b>Fail</b></p>"]
+           gauge, ""]
     else:
         row = [0, "Bolt gauge (mm)",
            " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
@@ -882,7 +882,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-    minPlateThick = str(round(5 * float(shear_load) * 1000 / (float(plateLength) * float(web_plate_fy)), 2))
+    minPlateThick = str(int(5 * float(shear_load) * 1000 / (float(plateLength) * float(web_plate_fy))))
     if float(minPlateThick) > int(plateThick):
         row = [0, "Plate thickness (mm)",
                "(5*" + shear_load + "*1000)/(" + plateLength + "*" + web_plate_fy + ") = " + minPlateThick +
@@ -906,7 +906,12 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
         maxEdge = str(float(beamdepth) - 2 * float(beamflangethk) - 2 * float(beamrootradius) - 10)
         maxedgestring = beamdepth + "-" + beamflangethk + "-" + beamrootradius + "-" + "10"
 
-    row = [0, "Plate height (mm)", "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
+    if int(plateLength) < float(minEdge) or int(plateLength) > float(maxEdge):
+        row = [0, "Plate height (mm)", "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
+           "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plateLength, " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
+    else:
+        row = [0, "Plate height (mm)",
+           "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
            "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plateLength, " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
 #        #row =[0,"Plate height (mm)","",plateLength]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')

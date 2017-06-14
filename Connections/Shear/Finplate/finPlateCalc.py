@@ -310,7 +310,7 @@ def finConn(uiObj):
         # Minimum spacing
         min_pitch = int(2.5 * bolt_dia)
         min_gauge = int(2.5 * bolt_dia)
-        if uiObj["detailing"]["typeof_edge"] == "a - Shear or hand flame cut":
+        if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
             min_end_dist = int(float(1.7 * (dia_hole)))
         else:
             min_end_dist = int(1.5 * (dia_hole))

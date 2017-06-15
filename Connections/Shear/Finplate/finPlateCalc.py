@@ -225,8 +225,6 @@ def finConn(uiObj):
 
     if connectivity == "Beam-Beam":
         notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
-        print notch_ht
-        print beam_d/5
         if notch_ht < (beam_d/5):
             pass
         else:

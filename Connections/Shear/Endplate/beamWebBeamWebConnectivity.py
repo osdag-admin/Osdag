@@ -55,7 +55,8 @@ class BeamWebBeamWeb(object):
         uDir = numpy.array([0, 1.0, 0])
         wDir = numpy.array([1.0, 0, 0.0])
         shift_origin = (self.column.D / 2 - self.beam.D / 2)
-        origin2 = self.column.sec_origin + (-shift_origin) * self.column.vDir + (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * self.column.uDir)
+        origin2 = self.column.sec_origin + (-shift_origin) * self.column.vDir + \
+                  (self.column.t / 2 * self.column.uDir) + (self.column.length / 2 * self.column.wDir) + (self.plate.T * self.column.uDir)
         self.beam.place(origin2, uDir, wDir)
         
 #     def create_column_geometry(self):

@@ -24,6 +24,8 @@ import os.path
 import subprocess
 import shutil
 
+import ConfigParser
+
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -113,9 +115,10 @@ class OsdagMainWindow(QMainWindow):
 
     def show_design_connection(self):
 
-        options = QFileDialog.Options()
-        # folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
-        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', os.path.join('..', '..', ' '))
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        default_workspace_path = config.get('default_workspace', 'path1')
+        folder = QFileDialog.getExistingDirectory(self,'Select Folder', default_workspace_path)
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':

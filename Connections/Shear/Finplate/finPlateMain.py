@@ -39,7 +39,6 @@ import shutil
 import ConfigParser
 
 
-
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
 
@@ -171,7 +170,6 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(10)
-
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -1069,13 +1067,12 @@ class MainController(QMainWindow):
         fileName = str(fileName)
         self.commLogicObj.call_designReport(fileName, popup_summary)
 
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
         # Creates pdf
-        if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
-            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
 
         options = {
             'margin-bottom': '10mm',

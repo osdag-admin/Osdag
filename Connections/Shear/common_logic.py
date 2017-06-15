@@ -204,14 +204,14 @@ class CommonDesignLogic(object):
 
         elif self.connection == "Endplate":
             notchObj = Notch(R1=notch_R1, height=notch_height,
-                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 )) + plate_thick,
+                             width=(pBeam_B / 2.0 - (pBeam_tw / 2.0 + plate_thick)) + plate_thick,
                              length=sBeam_B)
 
         elif self.connection == "cleatAngle":
             #((pBeam_B - (pBeam_tw + 40)) / 2.0 + 10)
             notchObj = Notch(R1=notch_R1,
                              height=notch_height,
-                             width= (pBeam_B / 2.0 - (pBeam_tw / 2.0)) + gap,
+                             width= (pBeam_B / 2.0 - (pBeam_tw / 2.0 + gap)) + gap,
                              length=sBeam_B)
 
         # column = ISectionold(B = 83, T = 14.1, D = 250, t = 11, R1 = 12, R2 = 3.2, alpha = 98, length = 1000)

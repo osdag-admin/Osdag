@@ -59,8 +59,11 @@ class EndCommonData(object):
         self.sectional_gauge = ouput_obj['Plate']['Sectional Gauge']
         self.col_L = 800
         self.beam_L = 350
-        self.notch_L = (self.beam_B / 2 - self.beam_tw / 2) + 10
+        self.R1_max = max([self.col_R1, self.beam_R1, 10])
+        #self.notch_L = (self.beam_B / 2 - self.beam_tw / 2) + 10
+        self.notch_width = (self.col_B / 2.0 - (self.col_tw / 2.0 + self.plate_thick)) + self.plate_thick
         self.notch_offset = (self.col_T + self.col_R1)
+        self.notch_ht = max([self.col_T, self.beam_T]) + max([self.col_R1, self.beam_R1]) + max([(self.col_T / 2), (self.beam_T / 2), 10])
 
         self.folder = folder
 
@@ -639,21 +642,33 @@ class End2DCreatorFront(object):
 
         # for secondary beam
 
-        self.BA1 = self.BB + 10 * np.array([1, 0])
-        self.BA2 = self.BA1 + (self.dataObj.beam_L - 10 - self.dataObj.col_B / 2 + self.dataObj.col_tw / 2 + self.dataObj.plate_thick) * np.array([1, 0])
-        self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
-        self.BB1 = self.BB2 - self.dataObj.beam_L * np.array([1, 0])
-        self.BA4 = self.BA1 + self.dataObj.beam_T * np.array([0, 1])
+        self.BP = self.BD + self.dataObj.col_T * np.array([0, -1]) + self.dataObj.notch_ht * np.array([0, 1])
+        #self.BA1 = self.BB + 10 * np.array([1, 0])
+        self.BA1 = self.BB + self.dataObj.plate_thick * np.array([1, 0])
+        #self.BA2 = self.BA1 + (self.dataObj.beam_L - 10 - self.dataObj.col_B / 2 + self.dataObj.col_tw / 2 + self.dataObj.plate_thick) * np.array([1, 0])
+        #self.BA2 = self.BA1 + (self.dataObj.beam_L-(self.dataObj.col_B/2 -(self.dataObj.col_tw/2 + self.dataObj.plate_thick))+ self.dataObj.plate_thick) * np.array([1, 0])
+        self.BA2 = self.BA1 + (self.dataObj.beam_L- self.dataObj.notch_width) * np.array([1, 0])
         self.BA3 = self.BA2 + self.dataObj.beam_T * np.array([0, 1])
-        self.BB3 = self.BB2 - self.dataObj.beam_T * np.array([0, 1])
-        self.BB4 = self.BB1 - self.dataObj.beam_T * np.array([0, 1])
-        self.BC1 = self.BB1 - (self.dataObj.D_beam - self.dataObj.notch_offset) * np.array([0, 1])
-        self.BC2 = self.BC1 + self.dataObj.plate_ht * np.array([0, 1])
-        self.BA5 = self.BA1 + self.dataObj.notch_offset * np.array([0, 1])
+        self.BB2 = self.BA2 + self.dataObj.D_beam * np.array([0, 1])
+        self.BB3 = self.BB2 + self.dataObj.beam_T * np.array([0, -1])
+        self.BB1 = self.BB2 + self.dataObj.beam_L * np.array([-1, 0])
+        self.BB4 = self.BB1 + self.dataObj.beam_T * np.array([0, -1])
+        self.BA4 = self.BA1 + self.dataObj.beam_T * np.array([0, 1])
+        self.BA6 = self.BP + self.dataObj.plate_thick * np.array([1,0])
+        self.BB5 = self.BA6 + self.dataObj.plate_ht * np.array([0,1])
+        self.BA5 = self.BA1 + self.dataObj.notch_ht * np.array([0, 1])
+        #self.BC1 = self.BB1 - (self.dataObj.D_beam - self.dataObj.notch_offset) * np.array([0, 1])
+        self.BC1 = self.BA5 + self.dataObj.R1_max * np.array([0, -1])
+        self.BC2 = self.BA5 + self.dataObj.R1_max * np.array([-1, 0])
+        self.BX = self.BA6 + self.dataObj.weld_thick * np.array([1,0])
+        self.BY = self.BX + self.dataObj.plate_ht * np.array([0,1])
+        # self.BC1 = self.BB1 - (self.dataObj.D_beam - self.dataObj.notch_offset) * np.array([0, 1])
+        # self.BC2 = self.BC1 + self.dataObj.plate_ht * np.array([0, 1])
+        #self.BA5 = self.BA1 + self.dataObj.notch_offset * np.array([0, 1])
 
         # for end plate
 
-        self.BP = self.BC1 - self.dataObj.plate_thick * np.array([1, 0])
+        #self.BP = self.BC1 - self.dataObj.plate_thick * np.array([1, 0])
 
     def call_BWBW_front(self, filename):
         v_height = self.dataObj.D_col + 850
@@ -675,18 +690,19 @@ class End2DCreatorFront(object):
                                      (self.BL), (self.BA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
         pt2 = self.BA5 - self.dataObj.col_R1 * np.array([1, 0])
-        dwg.add(dwg.polyline(points=[pt1, self.BA1, self.BA2, self.BB2, self.BB1, self.BB4, self.BC2, self.BC1, pt2], stroke='blue',
-                             fill='none', stroke_width=2.5))
-        #         dwg.add(dwg.polyline(points = [(self.BC1),(self.BA5),(self.BA1),(self.BA2),(self.BB2),(self.BB1),(self.BB4),(self.BC2),(self.BC1)],stroke = 'blue',
-        #                 fill = 'none',stroke_width = 2.5))
+        # dwg.add(dwg.polyline(points=[pt1, self.BA1, self.BA2, self.BB2, self.BB1, self.BB4, self.BC2, self.BC1, pt2], stroke='blue',
+        #                      fill='none', stroke_width=2.5))
+        # Secondary beam
+        dwg.add(dwg.polyline(points = [(self.BC1),(self.BA4),(self.BA1),(self.BA2),(self.BB2),(self.BB1),(self.BB4),(self.BB5)],stroke = 'blue',
+                        fill = 'none',stroke_width = 2.5))
+        dwg.add(dwg.line((self.BB5), (self.BA6)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
         dwg.add(dwg.line(self.BA4, self.BA3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.BB4, self.BB3).stroke('blue', width=2.5, linecap='square'))
-        dwg.add(dwg.rect(insert=self.BP, size=(self.dataObj.plate_thick, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
         d = []
         d.append("M")
-        d.append(pt1)
+        d.append(self.BC1)
         d.append("A")
-        d.append(np.array([self.dataObj.col_R1, self.dataObj.col_R1]))
+        d.append(np.array([self.dataObj.R1_max, self.dataObj.R1_max]))
         d.append(",")
         d.append("0")
         d.append(",")
@@ -694,14 +710,16 @@ class End2DCreatorFront(object):
         d.append(",")
         d.append("1")
         d.append(",")
-        d.append(pt2)
+        d.append(self.BC2)
         dwg.add(dwg.path(d=d, stroke="blue", fill="none", stroke_width="2.5"))
 
         # Weld hatching to represent WELD.
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(4, 4), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=1.5))
-        dwg.add(dwg.rect(insert=(self.BC1), size=(self.dataObj.weld_thick, self.dataObj.plate_ht),
+        dwg.add(dwg.rect(insert=(self.BA6), size=(self.dataObj.weld_thick, self.dataObj.plate_ht),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=2.0))
+        dwg.add(dwg.rect(insert=self.BP, size=(self.dataObj.plate_thick, self.dataObj.plate_ht), fill='none', stroke='blue', stroke_width=2.5))
+        dwg.add(dwg.line(self.BA6, self.BC2).stroke('blue', width=2.5, linecap='square'))
 
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col
@@ -1274,7 +1292,7 @@ class End2DCreatorTop(object):
         # Points for Beam - Beam connection
         self.beam_beam_length = self.dataObj.beam_B + 200
         # for primary beam
-        self.notch_length = (self.dataObj.col_B - self.dataObj.col_tw) / 2 + 10 - self.dataObj.plate_thick
+        #self.notch_length = (self.dataObj.col_B - self.dataObj.col_tw) / 2 + 10 - self.dataObj.plate_thick
 
         self.BA = (0, 0)
         self.BB = self.BA + (self.dataObj.col_B) * np.array([1, 0])
@@ -1289,8 +1307,8 @@ class End2DCreatorTop(object):
 
         self.BA3 = self.BB + 10 * np.array([1, 0]) + (self.beam_beam_length - self.dataObj.beam_B) / 2 * np.array([0, 1])
         self.BA2 = self.BA3 - 10 * np.array([1, 0])
-        self.BA1 = self.BA3 - self.notch_length * np.array([1, 0])
-        self.BA4 = self.BA3 + (self.dataObj.beam_L - self.notch_length) * np.array([1, 0])
+        self.BA1 = self.BA3 - self.dataObj.notch_width * np.array([1, 0])
+        self.BA4 = self.BA3 + (self.dataObj.beam_L - self.dataObj.notch_width) * np.array([1, 0])
         self.BA5 = self.BA4 + self.dataObj.beam_B * np.array([0, 1])
         self.BA6 = self.BA3 + self.dataObj.beam_B * np.array([0, 1])
         self.BA7 = self.BA2 + self.dataObj.beam_B * np.array([0, 1])
@@ -1941,6 +1959,7 @@ class End2DCreatorSide(object):
         self.BX1 = self.BX + self.dataObj.plate_ht * np.array([0, 1])
         self.BY1 = self.BY + self.dataObj.plate_ht * np.array([0, 1])
         self.BZ1 = self.BZ + self.dataObj.plate_ht * np.array([0, 1])
+        self.BV = self.BP + self.dataObj.beam_tw * np.array([-1,0])
 
     def call_BWBW_side(self, filename):
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -200 1200 1000'))
@@ -1964,6 +1983,7 @@ class End2DCreatorSide(object):
 
         dwg.add(dwg.rect(insert=(self.BZ), size=((self.dataObj.plate_width / 2 - self.dataObj.beam_tw / 2), self.dataObj.plate_ht), fill='none', stroke='blue',
                          stroke_width=2.5))
+        dwg.add(dwg.line((self.BP), (self.BV)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([2, 3])))
 
         nr = self.dataObj.no_of_rows
         nc = self.dataObj.no_of_col / 2

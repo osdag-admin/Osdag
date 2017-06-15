@@ -898,8 +898,14 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
         max_len = str(float(beam_d) - 2 * (float(beam_f_t) + float(beam_R1) + 5))
         str_max_len = "-" + beam_f_t + "-" + beam_R1 + "-" + beam_f_t + "-" + beam_R1 + "- 10"
     min_len = str(0.6 * float(beam_d))
-    row = [0, "Plate height (mm)", "&#8805; 0.6*" + beam_d + "=" + min_len + ", &#8804; " + beam_d + str_max_len + "=" + max_len +
+
+    if plate_length >= min_len or plate_length <= max_len:
+        row = [0, "Plate height (mm)", "&#8805; 0.6*" + beam_d + "=" + min_len + ", &#8804; " + beam_d + str_max_len + "=" + max_len +
            "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plate_length, " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
+    else:
+        row = [0, "Plate height (mm)","&#8805; 0.6*" + beam_d + "=" + min_len + ", &#8804; " + beam_d + str_max_len + "=" + max_len +
+               "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plate_length," <p align=left style=color:red><b>Fail</b></p>", "300", ""]
+
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -920,8 +926,13 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
         str_max_len = "140" + "2*(" + gauge + end + ")"
 
     min_width = plate_minwidth
-    row = [0, "Plate Width (mm)", "&#8805; " + min_width + ", &#8804; " + max_width + "<br>", plate_width,
+
+    if plate_width >= min_width or plate_width <= max_width:
+        row = [0, "Plate Width (mm)", "&#8805; " + min_width + ", &#8804; " + max_width + "<br>", plate_width,
            " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
+    else:
+        row = [0, "Plate Width (mm)", "&#8805; " + min_width + ", &#8804; " + max_width + "<br>", plate_width,
+               " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
     # row =[0,"Plate width (mm)","",plate_width]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

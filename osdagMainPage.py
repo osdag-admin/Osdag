@@ -22,6 +22,7 @@ from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_contro
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 import os.path
 import subprocess
+import shutil
 
 
 class MyTutorials(QDialog):
@@ -73,10 +74,8 @@ class OsdagMainWindow(QMainWindow):
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
-        if loc == "Sample Design Report":
-            self.sample_report()
-        elif loc == "Sample Problems":
-            self.sample_problem()
+        if loc == "Design Examples":
+            self.design_examples()
         elif loc == "Video Tutorials":
             self.open_tutorials()
         elif loc == "About Osdag":
@@ -115,7 +114,8 @@ class OsdagMainWindow(QMainWindow):
     def show_design_connection(self):
 
         options = QFileDialog.Options()
-        folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
+        # folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', os.path.join('..', '..', ' '))
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':
@@ -131,7 +131,11 @@ class OsdagMainWindow(QMainWindow):
                 flag = False
                 return flag
             else:
-                os.mkdir(os.path.join(root_path, create_folder))
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
             launchFinPlateController(self, folder)
@@ -176,28 +180,16 @@ class OsdagMainWindow(QMainWindow):
     def open_question(self):
         self.ask_question()
 
-    def sample_report(self):
+    def design_examples(self):
 
         root_path = os.path.join(os.path.dirname(__file__), 'Sample_Folder', 'Sample_Report')
-        for pdf_file in os.listdir(root_path):
-            if pdf_file.endswith('.pdf'):
+        for html_file in os.listdir(root_path):
+            if html_file.endswith('.html'):
                 if sys.platform == ("win32" or "win64"):
-                    os.startfile("%s/%s" % (root_path, pdf_file))
+                    os.startfile("%s/%s" % (root_path, html_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
-
-    def sample_problem(self):
-        root_path = os.path.join(os.path.dirname(__file__), 'Sample_Folder', 'Sample_Problems')
-        for pdf_file in os.listdir(root_path):
-            if pdf_file.endswith('.pdf'):
-                if sys.platform == ("win32" or "win64"):
-                    os.startfile("%s/%s" % (root_path, pdf_file))
-                else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
-
-
+                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
     def unavailable(self):
         QMessageBox.about(self, "INFO", "This module is not available in the current version.")

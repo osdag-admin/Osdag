@@ -176,9 +176,9 @@ def finConn(uiObj):
     old_col_section = get_oldcolumncombolist()
 
     if beam_sec in old_beam_section:
-        logger.warning(" : You are using section (in red color) that is not available in latest version of IS 808")
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
     if column_sec in old_col_section:
-        logger.warning(" : You are using section (in red color) that is not available in latest version of IS 808")
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
 
 
     #####################################################################################
@@ -230,7 +230,7 @@ def finConn(uiObj):
         if notch_ht < (beam_d/5):
             pass
         else:
-            logger.warning(" : Depth of coping should preferably be less than D/5 (D: Secondary beam depth)")
+            logger.warning(" : Depth of coping should preferably be less than D/5 (D = Secondary beam depth)")
     ########################################################################
     # INPUT FOR PLATE DIMENSIONS (FOR OPTIONAL INPUTS) AND VALIDATION
 
@@ -239,7 +239,7 @@ def finConn(uiObj):
         web_plate_t = beam_w_t
         design_status = False
         logger.error(": Chosen web plate thickness is not sufficient")
-        logger.warning(" : Minimum required thickness %2.2f mm" % (beam_w_t))
+        logger.warning(" : Minimum required thickness of web is %2.2f mm" % (beam_w_t))
 
     # # Plate height check
 
@@ -261,12 +261,12 @@ def finConn(uiObj):
         if web_plate_l > max_plate_height :
             if connectivity == "Beam-Beam":
                 design_status = False
-                logger.error(": Height of plate is more than the clear depth of the secondary beam")
+                logger.error(": Height of the plate is more than the clear depth of the secondary beam")
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height)) 
                 logger.info(": Reduce the plate height")
             else:
                 design_status = False
-                logger.error(": Height of plate is more than the clear depth of the beam")
+                logger.error(": Height of the plate is more than the clear depth of the beam")
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height)) 
                 logger.info(": Reduce the plate height")
                   
@@ -279,7 +279,7 @@ def finConn(uiObj):
                 logger.info(": Increase the plate height")
             else:
                 design_status = False
-                logger.error(": Minimum required plate height is more than the clear depth of the beam")
+                logger.error(": Minimum plate height required is more than the clear depth of the beam")
                 logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height))
                 logger.info(": Increase the plate height")
@@ -403,7 +403,7 @@ def finConn(uiObj):
                   
             elif min_plate_height > max_plate_height:
                 design_status = False
-                logger.error(": Minimum required plate height is more than the clear depth of the beam")
+                logger.error(": Minimum plate height required is more than the clear depth of the beam")
                 logger.warning(": Plate height required should be more than  %2.2f mm " % (min_plate_height))
                 logger.warning(": Maximum plate height allowed is %2.2f mm " % (max_plate_height))
                 logger.info(": Increase the plate height")
@@ -720,7 +720,7 @@ def finConn(uiObj):
             web_plate_l_opt = web_plate_l_opt
         if web_plate_l_opt > max_plate_height:
             design_status = False
-            logger.error(": Plate height provided is more than the maximum required height")
+            logger.error(": Plate height provided is more than the maximum height allowed")
             logger.warning(": Maximum plate height required is %2.2f mm " % (max_plate_height))
             logger.info("Try to increase the plate thickness")
     
@@ -744,8 +744,8 @@ def finConn(uiObj):
                new_bolt_param['pitch'] = round(new_bolt_param['pitch'], 3)
         if web_plate_l_opt > max_plate_height:
             design_status = False
-            logger.error(": The plate height required is more than the maximum height possible")
-            logger.warning(": Maximum plate height  required is %2.2f mm " % (max_plate_height))
+            logger.error(": Plate height required is more than the maximum height possible")
+            logger.warning(": Maximum plate height required is %2.2f mm " % (max_plate_height))
             logger.info("Try to increase the plate thickness")
    ##############
         
@@ -760,7 +760,7 @@ def finConn(uiObj):
             design_status = False
             logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
             logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
-            logger.info(": Select a higher depth secondary beam section") 
+            logger.info(": Select a deeper secondary beam section")
     
     # Calculation of plate height required (for optional input) 
     web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));
@@ -806,7 +806,7 @@ def finConn(uiObj):
                      boltParameters['gauge'], min_thk)
     if Tdb < shear_load:
         design_status = False
-        logger.error(": The block shear capacity of the plate is lass than the applied shear force [cl. 6.4.1]")
+        logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
         logger.warning(": Minimum block shear capacity required is " % (shear_load))
         logger.info(": Increase the plate thickness")
         
@@ -819,9 +819,9 @@ def finConn(uiObj):
     if connectivity == "Beam-Beam":
         if V_d < shear_load:
             design_status = False
-            logger.error(": The secondry beam fails in shear yeilding [cl. 8.4.1]/ AISC design manual")
-            logger.warning(": Minimum shear yeilding capacity required is %2.2f kN" % (shear_load))
-            logger.info(": Use a higher section for secondry beam")
+            logger.error(": Secondary beam fails in shear yielding [cl. 8.4.1]/ AISC design manual")
+            logger.warning(": Minimum shear yielding capacity required is %2.2f kN" % (shear_load))
+            logger.info(": Use a deeper section for the secondary beam")
 
     #### Check for shear rupture ###
 
@@ -832,9 +832,9 @@ def finConn(uiObj):
     if connectivity == "Beam-Beam":
         if R_n < shear_load:
             design_status = False
-            logger.error(": The capacity of secondry beam in shear rupture is less than the applied shear force AISC design manual/[cl.8.4.1.1]")
+            logger.error(": Capacity of the secondary beam in shear rupture is less than the applied shear force [cl. 8.4.1.1; AISC Steel Construction Manual, 14th Edition]")
             logger.warning(": Minimum shear rupture capacity required is %2.2f kN" % (shear_load))
-            logger.info(" : Use a higher section for secondry beam")
+            logger.info(" : Use a deeper section for the secondary beam")
 
 
     # # Weld design
@@ -881,7 +881,7 @@ def finConn(uiObj):
     
     if weld_t < weld_t_req:
         design_status = False
-        logger.error(": Weld thickness is not sufficient [cl. 10.5.7; Insdag Detailing Manual, 2002]")
+        logger.error(": Weld thickness is not sufficient [cl. 10.5.7; INSDAG Detailing Manual, 2002]")
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
         logger.info(": Increase the weld thickness or length of weld/finplate")

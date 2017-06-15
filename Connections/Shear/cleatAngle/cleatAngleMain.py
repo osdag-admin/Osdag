@@ -269,9 +269,13 @@ class MyPopupDialog(QDialog):
 
         filename, _ = QFileDialog.getSaveFileName(self, 'Save Files', os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
 
-        infile = open(filename, 'w')
-        pickle.dump(input_data, infile)
-        infile.close()
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(input_data, infile)
+            infile.close()
 
     def get_design_report_inputs(self):
 
@@ -443,8 +447,9 @@ class MainController(QMainWindow):
 # ************************************ Help button *******************************************************************************
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
-        self.ui.actionSample_Reports.triggered.connect(self.sample_report)
-        self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
+        self.ui.actionDesign_examples.triggered.connect(self.design_examples)
+        # self.ui.actionSample_Reports.triggered.connect(self.sample_report)
+        # self.ui.actionSample_Problems.triggered.connect(self.sample_problem)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
         self.ui.actionDesign_preferences.triggered.connect(self.design_preferences)
 
@@ -1758,27 +1763,16 @@ class MainController(QMainWindow):
         self.ask_question()
 
 
-    def sample_report(self):
+    def design_examples(self):
 
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
-        for pdf_file in os.listdir(root_path):
-            if pdf_file.endswith('.pdf'):
+        for html_file in os.listdir(root_path):
+            if html_file.endswith('.html'):
                 if sys.platform == ("win32" or "win64"):
-                    os.startfile("%s/%s" % (root_path, pdf_file))
+                    os.startfile("%s/%s" % (root_path, html_file))
                 else:
                     opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
-
-
-    def sample_problem(self):
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Problems')
-        for pdf_file in os.listdir(root_path):
-            if pdf_file.endswith('.pdf'):
-                if sys.platform == ("win32" or "win64"):
-                    os.startfile("%s/%s" % (root_path, pdf_file))
-                else:
-                    opener ="open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, "%s/%s" % (root_path, pdf_file)])
+                    subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
     def design_preferences(self):
         self.designPrefDialog.show()

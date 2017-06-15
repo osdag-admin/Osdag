@@ -672,7 +672,7 @@ class End2DCreatorFront(object):
 
         dwg.add(dwg.line(ptSecA, ptSecC).stroke('#666666', width=1.0, linecap='square'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BE), (self.BF), (self.BG), (self.BH), (self.BI), (self.BJ), (self.BK),
-                                     (self.BL), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
+                                     (self.BL), (self.BA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         pt1 = self.BA5 - self.dataObj.col_R1 * np.array([0, 1])
         pt2 = self.BA5 - self.dataObj.col_R1 * np.array([1, 0])
         dwg.add(dwg.polyline(points=[pt1, self.BA1, self.BA2, self.BB2, self.BB1, self.BB4, self.BC2, self.BC1, pt2], stroke='blue',
@@ -1953,7 +1953,7 @@ class End2DCreatorSide(object):
         dwg.add(dwg.line((self.BP1), (self.BX1)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
 
         dwg.add(dwg.polyline(points=[(self.BB1), (self.BC1), (self.BD1), (self.BE1), (self.BF1), (self.BG1), (self.BH1), (self.BI1), (self.BJ1), (self.BK1),
-                                     (self.BL1), (self.BA1)], stroke='blue', fill='none', stroke_width=2.5))
+                                     (self.BL1), (self.BA1)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=1.5))
@@ -1988,16 +1988,18 @@ class End2DCreatorSide(object):
                 blt3 = pt + (bolt_r + 5) * np.array([0, 1])
                 blt4 = pt + (bolt_r + 5) * np.array([0, -1])
 
-                dwg.add(dwg.line((blt1), (blt2)).stroke('black', width=1, linecap='square'))
-                dwg.add(dwg.line((blt3), (blt4)).stroke('black', width=1, linecap='square'))
+                point1 = pt +self.dataObj.edge_dist * np.array([1,0])
+
+                dwg.add(dwg.line((blt1), (blt2)).stroke('red', width=1.5, linecap='square'))
+                dwg.add(dwg.line((blt3), (blt4)).stroke('blue', width=1.5, linecap='square').dasharray(dasharray=([20, 5, 1, 5])))
 
                 blt1_o = pt_other + (bolt_r + 5) * np.array([1, 0])
                 blt2_o = pt_other + (bolt_r + 5) * np.array([-1, 0])
                 blt3_o = pt_other + (bolt_r + 5) * np.array([0, 1])
                 blt4_o = pt_other + (bolt_r + 5) * np.array([0, -1])
 
-                dwg.add(dwg.line((blt1_o), (blt2_o)).stroke('black', width=1, linecap='square'))
-                dwg.add(dwg.line((blt3_o), (blt4_o)).stroke('black', width=1, linecap='square'))
+                dwg.add(dwg.line((blt1_o), (blt2_o)).stroke('red', width=1.5, linecap='square'))
+                dwg.add(dwg.line((blt3_o), (blt4_o)).stroke('blue', width=1.5, linecap='square').dasharray(dasharray=([20, 5, 1, 5])))
                 col_list.append(pt_other)
                 col_list1.append(pt)
             pitch_pts.append(col_list)
@@ -2120,9 +2122,9 @@ class End2DCreatorSide(object):
         self.dataObj.draw_oriented_arrow(dwg, weld_pt, theta, "NW", offset, text_up, text_down, element="weld")
 
         # 2D view name
-        ptx = self.BG + (self.dataObj.beam_B * 2) * np.array([0, 1])
+        ptx = self.BG + (self.dataObj.beam_B * 1.6) * np.array([0, 1])
         dwg.add(dwg.text("Side view (Sec B-B)", insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        pty = self.BG + (self.dataObj.beam_B * 2 + 40) * np.array([0, 1])
+        pty = self.BG + (self.dataObj.beam_B * 1.6 + 40) * np.array([0, 1])
         dwg.add(dwg.text("(All Dimensions are in mm)", insert=(pty), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()

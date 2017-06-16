@@ -882,7 +882,7 @@ def finConn(uiObj):
         logger.error(": Weld thickness is not sufficient [cl. 10.5.7; INSDAG Detailing Manual, 2002]")
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
-        logger.info(": Increase the weld thickness or length of weld/finplate")
+        logger.info(": Increase the weld thickness or length of weld/fin plate")
 
     
     # End of calculation
@@ -1138,7 +1138,7 @@ def finConn(uiObj):
 
     if  design_status == True:
 
-        logger.info(": Overall finplate connection design is safe \n")
+        logger.info(": Overall fin plate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:
         logger.error(": Design is not safe \n ")

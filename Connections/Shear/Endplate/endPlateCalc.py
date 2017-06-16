@@ -33,51 +33,51 @@ def black_bolt_shear(dia, n, fu):
     return Vs
 
 # NOT present in CAD_notchB-B branch
-# ############ REDUCTION FACTORS FOR BOLTS ############
-# # Check added by Danish Ansari on 13th June 2017
-# # Check for Long joints & Large grip lengths, IS 800:2007 Cl 10.3.3.1 & Cl 10.3.3.2
-#
-# def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t):
-#
-#     l_j = (bolts_required - 1) * pitch  # length of joint in direction of load transfer
-#     if l_j > 15 * bolt_dia:
-#         beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
-#         if beta_long_joints <= 0.75 or beta_long_joints >= 1.0:
-#             beta_long_joints = 0.875  # assuming the value of beta_long_joints is average of 0.75 and 1.0
-#         else:
-#             beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
-#     else:
-#         beta_long_joints = int(1)
-#
-#     beta_l_j = beta_long_joints
-#
-#     # Check for Large grip lengths
-#     # Function for Large grip length, beta_lg (reduction factor to be multiplied to shear capacity of bearing bolt)
-#     # Ref: IS 800:2007 Cl 10.3.3.2
-#
-#     if connectivity == "Column flange-Beam web":
-#         l_g = column_f_t + end_plate_t
-#         if l_g > (5 * bolt_dia):
-#             beta_lg = 8 / (3 + (l_g / bolt_dia))
-#         else:
-#             beta_lg = int(1)
-#     elif connectivity == "Column web-Beam web":
-#         l_g = column_w_t + end_plate_t
-#         if l_g > (5 * bolt_dia):
-#             beta_lg = 8 / (3 + (l_g / bolt_dia))
-#         else:
-#             beta_lg = int(1)
-#     else:
-#         l_g = beam_w_t + end_plate_t
-#         if l_g > (5 * bolt_dia):
-#             beta_lg = 8 / (3 + (l_g / bolt_dia))
-#         else:
-#             beta_lg = int(1)
-#
-#     beta_l_g = beta_lg
-#     bolt_shear_capa = bolt_shear_capacity * beta_l_g *beta_l_j
-#     return bolt_shear_capa
-# #######################################################################
+############ REDUCTION FACTORS FOR BOLTS ############
+# Check added by Danish Ansari on 13th June 2017
+# Check for Long joints & Large grip lengths, IS 800:2007 Cl 10.3.3.1 & Cl 10.3.3.2
+
+def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t):
+
+    l_j = (bolts_required - 1) * pitch  # length of joint in direction of load transfer
+    if l_j > 15 * bolt_dia:
+        beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
+        if beta_long_joints <= 0.75 or beta_long_joints >= 1.0:
+            beta_long_joints = 0.875  # assuming the value of beta_long_joints is average of 0.75 and 1.0
+        else:
+            beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
+    else:
+        beta_long_joints = int(1)
+
+    beta_l_j = beta_long_joints
+
+    # Check for Large grip lengths
+    # Function for Large grip length, beta_lg (reduction factor to be multiplied to shear capacity of bearing bolt)
+    # Ref: IS 800:2007 Cl 10.3.3.2
+
+    if connectivity == "Column flange-Beam web":
+        l_g = column_f_t + end_plate_t
+        if l_g > (5 * bolt_dia):
+            beta_lg = 8 / (3 + (l_g / bolt_dia))
+        else:
+            beta_lg = int(1)
+    elif connectivity == "Column web-Beam web":
+        l_g = column_w_t + end_plate_t
+        if l_g > (5 * bolt_dia):
+            beta_lg = 8 / (3 + (l_g / bolt_dia))
+        else:
+            beta_lg = int(1)
+    else:
+        l_g = beam_w_t + end_plate_t
+        if l_g > (5 * bolt_dia):
+            beta_lg = 8 / (3 + (l_g / bolt_dia))
+        else:
+            beta_lg = int(1)
+
+    beta_l_g = beta_lg
+    bolt_shear_capa = bolt_shear_capacity * beta_l_g *beta_l_j
+    return bolt_shear_capa
+#######################################################################
 
 # BOLT: determination of bearing capacity = 2.5 * kb * d * t * fu / Y
 def bolt_bearing(dia, t, fu, kb):
@@ -621,6 +621,11 @@ def end_connection(ui_obj):
                     design_check = False
                     logger.error(": Calculated width of the end plate exceeds the width of the column")
                     logger.warning(": Minimum end plate width is %2.2f mm" % (min_end_plate_w))
+
+######### Check for shear capacity of bolt after multiplying the reduction factors (beta_l_g and beta_l_j) #####
+
+    bolt_shear_capacity = get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch,
+                                               end_plate_t, column_f_t, column_w_t, beam_w_t)                                                           
 
 # ################ CHECK 2: SHEAR CAPACITY OF BEAM WEB ####################
 

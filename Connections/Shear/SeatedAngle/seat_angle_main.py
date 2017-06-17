@@ -1394,9 +1394,9 @@ class MainController(QMainWindow):
         self.ask_questions()
 
     def design_examples(self):
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-            if html_file.endswith('.html'):
+            if html_file.startswith('index'):
                 if sys.platform == "nt":
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:

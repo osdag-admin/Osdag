@@ -592,7 +592,6 @@ class MainController(QMainWindow):
     def fill_plate_thick_combo(self):
         '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
         '''
-        print" combo_beam text:", self.ui.combo_Beam.currentText()
         if str(self.ui.combo_Beam.currentText()) == 'Select section':
             return
         dict_beam_data = self.fetch_beam_param()

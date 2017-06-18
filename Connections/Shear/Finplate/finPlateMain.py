@@ -424,6 +424,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
@@ -767,6 +768,56 @@ class MainController(QMainWindow):
 
             self.ui.comboPlateThick_2.blockSignals(False)
             self.ui.comboPlateThick_2.setCurrentIndex(0)
+
+
+    def check_plate_height(self, widget):
+        loc = self.ui.comboConnLoc.currentText()
+        plate_height = widget.text()
+        plate_height = float(plate_height)
+        if plate_height == 0:
+            self.ui.btn_Design.setDisabled(False)
+        else:
+
+            dict_beam_data = self.fetchBeamPara()
+            dict_column_data = self.fetchColumnPara()
+            beam_D = float(dict_beam_data['D'])
+            col_T = float(dict_column_data['T'])
+            col_R1 = float(dict_column_data['R1'])
+            beam_T = float(dict_beam_data['T'])
+            beam_R1 = float(dict_beam_data['R1'])
+            clear_depth = 0.0
+            min_plate_height = 0.6 * beam_D
+            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                clear_depth = beam_D - 2 * (beam_T + beam_R1 + 5)
+            else:
+                clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
+            if clear_depth < plate_height or min_plate_height > plate_height:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+            else:
+                self.ui.btn_Design.setDisabled(False)
+
+    def check_plate_width(self, widget):
+        loc = self.ui.comboConnLoc.currentText()
+        plate_width = widget.text()
+        plate_width = float(plate_width)
+        if plate_width == 0:
+            self.ui.btn_Design.setDisabled(False)
+        else:
+
+            dict_column_data = self.fetchColumnPara()
+            col_D = float(dict_column_data['D'])
+            col_T = float(dict_column_data['T'])
+            col_R1 = float(dict_column_data['R1'])
+            clear_depth = 0.0
+            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                clear_depth = col_D - 2 * (col_T + col_R1 + 5)
+
+            if clear_depth < plate_width:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
+            else:
+                self.ui.btn_Design.setDisabled(False)
 
     def populateWeldThickCombo(self):
         """Return weld thickness on the basis column flange and plate thickness check

@@ -1381,7 +1381,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # row =[0,"End distance (mm)","&#8805;1.7* 22 = 37.4,&#8804;12*8.9 = 106.9 <br> [cl. 10.2.4]","50"]
     min_end = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_end = str(12 * float(thinner_c))
-    if int(end_c) >= int(min_end) or int(end_c) <= int(max_end):
+    if float(end_c) >= int(min_end) or float(end_c) <= int(max_end):
         row = [0, "End distance (mm)",
                " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_end + ", &#8804; 12*" + thinner_c + " = " + max_end + " <br> [cl. 10.2.4]",
                end_c,

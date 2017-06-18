@@ -43,7 +43,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     myfile.write(t('/head'))
     myfile.write(t('body'))
-#     Connections/Shear/Finplate/
+#     Connections/Shear/Fin Plate/
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # DATA PARAMS
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -60,7 +60,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# FinPlate Main Data
+# Fin Plate Main Data
     beam_tw = str(float(dictBeamData["tw"]))
     beam_f_t = str(float(dictBeamData["T"]))
     beam_d = str(float(dictBeamData["D"]))
@@ -221,16 +221,16 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     if status == 'True':
-        row = [1, "Finplate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, "Fin Plate", "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Finplate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, "Fin Plate", "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Finplate", " "]
+    row = [0, "Fin Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -245,7 +245,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Connection Title", " Single Finplate"]
+    row = [1, "Connection Title", " Single Fin Plate"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')

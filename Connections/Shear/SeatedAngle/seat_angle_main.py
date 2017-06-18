@@ -1397,7 +1397,7 @@ class MainController(QMainWindow):
         root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
             if html_file.startswith('index'):
-                if sys.platform == "nt":
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:
                     opener = "open" if sys.platform == "darwin" else "xdg-open"

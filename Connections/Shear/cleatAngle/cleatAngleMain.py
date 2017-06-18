@@ -1025,6 +1025,54 @@ class MainController(QMainWindow):
         uiObj = json.load(in_file)
         self.setDictToUserInputs(uiObj)
 
+
+    def setDictToUserInputs(self, uiObj):
+
+        if (uiObj is not None):
+
+            self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
+
+            if uiObj['Member']['Connectivity'] == 'Beam-Beam':
+
+                self.ui.beamSection_lbl.setText('Secondary beam *')
+                self.ui.columnSection_lbl.setText('Primary beam *')
+                self.ui.comboColSec.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
+
+            self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
+            self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
+            self.ui.txtFu.setText(str(uiObj['Member']['fu (MPa)']))
+            self.ui.txtFy.setText(str(uiObj['Member']['fy (MPa)']))
+
+            self.ui.txtShear.setText(str(uiObj['Load']['ShearForce (kN)']))
+
+            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            comboTypeIndex = self.ui.comboBoltType.findText(str(uiObj['Bolt']['Type']))
+            self.ui.comboBoltType.setCurrentIndex(comboTypeIndex)
+            self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
+
+            prevValue = str(uiObj['Bolt']['Grade'])
+
+            comboGradeIndex = self.ui.comboBoltGrade.findText(prevValue)
+
+            self.ui.comboBoltGrade.setCurrentIndex(comboGradeIndex)
+
+            selection = str(uiObj['cleat']['Height (mm)'])
+            self.ui.txtInputCleatHeight.setText(selection)
+            cleat_section = str(uiObj['cleat']['section'])
+            self.ui.comboCleatSection.setCurrentIndex(self.ui.comboCleatSection.findText(cleat_section))
+
+
+        else:
+            pass
+
     def getuser_inputs(self):
         '''(nothing) -> Dictionary
         Returns the dictionary object with the user input fields for designing cleat angle connection

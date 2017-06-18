@@ -605,36 +605,50 @@ class MainController(QMainWindow):
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
-        if uiObj != None:
-            self.ui.combo_connectivity.setCurrentIndex(
-                self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
+        self.setDictToUserInputs(uiObj)
+
+    def setDictToUserInputs(self, uiObj):
+
+        if (uiObj is not None):
+
+            self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
-                self.ui.lbl_beam.setText('Secondary beam *')
-                self.ui.lbl_column.setText('Primary beam *')
-                self.ui.combo_column_section.addItems(get_beamcombolist())
 
-            self.ui.combo_beam_section.setCurrentIndex(
-                self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
-            self.ui.combo_column_section.setCurrentIndex(
-                self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
+                self.ui.lbl_comboBeamSec.setText('Secondary beam *')
+                self.ui.lbl_comboColSec.setText('Primary beam *')
+                self.ui.combo_column_section.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
 
+            self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
             self.ui.txt_fy.setText(str(uiObj['Member']['fy (MPa)']))
 
             self.ui.txt_shear_force.setText(str(uiObj['Load']['ShearForce (kN)']))
 
-            self.ui.combo_bolt_diameter.setCurrentIndex(
-                self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
-            combo_type_index = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
-            self.ui.combo_bolt_type.setCurrentIndex(combo_type_index)
+            self.ui.combo_bolt_diameter.setCurrentIndex(self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            comboTypeIndex = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
+            self.ui.combo_bolt_type.setCurrentIndex(comboTypeIndex)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
-            combo_grade_index = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
-            self.ui.combo_bolt_grade.setCurrentIndex(combo_grade_index)
-            combo_seat_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
-            self.ui.combo_angle_section.setCurrentIndex(combo_seat_angle_index)
-            combo_top_angle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
-            self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
+
+            prevValue = str(uiObj['Bolt']['Grade'])
+
+            comboGradeIndex = self.ui.combo_bolt_grade.findText(prevValue)
+
+            self.ui.combo_bolt_grade.setCurrentIndex(comboGradeIndex)
+
+            seat_angle = str(uiObj['Angle']['AngleSection'])
+            self.ui.combo_angle_section.setCurrentIndex(self.ui.combo_angle_section.findText(seat_angle))
+            top_angle = str(uiObj['Angle']['TopAngleSection'])
+            self.ui.combo_topangle_section.setCurrentIndex(self.ui.combo_topangle_section.findText(top_angle))
         else:
             pass
 

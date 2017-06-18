@@ -39,7 +39,7 @@ def black_bolt_shear(dia, n, fu):
 
 def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t):
 
-    l_j = (bolts_required - 1) * pitch  # length of joint in direction of load transfer
+    l_j = ((bolts_required/2) - 1) * pitch  # length of joint in direction of load transfer
     if l_j > 15 * bolt_dia:
         beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
         if beta_long_joints <= 0.75 or beta_long_joints >= 1.0:
@@ -320,7 +320,7 @@ def end_connection(ui_obj):
         # TODO Set parameters based on updated design preferences input from GUI
         muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
-        bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0 - oversize hole
+        bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0.85 - oversize hole
         bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
         bolt_bearing_capacity = 'N/A'
         bolt_capacity = bolt_shear_capacity
@@ -713,7 +713,7 @@ def end_connection(ui_obj):
     output_obj['Bolt']['dia_hole'] = float(dia_hole)
     output_obj['Bolt']['bolt_fu'] = float(bolt_fu)
     output_obj['Bolt']['bolt_fy'] = float(bolt_fy)
-    output_obj['Bolt']['critshear'] = round(crit_shear, 3)
+    output_obj['Bolt']['critshear'] = float(round(crit_shear, 3))
     output_obj['Bolt']['kb'] = float(kb)
 
     output_obj['Weld'] = {}

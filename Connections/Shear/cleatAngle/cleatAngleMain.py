@@ -1455,7 +1455,8 @@ class MainController(QMainWindow):
         elif self.ui.comboCleatSection.currentIndex() == 0:
             QMessageBox.information(self, "Information", "Please select Cleat angle")
             flag = False
-        flag = self.checkbeam_b()
+        else:
+            flag = self.checkbeam_b()
         return flag
 
     def bolt_head_thick_calculation(self, bolt_diameter):

@@ -751,7 +751,7 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
-            newlist.append("Select thickness")
+            newlist.append("Select Plate thickness")
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -843,7 +843,7 @@ class MainController(QMainWindow):
                 return
             dictcoldata = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
-            if plate_thickness != "Select thickness":
+            if plate_thickness != "Select Plate thickness":
                 plate_thick = float(plate_thickness)
 
 
@@ -896,7 +896,9 @@ class MainController(QMainWindow):
 
 
     def setDictToUserInputs(self, uiObj):
-
+        # if self.connection != "Finplate":
+        #     QMessageBox.information(self, "Unable to open file",
+        #                             "You can load this input file only from the corresponding design problem")
         if (uiObj is not None):
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
@@ -1496,7 +1498,9 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkBeam_B()
+        else:
+            flag = self.checkBeam_B()
+
         return flag
 
 

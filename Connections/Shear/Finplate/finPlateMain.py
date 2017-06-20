@@ -844,7 +844,7 @@ class MainController(QMainWindow):
             dictcoldata = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
             if plate_thickness != "Select thickness":
-                plate_thick = float(plate_thickness)
+                plate_thick = str(plate_thickness)
 
 
                 if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
@@ -1496,7 +1496,8 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkBeam_B()
+        else:
+            flag = self.checkBeam_B()
         return flag
 
 

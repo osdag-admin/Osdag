@@ -1364,7 +1364,8 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkbeam_b()
+        else:
+            flag = self.checkbeam_b()
 
         return flag
 

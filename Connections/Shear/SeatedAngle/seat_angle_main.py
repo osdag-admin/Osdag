@@ -221,7 +221,7 @@ class DesignReportDialog(QDialog):
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()

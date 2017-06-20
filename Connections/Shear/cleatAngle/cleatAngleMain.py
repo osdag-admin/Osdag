@@ -692,7 +692,7 @@ class MainController(QMainWindow):
         if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == '':
             return
         loc = self.ui.comboConnLoc.currentText()
-        if loc == "Column flange-Beam web" or "Column web-Beam web":
+        if loc == "Column flange-Beam web" or loc == "Column web-Beam web":
 
             dict_beam_data = self.fetch_beam_param()
             dict_column_data = self.fetch_column_param()

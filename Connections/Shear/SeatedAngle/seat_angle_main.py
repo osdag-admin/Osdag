@@ -1290,17 +1290,32 @@ class MainController(QMainWindow):
     def create2Dcad(self, connectivity):
         """ Returns the fuse model of finplate
         """
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.get_columnModel()
+
+        elif self.commLogicObj.component == "Seated Angle":
+            cadlist = [self.commLogicObj.connectivityObj.angleModel,
+                       self.commLogicObj.connectivityObj.topclipangleModel] + \
+                      self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
 
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        if self.connectivity == None:
-            self.connectivity = self.create3DColWebBeamWeb()
+        # if self.connectivity == None:
+        #     self.connectivity = self.create3DColWebBeamWeb()
         if self.fuse_model == None:
             self.fuse_model = self.create2Dcad(self.connectivity)
         shape = self.fuse_model

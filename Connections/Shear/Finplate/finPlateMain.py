@@ -569,7 +569,7 @@ class MainController(QMainWindow):
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.blockSignals(True)
             self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
@@ -616,7 +616,7 @@ class MainController(QMainWindow):
             self.ui.comboDiameter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
@@ -751,7 +751,7 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
-            newlist.append("Select Plate thickness")
+            newlist.append("Select plate thickness")
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -843,7 +843,7 @@ class MainController(QMainWindow):
                 return
             dictcoldata = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
-            if plate_thickness != "Select Plate thickness":
+            if plate_thickness != "Select plate thickness":
                 plate_thick = float(plate_thickness)
 
 
@@ -1183,7 +1183,7 @@ class MainController(QMainWindow):
         self.ui.comboType.setCurrentIndex((0))
         self.ui.comboGrade.setCurrentIndex((0))
 
-        self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+        self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
         self.ui.comboPlateThick_2.setCurrentIndex((0))
         self.ui.txtPlateLen.clear()
         self.ui.txtPlateWidth.clear()
@@ -1492,7 +1492,7 @@ class MainController(QMainWindow):
             flag = False
 
         elif self.ui.comboPlateThick_2.currentIndex() == 0:
-            QMessageBox.information(self, "information", "Please select Plate thickness")
+            QMessageBox.information(self, "information", "Please Select plate thickness")
             flag = False
 
         elif self.ui.comboWldSize.currentIndex() == 0:

@@ -196,7 +196,7 @@ def cleat_connection(ui_obj):
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
     bolt_HSFG_slip_factor = ui_obj["bolt"]["slip_factor"]
-    gap = ui_obj["detailing"]["gap"]
+    gap = float(ui_obj["detailing"]["gap"])
 
     mu_f = float(ui_obj["bolt"]["slip_factor"])
     dp_bolt_hole_type =  ui_obj["bolt"]["bolt_hole_type"]

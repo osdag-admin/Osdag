@@ -72,9 +72,9 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -112,7 +112,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = float(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 

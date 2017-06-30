@@ -73,8 +73,13 @@ class cleatCommonData(object):
         self.beam_L = 350
         # self.gap = 20  # Clear distance between Column and Beam as per subramanyam's book ,range 15-20 mm
         self.gap = input_obj["detailing"]["gap"]
-        self.notch_L = (self.col_B / 2 - self.col_tw / 2) + 10
-        self.notch_offset = (self.col_T + self.col_R1)
+        # self.notch_L = (self.col_B / 2 - self.col_tw / 2) + 10
+        # self.notch_offset = (self.col_T + self.col_R1)
+
+        self.R1_max = max([self.col_R1, self.beam_R1, 10])
+        self.notch_L = ((self.col_B / 2 - self.col_tw / 2) + self.gap)
+        self.notch_offset = max([self.col_T, self.beam_T]) + max([self.col_R1, self.beam_R1]) + max([(self.col_T/2), (self.beam_T/2),10])
+
 
         self.folder = folder
 
@@ -789,7 +794,8 @@ class Cleat2DCreatorFront(object):
         # ##################COLUMN CONNECTIVITY MARKING#####################
         # Draw Faint Line To Represent Distance Between Beam Flange and Cleat Angle.
         length = (self.dataObj.beam_B - self.dataObj.beam_tw) / 2
-        v_offset = self.dataObj.col_T + self.dataObj.col_R1  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC  
+        # v_offset = self.dataObj.col_T + self.dataObj.col_R1  # #NEED TO BE CHANGED AFTER CONSIDERING THE CONDITIONS FROM JSC
+        v_offset = self.dataObj.notch_offset
         BA_down = self.BA + v_offset * np.array([0, 1])
         BA_left = self.BA - 30 * np.array([1, 0])
         BA_left_down = BA_left + v_offset * np.array([0, 1])

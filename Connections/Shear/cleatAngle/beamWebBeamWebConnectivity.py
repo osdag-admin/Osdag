@@ -24,6 +24,7 @@ class BeamWebBeamWeb(object):
         self.angleLeft = copy.deepcopy(angle)
         self.nut_bolt_array = nut_bolt_array
         self.gap = gap
+        self.fillet_gap = self.gap - 0.1  # 0.1 is the extra margin for fillet of the angel
         self.columnModel = None
         self.beamModel = None
         self.angleModel = None
@@ -84,8 +85,10 @@ class BeamWebBeamWeb(object):
     
     def create_angle_geometry(self):
         angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
-                         * (self.beam.vDir) - (self.beam.t / 2 * self.beam.uDir) + self.gap
+                         * (self.beam.vDir) - ((self.beam.t / 2 )+ 0.1 * self.beam.uDir) + self.gap
                          * (-self.beam.wDir))
+
+
         # (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5)
         #  * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
         #  self.gap * (-self.beam.wDir))
@@ -98,7 +101,7 @@ class BeamWebBeamWeb(object):
         self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
         angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height)
-                         * (self.beam.vDir) + (self.beam.t / 2 * self.beam.uDir) + self.gap
+                         * (self.beam.vDir) + ((self.beam.t / 2 )+ 0.1 * self.beam.uDir)+ self.gap
                          * (-self.beam.wDir))
         # uDir1 = numpy.array([1.0, 0.0, 0])
         # wDir1 = numpy.array([0.0, 1.0, 0])
@@ -153,7 +156,7 @@ class BeamWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        return [self.columnModel, self.beamModel, self.angleModel] + self.nut_bolt_array.get_model()
+        return [self.columnModel, self.beamModel,self.angleModel,self.angleLeftModel] + self.nut_bolt_array.get_models() #[self.columnModel, self.beamModel,
              
     def get_nutboltmodels(self):
         

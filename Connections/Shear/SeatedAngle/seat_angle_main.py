@@ -1287,7 +1287,7 @@ class MainController(QMainWindow):
         else:
             pass
 
-    def create2Dcad(self, connectivity):
+    def create2Dcad(self):
         """ Returns the fuse model of finplate
         """
         if self.commLogicObj.component == "Beam":
@@ -1305,6 +1305,7 @@ class MainController(QMainWindow):
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
         else:
             cadlist = self.commLogicObj.connectivityObj.get_models()
+
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
@@ -1314,45 +1315,53 @@ class MainController(QMainWindow):
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        # if self.connectivity == None:
-        #     self.connectivity = self.create3DColWebBeamWeb()
-        if self.fuse_model == None:
-            self.fuse_model = self.create2Dcad(self.connectivity)
+
+        if self.fuse_model is None:
+            self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
-                                               files_types)
 
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                  files_types)
         fName = str(fileName)
-        file_extension = fName.split(".")[-1]
 
-        if file_extension == 'igs':
-            IGESControl.IGESControl_Controller().Init()
-            iges_writer = IGESControl.IGESControl_Writer()
-            iges_writer.AddShape(shape)
-            iges_writer.Write(fName)
-
-        elif file_extension == 'brep':
-            BRepTools.breptools.Write(shape, fName)
-
-        elif file_extension == 'stp':
-            # initialize the STEP exporter
-            step_writer = STEPControl_Writer()
-            Interface_Static_SetCVal("write.step.schema", "AP203")
-
-            # transfer shapes and write file
-            step_writer.Transfer(shape, STEPControl_AsIs)
-            status = step_writer.Write(fName)
-
-            assert (status == IFSelect_RetDone)
-
+        flag = True
+        if fName == '':
+            flag = False
+            return flag
         else:
-            stl_writer = StlAPI_Writer()
-            stl_writer.SetASCIIMode(True)
-            stl_writer.Write(shape, fName)
+            file_extension = fName.split(".")[-1]
 
-        QMessageBox.about(self, 'Information', "File saved")
+            if file_extension == 'igs':
+                IGESControl.IGESControl_Controller().Init()
+                iges_writer = IGESControl.IGESControl_Writer()
+                iges_writer.AddShape(shape)
+                iges_writer.Write(fName)
+
+            elif file_extension == 'brep':
+
+                BRepTools.breptools.Write(shape, fName)
+
+            elif file_extension == 'stp':
+                # initialize the STEP exporter
+                step_writer = STEPControl_Writer()
+                Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                # transfer shapes and write file
+                step_writer.Transfer(shape, STEPControl_AsIs)
+                status = step_writer.Write(fName)
+
+                assert (status == IFSelect_RetDone)
+
+            else:
+                stl_writer = StlAPI_Writer()
+                stl_writer.SetASCIIMode(True)
+                stl_writer.Write(shape, fName)
+
+            self.fuse_model = None
+
+            QMessageBox.about(self, 'Information', "File saved")
 
     def call_seatangle2D_Drawing(self, view):
         """ This routine saves the 2D SVG image as per the connectivity selected

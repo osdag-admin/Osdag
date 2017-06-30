@@ -208,6 +208,15 @@ class OsdagMainWindow(QMainWindow):
     sys._excepthook = sys.excepthook
 
     def the_exception_hook(exctype, value, traceback):
+        '''Finds the error occurs when Osdag crashes
+
+        Args:
+            value:
+            traceback:
+
+        Returns:
+            system exit(1)
+        '''
         # Print the error and traceback
         print "Error occurred: ", (exctype, value, traceback)
         # Call the normal Exception hook after

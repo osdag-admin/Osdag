@@ -199,6 +199,7 @@ def shear_rupture_b(A_vn, beam_fu ):
         beam_fu (float) Ultimate stress of beam material
 
     Returns:
+        Capacity of beam web in shear rupture
 
     '''
     R_n = (0.6 * beam_fu * A_vn) / 1000  #kN
@@ -745,7 +746,7 @@ def finConn(uiObj):
     # Check for long joint connections
     length_joint = (boltParameters['numofrow'] - 1) * boltParameters['pitch']
     if length_joint > 15 * bolt_dia:
-        beta_lj = 1.075 - length_joint / (200 * bolt_dia);
+        beta_lj = 1.075 - length_joint / (200 * bolt_dia)
         bolt_shear_capacity = beta_lj * boltParameters['shearcapacity']
 #         new_bolt_param = boltDesign(bolt_shear_capacity_new)
         new_bolt_param = boltDesign(web_plate_l)

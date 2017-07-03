@@ -25,6 +25,15 @@ module_setup()
 
 
 def net_area_calc(dia):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+
+    Returns:
+        Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
+    '''
     net_area = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
     return net_area[dia]
 
@@ -32,6 +41,17 @@ def net_area_calc(dia):
 
 
 def black_bolt_shear(dia, n, fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        n (str) number of shear plane(s) through which bolt is passing
+        fu  (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Shear capacity of bearing type bolt in kN
+
+    '''
     A = net_area_calc(dia)
     root3 = math.sqrt(3)
     Vs = fu * n * A / (root3 * 1.25 * 1000)
@@ -43,6 +63,18 @@ def black_bolt_shear(dia, n, fu):
 
 
 def HSFG_bolt_shear(uf, dia, n, fu):
+    '''
+
+    Args:
+        uf (float) slip factor
+        dia (int) diameter of bolt
+        n (str) number of shear plane(s)
+        fu (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Shear capacity of HSFG bolt
+
+    '''
     Anb = math.pi * dia * dia * 0.25 * 0.78  # threaded area(Anb) = 0.78 x shank area
     Fo = Anb * 0.7 * fu 
     Kh = 1  # Assuming fastners in Clearence hole
@@ -55,6 +87,18 @@ def HSFG_bolt_shear(uf, dia, n, fu):
 
 
 def bearing_capacity(dia, t, fu, beam_fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        t (float) summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
+        fu (float) ultimate tensile strength of a bolt
+        beam_fu (float) ultimate stress of material
+
+    Returns:
+        Bearing capacity of bearing bolt
+
+    '''
     # add code to determine kb if pitch, gauge, edge distance known
     if dia == 12 or dia == 14:
         dia_hole = dia + 1
@@ -79,6 +123,19 @@ def bearing_capacity(dia, t, fu, beam_fu):
 
 
 def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
+    '''
+
+    Args:
+        load load (float) Factored shear force/load
+        eccentricity  (float)
+        pitch (float)
+        gauge  (float)
+        bolts_one_line  (str) number of bolts in one line
+
+    Returns:
+        Resultant shear load for type1 effect (bolts on beam side)
+
+    '''
     sigma = 0.0
     r_y = 0.0
     r_x = 0.0
@@ -112,6 +169,20 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
 
 
 def column_critical_shear(load, eccentricity, pitch, gauge, bolts_one_line, c_edge_distance):
+    '''
+
+    Args:
+        load load (float) Factored shear force/load
+        eccentricity  (float)
+        pitch (float)
+        gauge  (float)
+        bolts_one_line  (str) number of bolts in one line
+        c_edge_distance  (float) edge distance (bolts on column side)
+
+    Returns:
+        Resultant shear load for type1 effect (bolts on column side)
+
+    '''
     resultant_1 = critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line)
     # Assuming centre of pressure 25 mm below the top cleat and again calculating the horizontal force
     # Maximum of force_x and above mentioned horizontal force will be used to check the safety of the bolts
@@ -144,6 +215,24 @@ def column_critical_shear(load, eccentricity, pitch, gauge, bolts_one_line, c_ed
 
 
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
+    '''
+
+    Args:
+        numrow (str) Number of row(s) of bolts
+        numcol  (str) Number of column(s) of bolts
+        dia_hole  (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+        fy (float) Yeild stress of material
+        fu  (float) Ultimate stress of material
+        edge_dist  (float) edge distance based on diameter of hole
+        end_dist (float) end distance based on diameter of hole
+        pitch (float) pitch distance based on diameter of bolt
+        gauge  (float) pitch distance based on diameter of bolt
+        thk (float) thickness of plate
+
+    Returns:
+        Capacity of Cleat Angle under block shear
+
+    '''
     Tdb = 0.0
     if numcol == 1:
         area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
@@ -172,12 +261,32 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
 #### Check for shear yeilding ####
 
 def shear_yeilding_b(A_v, beam_fy):
+    '''
+
+    Args:
+        A_v (float) Area under shear
+        beam_fy  (float) Yeild stress of beam material
+
+    Returns
+        Capacity of beam web in shear yeiding
+
+    '''
     V_p = (0.6 * A_v * beam_fy) / (math.sqrt(3) * 1.10 * 1000)  # kN
     return V_p
 
 ### Check for shear rupture ###
 
 def shear_rupture_b(A_vn, beam_fu):
+    '''
+
+    Args:
+        A_vn (float) Net area under shear
+        beam_fu  (float) Ultimate stress of beam material
+
+    Returns:
+        Capacity of beam web in shear rupture
+
+    '''
     R_n = (0.6* beam_fu * A_vn) / 1000 # kN
     return R_n
 

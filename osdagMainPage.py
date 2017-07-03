@@ -211,8 +211,9 @@ class OsdagMainWindow(QMainWindow):
         '''Finds the error occurs when Osdag crashes
 
         Args:
-            value:
-            traceback:
+            exctype: type of error
+            value: information of the error
+            traceback: trace the object
 
         Returns:
             system exit(1)

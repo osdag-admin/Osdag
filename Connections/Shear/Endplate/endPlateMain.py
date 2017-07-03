@@ -114,7 +114,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
-        self.saved_designPref["detailing"]["gap"] = int(0)
+        self.saved_designPref["detailing"]["gap"] = float(0)
         if typeOfEdge == "a - Sheared or hand flame cut":
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
@@ -170,7 +170,7 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        designPref["detailing"]["gap"] = int(0)
+        designPref["detailing"]["gap"] = float(0)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 

@@ -31,9 +31,10 @@ class Ui_Tutorial(object):
         self.textBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.5pt; font-weight:400; font-style:normal;\">\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Visit:</span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://osdag.fossee.in/\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in/</span></a></p></body></html>"))
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"http://osdag.fossee.in/resources/videos\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">http://osdag.fossee.in/resources/videos</span></a></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"https://www.youtube.com/channel/UCnSZ7EjhDwNi3eCPcSKpgJg\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">https://www.youtube.com/channel/UCnSZ7EjhDwNi3eCPcSKpgJg</span></a></p></body></html>"))
 
 import icons_rc
 

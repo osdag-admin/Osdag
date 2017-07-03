@@ -39,7 +39,6 @@ import shutil
 import ConfigParser
 
 
-
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
 
@@ -120,9 +119,9 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -171,7 +170,6 @@ class DesignPreferences(QDialog):
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
         designPref["detailing"]["gap"] = int(10)
-
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -266,13 +264,17 @@ class MyPopupDialog(QDialog):
 
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(
-            self, 'Open File', " ../",
+            self, 'Open File', " ../../",
             'Images (*.png *.svg*.jpg)',
             None, QFileDialog.DontUseNativeDialog)
-
-        base = os.path.basename(str(filename))
-        lblwidget.setText(base)
-        self.desired_location(filename)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            self.desired_location(filename)
 
         return str(filename)
 
@@ -422,6 +424,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
@@ -642,8 +645,8 @@ class MainController(QMainWindow):
 
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def callZoomin(self):
@@ -766,6 +769,56 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.blockSignals(False)
             self.ui.comboPlateThick_2.setCurrentIndex(0)
 
+
+    def check_plate_height(self, widget):
+        loc = self.ui.comboConnLoc.currentText()
+        plate_height = widget.text()
+        plate_height = float(plate_height)
+        if plate_height == 0:
+            self.ui.btn_Design.setDisabled(False)
+        else:
+
+            dict_beam_data = self.fetchBeamPara()
+            dict_column_data = self.fetchColumnPara()
+            beam_D = float(dict_beam_data['D'])
+            col_T = float(dict_column_data['T'])
+            col_R1 = float(dict_column_data['R1'])
+            beam_T = float(dict_beam_data['T'])
+            beam_R1 = float(dict_beam_data['R1'])
+            clear_depth = 0.0
+            min_plate_height = 0.6 * beam_D
+            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                clear_depth = beam_D - 2 * (beam_T + beam_R1 + 5)
+            else:
+                clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
+            if clear_depth < plate_height or min_plate_height > plate_height:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+            else:
+                self.ui.btn_Design.setDisabled(False)
+
+    def check_plate_width(self, widget):
+        loc = self.ui.comboConnLoc.currentText()
+        plate_width = widget.text()
+        plate_width = float(plate_width)
+        if plate_width == 0:
+            self.ui.btn_Design.setDisabled(False)
+        else:
+
+            dict_column_data = self.fetchColumnPara()
+            col_D = float(dict_column_data['D'])
+            col_T = float(dict_column_data['T'])
+            col_R1 = float(dict_column_data['R1'])
+            clear_depth = 0.0
+            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                clear_depth = col_D - 2 * (col_T + col_R1 + 5)
+
+            if clear_depth < plate_width:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
+            else:
+                self.ui.btn_Design.setDisabled(False)
+
     def populateWeldThickCombo(self):
         """Return weld thickness on the basis column flange and plate thickness check
         ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21
@@ -791,7 +844,7 @@ class MainController(QMainWindow):
             dictcoldata = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
             if plate_thickness != "Select thickness":
-                plate_thick = float(plate_thickness)
+                plate_thick = str(plate_thickness)
 
 
                 if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
@@ -1065,13 +1118,12 @@ class MainController(QMainWindow):
         fileName = str(fileName)
         self.commLogicObj.call_designReport(fileName, popup_summary)
 
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
         # Creates pdf
-        if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            path_wkthmltopdf = r'/usr/bin/wkhtmltopdf'
-            # path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
 
         options = {
             'margin-bottom': '10mm',
@@ -1444,7 +1496,8 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkBeam_B()
+        else:
+            flag = self.checkBeam_B()
         return flag
 
 
@@ -1795,9 +1848,9 @@ class MainController(QMainWindow):
 
     def design_examples(self):
 
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-            if html_file.endswith('.html'):
+            if html_file.startswith('index'):
                 if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:

@@ -24,6 +24,15 @@ module_setup()
 
 
 def netArea_calc(dia):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+
+    Returns:
+        Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
+    '''
     netArea = {12:84.5, 16:157, 20:245, 22:303, 24:353, 27:459, 30:561, 36:817};
     return netArea[dia]
 
@@ -31,16 +40,37 @@ def netArea_calc(dia):
 
 
 def bolt_shear(dia, n, fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        n (str) number of shear plane(s) through which bolt is passing
+        fu (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Shear capacity of bearing type bolt in kN
+
+    '''
     A = netArea_calc(dia)
     root3 = math.sqrt(3)
     Vs = fu * n * A / (root3 * 1.25 * 1000)
     Vs = round(Vs.real, 3)
     return Vs
 
-# BOLT: determination of bearing capacity 
-
 
 def bolt_bearing(dia, t, kb, fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        t (float) summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
+        kb (float) multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
+        fu (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Bearing capacity of bearing type bolt in kN
+
+    '''
     Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000)
     Vb = round(Vb.real, 3)
     return Vb
@@ -49,6 +79,15 @@ def bolt_bearing(dia, t, kb, fu):
 # PLATE HEIGHT: minimum height of fin plate
 # [Source: INSDAG detailing manual, page: 5-7] 
 def fin_min_h(beam_d):
+    '''
+
+    Args:
+        beam_d (float) Depth of beam
+
+    Returns:
+        Minimum height of fin plate depending on depth of beam
+
+    '''
     min_plate_ht = 0.6 * beam_d;
     return min_plate_ht;
 
@@ -57,6 +96,17 @@ def fin_min_h(beam_d):
 
 
 def fin_min_thk(shear_load, beam_fy, web_plate_l):
+    '''
+
+    Args:
+        shear_load (float) Factored shear force/load
+        beam_fy (float) Yeild stress of beam material
+        web_plate_l: Height of fin plate
+
+    Returns:
+        Minimum thickness of fin plate based on shear load and fin plate height
+
+    '''
     min_plate_thk = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
     return min_plate_thk;
 
@@ -65,6 +115,15 @@ def fin_min_thk(shear_load, beam_fy, web_plate_l):
 
 
 def fin_max_thk(bolt_dia):
+    '''
+
+    Args:
+        bolt_dia (int) diameter of bolt
+
+    Returns:
+        Maximum thickness of fin plate depending on diameter of bolt
+
+    '''
     max_plate_thk = 0.5 * bolt_dia
     return max_plate_thk
 
@@ -72,6 +131,24 @@ def fin_max_thk(bolt_dia):
 
 
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
+    '''
+
+    Args:
+        numrow (str) Number of row(s) of bolts
+        numcol (str) Number of column(s) of bolts
+        dia_hole (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+        fy (float) Yeild stress of material
+        fu (float) Ultimate stress of material
+        edge_dist (float) edge distance based on diameter of hole
+        end_dist (float) end distance based on diameter of hole
+        pitch (float) pitch distance based on diameter of bolt
+        gauge (float) pitch distance based on diameter of bolt
+        thk (float) thickness of plate
+
+    Returns:
+        Capacity of fin plate under block shear
+
+    '''
     if numcol == 1:
         Avg = thk * ((numrow - 1) * pitch + end_dist)
         Avn = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
@@ -99,12 +176,32 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
 ### Check for shear yeilding ###
 
 def shear_yeilding_b(A_v, beam_fy):
+    '''
+
+    Args:
+        A_v (float) Area under shear
+        beam_fy (float) Yeild stress of beam material
+
+    Returns:
+        Capacity of beam web in shear yeiding
+
+    '''
     V_p = ( 0.6 * A_v * beam_fy ) / ( math.sqrt(3) * 1.10 * 1000 ) # kN
     return V_p
 
 ### Check for shear rupture ###
 
 def shear_rupture_b(A_vn, beam_fu ):
+    '''
+
+    Args:
+        A_vn (float) Net area under shear
+        beam_fu (float) Ultimate stress of beam material
+
+    Returns:
+        Capacity of beam web in shear rupture
+
+    '''
     R_n = (0.6 * beam_fu * A_vn) / 1000  #kN
     return R_n
 
@@ -147,7 +244,7 @@ def finConn(uiObj):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
-    gap = int(uiObj["detailing"]["gap"])
+    gap = float(uiObj["detailing"]["gap"])
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
@@ -225,8 +322,6 @@ def finConn(uiObj):
 
     if connectivity == "Beam-Beam":
         notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
-        print notch_ht
-        print beam_d/5
         if notch_ht < (beam_d/5):
             pass
         else:
@@ -310,7 +405,7 @@ def finConn(uiObj):
         # Minimum spacing
         min_pitch = int(2.5 * bolt_dia)
         min_gauge = int(2.5 * bolt_dia)
-        if uiObj["detailing"]["typeof_edge"] == "a - Shear or hand flame cut":
+        if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
             min_end_dist = int(float(1.7 * (dia_hole)))
         else:
             min_end_dist = int(1.5 * (dia_hole))
@@ -362,7 +457,6 @@ def finConn(uiObj):
 
         # clause 10.2.2 is800
         max_spacing = int(min(100 + 4 * t_thinner, 200))  # clause 10.2.3.3 is800
-        #TODO: check max spacing
 
         if min_end_dist % 10 != 0:
             min_end_dist = (min_end_dist / 10) * 10 + 10
@@ -652,7 +746,7 @@ def finConn(uiObj):
     # Check for long joint connections
     length_joint = (boltParameters['numofrow'] - 1) * boltParameters['pitch']
     if length_joint > 15 * bolt_dia:
-        beta_lj = 1.075 - length_joint / (200 * bolt_dia);
+        beta_lj = 1.075 - length_joint / (200 * bolt_dia)
         bolt_shear_capacity = beta_lj * boltParameters['shearcapacity']
 #         new_bolt_param = boltDesign(bolt_shear_capacity_new)
         new_bolt_param = boltDesign(web_plate_l)
@@ -884,7 +978,7 @@ def finConn(uiObj):
         logger.error(": Weld thickness is not sufficient [cl. 10.5.7; INSDAG Detailing Manual, 2002]")
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
-        logger.info(": Increase the weld thickness or length of weld/finplate")
+        logger.info(": Increase the weld thickness or length of weld/fin plate")
 
     
     # End of calculation
@@ -1047,87 +1141,6 @@ def finConn(uiObj):
     outputObj['Weld']['weld_fu'] = weld_fu
     outputObj['Weld']['effectiveWeldlength'] = weld_l
 
-    # # Set design_status = False for various cases of failed design:
-    # # When shear force is 0
-    # if new_bolt_param['numofbolts'] == 0 or shear_load == 0:
-    #     design_status = False
-    #
-    # # Failed design for user defined plate height and width
-    # if web_plate_l != 0 and web_plate_w != 0 :
-    #     if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
-    #                     web_plate_w < web_plate_w_req or web_plate_t < min_plate_thk or\
-    #                     web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-    #         design_status = False
-    #
-    #         if boltParameters['numofcol'] == 1:
-    #             if web_plate_l < min_plate_height or web_plate_l > max_plate_height or \
-    #                             web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req:
-    #                 design_status = False
-    #             elif moment_capacity < boltParameters['moment']:
-    #                 design_status = False
-    #             elif Tdb < shear_load:
-    #                 design_status = False
-    #
-    #         elif boltParameters['numofcol'] == 2:
-    #             if boltParameters['pitch'] < boltParameters['minpitch']:
-    #                 design_status = False
-    #             elif web_plate_l == min_plate_height or web_plate_l == max_plate_height or\
-    #                             web_plate_l < web_plate_l_req or web_plate_w < web_plate_w_req or\
-    #                             weld_t_req > weld_t or weld_strength < Vr:
-    #                 design_status = False
-    #             elif moment_capacity < boltParameters['moment']:
-    #                 design_status = False
-    #             elif Tdb < shear_load:
-    #                 design_status = False
-    #     else:
-    #         pass
-    #
-    # # Failed design for user defined plate height but optional width
-    # elif web_plate_l != 0 and web_plate_w == 0:
-    #     if web_plate_l < min_plate_height or web_plate_l > max_plate_height or\
-    #                     web_plate_l < web_plate_l_req or web_plate_w_opt < web_plate_w_req or\
-    #                     web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
-    #                     weld_t_req > weld_t or weld_strength < Vr:
-    #         design_status = False
-    #     elif moment_capacity < boltParameters['moment']:
-    #         design_status = False
-    #     elif boltParameters['numofcol'] == 2:
-    #         if boltParameters['pitch'] < boltParameters['minpitch']:
-    #             design_status = False
-    #     elif Tdb < shear_load:
-    #         design_status = False
-    #
-    # # Failed design for optional plate height but user defined width
-    # elif web_plate_l == 0 and web_plate_w != 0:
-    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
-    #                     web_plate_l_opt < web_plate_l_req or web_plate_w < web_plate_w_req or\
-    #                     web_plate_t < min_plate_thk or  web_plate_t > max_plate_thk or\
-    #                     weld_t_req > weld_t or weld_strength < Vr:
-    #         design_status = False
-    #     elif moment_capacity < boltParameters['moment']:
-    #         design_status = False
-    #     elif boltParameters['numofcol'] == 2:
-    #         if boltParameters['pitch'] < boltParameters['minpitch']:
-    #             design_status = False
-    #     elif Tdb < shear_load:
-    #         design_status = False
-    # # Failed design for for user defined plate height (BUG)
-    # else:
-    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or weld_t_req > weld_t:
-    #         design_status = False
-    #
-    #     if web_plate_l_opt < min_plate_height or web_plate_l_opt > max_plate_height or \
-    #                     web_plate_l_opt < web_plate_l_req or \
-    #                     web_plate_w_opt < web_plate_w_req or web_plate_t < min_plate_thk or\
-    #                     web_plate_t > max_plate_thk or weld_t_req > weld_t or weld_strength < Vr:
-    #         design_status = False
-    #     elif moment_capacity < boltParameters['moment']:
-    #         design_status = False
-    #     elif boltParameters['numofcol']==2:
-    #         if boltParameters['pitch'] < boltParameters['minpitch']:
-    #             design_status = False
-    #     elif Tdb < shear_load:
-    #         design_status = False
 
 # Log message for safe/failed design
     if weld_type == 'Shop weld':
@@ -1140,7 +1153,7 @@ def finConn(uiObj):
 
     if  design_status == True:
 
-        logger.info(": Overall finplate connection design is safe \n")
+        logger.info(": Overall fin plate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:
         logger.error(": Design is not safe \n ")

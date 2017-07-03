@@ -56,7 +56,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# EndPlate Main Data
+# End Plate Main Data
 
     beam_tw = str(float(dictbeamdata["tw"]))
     beam_f_t = str(float(dictbeamdata["T"]))
@@ -136,10 +136,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     dia_hole = str(outobj['Bolt']['dia_hole'])
     weld_fu = str(410)
     weld_l = str(outobj['Weld']['weldlength'])
-    shear_capacity = str(round(outobj['Bolt']['shearcapacity'], 3))
+    shear_capacity = str(float(round(outobj['Bolt']['shearcapacity'], 3)))
     # bearingcapacity = str(round(outobj['Bolt']['bearingcapacity'], 4))
     bearingcapacity = str(outobj['Bolt']['bearingcapacity'])
-    critical_shear = str(round(outobj['Bolt']['critshear'], 0))
+    critical_shear = str(float(round(outobj['Bolt']['critshear'], 0)))
     status = outobj['Bolt']['status']
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -214,16 +214,16 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     if status is True:
-        row = [1, "Endplate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, "End Plate", "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Endplate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, "End Plate", "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1 "') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Endplate", " "]
+    row = [0, "End Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -238,7 +238,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Connection Title", " Flexible Endplate"]
+    row = [1, "Connection Title", " Flexible End Plate"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')

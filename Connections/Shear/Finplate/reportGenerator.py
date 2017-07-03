@@ -43,7 +43,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     myfile.write(t('/head'))
     myfile.write(t('body'))
-#     Connections/Shear/Finplate/
+#     Connections/Shear/Fin Plate/
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # DATA PARAMS
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -60,7 +60,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# FinPlate Main Data
+# Fin Plate Main Data
     beam_tw = str(float(dictBeamData["tw"]))
     beam_f_t = str(float(dictBeamData["T"]))
     beam_d = str(float(dictBeamData["D"]))
@@ -221,16 +221,16 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     if status == 'True':
-        row = [1, "Finplate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, "Fin Plate", "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Finplate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, "Fin Plate", "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Finplate", " "]
+    row = [0, "Fin Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -245,7 +245,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Connection Title", " Single Finplate"]
+    row = [1, "Connection Title", " Single Fin Plate"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -802,7 +802,12 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
     minPitch = str(int(2.5 * float(bolt_dia)))
     maxPitch = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
-    row = [0, "Bolt pitch (mm)", " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_tw + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
+    if int(pitch) <int(minPitch) or int(pitch) > int(maxPitch):
+        row = [0, "Bolt pitch (mm)", " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_tw + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
+           pitch, "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Bolt pitch (mm)",
+           " &#8805; 2.5* " + bolt_dia + " = " + minPitch + ",  &#8804; Min(32*" + beam_tw + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
            pitch, "  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -814,7 +819,12 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
     minGauge = str(int(2.5 * float(bolt_dia)))
     maxGauge = str(300) if 32 * float(beam_tw) > 300 else str(int(math.ceil(32 * float(beam_tw))))
-    row = [0, "Bolt gauge (mm)", " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
+    if int(gauge) < int(minGauge) or int(gauge) > int(maxGauge):
+        row = [0, "Bolt gauge (mm)", " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
+           gauge, ""]
+    else:
+        row = [0, "Bolt gauge (mm)",
+           " &#8805; 2.5*" + bolt_dia + " = " + minGauge + ", &#8804; Min(32*" + beam_tw + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
            gauge, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -826,7 +836,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEnd = str(float(12 * float(beam_tw)))
-    if end < minEnd or end > maxEnd:
+    if int(end) < int(minEnd) or int(end) > float(maxEnd):
         row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_tw + " = " + maxEnd + " <br> [cl. 10.2.4]",end,
            "  <p align=left style=color:red><b>Fail</b></p>"]
     else:
@@ -843,7 +853,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEdge = str(float(12 * float(beam_tw)))
-    if edge < minEdge or edge > maxEdge:
+    if int(edge) < int(minEdge) or int(edge) > float(maxEdge):
         row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_tw + " = " + maxEdge + " <br> [cl. 10.2.4]",
                edge,"  <p align=left style=color:red><b>Fail</b></p>"]
     else:
@@ -857,8 +867,13 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     rstr += t('tr')
-    row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load, "<i>V</i><sub>db</sub> = " + blockshear + "<br>",
-           "  <p align=left style=color:green><b>Pass</b></p>"]
+    if int(blockshear) < int(shear_load):
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load, "<i>V</i><sub>db</sub> = " + blockshear + "<br>",
+           "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + blockshear + "<br>",
+               "  <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -867,7 +882,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
 
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-    minPlateThick = str(round(5 * float(shear_load) * 1000 / (float(plateLength) * float(web_plate_fy)), 2))
+    minPlateThick = str(int(5 * float(shear_load) * 1000 / (float(plateLength) * float(web_plate_fy))))
     if float(minPlateThick) > int(plateThick):
         row = [0, "Plate thickness (mm)",
                "(5*" + shear_load + "*1000)/(" + plateLength + "*" + web_plate_fy + ") = " + minPlateThick +
@@ -891,7 +906,12 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
         maxEdge = str(float(beamdepth) - 2 * float(beamflangethk) - 2 * float(beamrootradius) - 10)
         maxedgestring = beamdepth + "-" + beamflangethk + "-" + beamrootradius + "-" + "10"
 
-    row = [0, "Plate height (mm)", "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
+    if int(plateLength) < float(minEdge) or int(plateLength) > float(maxEdge):
+        row = [0, "Plate height (mm)", "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
+           "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plateLength, " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
+    else:
+        row = [0, "Plate height (mm)",
+           "&#8805; 0.6*" + beamdepth + "=" + minEdge + ", &#8804; " + maxedgestring + "=" + maxEdge +
            "<br> [cl. 10.2.4, Insdag Detailing Manual, 2002]", plateLength, " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
 #        #row =[0,"Plate height (mm)","",plateLength]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')

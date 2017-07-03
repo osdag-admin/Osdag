@@ -738,7 +738,7 @@ border-bottom-right-radius: 0px ;
                  <string>Shift+F</string>
                 </property>
                 <property name="text">
-                 <string>Finplate</string>
+                 <string>Fin Plate</string>
                 </property>
                </widget>
               </item>
@@ -900,7 +900,7 @@ border-bottom-right-radius: 0px ;
                  <string>Shift+E</string>
                 </property>
                 <property name="text">
-                 <string>Endplate</string>
+                 <string>End Plate</string>
                 </property>
                </widget>
               </item>

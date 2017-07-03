@@ -1,3 +1,4 @@
+import ConfigParser
 import json
 import os.path
 import sys
@@ -71,9 +72,9 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -111,7 +112,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = float(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -155,7 +156,6 @@ class DesignPreferences(QDialog):
         """
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         """
-        # TODO : change grade to 10.9; also update UI
         boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.8: 1040,
                   10.9: 940, 12.9: 1220}
         boltGrd = float(boltGrade)
@@ -207,16 +207,21 @@ class DesignReportDialog(QDialog):
 
     def getLogoFilePath(self, lblwidget):
         self.ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None,
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None,
                                                   QFileDialog.DontUseNativeDialog)
-        base = os.path.basename(str(filename))
-        lblwidget.setText(base)
-        self.desired_location(filename)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            self.desired_location(filename)
 
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
@@ -291,13 +296,9 @@ class MainController(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
 
-        #self.ui.btn3D.clicked.connect(self.call_3DModel)
         self.ui.btn3D.clicked.connect(lambda:self.call_3DModel("gradient_bg"))
-        #self.ui.chkBxBeam.clicked.connect(self.call_3DBeam)
         self.ui.chkBxBeam.clicked.connect(lambda:self.call_3DBeam("gradient_bg"))
-        #self.ui.chkBxCol.clicked.connect(self.call_3DColumn)
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
-        #self.ui.chkBxSeatAngle.clicked.connect(self.call_3DSeatAngle)
         self.ui.chkBxSeatAngle.clicked.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
 
         validator = QIntValidator()
@@ -364,8 +365,6 @@ class MainController(QMainWindow):
         self.ui.actionAbout_Osdag.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
-        # self.ui.actionSample_Reports.triggered.connect(self.sample_report)
-        # self.ui.actionSampe_Problems.triggered.connect(self.sample_problem)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         from osdagMainSettings import backend_name
@@ -458,8 +457,8 @@ class MainController(QMainWindow):
     def showFontDialogue(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def callZoomin(self):
@@ -606,36 +605,50 @@ class MainController(QMainWindow):
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()
-        if uiObj != None:
-            self.ui.combo_connectivity.setCurrentIndex(
-                self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
+        self.setDictToUserInputs(uiObj)
+
+    def setDictToUserInputs(self, uiObj):
+
+        if (uiObj is not None):
+
+            self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
-                self.ui.lbl_beam.setText('Secondary beam *')
-                self.ui.lbl_column.setText('Primary beam *')
-                self.ui.combo_column_section.addItems(get_beamcombolist())
 
-            self.ui.combo_beam_section.setCurrentIndex(
-                self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
-            self.ui.combo_column_section.setCurrentIndex(
-                self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
+                self.ui.lbl_comboBeamSec.setText('Secondary beam *')
+                self.ui.lbl_comboColSec.setText('Primary beam *')
+                self.ui.combo_column_section.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
 
+            self.ui.combo_beam_section.setCurrentIndex(self.ui.combo_beam_section.findText(uiObj['Member']['BeamSection']))
+            self.ui.combo_column_section.setCurrentIndex(self.ui.combo_column_section.findText(uiObj['Member']['ColumnSection']))
             self.ui.txt_fu.setText(str(uiObj['Member']['fu (MPa)']))
             self.ui.txt_fy.setText(str(uiObj['Member']['fy (MPa)']))
 
             self.ui.txt_shear_force.setText(str(uiObj['Load']['ShearForce (kN)']))
 
-            self.ui.combo_bolt_diameter.setCurrentIndex(
-                self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
-            combo_type_index = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
-            self.ui.combo_bolt_type.setCurrentIndex(combo_type_index)
+            self.ui.combo_bolt_diameter.setCurrentIndex(self.ui.combo_bolt_diameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            comboTypeIndex = self.ui.combo_bolt_type.findText(str(uiObj['Bolt']['Type']))
+            self.ui.combo_bolt_type.setCurrentIndex(comboTypeIndex)
             self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
-            combo_grade_index = self.ui.combo_bolt_grade.findText(str(uiObj['Bolt']['Grade']))
-            self.ui.combo_bolt_grade.setCurrentIndex(combo_grade_index)
-            combo_seat_angle_index = self.ui.combo_angle_section.findText(str(uiObj['Angle']['AngleSection']))
-            self.ui.combo_angle_section.setCurrentIndex(combo_seat_angle_index)
-            combo_top_angle_index = self.ui.combo_topangle_section.findText(str(uiObj['Angle']['TopAngleSection']))
-            self.ui.combo_topangle_section.setCurrentIndex(combo_top_angle_index)
+
+            prevValue = str(uiObj['Bolt']['Grade'])
+
+            comboGradeIndex = self.ui.combo_bolt_grade.findText(prevValue)
+
+            self.ui.combo_bolt_grade.setCurrentIndex(comboGradeIndex)
+
+            seat_angle = str(uiObj['Angle']['AngleSection'])
+            self.ui.combo_angle_section.setCurrentIndex(self.ui.combo_angle_section.findText(seat_angle))
+            top_angle = str(uiObj['Angle']['TopAngleSection'])
+            self.ui.combo_topangle_section.setCurrentIndex(self.ui.combo_topangle_section.findText(top_angle))
         else:
             pass
 
@@ -778,11 +791,12 @@ class MainController(QMainWindow):
         self.commLogicObj.call_designReport(file_name, report_summary)
 
         # Creates PDF
-        if sys.platform == ("win32" or "win64"):
-            path_wkhtmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            path_wkhtmltopdf = r'/usr/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
         options = {
             'margin-bottom': '10mm',
             'footer-right': '[page]'
@@ -1276,17 +1290,32 @@ class MainController(QMainWindow):
     def create2Dcad(self, connectivity):
         """ Returns the fuse model of finplate
         """
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.get_columnModel()
+
+        elif self.commLogicObj.component == "Seated Angle":
+            cadlist = [self.commLogicObj.connectivityObj.angleModel,
+                       self.commLogicObj.connectivityObj.topclipangleModel] + \
+                      self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
 
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        if self.connectivity == None:
-            self.connectivity = self.create3DColWebBeamWeb()
+        # if self.connectivity == None:
+        #     self.connectivity = self.create3DColWebBeamWeb()
         if self.fuse_model == None:
             self.fuse_model = self.create2Dcad(self.connectivity)
         shape = self.fuse_model
@@ -1394,10 +1423,10 @@ class MainController(QMainWindow):
         self.ask_questions()
 
     def design_examples(self):
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-            if html_file.endswith('.html'):
-                if sys.platform == "nt":
+            if html_file.startswith('index'):
+                if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:
                     opener = "open" if sys.platform == "darwin" else "xdg-open"
@@ -1467,7 +1496,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName('Select Workspace Directory', "F:\Osdag_workspace")
-    workspace_folder_path = 'F:\Osdag_workspace\seated_angle'
+    workspace_folder_path = 'D:\Osdag_workspace\seated_angle'
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

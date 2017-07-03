@@ -4,6 +4,7 @@ comment
 
 @author: aravind
 '''
+import ConfigParser
 import json
 import os.path
 import pickle
@@ -88,9 +89,9 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         self.saved_designPref["design"] = {}
@@ -127,11 +128,11 @@ class DesignPreferences(QDialog):
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
-        self.ui.combo_weldType.setCurrentIndex(0)
-        designPref["weld"] = {}
-        weldType = str(self.ui.combo_weldType.currentText())
-        designPref["weld"]["typeof_weld"] = weldType
-        designPref["weld"]["safety_factor"] = float(1.25)
+        # self.ui.combo_weldType.setCurrentIndex(0)
+        # designPref["weld"] = {}
+        # weldType = str(self.ui.combo_weldType.currentText())
+        # designPref["weld"]["typeof_weld"] = weldType
+        # designPref["weld"]["safety_factor"] = float(1.25)
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
         self.ui.txt_detailingGap.setText(str(10))
@@ -139,7 +140,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = float(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -147,7 +148,6 @@ class DesignPreferences(QDialog):
         designPref["design"] = {}
         designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = False
-
         return designPref
 
     def set_bolthole_clernce(self):
@@ -255,11 +255,15 @@ class MyPopupDialog(QDialog):
     def get_logo_file_path(self, lblwidget):
 
         self.ui.lbl_browse.clear()
-        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', " ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
-
-        base = os.path.basename(str(filename))
-        lblwidget.setText(base)
-        self.desired_location(filename)
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None, QFileDialog.DontUseNativeDialog)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            self.desired_location(filename)
 
     def desired_location(self, filename):
         shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
@@ -688,7 +692,7 @@ class MainController(QMainWindow):
         if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == '':
             return
         loc = self.ui.comboConnLoc.currentText()
-        if loc == "Column web-Beam web" or "Column flange-Beam web":
+        if loc == "Column flange-Beam web" or loc == "Column web-Beam web":
 
             dict_beam_data = self.fetch_beam_param()
             dict_column_data = self.fetch_column_param()
@@ -733,11 +737,11 @@ class MainController(QMainWindow):
             pass
 
     def checkbeam_b(self):
+        check = True
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Column web-Beam web":
             if self.ui.comboColSec.currentIndex() == -1 or str(self.ui.combo_Beam.currentText()) == 'Select section' or str(self.ui.comboColSec.currentText()) == 'Select section':
                 return
-
 
             column = self.ui.comboColSec.currentText()
 
@@ -753,6 +757,7 @@ class MainController(QMainWindow):
             if column_web_depth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
 
@@ -773,8 +778,10 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information',
                                         "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                check = False
             else:
                 self.ui.btn_Design.setDisabled(False)
+        return check
 
     def check_cleat_height(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -808,8 +815,8 @@ class MainController(QMainWindow):
 
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def show_color_dialog(self):
@@ -1018,6 +1025,54 @@ class MainController(QMainWindow):
         uiObj = json.load(in_file)
         self.setDictToUserInputs(uiObj)
 
+
+    def setDictToUserInputs(self, uiObj):
+
+        if (uiObj is not None):
+
+            self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
+
+            if uiObj['Member']['Connectivity'] == 'Beam-Beam':
+
+                self.ui.beamSection_lbl.setText('Secondary beam *')
+                self.ui.columnSection_lbl.setText('Primary beam *')
+                self.ui.comboColSec.clear()
+                self.get_beamdata()
+                #self.ui.comboColSec.addItems(get_beamcombolist())
+                self.ui.chkBxBeam.setText("SBeam")
+                self.ui.chkBxBeam.setToolTip("Secondary  beam")
+                self.ui.chkBxCol.setText("PBeam")
+                self.ui.chkBxCol.setToolTip("Primary beam")
+                self.ui.actionShow_beam.setText("Show SBeam")
+                self.ui.actionShow_column.setText("Show PBeam")
+
+            self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(uiObj['Member']['BeamSection']))
+            self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(uiObj['Member']['ColumSection']))
+            self.ui.txtFu.setText(str(uiObj['Member']['fu (MPa)']))
+            self.ui.txtFy.setText(str(uiObj['Member']['fy (MPa)']))
+
+            self.ui.txtShear.setText(str(uiObj['Load']['ShearForce (kN)']))
+
+            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(uiObj['Bolt']['Diameter (mm)'])))
+            comboTypeIndex = self.ui.comboBoltType.findText(str(uiObj['Bolt']['Type']))
+            self.ui.comboBoltType.setCurrentIndex(comboTypeIndex)
+            self.combotype_currentindexchanged(str(uiObj['Bolt']['Type']))
+
+            prevValue = str(uiObj['Bolt']['Grade'])
+
+            comboGradeIndex = self.ui.comboBoltGrade.findText(prevValue)
+
+            self.ui.comboBoltGrade.setCurrentIndex(comboGradeIndex)
+
+            selection = str(uiObj['cleat']['Height (mm)'])
+            self.ui.txtInputCleatHeight.setText(selection)
+            cleat_section = str(uiObj['cleat']['section'])
+            self.ui.comboCleatSection.setCurrentIndex(self.ui.comboCleatSection.findText(cleat_section))
+
+
+        else:
+            pass
+
     def getuser_inputs(self):
         '''(nothing) -> Dictionary
         Returns the dictionary object with the user input fields for designing cleat angle connection
@@ -1098,13 +1153,12 @@ class MainController(QMainWindow):
         fileName = str(fileName)
         self.commLogicObj.call_designReport(fileName, popup_summary)
         # Creates pdf
-        # TODO update wkhtmltopdf paths
-        if sys.platform == ("win32" or "win64"):
-            path_wkthmltopdf = r'C:\Program Files (x86)\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        else:
-            #path_wkthmltopdf = r'/usr/local/bin/wkhtmltopdf'
-            path_wkthmltopdf = r'/home/deepa-c/miniconda2/pkgs/wkhtmltopdf-0.12.3-0/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path_wkthmltopdf)
+
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
 
         options = {
             'margin-bottom': '10mm',
@@ -1121,9 +1175,12 @@ class MainController(QMainWindow):
             pdfkit.from_file(fileName, fname, configuration=config, options=options)
             QMessageBox.about(self, 'Information', "Report Saved")
 
-
     def save_log(self):
+        """
+        Save log messages in user prefered text file at user prefered location.
+        Returns: (File) save_file
 
+        """
         filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder),  "Logmessages"), "Text files (*.txt)")
         return self.save_file(filename + ".txt")
 
@@ -1398,7 +1455,9 @@ class MainController(QMainWindow):
         elif self.ui.comboCleatSection.currentIndex() == 0:
             QMessageBox.information(self, "Information", "Please select Cleat angle")
             flag = False
-        return  flag
+        else:
+            flag = self.checkbeam_b()
+        return flag
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''
@@ -1765,9 +1824,9 @@ class MainController(QMainWindow):
 
     def design_examples(self):
 
-        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-            if html_file.endswith('.html'):
+            if html_file.startswith('index'):
                 if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:

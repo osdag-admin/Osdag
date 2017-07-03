@@ -18,12 +18,16 @@ def module_setup():
 
 module_setup()
 
-# FUNCTION DEFINITIONS---------------
-# Function for net area of ordinary bolts
-# Source: Subramanian's book, page: 348
-
-
 def net_area_calc(dia):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+
+    Returns
+        Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
+    '''
     net_area = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
     return net_area[dia]
 
@@ -31,19 +35,48 @@ def net_area_calc(dia):
 
 # BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
 def black_bolt_shear(dia, n, fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        n (str) number of shear plane(s) through which bolt is passing
+        fu (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Shear capacity of bearing type bolt in kN
+
+    '''
     A = net_area_calc(dia)
     root3 = math.sqrt(3)
     Vs = fu * n * A / (root3 * 1.25 * 1000)
     Vs = round(Vs.real, 3)
     return Vs
 
+# NOT present in CAD_notchB-B branch
 ############ REDUCTION FACTORS FOR BOLTS ############
 # Check added by Danish Ansari on 13th June 2017
 # Check for Long joints & Large grip lengths, IS 800:2007 Cl 10.3.3.1 & Cl 10.3.3.2
 
 def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t):
+    '''
 
-    l_j = (bolts_required - 1) * pitch  # length of joint in direction of load transfer
+    Args:
+        bolt_shear_capacity (float)
+        connectivity
+        bolt_dia (int) diameter of bolt
+        bolts_required (str)
+        pitch (float)
+        end_plate_t (float)
+        column_f_t (float)
+        column_w_t (float)
+        beam_w_t (float)
+
+    Returns:
+        Shear capacity of bolt after multiplying the reduction factors (i.e beta_lg & beta_lj. Ref. IS 800:2007 Cl 10.3.3.2 & Cl 10.3.3.1)
+
+    '''
+
+    l_j = ((bolts_required/2) - 1) * pitch  # length of joint in direction of load transfer
     if l_j > 15 * bolt_dia:
         beta_long_joints = 1.075 - 0.005 * (l_j / bolt_dia)
         if beta_long_joints <= 0.75 or beta_long_joints >= 1.0:
@@ -81,45 +114,39 @@ def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_requ
     beta_l_g = beta_lg
     bolt_shear_capa = bolt_shear_capacity * beta_l_g *beta_l_j
     return bolt_shear_capa
-
+#######################################################################
 
 # BOLT: determination of bearing capacity = 2.5 * kb * d * t * fu / Y
 def bolt_bearing(dia, t, fu, kb):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        t (float) summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
+        fu  (float) ultimate tensile strength of a bolt
+        kb  (float) multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
+
+    Returns:
+        Bearing capacity of bearing type bolt in kN
+
+    '''
     Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000)
     Vb = round(Vb.real, 3)
     return Vb
 
-    # add code to determine kb if pitch, gauge, edge distance known
-    # if dia == 12 or dia == 14:
-    #     dia_hole = dia + 1
-    # elif dia == 16 or dia == 18 or dia == 20 or dia == 22 or dia == 24:
-    #     dia_hole = dia + 2
-    # else:
-    #     dia_hole = dia + 3
-    # minimum spacing
-    # min_pitch = int(2.5 * dia)
-    # min_gauge = int(2.5 * dia)
-
-    # min_end_dist = int(1.7 * dia_hole)
-    #
-    # bolt_fu = int(bolt_grade * 100)
-    # bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
-
-#    # calculation of kb
-    # kbchk1 = min_end_dist / float(3 * dia_hole)
-    # kbchk2 = min_pitch / float(3 * dia_hole) - 0.25
-    # kbchk3 = fu / float(beam_fu)
-    # kbchk4 = 1
-    # kb = min(kbchk1, kbchk2, kbchk3, kbchk4)
-    # kb = round(kb, 3)
-    # Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000)
-    # Vb = round(Vb, 3)
-    # return Vb
-
-# According to subramanyam page no 372
-
 
 def end_plate_t_min(beam_depth, grade_bolt, dia):
+    '''
+
+    Args:
+        beam_depth (float)
+        grade_bolt (float)
+        dia (int) Diameter of bolt
+
+    Returns:
+        Minimum thickness of end plate based on beam depth and grade of bolt (Ref. Subramanian's book page no 372 )
+
+    '''
     if beam_depth < 450:
         if grade_bolt <= 4.6:
             min_endplate = min(8, int(dia) / 3)
@@ -132,29 +159,23 @@ def end_plate_t_min(beam_depth, grade_bolt, dia):
             min_endplate = min(10, int(dia) / 2)
     return min_endplate
 
-# BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
-# def black_bolt_shear(dia, n, fu):
-#     A = math.pi * dia * dia * 0.25 * 0.78; #threaded area = 0.78 x shank area
-#     root3 = math.sqrt(3);
-#     Vs = fu * n * A / (root3 * 1.25 * 1000)
-#     Vs = round(Vs,3)
-#     return Vs
-
-
-# BOLT: Determination of factored design force of HSFG bolts Vsf = Vnsf / Ymf = uf * ne * Kh * Fo where Vnsf: The nominal shear capacity of bolt
-# def HSFG_bolt_shear(uf, dia, n, fu):
-#     Anb = math.pi * dia * dia * 0.25 * 0.78  # threaded area(Anb) = 0.78 x shank area
-#     Fo = Anb * 0.7 * fu
-#     Kh = 1  # Assuming fastners in Clearence hole
-#     Ymf = 1.25  # Ymf = 1.25 if Slip resistance is designed at ultimate load
-#     Vsf = uf * n * Kh * Fo / (Ymf * 1000)
-#     Vsf = round(Vsf, 3)
-#     return Vsf
-
 # ############ CRITICAL BOLT SHEAR CAPACITY ###################
 
 
 def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
+    '''
+
+    Args:
+        load (float) Factored shear force/load
+        eccentricity (float)
+        pitch (float)
+        gauge (float)
+        bolts_one_line (str) number of bolts in one line
+
+    Returns:
+        Resultant shear load for type1 effect
+
+    '''
     sigma = 0.0
     r_y = 0.0
     r_x = 0.0
@@ -190,6 +211,24 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
 # #################### Block shear capacity of plates/members ##########################333
 
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
+    '''
+
+    Args:
+        numrow (str) Number of row(s) of bolts
+        numcol (str) Number of column(s) of bolts
+        dia_hole  (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+        fy (float) Yeild stress of material
+        fu  (float) Ultimate stress of material
+        edge_dist  (float) edge distance based on diameter of hole
+        end_dist (float) end distance based on diameter of hole
+        pitch (float) pitch distance based on diameter of bolt
+        gauge  (float) pitch distance based on diameter of bolt
+        thk (float) thickness of plate
+
+    Returns:
+        Capacity of fin plate under block shear
+
+    '''
     if numcol == 1:
         area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
         area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
@@ -237,8 +276,7 @@ def end_connection(ui_obj):
     dp_bolt_hole_type = str(ui_obj['bolt']['bolt_hole_type'])
     gamma_mw = float(ui_obj["weld"]["safety_factor"])
     weld_type = ui_obj['weld']['typeof_weld']
-    print "weld type",weld_type
-              
+
     end_plate_t = float(ui_obj['Plate']['Thickness (mm)'])
     end_plate_w = str(ui_obj['Plate']['Width (mm)'])
     if end_plate_w == '':
@@ -249,6 +287,8 @@ def end_connection(ui_obj):
     end_plate_l = str(ui_obj['Plate']['Height (mm)'])
     if end_plate_l == '':
         end_plate_l = 0
+    else:
+        end_plate_l = int(end_plate_l)
         
     web_plate_fu = float(ui_obj['Member']['fu (MPa)'])
     web_plate_fy = float(ui_obj['Member']['fy (MPa)'])
@@ -268,6 +308,14 @@ def end_connection(ui_obj):
     beam_depth = float(dictbeamdata["D"])
     beam_R1 = float(dictbeamdata["R1"])
 
+    old_beam_section = get_oldbeamcombolist()
+    old_col_section = get_oldcolumncombolist()
+
+    if beam_sec in old_beam_section:
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+    if column_sec in old_col_section:
+        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web":
         dictcolumndata = get_columndata(column_sec)
         column_w_t = float(dictcolumndata["tw"])
@@ -282,6 +330,13 @@ def end_connection(ui_obj):
         column_R1 = float(dictcolumndata["R1"])
         column_d = float(dictcolumndata["D"])
         column_b = float(dictcolumndata["B"])
+
+    if connectivity == "Beam-Beam":
+        notch_ht = max([column_f_t, beam_f_t]) + max([column_R1, beam_R1]) + max([(column_f_t / 2), (beam_f_t / 2), 10])
+        if notch_ht < (beam_depth/5):
+            pass
+        else:
+            logger.warning(" : Depth of coping should preferably be less than D/5 (D: Secondary beam depth)")
     
     design_check = True
 
@@ -351,10 +406,9 @@ def end_connection(ui_obj):
     max_end_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
 
     if bolt_type == 'HSFG':
-        # TODO Set parameters based on updated design preferences input from GUI
         muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
-        bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0 - oversize hole
+        bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0.85 - oversize hole
         bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
         bolt_bearing_capacity = 'N/A'
         bolt_capacity = bolt_shear_capacity
@@ -474,19 +528,6 @@ def end_connection(ui_obj):
 
         min_end_plate_l = 2 * min_end_dist + (no_row - 1) * min_pitch
         max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
-        # ############ check end plate length #################
-#         if end_plate_l > max_end_plate_l:
-#             design_check = False
-#             logger.error(": Selected end plate length exceeds the depth of the beam")
-#             logger.warning(": The maximum permissible end plate length is %2.2f" %(max_end_plate_l))
-#             logger.info(": Increase the beam section or decrease the length of the end plate")
-#         if end_plate_l < min_end_plate_l:
-#             design_check = False
-#             logger.error(": Selected end plate length is less than the minimum end plate length")
-#             logger.warning(": The minimum end plate length is %2.2f" %(min_end_plate_l))
-#             logger.info(": Increase the beam section or decrease the length of the end plate")
-
-        # ########### check end plate width ###################
 
         if connectivity == "Column web-Beam web":
             max_end_plate_w = column_d - 2 * (column_f_t + column_R1)
@@ -526,10 +567,6 @@ def end_connection(ui_obj):
                              "specified gauge [reference JSC : chap. 5 check 1]")
                 logger.warning(": Maximum permissible cross center gauge is 140 mm")
                 logger.info(": Decrease the plate width")
-
-#             if end_plate_w > max_end_plate_w:
-#                 design_check = False
-#                 logger.error(": Width of plate exceeds the width of column")
 
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
@@ -663,10 +700,6 @@ def end_connection(ui_obj):
                 logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
                 logger.warning(": Maximum required cross center gauge is 140 mm")
-#
-#             if end_plate_w > max_end_plate_w:
-#                 design_check = False
-#                 logger.error(": Width of the plate exceeds the width of column")
 
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
@@ -681,7 +714,8 @@ def end_connection(ui_obj):
 
 ######### Check for shear capacity of bolt after multiplying the reduction factors (beta_l_g and beta_l_j) #####
 
-    bolt_shear_capacity = get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t)
+    bolt_shear_capacity = get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch,
+                                               end_plate_t, column_f_t, column_w_t, beam_w_t)                                                           
 
 # ################ CHECK 2: SHEAR CAPACITY OF BEAM WEB ####################
 
@@ -705,13 +739,6 @@ def end_connection(ui_obj):
 
 # ################ CHECK 4: FILLET WELD ####################
 
-    # V: Weld shear strength -------------------
-#     weld_l = (shear_load* 1000)/float(158*2*weld_t);
-#     weld_l = round(weld_l,3)
-#     if weld_l > end_plate_l:
-#         weld_l = end_plate_l
-#     else:
-#         None
     weld_l = end_plate_l - 2 * weld_t
     Vy1 = (shear_load) / float(2 * weld_l)
     Vy1 = round(Vy1, 3)
@@ -774,7 +801,7 @@ def end_connection(ui_obj):
     output_obj['Bolt']['dia_hole'] = float(dia_hole)
     output_obj['Bolt']['bolt_fu'] = float(bolt_fu)
     output_obj['Bolt']['bolt_fy'] = float(bolt_fy)
-    output_obj['Bolt']['critshear'] = round(crit_shear, 3)
+    output_obj['Bolt']['critshear'] = float(round(crit_shear, 3))
     output_obj['Bolt']['kb'] = float(kb)
 
     output_obj['Weld'] = {}
@@ -791,18 +818,6 @@ def end_connection(ui_obj):
     output_obj['Plate']['MinWidth'] = float(min_end_plate_w)
     output_obj['Plate']['blockshear'] = float(Tdb)
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
-
-    # if bolts_required == 0:
-    #     for k in output_obj.keys():
-    #         for key in output_obj[k].keys():
-    #             output_obj[k][key] = ""
-    #
-    # if design_check is False:
-    #     for k in output_obj.keys():
-    #         for key in output_obj[k].keys():
-    #             output_obj[k][key] = ""
-
-#     output_obj = {}
 
     if weld_type == 'Shop weld':
         if weld_t < 6:

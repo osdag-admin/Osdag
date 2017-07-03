@@ -68,7 +68,7 @@
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_Bolt">
       <attribute name="title">
@@ -635,6 +635,28 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="1" column="0">
           <layout class="QGridLayout" name="gridLayout_4">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_40">
+             <property name="text">
+              <string>Are the members exposed to
+corrosive influences?</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="combo_detailing_memebers">
+             <item>
+              <property name="text">
+               <string>No</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yes</string>
+              </property>
+             </item>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_39">
              <property name="text">
@@ -652,45 +674,6 @@ p, li { white-space: pre-wrap; }
              <item>
               <property name="text">
                <string>b - Rolled, machine-flame cut, sawn and planed</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>Gap between beam &amp; support (mm)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_detailingGap">
-             <property name="text">
-              <string>10</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_40">
-             <property name="text">
-              <string>Are the members exposed to
-corrosive influences?</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="combo_detailing_memebers">
-             <item>
-              <property name="text">
-               <string>No</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Yes</string>
               </property>
              </item>
             </widget>

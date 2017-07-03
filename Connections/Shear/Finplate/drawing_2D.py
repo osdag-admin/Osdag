@@ -1105,7 +1105,7 @@ class Fin2DCreatorFront(object):
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BC), (self.BD), (self.BE), (self.BF), (self.BG), (self.BH), (self.BI), (self.BJ), (self.BK), (self.BL), (self.BA)], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.line((self.BA5), (self.BC2)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[(self.BC1), (self.BA4), (self.BA1), (self.BA2), (self.BB2), (self.BB1), (self.BB5)], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.line((self.BA5), (self.BB5)).stroke('red', width=2.5, linecap='square').dasharray(dasharray=([5, 5])))
+
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 8), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M -1,2 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.BP), size=(8, self.dataObj.plate_ht), fill='url(#diagonalHatch)', stroke='white', stroke_width=2.5))

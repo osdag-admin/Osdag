@@ -24,6 +24,8 @@ import os.path
 import subprocess
 import shutil
 
+import ConfigParser
+
 
 class MyTutorials(QDialog):
     def __init__(self, parent=None):
@@ -113,9 +115,10 @@ class OsdagMainWindow(QMainWindow):
 
     def show_design_connection(self):
 
-        options = QFileDialog.Options()
-        # folder, _ = QFileDialog.getSaveFileName(self, 'Select Workspace Directory', os.path.join('..','..','Osdag_workspace'),"All Files (*)", options=options)
-        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', os.path.join('..', '..', ' '))
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        default_workspace_path = config.get('default_workspace', 'path1')
+        folder = QFileDialog.getExistingDirectory(self,'Select Folder', default_workspace_path)
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':
@@ -181,10 +184,9 @@ class OsdagMainWindow(QMainWindow):
         self.ask_question()
 
     def design_examples(self):
-
-        root_path = os.path.join(os.path.dirname(__file__), 'Sample_Folder', 'Sample_Report')
+        root_path = os.path.join(os.path.dirname(__file__), 'ResourceFiles', 'design_example', '_build', 'html')
         for html_file in os.listdir(root_path):
-            if html_file.endswith('.html'):
+            if html_file.startswith('index'):
                 if sys.platform == ("win32" or "win64"):
                     os.startfile("%s/%s" % (root_path, html_file))
                 else:
@@ -202,8 +204,25 @@ class OsdagMainWindow(QMainWindow):
         # self.ui.btn_tension.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
 
 
+    # Back up the reference to the exceptionhook
+    sys._excepthook = sys.excepthook
+
+    def the_exception_hook(exctype, value, traceback):
+        # Print the error and traceback
+        print "Error occurred: ", (exctype, value, traceback)
+        # Call the normal Exception hook after
+        sys.__excepthook__(exctype, value, traceback)
+        sys.exit(1)
+
+    # Set the exception hook to our wrapping function
+    sys.excepthook = the_exception_hook
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except:
+        print "ERROR"

@@ -1,7 +1,7 @@
 <p align="center"> 
-  <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png">
+  <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
   Open steel design and graphics <br><br>
-  <a href="http://osdag.fossee.in/">Osdag</a><br>
+  <a href="http://osdag.fossee.in/">Osdag</a><br><br>
   </font>
   Osdag is a cross-platform, free, and open-source software for the design and detailing of steel structures.
 

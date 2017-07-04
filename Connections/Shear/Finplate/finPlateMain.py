@@ -474,9 +474,11 @@ class MainController(QMainWindow):
 
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
+
         Returns:
 
         """
+
         loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()

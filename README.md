@@ -7,6 +7,7 @@
 
 ## Table of contents
 * <a href="#quick-start">Quick start</a>
+* <a href="#contribute">Contributing</a>
 * <a href="#bugs">Bugs and known issues</a>
 * <a href="#version">Versioning</a>
 * <a href="#license">Copyright and license</a>
@@ -139,6 +140,7 @@
       Note that, Step/Command 2 will work only if the system default python is the one installed through Miniconda2.
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
 
+## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
 
 ## <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bugs and known issues
 Have a bug or a feature request? Please first read the <a href= "">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> osdag forum</a>.

@@ -141,9 +141,14 @@
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
 
 ## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
+Anyone and everyone is welcome to contribute. It's through your contributions that Osdag will continue to improve. Please take a moment to review the <a href= "">guidelines for contributing</a>.
+
+   * Bug reports
+   * Feature requests
+   * Pull requests
 
 ## <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bugs and known issues
-Have a bug or a feature request? Please first read the <a href= "">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> osdag forum</a>.
+Have a bug or a feature request? Please first read the <a href= "">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> Osdag forum</a>.
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
 This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e.

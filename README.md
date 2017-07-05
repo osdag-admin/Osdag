@@ -141,7 +141,7 @@
       Alternatively, you may specify the (installed) python you wish to use, in Command 2.
 
 ## <a id="user-content-contribute" class="anchor" href="#bugs" aria-hidden="true"></a> Contributing
-Anyone and everyone is welcome to contribute. It's through your contributions that Osdag will continue to improve. Please take a moment to review the <a href= "">guidelines for contributing</a>.
+Anyone and everyone is welcome to contribute. It's through your contributions that Osdag will continue to improve. Please take a moment to review the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.
 
    * Bug reports
    * Feature requests

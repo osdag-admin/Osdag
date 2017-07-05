@@ -12,6 +12,7 @@
 * <a href="#license">Copyright and license</a>
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
+<a href= "http://osdag.fossee.in/resources/downloads">Download the latest release</a>
 ### 1. Windows Installation
 
 #### System Requirements:

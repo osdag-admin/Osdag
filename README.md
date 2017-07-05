@@ -142,10 +142,9 @@
 ## <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bugs and known issues
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
-	This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e.
+This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e.
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license
-	(c) Copyright Osdag contributors 2017.
-	This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the 
-<a href="https://github.com/osdag-admin/Osdag/files/1123651/License.txt">License.txt</a> file for details regarding the license.
-	The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.
+(c) Copyright Osdag contributors 2017.<br>
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the <a href="https://github.com/osdag-admin/Osdag/files/1123651/License.txt">License.txt</a> file for details regarding the license.
+The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.

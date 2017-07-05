@@ -95,15 +95,15 @@ class ColFlangeBeamWeb(object):
         self.beam.place(beamOrigin, uDir, wDir)
 
     def createAngleGeometry(self):
-        angleOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + \
-                      ((self.column.length / 2 - self.beam.D / 2) * self.column.wDir) + \
+        angleOrigin = ((self.column.sec_origin + self.column.D / 2 + 0.05) * (-self.column.vDir)) + \
+                      ((self.column.length / 2 - self.beam.D / 2 + 0.05) * self.column.wDir) + \
                       (self.angle.L / 2 * (-self.column.uDir))
         uDir = numpy.array([0.0, -1.0, 0.0])
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.angle.place(angleOrigin, uDir, wDir)
 
-        topclipangleOrigin = ((self.column.sec_origin + self.column.D / 2) * (-self.column.vDir)) + \
-                             ((self.column.length / 2 + self.beam.D / 2) * self.column.wDir) + \
+        topclipangleOrigin = ((self.column.sec_origin + self.column.D / 2+ 0.05 ) * (-self.column.vDir)) + \
+                             ((self.column.length / 2 + self.beam.D / 2 + 0.05) * self.column.wDir) + \
                              (self.angle.L / 2 * (self.column.uDir))
         tcuDir = numpy.array([0.0, -1.0, 0.0])
         tcwDir = numpy.array([-1.0, 0.0, 0.0])
@@ -163,9 +163,10 @@ class ColFlangeBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        #return [self.columnModel,self.angleModel,self.topclipangleModel, self.beamModel] + self.nut_bolt_array.get_models()
-        return [self.columnModel, self.beamModel]  + [self.angleModel]
-        #return [self.beamModel, self.topclipangleModel, self.angleModel] + self.nut_bolt_array.get_models()
+        return [self.columnModel,self.angleModel,self.topclipangleModel, self.beamModel] + self.nut_bolt_array.get_models()
+        #return [self.columnModel, self.beamModel]
+        #return [self.columnModel ,self.topclipangleModel,self.angleModel] + self.nut_bolt_array.get_models()
+        #return [self.beamModel ,self.topclipangleModel,self.angleModel] + self.nut_bolt_array.get_models()
         #return [self.topclipangleModel, self.angleModel] + self.nut_bolt_array.get_models()
 
     def get_nutboltmodels(self):

@@ -2,9 +2,7 @@
   <img src = "https://user-images.githubusercontent.com/19147922/27816506-9f15355a-60a9-11e7-98cc-585312264801.png"><br>
   Open steel design and graphics <br><br>
   <a href="http://osdag.fossee.in/">Osdag</a><br><br>
-  </font>
   Osdag is a cross-platform, free, and open-source software for the design and detailing of steel structures.
-
 </p>
 
 ## Table of contents
@@ -148,5 +146,6 @@
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license
 	(c) Copyright Osdag contributors 2017.
-	This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the License.txt file for details regarding the license.
+	This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you are welcome to redistribute it under certain conditions. See the 
+<a href="https://github.com/osdag-admin/Osdag/files/1123651/License.txt">License.txt</a> file for details regarding the license.
 	The beta version of Osdag is released under the terms and conditions of the GNU LESSER GENERAL PUBLIC LICENSE (LGPL) Version 3.

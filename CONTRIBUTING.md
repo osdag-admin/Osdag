@@ -3,6 +3,10 @@
 
 It's through your contributions that Osdag will continue to improve. You can contribute in several ways. Please don't hesitate to jump in.
 
+Take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
+
+Following these guidelines helps to communicate that you respect the time of the developers managing and developing this open source project. In return, they should reciprocate that respect in addressing your issue or assessing patches and features.
+
 ### Using the issue tracker
 
 The issue tracker is the preferred channel for <a href= "#bugs">bug reports</a>, <a href= "#feature">features requests</a> and submitting <a href= "#pull">pull requests</a>, but please respect the following restrictions:

@@ -164,10 +164,6 @@ class ColFlangeBeamWeb(object):
         '''Returning 3D models
         '''
         return [self.columnModel,self.angleModel,self.topclipangleModel, self.beamModel] + self.nut_bolt_array.get_models()
-        #return [self.columnModel, self.beamModel]
-        #return [self.columnModel ,self.topclipangleModel,self.angleModel] + self.nut_bolt_array.get_models()
-        #return [self.beamModel ,self.topclipangleModel,self.angleModel] + self.nut_bolt_array.get_models()
-        #return [self.topclipangleModel, self.angleModel] + self.nut_bolt_array.get_models()
 
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()

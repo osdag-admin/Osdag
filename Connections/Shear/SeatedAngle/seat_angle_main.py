@@ -273,6 +273,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "SeatedAngle"
 
         self.get_columndata()
         self.get_beamdata()
@@ -379,7 +380,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.connection = "SeatedAngle"
         self.designPrefDialog = DesignPreferences(self)
 
     def get_columndata(self):
@@ -611,6 +611,10 @@ class MainController(QMainWindow):
 
         if (uiObj is not None):
 
+            if uiObj["Connection"] != "SeatedAngle":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
@@ -703,6 +707,7 @@ class MainController(QMainWindow):
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
 
         uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
+        uiObj["Connection"] = self.connection
 
         return uiObj
 

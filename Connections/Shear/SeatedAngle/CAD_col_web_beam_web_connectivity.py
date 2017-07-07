@@ -171,8 +171,6 @@ class ColWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        #return [self.columnModel, self.angleModel, self.topclipangleModel,
-                #self.beamModel] + self.nut_bolt_array.get_models()
         return [self.columnModel,self.beamModel,self.angleModel,self.topclipangleModel] + self.nut_bolt_array.get_models()
         
                 

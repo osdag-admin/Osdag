@@ -327,13 +327,13 @@ class MainController(QMainWindow):
         
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.folder = folder
+        self.connection = "Endplate"
 
         self.get_columndata()
         self.get_beamdata()
 
         self.ui.inputDock.setFixedSize(310, 710)
-        self.folder = folder
-        self.connection = "Endplate"
 
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
@@ -863,7 +863,7 @@ class MainController(QMainWindow):
     
     def setDictToUserInputs(self,uiobj):
 
-        if(uiobj is not None):
+        if (uiobj is not None):
 
             if uiobj["Connection"] != "Endplate":
                 QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")

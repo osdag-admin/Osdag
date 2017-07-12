@@ -67,9 +67,6 @@ class BeamWebBeamWeb(object):
         self.column.place(column_origin, column_u_dir, wDir1)
          
     def create_beam_geometry(self):
-        # beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) +\
-        #               ((self.column.t / 2 + 20) * self.column.uDir) + \
-        #               (self.column.length / 2 * (self.column.wDir))
         beam_origin = ((self.column.sec_origin + self.column.D / 2 - self.beam.D / 2) * (self.column.vDir)) + \
                       ((self.column.t / 2 + self.gap) * self.column.uDir) + \
                       (self.column.length / 2 * (self.column.wDir))
@@ -77,39 +74,28 @@ class BeamWebBeamWeb(object):
         wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam.place(beam_origin, uDir, wDir)
         
-#     def createNotchGeometry(self):
-#         notchOrigin = (self.beam.sec_origin)*(self.beam.wDir)
-#         uDir = numpy.array([-1.0, 0.0, 0])
-#         wDir = numpy.array([0.0, 1.0, 0.0])
-#         self.notch.place(notchOrigin,uDir,wDir)
-    
+
     def create_angle_geometry(self):
         angle0_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
-                         * (self.beam.vDir) - ((self.beam.t / 2 )+ 0.1 * self.beam.uDir) + self.gap
+                         * (self.beam.vDir) - (self.beam.t / 2  * self.beam.uDir) + self.fillet_gap
                          * (-self.beam.wDir))
-
-
-        # (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5)
-        #  * self.beam.vDir + (self.beam.t / 2 * self.beam.uDir) +
-        #  self.gap * (-self.beam.wDir))
-        # uDir0 = numpy.array([1.0, 0.0, 0])
-        # wDir0 = numpy.array([0.0, -1.0, 0])
         uDir0 = numpy.array([0, -1.0, 0])
         wDir0 = numpy.array([0.0, 0, 1.0])
-        # uDir0 = numpy.array([0, 1.0, 0])
-        # wDir0 = numpy.array([0, 0, 1.0])
+
         self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
-        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height)
-                         * (self.beam.vDir) + ((self.beam.t / 2 )+ 0.1 * self.beam.uDir)+ self.gap
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
+                         * (self.beam.vDir) + ((self.beam.t / 2 ) * self.beam.uDir)+ self.fillet_gap
                          * (-self.beam.wDir))
-        # uDir1 = numpy.array([1.0, 0.0, 0])
-        # wDir1 = numpy.array([0.0, 1.0, 0])
         uDir1 = numpy.array([0, 1.0, 0])
         wDir1 = numpy.array([0, 0, -1.0])
         self.angle.place(angle1_origin, uDir1, wDir1)
 
     def create_nut_bolt_array(self):
+        """
+
+        :return:
+        """
         nut_bolt_array_origin = self.angleLeft.sec_origin
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.uDir
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.vDir

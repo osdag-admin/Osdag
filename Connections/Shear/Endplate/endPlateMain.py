@@ -333,7 +333,7 @@ class MainController(QMainWindow):
 
         self.ui.inputDock.setFixedSize(310, 710)
         self.folder = folder
-
+        self.connection = "Endplate"
 
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
@@ -434,7 +434,6 @@ class MainController(QMainWindow):
 
         self.display, _ = self.init_display(backend_str=backend_name())
 
-        self.connection = "Endplate"
         self.connectivity = None
         self.fuse_model = None
         self.disable_view_buttons()
@@ -863,7 +862,13 @@ class MainController(QMainWindow):
     
     
     def setDictToUserInputs(self,uiobj):
+
         if(uiobj is not None):
+
+            if uiobj["Connection"] != "Endplate":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiobj['Member']['Connectivity'])))
 
             if uiobj['Member']['Connectivity'] == 'Beam-Beam':
@@ -960,6 +965,8 @@ class MainController(QMainWindow):
 
         uiobj['Load'] = {}
         uiobj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
+
+        uiobj["Connection"] = self.connection
 
         return uiobj
 

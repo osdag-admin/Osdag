@@ -354,6 +354,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "cleatAngle"
 
         self.get_columndata()
         self.get_beamdata()
@@ -461,7 +462,6 @@ class MainController(QMainWindow):
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
 
-        self.connection = "cleatAngle"
         self.connectivity = None
         self.fuse_model = None
         self.disable_view_buttons()
@@ -481,15 +481,6 @@ class MainController(QMainWindow):
         self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
 
     def get_beamdata(self):
-        # """Fetch old and new beam sections from "Intg_osdag" database
-        # Returns:
-        #
-        # """
-        # beamdata = get_beamcombolist()
-        # old_beamList = get_oldbeamcombolist()
-        # self.ui.combo_Beam.addItems(beamdata)
-        # self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
-
         """Fetch old and new beam sections from "Intg_osdag" database
                 Returns:
 
@@ -921,46 +912,7 @@ class MainController(QMainWindow):
 
     def retrieve_prevstate(self):
         ui_obj = self.get_prevstate()
-        if(ui_obj is not None):
-
-            self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(ui_obj['Member']['Connectivity'])))
-
-            if ui_obj['Member']['Connectivity'] == 'Beam-Beam':
-                self.ui.beamSection_lbl.setText('Secondary beam *')
-                self.ui.columnSection_lbl.setText('Primary beam *')
-                self.ui.comboColSec.clear()
-                self.get_beamdata()
-                #self.ui.comboColSec.addItems(get_beamcombolist())
-                self.ui.actionShow_beam.setText("Show SBeam")
-                self.ui.actionShow_column.setText("Show PBeam")
-                self.ui.chkBxBeam.setText("SBeam")
-                self.ui.chkBxBeam.setToolTip("Secondary  beam")
-                self.ui.chkBxCol.setText("PBeam")
-                self.ui.chkBxCol.setToolTip("Primary beam")
-
-            self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(ui_obj['Member']['BeamSection']))
-            self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(ui_obj['Member']['ColumSection']))
-
-            self.ui.txtFu.setText(str(ui_obj['Member']['fu (MPa)']))
-            self.ui.txtFy.setText(str(ui_obj['Member']['fy (MPa)']))
-
-            self.ui.txtShear.setText(str(ui_obj['Load']['ShearForce (kN)']))
-
-            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(ui_obj['Bolt']['Diameter (mm)'])))
-            comboTypeIndex = self.ui.comboBoltType.findText(str(ui_obj['Bolt']['Type']))
-            self.ui.comboBoltType.setCurrentIndex(comboTypeIndex)
-            self.combotype_currentindexchanged(str(ui_obj['Bolt']['Type']))
-
-            prevValue = str(ui_obj['Bolt']['Grade'])
-
-            comboGradeIndex = self.ui.comboBoltGrade.findText(prevValue)
-
-            self.ui.comboBoltGrade.setCurrentIndex(comboGradeIndex)
-
-            self.ui.txtInputCleatHeight.setText(str(ui_obj['cleat']['Height (mm)']))
-            self.ui.comboCleatSection.setCurrentIndex(self.ui.comboCleatSection.findText(str(ui_obj['cleat']['section'])))
-        else:
-            pass
+        self.setDictToUserInputs(ui_obj)
 
     def setimage_connection(self):
         '''
@@ -1030,6 +982,10 @@ class MainController(QMainWindow):
 
         if (uiObj is not None):
 
+            if uiObj["Connection"] != "cleatAngle":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
@@ -1096,6 +1052,7 @@ class MainController(QMainWindow):
 
         ui_obj['Load'] = {}
         ui_obj['Load']['ShearForce (kN)'] = (self.ui.txtShear.text())
+        ui_obj["Connection"] = self.connection
 
         return ui_obj
 

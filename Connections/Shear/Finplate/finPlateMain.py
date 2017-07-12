@@ -337,6 +337,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "Finplate"
 
         self.get_columndata()
         self.get_beamdata()
@@ -453,7 +454,7 @@ class MainController(QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-        self.connection = "Finplate"
+
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
@@ -474,9 +475,11 @@ class MainController(QMainWindow):
 
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
+
         Returns:
 
         """
+
         loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
@@ -895,11 +898,12 @@ class MainController(QMainWindow):
         self.setDictToUserInputs(uiObj)
 
 
-    def setDictToUserInputs(self, uiObj):
-        # if self.connection != "Finplate":
-        #     QMessageBox.information(self, "Unable to open file",
-        #                             "You can load this input file only from the corresponding design problem")
+    def setDictToUserInputs(self,uiObj):
+
         if (uiObj is not None):
+            if uiObj["Connection"] != "Finplate":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
@@ -1001,7 +1005,7 @@ class MainController(QMainWindow):
 
         uiObj['Load'] = {}
         uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
-
+        uiObj["Connection"] = self.connection
         return uiObj
 
     def saveDesign_inputs(self):

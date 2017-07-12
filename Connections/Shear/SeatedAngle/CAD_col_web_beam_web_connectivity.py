@@ -98,16 +98,16 @@ class ColWebBeamWeb(object):
         self.beam.place(beamorigin, uDir, wDir)
         
     def createAngleGeometry(self):
-        angleOrigin =((self.column.sec_origin +self.column.t/2)*self.column.uDir)+\
-                     ((self.column.length/2 - self.beam.D/2) * self.column.wDir)+\
+        angleOrigin =((self.column.sec_origin +self.column.t/2 + 0.05)*self.column.uDir)+\
+                     ((self.column.length/2 - self.beam.D/2 + 0.05) * self.column.wDir)+\
                      (self.angle.L/2 * (-self.column.vDir))
 
         wDir = numpy.array([0.0, 1.0, 0.0])
         uDir = numpy.array([1.0, 0.0, 0.0])
         self.angle.place(angleOrigin, uDir, wDir)
                  
-        topclipangleOrigin =((self.column.sec_origin + self.column.t/2)*self.column.uDir)+\
-                            ((self.column.length/2 + self.beam.D/2) * self.column.wDir)+\
+        topclipangleOrigin =((self.column.sec_origin + self.column.t/2 + 0.05)*self.column.uDir)+\
+                            ((self.column.length/2 + self.beam.D/2 + 0.05) * self.column.wDir)+\
                             (self.topclipangle.L/2 * (self.column.vDir))
 
         wDir = numpy.array([0.0, -1.0, 0.0])
@@ -171,8 +171,6 @@ class ColWebBeamWeb(object):
     def get_models(self):
         '''Returning 3D models
         '''
-        #return [self.columnModel, self.angleModel, self.topclipangleModel,
-                #self.beamModel] + self.nut_bolt_array.get_models()
         return [self.columnModel,self.beamModel,self.angleModel,self.topclipangleModel] + self.nut_bolt_array.get_models()
         
                 

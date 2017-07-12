@@ -64,21 +64,13 @@ class ColWebBeamWeb(object):
 
         angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.beam.T - self.beam.R1 - 5 - self.angle.L) * self.beam.vDir -
                          (self.beam.t / 2 * self.beam.uDir) + self.fillet_gap * (-self.beam.wDir))
-        # uDir1 = numpy.array([1.0, 0.0, 0])
-        # wDir1 = numpy.array([0, -1.0, 0])
+
         uDir1 = numpy.array([0, -1.0, 0])
         wDir1 = numpy.array([0, 0, 1.0])
         self.angleLeft.place(angle1_origin, uDir1, wDir1)
         
     def create_nut_bolt_array(self):
-        # nut_bolt_array_origin = self.angleLeft.sec_origin
-        # nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.wDir
-        # nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.uDir
-        #
-        # gauge_dir = self.angleLeft.uDir
-        # pitch_dir = self.angleLeft.vDir
-        # bolt_dir = -self.angleLeft.wDir
-        #####################################################################################
+
         nut_bolt_array_origin = self.angleLeft.sec_origin
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.T * self.angleLeft.uDir
         nut_bolt_array_origin = nut_bolt_array_origin + self.angleLeft.A * self.angleLeft.vDir
@@ -87,28 +79,16 @@ class ColWebBeamWeb(object):
         pitch_dir = self.angleLeft.wDir
         bolt_dir = -self.angleLeft.uDir
 
-        # c_nutbolt_array_origin = self.angle.sec_origin
-        # c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.uDir
-        # c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.wDir
+
         c_nutbolt_array_origin = self.angle.sec_origin
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.T * self.angle.vDir
         c_nutbolt_array_origin = c_nutbolt_array_origin + self.angle.B * self.angle.uDir
 
-        # c_gauge_dir = self.angle.wDir
-        # c_pitch_dir = self.angle.vDir
-        # c_bolt_dir = -self.angle.uDir
+
         c_gauge_dir = self.angle.uDir
         c_pitch_dir = self.angle.wDir
         c_bolt_dir = -self.angle.vDir
 
-        # c_nutbolt_array_origin1 = self.angleLeft.sec_origin
-        # c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.uDir
-        # c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.wDir
-        # c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + (self.angle.L * self.angle.vDir)
-        #
-        # c_gauge_dir1 = self.angle.wDir
-        # c_pitch_dir1 = self.angle.vDir
-        # c_bolt_dir1 = -self.angle.uDir
         c_nutbolt_array_origin1 = self.angleLeft.sec_origin
         c_nutbolt_array_origin1 = c_nutbolt_array_origin1 + self.angle.T * self.angle.vDir
         c_nutbolt_array_origin1 = c_nutbolt_array_origin - (self.beam.t + self.angle.B) * self.angle.uDir
@@ -127,8 +107,10 @@ class ColWebBeamWeb(object):
         return [self.columnModel, self.angleModel, self.angleLeftModel,
                 self.beamModel] + self.nut_bolt_array.get_models()
 
+
     def get_nut_bolt_models(self):
         return self.nut_bolt_array.get_models()
+
 
     def get_beamModel(self):
 
@@ -139,6 +121,7 @@ class ColWebBeamWeb(object):
             final_beam = BRepAlgoAPI_Cut(final_beam, bolt).Shape()
         return final_beam
     
+
     def get_columnModel(self):
 
         final_col = self.columnModel

@@ -1,7 +1,7 @@
 
 ## Contributing to Osdag
 
-It's through your contributions that Osdag will continue to improve. You can contribute in several ways. Please don't hesitate to jump in.
+It's through your contributions that Osdag will continue to improve. You can contribute in several ways.
 
 Take a moment to review this document in order to make the contribution process easy and effective for everyone involved.
 
@@ -9,7 +9,7 @@ Following these guidelines helps to communicate that you respect the time of the
 
 ### Using the issue tracker
 
-The issue tracker is the preferred channel for <a href= "#bugs">bug reports</a>, <a href= "#feature">features requests</a> and submitting <a href= "#pull">pull requests</a>, but please respect the following restrictions:
+The issue tracker is the preferred channel for <a href= "#bugs">bug reports</a>, <a href= "#feature">features requests</a> and submitting <a href= "#pull">pull requests</a>, but please follow the below restrictions:
 
    * Please **do not** use the issue tracker for personal support requests (use Osdag forum or GitHub issue).
 
@@ -20,15 +20,15 @@ The issue tracker is the preferred channel for <a href= "#bugs">bug reports</a>,
 ### <a id="user-content-bugs" class="anchor" href="#bugs" aria-hidden="true"></a> Bug reports
 
 
-A bug is a demonstrable problem that is caused by the code in the repository. Good bug reports are extremely helpful - thank you!
+A bug is a demonstrable problem that is caused by the code in the repository. Good bug reports are extremely helpful!
 
 Guidelines for bug reports:
 
    * **Use the GitHub issue search —** check if the issue has already been reported.
 
-   * **Check if the issue has been fixed —** try to reproduce it using the latest master or development branch in the repository.
+   * **Check if the issue has been fixed —** try to reproduce it using the latest master branch in the repository.
 
-A good bug report shouldn't leave others needing to chase you up for more information. Please try to be as detailed as possible in your report. What is your environment? What steps will reproduce the issue? What browser(s) and OS experience the problem? What would you expect to be the outcome? All these details will help people to fix any potential bugs.
+A good bug report shouldn't leave others needing to chase you up for more information. Please try to be as detailed as possible in your report. What is your environment? What steps will reproduce the issue? What browsers and OS experience the problem? What would you expect to be the outcome? All these details will help people to fix any potential bugs.
 
 Example:
 

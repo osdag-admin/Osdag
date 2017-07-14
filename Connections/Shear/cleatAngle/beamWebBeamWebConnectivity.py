@@ -84,7 +84,7 @@ class BeamWebBeamWeb(object):
 
         self.angleLeft.place(angle0_origin, uDir0, wDir0)
 
-        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height - self.angle.L)
+        angle1_origin = (self.beam.sec_origin + (self.beam.D / 2.0 - self.notch.height)
                          * (self.beam.vDir) + ((self.beam.t / 2 ) * self.beam.uDir)+ self.fillet_gap
                          * (-self.beam.wDir))
         uDir1 = numpy.array([0, 1.0, 0])

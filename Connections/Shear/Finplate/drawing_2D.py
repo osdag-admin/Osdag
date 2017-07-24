@@ -1000,7 +1000,7 @@ class Fin2DCreatorFront(object):
             # Draw Faint Lines to representation of Gap distance #
         dist1 = self.dataObj.col_L - ((self.dataObj.col_L - self.dataObj.D_beam) / 2 + self.dataObj.D_beam)
         ptA = self.ptB1
-        ptB = self.ptB1 + (dist1 + 100) * np.array([0, 1])
+        ptB = ptA + (dist1 + 100) * np.array([0, 1])
         self.dataObj.drawFaintLine(ptA, ptB, dwg)
         ptC = self.G 
         ptD = ptC + (100) * np.array([0, 1])
@@ -1792,7 +1792,7 @@ class Fin2DCreatorTop(object):
                 if len(ptList) > 1:
                     dimOffset = self.dataObj.col_L / 2 + 50
                     params = {"offset": dimOffset, "textoffset": 20, "lineori": "left", "endlinedim":10}
-                    self.dataObj.draw_dimension_outerArrow(dwg, np.array(ptList[0]), np.array(ptList[1]), str(int(self.dataObj.gauge)) + "mm", params)  
+                    self.dataObj.draw_dimension_outerArrow(dwg, np.array(ptList[0]), np.array(ptList[1]), str(int(self.dataObj.gauge)), params)
 
         # Cross section B-B and C-C
         ptSecA = self.BB + (20 * np.array([0, -1])) + ((self.dataObj.beam_L + 350) * np.array([1, 0]))
@@ -1832,7 +1832,7 @@ class Fin2DCreatorTop(object):
         ptY = ptx + self.dataObj.edge_dist * np.array([1, 0])
         offset = self.dataObj.col_L / 2 + 150 
         params = {"offset": offset, "textoffset": 20, "lineori": "left", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, ptx, ptY, str(int(self.dataObj.edge_dist)) + " mm", params)  
+        self.dataObj.draw_dimension_outerArrow(dwg, ptx, ptY, str(int(self.dataObj.edge_dist)), params)
 
         #  Draws Faint line to represent Gauge Distance
         ptK = self.BBB + self.dataObj.plateEdge_dist * np.array([1, 0])
@@ -1893,7 +1893,7 @@ class Fin2DCreatorTop(object):
         ptG2 = ptG1 + self.dataObj.gap * np.array([1, 0]) 
         offset = 100
         params = {"offset": offset, "textoffset": 10, "lineori": "right", "endlinedim":10, "arrowlen":50}
-        self.dataObj.draw_dimension_innerArrow(dwg, ptG1, ptG2, str(self.dataObj.gap) + " mm", params)
+        self.dataObj.draw_dimension_innerArrow(dwg, ptG1, ptG2, str(self.dataObj.gap), params)
         # Draw Faint Lines to representation of Gap distance #
         ptA = self.BF
         ptB = ptA + (240) * np.array([0, -1])
@@ -2284,9 +2284,9 @@ class Fin2DCreatorSide(object):
         params = {"offset": self.dataObj.col_L / 2 + 100, "textoffset": 15, "lineori": "left", "endlinedim": 10}
         self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[0]), np.array(pitchPts[len(pitchPts) - 1]), str(len(pitchPts) - 1) + u' \u0040' + str(int(self.dataObj.pitch)) + " mm c/c", params)     
         params = {"offset": self.dataObj.col_L / 2 + 100, "textoffset": 15, "lineori": "left", "endlinedim": 10}
-        self.dataObj.draw_dimension_outerArrow(dwg, self.BP, np.array(pitchPts[0]), str(int(self.dataObj.end_dist)) + " mm ", params)
+        self.dataObj.draw_dimension_outerArrow(dwg, self.BP, np.array(pitchPts[0]), str(int(self.dataObj.end_dist)), params)
         params = {"offset": self.dataObj.col_L / 2 + 100, "textoffset": 15, "lineori": "left", "endlinedim":10}
-        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[len(pitchPts) - 1]), self.BS, str(int(self.dataObj.end_dist)) + " mm", params)
+        self.dataObj.draw_dimension_outerArrow(dwg, np.array(pitchPts[len(pitchPts) - 1]), self.BS, str(int(self.dataObj.end_dist)), params)
 
         # Column Information
         beam_pt = self.BA2
@@ -2333,7 +2333,7 @@ class Fin2DCreatorSide(object):
         weldPt = np.array(pitchPts[len(pitchPts) - 1]) + self.dataObj.pitch / 2 * np.array([0, -1]) + (self.dataObj.plate_thick + 4) * np.array([-1, 0])
         theta = 25
         offset = self.dataObj.col_L / 4
-        textUp = "          z " + str(int(self.dataObj.weld_thick)) + " mm"
+        textUp = "          z " + str(int(self.dataObj.weld_thick))
         textDown = ""  # u"\u25C1"
         element = "weld"
         self.dataObj.drawOrientedArrow(dwg, weldPt, theta, "SE", offset, textUp, textDown, element)

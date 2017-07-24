@@ -672,7 +672,7 @@ class End2DCreatorFront(object):
 
     def call_BWBW_front(self, filename):
         v_height = self.dataObj.D_col + 850
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -400 1200 ' + str(v_height)))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-310 -400 1500 1500'))
 
         # Cross section A-A
         ptSecA = self.BA + (320 * np.array([0, -1]))
@@ -829,9 +829,9 @@ class End2DCreatorFront(object):
         self.dataObj.draw_oriented_arrow(dwg, plate_pt, theta, "NE", offset, text_up, text_down, element="")
 
         # 2D view name
-        ptx = self.BH + (self.dataObj.col_B*2 - 20) * np.array([0, 1])
+        ptx = self.BH + 150 * np.array([1, 0]) + 210 * np.array([0, 1])
         dwg.add(dwg.text("Front view (Sec C-C)", insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        pty = self.BH + (self.dataObj.col_B*2 + 20) * np.array([0, 1])
+        pty = self.BH + 150 * np.array([1, 0]) + 250 * np.array([0, 1])
         dwg.add(dwg.text("(All Dimensions are in mm)", insert=(pty), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
@@ -1347,7 +1347,7 @@ class End2DCreatorTop(object):
 
     def call_BWBW_top(self, filename):
 
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -250 1200 1000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-350 -350 1300 1300'))
 
         ############################################# B-B section #######################################################
         ptSecA = self.BB + ((50 + self.dataObj.plate_thick + self.dataObj.beam_L + 150) * np.array([1, 0]))
@@ -1362,7 +1362,7 @@ class End2DCreatorTop(object):
         dwg.add(dwg.line((ptSecA), (ptSecC)).stroke('#666666', width=1.0, linecap='square'))
 
         ############ C-C section #################
-        ptSecA = self.BD + 50 * np.array([-1, 0]) + ((self.dataObj.D_beam/2)) * np.array([0, 1])
+        ptSecA = self.BD + 200 * np.array([0, 1])
         ptSecB = ptSecA + (50 * np.array([0, -1]))
         txt_pt = ptSecB + (20 * np.array([-1, 0])) + (40 * np.array([0, -1]))
         txt = "C"
@@ -1493,7 +1493,7 @@ class End2DCreatorTop(object):
         self.dataObj.draw_oriented_arrow(dwg, beam_pt, theta, "SE", offset, text_up, text_down, element="")
 
         # Column Information
-        col_pt = (self.BA + self.BB) / 2
+        col_pt = (self.BA + self.BB) / 2 + 20 * np.array([1, 0])
         theta = 90
         offset = 100
         text_up = "Beam " + self.dataObj.col_Designation
@@ -1502,8 +1502,8 @@ class End2DCreatorTop(object):
 
         # Plate  Information
         plt_pt = self.BP4 + self.dataObj.plate_thick / 2 * np.array([1, 0])
-        theta = 90
-        offset = self.dataObj.beam_B / 2 + 50
+        theta = 60
+        offset = self.dataObj.beam_B / 2 + 60
         text_up = "PLT. " + str(int(self.dataObj.plate_ht)) + 'x' + str(int(self.dataObj.plate_width)) + 'x' + str(int(self.dataObj.plate_thick))
         text_down = ""
         self.dataObj.draw_oriented_arrow(dwg, plt_pt, theta, "SE", offset, text_up, text_down, element="")
@@ -1531,9 +1531,9 @@ class End2DCreatorTop(object):
         #         self.dataObj.draw_weld_arrow(weldarrow , dwg)
 
         # 2D view name
-        ptx = self.BC + (self.dataObj.col_B * 2 - 60) * np.array([0, 1])
+        ptx = self.BC + 250 * np.array([0, 1])
         dwg.add(dwg.text("Top view (Sec A-A)", insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
-        pty = self.BC + (self.dataObj.col_B * 2 - 20) * np.array([0, 1])
+        pty = self.BC + 290 * np.array([0, 1])
         dwg.add(dwg.text("(All Dimensions are in mm)", insert=(pty), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
         print "######### Beam Beam Top Saved ############"
@@ -1968,7 +1968,7 @@ class End2DCreatorSide(object):
         self.BV = self.BP + self.dataObj.beam_tw * np.array([-1,0])
 
     def call_BWBW_side(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -200 1200 1000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -350 1300 1300'))
         dwg.add(dwg.polyline(points=[(self.BA), (self.BB), (self.BI), (self.BJ), (self.BA)], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line((self.BG), (self.BH)).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.line((self.BF), (self.BE)).stroke('blue', width=2.5, linecap='square'))

@@ -975,6 +975,18 @@ def cleat_connection(ui_obj):
             logger.warning(": Minimum shear rupture capacity required is %2.2f kN" % (shear_load))
             logger.info(" : Use a deeper section for the secondary beam")
 
+# ----------------------------------------------------- Check for cleat_height against secondry beam depth -----------------------------------------------------------------------------------------------
+
+    notch_offset = max([column_f_t, beam_f_t]) + max([column_R1, beam_R1]) + max([(column_f_t / 2), (beam_f_t / 2), 10])
+    available_depth_beam = (notch_offset + cleat_length_b)
+    if connectivity == "Beam-Beam":
+        if available_depth_beam >= beam_D:
+            design_status = False
+            logger.error(": Calculated cleat height exceeds depth of secondry beam")
+            logger.warning(": Minimum depth of secondry beam required is greater than %2.2f mm" % (available_depth_beam))
+            logger.info(": Use a deeper section for the secondry beam")
+
+
     # ########################feeding output to array ###############
     output_obj ={}
     output_obj['Bolt'] = {}

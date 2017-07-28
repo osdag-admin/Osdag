@@ -976,16 +976,25 @@ def cleat_connection(ui_obj):
             logger.info(" : Use a deeper section for the secondary beam")
 
 # ----------------------------------------------------- Check for cleat_height against secondry beam depth -----------------------------------------------------------------------------------------------
+    max_cleat_length = beam_D - 2 * (beam_f_t + beam_R1)
 
-    notch_offset = max([column_f_t, beam_f_t]) + max([column_R1, beam_R1]) + max([(column_f_t / 2), (beam_f_t / 2), 10])
-    available_depth_beam = (notch_offset + cleat_length_b)
+
     if connectivity == "Beam-Beam":
-        if available_depth_beam >= beam_D:
+        notch_offset = max([column_f_t, beam_f_t]) + max([column_R1, beam_R1]) + max([(column_f_t / 2), (beam_f_t / 2), 10])
+        clearDepth = beam_D - (beam_R1 + beam_f_t + column_R1 + column_f_t)
+        available_depth_beam = (notch_offset + cleat_length_b)
+        if available_depth_beam > max_cleat_length:
             design_status = False
             logger.error(": Calculated cleat height exceeds depth of secondry beam")
-            logger.warning(": Minimum depth of secondry beam required is greater than %2.2f mm" % (available_depth_beam))
+            logger.warning(": Mamimum depth of cleat is %2.2f mm" % (clearDepth))
             logger.info(": Use a deeper section for the secondry beam")
-
+    else:
+        clearDepth = beam_D - 2 * (beam_f_t + beam_R1 + 5)
+        if cleat_length > max_cleat_length:
+            design_status = False
+            logger.error(": Calculated cleat height exceeds depth of beam")
+            logger.warning(": Maximum depth of cleat is %2.2f mm" % (clearDepth))
+            logger.info(": Use a deeper section for the beam")
 
     # ########################feeding output to array ###############
     output_obj ={}

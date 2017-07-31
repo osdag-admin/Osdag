@@ -776,9 +776,14 @@ class MainController(QMainWindow):
 
     def check_cleat_height(self, widget, lblwidget):
         '''
-        :param widget: QlineEdit
-        :param lblwidget: QLabel
-        :return: range of cleat height
+
+        Args:
+            widget: QlineEdit
+            lblwidget: QLabel
+
+        Returns:
+            range of cleat height
+
         '''
         loc = self.ui.comboConnLoc.currentText()
         cleatHeight = widget.text()

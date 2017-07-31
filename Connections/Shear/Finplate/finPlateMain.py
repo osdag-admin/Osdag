@@ -775,9 +775,14 @@ class MainController(QMainWindow):
 
     def check_plate_height(self, widget, lblwidget):
         '''
-        :param widget: QlineEdit
-        :param lblwidget: QLabel
-        :return: range of plate height
+
+        Args:
+            widget: QlineEdit
+            lblwidget: QLabel
+
+        Returns:
+        range of plate height
+
         '''
         loc = self.ui.comboConnLoc.currentText()
         plate_height = widget.text()

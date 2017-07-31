@@ -425,7 +425,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
-        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen, self.ui.lbl_len_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
@@ -773,7 +773,12 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.setCurrentIndex(0)
 
 
-    def check_plate_height(self, widget):
+    def check_plate_height(self, widget, lblwidget):
+        '''
+        :param widget: QlineEdit
+        :param lblwidget: QLabel
+        :return: range of plate height
+        '''
         loc = self.ui.comboConnLoc.currentText()
         plate_height = widget.text()
         plate_height = float(plate_height)
@@ -797,8 +802,15 @@ class MainController(QMainWindow):
             if clear_depth < plate_height or min_plate_height > plate_height:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def check_plate_width(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -1933,7 +1945,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    folder_path = "D:\Osdag_Workspace\\finplate"
+    folder_path = "D:\Osdag_Workspace\\Finplate"
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0755)
     image_folder_path = os.path.join(folder_path, 'images_html')

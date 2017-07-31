@@ -410,7 +410,7 @@ class MainController(QMainWindow):
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populate_weld_thick_combo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
-        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen,self.ui.lbl_len_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
@@ -606,7 +606,12 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.addItem(str(i))
         self.ui.comboPlateThick_2.setCurrentIndex(0)
 
-    def check_plate_height(self, widget):
+    def check_plate_height(self, widget, lblwidget):
+        '''
+        :param widget: QlineEdit
+        :param lblwidget: QLabel
+        :return: range of plate height
+        '''
         loc = self.ui.comboConnLoc.currentText()
         plate_height = widget.text()
         plate_height = float(plate_height)
@@ -630,8 +635,15 @@ class MainController(QMainWindow):
             if clear_depth < plate_height or min_plate_height > plate_height:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def check_plate_width(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -1040,7 +1052,7 @@ class MainController(QMainWindow):
         outobj['Weld']["Weld Strength (kN/mm)"] = float(self.ui.txtWeldStrng.text())
 
         outobj['Bolt'] = {}
-        outobj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txtShrCapacity.text())
+        outobj['Bolt']["Shear Capacity (kN)"] = float(round(self.ui.txtShrCapacity.text(), 3))
         outobj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txtbearCapacity.text())
         outobj['Bolt']["Capacity Of Bolt (kN)"] = float(self.ui.txtBoltCapacity.text())
         outobj['Bolt']["No Of Bolts"] = float(self.ui.txtNoBolts.text())
@@ -1956,7 +1968,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_Workspace\endplate"
+    workspace_folder_path = "D:\Osdag_Workspace\endplate"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

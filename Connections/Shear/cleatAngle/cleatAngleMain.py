@@ -432,7 +432,7 @@ class MainController(QMainWindow):
         self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
-        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight))
+        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
 
         ######################################################################################
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
@@ -774,7 +774,12 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         return check
 
-    def check_cleat_height(self, widget):
+    def check_cleat_height(self, widget, lblwidget):
+        '''
+        :param widget: QlineEdit
+        :param lblwidget: QLabel
+        :return: range of cleat height
+        '''
         loc = self.ui.comboConnLoc.currentText()
         cleatHeight = widget.text()
         cleatHeight = float(cleatHeight)
@@ -797,10 +802,18 @@ class MainController(QMainWindow):
                 clearDepth = beam_D - (beam_R1 + beam_T + col_R1 + col_T)
             if clearDepth < cleatHeight or cleatHeight < minCleatHeight:
                 self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information',
-                                        "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                # QMessageBox.about(self, 'Information', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                QMessageBox.warning(self, 'Warning', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
+                return
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def show_font_dialog(self):
 
@@ -1227,7 +1240,7 @@ class MainController(QMainWindow):
 
     def check_range(self, widget, lblwidget, min_val, max_val):
 
-        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        '''(QlineEdit,QLabel,Number,Number)---> NoneType
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         text_str = widget.text()

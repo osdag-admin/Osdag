@@ -2227,7 +2227,7 @@ class Fin2DCreatorSide(object):
 
         # 2D view name
         ptx = self.FC + 90 * np.array([-1, 0]) + 140 * np.array([0, 1])
-        dwg.add(dwg.text('Side view (Sec B-B))', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FC  + 90 * np.array([-1, 0]) + 180 * np.array([0, 1])
         dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.fit()

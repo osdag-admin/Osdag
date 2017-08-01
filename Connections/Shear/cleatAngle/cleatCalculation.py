@@ -1038,7 +1038,7 @@ def cleat_connection(ui_obj):
 
     output_obj['cleat'] = {}
     output_obj['cleat']['numofbolts'] = 2 * no_row_c * no_col_c
-    output_obj['cleat']['height'] = int(cleat_length)
+    output_obj['cleat']['height'] = float(cleat_length)
     output_obj['cleat']['externalmoment'] = round(moment_demand_c , 3)
     output_obj['cleat']['momentcapacity'] = round(moment_capacity_c, 3)
     output_obj['cleat']['numofrow'] = no_row_c

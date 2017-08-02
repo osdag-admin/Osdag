@@ -204,8 +204,35 @@ class OsdagMainWindow(QMainWindow):
         # self.ui.btn_tension.clicked.connect(lambda:self.change_desgin_page(list_of_items['Osdagpage'], list_of_items['tensionpage']))
 
 
+    # Back up the reference to the exceptionhook
+    sys._excepthook = sys.excepthook
+
+    def the_exception_hook(exctype, value, traceback):
+        '''Finds the error occurs when Osdag crashes
+
+        Args:
+            exctype: type of error
+            value: information of the error
+            traceback: trace the object
+
+        Returns:
+            system exit(1)
+        '''
+        # Print the error and traceback
+        print "Error occurred: ", (exctype, value, traceback)
+        # Call the normal Exception hook after
+        sys.__excepthook__(exctype, value, traceback)
+        sys.exit(1)
+
+    # Set the exception hook to our wrapping function
+    sys.excepthook = the_exception_hook
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except:
+        print "ERROR"

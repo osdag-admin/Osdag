@@ -1399,7 +1399,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     # row =[0,"Edge distance (mm)","&#8805; 1.7* 22 = 37.4,&#8804;12*8.9 = 106.9<br> [cl. 10.2.4]","50"," <p align=right style=color:green><b>Pass</b></p>"]
     min_edge = str(int(float(min_edgend_dist) * float(dia_hole)))
     max_edge = str(12 * float(thinner_c))
-    if int(edge_c) >= int(min_edge) or int(edge_c) <= int(max_edge) :
+    if edge_c >= min_edge or edge_c <= max_edge :
         row = [0, "Edge distance (mm)",
            " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + min_edge + ", &#8804;12*" + thinner_c + " = " + max_edge + "<br> [cl. 10.2.4]",
            edge_c,

@@ -89,9 +89,9 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
         self.saved_designPref["design"] = {}
@@ -140,7 +140,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = float(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -354,6 +354,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "cleatAngle"
 
         self.get_columndata()
         self.get_beamdata()
@@ -431,7 +432,7 @@ class MainController(QMainWindow):
         self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
-        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight))
+        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
 
         ######################################################################################
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
@@ -461,7 +462,6 @@ class MainController(QMainWindow):
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
 
-        self.connection = "cleatAngle"
         self.connectivity = None
         self.fuse_model = None
         self.disable_view_buttons()
@@ -481,15 +481,6 @@ class MainController(QMainWindow):
         self.color_oldDB_sections(old_colList, columndata, self.ui.comboColSec)
 
     def get_beamdata(self):
-        # """Fetch old and new beam sections from "Intg_osdag" database
-        # Returns:
-        #
-        # """
-        # beamdata = get_beamcombolist()
-        # old_beamList = get_oldbeamcombolist()
-        # self.ui.combo_Beam.addItems(beamdata)
-        # self.color_oldDB_sections(old_beamList, beamdata, self.ui.combo_Beam)
-
         """Fetch old and new beam sections from "Intg_osdag" database
                 Returns:
 
@@ -692,7 +683,7 @@ class MainController(QMainWindow):
         if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == '':
             return
         loc = self.ui.comboConnLoc.currentText()
-        if loc == "Column web-Beam web" or "Column flange-Beam web":
+        if loc == "Column flange-Beam web" or loc == "Column web-Beam web":
 
             dict_beam_data = self.fetch_beam_param()
             dict_column_data = self.fetch_column_param()
@@ -783,7 +774,17 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         return check
 
-    def check_cleat_height(self, widget):
+    def check_cleat_height(self, widget, lblwidget):
+        '''
+
+        Args:
+            widget: QlineEdit
+            lblwidget: QLabel
+
+        Returns:
+            range of cleat height
+
+        '''
         loc = self.ui.comboConnLoc.currentText()
         cleatHeight = widget.text()
         cleatHeight = float(cleatHeight)
@@ -806,17 +807,25 @@ class MainController(QMainWindow):
                 clearDepth = beam_D - (beam_R1 + beam_T + col_R1 + col_T)
             if clearDepth < cleatHeight or cleatHeight < minCleatHeight:
                 self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information',
-                                        "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                # QMessageBox.about(self, 'Information', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                QMessageBox.warning(self, 'Warning', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
+                return
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def show_font_dialog(self):
 
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def show_color_dialog(self):
@@ -921,46 +930,7 @@ class MainController(QMainWindow):
 
     def retrieve_prevstate(self):
         ui_obj = self.get_prevstate()
-        if(ui_obj is not None):
-
-            self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(ui_obj['Member']['Connectivity'])))
-
-            if ui_obj['Member']['Connectivity'] == 'Beam-Beam':
-                self.ui.beamSection_lbl.setText('Secondary beam *')
-                self.ui.columnSection_lbl.setText('Primary beam *')
-                self.ui.comboColSec.clear()
-                self.get_beamdata()
-                #self.ui.comboColSec.addItems(get_beamcombolist())
-                self.ui.actionShow_beam.setText("Show SBeam")
-                self.ui.actionShow_column.setText("Show PBeam")
-                self.ui.chkBxBeam.setText("SBeam")
-                self.ui.chkBxBeam.setToolTip("Secondary  beam")
-                self.ui.chkBxCol.setText("PBeam")
-                self.ui.chkBxCol.setToolTip("Primary beam")
-
-            self.ui.combo_Beam.setCurrentIndex(self.ui.combo_Beam.findText(ui_obj['Member']['BeamSection']))
-            self.ui.comboColSec.setCurrentIndex(self.ui.comboColSec.findText(ui_obj['Member']['ColumSection']))
-
-            self.ui.txtFu.setText(str(ui_obj['Member']['fu (MPa)']))
-            self.ui.txtFy.setText(str(ui_obj['Member']['fy (MPa)']))
-
-            self.ui.txtShear.setText(str(ui_obj['Load']['ShearForce (kN)']))
-
-            self.ui.comboDiameter.setCurrentIndex(self.ui.comboDiameter.findText(str(ui_obj['Bolt']['Diameter (mm)'])))
-            comboTypeIndex = self.ui.comboBoltType.findText(str(ui_obj['Bolt']['Type']))
-            self.ui.comboBoltType.setCurrentIndex(comboTypeIndex)
-            self.combotype_currentindexchanged(str(ui_obj['Bolt']['Type']))
-
-            prevValue = str(ui_obj['Bolt']['Grade'])
-
-            comboGradeIndex = self.ui.comboBoltGrade.findText(prevValue)
-
-            self.ui.comboBoltGrade.setCurrentIndex(comboGradeIndex)
-
-            self.ui.txtInputCleatHeight.setText(str(ui_obj['cleat']['Height (mm)']))
-            self.ui.comboCleatSection.setCurrentIndex(self.ui.comboCleatSection.findText(str(ui_obj['cleat']['section'])))
-        else:
-            pass
+        self.setDictToUserInputs(ui_obj)
 
     def setimage_connection(self):
         '''
@@ -1030,6 +1000,10 @@ class MainController(QMainWindow):
 
         if (uiObj is not None):
 
+            if uiObj["Connection"] != "cleatAngle":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
@@ -1096,6 +1070,7 @@ class MainController(QMainWindow):
 
         ui_obj['Load'] = {}
         ui_obj['Load']['ShearForce (kN)'] = (self.ui.txtShear.text())
+        ui_obj["Connection"] = self.connection
 
         return ui_obj
 
@@ -1270,7 +1245,7 @@ class MainController(QMainWindow):
 
     def check_range(self, widget, lblwidget, min_val, max_val):
 
-        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        '''(QlineEdit,QLabel,Number,Number)---> NoneType
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         text_str = widget.text()
@@ -1455,7 +1430,8 @@ class MainController(QMainWindow):
         elif self.ui.comboCleatSection.currentIndex() == 0:
             QMessageBox.information(self, "Information", "Please select Cleat angle")
             flag = False
-        flag = self.checkbeam_b()
+        else:
+            flag = self.checkbeam_b()
         return flag
 
     def bolt_head_thick_calculation(self, bolt_diameter):

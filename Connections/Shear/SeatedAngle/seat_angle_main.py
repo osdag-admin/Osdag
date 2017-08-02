@@ -72,9 +72,9 @@ class DesignPreferences(QDialog):
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -112,7 +112,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = float(10)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -221,7 +221,7 @@ class DesignReportDialog(QDialog):
         return str(filename)
 
     def desired_location(self, filename):
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
+        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
@@ -273,6 +273,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "SeatedAngle"
 
         self.get_columndata()
         self.get_beamdata()
@@ -379,7 +380,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.connection = "SeatedAngle"
         self.designPrefDialog = DesignPreferences(self)
 
     def get_columndata(self):
@@ -457,8 +457,8 @@ class MainController(QMainWindow):
     def showFontDialogue(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def callZoomin(self):
@@ -611,6 +611,10 @@ class MainController(QMainWindow):
 
         if (uiObj is not None):
 
+            if uiObj["Connection"] != "SeatedAngle":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.combo_connectivity.setCurrentIndex(self.ui.combo_connectivity.findText(str(uiObj['Member']['Connectivity'])))
 
             if uiObj['Member']['Connectivity'] == 'Beam-Beam':
@@ -703,6 +707,7 @@ class MainController(QMainWindow):
         uiObj['Angle']['AngleSection'] = str(self.ui.combo_angle_section.currentText())
 
         uiObj['Angle']['TopAngleSection'] = str(self.ui.combo_topangle_section.currentText())
+        uiObj["Connection"] = self.connection
 
         return uiObj
 
@@ -1287,57 +1292,81 @@ class MainController(QMainWindow):
         else:
             pass
 
-    def create2Dcad(self, connectivity):
+    def create2Dcad(self):
         """ Returns the fuse model of finplate
         """
-        cadlist = self.connectivity.get_models()
-        final_model = cadlist[0]
-        for model in cadlist[1:]:
-            final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        if self.commLogicObj.component == "Beam":
+            final_model = self.commLogicObj.connectivityObj.get_beamModel()
+
+        elif self.commLogicObj.component == "Column":
+            final_model = self.commLogicObj.connectivityObj.get_columnModel()
+
+        elif self.commLogicObj.component == "Seated Angle":
+            cadlist = [self.commLogicObj.connectivityObj.angleModel,
+                       self.commLogicObj.connectivityObj.topclipangleModel] + \
+                      self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+        else:
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+
+            final_model = cadlist[0]
+            for model in cadlist[1:]:
+                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         return final_model
 
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
-        if self.connectivity == None:
-            self.connectivity = self.create3DColWebBeamWeb()
-        if self.fuse_model == None:
-            self.fuse_model = self.create2Dcad(self.connectivity)
+
+        if self.fuse_model is None:
+            self.fuse_model = self.create2Dcad()
         shape = self.fuse_model
 
         files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-        fileName = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
-                                               files_types)
 
+        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                  files_types)
         fName = str(fileName)
-        file_extension = fName.split(".")[-1]
 
-        if file_extension == 'igs':
-            IGESControl.IGESControl_Controller().Init()
-            iges_writer = IGESControl.IGESControl_Writer()
-            iges_writer.AddShape(shape)
-            iges_writer.Write(fName)
-
-        elif file_extension == 'brep':
-            BRepTools.breptools.Write(shape, fName)
-
-        elif file_extension == 'stp':
-            # initialize the STEP exporter
-            step_writer = STEPControl_Writer()
-            Interface_Static_SetCVal("write.step.schema", "AP203")
-
-            # transfer shapes and write file
-            step_writer.Transfer(shape, STEPControl_AsIs)
-            status = step_writer.Write(fName)
-
-            assert (status == IFSelect_RetDone)
-
+        flag = True
+        if fName == '':
+            flag = False
+            return flag
         else:
-            stl_writer = StlAPI_Writer()
-            stl_writer.SetASCIIMode(True)
-            stl_writer.Write(shape, fName)
+            file_extension = fName.split(".")[-1]
 
-        QMessageBox.about(self, 'Information', "File saved")
+            if file_extension == 'igs':
+                IGESControl.IGESControl_Controller().Init()
+                iges_writer = IGESControl.IGESControl_Writer()
+                iges_writer.AddShape(shape)
+                iges_writer.Write(fName)
+
+            elif file_extension == 'brep':
+
+                BRepTools.breptools.Write(shape, fName)
+
+            elif file_extension == 'stp':
+                # initialize the STEP exporter
+                step_writer = STEPControl_Writer()
+                Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                # transfer shapes and write file
+                step_writer.Transfer(shape, STEPControl_AsIs)
+                status = step_writer.Write(fName)
+
+                assert (status == IFSelect_RetDone)
+
+            else:
+                stl_writer = StlAPI_Writer()
+                stl_writer.SetASCIIMode(True)
+                stl_writer.Write(shape, fName)
+
+            self.fuse_model = None
+
+            QMessageBox.about(self, 'Information', "File saved")
 
     def call_seatangle2D_Drawing(self, view):
         """ This routine saves the 2D SVG image as per the connectivity selected

@@ -119,9 +119,9 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            self.saved_designPref["detailing"]["gap"] = int(10)
+            self.saved_designPref["detailing"]["gap"] = float(10)
         else:
-            self.saved_designPref["detailing"]["gap"] = int(self.ui.txt_detailingGap.text())
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -337,6 +337,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.folder = folder
+        self.connection = "Finplate"
 
         self.get_columndata()
         self.get_beamdata()
@@ -424,7 +425,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
 
-        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen, self.ui.lbl_len_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_CreateDesign.clicked.connect(self.createDesignReport)  # Saves the create design report
@@ -453,7 +454,7 @@ class MainController(QMainWindow):
         # Initialising the qtviewer
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
-        self.connection = "Finplate"
+
         self.connectivity = None
         self.fuse_model = None
         self.disableViewButtons()
@@ -474,9 +475,11 @@ class MainController(QMainWindow):
 
     def get_beamdata(self):
         """Fetch old and new beam sections from "Intg_osdag" database
+
         Returns:
 
         """
+
         loc = self.ui.comboConnLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamList = get_oldbeamcombolist()
@@ -569,7 +572,7 @@ class MainController(QMainWindow):
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.blockSignals(True)
             self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
@@ -616,7 +619,7 @@ class MainController(QMainWindow):
             self.ui.comboDiameter.setCurrentIndex(0)
             self.ui.comboType.setCurrentIndex((0))
             self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+            self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
             self.ui.comboPlateThick_2.setCurrentIndex((0))
             self.ui.txtPlateLen.clear()
             self.ui.txtPlateWidth.clear()
@@ -645,8 +648,8 @@ class MainController(QMainWindow):
 
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def callZoomin(self):
@@ -751,7 +754,7 @@ class MainController(QMainWindow):
             plateThickness = [6, 8, 10, 12, 14, 16, 18, 20]
 
             newlist = []
-            newlist.append("Select thickness")
+            newlist.append("Select plate thickness")
             for ele in plateThickness[:]:
                 item = int(ele)
                 if item >= beam_tw:
@@ -770,7 +773,17 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.setCurrentIndex(0)
 
 
-    def check_plate_height(self, widget):
+    def check_plate_height(self, widget, lblwidget):
+        '''
+
+        Args:
+            widget: QlineEdit
+            lblwidget: QLabel
+
+        Returns:
+        range of plate height
+
+        '''
         loc = self.ui.comboConnLoc.currentText()
         plate_height = widget.text()
         plate_height = float(plate_height)
@@ -794,8 +807,15 @@ class MainController(QMainWindow):
             if clear_depth < plate_height or min_plate_height > plate_height:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def check_plate_width(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -843,9 +863,9 @@ class MainController(QMainWindow):
                 return
             dictcoldata = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
-            if plate_thickness != "Select thickness":
-                plate_thick = float(plate_thickness)
 
+            if plate_thickness != "Select plate thickness":
+                plate_thick = float(plate_thickness)
 
                 if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
                     if str(self.ui.comboColSec.currentText()) == "Select section":
@@ -895,9 +915,12 @@ class MainController(QMainWindow):
         self.setDictToUserInputs(uiObj)
 
 
-    def setDictToUserInputs(self, uiObj):
+    def setDictToUserInputs(self,uiObj):
 
         if (uiObj is not None):
+            if uiObj["Connection"] != "Finplate":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
 
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiObj['Member']['Connectivity'])))
 
@@ -999,7 +1022,7 @@ class MainController(QMainWindow):
 
         uiObj['Load'] = {}
         uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
-
+        uiObj["Connection"] = self.connection
         return uiObj
 
     def saveDesign_inputs(self):
@@ -1181,7 +1204,7 @@ class MainController(QMainWindow):
         self.ui.comboType.setCurrentIndex((0))
         self.ui.comboGrade.setCurrentIndex((0))
 
-        self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+        self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
         self.ui.comboPlateThick_2.setCurrentIndex((0))
         self.ui.txtPlateLen.clear()
         self.ui.txtPlateWidth.clear()
@@ -1490,13 +1513,14 @@ class MainController(QMainWindow):
             flag = False
 
         elif self.ui.comboPlateThick_2.currentIndex() == 0:
-            QMessageBox.information(self, "information", "Please select Plate thickness")
+            QMessageBox.information(self, "information", "Please Select plate thickness")
             flag = False
 
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkBeam_B()
+        else:
+            flag = self.checkBeam_B()
         return flag
 
 
@@ -1926,7 +1950,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     ########################################
-    folder_path = "D:\Osdag_Workspace\\finplate"
+    folder_path = "D:\Osdag_Workspace\\Finplate"
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0755)
     image_folder_path = os.path.join(folder_path, 'images_html')

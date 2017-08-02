@@ -19,6 +19,15 @@ def module_setup():
 module_setup()
 
 def net_area_calc(dia):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+
+    Returns
+        Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
+    '''
     net_area = {5: 15.3, 6: 22.04, 8: 39.18, 10: 61.23, 12: 84.5, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
     return net_area[dia]
 
@@ -26,6 +35,17 @@ def net_area_calc(dia):
 
 # BOLT: determination of shear capacity of black bolt = fu * n * A / (root(3) * Y)
 def black_bolt_shear(dia, n, fu):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        n (str) number of shear plane(s) through which bolt is passing
+        fu (float) ultimate tensile strength of a bolt
+
+    Returns:
+        Shear capacity of bearing type bolt in kN
+
+    '''
     A = net_area_calc(dia)
     root3 = math.sqrt(3)
     Vs = fu * n * A / (root3 * 1.25 * 1000)
@@ -38,6 +58,23 @@ def black_bolt_shear(dia, n, fu):
 # Check for Long joints & Large grip lengths, IS 800:2007 Cl 10.3.3.1 & Cl 10.3.3.2
 
 def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_required, pitch, end_plate_t, column_f_t,column_w_t, beam_w_t):
+    '''
+
+    Args:
+        bolt_shear_capacity (float)
+        connectivity
+        bolt_dia (int) diameter of bolt
+        bolts_required (str)
+        pitch (float)
+        end_plate_t (float)
+        column_f_t (float)
+        column_w_t (float)
+        beam_w_t (float)
+
+    Returns:
+        Shear capacity of bolt after multiplying the reduction factors (i.e beta_lg & beta_lj. Ref. IS 800:2007 Cl 10.3.3.2 & Cl 10.3.3.1)
+
+    '''
 
     l_j = ((bolts_required/2) - 1) * pitch  # length of joint in direction of load transfer
     if l_j > 15 * bolt_dia:
@@ -81,14 +118,35 @@ def get_reduction_factor(bolt_shear_capacity, connectivity, bolt_dia, bolts_requ
 
 # BOLT: determination of bearing capacity = 2.5 * kb * d * t * fu / Y
 def bolt_bearing(dia, t, fu, kb):
+    '''
+
+    Args:
+        dia (int) diameter of bolt
+        t (float) summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
+        fu  (float) ultimate tensile strength of a bolt
+        kb  (float) multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
+
+    Returns:
+        Bearing capacity of bearing type bolt in kN
+
+    '''
     Vb = 2.5 * kb * dia * t * fu / (1.25 * 1000)
     Vb = round(Vb.real, 3)
     return Vb
 
-# According to subramanyam page no 372
-
 
 def end_plate_t_min(beam_depth, grade_bolt, dia):
+    '''
+
+    Args:
+        beam_depth (float)
+        grade_bolt (float)
+        dia (int) Diameter of bolt
+
+    Returns:
+        Minimum thickness of end plate based on beam depth and grade of bolt (Ref. Subramanian's book page no 372 )
+
+    '''
     if beam_depth < 450:
         if grade_bolt <= 4.6:
             min_endplate = min(8, int(dia) / 3)
@@ -105,6 +163,19 @@ def end_plate_t_min(beam_depth, grade_bolt, dia):
 
 
 def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
+    '''
+
+    Args:
+        load (float) Factored shear force/load
+        eccentricity (float)
+        pitch (float)
+        gauge (float)
+        bolts_one_line (str) number of bolts in one line
+
+    Returns:
+        Resultant shear load for type1 effect
+
+    '''
     sigma = 0.0
     r_y = 0.0
     r_x = 0.0
@@ -140,6 +211,24 @@ def critical_bolt_shear(load, eccentricity, pitch, gauge, bolts_one_line):
 # #################### Block shear capacity of plates/members ##########################333
 
 def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gauge, thk):
+    '''
+
+    Args:
+        numrow (str) Number of row(s) of bolts
+        numcol (str) Number of column(s) of bolts
+        dia_hole  (int) diameter of hole (Ref. Table 5.6 Subramanian's book, page: 340)
+        fy (float) Yeild stress of material
+        fu  (float) Ultimate stress of material
+        edge_dist  (float) edge distance based on diameter of hole
+        end_dist (float) end distance based on diameter of hole
+        pitch (float) pitch distance based on diameter of bolt
+        gauge  (float) pitch distance based on diameter of bolt
+        thk (float) thickness of plate
+
+    Returns:
+        Capacity of fin plate under block shear
+
+    '''
     if numcol == 1:
         area_shear_gross = thk * ((numrow - 1) * pitch + end_dist)
         area_shear_net = thk * ((numrow - 1) * pitch + end_dist - (numrow - 1 + 0.5) * dia_hole)
@@ -317,7 +406,6 @@ def end_connection(ui_obj):
     max_end_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
 
     if bolt_type == 'HSFG':
-        # TODO Set parameters based on updated design preferences input from GUI
         muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
         bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0.85 - oversize hole

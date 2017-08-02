@@ -220,10 +220,10 @@
         <string>Seated Angle</string>
        </property>
       </widget>
-      <widget class="QToolButton" name="btn_front">
+      <widget class="QToolButton" name="btn_side">
        <property name="geometry">
         <rect>
-         <x>120</x>
+         <x>180</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
@@ -243,7 +243,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Front View</string>
+        <string>Side View</string>
        </property>
        <property name="text">
         <string/>
@@ -301,10 +301,10 @@
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QToolButton" name="btn_side">
+      <widget class="QToolButton" name="btn_front">
        <property name="geometry">
         <rect>
-         <x>180</x>
+         <x>120</x>
          <y>0</y>
          <width>28</width>
          <height>28</height>
@@ -321,7 +321,7 @@
         <enum>Qt::WheelFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Side View</string>
+        <string>Front View</string>
        </property>
        <property name="text">
         <string/>
@@ -4369,25 +4369,25 @@ QMenu::item:selected {
   <tabstop>chkBxBeam</tabstop>
   <tabstop>chkBxCol</tabstop>
   <tabstop>chkBxSeatAngle</tabstop>
+  <tabstop>txt_bolt_shear_capacity</tabstop>
+  <tabstop>txt_bolt_bearing_capacity</tabstop>
+  <tabstop>txt_bolt_capacity</tabstop>
+  <tabstop>txt_no_bolts</tabstop>
+  <tabstop>txt_bolt_group_capacity</tabstop>
+  <tabstop>txt_bolt_rows</tabstop>
+  <tabstop>txt_bolt_cols</tabstop>
+  <tabstop>txt_bolt_pitch</tabstop>
+  <tabstop>txt_bolt_gauge</tabstop>
+  <tabstop>txt_end_distance</tabstop>
+  <tabstop>txt_edge_distance</tabstop>
+  <tabstop>txt_seat_angle</tabstop>
+  <tabstop>txt_seat_length</tabstop>
   <tabstop>txt_moment_demand</tabstop>
   <tabstop>txt_moment_capacity</tabstop>
   <tabstop>txt_seat_shear_demand</tabstop>
   <tabstop>txt_seat_shear_capacity</tabstop>
   <tabstop>txt_beam_shear_strength</tabstop>
-  <tabstop>txtNoBolts_3</tabstop>
-  <tabstop>txtPitch_3</tabstop>
-  <tabstop>txtGuage_3</tabstop>
-  <tabstop>txtBoltCapacity_3</tabstop>
-  <tabstop>txtEndDist_3</tabstop>
-  <tabstop>txtEdgeDist_3</tabstop>
-  <tabstop>txtWeldThick_3</tabstop>
-  <tabstop>txtResltShr_3</tabstop>
-  <tabstop>txtWeldStrng_3</tabstop>
-  <tabstop>txtPlateThick_3</tabstop>
-  <tabstop>txtExtMomnt_3</tabstop>
-  <tabstop>txtMomntCapacity_3</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_6</tabstop>
+  <tabstop>txt_top_angle</tabstop>
   <tabstop>pushButton_3</tabstop>
   <tabstop>btnReset_3</tabstop>
   <tabstop>btnDesign_3</tabstop>
@@ -4428,24 +4428,24 @@ QMenu::item:selected {
   <tabstop>btnReset_2</tabstop>
   <tabstop>pushButton_2</tabstop>
   <tabstop>btnDesign_2</tabstop>
-  <tabstop>txt_bolt_shear_capacity</tabstop>
-  <tabstop>txt_bolt_bearing_capacity</tabstop>
+  <tabstop>txtWeldStrng_3</tabstop>
+  <tabstop>txtPlateThick_3</tabstop>
   <tabstop>lineEdit_4</tabstop>
   <tabstop>txtWeldThick_2</tabstop>
   <tabstop>txtShrCapacity_3</tabstop>
   <tabstop>txtbearCapacity_3</tabstop>
-  <tabstop>txt_bolt_capacity</tabstop>
-  <tabstop>txt_no_bolts</tabstop>
-  <tabstop>txt_bolt_gauge</tabstop>
-  <tabstop>txt_end_distance</tabstop>
-  <tabstop>txt_edge_distance</tabstop>
-  <tabstop>txt_bolt_group_capacity</tabstop>
-  <tabstop>txt_bolt_rows</tabstop>
-  <tabstop>txt_bolt_cols</tabstop>
-  <tabstop>txt_bolt_pitch</tabstop>
-  <tabstop>txt_seat_length</tabstop>
-  <tabstop>txt_top_angle</tabstop>
-  <tabstop>txt_seat_angle</tabstop>
+  <tabstop>txtExtMomnt_3</tabstop>
+  <tabstop>txtMomntCapacity_3</tabstop>
+  <tabstop>txtBoltCapacity_3</tabstop>
+  <tabstop>txtEndDist_3</tabstop>
+  <tabstop>txtEdgeDist_3</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>txtNoBolts_3</tabstop>
+  <tabstop>txtPitch_3</tabstop>
+  <tabstop>txtGuage_3</tabstop>
+  <tabstop>txtResltShr_3</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+  <tabstop>txtWeldThick_3</tabstop>
  </tabstops>
  <resources>
   <include location="ResourceFiles/icons.qrc"/>

@@ -32,7 +32,7 @@ from reportGenerator import *
 from ui_design_preferences import Ui_ShearDesignPreferences
 from endPlateCalc import end_connection
 from model import *
-from ui_endplate import Ui_MainWindow
+from ui_endPlate import Ui_MainWindow
 from drawing_2D import EndCommonData
 from Connections.Shear.common_logic import CommonDesignLogic
 from Svg_Window import SvgWindow
@@ -114,7 +114,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["detailing"] = {}
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
-        self.saved_designPref["detailing"]["gap"] = int(0)
+        self.saved_designPref["detailing"]["gap"] = float(0)
         if typeOfEdge == "a - Sheared or hand flame cut":
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
@@ -170,7 +170,7 @@ class DesignPreferences(QDialog):
             designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        designPref["detailing"]["gap"] = int(0)
+        designPref["detailing"]["gap"] = float(0)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -327,13 +327,13 @@ class MainController(QMainWindow):
         
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.folder = folder
+        self.connection = "Endplate"
 
         self.get_columndata()
         self.get_beamdata()
 
         self.ui.inputDock.setFixedSize(310, 710)
-        self.folder = folder
-
 
         self.gradeType = {'Please Select Type':'',
                          'HSFG': [8.8, 10.9],
@@ -410,7 +410,7 @@ class MainController(QMainWindow):
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populate_weld_thick_combo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
-        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen))
+        self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen,self.ui.lbl_len_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
@@ -434,7 +434,6 @@ class MainController(QMainWindow):
 
         self.display, _ = self.init_display(backend_str=backend_name())
 
-        self.connection = "Endplate"
         self.connectivity = None
         self.fuse_model = None
         self.disable_view_buttons()
@@ -495,8 +494,8 @@ class MainController(QMainWindow):
     def show_font_dialog(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.inputDock.setFont(font)
-            self.ui.outputDock.setFont(font)
+            # self.ui.inputDock.setFont(font)
+            # self.ui.outputDock.setFont(font)
             self.ui.textEdit.setFont(font)
 
     def show_color_dialog(self):
@@ -607,7 +606,17 @@ class MainController(QMainWindow):
             self.ui.comboPlateThick_2.addItem(str(i))
         self.ui.comboPlateThick_2.setCurrentIndex(0)
 
-    def check_plate_height(self, widget):
+    def check_plate_height(self, widget, lblwidget):
+        '''
+
+        Args:
+            widget: QlineEdit
+            lblwidget: QLabel
+
+        Returns:
+            range of plate height
+
+        '''
         loc = self.ui.comboConnLoc.currentText()
         plate_height = widget.text()
         plate_height = float(plate_height)
@@ -631,8 +640,15 @@ class MainController(QMainWindow):
             if clear_depth < plate_height or min_plate_height > plate_height:
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def check_plate_width(self, widget):
         loc = self.ui.comboConnLoc.currentText()
@@ -863,7 +879,13 @@ class MainController(QMainWindow):
     
     
     def setDictToUserInputs(self,uiobj):
-        if(uiobj is not None):
+
+        if (uiobj is not None):
+
+            if uiobj["Connection"] != "Endplate":
+                QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+                return
+
             self.ui.comboConnLoc.setCurrentIndex(self.ui.comboConnLoc.findText(str(uiobj['Member']['Connectivity'])))
 
             if uiobj['Member']['Connectivity'] == 'Beam-Beam':
@@ -961,6 +983,8 @@ class MainController(QMainWindow):
         uiobj['Load'] = {}
         uiobj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
 
+        uiobj["Connection"] = self.connection
+
         return uiobj
 
     def saveDesign_inputs(self):
@@ -1033,7 +1057,7 @@ class MainController(QMainWindow):
         outobj['Weld']["Weld Strength (kN/mm)"] = float(self.ui.txtWeldStrng.text())
 
         outobj['Bolt'] = {}
-        outobj['Bolt']["Shear Capacity (kN)"] = float(self.ui.txtShrCapacity.text())
+        outobj['Bolt']["Shear Capacity (kN)"] = float(round(self.ui.txtShrCapacity.text(), 3))
         outobj['Bolt']["Bearing Capacity (kN)"] = float(self.ui.txtbearCapacity.text())
         outobj['Bolt']["Capacity Of Bolt (kN)"] = float(self.ui.txtBoltCapacity.text())
         outobj['Bolt']["No Of Bolts"] = float(self.ui.txtNoBolts.text())
@@ -1364,7 +1388,8 @@ class MainController(QMainWindow):
         elif self.ui.comboWldSize.currentIndex() == 0:
             QMessageBox.information(self, "information", "Please select Weld thickness")
             flag = False
-        flag = self.checkbeam_b()
+        else:
+            flag = self.checkbeam_b()
 
         return flag
 
@@ -1948,7 +1973,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     module_setup()
     # workspace_folder_path, _ = QFileDialog.getSaveFileName(caption='Select Workspace Directory', directory="F:\Osdag_workspace")
-    workspace_folder_path = "F:\Osdag_Workspace\endplate"
+    workspace_folder_path = "D:\Osdag_Workspace\endplate"
     if not os.path.exists(workspace_folder_path):
         os.mkdir(workspace_folder_path, 0755)
     image_folder_path = os.path.join(workspace_folder_path, 'images_html')

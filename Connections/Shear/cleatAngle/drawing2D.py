@@ -873,8 +873,8 @@ class Cleat2DCreatorFront(object):
         cleat_pt = self.BR1
         theta = 60
         offset = (self.dataObj.D_beam/2 + 10)
-        text_up = "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
-        text_down = ""
+        text_up = ""
+        text_down = "ISA." + str(int(self.dataObj.cleat_legsize)) + "X" + str(int(self.dataObj.cleat_legsize_1)) + "X" + str(int(self.dataObj.cleat_thk))
         self.dataObj.draw_oriented_arrow(dwg, cleat_pt, theta, "SE", offset, text_up, text_down)
 
         # 2D view name

@@ -474,15 +474,23 @@ class MainController(QMainWindow):
         self.display.Pan(50, 0)
 
     def save_cadImages(self):
-        files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
-                                                  files_types)
-        fName = str(fileName)
-        file_extension = fName.split(".")[-1]
 
-        if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
-            self.display.ExportToImage(fName)
-            QMessageBox.about(self, 'Information', "File saved")
+        status = self.resultObj['Bolt']['status']
+        if status is True:
+
+            files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+                                                      files_types)
+            fName = str(fileName)
+            file_extension = fName.split(".")[-1]
+
+            if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+                self.display.ExportToImage(fName)
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            self.ui.action_save_CAD_image.setEnabled(False)
+            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be saved')
+
 
     def disableViewButtons(self):
         """
@@ -1320,53 +1328,58 @@ class MainController(QMainWindow):
         # Export to IGS,STEP,STL,BREP
 
     def save3DcadImages(self):
+        status = self.resultObj['Bolt']['status']
+        if status is True:
 
-        if self.fuse_model is None:
-            self.fuse_model = self.create2Dcad()
-        shape = self.fuse_model
+            if self.fuse_model is None:
+                self.fuse_model = self.create2Dcad()
+            shape = self.fuse_model
 
-        files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
-        fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
-                                                  files_types)
-        fName = str(fileName)
+            fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+                                                      files_types)
+            fName = str(fileName)
 
-        flag = True
-        if fName == '':
-            flag = False
-            return flag
-        else:
-            file_extension = fName.split(".")[-1]
-
-            if file_extension == 'igs':
-                IGESControl.IGESControl_Controller().Init()
-                iges_writer = IGESControl.IGESControl_Writer()
-                iges_writer.AddShape(shape)
-                iges_writer.Write(fName)
-
-            elif file_extension == 'brep':
-
-                BRepTools.breptools.Write(shape, fName)
-
-            elif file_extension == 'stp':
-                # initialize the STEP exporter
-                step_writer = STEPControl_Writer()
-                Interface_Static_SetCVal("write.step.schema", "AP203")
-
-                # transfer shapes and write file
-                step_writer.Transfer(shape, STEPControl_AsIs)
-                status = step_writer.Write(fName)
-
-                assert (status == IFSelect_RetDone)
-
+            flag = True
+            if fName == '':
+                flag = False
+                return flag
             else:
-                stl_writer = StlAPI_Writer()
-                stl_writer.SetASCIIMode(True)
-                stl_writer.Write(shape, fName)
+                file_extension = fName.split(".")[-1]
 
-            self.fuse_model = None
+                if file_extension == 'igs':
+                    IGESControl.IGESControl_Controller().Init()
+                    iges_writer = IGESControl.IGESControl_Writer()
+                    iges_writer.AddShape(shape)
+                    iges_writer.Write(fName)
 
-            QMessageBox.about(self, 'Information', "File saved")
+                elif file_extension == 'brep':
+
+                    BRepTools.breptools.Write(shape, fName)
+
+                elif file_extension == 'stp':
+                    # initialize the STEP exporter
+                    step_writer = STEPControl_Writer()
+                    Interface_Static_SetCVal("write.step.schema", "AP203")
+
+                    # transfer shapes and write file
+                    step_writer.Transfer(shape, STEPControl_AsIs)
+                    status = step_writer.Write(fName)
+
+                    assert (status == IFSelect_RetDone)
+
+                else:
+                    stl_writer = StlAPI_Writer()
+                    stl_writer.SetASCIIMode(True)
+                    stl_writer.Write(shape, fName)
+
+                self.fuse_model = None
+
+                QMessageBox.about(self, 'Information', "File saved")
+        else:
+            self.ui.action_save_3D_model.setEnabled(False)
+            QMessageBox.about(self,'Information', 'Design Unsafe: 3D Model cannot be saved')
 
     def call_seatangle2D_Drawing(self, view):
         """ This routine saves the 2D SVG image as per the connectivity selected
@@ -1396,7 +1409,8 @@ class MainController(QMainWindow):
                 fname = ''
                 self.commLogicObj.call2D_Drawing(view, fname, self.folder)
         else:
-            pass
+            QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be saved' %(view))
+
 
     def closeEvent(self, event):
         """

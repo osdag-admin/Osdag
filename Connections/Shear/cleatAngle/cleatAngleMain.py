@@ -679,7 +679,6 @@ class MainController(QMainWindow):
         '''
         self.ui.combo_Beam.currentText()
         self.ui.comboColSec.currentText()
-
         if str(self.ui.combo_Beam.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == "Select section" or str(self.ui.comboColSec.currentText()) == '':
             return
         loc = self.ui.comboConnLoc.currentText()
@@ -695,7 +694,7 @@ class MainController(QMainWindow):
             beam_tw = float(dict_beam_data["tw"])
 
             if loc == "Column web-Beam web":
-                colWeb = col_D - 2 * (col_T + col_R1)
+                colWeb = col_D - (2 * (col_T + col_R1))
             elif loc == "Column flange-Beam web":
                 colWeb = col_B
             newlist = ['Select Cleat']
@@ -707,7 +706,7 @@ class MainController(QMainWindow):
                 cleat_legsize_A = int(cleat_legsizes.split('x')[0])
                 cleat_legsize_B = int(cleat_legsizes.split('x')[1])
                 cleat_legsize_b = float(cleat_legsize_B)
-                con_legsize = 2 * cleat_legsize_b + beam_tw
+                con_legsize = (2 * cleat_legsize_b) + beam_tw
                 space = colWeb - con_legsize
                 if space > 0:
                     newlist.append(str(ele))
@@ -1646,7 +1645,9 @@ class MainController(QMainWindow):
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
         else:
-            cadlist = self.commLogicObj.connectivityObj.get_models()
+            # cadlist = self.commLogicObj.connectivityObj.get_models()
+            cadlist = [self.commLogicObj.connectivityObj.angleModel,
+                       self.commLogicObj.connectivityObj.angleLeftModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()

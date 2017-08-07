@@ -1841,7 +1841,7 @@ class Seat2DCreatorTop(object):
         no_of_bolts_beam = self.data_object.bolts_top_beam_col * self.data_object.bolts_top_beam_row
         bolt_pt = np.array(pt_top_beam_list[0][0])
         theta = 60
-        offset = self.data_object.beam_depth / 2 +50
+        offset = self.data_object.beam_width + 50
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         if str(self.data_object.bolt_type) == "HSFG":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
@@ -1853,7 +1853,7 @@ class Seat2DCreatorTop(object):
         no_of_bolts_column = self.data_object.bolts_top_column_col * self.data_object.bolts_top_column_row
         bolt_pt = np.array(pt_top_column_list[0])
         theta = 90
-        offset = self.data_object.beam_depth / 2
+        offset = (self.data_object.col_depth - self.data_object.beam_width)/ 2 + 50
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         if str(self.data_object.bolt_type) == "HSFG":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"

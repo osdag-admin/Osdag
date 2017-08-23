@@ -38,6 +38,7 @@
     # See Advanced-User section below, before you execute these steps.
     1) Run Miniconda2-latest-Windows-x86.exe
         # Follow on-screen instructions AND select the following options in the Setup:
+	NOTE: Installation of Miniconda2-latest-Windows-x86 is mandatory in 'C drive' only.
         a) Install for: [All Users (requires admin privileges)]
         b) Destination Folder: ["C:\Program Files (x86)\Miniconda2"]
 				1. After selecting the “Program Files (x86)\” directory, manually type “Miniconda2” (without quotes)

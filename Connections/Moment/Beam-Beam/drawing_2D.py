@@ -13,30 +13,38 @@ import os
 class ExtendedEndPlate(object):
     def __init__(self):
         # self.filename = filename
-        self.beam_length_L1 = 400
-        self.beam_length_L2 = 400
-        self.beam_depth_D1 = 300
-        self.beam_depth_D2 = 300
-        self.beam_width_B1 = 150
-        self.beam_width_B2 = 150
-        self.plate_thickness_p1 = 30
-        self.plate_thickness_p2 = 30
-        self.plate_width_B1 = 200
-        self.plate_width_B2 = 200
-        self.plate_length_L1 = 500
-        self.plate_length_L2 = 500
-        self.flange_thickness_T1 = 20
-        self.flange_thickness_T2 = 20
-        self.web_thickness_tw1 = 20
-        self.web_thickness_tw2 = 20
+        self.beam_length_L1 = 1000
+        self.beam_length_L2 = 1000
+
+        self.beam_depth_D1 = 400
+        self.beam_depth_D2 = 400
+
+        self.beam_width_B1 = 140
+        self.beam_width_B2 = 140
+
+        self.plate_thickness_p1 = 20
+        self.plate_thickness_p2 = 20
+
+        self.plate_width_B1 = 178.4
+        self.plate_width_B2 = 178.4
+
+        self.plate_length_L1 = 613.4
+        self.plate_length_L2 = 613.4
+
+        self.flange_thickness_T1 = 16
+        self.flange_thickness_T2 = 16
+
+        self.web_thickness_tw1 = 8.9
+        self.web_thickness_tw2 = 8.9
+
         self.flange_weld_thickness = 12
         self.web_weld_thickness = 8
 
         self.bolt_diameter = 24
         self.bolt_hole_diameter =26
         self.edge_dist = 44.2
-        self.end_dist = 44.2
-        self.gauge_dist = 90
+        self.end_dist = self.edge_dist
+        self.cross_centre_gauge_dist = 90
         self.pitch = 60
 
         self.bolts_outside_top_flange_col = 2
@@ -879,13 +887,12 @@ class ExtendedEnd2DSide(object):
 
         # ------------------------------------------  Bolts Outside Top Flange -------------------------------------------
         pt_outside_top_column_list = []
-        pt_inside_top_column_list = []
 
         for i in range(1, (botfr + 1)):
-            col_list_top = []
+            col_outside_list_top = []
             for j in range(1, (botfc + 1)):
-                pt = self.P1 + (((self.data_object.plate_length_L1 - self.data_object.beam_depth_D1)/2 - self.data_object.flange_weld_thickness) - self.data_object.end_dist) * np.array([0, 1]) + \
-                     self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.gauge_dist * np.array([1, 0])
+                pt = self.P1 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D1)/2 - self.data_object.end_dist) * np.array([0, 1]) + \
+                     self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
                 pt_C = pt - (bolt_r + 4) * np.array([1, 0])
                 pt_D = pt + (bolt_r + 4) * np.array([1, 0])
@@ -895,11 +902,52 @@ class ExtendedEnd2DSide(object):
                 pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
                 dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
 
-                col_list_top.append(pt)
-            pt_outside_top_column_list.append(col_list_top)
-        # ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
+                col_outside_list_top.append(pt)
+            pt_outside_top_column_list.append(col_outside_list_top)
 
+        # ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
+        # pt_inside_top_column_list = []
+        # for i in range(1, (bitfr + 1)):
+        #     col_inside_list_top = []
+        #     for j in range(1, (bitfc + 1)):
+        #         pt = self.A12 + (self.data_object.end_dist) * np.array([0, -1]) + \
+        #              self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+        #         dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+        #         pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+        #         pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+        #         dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+        #
+        #         pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+        #         pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+        #         dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+        #
+        #         col_inside_list_top.append(pt)
+        #     pt_inside_top_column_list.append(col_inside_list_top)
+        # -----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        bobfc = self.data_object.bolts_outside_bottom_flange_col
+        bobfr = self.data_object.bolts_outside_bottom_flange_row
+        bibfc = self.data_object.bolts_inside_bottom_flange_col
+        bibfr = self.data_object.bolts_inside_bottom_flange_row
         # ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
+
+        pt_outside_bottom_column_list = []
+        for i in range(1, (bobfr + 1)):
+            col_outside_list_bottom = []
+            for j in range(1, (bobfc + 1)):
+                pt = self.P4 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D1)/2 - self.data_object.end_dist) * np.array([0, -1]) + \
+                     self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+                col_outside_list_bottom.append(pt)
+            pt_outside_bottom_column_list.append(col_outside_list_bottom)
 
         # ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
 

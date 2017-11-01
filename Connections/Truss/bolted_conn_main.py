@@ -319,11 +319,6 @@ class SectionSelection(QDialog):
             self.ui.comboBx_selection_7.hide()
             self.ui.lineEdit_loads_7.hide()
 
-        elif no_of_member == '7':
-            no_member_display = str(no_of_member)
-            # self.ui.lineEdit_no_of_member.setText(no_member_display)
-            pass
-
             # self.ui.buttonBox.clicked.connect(self.save_user_inputs)
 
         # QMessageBox.about(self, 'Information', 'Define members saved')
@@ -466,9 +461,162 @@ class SectionSelection(QDialog):
 
 
 class BoltOutput(QDialog):
-    def __init__(self):
-        QDialog.__init__(self, parent=None)
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_BoltOutput()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
 
+        dbl_validator = QDoubleValidator()
+        self.ui.lineEdit_shr.setValidator(dbl_validator)
+        self.ui.lineEdit_shr2.setValidator(dbl_validator)
+        self.ui.lineEdit_shr3.setValidator(dbl_validator)
+        self.ui.lineEdit_shr4.setValidator(dbl_validator)
+        self.ui.lineEdit_shr5.setValidator(dbl_validator)
+        self.ui.lineEdit_shr6.setValidator(dbl_validator)
+        self.ui.lineEdit_shr7.setValidator(dbl_validator)
+
+        ui_obj = self.maincontroller.get_user_inputs()
+        no_of_member = ui_obj["Member"]["No. of members"]
+        print no_of_member, "no of members"
+        if no_of_member == '2':
+            self.ui.lineEdit_mem3.hide()
+            self.ui.lineEdit_mem4.hide()
+            self.ui.lineEdit_mem5.hide()
+            self.ui.lineEdit_mem6.hide()
+            self.ui.lineEdit_mem7.hide()
+
+            self.ui.lineEdit_shr3.hide()
+            self.ui.lineEdit_shr4.hide()
+            self.ui.lineEdit_shr5.hide()
+            self.ui.lineEdit_shr6.hide()
+            self.ui.lineEdit_shr7.hide()
+
+            self.ui.lineEdit_ber3.hide()
+            self.ui.lineEdit_ber4.hide()
+            self.ui.lineEdit_ber5.hide()
+            self.ui.lineEdit_ber6.hide()
+            self.ui.lineEdit_ber7.hide()
+
+            self.ui.lineEdit_req3.hide()
+            self.ui.lineEdit_req4.hide()
+            self.ui.lineEdit_req5.hide()
+            self.ui.lineEdit_req6.hide()
+            self.ui.lineEdit_req7.hide()
+
+            self.ui.lineEdit_blt_cap3.hide()
+            self.ui.lineEdit_blt_cap4.hide()
+            self.ui.lineEdit_blt_cap5.hide()
+            self.ui.lineEdit_blt_cap6.hide()
+            self.ui.lineEdit_blt_cap7.hide()
+
+            self.ui.lineEdit_col3.hide()
+            self.ui.lineEdit_col4.hide()
+            self.ui.lineEdit_col5.hide()
+            self.ui.lineEdit_col6.hide()
+            self.ui.lineEdit_col7.hide()
+
+            self.ui.lineEdit_row3.hide()
+            self.ui.lineEdit_row4.hide()
+            self.ui.lineEdit_row5.hide()
+            self.ui.lineEdit_row6.hide()
+            self.ui.lineEdit_row7.hide()
+
+        elif no_of_member == '3':
+            self.ui.lineEdit_mem4.hide()
+            self.ui.lineEdit_mem5.hide()
+            self.ui.lineEdit_mem6.hide()
+            self.ui.lineEdit_mem7.hide()
+
+            self.ui.lineEdit_shr4.hide()
+            self.ui.lineEdit_shr5.hide()
+            self.ui.lineEdit_shr6.hide()
+            self.ui.lineEdit_shr7.hide()
+
+            self.ui.lineEdit_ber4.hide()
+            self.ui.lineEdit_ber5.hide()
+            self.ui.lineEdit_ber6.hide()
+            self.ui.lineEdit_ber7.hide()
+
+            self.ui.lineEdit_req4.hide()
+            self.ui.lineEdit_req5.hide()
+            self.ui.lineEdit_req6.hide()
+            self.ui.lineEdit_req7.hide()
+
+            self.ui.lineEdit_blt_cap4.hide()
+            self.ui.lineEdit_blt_cap5.hide()
+            self.ui.lineEdit_blt_cap6.hide()
+            self.ui.lineEdit_blt_cap7.hide()
+
+            self.ui.lineEdit_col4.hide()
+            self.ui.lineEdit_col5.hide()
+            self.ui.lineEdit_col6.hide()
+            self.ui.lineEdit_col7.hide()
+
+            self.ui.lineEdit_row4.hide()
+            self.ui.lineEdit_row5.hide()
+            self.ui.lineEdit_row6.hide()
+            self.ui.lineEdit_row7.hide()
+
+        elif no_of_member == '4':
+            self.ui.lineEdit_mem5.hide()
+            self.ui.lineEdit_mem6.hide()
+            self.ui.lineEdit_mem7.hide()
+
+            self.ui.lineEdit_shr5.hide()
+            self.ui.lineEdit_shr6.hide()
+            self.ui.lineEdit_shr7.hide()
+
+            self.ui.lineEdit_ber5.hide()
+            self.ui.lineEdit_ber6.hide()
+            self.ui.lineEdit_ber7.hide()
+
+            self.ui.lineEdit_req5.hide()
+            self.ui.lineEdit_req6.hide()
+            self.ui.lineEdit_req7.hide()
+
+            self.ui.lineEdit_blt_cap5.hide()
+            self.ui.lineEdit_blt_cap6.hide()
+            self.ui.lineEdit_blt_cap7.hide()
+
+            self.ui.lineEdit_col5.hide()
+            self.ui.lineEdit_col6.hide()
+            self.ui.lineEdit_col7.hide()
+
+            self.ui.lineEdit_row5.hide()
+            self.ui.lineEdit_row6.hide()
+            self.ui.lineEdit_row7.hide()
+
+        elif no_of_member == '5':
+            self.ui.lineEdit_mem6.hide()
+            self.ui.lineEdit_mem7.hide()
+
+            self.ui.lineEdit_shr6.hide()
+            self.ui.lineEdit_shr7.hide()
+
+            self.ui.lineEdit_ber6.hide()
+            self.ui.lineEdit_ber7.hide()
+
+            self.ui.lineEdit_req6.hide()
+            self.ui.lineEdit_req7.hide()
+
+            self.ui.lineEdit_blt_cap6.hide()
+            self.ui.lineEdit_blt_cap7.hide()
+
+            self.ui.lineEdit_col6.hide()
+            self.ui.lineEdit_col7.hide()
+
+            self.ui.lineEdit_row6.hide()
+            self.ui.lineEdit_row7.hide()
+
+        elif no_of_member == '6':
+            self.ui.lineEdit_mem7.hide()
+            self.ui.lineEdit_shr7.hide()
+            self.ui.lineEdit_ber7.hide()
+            self.ui.lineEdit_req7.hide()
+            self.ui.lineEdit_blt_cap7.hide()
+            self.ui.lineEdit_col7.hide()
+            self.ui.lineEdit_row7.hide()
 
 
 class Maincontroller(QMainWindow):
@@ -481,11 +629,15 @@ class Maincontroller(QMainWindow):
         self.ui.combo_member.setItemText(0, "Select no.of members")
         self.ui.combo_member.setCurrentIndex(0)
         self.ui.btn_Reset.clicked.connect(self.reset_button_clicked)
+        self.ui.btn_bolt_output.clicked.connect(self.bolt_output)
 
     def section_selection(self):
         section = SectionSelection(self)
         section.show()
 
+    def bolt_output(self):
+        section = BoltOutput(self)
+        section.show()
 
     def reset_button_clicked(self):
         """

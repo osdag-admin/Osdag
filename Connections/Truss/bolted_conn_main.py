@@ -9,12 +9,25 @@ from ui_singleangle import Ui_Singleangle
 from ui_doubleangle import Ui_Doubleangle
 from ui_channel import Ui_Channel
 from ui_output import Ui_BoltOutput
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from newoutput import Ui_Table
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QTableWidgetItem
 from PyQt5.QtGui import QIntValidator, QPalette, QDoubleValidator
 from PyQt5.Qt import Qt
 from model import *
 import sys
 import os
+
+class NewTable(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Table()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        item = "23.341343"
+        self.ui.tableWidget.setItem(2, 2, QTableWidgetItem(item))
+        self.ui.tableWidget.setRowHidden(6, True)
+
 
 class SingleAngleSelection(QDialog):
     def __init__(self, parent=None):
@@ -22,11 +35,13 @@ class SingleAngleSelection(QDialog):
         self.ui = Ui_Singleangle()
         self.ui.setupUi(self)
         self.maincontroller = parent
+        self.saved =None
 
         self.ui.comboBox_sign_angle.setCurrentIndex(0)
         self.ui.comboBox_sign_angle.currentIndexChanged.connect(self.get_angledata)
         self.ui.comboBox_sign_leg.setEnabled(False)
         self.ui.btn_save.clicked.connect(self.save_singledata_para)
+        self.ui.btn_save.clicked.connect(self.lbl_section)
         self.ui.btn_close.clicked.connect(self.close_singledata_para)
 
     def save_singledata_para(self):
@@ -37,6 +52,7 @@ class SingleAngleSelection(QDialog):
         self.save_singledata["SingleAngle"]["angle_type"]["type"] = str(self.ui.comboBox_sign_angle.currentText())
         self.save_singledata["SingleAngle"]["angle_type"]["section"] = str(self.ui.comboBox_sign_selct_section.currentText())
         self.save_singledata["SingleAngle"]["leg"] = str(self.ui.comboBox_sign_leg.currentText())
+        # self.saved =True
         print self.save_singledata, "Single data"
         QMessageBox.about(self, 'Information', "Single angle data saved")
 
@@ -44,6 +60,23 @@ class SingleAngleSelection(QDialog):
 
     def close_singledata_para(self):
         self.close()
+
+    def lbl_section(self):
+        ui_sing_obj = self.save_singledata_para()
+        type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+        section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+        leg = ui_sing_obj["SingleAngle"]["leg"]
+
+        print ui_sing_obj, type, section, leg
+        call_section =SectionSelection(self)
+        section_label = call_section.ui.lbl_sectionSelection.setText(type)
+        print section_label
+        # if self.save_singledata_para.saved is not True:
+        #     pass
+        # else:
+        # section_label = self.singledataparams.save_singledata
+        # print section_label, "label"
+
 
     def get_angledata(self):
         """
@@ -143,10 +176,14 @@ class ChannelSelection(QDialog):
         self.ui = Ui_Channel()
         self.maincontroller = parent
 
+        # if self.ui.comboBox_channel.itemText('Channel') == "Channel":
+        #     pass
+        # self.ui.comboBox_channel.itemText(self.get_channeldata)
+
         # self.ui.comboBox_channel.setCurrentIndex(0)
         # self.ui.comboBox_channel.currentIndexChanged.connect(self.get_channeldata)
-        self.ui.btn_save.clicked.connect(self.save_channel_para)
-        self.ui.btn_close.clicked.connect(self.close_channel_para)
+        # self.ui.btn_save.clicked.connect(self.save_channel_para)
+        # self.ui.btn_close.clicked.connect(self.close_channel_para)
 
     def save_channel_para(self):
         self.save_channeldata = {}
@@ -177,6 +214,12 @@ class SectionSelection(QDialog):
         self.ui = Ui_Selection()
         self.ui.setupUi(self)
         self.maincontroller = parent
+
+        self.singledataparams = SingleAngleSelection(self)
+        self.doubledataparams = DoubleAngleSelection(self)
+        self.channeldataparams = ChannelSelection(self)
+        self.ui.btn_save.clicked.connect(self.save_definemembrs_para)
+        self.ui.btn_close.clicked.connect(self.close_definemembrs_para)
 
         self.ui.comboBx_selection.setCurrentIndex(0)
         self.ui.comboBx_selection_2.setCurrentIndex(0)
@@ -235,6 +278,7 @@ class SectionSelection(QDialog):
     #     Returns: Shows the define members list depending on members selected
     #
     #     """
+
         ui_obj = self.maincontroller.get_user_inputs()
         no_of_member = ui_obj["Member"]["No. of members"]
         print no_of_member, "no_of_member"
@@ -262,6 +306,14 @@ class SectionSelection(QDialog):
             self.ui.lineEdit_loads_5.hide()
             self.ui.lineEdit_loads_6.hide()
             self.ui.lineEdit_loads_7.hide()
+
+            self.ui.lbl_sectionSelection.clear()
+            self.ui.lbl_sectionSelection_2.clear()
+            self.ui.lbl_sectionSelection_3.clear()
+            self.ui.lbl_sectionSelection_4.clear()
+            self.ui.lbl_sectionSelection_5.clear()
+            self.ui.lbl_sectionSelection_6.clear()
+            self.ui.lbl_sectionSelection_7.clear()
 
         elif no_of_member == '3':
             no_member_display = str(no_of_member)
@@ -323,6 +375,7 @@ class SectionSelection(QDialog):
 
         # QMessageBox.about(self, 'Information', 'Define members saved')
 
+
     def save_user_inputs(self):
         pass
         # self.save_section = {}
@@ -342,8 +395,11 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc == "Double Angle":
             self.double_angle()
+        elif loc == "Select type":
+            pass
         else:
             self.channel()
+
 
     def single_angle_selection2(self):
         """
@@ -356,6 +412,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc1 == "Double Angle":
             self.double_angle()
+        elif loc1 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -370,6 +428,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc2 == "Double Angle":
             self.double_angle()
+        elif loc2 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -384,6 +444,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc3 == "Double Angle":
             self.double_angle()
+        elif loc3 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -398,6 +460,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc4 == "Double Angle":
             self.double_angle()
+        elif loc4 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -412,6 +476,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc5 == "Double Angle":
             self.double_angle()
+        elif loc5 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -426,6 +492,8 @@ class SectionSelection(QDialog):
             self.single_angle()
         elif loc6 == "Double Angle":
             self.double_angle()
+        elif loc6 == "Select type":
+            pass
         else:
             self.channel()
 
@@ -459,6 +527,11 @@ class SectionSelection(QDialog):
             widget.clear()
             widget.setFocus()
 
+    def save_definemembrs_para(self):
+        pass
+
+    def close_definemembrs_para(self):
+        self.close()
 
 class BoltOutput(QDialog):
     def __init__(self, parent=None):
@@ -480,143 +553,200 @@ class BoltOutput(QDialog):
         no_of_member = ui_obj["Member"]["No. of members"]
         print no_of_member, "no of members"
         if no_of_member == '2':
-            self.ui.lineEdit_mem3.hide()
-            self.ui.lineEdit_mem4.hide()
-            self.ui.lineEdit_mem5.hide()
-            self.ui.lineEdit_mem6.hide()
-            self.ui.lineEdit_mem7.hide()
-
+            self.ui.lbl_mem3.hide()
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
             self.ui.lineEdit_shr3.hide()
             self.ui.lineEdit_shr4.hide()
             self.ui.lineEdit_shr5.hide()
             self.ui.lineEdit_shr6.hide()
             self.ui.lineEdit_shr7.hide()
-
             self.ui.lineEdit_ber3.hide()
             self.ui.lineEdit_ber4.hide()
             self.ui.lineEdit_ber5.hide()
             self.ui.lineEdit_ber6.hide()
             self.ui.lineEdit_ber7.hide()
-
             self.ui.lineEdit_req3.hide()
             self.ui.lineEdit_req4.hide()
             self.ui.lineEdit_req5.hide()
             self.ui.lineEdit_req6.hide()
             self.ui.lineEdit_req7.hide()
-
             self.ui.lineEdit_blt_cap3.hide()
             self.ui.lineEdit_blt_cap4.hide()
             self.ui.lineEdit_blt_cap5.hide()
             self.ui.lineEdit_blt_cap6.hide()
             self.ui.lineEdit_blt_cap7.hide()
-
             self.ui.lineEdit_col3.hide()
             self.ui.lineEdit_col4.hide()
             self.ui.lineEdit_col5.hide()
             self.ui.lineEdit_col6.hide()
             self.ui.lineEdit_col7.hide()
-
             self.ui.lineEdit_row3.hide()
             self.ui.lineEdit_row4.hide()
             self.ui.lineEdit_row5.hide()
             self.ui.lineEdit_row6.hide()
             self.ui.lineEdit_row7.hide()
+            self.ui.lineEdit_pitch3.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+            self.ui.lineEdit_gauge3.hide()
+            self.ui.lineEdit_gauge4.hide()
+            self.ui.lineEdit_gauge5.hide()
+            self.ui.lineEdit_gauge6.hide()
+            self.ui.lineEdit_gauge7.hide()
+            self.ui.lineEdit_end3.hide()
+            self.ui.lineEdit_end4.hide()
+            self.ui.lineEdit_end5.hide()
+            self.ui.lineEdit_end6.hide()
+            self.ui.lineEdit_end7.hide()
+            self.ui.lineEdit_edge3.hide()
+            self.ui.lineEdit_edge4.hide()
+            self.ui.lineEdit_edge5.hide()
+            self.ui.lineEdit_edge6.hide()
+            self.ui.lineEdit_edge7.hide()
+            self.ui.lineEdit_block3.hide()
+            self.ui.lineEdit_block4.hide()
+            self.ui.lineEdit_block5.hide()
+            self.ui.lineEdit_block6.hide()
+            self.ui.lineEdit_block7.hide()
 
         elif no_of_member == '3':
-            self.ui.lineEdit_mem4.hide()
-            self.ui.lineEdit_mem5.hide()
-            self.ui.lineEdit_mem6.hide()
-            self.ui.lineEdit_mem7.hide()
-
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
             self.ui.lineEdit_shr4.hide()
             self.ui.lineEdit_shr5.hide()
             self.ui.lineEdit_shr6.hide()
             self.ui.lineEdit_shr7.hide()
-
             self.ui.lineEdit_ber4.hide()
             self.ui.lineEdit_ber5.hide()
             self.ui.lineEdit_ber6.hide()
             self.ui.lineEdit_ber7.hide()
-
             self.ui.lineEdit_req4.hide()
             self.ui.lineEdit_req5.hide()
             self.ui.lineEdit_req6.hide()
             self.ui.lineEdit_req7.hide()
-
             self.ui.lineEdit_blt_cap4.hide()
             self.ui.lineEdit_blt_cap5.hide()
             self.ui.lineEdit_blt_cap6.hide()
             self.ui.lineEdit_blt_cap7.hide()
-
             self.ui.lineEdit_col4.hide()
             self.ui.lineEdit_col5.hide()
             self.ui.lineEdit_col6.hide()
             self.ui.lineEdit_col7.hide()
-
             self.ui.lineEdit_row4.hide()
             self.ui.lineEdit_row5.hide()
             self.ui.lineEdit_row6.hide()
             self.ui.lineEdit_row7.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+            self.ui.lineEdit_gauge4.hide()
+            self.ui.lineEdit_gauge5.hide()
+            self.ui.lineEdit_gauge6.hide()
+            self.ui.lineEdit_gauge7.hide()
+            self.ui.lineEdit_end4.hide()
+            self.ui.lineEdit_end5.hide()
+            self.ui.lineEdit_end6.hide()
+            self.ui.lineEdit_end7.hide()
+            self.ui.lineEdit_edge4.hide()
+            self.ui.lineEdit_edge5.hide()
+            self.ui.lineEdit_edge6.hide()
+            self.ui.lineEdit_edge7.hide()
+            self.ui.lineEdit_block4.hide()
+            self.ui.lineEdit_block5.hide()
+            self.ui.lineEdit_block6.hide()
+            self.ui.lineEdit_block7.hide()
 
         elif no_of_member == '4':
-            self.ui.lineEdit_mem5.hide()
-            self.ui.lineEdit_mem6.hide()
-            self.ui.lineEdit_mem7.hide()
-
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
             self.ui.lineEdit_shr5.hide()
             self.ui.lineEdit_shr6.hide()
             self.ui.lineEdit_shr7.hide()
-
             self.ui.lineEdit_ber5.hide()
             self.ui.lineEdit_ber6.hide()
             self.ui.lineEdit_ber7.hide()
-
             self.ui.lineEdit_req5.hide()
             self.ui.lineEdit_req6.hide()
             self.ui.lineEdit_req7.hide()
-
             self.ui.lineEdit_blt_cap5.hide()
             self.ui.lineEdit_blt_cap6.hide()
             self.ui.lineEdit_blt_cap7.hide()
-
             self.ui.lineEdit_col5.hide()
             self.ui.lineEdit_col6.hide()
             self.ui.lineEdit_col7.hide()
-
             self.ui.lineEdit_row5.hide()
             self.ui.lineEdit_row6.hide()
             self.ui.lineEdit_row7.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+            self.ui.lineEdit_gauge5.hide()
+            self.ui.lineEdit_gauge6.hide()
+            self.ui.lineEdit_gauge7.hide()
+            self.ui.lineEdit_end5.hide()
+            self.ui.lineEdit_end6.hide()
+            self.ui.lineEdit_end7.hide()
+            self.ui.lineEdit_edge5.hide()
+            self.ui.lineEdit_edge6.hide()
+            self.ui.lineEdit_edge7.hide()
+            self.ui.lineEdit_tens5.hide()
+            self.ui.lineEdit_tens6.hide()
+            self.ui.lineEdit_tens7.hide()
+            self.ui.lineEdit_block5.hide()
+            self.ui.lineEdit_block6.hide()
+            self.ui.lineEdit_block7.hide()
 
         elif no_of_member == '5':
-            self.ui.lineEdit_mem6.hide()
-            self.ui.lineEdit_mem7.hide()
-
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
             self.ui.lineEdit_shr6.hide()
             self.ui.lineEdit_shr7.hide()
-
             self.ui.lineEdit_ber6.hide()
             self.ui.lineEdit_ber7.hide()
-
             self.ui.lineEdit_req6.hide()
             self.ui.lineEdit_req7.hide()
-
             self.ui.lineEdit_blt_cap6.hide()
             self.ui.lineEdit_blt_cap7.hide()
-
             self.ui.lineEdit_col6.hide()
             self.ui.lineEdit_col7.hide()
-
             self.ui.lineEdit_row6.hide()
             self.ui.lineEdit_row7.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+            self.ui.lineEdit_gauge6.hide()
+            self.ui.lineEdit_gauge7.hide()
+            self.ui.lineEdit_end6.hide()
+            self.ui.lineEdit_end7.hide()
+            self.ui.lineEdit_edge6.hide()
+            self.ui.lineEdit_edge7.hide()
+            self.ui.lineEdit_tens6.hide()
+            self.ui.lineEdit_tens7.hide()
+            self.ui.lineEdit_block6.hide()
+            self.ui.lineEdit_block7.hide()
 
         elif no_of_member == '6':
-            self.ui.lineEdit_mem7.hide()
+            self.ui.lbl_mem7.hide()
             self.ui.lineEdit_shr7.hide()
             self.ui.lineEdit_ber7.hide()
             self.ui.lineEdit_req7.hide()
             self.ui.lineEdit_blt_cap7.hide()
             self.ui.lineEdit_col7.hide()
             self.ui.lineEdit_row7.hide()
+            self.ui.lineEdit_pitch7.hide()
+            self.ui.lineEdit_gauge7.hide()
+            self.ui.lineEdit_end7.hide()
+            self.ui.lineEdit_edge7.hide()
+            self.ui.lineEdit_tens7.hide()
+            self.ui.lineEdit_block7.hide()
 
 
 class Maincontroller(QMainWindow):
@@ -637,6 +767,7 @@ class Maincontroller(QMainWindow):
 
     def bolt_output(self):
         section = BoltOutput(self)
+        # section = NewTable(self)
         section.show()
 
     def reset_button_clicked(self):
@@ -662,7 +793,7 @@ class Maincontroller(QMainWindow):
         ui_obj = {}
         ui_obj["Member"] = {}
         ui_obj["Member"]["No. of members"] = self.ui.combo_member.currentText()
-        ui_obj["Member"]["Members"] = self.ui.btn_section.text()          #TODO call define members dictionary
+        ui_obj["Member"]["DefineMembers"] = self.ui.btn_section.text()          #TODO call define members dictionary
         ui_obj["Member"]["fu (MPa)"] = self.ui.txt_Fu.text()
         ui_obj["Member"]["fy (MPa)"] = self.ui.txt_Fy.text()
         # ui_obj["Member"]["Section"] =

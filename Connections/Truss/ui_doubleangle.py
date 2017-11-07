@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Doubleangle(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(492, 193)
+        Dialog.resize(345, 193)
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)

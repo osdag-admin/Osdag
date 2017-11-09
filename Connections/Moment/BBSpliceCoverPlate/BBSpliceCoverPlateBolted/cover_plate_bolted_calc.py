@@ -123,7 +123,8 @@ def thk_flange_plate(D,tf,F,M,bf,fy,gamma_m0):
 
     """
     FF = flange_force(D,tf,F,M)
-    TFP = FF / (bf *(fy/(gamma_m0*1000)) # TODO - need to ceil the thickness of plate based on available  plate
+    TFP = FF / (bf *(fy/(gamma_m0*1000)))
+    # TODO - need to ceil the thickness of plate based on available  plate
     # TODO continued...  thickness in market (better to create dictionary)
     # TODO - the value should be greater than minimum thickness of flange splice plate
     return TFP # mm
@@ -142,6 +143,8 @@ def long_joint(bolt_diameter):
     # TODO - To calculate this we need lj as input which inturn depends on length of splice plate
     # TODO - This function also requires validation as beta_lj should be between 0.75 and 1.0
     # TODO - Also check if lj > 15d
+    lj = 0
+    #TODO swathi change the name of lj
     beta_lj = 1.075 - (lj/(200*bolt_diameter))
     return beta_lj
 
@@ -189,3 +192,27 @@ def flange_capacity(tf,bf,bolt_hole_diameter,fy,gamma_m0):
 
 ########################################################################################################################
 # Shear rupture
+
+def coverplateboltedconnection(uiObj):
+    print uiObj
+    connectivity = uiObj["Member"]["Connectivity"]
+    beam_section = uiObj["Member"]["BeamSection"]
+    beam_fu = float(uiObj["Member"]["fu (MPa)"])
+    beam_fy = float(uiObj["Member"]["fy (MPa)"])
+
+    shear_load = float(uiObj["Load"]["ShearForce (kN)"] )
+    moment_load = float(uiObj["Load"]["Moment (kNm)"] )
+    axial_force = float(uiObj["Load"]["AxialForce"])
+
+    bolt_diameter = int(uiObj["Bolt"]["Diameter (mm)"] )
+    bolt_grade = float(uiObj["Bolt"]["Grade"] )
+    bolt_type = (uiObj["Bolt"]["Type"] )
+
+    flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"] )
+    flange_plate_h = str(uiObj["FlangePlate"]["Height (mm)"] )
+    flange_plate_w = str(uiObj["FlangePlate"]["Width (mm)"] )
+
+    web_plate_t = float(uiObj["WebPlate"]["Thickness (mm)"] )
+    web_plate_h = str(uiObj["WebPlate"]["Height (mm)"] )
+    web_plate_w = str(uiObj["WebPlate"]["Width (mm)"] )
+    return uiObj

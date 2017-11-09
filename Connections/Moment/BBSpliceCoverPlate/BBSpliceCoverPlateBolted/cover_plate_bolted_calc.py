@@ -215,3 +215,4 @@ def coverplateboltedconnection(uiObj):
     web_plate_t = float(uiObj["WebPlate"]["Thickness (mm)"] )
     web_plate_h = str(uiObj["WebPlate"]["Height (mm)"] )
     web_plate_w = str(uiObj["WebPlate"]["Width (mm)"] )
+    return uiObj

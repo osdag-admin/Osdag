@@ -31,7 +31,7 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-
+        self.resultObj = None
         self.ui.combo_connLoc.setCurrentIndex(0)
         self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.get_beamdata()
@@ -102,8 +102,10 @@ class MainController(QMainWindow):
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()
         outputs = coverplateboltedconnection(self.uiObj)
-        # self.resultObj = outputs.cov
-        self.display_output(outputs)
+        # self.resultObj = outputs
+        # alist =self.resultObj.values()
+        # self.display_output(self.resultObj)
+        # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
@@ -112,7 +114,55 @@ class MainController(QMainWindow):
                     resultObj = outputObj
                 else:
                     resultObj = outputObj
-        flange_shear_capacity = resultObj["Fla"]
+
+        flange_shear_capacity = resultObj["FlangeBolt"]["ShearCapacity"]
+        self.ui.txt_shearCapacity.setText(str(flange_shear_capacity))
+
+        flange_bearing_capacity =resultObj["FlangeBolt"]["BearingCapacity"]
+        self.ui.txt_bearCapacity.setText(str(flange_bearing_capacity))
+
+        flange_capacity_bolt = resultObj["FlangeBolt"]["CapacityBolt"]
+        self.ui.txt_capacityOfbolt.setText(str(flange_capacity_bolt))
+
+        flange_bolt_req = resultObj["FlangeBolt"]["BoltsRequired"]
+        self.ui.txt_noBolts.setText(str(flange_bolt_req))
+
+        flange_pitch = resultObj["FlangeBolt"]["Pitch"]
+        self.ui.txt_pitch.setText(str(flange_pitch))
+
+        flange_gauge = resultObj["FlangeBolt"]["Gauge"]
+        self.ui.txt_gauge.setText(str(flange_gauge))
+
+        flange_enddist = resultObj["FlangeBolt"]["End"]
+        self.ui.txt_endDist.setText(str(flange_enddist))
+
+        flange_edgedist = resultObj["FlangeBolt"]["Edge"]
+        self.ui.txt_edgeDist.setText(str(flange_edgedist))
+
+        web_shear_capacity = resultObj["WebBolt"]["ShearCapacity"]
+        self.ui.txt_shearCapacity_2.setText(str(web_shear_capacity))
+
+        web_bearing_capacity =resultObj["WebBolt"]["BearingCapacity"]
+        self.ui.txt_bearCapacity_2.setText(str(web_bearing_capacity))
+
+        web_capacity_bolt = resultObj["WebBolt"]["CapacityBolt"]
+        self.ui.txt_capacityOfbolt_2.setText(str(web_capacity_bolt))
+
+        web_bolt_req = resultObj["WebBolt"]["BoltsRequired"]
+        self.ui.txt_noBolts_2.setText(str(web_bolt_req))
+
+        web_pitch = resultObj["WebBolt"]["Pitch"]
+        self.ui.txt_pitch_2.setText(str(web_pitch))
+
+        web_gauge = resultObj["WebBolt"]["Gauge"]
+        self.ui.txt_gauge_2.setText(str(web_gauge))
+
+        web_enddist = resultObj["WebBolt"]["End"]
+        self.ui.txt_endDist_2.setText(str(web_enddist))
+
+        web_edgedist = resultObj["WebBolt"]["Edge"]
+        self.ui.txt_edgeDist_2.setText(str(web_edgedist))
+
 
     def flangesplice_plate(self):
         section = Flangespliceplate(self)

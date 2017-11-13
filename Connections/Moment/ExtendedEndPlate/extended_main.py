@@ -31,13 +31,13 @@ class Maincontroller(QMainWindow):
     def go_to_drawing(self, view):
         beam_beam = ExtendedEndPlate()
         if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Extended_bothway\Front.svg"
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
             beam_beam.save_to_svg(filename, view)
         elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Extended_bothway\Side.svg"
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
             beam_beam.save_to_svg(filename, view)
         else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Extended_bothway\Top.svg"
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
             beam_beam.save_to_svg(filename, view)
 
 

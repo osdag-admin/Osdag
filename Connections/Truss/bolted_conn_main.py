@@ -35,6 +35,7 @@ class SingleAngleSelection(QDialog):
         self.ui = Ui_Singleangle()
         self.ui.setupUi(self)
         self.maincontroller = parent
+        self.sectionselection = parent
         self.saved =None
 
         self.ui.comboBox_sign_angle.setCurrentIndex(0)
@@ -52,7 +53,7 @@ class SingleAngleSelection(QDialog):
         self.save_singledata["SingleAngle"]["angle_type"]["type"] = str(self.ui.comboBox_sign_angle.currentText())
         self.save_singledata["SingleAngle"]["angle_type"]["section"] = str(self.ui.comboBox_sign_selct_section.currentText())
         self.save_singledata["SingleAngle"]["leg"] = str(self.ui.comboBox_sign_leg.currentText())
-        # self.saved =True
+        self.saved =True
         print self.save_singledata, "Single data"
         QMessageBox.about(self, 'Information', "Single angle data saved")
 
@@ -66,17 +67,17 @@ class SingleAngleSelection(QDialog):
         type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
         section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
         leg = ui_sing_obj["SingleAngle"]["leg"]
-
         print ui_sing_obj, type, section, leg
-        call_section =SectionSelection(self)
-        section_label = call_section.ui.lbl_sectionSelection.setText(type)
-        print section_label
-        # if self.save_singledata_para.saved is not True:
-        #     pass
-        # else:
-        # section_label = self.singledataparams.save_singledata
-        # print section_label, "label"
 
+        if type == "Equal angle":
+            section_label = self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section)
+        else:
+            section_label = self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section + ' ' + leg)
+
+        if type == "Equal angle":
+            section_label1 = self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section)
+        else:
+            section_label1 = self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section + ' ' + leg)
 
     def get_angledata(self):
         """
@@ -210,6 +211,7 @@ class ChannelSelection(QDialog):
 
 class SectionSelection(QDialog):
     def __init__(self, parent=None):
+        super(SectionSelection, self).__init__(parent)
         QDialog.__init__(self, parent)
         self.ui = Ui_Selection()
         self.ui.setupUi(self)
@@ -272,16 +274,16 @@ class SectionSelection(QDialog):
         self.ui.lineEdit_loads_6.setValidator(QDoubleValidator(0.00, 10000.00, 3))
         self.ui.lineEdit_loads_7.setValidator(QDoubleValidator(0.00, 10000.00, 3))
 
-    # def define_members(self):
-    #     """
-    #
-    #     Returns: Shows the define members list depending on members selected
-    #
-    #     """
 
-        ui_obj = self.maincontroller.get_user_inputs()
-        no_of_member = ui_obj["Member"]["No. of members"]
+        # ui_obj = self.maincontroller.get_user_inputs(["Member"]["No. of members"] )
+        # no_of_member = ui_obj["Member"]["No. of members"]
+        ui_obj = self.maincontroller.no_of_members()
+        no_of_member = ui_obj
         print no_of_member, "no_of_member"
+
+        # self.hide_section(no_of_member)
+        # def hide_section(no_of_member):
+
 
         if no_of_member == '2':
             no_member_display = str(no_of_member)
@@ -399,7 +401,6 @@ class SectionSelection(QDialog):
             pass
         else:
             self.channel()
-
 
     def single_angle_selection2(self):
         """
@@ -549,8 +550,10 @@ class BoltOutput(QDialog):
         self.ui.lineEdit_shr6.setValidator(dbl_validator)
         self.ui.lineEdit_shr7.setValidator(dbl_validator)
 
-        ui_obj = self.maincontroller.get_user_inputs()
-        no_of_member = ui_obj["Member"]["No. of members"]
+        # ui_obj = self.maincontroller.get_user_inputs()
+        # no_of_member = ui_obj["Member"]["No. of members"]
+        ui_obj = self.maincontroller.no_of_members()
+        no_of_member = ui_obj
         print no_of_member, "no of members"
         if no_of_member == '2':
             self.ui.lbl_mem3.hide()
@@ -767,8 +770,14 @@ class Maincontroller(QMainWindow):
         self.ui.btn_section.clicked.connect(self.section_selection)
         self.ui.combo_member.setItemText(0, "Select no.of members")
         self.ui.combo_member.setCurrentIndex(0)
+        self.ui.combo_member.currentIndexChanged.connect(self.no_of_members)
         self.ui.btn_Reset.clicked.connect(self.reset_button_clicked)
         self.ui.btn_bolt_output.clicked.connect(self.bolt_output)
+
+    def no_of_members(self):
+        membr_num = self.ui.combo_member.currentText()
+        print membr_num
+        return membr_num
 
     def section_selection(self):
         section = SectionSelection(self)
@@ -802,10 +811,9 @@ class Maincontroller(QMainWindow):
         ui_obj = {}
         ui_obj["Member"] = {}
         ui_obj["Member"]["No. of members"] = self.ui.combo_member.currentText()
-        ui_obj["Member"]["DefineMembers"] = self.ui.btn_section.text()          #TODO call define members dictionary
+        # ui_obj["Member"]["DefineMembers"] = self.ui.btn_section.text()          #TODO call define members dictionary
         ui_obj["Member"]["fu (MPa)"] = self.ui.txt_Fu.text()
         ui_obj["Member"]["fy (MPa)"] = self.ui.txt_Fy.text()
-        # ui_obj["Member"]["Section"] =
 
         ui_obj["Bolt"] = {}
         ui_obj["Bolt"]["Diameter (mm)"] = self.ui.combo_diameter.currentText()

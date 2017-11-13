@@ -6,6 +6,7 @@ Created on 7-November-2017
 from ui_coverplatebolted import Ui_MainWindow
 from ui_flangespliceplate import Ui_Flangespliceplate
 from ui_webspliceplate import Ui_Webspliceplate
+from svg_window
 from cover_plate_bolted_calc import coverplateboltedconnection
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
 from model import *

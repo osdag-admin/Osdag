@@ -63,16 +63,17 @@ class SingleAngleSelection(QDialog):
         self.close()
 
     def lbl_section(self):
-        ui_sing_obj = self.save_singledata_para()
-        type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
-        section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
-        leg = ui_sing_obj["SingleAngle"]["leg"]
-        print ui_sing_obj, type, section, leg
 
         section_type = self.sectionselection.ui.comboBx_selection.currentText()
         if section_type == "Select type":
             pass
         elif section_type == "Single Angle":
+            ui_sing_obj = self.save_singledata_para()
+            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+            leg = ui_sing_obj["SingleAngle"]["leg"]
+            print ui_sing_obj, type, section, leg
+
             if type == "Equal angle":
                 section_label = self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section)
             else:
@@ -82,6 +83,11 @@ class SingleAngleSelection(QDialog):
         if section_type2 == "Select type":
             pass
         else:
+            ui_sing_obj = self.save_singledata_para()
+            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+            leg = ui_sing_obj["SingleAngle"]["leg"]
+            print ui_sing_obj, type, section, leg
             if type == "Equal angle":
                 section_label2 = self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section)
             else:
@@ -91,6 +97,11 @@ class SingleAngleSelection(QDialog):
         if section_type3 == "Select type":
             pass
         else:
+            ui_sing_obj = self.save_singledata_para()
+            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+            leg = ui_sing_obj["SingleAngle"]["leg"]
+            print ui_sing_obj, type, section, leg
             if type == "Equal angle":
                 section_label3 = self.sectionselection.ui.lbl_sectionSelection_3.setText(type + ' ' + section)
             else:
@@ -193,20 +204,19 @@ class ChannelSelection(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_Channel()
+        self.ui.setupUi(self)
         self.maincontroller = parent
 
-        # if self.ui.comboBox_channel.itemText('Channel') == "Channel":
-        #     pass
-        # self.ui.comboBox_channel.itemText(self.get_channeldata)
-
-        # self.ui.comboBox_channel.setCurrentIndex(0)
-        # self.ui.comboBox_channel.currentIndexChanged.connect(self.get_channeldata)
-        # self.ui.btn_save.clicked.connect(self.save_channel_para)
-        # self.ui.btn_close.clicked.connect(self.close_channel_para)
+        self.ui.comboBox_channel.setCurrentIndex(0)
+        if self.ui.comboBox_channel.currentText() == "Channel":
+            self.get_channeldata()
+            print self.ui.comboBox_channel.currentText(), "yes"
+        self.ui.btn_save.clicked.connect(self.save_channel_para)
+        self.ui.btn_close.clicked.connect(self.close_channel_para)
 
     def save_channel_para(self):
         self.save_channeldata = {}
-        self.save_channeldata["Channel"]["type"] = str(self.ui.comboBox_channel.currentIndex())
+        self.save_channeldata["Channel"]["type"] = str(self.ui.comboBox_channel.currentText())
         self.save_channeldata["Channel"]["section"] = str(self.ui.comboBox_channl_selct_section.currentText())
         print self.save_channeldata, "Channel data"
         QMessageBox.about(self, "Information", "Channel data saved")

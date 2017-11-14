@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Selection(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(709, 409)
+        Dialog.resize(709, 402)
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(10)

@@ -216,6 +216,7 @@ class ChannelSelection(QDialog):
 
     def save_channel_para(self):
         self.save_channeldata = {}
+        self.save_channeldata["Channel"] = {}
         self.save_channeldata["Channel"]["type"] = str(self.ui.comboBox_channel.currentText())
         self.save_channeldata["Channel"]["section"] = str(self.ui.comboBox_channl_selct_section.currentText())
         print self.save_channeldata, "Channel data"

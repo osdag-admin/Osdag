@@ -6,9 +6,11 @@ Created on 7-November-2017
 from ui_coverplatebolted import Ui_MainWindow
 from ui_flangespliceplate import Ui_Flangespliceplate
 from ui_webspliceplate import Ui_Webspliceplate
-from svg_window
+from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
+from drawing_2D import CoverEndPlate
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
+from PyQt5.Qt import QIntValidator, QDoubleValidator
 from model import *
 import sys
 
@@ -18,6 +20,10 @@ class Flangespliceplate(QDialog):
         self.ui = Ui_Flangespliceplate()
         self.ui.setupUi(self)
         self.maincontroller = parent
+
+    def flange_plate(self):
+        flange_plate = {}
+
 
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
@@ -42,10 +48,34 @@ class MainController(QMainWindow):
         self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
         self.ui.combo_type.setCurrentIndex(0)
 
-        self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
+        self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
+        self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
 
+        self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
+
+        validator = QIntValidator()
+        self.ui.txt_Fu.setValidator(validator)
+        self.ui.txt_Fy.setValidator(validator)
+
+        doubl_validator = QDoubleValidator()
+        self.ui.txt_Moment.setValidator(doubl_validator)
+        self.ui.txt_Shear.setValidator(doubl_validator)
+        self.ui.txt_Axial.setValidator(doubl_validator)
+        self.ui.txt_flangeplateHeight.setValidator(doubl_validator)
+        self.ui.txt_flangeplateWidth.setValidator(doubl_validator)
+        self.ui.txt_webplateHeight.setValidator(doubl_validator)
+        self.ui.txt_webplateWidth.setValidator(doubl_validator)
+
+        min_fu = 290
+        max_fu = 590
+        self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+
+        min_fy = 165
+        max_fy = 450
+        self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
     def get_beamdata(self):
         loc = self.ui.combo_connLoc.currentText()
@@ -69,6 +99,15 @@ class MainController(QMainWindow):
             self.ui.combo_grade.addItems(stritems)
         else:
             pass
+
+    def check_range(self, widget, min_val, max_val):
+        text_str = widget.text()
+        # text_str = int(text_str)
+        if (text_str < min_val or text_str > max_val or text_str == ' '):
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            widget.clear()
+            widget.setFocus()
+
 
     def get_user_inputs(self):
         uiObj = {}
@@ -164,6 +203,18 @@ class MainController(QMainWindow):
         web_edgedist = resultObj["WebBolt"]["Edge"]
         self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
+
+    def call_2D_drawing(self, view):
+        beam_beam = CoverEndPlate()
+        if view == "Front":
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+            beam_beam.save_to_svg(filename, view)
+        elif view == "Side":
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+            beam_beam.save_to_svg(filename, view)
+        else:
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+            beam_beam.save_to_svg(filename, view)
 
     def flangesplice_plate(self):
         section = Flangespliceplate(self)

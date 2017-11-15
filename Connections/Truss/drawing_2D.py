@@ -9,5 +9,5 @@ class TrussBoltedConnection(object):
     def __init__(self):
         pass
 
-    def save_to_svg(self):
+    def save_to_svg(self, filename, view):
         pass

@@ -860,8 +860,10 @@ class Maincontroller(QMainWindow):
     def call_2D_drawing(self, view):
         conn_members = TrussBoltedConnection()
         if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Truss\Front.svg"
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Truss\Front.svg"
             conn_members.save_to_svg(filename, view)
+        else:
+            pass
 
 def main():
     app = QApplication(sys.argv)

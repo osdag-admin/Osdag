@@ -10,6 +10,7 @@ from ui_doubleangle import Ui_Doubleangle
 from ui_channel import Ui_Channel
 from ui_output import Ui_BoltOutput
 from newoutput import Ui_Table
+from drawing_2D import TrussBoltedConnection
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QTableWidgetItem
 from PyQt5.QtGui import QIntValidator, QPalette, QDoubleValidator
 from PyQt5.Qt import Qt
@@ -803,6 +804,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_member.currentIndexChanged.connect(self.no_of_members)
         self.ui.btn_Reset.clicked.connect(self.reset_button_clicked)
         self.ui.btn_bolt_output.clicked.connect(self.bolt_output)
+        self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
 
     def no_of_members(self):
         membr_num = self.ui.combo_member.currentText()
@@ -855,6 +857,11 @@ class Maincontroller(QMainWindow):
         print ui_obj, "ui_obj"
         return ui_obj
 
+    def call_2D_drawing(self, view):
+        conn_members = TrussBoltedConnection()
+        if view == "Front":
+            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Truss\Front.svg"
+            conn_members.save_to_svg(filename, view)
 
 def main():
     app = QApplication(sys.argv)

@@ -10,9 +10,11 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
-from PyQt5.Qt import QIntValidator, QDoubleValidator
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile
 from model import *
 import sys
+import os.path
+import pickle
 
 class Flangespliceplate(QDialog):
     def __init__(self, parent=None):
@@ -21,8 +23,10 @@ class Flangespliceplate(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
-    def flange_plate(self):
-        flange_plate = {}
+        uiObj = self.maincontroller # TODO pass dictionary
+        resultObj_flangeplate = coverplateboltedconnection(uiObj)
+
+        self.ui.txt_plateHeight.setText()
 
 
 class Webspliceplate(QDialog):
@@ -47,6 +51,7 @@ class MainController(QMainWindow):
         self.ui.combo_type.addItems(self.gradeType.keys())
         self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
         self.ui.combo_type.setCurrentIndex(0)
+        self.retrieve_prevstate()
 
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
@@ -102,7 +107,7 @@ class MainController(QMainWindow):
 
     def check_range(self, widget, min_val, max_val):
         text_str = widget.text()
-        # text_str = int(text_str)
+        text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ' '):
             QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
             widget.clear()
@@ -136,8 +141,64 @@ class MainController(QMainWindow):
         uiObj["WebPlate"]["Thickness (mm)"] = self.ui.combo_webplateThick.currentText()
         uiObj["WebPlate"]["Height (mm)"] = self.ui.txt_webplateHeight.text()
         uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
-
         return uiObj
+
+    def closeEvent(self, event):
+        uiInput = self.get_user_inputs()
+        self.save_inputs_totext(uiInput)
+        action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+        if action == QMessageBox.Yes:
+            # self.close.emit()
+            self.close()
+            event.accept()
+        else:
+            event.ignore()
+
+    def save_inputs_totext(self, uiObj):
+        input_file = QFile(os.path.join("saveINPUT.txt"))
+        print "inputfile", input_file
+        if not input_file.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s: \n%s"
+                                % (input_file.fileName(), input_file.errorString()))
+        pickle.dump(uiObj, input_file)
+
+    def get_prevstate(self):
+        filename = os.path.join("saveINPUT.txt")
+        if os.path.isfile(filename):
+            file_object = open(filename, 'r')
+            uiObj  = pickle.load(file_object)
+            return uiObj
+        else:
+            return None
+
+    def retrieve_prevstate(self):
+        uiObj = self.get_prevstate()
+        self.set_dict_touser_inputs(uiObj)
+
+    def set_dict_touser_inputs(self, uiObj):
+        # if uiObj["Member"]["Connectivity"] == "Beam-Beam":
+        if uiObj is not None :
+            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+            self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
+            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+            self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
+            self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+            self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
+            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+            self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
+            self.ui.combo_webplateThick.setCurrentIndex(self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
+            self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
+            self.ui.txt_flangeplateWidth.setText(str(uiObj["FlangePlate"]["Width (mm)"]))
+            self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
+            self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
+
+        else:
+            pass
+
 
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()

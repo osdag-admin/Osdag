@@ -441,9 +441,20 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Minimum and Maximum width of End Plate [Ref: Based on reasoning and AISC Design guide 16]
     # TODO check for mini width as per AISC after excomm review
-    end_plate_width_mini = g_1 + (2 * min_edge_distance)
 
+    end_plate_width_mini = g_1 + (2 * min_edge_distance)
     end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
+
+    if end_plate_width < end_plate_width_mini:
+        design_status = False
+        logger.error(": Width of the End Plate is less than the minimum required value ")
+        logger.warning(": Minimum End Plate width required is %2.2f mm" % end_plate_width_mini)
+        logger.info(": Increase the width of End Plate")
+    if end_plate_width > end_plate_width_max:
+        design_status = False
+        logger.error(": Width of the End Plate is greater than the minimum required value")
+        logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
+        logger.info(": Decrease the width of End Plate")
 
 
     # Check for Minimum and Maximum values of End Plate Height from user input
@@ -469,10 +480,58 @@ def bbExtendedEndPlateSplice(uiObj):
             # end_plate_height = end_plate_height_max
             design_status = False
             logger.error(": Height of End Plate exceeds the maximum allowed height")
-            logger.warning(": Maximum End Plate height allowed is %2.2f mm" % end_plate_height_max)
+            logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
             logger.info(": Decrease the Height of End Plate")
     else:
         pass
+
+    #######################################################################
+    # Check for shear capacity of HSFG bolt (Cl. 10.4.3, IS 800:2007)
+    # Here,
+    # Vdsf = nominal shear capacity of HSFG bolt
+    # V_dsf = nominal shear capacity of HSFG bolt after multiplying the correction factor(s)
+
+    n_e = 1  # number of effective interfaces offering resistance to shear
+    Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
+
+    # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
+    l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
+
+    if l_j > 15 * bolt_dia:
+        V_dsf = Vdsf * long_joint(bolt_dia, l_j)
+    else:
+        V_dsf = Vdsf
+
+    #######################################################################
+    # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
+    # Here,
+    # Vdsb = nominal shear capacity of Bearing bolt
+    # V_dsb = nominal shear capacity of Bearing bolt after multiplying the correction factor(s)
+
+    # 1. Check for Shear capacity of bolt
+    Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)
+
+    if l_j > 15 * bolt_dia:
+        V_dsb = Vdsb * long_joint(bolt_dia, l_j)
+    else:
+        V_dsb = Vdsb
+
+    # 2. Check for Bearing capacity of bolt
+    factor = 1
+    sum_plate_thickness = 2 * end_plate_thickness
+
+    # Calculation of k_b
+    kb_1 = min_end_distance / (3 * dia_hole)
+    kb_2 = (min_pitch / (3 * dia_hole)) - 0.25
+    kb_3 = bolt_fu / end_plate_fu
+    kb_4 = 1.0
+    k_b = min(kb_1, kb_2, kb_3, kb_4)
+
+    plate_fu = int(end_plate_fu)
+    Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)
+
+    # Capacity of bearing bolt (V_db) is minimum of V_dsb and Vdpb
+    V_db = min(V_dsb, Vdpb)
 
     #######################################################################
     # Calculation for number of bolts in each column
@@ -483,8 +542,11 @@ def bbExtendedEndPlateSplice(uiObj):
     # Number of bolts in each column
     # Here, the number of shear plane(s) is 1
 
-    n = 1
-    bolt_shear_capacity = bolt_shear(bolt_dia, n, bolt_fu)
+    if bolt_type == "HSFG":
+        bolt_shear_capacity = V_dsf
+    else:
+        bolt_shear_capacity = V_db
+
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
     n = math.sqrt((6 * M_u) / (2 * min_pitch * bolt_shear_capacity))
     n = round(n.real)
@@ -595,6 +657,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     if bolt_type == "HSFG" or "Bearing Bolt":
         if Tdf >= Tdf_1:
+            design_status = False
             logger.error(": Tension capacity of bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
             logger.info(": Re-design the connection using bolt of smaller diameter")
@@ -605,59 +668,76 @@ def bbExtendedEndPlateSplice(uiObj):
 
     if bolt_type == "HSFG":
         if T_b >= Tdf:
+            design_status = False
             logger.error(": Tension on bolt due to Moment + Axial load + Prying action exceeds the tension carrying capacity of the selected HSFG bolt (Clause 10.4.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension on HSFGF bolt of selected diameter is %2.2f kN" % Tdf)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
         if T_b >= Tdb:
+            design_status = False
             logger.error(": Tension on bolt due to Moment + Axial load + Prying action exceeds the tension carrying capacity of the selected Bearing bolt (Clause 10.3.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension on Bearing bolt of selected diameter is %2.2f kN" % Tdb)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
     #######################################################################
-    # Check for shear capacity of HSFG bolt (Cl. 10.4.3, IS 800:2007)
-    # Here,
-    # Vdsf = nominal shear capacity of HSFG bolt
-    # V_dsf = nominal shear capacity of HSFG bolt after multiplying the correction factor(s)
+    # Check for Combined shear and tension capacity of bolt
 
-    n_e = 1  # number of effective interfaces offering resistance to shear
-    Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
+    # 1. HSFG bolt (Cl. 10.4.6, IS 800:2007)
+    # Here, Vsf = Factored shear load acting on single bolt, Vdf = shear capacity of single HSFG bolt
+    # Tf = External factored tension acting on a single HSFG bolt, Tdf = Tension capacity of single HSFG bolt
 
-    # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
-    l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
+    # 2. Bearing bolt (Cl. 10.3.6, IS 800:2007)
+    # Here, Vsb = Factored shear load acting on single bolt, Vdb = shear capacity of single bearing bolt
+    # Tb = External factored tension acting on single bearing bolt, Tdb = Tension capacity of single bearing bolt
 
-    if l_j > 15 * bolt_dia:
-        V_dsf = Vdsf * long_joint(bolt_dia, l_j)
+    Vsf = factored_shear_load / number_of_bolts
+    Vdf = V_dsf
+    Tf = T_b
+    combined_capacity_hsfg = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
+
+    Vsb = Vsf
+    Vdb = V_db
+    Tb = T_b
+    combined_capacity_bearing = (Vsb / Vdb) **2 + (Tb / Tdb) ** 2
+
+    if bolt_type == "HSFG":
+        if combined_capacity_hsfg >= 1.0:
+            design_status = False
+            logger.error(": Load due to combined shear and tension on selected HSFG bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
+            logger.warning(": The maximum allowable value is 1.0")
+            logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
-        V_dsf = Vdsf
+        if combined_capacity_bearing >= 1.0:
+            design_status = False
+            logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
+            logger.warning(": The maximum allowable value is 1.0")
+            logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
     #######################################################################
-    # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
-    # Here,
-    # Vdsb = nominal shear capacity of Bearing bolt
-    # V_dsb = nominal shear capacity of Bearing bolt after multiplying the correction factor(s)
+    # Check for Shear yielding and shear rupture of end plate
 
-    # 1. Check for Shear capacity of bolt
-    Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)
+    # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
+    A_v = end_plate_width * end_plate_thickness  # gross shear area of end plate
+    V_d = (0.6 * A_v * end_plate_fy) / (math.sqrt(3) * 1.10)
 
-    if l_j > 15 * bolt_dia:
-        V_dsb = Vdsb * long_joint(bolt_dia, l_j)
-    else:
-        V_dsb = Vdsb
+    if V_d < factored_shear_load:
+        design_status = False
+        logger.error(": The End Plate might yield due to Shear")
+        logger.warning(": The minimum shear yielding capacity required is %2.2f kN" % factored_shear_load)
+        logger.info(": Increase the thickness of End Plate")
 
-    # 2. Check for Bearing capacity of bolt
-    factor = 1
-    sum_plate_thickness = 2 * tp_required
+    # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
+    A_vn = A_v - (number_of_bolts * dia_hole)
+    R_n = 0.6 * end_plate_fu * A_vn
 
-    # Calculation of k_b
-    kb_1 = min_end_distance / (3 * dia_hole)
-    kb_2 = (min_pitch / (3 * dia_hole)) - 0.25
-    kb_3 = bolt_fu / end_plate_fu
-    kb_4 = 1.0
-    k_b = min(kb_1, kb_2, kb_3, kb_4)
+    if R_n < factored_shear_load:
+        design_status = False
+        logger.error(": The End Plate might rupture due to Shear")
+        logger.warning(": The minimum shear rupture capacity required is %2.2f kN" % factored_shear_load)
+        logger.info(": Increase the thickness of End Plate")
+        
+    # TODO add block shear check
 
-    plate_fu = int(end_plate_fu)
-    Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)
 
 
 

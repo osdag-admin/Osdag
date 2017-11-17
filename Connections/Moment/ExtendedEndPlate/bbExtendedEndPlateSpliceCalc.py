@@ -718,7 +718,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
     A_v = end_plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = (0.6 * A_v * end_plate_fy) / (math.sqrt(3) * 1.10)
+    V_d = shear_yielding(A_v, end_plate_fy)
 
     if V_d < factored_shear_load:
         design_status = False
@@ -728,15 +728,34 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
     A_vn = A_v - (number_of_bolts * dia_hole)
-    R_n = 0.6 * end_plate_fu * A_vn
+    R_n = shear_rupture(A_vn, end_plate_fu)
 
     if R_n < factored_shear_load:
         design_status = False
         logger.error(": The End Plate might rupture due to Shear")
         logger.warning(": The minimum shear rupture capacity required is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
-        
+
     # TODO add block shear check
+
+    #######################################################################
+    # Member Checks
+    # Strength of flange under Compression (Reference: Example 5.23 & 5.27, Design of Steel structures by Dr. N. Subramanian)
+
+    A_f = beam_B * beam_tf  # area of beam flange
+    capacity_beam_flange = ((beam_fy / 1.10) * A_f) / 1000  # kN
+    force_flange = M_u / (beam_d - beam_tf)
+
+    if capacity_beam_flange < force_flange:
+        design_status = False
+        logger.error(": Force in the flange is greater than its load carrying capacity")
+        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
+        logger.info(": Use a higher beam section with wider and thicker flange")
+
+
+
+
+
 
 
 

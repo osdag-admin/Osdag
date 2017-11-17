@@ -14,7 +14,7 @@ logger = None
 def set_databaseconnection():
     """
 
-    Returns:    Setting connection with SQLite
+    Returns:  Setting connection with SQLite
 
 
     """

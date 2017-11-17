@@ -82,6 +82,11 @@ class MainController(QMainWindow):
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
     def get_beamdata(self):
+        """
+
+        Returns: Selects beam data from both Old & Integrated database
+
+        """
         loc = self.ui.combo_connLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamdata = get_oldbeamcombolist()
@@ -93,6 +98,15 @@ class MainController(QMainWindow):
         self.color_oldDatabase_section(old_beamdata, beamdata)
 
     def color_oldDatabase_section(self, old_section, intg_section):
+        """
+
+        Args:
+            old_section: Old database
+            intg_section: Integrated database
+
+        Returns: Differentiate the database by color code
+
+        """
         for col in old_section:
             if col in intg_section:
                 indx = intg_section.index(str(col))
@@ -109,6 +123,14 @@ class MainController(QMainWindow):
         return  dictbeamdata
 
     def combotype_current_index_changed(self, index):
+        """
+
+        Args:
+            index: Number
+
+        Returns: Types of Grade
+
+        """
         items = self.gradeType[str(index)]
         if items != 0 :
             self.ui.combo_grade.clear()
@@ -121,6 +143,16 @@ class MainController(QMainWindow):
             pass
 
     def check_range(self, widget, min_val, max_val):
+        """
+
+        Args:
+            widget: Fu , Fy lineedit
+            min_val: min value
+            max_val: max value
+
+        Returns: Check for the value mentioned for the given range
+
+        """
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ' '):
@@ -130,6 +162,11 @@ class MainController(QMainWindow):
 
 
     def get_user_inputs(self):
+        """
+
+        Returns: User Input dictionary
+
+        """
         uiObj = {}
         uiObj["Member"] = {}
         uiObj["Member"]["Connectivity"] = str(self.ui.combo_connLoc.currentText())
@@ -159,6 +196,14 @@ class MainController(QMainWindow):
         return uiObj
 
     def closeEvent(self, event):
+        """
+
+        Args:
+            event: Yes or No
+
+        Returns: Ask for the confirmation while closing the window
+
+        """
         uiInput = self.get_user_inputs()
         self.save_inputs_totext(uiInput)
         action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
@@ -170,6 +215,14 @@ class MainController(QMainWindow):
             event.ignore()
 
     def save_inputs_totext(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Save the user input to txt format
+
+        """
         input_file = QFile(os.path.join("saveINPUT.txt"))
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -178,6 +231,11 @@ class MainController(QMainWindow):
         pickle.dump(uiObj, input_file)
 
     def get_prevstate(self):
+        """
+
+        Returns: Read for the previous user inputs design
+
+        """
         filename = os.path.join("saveINPUT.txt")
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
@@ -187,11 +245,23 @@ class MainController(QMainWindow):
             return None
 
     def retrieve_prevstate(self):
+        """
+
+        Returns: Retrieve the previous user inputs
+
+        """
         uiObj = self.get_prevstate()
         self.set_dict_touser_inputs(uiObj)
 
     def set_dict_touser_inputs(self, uiObj):
-        # if uiObj["Member"]["Connectivity"] == "Beam-Beam":
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Set the dictionary to user inputs
+
+        """
         if uiObj is not None :
             self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
             self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
@@ -215,6 +285,11 @@ class MainController(QMainWindow):
 
 
     def design_btnclicked(self):
+        """
+
+        Returns:
+
+        """
         self.uiObj = self.get_user_inputs()
         outputs = coverplateboltedconnection(self.uiObj)
         # self.resultObj = outputs
@@ -280,6 +355,14 @@ class MainController(QMainWindow):
 
 
     def call_2D_drawing(self, view):
+        """
+
+        Args:
+            view: Front, Side & Top views
+
+        Returns: Saves 2D svg drawings
+
+        """
         beam_beam = CoverEndPlate()
         if view == "Front":
             filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"

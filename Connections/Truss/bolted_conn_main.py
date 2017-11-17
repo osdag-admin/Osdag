@@ -42,12 +42,17 @@ class SingleAngleSelection(QDialog):
         self.ui.comboBox_sign_angle.setCurrentIndex(0)
         self.ui.comboBox_sign_angle.currentIndexChanged.connect(self.get_angledata)
         self.ui.comboBox_sign_leg.setEnabled(False)
-        self.ui.btn_save.clicked.connect(self.save_singledata_para)
+        # self.ui.btn_save.clicked.connect(self.save_singledata_para)
         self.ui.btn_save.clicked.connect(self.lbl_section)
         self.ui.btn_close.clicked.connect(self.close_singledata_para)
 
-    def save_singledata_para(self):
 
+    def save_singledata_para(self):
+        """
+
+        Returns: Single angle dictionary
+
+        """
         self.save_singledata = {}
         self.save_singledata["SingleAngle"] = {}
         self.save_singledata["SingleAngle"]["angle_type"] = {}
@@ -61,52 +66,61 @@ class SingleAngleSelection(QDialog):
         return self.save_singledata
 
     def close_singledata_para(self):
+        """
+
+        Returns: Close the window
+
+        """
         self.close()
 
+
     def lbl_section(self):
-
-        section_type = self.sectionselection.ui.comboBx_selection.currentText()
-        if section_type == "Select type":
-            pass
-        elif section_type == "Single Angle":
-            ui_sing_obj = self.save_singledata_para()
-            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
-            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
-            leg = ui_sing_obj["SingleAngle"]["leg"]
-            print ui_sing_obj, type, section, leg
-
-            if type == "Equal angle":
-                section_label = self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section)
-            else:
-                section_label = self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section + ' ' + leg)
-
-        section_type2 = self.sectionselection.ui.comboBx_selection_2.currentText()
-        if section_type2 == "Select type":
+        if self.sectionselection.ui.lbl_sectionSelection.hasSelectedText() is True:
             pass
         else:
-            ui_sing_obj = self.save_singledata_para()
-            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
-            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
-            leg = ui_sing_obj["SingleAngle"]["leg"]
-            print ui_sing_obj, type, section, leg
-            if type == "Equal angle":
-                section_label2 = self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section)
+            if self.sectionselection.ui.comboBx_selection.currentText() == "Select type":
+                pass
             else:
-                section_label2 = self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section + ' ' + leg)
+                ui_sing_obj = self.save_singledata_para()
+                type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+                section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+                leg = ui_sing_obj["SingleAngle"]["leg"]
+                print ui_sing_obj, type, section, leg
+                if type == "Equal angle":
+                    self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section)
+                else:
+                    self.sectionselection.ui.lbl_sectionSelection.setText(type + ' ' + section + ' ' + leg)
 
-        section_type3 = self.sectionselection.ui.comboBx_selection_3.currentText()
-        if section_type3 == "Select type":
+
+        if self.sectionselection.ui.lbl_sectionSelection_2.hasSelectedText() is False:
             pass
         else:
-            ui_sing_obj = self.save_singledata_para()
-            type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
-            section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
-            leg = ui_sing_obj["SingleAngle"]["leg"]
-            print ui_sing_obj, type, section, leg
-            if type == "Equal angle":
-                section_label3 = self.sectionselection.ui.lbl_sectionSelection_3.setText(type + ' ' + section)
+            if self.sectionselection.ui.comboBx_selection_2.currentText() == "Select type":
+                pass
             else:
-                section_label3 = self.sectionselection.ui.lbl_sectionSelection_3.setText(type + ' ' + section + ' ' + leg)
+                ui_sing_obj = self.save_singledata_para()
+                type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+                section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+                leg = ui_sing_obj["SingleAngle"]["leg"]
+                print ui_sing_obj, type, section, leg
+                if type == "Equal angle":
+                    self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section)
+                else:
+                    self.sectionselection.ui.lbl_sectionSelection_2.setText(type + ' ' + section + ' ' + leg)
+        #
+        # section_type3 = self.sectionselection.ui.comboBx_selection_3.currentText()
+        # if section_type3 == "Select type":
+        #     pass
+        # else:
+        #     ui_sing_obj = self.save_singledata_para()
+        #     type = ui_sing_obj["SingleAngle"]["angle_type"]["type"]
+        #     section = ui_sing_obj["SingleAngle"]["angle_type"]["section"]
+        #     leg = ui_sing_obj["SingleAngle"]["leg"]
+        #     print ui_sing_obj, type, section, leg
+        #     if type == "Equal angle":
+        #         self.sectionselection.ui.lbl_sectionSelection_3.setText(type + ' ' + section)
+        #     else:
+        #         self.sectionselection.ui.lbl_sectionSelection_3.setText(type + ' ' + section + ' ' + leg)
 
 
     def get_angledata(self):
@@ -154,7 +168,11 @@ class DoubleAngleSelection(QDialog):
         self.ui.btn_close.clicked.connect(self.close_doubledata_para)
 
     def save_doubledata_para(self):
+        """
 
+        Returns: Double angle dictionary
+
+        """
         self.save_doubledata = {}
         self.save_doubledata["DoubleAngle"] = {}
         self.save_doubledata["DoubleAngle"]["angle_type"] = {}
@@ -167,6 +185,11 @@ class DoubleAngleSelection(QDialog):
         return self.save_doubledata
 
     def close_doubledata_para(self):
+        """
+
+        Returns: Close the window
+
+        """
         self.close()
 
     def get_angledata(self):
@@ -420,7 +443,7 @@ class SectionSelection(QDialog):
     def single_angle_selection1(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc = self.ui.comboBx_selection.currentText()
@@ -436,7 +459,7 @@ class SectionSelection(QDialog):
     def single_angle_selection2(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc1 = self.ui.comboBx_selection_2.currentText()
@@ -452,7 +475,7 @@ class SectionSelection(QDialog):
     def single_angle_selection3(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc2 = self.ui.comboBx_selection_3.currentText()
@@ -468,7 +491,7 @@ class SectionSelection(QDialog):
     def single_angle_selection4(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc3 = self.ui.comboBx_selection_4.currentText()
@@ -484,7 +507,7 @@ class SectionSelection(QDialog):
     def single_angle_selection5(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc4 = self.ui.comboBx_selection_5.currentText()
@@ -500,7 +523,7 @@ class SectionSelection(QDialog):
     def single_angle_selection6(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc5 = self.ui.comboBx_selection_6.currentText()
@@ -516,7 +539,7 @@ class SectionSelection(QDialog):
     def single_angle_selection7(self):
         """
 
-        Returns: Select type of Angle
+        Returns: Select type of Angles or Channel
 
         """
         loc6 = self.ui.comboBx_selection_7.currentText()
@@ -807,6 +830,11 @@ class Maincontroller(QMainWindow):
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
 
     def no_of_members(self):
+        """
+
+        Returns: Number of Members selected
+
+        """
         membr_num = self.ui.combo_member.currentText()
         print membr_num
         return membr_num
@@ -858,6 +886,14 @@ class Maincontroller(QMainWindow):
         return ui_obj
 
     def call_2D_drawing(self, view):
+        """
+
+        Args:
+            view: Front, Side & Top views
+
+        Returns: Saves 2D svg drawings
+
+        """
         conn_members = TrussBoltedConnection()
         if view == "Front":
             filename = "D:\PyCharmWorkspace\Osdag\Connections\Truss\Front.svg"

@@ -42,9 +42,10 @@ class MainController(QMainWindow):
         self.ui.setupUi(self)
 
         self.resultObj = None
+        self.get_beamdata()
         self.ui.combo_connLoc.setCurrentIndex(0)
         self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
-        # self.get_beamdata()
+        self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -195,6 +196,24 @@ class MainController(QMainWindow):
         uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
         return uiObj
 
+    def reset_btnclicked(self):
+        self.ui.combo_beamSec.setCurrentIndex(0)
+        self.ui.combo_connLoc.setCurrentIndex(0)
+        self.ui.txt_Fu.clear()
+        self.ui.txt_Fy.clear()
+        self.ui.txt_Axial.clear()
+        self.ui.txt_Shear.clear()
+        self.ui.txt_Moment.clear()
+        self.ui.combo_diameter.setCurrentIndex(0)
+        self.ui.combo_type.setCurrentIndex(0)
+        self.ui.combo_grade.setCurrentIndex(0)
+        self.ui.combo_flangeplateThick.setCurrentIndex(0)
+        self.ui.txt_flangeplateHeight.clear()
+        self.ui.txt_flangeplateWidth.clear()
+        self.ui.combo_webplateThick.setCurrentIndex(0)
+        self.ui.txt_webplateWidth.clear()
+        self.ui.txt_webplateHeight.clear()
+
     def closeEvent(self, event):
         """
 
@@ -282,7 +301,6 @@ class MainController(QMainWindow):
 
         else:
             pass
-
 
     def design_btnclicked(self):
         """

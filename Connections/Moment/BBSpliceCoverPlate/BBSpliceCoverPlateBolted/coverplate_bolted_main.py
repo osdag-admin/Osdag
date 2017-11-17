@@ -10,7 +10,7 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from model import *
 import sys
 import os.path
@@ -27,7 +27,6 @@ class Flangespliceplate(QDialog):
         resultObj_flangeplate = coverplateboltedconnection(uiObj)
 
         self.ui.txt_plateHeight.setText()
-
 
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
@@ -85,8 +84,24 @@ class MainController(QMainWindow):
     def get_beamdata(self):
         loc = self.ui.combo_connLoc.currentText()
         beamdata = get_beamcombolist()
+        old_beamdata = get_oldbeamcombolist()
+        # combo_section = ' '
         if loc == 'Beam-Beam':
             self.ui.combo_beamSec.addItems(beamdata)
+            # combo_section = self.ui.combo_beamSec
+
+        self.color_oldDatabase_section(old_beamdata, beamdata)
+
+    def color_oldDatabase_section(self, old_section, intg_section):
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                self.ui.combo_beamSec.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+        duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+        for i in duplicate:
+            self.ui.combo_beamSec.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
+
 
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
@@ -156,7 +171,6 @@ class MainController(QMainWindow):
 
     def save_inputs_totext(self, uiObj):
         input_file = QFile(os.path.join("saveINPUT.txt"))
-        print "inputfile", input_file
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s: \n%s"

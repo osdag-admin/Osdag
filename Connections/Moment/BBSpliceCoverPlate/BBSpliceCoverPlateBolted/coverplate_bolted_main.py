@@ -99,9 +99,22 @@ class MainController(QMainWindow):
 
         return uiObj
 
+# Changes made by Swathi
+    def design_preference(self):
+        designPre = {}
+        designPre["test"] = {}
+        designPre["test"]["gap"] = int(5) # hard coded value 5 mm
+        designPre["test"]["slip_factor"] = float(0.48) # sand blasted surface
+        designPre["test"]["bolt_hole_type"] = str("Standard")
+        designPre["test"]["bolt_hole_clrnce"] = int(2)
+        designPre["test"]["typeof_edge"] = str("a - Sheared or hand flame cut")
+        return designPre
+
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()
-        outputs = coverplateboltedconnection(self.uiObj)
+        self.designPre = self.design_preference()
+
+        outputs = coverplateboltedconnection(self.uiObj, self.designPre)
         # self.resultObj = outputs
         # alist =self.resultObj.values()
         # self.display_output(self.resultObj)

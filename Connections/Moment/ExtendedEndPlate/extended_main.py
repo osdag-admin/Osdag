@@ -5,12 +5,20 @@ Created on 24-Aug-2017
 """
 
 from ui_extendedendplate  import  Ui_MainWindow
+from ui_design_preferences import Ui_Dialog
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
 from PyQt5.Qt import QColor, QBrush, Qt
 from model import *
 import sys
 import os
+
+class DesignPreference(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Dialog()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
 
 
 class Maincontroller(QMainWindow):
@@ -37,6 +45,16 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+
+
+        min_fu = 290
+        max_fu = 590
+        self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+
+        min_fy = 165
+        max_fy = 450
+        self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
     def get_user_inputs(self):
         uiObj = {}
@@ -65,6 +83,10 @@ class Maincontroller(QMainWindow):
         uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
         uiObj["Weld"]["Web (mm)"] = self.ui.combo_webSize.currentText()
         return uiObj
+
+    def design_prefer(self):
+        section = DesignPreference(self)
+        section.show()
 
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()
@@ -152,7 +174,7 @@ class Maincontroller(QMainWindow):
         """
         text_str = widget.text()
         text_str = int(text_str)
-        if (text_str < min_val or text_str > max_val or text_str == ' '):
+        if (text_str < min_val or text_str > max_val or text_str == ''):
             QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
             widget.clear()
             widget.setFocus()

@@ -666,7 +666,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="placeholderText">
-      <string>000.0</string>
+      <string>000</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_beam1">
@@ -733,7 +733,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="placeholderText">
-      <string>000.0</string>
+      <string>000</string>
      </property>
     </widget>
     <widget class="QLabel" name="label">
@@ -3701,15 +3701,15 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_SaveMessages">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>650</y>
-       <width>141</width>
+       <x>50</x>
+       <y>616</y>
+       <width>151</width>
        <height>30</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="toolTip">
@@ -3725,15 +3725,15 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_CreateDesign">
      <property name="geometry">
       <rect>
-       <x>159</x>
+       <x>50</x>
        <y>650</y>
-       <width>141</width>
+       <width>151</width>
        <height>30</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>10</pointsize>
+       <pointsize>11</pointsize>
       </font>
      </property>
      <property name="toolTip">
@@ -4735,7 +4735,9 @@ QMenu::item:selected {
   <tabstop>combo_beamSec</tabstop>
   <tabstop>txt_Fu</tabstop>
   <tabstop>txt_Fy</tabstop>
+  <tabstop>txt_Moment</tabstop>
   <tabstop>txt_Shear</tabstop>
+  <tabstop>txt_Axial</tabstop>
   <tabstop>combo_diameter</tabstop>
   <tabstop>combo_type</tabstop>
   <tabstop>combo_grade</tabstop>
@@ -4743,38 +4745,36 @@ QMenu::item:selected {
   <tabstop>txt_flangeplateHeight</tabstop>
   <tabstop>txt_flangeplateWidth</tabstop>
   <tabstop>combo_webplateThick</tabstop>
+  <tabstop>txt_webplateHeight</tabstop>
+  <tabstop>txt_webplateWidth</tabstop>
   <tabstop>btn_Design</tabstop>
   <tabstop>btn_Reset</tabstop>
-  <tabstop>btn_SaveMessages</tabstop>
-  <tabstop>btn_CreateDesign</tabstop>
-  <tabstop>btnInput</tabstop>
-  <tabstop>btnOutput</tabstop>
   <tabstop>btnFront</tabstop>
   <tabstop>btnSide</tabstop>
   <tabstop>btnTop</tabstop>
   <tabstop>btn3D</tabstop>
   <tabstop>chkBx_beamSec1</tabstop>
   <tabstop>chkBx_extndPlate</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>btnReset_2</tabstop>
-  <tabstop>btnDesign_2</tabstop>
-  <tabstop>txtGuage_2</tabstop>
-  <tabstop>txtbearCapacity_3</tabstop>
-  <tabstop>txtBoltCapacity_3</tabstop>
-  <tabstop>txtNoBolts_3</tabstop>
-  <tabstop>txtPitch_3</tabstop>
-  <tabstop>txtGuage_3</tabstop>
-  <tabstop>txtEndDist_3</tabstop>
-  <tabstop>txtEdgeDist_3</tabstop>
-  <tabstop>txtWeldThick_3</tabstop>
-  <tabstop>txtResltShr_3</tabstop>
-  <tabstop>txtWeldStrng_3</tabstop>
-  <tabstop>txtPlateThick_3</tabstop>
-  <tabstop>txtExtMomnt_3</tabstop>
-  <tabstop>txtMomntCapacity_3</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_6</tabstop>
+  <tabstop>txt_shearCapacity</tabstop>
+  <tabstop>txt_bearCapacity</tabstop>
+  <tabstop>txt_capacityOfbolt</tabstop>
+  <tabstop>txt_noBolts</tabstop>
+  <tabstop>txt_pitch</tabstop>
+  <tabstop>txt_gauge</tabstop>
+  <tabstop>txt_endDist</tabstop>
+  <tabstop>txt_edgeDist</tabstop>
+  <tabstop>btn_flangePlate</tabstop>
+  <tabstop>txt_shearCapacity_2</tabstop>
+  <tabstop>txt_bearCapacity_2</tabstop>
+  <tabstop>txt_capacityOfbolt_2</tabstop>
+  <tabstop>txt_noBolts_2</tabstop>
+  <tabstop>txt_pitch_2</tabstop>
+  <tabstop>txt_gauge_2</tabstop>
+  <tabstop>txt_endDist_2</tabstop>
+  <tabstop>txt_edgeDist_2</tabstop>
+  <tabstop>btn_webPlate</tabstop>
+  <tabstop>btn_CreateDesign</tabstop>
+  <tabstop>btn_SaveMessages</tabstop>
   <tabstop>pushButton_3</tabstop>
   <tabstop>btnReset_3</tabstop>
   <tabstop>btnDesign_3</tabstop>
@@ -4802,12 +4802,12 @@ QMenu::item:selected {
   <tabstop>txtBoltCapacity_2</tabstop>
   <tabstop>textEdit</tabstop>
   <tabstop>txtbearCapacity_2</tabstop>
-  <tabstop>txt_noBolts</tabstop>
-  <tabstop>txt_pitch</tabstop>
-  <tabstop>txt_bearCapacity</tabstop>
-  <tabstop>txt_edgeDist</tabstop>
-  <tabstop>txt_endDist</tabstop>
-  <tabstop>txt_edgeDist_2</tabstop>
+  <tabstop>btnDesign_2</tabstop>
+  <tabstop>txtGuage_2</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>txtNoBolts_3</tabstop>
+  <tabstop>txtBoltCapacity_3</tabstop>
+  <tabstop>txtExtMomnt_3</tabstop>
   <tabstop>txtPitch_2</tabstop>
   <tabstop>txtShrCapacity_3</tabstop>
   <tabstop>txtEndDist_2</tabstop>
@@ -4819,6 +4819,22 @@ QMenu::item:selected {
   <tabstop>txtExtMomnt_2</tabstop>
   <tabstop>txtMomntCapacity_2</tabstop>
   <tabstop>lineEdit_3</tabstop>
+  <tabstop>btnOutput</tabstop>
+  <tabstop>btnInput</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>txtbearCapacity_3</tabstop>
+  <tabstop>lineEdit_4</tabstop>
+  <tabstop>txtWeldThick_3</tabstop>
+  <tabstop>txtGuage_3</tabstop>
+  <tabstop>txtResltShr_3</tabstop>
+  <tabstop>txtWeldStrng_3</tabstop>
+  <tabstop>txtEndDist_3</tabstop>
+  <tabstop>txtPlateThick_3</tabstop>
+  <tabstop>btnReset_2</tabstop>
+  <tabstop>txtEdgeDist_3</tabstop>
+  <tabstop>txtPitch_3</tabstop>
+  <tabstop>txtMomntCapacity_3</tabstop>
  </tabstops>
  <resources>
   <include location="ResourceFiles/icons.qrc"/>

@@ -1,11 +1,9 @@
-'''
-Created on 18th October, 2017
 
-@author: Danish Ansari
+"""
+Created on 8-November-2017
 
-'''
-
-import sys
+@author: Reshma
+"""
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, qApp
 import logging
@@ -15,13 +13,16 @@ logger = None
 
 
 def set_databaseconnection():
-    '''
-    Setting connection with SQLite
-    '''
+    """
+
+    Returns:  Setting connection with SQLite
+
+
+    """
     filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
+    print filepath, "database"
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)
-    # db.open()
     if not db.open():
 
         QMessageBox.critical(None, qApp.tr("Cannot open database"),
@@ -40,29 +41,35 @@ def module_setup():
     set_databaseconnection()
 
 
-
 def get_beamcombolist():
-    '''(None) -> (List)
-    This function returns list of Indian Standard Beam Designation.
-    '''
+    """
+
+    Returns:     This function returns list of Indian Standard Beam Designation.
+
+    """
     comboList = []
-    beamQuery = QSqlQuery("Select Designation from Beams")
+    beamQuery = QSqlQuery("SELECT Designation FROM Beams")
     comboList.append("Select section")
+
     while(beamQuery.next()):
         comboList.append(beamQuery.value(0))
     return comboList
 
 
 def get_beamdata(sect):
-    '''(None) --> (Dictionary)
-    This Function returns the Indian Standard Beam section properties.
-    '''
+    """
+
+    Args:
+        sect: section properties
+
+    Returns:  This Function returns the Indian Standard Beam section properties.
+
+
+    """
     section = sect
 
-    queryStr = "Select * from Beams where Designation = '%s'" % section
-
+    queryStr = "SELECT * FROM Beams where Designation = '%s'" % section
     designQuery = QSqlQuery(queryStr)
-
     retDict = {}
     record = designQuery.record()
 
@@ -87,52 +94,4 @@ def get_oldbeamcombolist():
     return old_columnList
 
 
-def get_oldcolumncombolist():
-    '''(None) -> (List)
-    This function returns the list of Indian Standard Column Designation.
-    '''
-    old_columnList = []
-    columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
-    a = columnQuery.size()
 
-    #comboList.append("Select section")
-    while(columnQuery.next()):
-        old_columnList.append(columnQuery.value(0))
-
-    return old_columnList
-
-
-def get_columncombolist():
-    '''(None) -> (List)
-    This function returns the list of Indian Standard Column Designation.
-    '''
-    comboList = []
-    columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
-    a = columnQuery.size()
-
-    comboList.append("Select section")
-    while(columnQuery.next()):
-        comboList.append(columnQuery.value(0))
-    return comboList
-
-
-def get_columndata(sect):
-
-    '''(None) --> (Dictionary)
-    This Function returns the Indian Standard column section properties.
-    '''
-    section = sect
-    # section = Ui_MainWindow.comboColSec.currentText()
-    queryStr = "Select * from Columns where Designation = '%s'" % section
-
-    designQuery = QSqlQuery(queryStr)
-
-    retDict = {}
-    record = designQuery.record()
-
-    while(designQuery.next()):
-        for i in range(0, record.count()):
-            colName = record.fieldName(i)
-            retDict[colName] = designQuery.value(i)
-
-    return retDict

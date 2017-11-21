@@ -14,7 +14,7 @@ logger = None
 def set_databaseconnection():
     """
 
-    Returns:    Setting connection with SQLite
+    Returns:  Setting connection with SQLite
 
 
     """
@@ -41,9 +41,11 @@ def module_setup():
 
 
 def get_beamcombolist():
-    '''(None) -> (List)
-    This function returns list of Indian Standard Beam Designation.
-    '''
+    """
+
+    Returns:     This function returns list of Indian Standard Beam Designation.
+
+    """
     comboList = []
     beamQuery = QSqlQuery("SELECT Designation FROM Beams")
     comboList.append("Select section")
@@ -54,9 +56,15 @@ def get_beamcombolist():
 
 
 def get_beamdata(sect):
-    '''(None) --> (Dictionary)
-    This Function returns the Indian Standard Beam section properties.
-    '''
+    """
+
+    Args:
+        sect: section properties
+
+    Returns:  This Function returns the Indian Standard Beam section properties.
+
+
+    """
     section = sect
 
     queryStr = "SELECT * FROM Beams where Designation = '%s'" % section
@@ -70,4 +78,21 @@ def get_beamdata(sect):
             retDict[colName] = designQuery.value(i)
 
     return retDict
+
+def get_oldbeamcombolist():
+    """
+
+    Returns:  This function returns the list of Indian Standard Column Designation.
+
+
+    """
+    old_beamList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    while(columnQuery.next()):
+        old_beamList.append(columnQuery.value(0))
+
+    return old_beamList
+
 

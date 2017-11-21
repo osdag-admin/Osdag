@@ -9,11 +9,11 @@ from ui_design_preferences import Ui_DesignPreference
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
-from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from model import *
 import sys
 import os
-
+import pickle
 
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
@@ -99,7 +99,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_type.addItems(self.gradeType.keys())
         self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
         self.ui.combo_type.setCurrentIndex(0)
-        # self.retrieve_prestate()
+        self.retrieve_prevstate()
 
         self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
@@ -159,6 +159,93 @@ class Maincontroller(QMainWindow):
     def design_prefer(self):
         section = DesignPreference(self)
         section.show()
+
+    def closeEvent(self, event):
+        """
+
+        Args:
+            event: Yes or No
+
+        Returns: Ask for the confirmation while closing the window
+
+        """
+        uiInput = self.get_user_inputs()
+        self.save_inputs_totext(uiInput)
+        action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+        if action == QMessageBox.Yes:
+            # self.close.emit()
+            self.close()
+            event.accept()
+        else:
+            event.ignore()
+
+    def save_inputs_totext(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Save the user input to txt format
+
+        """
+        input_file = QFile(os.path.join("saveINPUT.txt"))
+        if not input_file.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s: \n%s"
+                                % (input_file.fileName(), input_file.errorString()))
+        pickle.dump(uiObj, input_file)
+
+    def get_prevstate(self):
+        """
+
+        Returns: Read for the previous user inputs design
+
+        """
+        filename = os.path.join("saveINPUT.txt")
+        if os.path.isfile(filename):
+            file_object = open(filename, 'r')
+            uiObj = pickle.load(file_object)
+            return uiObj
+        else:
+            return None
+
+    def retrieve_prevstate(self):
+        """
+
+        Returns: Retrieve the previous user inputs
+
+        """
+        uiObj = self.get_prevstate()
+        self.set_dict_touser_inputs(uiObj)
+
+    def set_dict_touser_inputs(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Set the dictionary to user inputs
+
+        """
+        if uiObj is not None :
+            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+            self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
+            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+            self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
+            self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+            self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
+            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+            self.ui.combo_plateThick.setCurrentIndex(self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
+            self.ui.txt_plateHeight.setText(str(uiObj["Plate"]["Height (mm)"]))
+            self.ui.txt_plateWidth.setText(str(uiObj["Plate"]["Width (mm)"]))
+            self.ui.combo_flangeSize.setCurrentIndex(self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
+            self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
+
+        else:
+            pass
 
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()

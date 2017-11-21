@@ -750,7 +750,90 @@ def bbExtendedEndPlateSplice(uiObj):
         design_status = False
         logger.error(": Force in the flange is greater than its load carrying capacity")
         logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
-        logger.info(": Use a higher beam section with wider and thicker flange")
+        logger.info(": Use a higher beam section with wider and/or thicker flange")
+
+    #######################################################################
+    # Design of Weld
+    # Assumption: The size of weld at flange will be greater than the size of weld at the web
+    # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
+
+    # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) (Reference: Design of Steel structures by Dr. N. Subramanian)
+    # TODO add condition to retrieve weld fu and fy from design preference
+    weld_fu = 410  # Mpa
+    weld_fy = 250  # Mpa
+
+    # Minimum weld thickness (mm)
+
+    # Design of weld at flange
+    # Minimum weld thickness at flange (for drop-down list)
+    # Minimum weld thickness (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
+
+    t_thicker = max(beam_tf, beam_tw, tp_required)
+
+    if t_thicker <= 10:
+        tw_minimum = 3
+    elif t_thicker > 10 or t_thicker <= 20:
+        tw_minimum = 5
+    elif t_thicker > 20 or t_thicker <= 32:
+        tw_minimum = 6
+    elif t_thicker > 32 or t_thicker <= 50:
+        tw_minimum = 8
+
+    # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
+    k = 0.7  # constant (Table 22, IS 800:2007)
+
+    # capacity_unit_flange is the capacity of weld of unit throat thickness
+    capacity_unit_flange = (k * weld_fu) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+
+    # Calculating th effective length of weld at the flange
+    L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) + (4 * beam_tf)) + (2 * weld_thickness_flange)  # mm
+
+    # Calculating the area of weld at flange (a_weld_flange) assuming minimum throat thickness i.e. 3mm (Clause 10.5.3, IS 800:2007)
+    a_weld_flange = L_effective_flange * 3  # mm**2
+
+    # Calculating stresses on weld
+    # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
+    # whereas, the weld at beam web are designed to resist factored shear force and axial loads
+
+    # 1. Direct stress (DS)
+    # Since there is no direct stress (DS_flange) acting on weld at flange, the value od direct stress will be zero
+    DS_flange = 0
+
+    # 2. Bending Stress (BS)
+    # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
+    Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
+    BS_flange = M_u / Z
+
+    # Resultant (R)
+    R = math.sqrt(DS_flange **2 + BS_flange **2)
+
+    # Actual required size of weld
+    t_weld_flange = round(R / capacity_unit_flange)  # mm
+
+    if t_weld_flange != int(t_weld_flange):
+        t_weld_flange = int(t_weld_flange) + 1
+    else:
+        t_weld_flange = t_weld_flange
+
+    if weld_thickness_flange < t_weld_flange:
+        design_status = False
+        logger.error(": Weld thickness at the flange is not sufficient")
+        logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_flange)
+        logger.info(": Increase the weld thickness")
+
+    # Design of weld at web
+    t_weld_web = min(beam_tw, tp_required)
+
+    if t_weld_web != int(t_weld_web):
+        t_weld_web = int(t_weld_web) + 1
+    else:
+        t_weld_web = t_weld_web
+
+
+
+
+
+
 
 
 

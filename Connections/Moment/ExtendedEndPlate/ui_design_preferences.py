@@ -8,10 +8,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_Dialog(object):
+class Ui_DesignPreference(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(808, 515)
+        Dialog.resize(808, 519)
         self.gridLayout_5 = QtWidgets.QGridLayout(Dialog)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -89,14 +89,14 @@ class Ui_Dialog(object):
         self.txt_boltFu.setReadOnly(False)
         self.txt_boltFu.setObjectName("txt_boltFu")
         self.gridLayout.addWidget(self.txt_boltFu, 2, 1, 1, 1)
-        self.comboBox = QtWidgets.QComboBox(self.tab_Bolt)
+        self.combo_boltType = QtWidgets.QComboBox(self.tab_Bolt)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.comboBox.setFont(font)
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.gridLayout.addWidget(self.comboBox, 0, 1, 1, 1)
+        self.combo_boltType.setFont(font)
+        self.combo_boltType.setObjectName("combo_boltType")
+        self.combo_boltType.addItem("")
+        self.combo_boltType.addItem("")
+        self.gridLayout.addWidget(self.combo_boltType, 0, 1, 1, 1)
         self.gridLayout_9.addLayout(self.gridLayout, 0, 1, 3, 1)
         self.label_4 = QtWidgets.QLabel(self.tab_Bolt)
         font = QtGui.QFont()
@@ -366,8 +366,8 @@ class Ui_Dialog(object):
         self.combo_boltHoleType.setItemText(1, _translate("Dialog", "Over-sized"))
         self.label_8.setText(_translate("Dialog", "Fu"))
         self.txt_boltFu.setText(_translate("Dialog", "800"))
-        self.comboBox.setItemText(0, _translate("Dialog", "Pretensioned"))
-        self.comboBox.setItemText(1, _translate("Dialog", "Non-pretensioned"))
+        self.combo_boltType.setItemText(0, _translate("Dialog", "Pretensioned"))
+        self.combo_boltType.setItemText(1, _translate("Dialog", "Non-pretensioned"))
         self.label_4.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
         self.label_2.setText(_translate("Dialog", "Bolt hole type"))
         self.label_7.setText(_translate("Dialog", "HSFG bolt design parameters:"))
@@ -535,7 +535,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_DesignPreference()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

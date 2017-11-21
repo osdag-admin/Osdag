@@ -4,21 +4,83 @@ Created on 24-Aug-2017
 @author: Reshma
 """
 
-from ui_extendedendplate  import  Ui_MainWindow
-from ui_design_preferences import Ui_Dialog
+from ui_extendedendplate import Ui_MainWindow
+from ui_design_preferences import Ui_DesignPreference
+from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
-from PyQt5.Qt import QColor, QBrush, Qt
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator
 from model import *
 import sys
 import os
 
+
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_Dialog()
+        self.ui = Ui_DesignPreference()
         self.ui.setupUi(self)
         self.maincontroller = parent
+
+        self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        # self.set_default_para()
+        dbl_validator = QDoubleValidator()
+        self.ui.txt_boltFu.setValidator(dbl_validator)
+        self.ui.txt_boltFu.setMaxLength(7)
+        self.ui.txt_weldFu.setValidator(dbl_validator)
+        self.ui.txt_weldFu.setMaxLength(7)
+        self.ui.txt_detailingGap.setValidator(dbl_validator)
+        self.ui.txt_detailingGap.setMaxLength(5)
+        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+
+    def save_designPref_para(self):
+        uiObj = self.maincontroller.get_user_inputs()
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        # self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+
+        self.saved_designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+        self.saved_designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
+
+        self.saved_designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text() == '':
+
+            self.saved_designPref["detailing"]["gap"] = float(10)
+        else:
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
+
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
+        self.saved = True
+
+        QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return self.saved_designPref
+
+    def close_designPref(self):
+        self.close()
 
 
 class Maincontroller(QMainWindow):
@@ -47,6 +109,16 @@ class Maincontroller(QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
 
+        validator = QIntValidator()
+        self.ui.txt_Fu.setValidator(validator)
+        self.ui.txt_Fy.setValidator(validator)
+
+        doubl_validator = QDoubleValidator()
+        self.ui.txt_Moment.setValidator(doubl_validator)
+        self.ui.txt_Shear.setValidator(doubl_validator)
+        self.ui.txt_Axial.setValidator(doubl_validator)
+        self.ui.txt_plateHeight.setValidator(doubl_validator)
+        self.ui.txt_plateWidth.setValidator(doubl_validator)
 
         min_fu = 290
         max_fu = 590
@@ -90,7 +162,8 @@ class Maincontroller(QMainWindow):
 
     def design_btnclicked(self):
         self.uiObj = self.get_user_inputs()
-        # outputs = extendedendplate(self.uiObj)
+        print self.uiObj
+        outputs = bbExtendedEndPlateSplice(self.uiObj)
 
     def reset_btnclicked(self):
         self.ui.combo_beamSec.setCurrentIndex(0)

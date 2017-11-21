@@ -9,12 +9,81 @@ from ui_webspliceplate import Ui_Webspliceplate
 from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
+from ui_design_preferences import Ui_DesignPreference
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from model import *
 import sys
 import os.path
 import pickle
+
+class DesignPreferences(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_DesignPreference()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        # self.set_default_para()
+        dbl_validator = QDoubleValidator()
+        self.ui.txt_boltFu.setValidator(dbl_validator)
+        self.ui.txt_boltFu.setMaxLength(7)
+        self.ui.txt_weldFu.setValidator(dbl_validator)
+        self.ui.txt_weldFu.setMaxLength(7)
+        self.ui.txt_detailingGap.setValidator(dbl_validator)
+        self.ui.txt_detailingGap.setMaxLength(5)
+        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+
+    def save_designPref_para(self):
+        uiObj = self.maincontroller.get_user_inputs()
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        # self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+
+        self.saved_designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+        self.saved_designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
+
+        self.saved_designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text() == '':
+
+            self.saved_designPref["detailing"]["gap"] = float(10)
+        else:
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
+
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
+        self.saved = True
+
+        QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return self.saved_designPref
+
+    def close_designPref(self):
+        self.close()
+
 
 class Flangespliceplate(QDialog):
     def __init__(self, parent=None):
@@ -28,12 +97,14 @@ class Flangespliceplate(QDialog):
 
         self.ui.txt_plateHeight.setText()
 
+
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_Webspliceplate()
         self.ui.setupUi(self)
         self.maincontroller = parent
+
 
 class MainController(QMainWindow):
     def __init__(self):
@@ -58,6 +129,7 @@ class MainController(QMainWindow):
         self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -301,6 +373,10 @@ class MainController(QMainWindow):
 
         else:
             pass
+
+    def design_prefer(self):
+        section = DesignPreferences(self)
+        section.show()
 
     def design_btnclicked(self):
         """

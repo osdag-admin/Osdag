@@ -112,11 +112,11 @@ class MainController(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.resultObj = None
         self.get_beamdata()
-        self.ui.combo_connLoc.setCurrentIndex(0)
-        self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
-        self.ui.combo_beamSec.setCurrentIndex(0)
+        self.resultObj = None
+        # self.ui.combo_connLoc.setCurrentIndex(0)
+        # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
+        # self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -163,14 +163,13 @@ class MainController(QMainWindow):
         loc = self.ui.combo_connLoc.currentText()
         beamdata = get_beamcombolist()
         old_beamdata = get_oldbeamcombolist()
-        # combo_section = ' '
-        if loc == 'Beam-Beam':
-            self.ui.combo_beamSec.addItems(beamdata)
-            # combo_section = self.ui.combo_beamSec
+        combo_section = ''
+        self.ui.combo_beamSec.addItems(beamdata)
+        combo_section = self.ui.combo_beamSec
 
-        self.color_oldDatabase_section(old_beamdata, beamdata)
+        self.color_oldDatabase_section(old_beamdata, beamdata, combo_section)
 
-    def color_oldDatabase_section(self, old_section, intg_section):
+    def color_oldDatabase_section(self, old_section, intg_section, combo_section):
         """
 
         Args:
@@ -183,11 +182,11 @@ class MainController(QMainWindow):
         for col in old_section:
             if col in intg_section:
                 indx = intg_section.index(str(col))
-                self.ui.combo_beamSec.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+                combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
 
         duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
         for i in duplicate:
-            self.ui.combo_beamSec.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
+            combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
 
 
     def fetchBeamPara(self):
@@ -330,7 +329,7 @@ class MainController(QMainWindow):
         filename = os.path.join("saveINPUT.txt")
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
-            uiObj  = pickle.load(file_object)
+            uiObj = pickle.load(file_object)
             return uiObj
         else:
             return None
@@ -353,23 +352,25 @@ class MainController(QMainWindow):
         Returns: Set the dictionary to user inputs
 
         """
-        if uiObj is not None :
-            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
-            self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
-            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
-            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
-            self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-            self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
-            self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
-            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
-            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
-            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
-            self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
-            self.ui.combo_webplateThick.setCurrentIndex(self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
-            self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
-            self.ui.txt_flangeplateWidth.setText(str(uiObj["FlangePlate"]["Width (mm)"]))
-            self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
-            self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
+        if uiObj is not None:
+            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
+            if uiObj["Member"]["Connectivity"] == "Beam-Beam" or "Select Connectivity":
+                self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+                self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
+                self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+                self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+                self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
+                self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+                self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+                self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+                self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
+                self.ui.combo_webplateThick.setCurrentIndex(self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
+                self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
+                self.ui.txt_flangeplateWidth.setText(str(uiObj["FlangePlate"]["Width (mm)"]))
+                self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
+                self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
 
         else:
             pass
@@ -478,8 +479,8 @@ class MainController(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    window = MainController()
     module_setup()
+    window = MainController()
     window.show()
     sys.exit(app.exec_())
 if __name__ == '__main__':

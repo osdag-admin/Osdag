@@ -89,11 +89,11 @@ class Maincontroller(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.resultobj = None
-        self.ui.combo_connLoc.setCurrentIndex(0)
-        self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
-        self.ui.combo_beamSec.setCurrentIndex(0)
         self.get_beamdata()
+        self.resultobj = None
+        # self.ui.combo_connLoc.setCurrentIndex(0)
+        # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
+        # self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -228,21 +228,23 @@ class Maincontroller(QMainWindow):
 
         """
         if uiObj is not None :
-            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
-            self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
-            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
-            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
-            self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-            self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
-            self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
-            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
-            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
-            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
-            self.ui.combo_plateThick.setCurrentIndex(self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
-            self.ui.txt_plateHeight.setText(str(uiObj["Plate"]["Height (mm)"]))
-            self.ui.txt_plateWidth.setText(str(uiObj["Plate"]["Width (mm)"]))
-            self.ui.combo_flangeSize.setCurrentIndex(self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
-            self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
+            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
+            if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
+                self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+                self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
+                self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+                self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+                self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
+                self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+                self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+                self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+                self.ui.combo_plateThick.setCurrentIndex(self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
+                self.ui.txt_plateHeight.setText(str(uiObj["Plate"]["Height (mm)"]))
+                self.ui.txt_plateWidth.setText(str(uiObj["Plate"]["Width (mm)"]))
+                self.ui.combo_flangeSize.setCurrentIndex(self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
+                self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
 
         else:
             pass
@@ -271,11 +273,12 @@ class Maincontroller(QMainWindow):
 
     def get_beamdata(self):
         loc = self.ui.combo_connLoc.currentText()
-        if loc == 'Flush' or loc == 'Extended one way' or loc == 'Extended both ways':
-            beamdata = get_beamcombolist()
-            old_beamdata = get_oldbeamcombolist()
-            self.ui.combo_beamSec.addItems(beamdata)
-            self.color_oldDatabase_section(old_beamdata, beamdata, self.ui.combo_beamSec)
+        beamdata = get_beamcombolist()
+        old_beamdata = get_oldbeamcombolist()
+        combo_section = ''
+        self.ui.combo_beamSec.addItems(beamdata)
+        combo_section = self.ui.combo_beamSec
+        self.color_oldDatabase_section(old_beamdata, beamdata, combo_section)
 
     def color_oldDatabase_section(self, old_section, intg_section, combo_section):
         """
@@ -283,6 +286,7 @@ class Maincontroller(QMainWindow):
         Args:
             old_section: Old database
             intg_section: Integrated database
+            combo_section: Contents of database
 
         Returns: Differentiate the database by color code
 
@@ -339,9 +343,6 @@ class Maincontroller(QMainWindow):
             widget.clear()
             widget.setFocus()
 
-
-
-
     def call_2D_drawing(self, view):
         beam_beam = ExtendedEndPlate()
         if view == "Front":
@@ -357,8 +358,8 @@ class Maincontroller(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    window = Maincontroller()
     module_setup()
+    window = Maincontroller()
     window.show()
     sys.exit(app.exec_())
 if __name__ == "__main__":

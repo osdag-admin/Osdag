@@ -223,19 +223,19 @@ def web_max_h(beam_d, beam_f_t, beam_r1):
 ########################################################################################################################
 # Thickness of web splice plate
 ## Minimum thickness of web splice plate [Reference: N. Subramanian, section 5.7.7 page 373]
-def web_min_t(shear_load, beam_fy, web_plate_l):
-    """
-
-    Args:
-        shear_load: Factored shear force in kN (float)
-        beam_fy: Characteristic yield stress of beam N/mm^2 (float)
-        web_plate_l: Height of web splice plate in mm (float)
-
-    Returns: Minimum thickness of web splice plate
-
-    """
-    min_web_t = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
-    return min_web_t
+# def web_min_t(shear_load, beam_fy, web_plate_l):
+#     """
+#
+#     Args:
+#         shear_load: Factored shear force in kN (float)
+#         beam_fy: Characteristic yield stress of beam N/mm^2 (float)
+#         web_plate_l: Height of web splice plate in mm (float)
+#
+#     Returns: Minimum thickness of web splice plate
+#
+#     """
+#     min_web_t = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
+#     return min_web_t
 
 ## Maximum thickness of web splice plate [Reference: Handbook on structural steel detailing, INSDAG - Chapter 5, section 5.2.3 page 5.7]
 def web_max_t(bolt_diameter):
@@ -346,7 +346,6 @@ def coverplateboltedconnection(uiObj, desigpre):
     else:
         pass
 
-    # beam_w_t = float(dictbeamdata["tw"])
     beam_w_t = float(dictbeamdata["tw"])
     beam_f_t = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
@@ -367,20 +366,20 @@ def coverplateboltedconnection(uiObj, desigpre):
         logger.warning(": Minimum required thickness of web splice plate is %2.2f mm") % beam_w_t
         logger.info(": Increase thickness of web splice plate")
 
-    elif web_plate_t < web_min_t:
-        design_status = False
-        logger.error(": Chosen web splice plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of web splice plate is %2.2f mm") % web_min_t
-        logger.info(": Increase the thickness of web splice plate")
-
+    # elif web_plate_t < web_min_t:
+    #     design_status = False
+    #     logger.error(": Chosen web splice plate thickness is not sufficient")
+    #     logger.warning(": Minimum required thickness of web splice plate is %2.2f mm") % web_min_t
+    #     logger.info(": Increase the thickness of web splice plate")
+    #
     elif web_plate_t > web_max_t:
         design_status = False
         logger.error(": Thickness of web splice plate is greater than the maximum thickness")
         logger.warning(": Maximum allowed thickness of web splice plate is %2.2f mm") % web_max_t
         logger.info(": Decrease the thickness of web splice plate")
 
-    else:
-        pass
+    # else:
+    #     pass
 
     # Plate height input and check for maximum and minimum values
 
@@ -391,8 +390,8 @@ def coverplateboltedconnection(uiObj, desigpre):
                 logger.error(": Height of web splice plate is greater than the clear depth of beam")
                 logger.warning(": Maximum web splice plate height allowed is %2.2f mm" % web_max_h)
                 logger.info(": Reduce the height of web splice plate")
-            else:
-                pass
+            # else:
+            #     pass
 
         elif web_min_h > web_max_h:
             if connectivity == "Beam-Beam":
@@ -411,113 +410,192 @@ def coverplateboltedconnection(uiObj, desigpre):
             pass
 
     ########################################################################################################################
-    # Bolt design function
-    # def boltDesignWeb (web_plate_l):
-    # Bolt fu and fy calculation
-    bolt_fu = int(bolt_grade) * 100
-    bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
+    def boltdesignweb (web_plate_l):
+        # Bolt fu and fy calculation
+        bolt_fu = int(bolt_grade) * 100
+        bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
+        print bolt_fu
+        # Minimum pitch and gauge
+        min_pitch = int(2.5 * bolt_diameter)
+        min_gauge = int(2.5 * bolt_diameter)
 
-    # Minimum pitch and gauge
-    min_pitch = int(2.5 * bolt_diameter)
-    min_gauge = int(2.5 * bolt_diameter)
-
-    # Minimum and maximum end and edge distance
-    if "typeof_edge" == "a - Sheared or hand flame cut":
-        min_end_dist = int(float(1.7 * dia_hole))
-    else:
-        min_end_dist = int(float(1.5 * dia_hole))
-    min_edge_dist = min_end_dist
-
-    # max_end_distance  = 12 * web_t_thinner * (fy/25)^0.5
-
-    # Calculation of kb
-    kbChk1 = min_end_dist / float(3 * dia_hole)
-    kbChk2 = min_pitch / float(3 * dia_hole) - 0.25
-    kbChk3 = bolt_fu / float(beam_fu)
-    kbChk4 = 1
-    kb = min(kbChk1, kbChk2, kbChk3, kbChk4)
-    kb = round(kb, 3)
-
-    # Bolt capacity calculation for web splice
-    web_t_thinner = min(beam_w_t, web_plate_t.real)
-    web_bolt_planes = 1
-    number_of_bolts = 1
-    if bolt_type == "Bearing Bolt":
-        web_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, web_bolt_planes, bolt_fu)
-        web_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter,number_of_bolts, web_t_thinner,\
-                                                                        kb, web_plate_fu)
-        web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
-
-    elif bolt_type == "HSFG":
-        muf = mu_f
-        bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
-        n_e = 2  # number of effective surfaces offering frictional resistance
-        web_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type)
-        web_bolt_bearing_capacity = 'N/A'
-        web_bolt_capacity = web_bolt_shear_capacity
-
-        print web_bolt_bearing_capacity, web_bolt_shear_capacity, web_bolt_capacity
-    # # Bolt capacity calculation for flange splice
-    #     # Bolt capacity calculation for web splice plate
-    #
-    #     flange_t_thinner = min(beam_f_t, flange_plate_t.real)
-    #     flange_bolt_planes = 1
-    #     number_of_bolts = 1
-    #     if bolt_type == "Bearing Bolt":
-    #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, flange_bolt_planes, bolt_fu)
-    #         flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
-    #                                                                         kb, int(flange_plate_fu))
-    #         flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
-    #
-    #     elif bolt_type == "HSFG":
-    #         muf = mu_f
-    #         bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
-    #         n_e = 2  # number of effective surfaces offering frictional resistance
-    #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
-    #                                                                          bolt_hole_type)
-    #         flange_bolt_bearing_capacity = 'N/A'
-    #         flange_bolt_capacity = flange_bolt_shear_capacity
-    #
-    #         print flange_bolt_bearing_capacity, flange_bolt_shear_capacity, flange_bolt_capacity
-
-        # print total_moment(beam_d, beam_f_t, axial_force, moment_load) # tested
-        # print flange_force(beam_d, beam_f_t, axial_force, moment_load) # tested
-        # print thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, dia_hole) # tested
-        # print flange_capacity(beam_f_t,beam_b,dia_hole,beam_fy) # tested
-        # print web_min_h(beam_d) # tested
-        # print web_max_h(beam_d, beam_f_t, beam_r1) # tested
-        # print web_min_t(shear_load, beam_fy, web_plate_l) # TODO
-        # print web_max_t(bolt_diameter) # tested
-
-# Calculation of number of bolts required for web splice plate
-    if shear_load != 0:
-        web_bolts_required = int(math.ceil(shear_load/ web_bolt_capacity))
-    else:
-        web_bolts_required = 0
-
-# From practical considerations, minimum number of bolts required for web splice plate is 3 [Reference: ML Gambhir page 10.84]
-    if web_bolts_required > 0 and web_bolts_required <=2:
-        web_bolts_required = 3
-
- # Calculation of bolt group capacity for web splice plate
-    web_bolt_group_capcity = web_bolts_required * web_bolt_capacity
-
-
-# Roundup pitch and end distances as a whole number in the multiples of 10
-    if min_pitch % 10 != 0 or min_gauge % 10 != 0:
-        min_pitch = int(min_pitch / 10) * 10 + 10
-        min_gauge = int(min_pitch / 10) * 10 + 10
-    else:
-        min_pitch = min_pitch
-        min_gauge = min_gauge
-
-# Roundup end and edge distances as a whole number in the multiples of 10
-    if min_end_dist % 10 != 0
-        min_end_dist = int(min_end_dist / 10) * 10 + 10
-        min_edge_dist = int(min_edge_dist / 10) * 10 + 10
-    else:
-        min_end_dist = min_end_dist
+        # Minimum and maximum end and edge distance
+        if desigpre["test"]["typeof_edge"] == str("a - Sheared or hand flame cut"):
+            min_end_dist = int(float(1.7 * dia_hole))
+        else:
+            min_end_dist = int(float(1.5 * dia_hole))
         min_edge_dist = min_end_dist
+
+        min_end_dist = 1.7 * dia_hole
+        min_edge_dist = min_end_dist
+
+        # max_end_distance  = 12 * web_t_thinner * (fy/25)^0.5
+
+        # Calculation of kb
+        kbChk1 = min_end_dist / float(3 * dia_hole)
+        kbChk2 = min_pitch / float(3 * dia_hole) - 0.25
+        kbChk3 = bolt_fu / float(beam_fu)
+        kbChk4 = 1
+        kb = min(kbChk1, kbChk2, kbChk3, kbChk4)
+        kb = round(kb, 3)
+
+        # Bolt capacity calculation for web splice
+        web_t_thinner = min(beam_w_t, web_plate_t.real)
+        web_bolt_planes = 1
+        number_of_bolts = 1
+        if bolt_type == "Bearing Bolt":
+            web_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, web_bolt_planes, bolt_fu)
+            web_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter,number_of_bolts, web_t_thinner,\
+                                                                            kb, web_plate_fu)
+            web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
+
+        elif bolt_type == "HSFG":
+            muf = mu_f
+            bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
+            n_e = 2  # number of effective surfaces offering frictional resistance
+            web_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type)
+            web_bolt_bearing_capacity = 'N/A'
+            web_bolt_capacity = web_bolt_shear_capacity
+
+            print web_bolt_bearing_capacity, web_bolt_shear_capacity, web_bolt_capacity
+        # # Bolt capacity calculation for flange splice
+        #     # Bolt capacity calculation for web splice plate
+        #
+        #     flange_t_thinner = min(beam_f_t, flange_plate_t.real)
+        #     flange_bolt_planes = 1
+        #     number_of_bolts = 1
+        #     if bolt_type == "Bearing Bolt":
+        #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, flange_bolt_planes, bolt_fu)
+        #         flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
+        #                                                                         kb, int(flange_plate_fu))
+        #         flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
+        #
+        #     elif bolt_type == "HSFG":
+        #         muf = mu_f
+        #         bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
+        #         n_e = 2  # number of effective surfaces offering frictional resistance
+        #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
+        #                                                                          bolt_hole_type)
+        #         flange_bolt_bearing_capacity = 'N/A'
+        #         flange_bolt_capacity = flange_bolt_shear_capacity
+        #
+        #         print flange_bolt_bearing_capacity, flange_bolt_shear_capacity, flange_bolt_capacity
+
+            # print total_moment(beam_d, beam_f_t, axial_force, moment_load) # tested
+            # print flange_force(beam_d, beam_f_t, axial_force, moment_load) # tested
+            # print thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, dia_hole) # tested
+            # print flange_capacity(beam_f_t,beam_b,dia_hole,beam_fy) # tested
+            # print web_min_h(beam_d) # tested
+            # print web_max_h(beam_d, beam_f_t, beam_r1) # tested
+            # print web_min_t(shear_load, beam_fy, web_plate_l) # TODO
+            # print web_max_t(bolt_diameter) # tested
+
+    # Maximum pitch and gauge distance
+        max_pitch = int(min((32 * web_t_thinner), 300))
+    # Calculation of number of bolts required for web splice plate
+        if shear_load != 0:
+            web_bolts_required = int(math.ceil(shear_load/ web_bolt_capacity))
+        else:
+            web_bolts_required = 0
+
+    # From practical considerations, minimum number of bolts required for web splice plate is 3 [Reference: ML Gambhir page 10.84]
+        if web_bolts_required > 0 and web_bolts_required <=2:
+            web_bolts_required = 3
+
+     # Calculation of bolt group capacity for web splice plate
+        web_bolt_group_capcity = web_bolts_required * web_bolt_capacity
+
+
+    # Roundup pitch and end distances as a whole number in the multiples of 10
+        if min_pitch % 10 != 0 or min_gauge % 10 != 0:
+            min_pitch = int(min_pitch / 10) * 10 + 10
+            min_gauge = int(min_pitch / 10) * 10 + 10
+        else:
+            min_pitch = min_pitch
+            min_gauge = min_gauge
+
+    # Roundup end and edge distances as a whole number in the multiples of 10
+        if min_end_dist % 10 != 0:
+            min_end_dist = int(min_end_dist / 10) * 10 + 10
+            min_edge_dist = int(min_edge_dist / 10) * 10 + 10
+        else:
+            min_end_dist = min_end_dist
+            min_edge_dist = min_end_dist
+
+    # Pitch calculation for a user given height of web splice plate
+        if web_plate_l != 0:
+            length_avail = (web_plate_l - 2 * min_end_dist)
+            web_pitch = round(length_avail / (web_bolts_required - 1), 3)
+
+    # Case : When there is no user input for height of web splice plate
+        elif web_plate_l == 0:
+            # Consider web splice plate equal to minimum required height of web splice plate & calc pitch
+            web_plate_l_opt = web_min_h(beam_d);
+            web_plate_l_opt = int(web_plate_l_opt)
+            web_pitch = (web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)
+            ## In the above case if "pitch < required min pitch" then recalculate height of web splice plate
+            if web_pitch <= min_pitch:
+                web_plate_l_opt = (web_bolts_required - 1) * min_pitch + 2 * min_end_dist
+                web_pitch = min_pitch
+                # Recalculate pitch if height of web splice plate is greater than maximum height of web splice plate
+                if web_plate_l > web_max_h:
+                    web_plate_l_opt = web_max_h
+                    web_pitch = (int(web_plate_l_opt) - 2 * min_end_dist) / (web_bolts_required - 1)
+                else:
+                    pass
+
+            elif web_pitch >= max_pitch:
+                web_plate_l = (web_bolts_required - 1) * max_pitch + 2 * min_end_dist
+                web_pitch = max_pitch
+
+            else:
+                pass
+
+        else:
+            pass
+
+
+    # Calculation of minimum web plate thickness and maximum end/edge distance
+        if web_plate_l != 0:
+            web_min_t = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
+            max_end_distance = int((12 * web_min_t * math.sqrt(250 / beam_fy)).real)
+            max_edge_distance = max_end_distance
+            if web_plate_t < web_min_t:
+                design_status = False
+                logger.error(": Chosen web splice plate thickness is not sufficient")
+                logger.warning(": Minimum required thickness of web splice plate is %2.2f mm") % web_min_t
+                logger.info(": Increase the thickness of web splice plate")
+
+        elif web_plate_l == 0:
+            web_min_t = (5 * shear_load * 1000) / (beam_fy * web_plate_l_opt)
+            max_end_distance = int((12 * web_min_t * math.sqrt(250 / beam_fy)).real)
+            max_edge_distance = max_end_distance
+
+        ################################################################################################################
+        # Fetch bolt design output parameters dictionary
+        if web_plate_l == 0:
+            boltParam = {}
+            boltParam["ShearCapacity"] = web_bolt_shear_capacity
+            boltParam["BearingCapacity"] = web_bolt_bearing_capacity
+            boltParam["CapacityBolt"] = web_bolt_capacity
+            boltParam["BoltsRequired"] = web_bolts_required
+            boltParam["Pitch"] = web_pitch
+            boltParam["End"] = min_end_dist
+            boltParam["Edge"] = min_edge_dist
+            return boltParam
+        else:
+            boltParam = {}
+            boltParam["ShearCapacity"] = web_bolt_shear_capacity
+            boltParam["BearingCapacity"] = web_bolt_bearing_capacity
+            boltParam["CapacityBolt"] = web_bolt_capacity
+            boltParam["BoltsRequired"] = web_bolts_required
+            boltParam["Pitch"] = web_pitch
+            boltParam["End"] = min_end_dist
+            boltParam["Edge"] = min_edge_dist
+            return boltParam
+        # Call function for bolt design output
+    boltparameters = boltdesignweb(web_plate_l)
+    print "boltparmatert", boltparameters
 
 
 

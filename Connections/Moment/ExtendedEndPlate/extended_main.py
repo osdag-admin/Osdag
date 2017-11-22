@@ -139,7 +139,7 @@ class Maincontroller(QMainWindow):
         uiObj["Load"] = {}
         uiObj["Load"]["ShearForce (kN)"] = self.ui.txt_Shear.text()
         uiObj["Load"]["Moment (kNm)"] = self.ui.txt_Moment.text()
-        uiObj["Load"]["AxialForce"] = self.ui.txt_Axial.text()
+        uiObj["Load"]["AxialForce (kN)"] = self.ui.txt_Axial.text()
 
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_diameter.currentText()

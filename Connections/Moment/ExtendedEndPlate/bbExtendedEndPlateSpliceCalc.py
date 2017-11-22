@@ -805,15 +805,20 @@ def bbExtendedEndPlateSplice(uiObj):
     BS_flange = M_u / Z
 
     # Resultant (R)
-    R = math.sqrt(DS_flange **2 + BS_flange **2)
+    R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
 
     # Actual required size of weld
     t_weld_flange = round(R / capacity_unit_flange)  # mm
 
-    if t_weld_flange != int(t_weld_flange):
-        t_weld_flange = int(t_weld_flange) + 1
-    else:
+    if t_weld_flange % 2 == 0:
         t_weld_flange = t_weld_flange
+    else:
+        t_weld_flange += 1
+
+    # if t_weld_flange != int(t_weld_flange):
+    #     t_weld_flange = int(t_weld_flange) + 1
+    # else:
+    #     t_weld_flange = t_weld_flange
 
     if weld_thickness_flange < t_weld_flange:
         design_status = False
@@ -822,12 +827,13 @@ def bbExtendedEndPlateSplice(uiObj):
         logger.info(": Increase the weld thickness")
 
     # Design of weld at web
-    t_weld_web = min(beam_tw, tp_required)
+    t_weld_web = round(min(beam_tw, tp_required))
 
-    if t_weld_web != int(t_weld_web):
-        t_weld_web = int(t_weld_web) + 1
-    else:
+    if t_weld_web % 2 == 0:
         t_weld_web = t_weld_web
+    else:
+        t_weld_web += 1
+    
 
 
 

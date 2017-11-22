@@ -763,8 +763,6 @@ def bbExtendedEndPlateSplice(uiObj):
     weld_fy = 250  # Mpa
 
     # Minimum weld thickness (mm)
-
-    # Design of weld at flange
     # Minimum weld thickness at flange (for drop-down list)
     # Minimum weld thickness (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
 
@@ -779,6 +777,7 @@ def bbExtendedEndPlateSplice(uiObj):
     elif t_thicker > 32 or t_thicker <= 50:
         tw_minimum = 8
 
+    # Design of weld at flange
     # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
     k = 0.7  # constant (Table 22, IS 800:2007)
 
@@ -808,17 +807,12 @@ def bbExtendedEndPlateSplice(uiObj):
     R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
 
     # Actual required size of weld
-    t_weld_flange = round(R / capacity_unit_flange)  # mm
+    t_weld_flange = math.ceil(R / capacity_unit_flange)  # mm
 
     if t_weld_flange % 2 == 0:
         t_weld_flange = t_weld_flange
     else:
         t_weld_flange += 1
-
-    # if t_weld_flange != int(t_weld_flange):
-    #     t_weld_flange = int(t_weld_flange) + 1
-    # else:
-    #     t_weld_flange = t_weld_flange
 
     if weld_thickness_flange < t_weld_flange:
         design_status = False
@@ -827,13 +821,82 @@ def bbExtendedEndPlateSplice(uiObj):
         logger.info(": Increase the weld thickness")
 
     # Design of weld at web
-    t_weld_web = round(min(beam_tw, tp_required))
+    t_weld_web = math.ceil(min(beam_tw, tp_required))
 
     if t_weld_web % 2 == 0:
         t_weld_web = t_weld_web
     else:
         t_weld_web += 1
-    
+
+    #######################################################################
+    # Weld Checks
+    # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
+
+    # Weld at flange
+    # 1. Check for normal stress
+
+    f_a_flange = force_flange / (3 * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+
+    # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
+    f_wd = weld_fu / (math.sqrt(3) * 1.25)
+    # TODO: call appropriate factor of safety for weld from main file
+
+    if f_a_flange > f_wd:
+        design_status = False
+        logger.error(": The stress in weld at flange exceeds the limiting value (Clause 10.5.7.1.1, IS 800:2007)")
+        logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
+        logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+    # Weld at web
+    L_effective_web = 4 * (beam_d - (2 * beam_tf))
+
+    # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
+    f_a_web = factored_axial_load / (3 * L_effective_web)
+
+    # 2. Check for shear stress
+    q_web = factored_shear_load / (3 * L_effective_web)
+
+    # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
+    f_e = math.sqrt(f_a_web ** 2 + (3 * q_web) ** 2)
+
+    if f_e > f_wd:
+        design_status = False
+        logger.error(": The stress in weld at web exceeds the limiting value (Clause 10.5.10.1.1, IS 800:2007)")
+        logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
+        logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+    #######################################################################
+    # Design of Stiffener
+
+    # TODO: add material strengths for below condition (design preference?)
+    stiffener_fy = beam_fy
+    stiffener_fu =beam_fu
+
+    # Height of stiffener (mm) (AISC Design guide 4, page 16)
+    # TODO: Do calculation for actual height of end plate above
+    h_st = (end_plate_height - beam_d) / 2
+
+    # Length of stiffener
+    cf = math.pi/180
+    l_st = ((h_st - 25) / math.tan(30 * cf)) + 25
+
+    # Thickness of stiffener
+    ts1 = beam_tw
+    ts2 = (beam_fy / stiffener_fy) * beam_tw
+    thickness_stiffener = math.ceil(max(ts1, ts2))
+
+    # Check of stiffener against local buckling
+    E = 2 * 10 ** 5  # MPa
+    ts_required = 1.79 * h_st * stiffener_fy / E
+
+    if thickness_stiffener < ts_required:
+        design_status = False
+        logger.error(": The thickness of stiffener is not sufficient")
+        logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
+        logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
+        logger.info(": Increase the thickness of stiffener")
+
+
 
 
 

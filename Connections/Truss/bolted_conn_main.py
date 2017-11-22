@@ -1760,7 +1760,6 @@ class SectionSelection(QDialog):
 
         # QMessageBox.about(self, 'Information', 'Define members saved')
 
-
     def save_user_inputs(self):
         pass
         # self.save_section = {}
@@ -1925,6 +1924,7 @@ class SectionSelection(QDialog):
 
     def close_definemembrs_para(self):
         self.close()
+
 
 class BoltOutput(QDialog):
     def __init__(self, parent=None):
@@ -2166,6 +2166,61 @@ class Maincontroller(QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.reset_button_clicked)
         self.ui.btn_bolt_output.clicked.connect(self.bolt_output)
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
+        self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
+        self.ui.combo_type.addItems(self.gradeType.keys())
+        self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
+        self.ui.combo_type.setCurrentIndex(0)
+
+        validator = QIntValidator()
+        self.ui.txt_Fu.setValidator(validator)
+        self.ui.txt_Fy.setValidator(validator)
+
+        min_fu = 290
+        max_fu = 590
+        self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+
+        min_fy = 165
+        max_fy = 450
+        self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+
+    def check_range(self, widget, min_val, max_val):
+        """
+
+        Args:
+            widget: Fu , Fy lineedit
+            min_val: min value
+            max_val: max value
+
+        Returns: Check for the value mentioned for the given range
+
+        """
+        text_str = widget.text()
+        text_str = int(text_str)
+        if (text_str < min_val or text_str > max_val or text_str == ' '):
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            widget.clear()
+            widget.setFocus()
+
+    def combotype_current_index_changed(self, index):
+        """
+
+        Args:
+            index: Number
+
+        Returns: Types of Grade
+
+        """
+        items = self.gradeType[str(index)]
+        if items != 0 :
+            self.ui.combo_grade.clear()
+            stritems = []
+            for val in items:
+                stritems.append(str(val))
+
+            self.ui.combo_grade.addItems(stritems)
+        else:
+            pass
 
     def no_of_members(self):
         """
@@ -2238,6 +2293,7 @@ class Maincontroller(QMainWindow):
             conn_members.save_to_svg(filename, view)
         else:
             pass
+
 
 def main():
     app = QApplication(sys.argv)

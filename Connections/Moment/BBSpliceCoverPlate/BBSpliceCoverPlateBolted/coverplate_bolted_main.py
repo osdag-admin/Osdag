@@ -459,13 +459,13 @@ class MainController(QMainWindow):
         """
         beam_beam = CoverEndPlate()
         if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+            filename = "F:\drawing\Front.svg"
             beam_beam.save_to_svg(filename, view)
         elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+            filename = "F:\drawing\Side.svg"
             beam_beam.save_to_svg(filename, view)
         else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+            filename = "F:\drawing\Top.svg"
             beam_beam.save_to_svg(filename, view)
 
     def flangesplice_plate(self):

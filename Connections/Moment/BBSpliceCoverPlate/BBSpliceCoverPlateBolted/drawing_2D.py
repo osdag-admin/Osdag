@@ -366,14 +366,14 @@ class CoverEndPlate(object):
         cover_end_2d_side = CoverEnd2DSide(self)
         if view == "Front":
             cover_end_2d_front.call_CoverEnd_front(filename)
-            # cairosvg.svg2png(file_obj=filename, write_to="D:\PyCharmWorkspace\Osdag\Connections\Moment\Beam-Beam")
+            # cairosvg.svg2png(file_obj=filename, write_to="F:\drawing\TFront.svg")
         elif view == "Top":
             cover_end_2d_top.call_CoverEnd_top(filename)
-
         elif view == "Side":
             cover_end_2d_side.call_CoverEnd_side(filename)
         else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Cover_plate\TFront.svg"
+            # filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Cover_plate\TFront.svg"
+            filename = "F:\drawing\TFront.svg"
             cover_end_2d_front.call_CoverEnd_front(filename)
 
 class CoverEnd2DFront(object):

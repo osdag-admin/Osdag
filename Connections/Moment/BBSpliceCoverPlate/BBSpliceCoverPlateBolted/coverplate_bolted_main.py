@@ -229,28 +229,28 @@ class MainController(QMainWindow):
                 else:
                     resultObj = outputObj
 
-        flange_shear_capacity = resultObj["FlangeBolt"]["ShearCapacity"]
+        flange_shear_capacity = resultObj["FlangeBolt"]["ShearCapacityF"]
         self.ui.txt_shearCapacity.setText(str(flange_shear_capacity))
 
-        flange_bearing_capacity =resultObj["FlangeBolt"]["BearingCapacity"]
+        flange_bearing_capacity =resultObj["FlangeBolt"]["BearingCapacityF"]
         self.ui.txt_bearCapacity.setText(str(flange_bearing_capacity))
 
-        flange_capacity_bolt = resultObj["FlangeBolt"]["CapacityBolt"]
+        flange_capacity_bolt = resultObj["FlangeBolt"]["CapacityBoltF"]
         self.ui.txt_capacityOfbolt.setText(str(flange_capacity_bolt))
 
-        flange_bolt_req = resultObj["FlangeBolt"]["BoltsRequired"]
+        flange_bolt_req = resultObj["FlangeBolt"]["BoltsRequiredF"]
         self.ui.txt_noBolts.setText(str(flange_bolt_req))
 
-        flange_pitch = resultObj["FlangeBolt"]["Pitch"]
+        flange_pitch = resultObj["FlangeBolt"]["PitchF"]
         self.ui.txt_pitch.setText(str(flange_pitch))
 
-        flange_gauge = resultObj["FlangeBolt"]["Gauge"]
+        flange_gauge = resultObj["FlangeBolt"]["GaugeF"]
         self.ui.txt_gauge.setText(str(flange_gauge))
 
-        flange_enddist = resultObj["FlangeBolt"]["End"]
+        flange_enddist = resultObj["FlangeBolt"]["EndF"]
         self.ui.txt_endDist.setText(str(flange_enddist))
 
-        flange_edgedist = resultObj["FlangeBolt"]["Edge"]
+        flange_edgedist = resultObj["FlangeBolt"]["EdgeF"]
         self.ui.txt_edgeDist.setText(str(flange_edgedist))
 
         web_shear_capacity = resultObj["WebBolt"]["ShearCapacity"]

@@ -18,7 +18,7 @@ def set_databaseconnection():
 
 
     """
-    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
+    filepath = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'Database', 'Intg_osdag.sqlite')
     print filepath, "database"
     db = QSqlDatabase.addDatabase("QSQLITE")
     db.setDatabaseName(filepath)

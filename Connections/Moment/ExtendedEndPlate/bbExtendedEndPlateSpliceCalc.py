@@ -1,0 +1,3 @@
+
+def bbExtendedEndPlateSplice(uiObj):
+    pass

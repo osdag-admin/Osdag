@@ -9,12 +9,81 @@ from ui_webspliceplate import Ui_Webspliceplate
 from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
+from ui_design_preferences import Ui_DesignPreference
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from model import *
 import sys
 import os.path
 import pickle
+
+class DesignPreferences(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_DesignPreference()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        self.saved = None
+        self.ui.combo_design_method.model().item(1).setEnabled(False)
+        self.ui.combo_design_method.model().item(2).setEnabled(False)
+        # self.set_default_para()
+        dbl_validator = QDoubleValidator()
+        self.ui.txt_boltFu.setValidator(dbl_validator)
+        self.ui.txt_boltFu.setMaxLength(7)
+        self.ui.txt_weldFu.setValidator(dbl_validator)
+        self.ui.txt_weldFu.setMaxLength(7)
+        self.ui.txt_detailingGap.setValidator(dbl_validator)
+        self.ui.txt_detailingGap.setMaxLength(5)
+        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_save.clicked.connect(self.save_designPref_para)
+        self.ui.btn_close.clicked.connect(self.close_designPref)
+        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+
+    def save_designPref_para(self):
+        uiObj = self.maincontroller.get_user_inputs()
+        self.saved_designPref = {}
+        self.saved_designPref["bolt"] = {}
+        self.saved_designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
+        self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        # self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+        self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+
+        self.saved_designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        self.saved_designPref["weld"]["typeof_weld"] = weldType
+        if weldType == "Shop weld":
+            self.saved_designPref["weld"]["safety_factor"] = float(1.25)
+        else:
+            self.saved_designPref["weld"]["safety_factor"] = float(1.5)
+        self.saved_designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
+
+        self.saved_designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        self.saved_designPref["detailing"]["typeof_edge"] = typeOfEdge
+        if typeOfEdge == "a - Sheared or hand flame cut":
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        else:
+            self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
+        if self.ui.txt_detailingGap.text() == '':
+
+            self.saved_designPref["detailing"]["gap"] = float(10)
+        else:
+            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
+
+        self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+        self.saved_designPref["design"] = {}
+        self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
+        self.saved = True
+
+        QMessageBox.about(self, 'Information', "Preferences saved")
+
+        return self.saved_designPref
+
+    def close_designPref(self):
+        self.close()
+
 
 class Flangespliceplate(QDialog):
     def __init__(self, parent=None):
@@ -36,16 +105,18 @@ class Webspliceplate(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
+
 class MainController(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.get_beamdata()
         self.resultObj = None
-        self.ui.combo_connLoc.setCurrentIndex(0)
-        self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
-        # self.get_beamdata()
+        # self.ui.combo_connLoc.setCurrentIndex(0)
+        # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
+        # self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -58,6 +129,7 @@ class MainController(QMainWindow):
         self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -83,10 +155,39 @@ class MainController(QMainWindow):
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
     def get_beamdata(self):
+        """
+
+        Returns: Selects beam data from both Old & Integrated database
+
+        """
         loc = self.ui.combo_connLoc.currentText()
         beamdata = get_beamcombolist()
-        if loc == 'Beam-Beam':
-            self.ui.combo_beamSec.addItems(beamdata)
+        old_beamdata = get_oldbeamcombolist()
+        combo_section = ''
+        self.ui.combo_beamSec.addItems(beamdata)
+        combo_section = self.ui.combo_beamSec
+
+        self.color_oldDatabase_section(old_beamdata, beamdata, combo_section)
+
+    def color_oldDatabase_section(self, old_section, intg_section, combo_section):
+        """
+
+        Args:
+            old_section: Old database
+            intg_section: Integrated database
+
+        Returns: Differentiate the database by color code
+
+        """
+        for col in old_section:
+            if col in intg_section:
+                indx = intg_section.index(str(col))
+                combo_section.setItemData(indx, QBrush(QColor("red")), Qt.TextColorRole)
+
+        duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
+        for i in duplicate:
+            combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
+
 
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
@@ -94,6 +195,14 @@ class MainController(QMainWindow):
         return  dictbeamdata
 
     def combotype_current_index_changed(self, index):
+        """
+
+        Args:
+            index: Number
+
+        Returns: Types of Grade
+
+        """
         items = self.gradeType[str(index)]
         if items != 0 :
             self.ui.combo_grade.clear()
@@ -106,6 +215,16 @@ class MainController(QMainWindow):
             pass
 
     def check_range(self, widget, min_val, max_val):
+        """
+
+        Args:
+            widget: Fu , Fy lineedit
+            min_val: min value
+            max_val: max value
+
+        Returns: Check for the value mentioned for the given range
+
+        """
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ' '):
@@ -115,6 +234,11 @@ class MainController(QMainWindow):
 
 
     def get_user_inputs(self):
+        """
+
+        Returns: User Input dictionary
+
+        """
         uiObj = {}
         uiObj["Member"] = {}
         uiObj["Member"]["Connectivity"] = str(self.ui.combo_connLoc.currentText())
@@ -143,6 +267,7 @@ class MainController(QMainWindow):
         uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
         return uiObj
 
+
 # Changes made by Swathi
     def design_preference(self):
         designPre = {}
@@ -154,7 +279,34 @@ class MainController(QMainWindow):
         designPre["test"]["typeof_edge"] = str("a - Sheared or hand flame cut")
         return designPre
 
+    def reset_btnclicked(self):
+        self.ui.combo_beamSec.setCurrentIndex(0)
+        self.ui.combo_connLoc.setCurrentIndex(0)
+        self.ui.txt_Fu.clear()
+        self.ui.txt_Fy.clear()
+        self.ui.txt_Axial.clear()
+        self.ui.txt_Shear.clear()
+        self.ui.txt_Moment.clear()
+        self.ui.combo_diameter.setCurrentIndex(0)
+        self.ui.combo_type.setCurrentIndex(0)
+        self.ui.combo_grade.setCurrentIndex(0)
+        self.ui.combo_flangeplateThick.setCurrentIndex(0)
+        self.ui.txt_flangeplateHeight.clear()
+        self.ui.txt_flangeplateWidth.clear()
+        self.ui.combo_webplateThick.setCurrentIndex(0)
+        self.ui.txt_webplateWidth.clear()
+        self.ui.txt_webplateHeight.clear()
+
+
     def closeEvent(self, event):
+        """
+
+        Args:
+            event: Yes or No
+
+        Returns: Ask for the confirmation while closing the window
+
+        """
         uiInput = self.get_user_inputs()
         self.save_inputs_totext(uiInput)
         action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
@@ -166,8 +318,15 @@ class MainController(QMainWindow):
             event.ignore()
 
     def save_inputs_totext(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Save the user input to txt format
+
+        """
         input_file = QFile(os.path.join("saveINPUT.txt"))
-        print "inputfile", input_file
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s: \n%s"
@@ -175,43 +334,70 @@ class MainController(QMainWindow):
         pickle.dump(uiObj, input_file)
 
     def get_prevstate(self):
+        """
+
+        Returns: Read for the previous user inputs design
+
+        """
         filename = os.path.join("saveINPUT.txt")
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
-            uiObj  = pickle.load(file_object)
+            uiObj = pickle.load(file_object)
             return uiObj
         else:
             return None
 
     def retrieve_prevstate(self):
+        """
+
+        Returns: Retrieve the previous user inputs
+
+        """
         uiObj = self.get_prevstate()
         self.set_dict_touser_inputs(uiObj)
 
     def set_dict_touser_inputs(self, uiObj):
-        # if uiObj["Member"]["Connectivity"] == "Beam-Beam":
-        if uiObj is not None :
-            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
-            self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
-            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
-            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
-            self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-            self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
-            self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
-            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
-            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
-            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
-            self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
-            self.ui.combo_webplateThick.setCurrentIndex(self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
-            self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
-            self.ui.txt_flangeplateWidth.setText(str(uiObj["FlangePlate"]["Width (mm)"]))
-            self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
-            self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Set the dictionary to user inputs
+
+        """
+        if uiObj is not None:
+            self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
+            if uiObj["Member"]["Connectivity"] == "Beam-Beam" or "Select Connectivity":
+                self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+                self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
+                self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+                self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+                self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
+                self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+                self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+                self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+                self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
+                self.ui.combo_webplateThick.setCurrentIndex(self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
+                self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
+                self.ui.txt_flangeplateWidth.setText(str(uiObj["FlangePlate"]["Width (mm)"]))
+                self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
+                self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
 
         else:
             pass
 
+    def design_prefer(self):
+        section = DesignPreferences(self)
+        section.show()
 
     def design_btnclicked(self):
+        """
+
+        Returns:
+
+        """
         self.uiObj = self.get_user_inputs()
         self.designPre = self.design_preference()
 
@@ -279,6 +465,14 @@ class MainController(QMainWindow):
 
 
     def call_2D_drawing(self, view):
+        """
+
+        Args:
+            view: Front, Side & Top views
+
+        Returns: Saves 2D svg drawings
+
+        """
         beam_beam = CoverEndPlate()
         if view == "Front":
             filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
@@ -300,8 +494,8 @@ class MainController(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    window = MainController()
     module_setup()
+    window = MainController()
     window.show()
     sys.exit(app.exec_())
 if __name__ == '__main__':

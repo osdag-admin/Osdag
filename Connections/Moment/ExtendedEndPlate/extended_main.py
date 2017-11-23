@@ -339,7 +339,7 @@ class Maincontroller(QMainWindow):
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ''):
-            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
             widget.clear()
             widget.setFocus()
 

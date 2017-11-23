@@ -1,4 +1,4 @@
-'''
+"""
 Created on 16th October, 2017.
 
 @author: Danish Ansari
@@ -41,7 +41,7 @@ ASCII diagram
 Note: The above ASCII diagram does not show details of weld
 
 
-'''
+"""
 
 from model import *
 from Connections.connection_calculations import ConnectionCalculations
@@ -225,9 +225,8 @@ def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
     Returns: (float)- Prying force in bolt (in kN)
 
     """
-    prying_force_bolt = (l_v / 2 * l_e) * (T_e - ((beta * eta * f_0 * b_e * t_p ^ 4) / 27 * l_e * l_v ^ 2))
+    prying_force_bolt = (l_v / 2 * l_e) * (T_e - ((beta * eta * f_0 * b_e * t_p ** 4) / 27 * l_e * l_v ** 2))
     return prying_force_bolt
-
 
 #######################################################################
 
@@ -306,8 +305,7 @@ def shear_rupture(A_vn, plate_fu):
 
 
 #######################################################################
-
-#Function for fetching beam parameters from the database
+# Function for fetching beam parameters from the database
 
 def fetchBeamPara(self):
     beam_sec = self.ui.combo_Beam.currentText()
@@ -351,13 +349,13 @@ def bbExtendedEndPlateSplice(uiObj):
     if end_plate_width == '':
         end_plate_width = 0
     else:
-        end_plate_width = int(end_plate_width)
+        end_plate_width = float(end_plate_width)
 
     end_plate_height = str(uiObj['Plate']['Height (mm)'])
     if end_plate_height == '':
         end_plate_height = 0
     else:
-        end_plate_height = int(end_plate_height)
+        end_plate_height = float(end_plate_height)
 
     # TODO implement after excomm review for different grades of plate
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
@@ -396,18 +394,18 @@ def bbExtendedEndPlateSplice(uiObj):
     #######################################################################
     # Calculation of Spacing
 
-    # t_thinner is the thickness of the thinner plate
+    # t_thinner is the thickness of the thinner plate(s) being connected
     t_thinner = end_plate_thickness
 
     # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm) [Cl. 10.2.2, IS 800:2007]
     min_pitch = int(2.5 * bolt_dia)
-    max_pitch = max(int(32 * t_thinner, 300))
+    max_pitch = min(int(32 * t_thinner, 300))
 
     # min_gauge & max_gauge = Minimum and Maximum gauge distance (mm) [Cl. 10.2.3.1, IS 800:2007]
     min_gauge = min_pitch
     max_gauge = max_pitch
 
-    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge)
+    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
     g_1 = 90
 
@@ -433,6 +431,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # End Plate Thickness
 
+    # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
     if end_plate_thickness < max(beam_tf, beam_tw):
         end_plate_thickness = max(beam_tf, beam_tw)
         design_status = False
@@ -463,12 +462,12 @@ def bbExtendedEndPlateSplice(uiObj):
         logger.error(": Width of the End Plate is less than the minimum required value ")
         logger.warning(": Minimum End Plate width required is %2.2f mm" % end_plate_width_mini)
         logger.info(": Increase the width of End Plate")
+
     if end_plate_width > end_plate_width_max:
         design_status = False
-        logger.error(": Width of the End Plate is greater than the minimum required value")
+        logger.error(": Width of the End Plate exceeds the maximum allowed width ")
         logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
         logger.info(": Decrease the width of End Plate")
-
 
     # Check for Minimum and Maximum values of End Plate Height from user input
 
@@ -476,7 +475,7 @@ def bbExtendedEndPlateSplice(uiObj):
         if end_plate_height <= beam_d:
             # end_plate_height = end_plate_height_mini
             design_status = False
-            logger.error(": Height of End Plate is less than the depth of the Beam ")
+            logger.error(": Height of End Plate is less than/or equal to the depth of the Beam ")
             logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
             logger.info(": Increase the Height of End Plate")
         elif end_plate_height <= end_plate_height_mini:
@@ -562,7 +561,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
     n = math.sqrt((6 * M_u) / (2 * min_pitch * bolt_shear_capacity))
-    n = round(n.real)
+    n = math.ceil(n)
 
     # number_of_bolts = Total number of bolts in the configuration
     number_of_bolts = 2 * n
@@ -583,7 +582,7 @@ def bbExtendedEndPlateSplice(uiObj):
     # Calculation of Tension in bolts
     # Assuming the Neutral axis to pass through the centre of the bottom flange
     # T1, T2, ..., Tn are the Tension in the bolts starting from top of the end plate and y1, y2, ..., yn are its corresponding distances from N.A
-    # TODO : check the working of the loop below
+    # TODO : check the working of the below loop
     if number_of_bolts == 8:
         y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
         y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
@@ -638,7 +637,7 @@ def bbExtendedEndPlateSplice(uiObj):
     tension_flange = T_f
     M_p = (tension_flange * l_v) / 2
     tp_required = math.sqrt((4 * 1.10 * M_p) / (end_plate_fy * b_e))
-    tp_required = round(tp_required)
+    tp_required = math.ceil(tp_required)
 
     if tp_required < end_plate_thickness:
         design_status = False
@@ -650,13 +649,17 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Calculation of Prying Force at Tension flange
     # TODO : add condition of beta depending on bolt type
+    if uiObj['bolt']['bolt_type'] == "pre-tensioned":
+        beta = 1
+    else:
+        beta = 2
 
-    beta = 2
     eta = 1.5
     f_0 = 0.7 * bolt_fu
     l_e = min(min_end_distance, 1.1 * tp_required * math.sqrt((beta * f_0) / bolt_fy))
     T_e = T_f
     t_p = tp_required
+
     Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
     Q = round(Q.real, 3)
 
@@ -682,13 +685,13 @@ def bbExtendedEndPlateSplice(uiObj):
     if bolt_type == "HSFG":
         if T_b >= Tdf:
             design_status = False
-            logger.error(": Tension on bolt due to Moment + Axial load + Prying action exceeds the tension carrying capacity of the selected HSFG bolt (Clause 10.4.5, IS 800:2007)")
+            logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.4.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension on HSFGF bolt of selected diameter is %2.2f kN" % Tdf)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
         if T_b >= Tdb:
             design_status = False
-            logger.error(": Tension on bolt due to Moment + Axial load + Prying action exceeds the tension carrying capacity of the selected Bearing bolt (Clause 10.3.5, IS 800:2007)")
+            logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.3.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension on Bearing bolt of selected diameter is %2.2f kN" % Tdb)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
@@ -711,16 +714,16 @@ def bbExtendedEndPlateSplice(uiObj):
     Vsb = Vsf
     Vdb = V_db
     Tb = T_b
-    combined_capacity_bearing = (Vsb / Vdb) **2 + (Tb / Tdb) ** 2
+    combined_capacity_bearing = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
 
     if bolt_type == "HSFG":
-        if combined_capacity_hsfg >= 1.0:
+        if combined_capacity_hsfg > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected HSFG bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
-        if combined_capacity_bearing >= 1.0:
+        if combined_capacity_bearing > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
@@ -736,7 +739,7 @@ def bbExtendedEndPlateSplice(uiObj):
     if V_d < factored_shear_load:
         design_status = False
         logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The minimum shear yielding capacity required is %2.2f kN" % factored_shear_load)
+        logger.warning(": The minimum required shear yielding capacity is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
 
     # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
@@ -840,6 +843,12 @@ def bbExtendedEndPlateSplice(uiObj):
         t_weld_web = t_weld_web
     else:
         t_weld_web += 1
+
+    if weld_thickness_web < t_weld_web:
+        design_status = False
+        logger.error(": Weld thickness at the web is not sufficient")
+        logger.warning(": Minimum weld thickness required is %2.2f mm" % t_weld_web)
+        logger.info(": Increase the weld thickness")
 
     #######################################################################
     # Weld Checks

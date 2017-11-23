@@ -27,7 +27,7 @@ from ui_channel5 import Ui_Channel_Five
 from ui_channel6 import Ui_Channel_Six
 from ui_channel7 import Ui_Channel_Seven
 from ui_output import Ui_BoltOutput
-from newoutput import Ui_Table
+# from newoutput import Ui_Table
 from drawing_2D import TrussBoltedConnection
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QTableWidgetItem
 from PyQt5.QtGui import QIntValidator, QPalette, QDoubleValidator
@@ -2234,7 +2234,7 @@ class Maincontroller(QMainWindow):
         """
         conn_members = TrussBoltedConnection()
         if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Truss\Front.svg"
+            filename = "F:\drawing\TrussFront.svg"
             conn_members.save_to_svg(filename, view)
         else:
             pass

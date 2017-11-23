@@ -68,11 +68,12 @@ module_setup()
 def netArea_thread(dia):
     """
 
-    :param dia: (int)- diameter of bolt (HSFG/Bearing bolt)
+    Args:
+        dia: (int)- diameter of bolt (HSFG/Bearing bolt)
 
-    :return: (float)- Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+    Returns: (float)- Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
     """
-
     netArea = {12: 84.3, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
     return netArea[dia]
 
@@ -84,9 +85,11 @@ def netArea_thread(dia):
 def netarea_shank(dia):
     """
 
-    :param dia: (int) -  diameter of bolt (HSFG/Bearing bolt)
+    Args:
+        dia: (int) -  diameter of bolt (HSFG/Bearing bolt)
 
-    :return: (int)- Net area of bolts at shank portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+    Returns: (int)- Net area of bolts at shank portion (Ref. Table 5.11 Subramanian's book, page: 358 )
+
     """
     net_area = {12: 113, 16: 201, 20: 314, 22: 380, 24: 452, 27: 572, 30: 706, 36: 1017}
     return net_area[dia]
@@ -100,12 +103,13 @@ def netarea_shank(dia):
 def long_joint(dia, l_j):
     """
 
-    :param dia: (int)- diameter of bolt
-    :param l_j: (float)- length of joint i.e. distance between first and last bolt in the joint measured in the direction of load transfer
+    Args:
+        dia: (int)- diameter of bolt
+        l_j: (float)- length of joint i.e. distance between first and last bolt in the joint measured in the direction of load transfer
 
-    :return: (float)- reduction factor beta_lj
+    Returns: (float)- reduction factor beta_lj
+
     """
-
     beta_lj = 1.075 - (0.005 * (l_j/dia))
     return beta_lj
 
@@ -120,13 +124,14 @@ def long_joint(dia, l_j):
 def bolt_shear(dia, n, bolt_fu):
     """
 
-    :param dia: (int)- diameter of bolt
-    :param n: (str)- number of shear plane(s) through which bolt is passing
-    :param bolt_fu: (float)- Ultimate tensile strength of a bolt
+    Args:
+        dia: (int)- diameter of bolt
+        n: (str)- number of shear plane(s) through which bolt is passing
+        bolt_fu: (float)- Ultimate tensile strength of a bolt
 
-    :return: (float)- Shear capacity of bearing type bolt in kN
+    Returns: (float)- Shear capacity of bearing type bolt in kN
+
     """
-
     A = netArea_thread(dia)
     V_dsb = bolt_fu * n * A / (math.sqrt(3) * 1.25 * 1000)
     V_dsb = round(V_dsb.real, 3)
@@ -142,14 +147,15 @@ def bolt_shear(dia, n, bolt_fu):
 def bolt_bearing(dia, t, k_b, bolt_fu):
     """
 
-    :param dia: (int)- diameter of bolt
-    :param t: (float)- summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
-    :param k_b: (float)- multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
-    :param bolt_fu: (float)- Ultimate tensile strength of a bolt
+    Args:
+        dia: (int)- diameter of bolt
+        t: (float)- summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
+        k_b: (float)- multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
+        bolt_fu: (float)- Ultimate tensile strength of a bolt
 
-    :return: (float)- Bearing capacity of bearing type bolt in kN
+    Returns: (float)- Bearing capacity of bearing type bolt in kN
+
     """
-
     V_dpb = 2.5 * k_b * dia * t * bolt_fu / (1.25 * 1000)
     V_dpb  = round(V_dpb.real, 3)
     return V_dpb
@@ -163,15 +169,16 @@ def bolt_bearing(dia, t, k_b, bolt_fu):
 def min_plate_height(beam_D, l_v, n_r, min_pitch, e_1):
     """
 
-    :param beam_D: (float) - Depth of beam
-    :param l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
-    :param n_r: (int)- number of row(s) above or below the beam flange
-    :param min_pitch: (float)- minimum pitch distance i.e. 2.5*bolt_diameter
-    :param e_1: (float)- minimum end distance i.e. 1.7*bolt_hole_diameter
+    Args:
+        beam_D: (float) - Depth of beam
+        l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
+        n_r: (int)- number of row(s) above or below the beam flange
+        min_pitch: (float)- minimum pitch distance i.e. 2.5*bolt_diameter
+        e_1: (float)- minimum end distance i.e. 1.7*bolt_hole_diameter
 
-    :return: (float)- Minimum required height of extended end plate as per detailing requirements in mm
+    Returns: (float)- Minimum required height of extended end plate as per detailing requirements in mm
+
     """
-
     min_end_plate_height = beam_D + (2 * l_v) + (2 * (n_r-1) * min_pitch) + (2 * e_1)
     return min_end_plate_height
 
@@ -184,14 +191,15 @@ def min_plate_height(beam_D, l_v, n_r, min_pitch, e_1):
 def min_plate_width(g_1, n, min_gauge, e_2):
     """
 
-    :param g_1: (float)- Cross-centre gauge distance
-    :param n: (int)- Number of columns of bolt (assumed to be 2)
-    :param min_gauge: (float)- minimum gauge distance i.e. 2.5*bolt_diameter
-    :param e_2: (float)- minimum edge distance i.e. 1.7*bolt_hole_diameter
+    Args:
+        g_1: (float)- Cross-centre gauge distance
+        n: (int)- Number of columns of bolt (assumed to be 2)
+        min_gauge: (float)- minimum gauge distance i.e. 2.5*bolt_diameter
+        e_2: (float)- minimum edge distance i.e. 1.7*bolt_hole_diameter
 
-    :return: (float)- Minimum required width of extended end plate as per detailing requirements in mm
+    Returns: (float)- Minimum required width of extended end plate as per detailing requirements in mm
+
     """
-
     min_end_plate_width = g_1 + (n - 2) * min_gauge + (2 * e_2)
     return min_end_plate_width
 
@@ -204,18 +212,19 @@ def min_plate_width(g_1, n, min_gauge, e_2):
 def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
     """
 
-    :param T_e: (float): Tension acting on beam flange
-    :param l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
-    :param l_e: (float)- Distance between prying force and bolt centreline
-    :param beta: (int)- multiplying factor
-    :param eta: (float)- multiplying factor
-    :param f_0: (float)- proof stress in consistent units
-    :param b_e: (float)- effective width of flange per pair of bolts
-    :param t_p: (float)- thickness of end plate
+    Args:
+        T_e: (float): Tension acting on beam flange
+        l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
+        l_e: (float)- Distance between prying force and bolt centreline
+        beta: (int)- multiplying factor
+        eta: (float)- multiplying factor
+        f_0: (float)- proof stress in consistent units
+        b_e: (float)- effective width of flange per pair of bolts
+        t_p: (float)- thickness of end plate
 
-    :return: (float)- Prying force in bolt (in kN)
+    Returns: (float)- Prying force in bolt (in kN)
+
     """
-
     prying_force_bolt = (l_v / 2 * l_e) * (T_e - ((beta * eta * f_0 * b_e * t_p ^ 4) / 27 * l_e * l_v ^ 2))
     return prying_force_bolt
 
@@ -228,12 +237,13 @@ def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
 def bolt_tension_hsfg(bolt_fu, netArea):
     """
 
-    :param bolt_fu: (float)- Ultimate tensile strength of a bolt
-    :param netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
+    Args:
+        bolt_fu: (float)- Ultimate tensile strength of a bolt
+        netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
 
-    :return: (float)- Tension capacity of HSFG bolt in kN
+    Returns: (float)- Tension capacity of HSFG bolt in kN
+
     """
-
     T_df = 0.9 * bolt_fu * netArea / 1.25 * 1000
     return T_df
 
@@ -246,12 +256,13 @@ def bolt_tension_hsfg(bolt_fu, netArea):
 def bolt_tension_bearing(bolt_fu, netArea):
     """
 
-    :param bolt_fu: (float)- Ultimate tensile strength of a bolt
-    :param netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
+    Args:
+        bolt_fu: (float)- Ultimate tensile strength of a bolt
+        netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
 
-    :return: (float)- Tension capacity of Bearing bolt in kN
+    Returns: (float)- Tension capacity of Bearing bolt in kN
+
     """
-
     T_db = 0.9 * bolt_fu * netArea / 1.25 * 1000
     return T_db
 
@@ -264,12 +275,13 @@ def bolt_tension_bearing(bolt_fu, netArea):
 def shear_yielding(A_v, plate_fy):
     """
 
-    :param A_v: (float)- Gross shear area of end plate
-    :param plate_fy: (float)- Yield stress of plate material
+    Args:
+        A_v: (float)- Gross shear area of end plate
+        plate_fy: (float)- Yield stress of plate material
 
-    :return: (float)- Shear yielding capacity of End Plate in kN
+    Returns: (float)- Shear yielding capacity of End Plate in kN
+
     """
-
     V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
     return V_d
 
@@ -282,12 +294,13 @@ def shear_yielding(A_v, plate_fy):
 def shear_rupture(A_vn, plate_fu):
     """
 
-    :param A_vn: (float)- Net shear area of end plate
-    :param plate_fu: (float)- Ultimate stress of plate material
+    Args:
+        A_vn: (float)- Net shear area of end plate
+        plate_fu: (float)- Ultimate stress of plate material
 
-    :return: (float)- Shear rupture capacity of End Plate in kN
+    Returns: (float)- Shear rupture capacity of End Plate in kN
+
     """
-
     R_n = 0.6 * A_vn * plate_fu / 1000
     return R_n
 
@@ -870,7 +883,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # TODO: add material strengths for below condition (design preference?)
     stiffener_fy = beam_fy
-    stiffener_fu =beam_fu
+    stiffener_fu = beam_fu
 
     # Height of stiffener (mm) (AISC Design guide 4, page 16)
     # TODO: Do calculation for actual height of end plate above

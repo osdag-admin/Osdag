@@ -25,6 +25,7 @@ class DesignPreferences(QDialog):
         self.maincontroller = parent
 
         self.saved = None
+        self.ui.tabWidget.removeTab(1)
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
         # self.set_default_para()
@@ -93,9 +94,9 @@ class Flangespliceplate(QDialog):
         self.maincontroller = parent
 
         uiObj = self.maincontroller # TODO pass dictionary
-        resultObj_flangeplate = coverplateboltedconnection(uiObj)
+        # resultObj_flangeplate = coverplateboltedconnection(uiObj)
 
-        self.ui.txt_plateHeight.setText()
+        # self.ui.txt_plateHeight.setText()
 
 
 class Webspliceplate(QDialog):
@@ -188,7 +189,6 @@ class MainController(QMainWindow):
         for i in duplicate:
             combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
 
-
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
         dictbeamdata = get_beamdata(beamdata_sec)
@@ -231,7 +231,6 @@ class MainController(QMainWindow):
             QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
             widget.clear()
             widget.setFocus()
-
 
     def get_user_inputs(self):
         """

@@ -7,8 +7,8 @@ import os
 
 class TrussBoltedConnection(object):
     def __init__(self):
-        self.plate_length = 100
-        self.plate_width = 800
+        self.plate_length = 600
+        self.plate_width = 400
         self.plate_thick = 22
 
         self.angle1_A = 150
@@ -313,15 +313,39 @@ class TrussBoltedConnection(object):
 class Truss2DFront(object):
     def __init__(self, Truss_common_object):
         self.data_object = Truss_common_object
+        # --------------------------------------------------------------------------
+        #                               FRONT VIEW
+        # --------------------------------------------------------------------------
 
         self.origin = np.array([0,0])
-        self.A = np.array([-self.data_object.plate_length/2, self.data_object.plate_width/2])
-        self.B = np.array([self.data_object.plate_length/2, self.data_object.plate_width/2])
-        self.C = np.array([self.data_object.plate_length/2, -self.data_object.plate_width/2])
-        self.D = np.array([-self.data_object.plate_length/2, -self.data_object.plate_width/2])
+
+        offsetX = 1000
+        offsetY = 300
+
+        Ax = -self.data_object.plate_length + offsetX
+        Ay = self.data_object.plate_width + offsetY
+        self.A = np.array([Ax, Ay])
+
+        Bx = self.data_object.plate_length + offsetX
+        By = self.data_object.plate_width + offsetY
+        self.B = np.array([Bx, By])
+
+        Cx = self.data_object.plate_length + offsetX
+        Cy = -self.data_object.plate_width + offsetY
+        self.C = np.array([Cx, Cy])
+
+        Dx = -self.data_object.plate_length + offsetX
+        Dy = -self.data_object.plate_width + offsetY
+        self.D = np.array([Dx, Dy])
 
     def  call_Truss_2DFront(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2840 1740'))  # 230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
-        dwg.add(dwg.polyline(self.A, self.B).stroke('blue', width=2.5, linecap='square'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2840 1740'))  # 230 = move towards left , 600= move towards
+        # down, 2840= width of view, 2340= height of view
+        # dwg.add(dwg.line(self.A, self.B).stroke('blue', width=2.5, linecap='square'))
+        # dwg.add(dwg.line(self.B, self.C).stroke('blue', width=2.5, linecap='square'))
+        # dwg.add(dwg.line(self.C, self.D).stroke('blue', width=2.5, linecap='square'))
+        # dwg.add(dwg.line(self.D, self.A).stroke('blue', width=2.5, linecap='square'))
+
+        dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))
 
         dwg.save()

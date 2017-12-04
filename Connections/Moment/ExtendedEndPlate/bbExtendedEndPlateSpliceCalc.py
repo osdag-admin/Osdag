@@ -335,13 +335,18 @@ def bbExtendedEndPlateSplice(uiObj):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
-    mu_f = float(uiObj["bolt"]["slip_factor"])
-    gamma_mw = float(uiObj["weld"]["safety_factor"])
-    dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
-    dia_hole = int(uiObj['bolt']['bolt_hole_clrnce']) + bolt_dia
-    weld_type = uiObj['weld']['typeof_weld']
-    dp_bolt_type = uiObj['bolt']['bolt_type']
-
+    mu_f = 0.30
+    gamma_mw = 1.25
+    dp_bolt_hole_type = "Standard"
+    dia_hole = bolt_dia + 2
+    weld_type = "Shop weld"
+    dp_bolt_type = "HSFG"
+    # mu_f = float(uiObj["bolt"]["slip_factor"])
+    # gamma_mw = float(uiObj["weld"]["safety_factor"])
+    # dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
+    # dia_hole = int(uiObj['bolt']['bolt_hole_clrnce']) + bolt_dia
+    # weld_type = uiObj['weld']['typeof_weld']
+    # dp_bolt_type = uiObj['bolt']['bolt_type']
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
@@ -361,8 +366,8 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
-    weld_thickness_flange = float(uiObj['Weld']['Size (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Size (mm)'])
+    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
+    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
     old_beam_section = get_oldbeamcombolist()
 
@@ -399,11 +404,15 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm) [Cl. 10.2.2, IS 800:2007]
     min_pitch = int(2.5 * bolt_dia)
-    max_pitch = min(int(32 * t_thinner, 300))
+    pitch_dist_min = min_pitch + (5 - min_pitch) % 5  # round off to nearest multiple of five
+
+    max_pitch = int(min(32 * t_thinner, 300))
+    pitch_dist_max = max_pitch + (5 - max_pitch) % 5  # round off to nearest multiple of five
 
     # min_gauge & max_gauge = Minimum and Maximum gauge distance (mm) [Cl. 10.2.3.1, IS 800:2007]
-    min_gauge = min_pitch
-    max_gauge = max_pitch
+
+    gauge_dist_min = pitch_dist_min
+    gauge_dist_max = pitch_dist_max
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
@@ -411,16 +420,20 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
-        min_end_distance = int(float(1.7 * dia_hole))
+        min_end_distance = int(math.ceil(1.7 * dia_hole))
     else:
         min_end_distance = int(float(1.5 * dia_hole))
+
+    end_dist_mini = min_end_distance + (5 - min_end_distance) % 5  # round off to nearest multiple of five
 
     e = math.sqrt(250 / end_plate_fy)
     max_end_distance = 12 * end_plate_thickness * e
 
+    end_dist_max = max_end_distance + (5 - max_end_distance) % 5  # round off to nearest multiple of five
+
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
-    min_edge_distance = min_end_distance
-    max_edge_distance = max_end_distance
+    edge_dist_mini = end_dist_mini
+    edge_dist_max = end_dist_max
 
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
@@ -433,7 +446,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
     if end_plate_thickness < max(beam_tf, beam_tw):
-        end_plate_thickness = max(beam_tf, beam_tw)
+        end_plate_thickness = max(math.ceil(beam_tf, beam_tw))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
@@ -442,19 +455,19 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Minimum and Maximum Plate Height
     # TODO: Validate end_plate_height_mini after excomm review (currently used value of l_v is 50mm)
-    end_plate_height_mini = beam_d + 50 + (2 * min_end_distance)
+    end_plate_height_mini = beam_d + 50 + (2 * end_dist_mini)
 
     # TODO: Validate end_plate_height_max after excomm review
     # Note: The distance between the toe of weld or the flange edge to the centre of the nearer bolt is 62.5mm (assumed to be maximum)
 
-    end_plate_height_max = beam_d + 50 + (2 * max_end_distance)
+    end_plate_height_max = beam_d + 50 + (2 * end_dist_max)
 
     # End Plate Width
 
     # Minimum and Maximum width of End Plate [Ref: Based on reasoning and AISC Design guide 16]
     # TODO check for mini width as per AISC after excomm review
 
-    end_plate_width_mini = g_1 + (2 * min_edge_distance)
+    end_plate_width_mini = g_1 + (2 * edge_dist_mini)
     end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
 
     if end_plate_width < end_plate_width_mini:
@@ -533,8 +546,8 @@ def bbExtendedEndPlateSplice(uiObj):
     sum_plate_thickness = 2 * end_plate_thickness
 
     # Calculation of k_b
-    kb_1 = min_end_distance / (3 * dia_hole)
-    kb_2 = (min_pitch / (3 * dia_hole)) - 0.25
+    kb_1 = end_dist_mini / (3 * dia_hole)
+    kb_2 = (pitch_dist_min / (3 * dia_hole)) - 0.25
     kb_3 = bolt_fu / end_plate_fu
     kb_4 = 1.0
     k_b = min(kb_1, kb_2, kb_3, kb_4)
@@ -560,7 +573,7 @@ def bbExtendedEndPlateSplice(uiObj):
         bolt_shear_capacity = V_db
 
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
-    n = math.sqrt((6 * M_u) / (2 * min_pitch * bolt_shear_capacity))
+    n = math.sqrt((6 * M_u) / (2 * pitch_dist_min * bolt_shear_capacity))
     n = math.ceil(n)
 
     # number_of_bolts = Total number of bolts in the configuration
@@ -597,8 +610,8 @@ def bbExtendedEndPlateSplice(uiObj):
         y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
         y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
         y3 = y2 - min_pitch
-        y4 = (beam_tf/2) + weld_thickness_flange + l_v + min_pitch
-        y5 = y4 - min_pitch
+        y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
+        y5 = y4 - pitch_dist_min
         y = (y1**2 + y2**2 + y3**2 + y4**2 + y5**2)
         T1 = (M_u * y1) / y
         T2 = (M_u * y2) / y
@@ -610,11 +623,11 @@ def bbExtendedEndPlateSplice(uiObj):
     elif number_of_bolts == 16:
         y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
         y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-        y3 = y2 - min_pitch
-        y4 = y3 - min_pitch
-        y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * min_pitch)
-        y6 = y5 - min_pitch
-        y7 = y6 - min_pitch
+        y3 = y2 - pitch_dist_min
+        y4 = y3 - pitch_dist_min
+        y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+        y6 = y5 - pitch_dist_min
+        y7 = y6 - pitch_dist_min
         y = (y1**2 + y2**2 + y3**2 + y4**2 + y5**2 + y6**2 + y7**2)
         T1 = (M_u * y1) / y
         T2 = (M_u * y2) /y
@@ -656,7 +669,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     eta = 1.5
     f_0 = 0.7 * bolt_fu
-    l_e = min(min_end_distance, 1.1 * tp_required * math.sqrt((beta * f_0) / bolt_fy))
+    l_e = min(end_dist_mini, 1.1 * tp_required * math.sqrt((beta * f_0) / bolt_fy))
     T_e = T_f
     t_p = tp_required
 

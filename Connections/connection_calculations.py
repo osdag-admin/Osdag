@@ -305,3 +305,17 @@ class ConnectionCalculations(object):
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
         if is_environ_corrosive == "Yes":
             self.max_edge_dist = min(self.max_edge_dist, 40 + 4 * thickness_governing_min)
+
+    @staticmethod
+    def round_to_next_five(distance):
+        """
+
+        Args:
+            distance: (float) takes value of distance in mm
+
+        Returns:
+            distance: (float) Value of distance rounded up to the nearest multiple of five
+
+        """
+        round_up_distance = distance + (5 - distance) % 5
+        return round_up_distance

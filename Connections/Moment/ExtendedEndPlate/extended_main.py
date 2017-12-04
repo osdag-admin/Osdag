@@ -147,9 +147,9 @@ class Maincontroller(QMainWindow):
         uiObj["Bolt"]["Type"] = self.ui.combo_type.currentText()
 
         uiObj["Plate"] = {}
-        uiObj["Plate"]["Thickness (mm)"] = self.ui.combo_plateThick.currentText()
-        uiObj["Plate"]["Height (mm)"] = self.ui.txt_plateHeight.text()
-        uiObj["Plate"]["Width (mm)"] = self.ui.txt_plateWidth.text()
+        uiObj["Plate"]["Thickness (mm)"] = str(self.ui.combo_plateThick.currentText())
+        uiObj["Plate"]["Height (mm)"] = str(self.ui.txt_plateHeight.text())
+        uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
         uiObj["Weld"] = {}
         uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
@@ -235,7 +235,7 @@ class Maincontroller(QMainWindow):
                 self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
                 self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
                 self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce (kN)"]))
                 self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
                 self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
                 self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))

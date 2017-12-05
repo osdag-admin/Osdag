@@ -29,7 +29,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1244</width>
+        <width>1236</width>
         <height>273</height>
        </rect>
       </property>
@@ -127,7 +127,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Members</string>
+          <string>Member</string>
          </property>
         </widget>
        </item>

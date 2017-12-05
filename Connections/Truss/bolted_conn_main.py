@@ -6,26 +6,8 @@ Created on 27-Sept-2017
 from ui_boltedconnection import Ui_MainWindow
 from ui_selection import Ui_Selection
 from ui_singleangle import Ui_Singleangle
-from ui_singleangle2 import Ui_Singleangle_Two
-from ui_singleangle3 import Ui_Singleangle_Three
-from ui_singleangle4 import Ui_Singleangle_Four
-from ui_singleangle5 import Ui_Singleangle_Five
-from ui_singleangle6 import Ui_Singleangle_Six
-from ui_singleangle7 import Ui_Singleangle_Seven
 from ui_doubleangle import Ui_Doubleangle
-from ui_doubleangle2 import Ui_Doubleangle_Two
-from ui_doubleangle3 import Ui_Doubleangle_Three
-from ui_doubleangle4 import Ui_Doubleangle_Four
-from ui_doubleangle5 import Ui_Doubleangle_Five
-from ui_doubleangle6 import Ui_Doubleangle_Six
-from ui_doubleangle7 import Ui_Doubleangle_Seven
 from ui_channel import Ui_Channel
-from ui_channel2 import Ui_Channel_Two
-from ui_channel3 import Ui_Channel_Three
-from ui_channel4 import Ui_Channel_Four
-from ui_channel5 import Ui_Channel_Five
-from ui_channel6 import Ui_Channel_Six
-from ui_channel7 import Ui_Channel_Seven
 from ui_output import Ui_BoltOutput
 # from newoutput import Ui_Table
 from drawing_2D import TrussBoltedConnection

@@ -19,14 +19,16 @@ class TrussBoltedConnection(object):
         self.angle2_B = 65
         self.angl2_T = 12
 
-        self.angle_length = 1200
+        self.angle_length = 1000
 
         self.bolt_diameter = 20
-        self.bolt_hole_diameter = 22
+        self.bolt_hole_diameter = self.bolt_diameter + 2
+
+        self.theta = {"theta1": 50, "theta2": 160, "theta3": 250, "theta4": 340}
+        self.TrsDist = {"TrsDist1": 250, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
 
         self.edge_dist = 40
         self.end_dist = 40
-
         self.gauge = 90
 
     def add_s_marker(self, dwg):
@@ -319,9 +321,9 @@ class Truss2DFront(object):
 
         self.origin = np.array([0,0])
 
-        offsetX = 1000
-        offsetY = 300
-
+        offsetX = 000
+        offsetY = 00
+        ####### GUSSET PLATE ######
         Ax = -self.data_object.plate_length + offsetX
         Ay = self.data_object.plate_width + offsetY
         self.A = np.array([Ax, Ay])
@@ -337,9 +339,12 @@ class Truss2DFront(object):
         Dx = -self.data_object.plate_length + offsetX
         Dy = -self.data_object.plate_width + offsetY
         self.D = np.array([Dx, Dy])
+        ####### GUSSET PLATE ######
+
 
     def  call_Truss_2DFront(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2840 1740'))  # 230 = move towards left , 600= move towards
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1400 -850 2840 1740'), debug=True)  # 230 = move towards left ,
+        # 600= move towards
         # down, 2840= width of view, 2340= height of view
         # dwg.add(dwg.line(self.A, self.B).stroke('blue', width=2.5, linecap='square'))
         # dwg.add(dwg.line(self.B, self.C).stroke('blue', width=2.5, linecap='square'))
@@ -347,5 +352,6 @@ class Truss2DFront(object):
         # dwg.add(dwg.line(self.D, self.A).stroke('blue', width=2.5, linecap='square'))
 
         dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.CentrePoint, self.EndPoint).stroke('blue', width=5, linecap='square'))
 
         dwg.save()

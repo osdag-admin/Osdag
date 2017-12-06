@@ -512,36 +512,14 @@ def bbExtendedEndPlateSplice(uiObj):
 
     #######################################################################
     # Check for shear capacity of HSFG bolt (Cl. 10.4.3, IS 800:2007)
+    # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
     # Here,
     # Vdsf = nominal shear capacity of HSFG bolt
     # V_dsf = nominal shear capacity of HSFG bolt after multiplying the correction factor(s)
-
-    n_e = 1  # number of effective interfaces offering resistance to shear
-    Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
-
-    # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
-    l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
-
-    if l_j > 15 * bolt_dia:
-        V_dsf = Vdsf * long_joint(bolt_dia, l_j)
-    else:
-        V_dsf = Vdsf
-
-    #######################################################################
-    # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
-    # Here,
     # Vdsb = nominal shear capacity of Bearing bolt
     # V_dsb = nominal shear capacity of Bearing bolt after multiplying the correction factor(s)
 
-    # 1. Check for Shear capacity of bolt
-    Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)
-
-    if l_j > 15 * bolt_dia:
-        V_dsb = Vdsb * long_joint(bolt_dia, l_j)
-    else:
-        V_dsb = Vdsb
-
-    # 2. Check for Bearing capacity of bolt
+    n_e = 1  # number of effective interfaces offering resistance to shear
     factor = 1
     sum_plate_thickness = 2 * end_plate_thickness
 
@@ -553,24 +531,38 @@ def bbExtendedEndPlateSplice(uiObj):
     k_b = min(kb_1, kb_2, kb_3, kb_4)
 
     plate_fu = int(end_plate_fu)
-    Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)
 
-    # Capacity of bearing bolt (V_db) is minimum of V_dsb and Vdpb
-    V_db = min(V_dsb, Vdpb)
+    # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
+    l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
+
+    if bolt_type == "HSFG":
+        Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
+        if l_j > 15 * bolt_dia:
+            V_dsf = Vdsf * long_joint(bolt_dia, l_j)
+        else:
+            V_dsf = Vdsf
+    else:
+        Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)      # 1. Check for Shear capacity of bearing bolt
+        if l_j > 15 * bolt_dia:
+            V_dsb = Vdsb * long_joint(bolt_dia, l_j)
+        else:
+            V_dsb = Vdsb
+        Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)  # 2. Check for Bearing capacity of bearing bolt
+        # Capacity of bearing bolt (V_db) is minimum of V_dsb and Vdpb
+        V_db = min(V_dsb, Vdpb)
 
     #######################################################################
     # Calculation for number of bolts in each column
 
     # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )
-    M_u = factored_moment + ((factored_axial_load * (beam_d/2 - beam_tf/2)) / 1000)
+    M_u = factored_moment + ((factored_axial_load * (beam_d/2 - beam_tf/2)) / 1000)  # kN-m
 
     # Number of bolts in each column
-    # Here, the number of shear plane(s) is 1
 
     if bolt_type == "HSFG":
         bolt_shear_capacity = V_dsf
     else:
-        bolt_shear_capacity = V_db
+        bolt_shear_capacity = V_dsb
 
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
     n = math.sqrt((6 * M_u) / (2 * pitch_dist_min * bolt_shear_capacity))
@@ -630,12 +622,12 @@ def bbExtendedEndPlateSplice(uiObj):
         y7 = y6 - pitch_dist_min
         y = (y1**2 + y2**2 + y3**2 + y4**2 + y5**2 + y6**2 + y7**2)
         T1 = (M_u * y1) / y
-        T2 = (M_u * y2) /y
-        T3 = (M_u * y3) /y
-        T4 = (M_u * y4) /y
-        T5 = (M_u * y5) /y
-        T6 = (M_u * y6) /y
-        T7 = (M_u * y7) /y
+        T2 = (M_u * y2) / y
+        T3 = (M_u * y3) / y
+        T4 = (M_u * y4) / y
+        T5 = (M_u * y5) / y
+        T6 = (M_u * y6) / y
+        T7 = (M_u * y7) / y
         T_f = (T1 * (beam_d - beam_tf)) / y1
 
     else:
@@ -679,15 +671,22 @@ def bbExtendedEndPlateSplice(uiObj):
     #######################################################################
     # Check for tension capacities of bolt
 
-    Tdf = bolt_tension_hsfg(bolt_fu, netArea_thread(bolt_dia))
-    Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
-
     Tdf_1 = (bolt_fy * netarea_shank(bolt_dia) * (1.25/1.10))  # Here, Tdf_1 is the maximum allowed tension capacity of bolt (Cl 10.4.5, IS 800:2007 )
 
-    if bolt_type == "HSFG" or "Bearing Bolt":
-        if Tdf >= Tdf_1:
+    if bolt_type == "HSFG":
+        Tdf = bolt_tension_hsfg(bolt_fu, netArea_thread(bolt_dia))
+
+        if Tdf > Tdf_1:
             design_status = False
-            logger.error(": Tension capacity of bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
+            logger.error(": Tension capacity of HSFG bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
+            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
+            logger.info(": Re-design the connection using bolt of smaller diameter")
+    else:
+        Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
+
+        if Tdb > Tdf_1:
+            design_status = False
+            logger.error(": Tension capacity of Bearing bolt exceeds the specified limit (Clause 10.3.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
             logger.info(": Re-design the connection using bolt of smaller diameter")
 
@@ -699,7 +698,7 @@ def bbExtendedEndPlateSplice(uiObj):
         if T_b >= Tdf:
             design_status = False
             logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.4.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension on HSFGF bolt of selected diameter is %2.2f kN" % Tdf)
+            logger.warning(": Maximum allowed tension on HSFG bolt of selected diameter is %2.2f kN" % Tdf)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
         if T_b >= Tdb:
@@ -722,20 +721,22 @@ def bbExtendedEndPlateSplice(uiObj):
     Vsf = factored_shear_load / number_of_bolts
     Vdf = V_dsf
     Tf = T_b
-    combined_capacity_hsfg = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
 
     Vsb = Vsf
     Vdb = V_db
     Tb = T_b
-    combined_capacity_bearing = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
 
     if bolt_type == "HSFG":
+        combined_capacity_hsfg = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
+
         if combined_capacity_hsfg > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected HSFG bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
+        combined_capacity_bearing = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
+
         if combined_capacity_bearing > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
@@ -912,7 +913,7 @@ def bbExtendedEndPlateSplice(uiObj):
     h_st = (end_plate_height - beam_d) / 2
 
     # Length of stiffener
-    cf = math.pi/180
+    cf = math.pi/180  # conversion factor to convert degree into radian
     l_st = ((h_st - 25) / math.tan(30 * cf)) + 25
 
     # Thickness of stiffener
@@ -922,7 +923,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Check of stiffener against local buckling
     E = 2 * 10 ** 5  # MPa
-    ts_required = 1.79 * h_st * stiffener_fy / E
+    ts_required = 1.79 * h_st * stiffener_fy / E  # mm
 
     if thickness_stiffener < ts_required:
         design_status = False

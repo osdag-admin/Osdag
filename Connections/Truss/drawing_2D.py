@@ -2,13 +2,14 @@ from numpy import math
 import svgwrite
 import cairosvg
 import numpy as np
+from math import radians, sin, cos, sqrt
 import os
 
 
 class TrussBoltedConnection(object):
     def __init__(self):
-        self.plate_length = 600
-        self.plate_width = 400
+        self.plate_length = 1000
+        self.plate_width = 600
         self.plate_thick = 22
 
         self.angle1_A = 150
@@ -17,15 +18,20 @@ class TrussBoltedConnection(object):
 
         self.angle2_A = 100
         self.angle2_B = 65
-        self.angl2_T = 12
+        self.angl2_T = 8
+
+        self.Cz1 = 41.2
+        self.Cy1 = 41.2
+        self.Cz2 = 32.9
+        self.Cy2 = 16.1
 
         self.angle_length = 1000
 
         self.bolt_diameter = 20
         self.bolt_hole_diameter = self.bolt_diameter + 2
 
-        self.theta = {"theta1": 50, "theta2": 160, "theta3": 250, "theta4": 340}
-        self.TrsDist = {"TrsDist1": 250, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
+        self.theta = {"theta1": 45, "theta2": 160, "theta3": 250, "theta4": 340}
+        self.TrsDist = {"TrsDist1": 100, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
 
         self.edge_dist = 40
         self.end_dist = 40
@@ -323,6 +329,7 @@ class Truss2DFront(object):
 
         offsetX = 000
         offsetY = 00
+
         ####### GUSSET PLATE ######
         Ax = -self.data_object.plate_length + offsetX
         Ay = self.data_object.plate_width + offsetY
@@ -339,19 +346,64 @@ class Truss2DFront(object):
         Dx = -self.data_object.plate_length + offsetX
         Dy = -self.data_object.plate_width + offsetY
         self.D = np.array([Dx, Dy])
-        ####### GUSSET PLATE ######
 
+        ####### ANGLE MEMBERS (TOTAL 4 ANGLE MEMBERS) ######
+        #============ ANGLE 1 ================
+        rot_mat_1 = ([np.cos(radians(self.data_object.theta["theta1"])), -np.sin(radians(self.data_object.theta["theta1"]))],
+                           [np.sin(radians(self.data_object.theta["theta1"])), np.cos(radians(self.data_object.theta["theta1"]))])
+        ptAx_1 = 0
+        ptAy_1 = -(self.data_object.angle1_B-self.data_object.Cz1)
+        A_1 = [ptAx_1,ptAy_1]
+        self.A_1 = np.dot(A_1,rot_mat_1)
+        self.A_1[0] = self.A_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.A_1[1] = self.A_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.A_1 = [self.A_1[0],self.A_1[1]]
+
+        ptBx_1 = 0
+        ptBy_1 = (self.data_object.Cz1 - self.data_object.angle1_T)
+        B_1 = [ptBx_1, ptBy_1]
+        self.B_1 = np.dot(B_1, rot_mat_1)
+        self.B_1[0] = self.B_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.B_1[1] = self.B_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.B_1 = [self.B_1[0], self.B_1[1]]
+
+        ptCx_1 = 0
+        ptCy_1 = self.data_object.Cz1
+        C_1 = [ptCx_1, ptCy_1]
+        self.C_1 = np.dot(C_1, rot_mat_1)
+        self.C_1[0] = self.C_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.C_1[1] = self.C_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.C_1 = [self.C_1[0], self.C_1[1]]
+
+        ptDx_1 = self.data_object.angle_length
+        ptDy_1 = self.data_object.Cz1
+        D_1 = [ptDx_1, ptDy_1]
+        self.D_1 = np.dot(D_1, rot_mat_1)
+        self.D_1[0] = self.D_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.D_1[1] = self.D_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.D_1 = [self.D_1[0], self.D_1[1]]
+
+        ptEx_1 = self.data_object.angle_length
+        ptEy_1 = (self.data_object.Cz1 - self.data_object.angle1_T)
+        E_1 = [ptEx_1, ptEy_1]
+        self.E_1 = np.dot(E_1, rot_mat_1)
+        self.E_1[0] = self.E_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.E_1[1] = self.E_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.E_1 = [self.E_1[0], self.E_1[1]]
+
+        ptFx_1 = self.data_object.angle_length
+        ptFy_1 = -(self.data_object.angle1_B-self.data_object.Cz1)
+        F_1 = [ptFx_1, ptFy_1]
+        self.F_1 = np.dot(F_1, rot_mat_1)
+        self.F_1[0] = self.F_1[0] + self.data_object.TrsDist["TrsDist1"]
+        self.F_1[1] = self.F_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.F_1 = [self.F_1[0], self.F_1[1]]
 
     def  call_Truss_2DFront(self, filename):
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1400 -850 2840 1740'), debug=True)  # 230 = move towards left ,
-        # 600= move towards
-        # down, 2840= width of view, 2340= height of view
-        # dwg.add(dwg.line(self.A, self.B).stroke('blue', width=2.5, linecap='square'))
-        # dwg.add(dwg.line(self.B, self.C).stroke('blue', width=2.5, linecap='square'))
-        # dwg.add(dwg.line(self.C, self.D).stroke('blue', width=2.5, linecap='square'))
-        # dwg.add(dwg.line(self.D, self.A).stroke('blue', width=2.5, linecap='square'))
 
         dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.line(self.CentrePoint, self.EndPoint).stroke('blue', width=5, linecap='square'))
+        dwg.add(dwg.polyline(points=[self.A_1,self.C_1,self.D_1,self.F_1,self.A_1],stroke='blue', fill = 'none',stroke_width=2.5))
+        dwg.add(dwg.line(self.B_1, self.E_1).stroke('blue', width=2.5, linecap='square'))
 
         dwg.save()

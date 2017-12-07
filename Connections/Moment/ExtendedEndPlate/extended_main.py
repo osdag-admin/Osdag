@@ -163,6 +163,7 @@ class Maincontroller(QMainWindow):
 
         self.get_beamdata()
         self.resultobj = None
+
         self.designPrefDialog = DesignPreference(self)
         # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
@@ -212,7 +213,7 @@ class Maincontroller(QMainWindow):
         uiObj["Load"] = {}
         uiObj["Load"]["ShearForce (kN)"] = self.ui.txt_Shear.text()
         uiObj["Load"]["Moment (kNm)"] = self.ui.txt_Moment.text()
-        uiObj["Load"]["AxialForce"] = self.ui.txt_Axial.text()
+        uiObj["Load"]["AxialForce (kN)"] = self.ui.txt_Axial.text()
 
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_diameter.currentText()
@@ -220,9 +221,9 @@ class Maincontroller(QMainWindow):
         uiObj["Bolt"]["Type"] = self.ui.combo_type.currentText()
 
         uiObj["Plate"] = {}
-        uiObj["Plate"]["Thickness (mm)"] = self.ui.combo_plateThick.currentText()
-        uiObj["Plate"]["Height (mm)"] = self.ui.txt_plateHeight.text()
-        uiObj["Plate"]["Width (mm)"] = self.ui.txt_plateWidth.text()
+        uiObj["Plate"]["Thickness (mm)"] = str(self.ui.combo_plateThick.currentText())
+        uiObj["Plate"]["Height (mm)"] = str(self.ui.txt_plateHeight.text())
+        uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
         uiObj["Weld"] = {}
         uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
@@ -300,6 +301,7 @@ class Maincontroller(QMainWindow):
         Returns: Set the dictionary to user inputs
 
         """
+
         if uiObj is not None:
             self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
             if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
@@ -308,7 +310,7 @@ class Maincontroller(QMainWindow):
                 self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
                 self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
                 self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce (kN)"]))
                 self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
                 self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
                 self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
@@ -437,7 +439,7 @@ class Maincontroller(QMainWindow):
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ''):
-            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
             widget.clear()
             widget.setFocus()
 

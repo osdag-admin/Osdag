@@ -189,6 +189,7 @@ class MainController(QMainWindow):
         for i in duplicate:
             combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
 
+
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
         dictbeamdata = get_beamdata(beamdata_sec)

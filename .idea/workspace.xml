@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="da2a0a34-1ad6-4917-9f41-8ce7f0374584" name="Default" comment="Update: 4 angle members added and eccentric at a point">
+    <list default="true" id="da2a0a34-1ad6-4917-9f41-8ce7f0374584" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Connections/Truss/drawing_2D.py" afterPath="$PROJECT_DIR$/Connections/Truss/drawing_2D.py" />
     </list>
@@ -18,11 +18,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="drawing_2D.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Connections/Moment/BBSpliceCoverPlate/BBSpliceCoverPlateBolted/drawing_2D.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="136">
+              <caret line="533" column="115" lean-forward="false" selection-start-line="533" selection-start-column="115" selection-end-line="533" selection-end-column="115" />
+              <folding>
+                <element signature="e#48#70#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="drawing_2D.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Connections/Truss/drawing_2D.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="173">
-              <caret line="578" column="83" lean-forward="false" selection-start-line="578" selection-start-column="83" selection-end-line="578" selection-end-column="83" />
+            <state relative-caret-position="377">
+              <caret line="593" column="131" lean-forward="false" selection-start-line="593" selection-start-column="131" selection-end-line="593" selection-end-column="131" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
               </folding>
@@ -36,6 +48,8 @@
     <findStrings>
       <find>1</find>
       <find>2</find>
+      <find>front</find>
+      <find>das</find>
     </findStrings>
     <replaceStrings>
       <replace>2</replace>
@@ -306,7 +320,14 @@
       <option name="project" value="LOCAL" />
       <updated>1512640117583</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Update: Ready for demonstration">
+      <created>1512651408406</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1512651408406</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -314,10 +335,10 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19969743" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32952693" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19967267" sideWeight="0.537065" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19967267" sideWeight="0.46293494" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19967267" sideWeight="0.5400908" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19967267" sideWeight="0.45990923" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30769232" sideWeight="0.4969743" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2111293" sideWeight="0.4515885" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2111293" sideWeight="0.44856277" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24320242" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21767594" sideWeight="0.49394855" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -386,7 +407,8 @@
     <MESSAGE value="Test" />
     <MESSAGE value="Update: Translation in same axis, with sine and cosine components" />
     <MESSAGE value="Update: 4 angle members added and eccentric at a point" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update: 4 angle members added and eccentric at a point" />
+    <MESSAGE value="Update: Ready for demonstration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update: Ready for demonstration" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -420,13 +442,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/Program Files (x86)/Miniconda2/Lib/site-packages/OCC/Display/qtDisplay.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="160" column="0" lean-forward="false" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Connections/Shear/Finplate/Svg_Window.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -683,14 +698,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Connections/Moment/BBSpliceCoverPlate/BBSpliceCoverPlateBolted/drawing_2D.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-890">
-          <caret line="444" column="14" lean-forward="true" selection-start-line="444" selection-start-column="14" selection-end-line="444" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Connections/Truss/bolted_conn_main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="349">
@@ -699,10 +706,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files (x86)/Miniconda2/Lib/site-packages/svgwrite-1.1.6-py2.7.egg!/svgwrite/mixins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="142">
+          <caret line="211" column="8" lean-forward="false" selection-start-line="211" selection-start-column="8" selection-end-line="211" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Connections/Moment/BBSpliceCoverPlate/BBSpliceCoverPlateBolted/drawing_2D.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="533" column="115" lean-forward="false" selection-start-line="533" selection-start-column="115" selection-end-line="533" selection-end-column="115" />
+          <folding>
+            <element signature="e#48#70#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Connections/Truss/drawing_2D.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="173">
-          <caret line="578" column="83" lean-forward="false" selection-start-line="578" selection-start-column="83" selection-end-line="578" selection-end-column="83" />
+        <state relative-caret-position="377">
+          <caret line="593" column="131" lean-forward="false" selection-start-line="593" selection-start-column="131" selection-end-line="593" selection-end-column="131" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>

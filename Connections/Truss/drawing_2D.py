@@ -580,17 +580,18 @@ class Truss2DFront(object):
 
         dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))    #Gusset Plate
         # boarder
-        dwg.add(dwg.line(self.pt_origin, self.pt_1).stroke('red', width=2.5, linecap='square'))     # CG line of Angle member 1
+        dwg.add(dwg.line(self.pt_origin, self.pt_1).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[15, 10, 5, 10]))     # CG line of Angle member 1
         dwg.add(dwg.polyline(points=[self.A_1,self.C_1,self.D_1,self.F_1,self.A_1],stroke='blue', fill = 'none',stroke_width=2.5))
         dwg.add(dwg.line(self.B_1, self.E_1).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_2, self.C_2, self.D_2, self.F_2, self.A_2], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.line(self.pt_origin, self.pt_2).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 2
+        dwg.add(dwg.line(self.pt_origin, self.pt_2).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[15, 10, 5, 10]))  # CG line of Angle
+        # member 2
         dwg.add(dwg.line(self.B_2, self.E_2).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_3, self.C_3, self.D_3, self.F_3, self.A_3], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.line(self.pt_origin, self.pt_3).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 3
+        dwg.add(dwg.line(self.pt_origin, self.pt_3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[15, 10, 5, 10]))  # CG line of Angle member 3
         dwg.add(dwg.line(self.B_3, self.E_3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_4, self.C_4, self.D_4, self.F_4, self.A_4], stroke='blue', fill='none', stroke_width=2.5))
-        dwg.add(dwg.line(self.pt_origin, self.pt_4).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 1
+        dwg.add(dwg.line(self.pt_origin, self.pt_4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[15, 10, 5, 10]))  # CG line of Angle member 1
         dwg.add(dwg.line(self.B_4, self.E_4).stroke('blue', width=2.5, linecap='square'))
 
         dwg.save()

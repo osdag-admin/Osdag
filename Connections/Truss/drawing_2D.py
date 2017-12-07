@@ -30,8 +30,8 @@ class TrussBoltedConnection(object):
         self.bolt_diameter = 20
         self.bolt_hole_diameter = self.bolt_diameter + 2
 
-        self.theta = {"theta1": 45, "theta2": 160, "theta3": 250, "theta4": 340}
-        self.TrsDist = {"TrsDist1": 100, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
+        self.theta = {"theta1": 0, "theta2": 160, "theta3": 250, "theta4": 340}
+        self.TrsDist = {"TrsDist1": 0, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
 
         self.edge_dist = 40
         self.end_dist = 40

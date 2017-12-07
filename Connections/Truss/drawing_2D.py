@@ -2,7 +2,7 @@ from numpy import math
 import svgwrite
 import cairosvg
 import numpy as np
-from math import radians, sin, cos, sqrt
+from math import radians, sin, cos
 import os
 
 
@@ -12,26 +12,37 @@ class TrussBoltedConnection(object):
         self.plate_width = 600
         self.plate_thick = 22
 
-        self.angle1_A = 150
-        self.angle1_B = 150
-        self.angle1_T = 12
+        self.angle1_A = 100
+        self.angle1_B = 100
+        self.angle1_T = 15
+        self.Cz1 = 30.3
+        self.Cy1 = 30.3
 
         self.angle2_A = 100
         self.angle2_B = 65
         self.angle2_T = 8
-
-        self.Cz1 = 41.2
-        self.Cy1 = 41.2
         self.Cz2 = 32.9
         self.Cy2 = 16.1
+
+        self.angle3_A = 150
+        self.angle3_B = 150
+        self.angle3_T = 12
+        self.Cz3 = 41.2
+        self.Cy3 = 41.2
+
+        self.angle4_A = 150
+        self.angle4_B = 90
+        self.angle4_T = 12
+        self.Cz4 = 52.1
+        self.Cy4 = 22.7
 
         self.angle_length = 1000
 
         self.bolt_diameter = 20
         self.bolt_hole_diameter = self.bolt_diameter + 2
 
-        self.theta = {"theta1": 0, "theta2": 90, "theta3": 180, "theta4": 270}
-        self.TrsDist = {"TrsDist1": 0, "TrsDist2": 0, "TrsDist3": 0, "TrsDist4": 0}
+        self.theta = {"theta1": 45, "theta2": 135, "theta3": 225, "theta4": 315}
+        self.TrsDist = {"TrsDist1": 200, "TrsDist2": 200, "TrsDist3": 200, "TrsDist4": 200}
 
         self.edge_dist = 40
         self.end_dist = 40
@@ -328,6 +339,7 @@ class Truss2DFront(object):
         self.origin = np.array([0,0])
 
         ####### GUSSET PLATE ######
+
         Ax = -self.data_object.plate_length
         Ay = self.data_object.plate_width
         self.A = np.array([Ax, Ay])
@@ -348,218 +360,237 @@ class Truss2DFront(object):
         #============ ANGLE MEMBER 1 ================
         rot_mat_1 = ([np.cos(radians(self.data_object.theta["theta1"])), -np.sin(radians(self.data_object.theta["theta1"]))],
                            [np.sin(radians(self.data_object.theta["theta1"])), np.cos(radians(self.data_object.theta["theta1"]))])
+        self.pt_origin = [0,0]
+        self.pt_1 = [(self.data_object.angle_length+self.data_object.TrsDist["TrsDist1"])*cos(radians(self.data_object.theta["theta1"])),
+                     -(self.data_object.angle_length+self.data_object.TrsDist["TrsDist1"])*sin(radians(self.data_object.theta["theta1"]))]
+
         ptAx_1 = 0
-        ptAy_1 = 0
+        ptAy_1 = -(self.data_object.angle1_A - self.data_object.Cz1)
         A_1 = [ptAx_1,ptAy_1]
         self.A_1 = np.dot(A_1,rot_mat_1)
         self.A_1[0] = self.A_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.A_1[1] = self.A_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.A_1[1] = self.A_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.A_1 = [self.A_1[0],self.A_1[1]]
 
         ptBx_1 = 0
-        ptBy_1 = self.data_object.angle1_B - self.data_object.angle1_T
+        ptBy_1 = self.data_object.Cz1 - self.data_object.angle1_T
         B_1 = [ptBx_1, ptBy_1]
         self.B_1 = np.dot(B_1, rot_mat_1)
         self.B_1[0] = self.B_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.B_1[1] = self.B_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.B_1[1] = self.B_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.B_1 = [self.B_1[0], self.B_1[1]]
 
         ptCx_1 = 0
-        ptCy_1 = self.data_object.angle1_B
+        ptCy_1 = self.data_object.Cz1
         C_1 = [ptCx_1, ptCy_1]
         self.C_1 = np.dot(C_1, rot_mat_1)
         self.C_1[0] = self.C_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.C_1[1] = self.C_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.C_1[1] = self.C_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.C_1 = [self.C_1[0], self.C_1[1]]
 
         ptDx_1 = self.data_object.angle_length
-        ptDy_1 = self.data_object.angle1_B
+        ptDy_1 = self.data_object.Cz1
         D_1 = [ptDx_1, ptDy_1]
         self.D_1 = np.dot(D_1, rot_mat_1)
         self.D_1[0] = self.D_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.D_1[1] = self.D_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.D_1[1] = self.D_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.D_1 = [self.D_1[0], self.D_1[1]]
 
         ptEx_1 = self.data_object.angle_length
-        ptEy_1 = self.data_object.angle1_B - self.data_object.angle1_T
+        ptEy_1 = self.data_object.Cz1 - self.data_object.angle1_T
         E_1 = [ptEx_1, ptEy_1]
         self.E_1 = np.dot(E_1, rot_mat_1)
         self.E_1[0] = self.E_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.E_1[1] = self.E_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.E_1[1] = self.E_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.E_1 = [self.E_1[0], self.E_1[1]]
 
         ptFx_1 = self.data_object.angle_length
-        ptFy_1 = 0
+        ptFy_1 = -(self.data_object.angle1_A - self.data_object.Cz1)
         F_1 = [ptFx_1, ptFy_1]
         self.F_1 = np.dot(F_1, rot_mat_1)
         self.F_1[0] = self.F_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
-        self.F_1[1] = self.F_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
+        self.F_1[1] = self.F_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.F_1 = [self.F_1[0], self.F_1[1]]
 
         # ============ ANGLE MEMBER 2 ================
         rot_mat_2 = ([np.cos(radians(self.data_object.theta["theta2"])), -np.sin(radians(self.data_object.theta["theta2"]))],
                      [np.sin(radians(self.data_object.theta["theta2"])), np.cos(radians(self.data_object.theta["theta2"]))])
+
+        self.pt_2 = [(self.data_object.angle_length+self.data_object.TrsDist["TrsDist2"]) * cos(radians(self.data_object.theta["theta2"])),
+                     -(self.data_object.angle_length+self.data_object.TrsDist["TrsDist2"]) * sin(radians(self.data_object.theta["theta2"]))]
+
         ptAx_2 = 0
-        ptAy_2 = 0
+        ptAy_2 = -(self.data_object.angle2_A - self.data_object.Cz2)
         A_2 = [ptAx_2, ptAy_2]
         self.A_2 = np.dot(A_2, rot_mat_2)
         self.A_2[0] = self.A_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.A_2[1] = self.A_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.A_2[1] = self.A_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.A_2 = [self.A_2[0], self.A_2[1]]
 
         ptBx_2 = 0
-        ptBy_2 = self.data_object.angle1_B - self.data_object.angle1_T
+        ptBy_2 = self.data_object.Cz2 - self.data_object.angle2_T
         B_2 = [ptBx_2, ptBy_2]
         self.B_2 = np.dot(B_2, rot_mat_2)
         self.B_2[0] = self.B_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.B_2[1] = self.B_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.B_2[1] = self.B_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.B_2 = [self.B_2[0], self.B_2[1]]
 
         ptCx_2 = 0
-        ptCy_2 = self.data_object.angle1_B
+        ptCy_2 = self.data_object.Cz2
         C_2 = [ptCx_2, ptCy_2]
         self.C_2 = np.dot(C_2, rot_mat_2)
         self.C_2[0] = self.C_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.C_2[1] = self.C_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.C_2[1] = self.C_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.C_2 = [self.C_2[0], self.C_2[1]]
 
         ptDx_2 = self.data_object.angle_length
-        ptDy_2 = self.data_object.angle1_B
+        ptDy_2 = self.data_object.Cz2
         D_2 = [ptDx_2, ptDy_2]
         self.D_2 = np.dot(D_2, rot_mat_2)
         self.D_2[0] = self.D_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.D_2[1] = self.D_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.D_2[1] = self.D_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.D_2 = [self.D_2[0], self.D_2[1]]
 
         ptEx_2 = self.data_object.angle_length
-        ptEy_2 = self.data_object.angle1_B - self.data_object.angle1_T
+        ptEy_2 = self.data_object.Cz2 - self.data_object.angle2_T
         E_2 = [ptEx_2, ptEy_2]
         self.E_2 = np.dot(E_2, rot_mat_2)
         self.E_2[0] = self.E_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.E_2[1] = self.E_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.E_2[1] = self.E_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.E_2 = [self.E_2[0], self.E_2[1]]
 
         ptFx_2 = self.data_object.angle_length
-        ptFy_2 = 0
+        ptFy_2 = -(self.data_object.angle2_A - self.data_object.Cz2)
         F_2 = [ptFx_2, ptFy_2]
         self.F_2 = np.dot(F_2, rot_mat_2)
         self.F_2[0] = self.F_2[0] + self.data_object.TrsDist["TrsDist2"] * cos(radians(self.data_object.theta["theta2"]))
-        self.F_2[1] = self.F_2[1] + self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
+        self.F_2[1] = self.F_2[1] - self.data_object.TrsDist["TrsDist2"] * sin(radians(self.data_object.theta["theta2"]))
         self.F_2 = [self.F_2[0], self.F_2[1]]
 
         # ============ ANGLE MEMBER 3 ================
         rot_mat_3 = ([np.cos(radians(self.data_object.theta["theta3"])), -np.sin(radians(self.data_object.theta["theta3"]))],
                      [np.sin(radians(self.data_object.theta["theta3"])), np.cos(radians(self.data_object.theta["theta3"]))])
+        self.pt_3 = [(self.data_object.angle_length+self.data_object.TrsDist["TrsDist3"]) * cos(radians(self.data_object.theta["theta3"])),
+                     -(self.data_object.angle_length+self.data_object.TrsDist["TrsDist3"]) * sin(radians(self.data_object.theta["theta3"]))]
+
         ptAx_3 = 0
-        ptAy_3 = 0
+        ptAy_3 = -(self.data_object.angle3_A - self.data_object.Cz3)
         A_3 = [ptAx_3, ptAy_3]
         self.A_3 = np.dot(A_3, rot_mat_3)
         self.A_3[0] = self.A_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.A_3[1] = self.A_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.A_3[1] = self.A_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.A_3 = [self.A_3[0], self.A_3[1]]
 
         ptBx_3 = 0
-        ptBy_3 = self.data_object.angle2_A - self.data_object.angle2_T
+        ptBy_3 = self.data_object.Cz3 - self.data_object.angle3_T
         B_3 = [ptBx_3, ptBy_3]
         self.B_3 = np.dot(B_3, rot_mat_3)
         self.B_3[0] = self.B_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.B_3[1] = self.B_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.B_3[1] = self.B_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.B_3 = [self.B_3[0], self.B_3[1]]
 
         ptCx_3 = 0
-        ptCy_3 = self.data_object.angle2_A
+        ptCy_3 = self.data_object.Cz3
         C_3 = [ptCx_3, ptCy_3]
         self.C_3 = np.dot(C_3, rot_mat_3)
         self.C_3[0] = self.C_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.C_3[1] = self.C_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.C_3[1] = self.C_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.C_3 = [self.C_3[0], self.C_3[1]]
 
         ptDx_3 = self.data_object.angle_length
-        ptDy_3 = self.data_object.angle2_A
+        ptDy_3 = self.data_object.Cz3
         D_3 = [ptDx_3, ptDy_3]
         self.D_3 = np.dot(D_3, rot_mat_3)
         self.D_3[0] = self.D_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.D_3[1] = self.D_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.D_3[1] = self.D_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.D_3 = [self.D_3[0], self.D_3[1]]
 
         ptEx_3 = self.data_object.angle_length
-        ptEy_3 = self.data_object.angle2_A - self.data_object.angle2_T
+        ptEy_3 = self.data_object.Cz3 - self.data_object.angle3_T
         E_3 = [ptEx_3, ptEy_3]
         self.E_3 = np.dot(E_3, rot_mat_3)
         self.E_3[0] = self.E_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.E_3[1] = self.E_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.E_3[1] = self.E_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.E_3 = [self.E_3[0], self.E_3[1]]
 
         ptFx_3 = self.data_object.angle_length
-        ptFy_3 = 0
+        ptFy_3 = -(self.data_object.angle3_A - self.data_object.Cz3)
         F_3 = [ptFx_3, ptFy_3]
         self.F_3 = np.dot(F_3, rot_mat_3)
         self.F_3[0] = self.F_3[0] + self.data_object.TrsDist["TrsDist3"] * cos(radians(self.data_object.theta["theta3"]))
-        self.F_3[1] = self.F_3[1] + self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
+        self.F_3[1] = self.F_3[1] - self.data_object.TrsDist["TrsDist3"] * sin(radians(self.data_object.theta["theta3"]))
         self.F_3 = [self.F_3[0], self.F_3[1]]
 
         # ============ ANGLE MEMBER 4 ================
         rot_mat_4 = ([np.cos(radians(self.data_object.theta["theta4"])), -np.sin(radians(self.data_object.theta["theta4"]))],
                      [np.sin(radians(self.data_object.theta["theta4"])), np.cos(radians(self.data_object.theta["theta4"]))])
+        self.pt_4 = [(self.data_object.angle_length+self.data_object.TrsDist["TrsDist4"]) * cos(radians(self.data_object.theta["theta4"])),
+                     -(self.data_object.angle_length+self.data_object.TrsDist["TrsDist4"]) * sin(radians(self.data_object.theta["theta4"]))]
+
         ptAx_4 = 0
-        ptAy_4 = 0
+        ptAy_4 = -(self.data_object.angle4_A - self.data_object.Cz4)
         A_4 = [ptAx_4, ptAy_4]
         self.A_4 = np.dot(A_4, rot_mat_4)
         self.A_4[0] = self.A_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.A_4[1] = self.A_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.A_4[1] = self.A_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.A_4 = [self.A_4[0], self.A_4[1]]
 
         ptBx_4 = 0
-        ptBy_4 = self.data_object.angle2_A - self.data_object.angle2_T
+        ptBy_4 = self.data_object.Cz4 - self.data_object.angle4_T
         B_4 = [ptBx_4, ptBy_4]
         self.B_4 = np.dot(B_4, rot_mat_4)
         self.B_4[0] = self.B_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.B_4[1] = self.B_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.B_4[1] = self.B_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.B_4 = [self.B_4[0], self.B_4[1]]
 
         ptCx_4 = 0
-        ptCy_4 = self.data_object.angle2_A
+        ptCy_4 = self.data_object.Cz4
         C_4 = [ptCx_4, ptCy_4]
         self.C_4 = np.dot(C_4, rot_mat_4)
         self.C_4[0] = self.C_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.C_4[1] = self.C_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.C_4[1] = self.C_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.C_4 = [self.C_4[0], self.C_4[1]]
 
         ptDx_4 = self.data_object.angle_length
-        ptDy_4 = self.data_object.angle2_A
+        ptDy_4 = self.data_object.Cz4
         D_4 = [ptDx_4, ptDy_4]
         self.D_4 = np.dot(D_4, rot_mat_4)
         self.D_4[0] = self.D_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.D_4[1] = self.D_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.D_4[1] = self.D_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.D_4 = [self.D_4[0], self.D_4[1]]
 
         ptEx_4 = self.data_object.angle_length
-        ptEy_4 = self.data_object.angle2_A - self.data_object.angle2_T
+        ptEy_4 = self.data_object.Cz4 - self.data_object.angle4_T
         E_4 = [ptEx_4, ptEy_4]
         self.E_4 = np.dot(E_4, rot_mat_4)
         self.E_4[0] = self.E_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.E_4[1] = self.E_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.E_4[1] = self.E_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.E_4 = [self.E_4[0], self.E_4[1]]
 
         ptFx_4 = self.data_object.angle_length
-        ptFy_4 = 0
+        ptFy_4 = -(self.data_object.angle4_A - self.data_object.Cz4)
         F_4 = [ptFx_4, ptFy_4]
         self.F_4 = np.dot(F_4, rot_mat_4)
         self.F_4[0] = self.F_4[0] + self.data_object.TrsDist["TrsDist4"] * cos(radians(self.data_object.theta["theta4"]))
-        self.F_4[1] = self.F_4[1] + self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
+        self.F_4[1] = self.F_4[1] - self.data_object.TrsDist["TrsDist4"] * sin(radians(self.data_object.theta["theta4"]))
         self.F_4 = [self.F_4[0], self.F_4[1]]
 
     def  call_Truss_2DFront(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1400 -850 2840 1740'), debug=True)  # 230 = move towards left ,
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1400 -980 2840 1940'), debug=True)  # 230 = move towards left ,
 
-        dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))    #Gusset Plate
+        # boarder
+        dwg.add(dwg.line(self.pt_origin, self.pt_1).stroke('red', width=2.5, linecap='square'))     # CG line of Angle member 1
         dwg.add(dwg.polyline(points=[self.A_1,self.C_1,self.D_1,self.F_1,self.A_1],stroke='blue', fill = 'none',stroke_width=2.5))
         dwg.add(dwg.line(self.B_1, self.E_1).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_2, self.C_2, self.D_2, self.F_2, self.A_2], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.pt_origin, self.pt_2).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 2
         dwg.add(dwg.line(self.B_2, self.E_2).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_3, self.C_3, self.D_3, self.F_3, self.A_3], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.pt_origin, self.pt_3).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 3
         dwg.add(dwg.line(self.B_3, self.E_3).stroke('blue', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.A_4, self.C_4, self.D_4, self.F_4, self.A_4], stroke='blue', fill='none', stroke_width=2.5))
+        dwg.add(dwg.line(self.pt_origin, self.pt_4).stroke('red', width=2.5, linecap='square'))  # CG line of Angle member 1
         dwg.add(dwg.line(self.B_4, self.E_4).stroke('blue', width=2.5, linecap='square'))
 
         dwg.save()

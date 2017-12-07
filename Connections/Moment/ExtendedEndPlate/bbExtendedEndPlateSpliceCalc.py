@@ -1,3 +1,3 @@
 
-def bbExtendedEndPlateSplice(uiObj):
+def bbExtendedEndPlateSplice(uiObj, designparams):
     pass

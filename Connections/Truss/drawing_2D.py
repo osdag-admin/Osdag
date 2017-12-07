@@ -30,8 +30,8 @@ class TrussBoltedConnection(object):
         self.bolt_diameter = 20
         self.bolt_hole_diameter = self.bolt_diameter + 2
 
-        self.theta = {"theta1": 0, "theta2": 160, "theta3": 250, "theta4": 340}
-        self.TrsDist = {"TrsDist1": 0, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
+        self.theta = {"theta1": 45, "theta2": 160, "theta3": 250, "theta4": 340}
+        self.TrsDist = {"TrsDist1": 200, "TrsDist2": 250, "TrsDist3": 250, "TrsDist4": 250}
 
         self.edge_dist = 40
         self.end_dist = 40
@@ -327,24 +327,21 @@ class Truss2DFront(object):
 
         self.origin = np.array([0,0])
 
-        offsetX = 000
-        offsetY = 00
-
         ####### GUSSET PLATE ######
-        Ax = -self.data_object.plate_length + offsetX
-        Ay = self.data_object.plate_width + offsetY
+        Ax = -self.data_object.plate_length
+        Ay = self.data_object.plate_width
         self.A = np.array([Ax, Ay])
 
-        Bx = self.data_object.plate_length + offsetX
-        By = self.data_object.plate_width + offsetY
+        Bx = self.data_object.plate_length
+        By = self.data_object.plate_width
         self.B = np.array([Bx, By])
 
-        Cx = self.data_object.plate_length + offsetX
-        Cy = -self.data_object.plate_width + offsetY
+        Cx = self.data_object.plate_length
+        Cy = -self.data_object.plate_width
         self.C = np.array([Cx, Cy])
 
-        Dx = -self.data_object.plate_length + offsetX
-        Dy = -self.data_object.plate_width + offsetY
+        Dx = -self.data_object.plate_length
+        Dy = -self.data_object.plate_width
         self.D = np.array([Dx, Dy])
 
         ####### ANGLE MEMBERS (TOTAL 4 ANGLE MEMBERS) ######
@@ -352,51 +349,51 @@ class Truss2DFront(object):
         rot_mat_1 = ([np.cos(radians(self.data_object.theta["theta1"])), -np.sin(radians(self.data_object.theta["theta1"]))],
                            [np.sin(radians(self.data_object.theta["theta1"])), np.cos(radians(self.data_object.theta["theta1"]))])
         ptAx_1 = 0
-        ptAy_1 = -(self.data_object.angle1_B-self.data_object.Cz1)
+        ptAy_1 = 0
         A_1 = [ptAx_1,ptAy_1]
         self.A_1 = np.dot(A_1,rot_mat_1)
-        self.A_1[0] = self.A_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.A_1[1] = self.A_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.A_1[0] = self.A_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.A_1[1] = self.A_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.A_1 = [self.A_1[0],self.A_1[1]]
 
         ptBx_1 = 0
-        ptBy_1 = (self.data_object.Cz1 - self.data_object.angle1_T)
+        ptBy_1 = self.data_object.angle1_B - self.data_object.angle1_T
         B_1 = [ptBx_1, ptBy_1]
         self.B_1 = np.dot(B_1, rot_mat_1)
-        self.B_1[0] = self.B_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.B_1[1] = self.B_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.B_1[0] = self.B_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.B_1[1] = self.B_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.B_1 = [self.B_1[0], self.B_1[1]]
 
         ptCx_1 = 0
-        ptCy_1 = self.data_object.Cz1
+        ptCy_1 = self.data_object.angle1_B
         C_1 = [ptCx_1, ptCy_1]
         self.C_1 = np.dot(C_1, rot_mat_1)
-        self.C_1[0] = self.C_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.C_1[1] = self.C_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.C_1[0] = self.C_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.C_1[1] = self.C_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.C_1 = [self.C_1[0], self.C_1[1]]
 
         ptDx_1 = self.data_object.angle_length
-        ptDy_1 = self.data_object.Cz1
+        ptDy_1 = self.data_object.angle1_B
         D_1 = [ptDx_1, ptDy_1]
         self.D_1 = np.dot(D_1, rot_mat_1)
-        self.D_1[0] = self.D_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.D_1[1] = self.D_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.D_1[0] = self.D_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.D_1[1] = self.D_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.D_1 = [self.D_1[0], self.D_1[1]]
 
         ptEx_1 = self.data_object.angle_length
-        ptEy_1 = (self.data_object.Cz1 - self.data_object.angle1_T)
+        ptEy_1 = self.data_object.angle1_B - self.data_object.angle1_T
         E_1 = [ptEx_1, ptEy_1]
         self.E_1 = np.dot(E_1, rot_mat_1)
-        self.E_1[0] = self.E_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.E_1[1] = self.E_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.E_1[0] = self.E_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.E_1[1] = self.E_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.E_1 = [self.E_1[0], self.E_1[1]]
 
         ptFx_1 = self.data_object.angle_length
-        ptFy_1 = -(self.data_object.angle1_B-self.data_object.Cz1)
+        ptFy_1 = 0
         F_1 = [ptFx_1, ptFy_1]
         self.F_1 = np.dot(F_1, rot_mat_1)
-        self.F_1[0] = self.F_1[0] + self.data_object.TrsDist["TrsDist1"]
-        self.F_1[1] = self.F_1[1] + self.data_object.TrsDist["TrsDist1"]
+        self.F_1[0] = self.F_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
+        self.F_1[1] = self.F_1[1] + self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
         self.F_1 = [self.F_1[0], self.F_1[1]]
 
     def  call_Truss_2DFront(self, filename):

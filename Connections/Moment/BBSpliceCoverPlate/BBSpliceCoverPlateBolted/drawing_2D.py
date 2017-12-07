@@ -438,7 +438,7 @@ class CoverEnd2DFront(object):
         self.A4 = np.array([ptA4x, ptA4y])
 
         ptA8x = ptA1x
-        ptA8y =  ptA4y - self.data_object.flange_thickness_T1
+        ptA8y = ptA4y - self.data_object.flange_thickness_T1
         self.A8 = np.array([ptA8x, ptA8y])
 
         ptA5x = ptA1x

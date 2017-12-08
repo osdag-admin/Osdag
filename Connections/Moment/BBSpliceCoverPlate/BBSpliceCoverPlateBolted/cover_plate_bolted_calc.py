@@ -301,7 +301,7 @@ def fetchBeamPara(self):
 ########################################################################################################################
 # Start of main program
 
-def coverplateboltedconnection(uiObj, desigpre):
+def coverplateboltedconnection(uiObj, desginParam):
 
     global logger
     global design_status
@@ -321,12 +321,11 @@ def coverplateboltedconnection(uiObj, desigpre):
     bolt_grade = float(uiObj["Bolt"]["Grade"])
     bolt_type = (uiObj["Bolt"]["Type"])
 
-    gap = float(desigpre["test"]["gap"]) # gap between two beams
-    mu_f = float(desigpre["test"]["slip_factor"])
-    # gamma_mw = float(desigpre["test"]["safety_factor"])
-    dp_bolt_hole_type = str(desigpre["test"]["bolt_hole_type"])
-    dia_hole = int(desigpre["test"]["bolt_hole_clrnce"]) + bolt_diameter
-    type_edge = str(desigpre["test"]["typeof_edge"])
+    gap = float(desginParam["detailing"]["gap"]) # gap between two beams
+    mu_f = float(desginParam["bolt"]["slip_factor"])
+    dp_bolt_hole_type = str(desginParam["bolt"]["bolt_hole_type"])
+    dia_hole = int(desginParam["bolt"]["bolt_hole_clrnce"]) + bolt_diameter
+    type_edge = str(desginParam["detailing"]["typeof_edge"])
 
     flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"])
     flange_plate_w = str(uiObj["FlangePlate"]["Width (mm)"])
@@ -454,7 +453,7 @@ def coverplateboltedconnection(uiObj, desigpre):
         min_gauge = int(2.5 * bolt_diameter)
 
         # Minimum and maximum end and edge distance
-        if desigpre["test"]["typeof_edge"] == str("a - Sheared or hand flame cut"):
+        if desginParam["detailing"]["typeof_edge"] == str("a - Sheared or hand flame cut"):
             min_end_dist = int(float(1.7 * dia_hole))
         else:
             min_end_dist = int(float(1.5 * dia_hole))

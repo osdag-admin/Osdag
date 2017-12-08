@@ -31,8 +31,6 @@ class DesignPreference(QDialog):
         self.ui.txt_boltFu.setMaxLength(7)
         self.ui.txt_weldFu.setValidator(dbl_validator)
         self.ui.txt_weldFu.setMaxLength(7)
-        self.ui.txt_detailingGap.setValidator(dbl_validator)
-        self.ui.txt_detailingGap.setMaxLength(5)
         # self.ui.btn_defaults.clicked.connect(self.set_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
@@ -44,7 +42,7 @@ class DesignPreference(QDialog):
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        # self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -64,11 +62,6 @@ class DesignPreference(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.7)
         else:
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
-        if self.ui.txt_detailingGap.text() == '':
-
-            self.saved_designPref["detailing"]["gap"] = float(10)
-        else:
-            self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
@@ -78,6 +71,85 @@ class DesignPreference(QDialog):
         QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
+
+    def save_default_para(self):
+        uiObj = self.maincontroller.get_user_inputs()
+        if uiObj["Bolt"]["Grade"] == '':
+            pass
+        else:
+            bolt_grade = float(uiObj["Bolt"]["Grade"])
+            bolt_fu = str(self.get_boltFu(bolt_grade))
+            self.ui.txt_boltFu.setText(bolt_fu)
+        self.ui.combo_boltHoleType.setCurrentIndex(0)
+        designPref = {}
+        designPref["bolt"] = {}
+        designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
+        designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
+        designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.ui.combo_slipfactor.setCurrentIndex(4)
+        designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
+
+        self.ui.combo_weldType.setCurrentIndex(0)
+        designPref["weld"] = {}
+        weldType = str(self.ui.combo_weldType.currentText())
+        designPref["weld"]["typeof_weld"] = weldType
+        designPref["weld"]["safety_factor"] = float(1.25)
+        self.ui.txt_weldFu.setText(str(410))
+        designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
+
+        self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+        designPref["detailing"] = {}
+        typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
+        designPref["detailing"]["typeof_edge"] = typeOfEdge
+        designPref["detailing"]["min_edgend_dist"] = float(1.7)
+        self.ui.combo_detailing_memebers.setCurrentIndex(0)
+        designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
+
+        designPref["design"] = {}
+        designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
+        self.saved = False
+        return designPref
+
+    def set_boltFu(self):
+        uiObj = self.main_controller.getuser_inputs()
+        boltGrade = str(uiObj["Bolt"]["Grade"])
+        if boltGrade != '':
+            boltfu = str(self.get_boltFu(boltGrade))
+            self.ui.txt_boltFu.setText(boltfu)
+        else:
+            pass
+    def get_clearance(self):
+
+        uiObj = self.maincontroller.get_user_inputs()
+        boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
+        if boltDia != 'Diameter of Bolt':
+
+            standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
+            overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
+            boltHoleType = str(self.ui.combo_boltHoleType.currentText())
+            if boltHoleType == "Standard":
+                clearance = standard_clrnce[int(boltDia)]
+            else:
+                clearance = overhead_clrnce[int(boltDia)]
+
+            return clearance
+        else:
+            pass
+
+    def get_boltFu(self, boltGrade):
+        """
+
+        Args:
+            boltGrade: HSFG or Bearing Bolt
+
+        Returns: ultimate strength of bolt depending upon grade of bolt chosen
+
+        """
+        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+                  12.9: 1220}
+        boltGrd = float(boltGrade)
+        return boltFu[boltGrd]
 
     def close_designPref(self):
         self.close()
@@ -91,6 +163,8 @@ class Maincontroller(QMainWindow):
 
         self.get_beamdata()
         self.resultobj = None
+
+        self.designPrefDialog = DesignPreference(self)
         # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.ui.combo_beamSec.setCurrentIndex(0)
@@ -139,7 +213,7 @@ class Maincontroller(QMainWindow):
         uiObj["Load"] = {}
         uiObj["Load"]["ShearForce (kN)"] = self.ui.txt_Shear.text()
         uiObj["Load"]["Moment (kNm)"] = self.ui.txt_Moment.text()
-        uiObj["Load"]["AxialForce"] = self.ui.txt_Axial.text()
+        uiObj["Load"]["AxialForce (kN)"] = self.ui.txt_Axial.text()
 
         uiObj["Bolt"] = {}
         uiObj["Bolt"]["Diameter (mm)"] = self.ui.combo_diameter.currentText()
@@ -147,9 +221,9 @@ class Maincontroller(QMainWindow):
         uiObj["Bolt"]["Type"] = self.ui.combo_type.currentText()
 
         uiObj["Plate"] = {}
-        uiObj["Plate"]["Thickness (mm)"] = self.ui.combo_plateThick.currentText()
-        uiObj["Plate"]["Height (mm)"] = self.ui.txt_plateHeight.text()
-        uiObj["Plate"]["Width (mm)"] = self.ui.txt_plateWidth.text()
+        uiObj["Plate"]["Thickness (mm)"] = str(self.ui.combo_plateThick.currentText())
+        uiObj["Plate"]["Height (mm)"] = str(self.ui.txt_plateHeight.text())
+        uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
         uiObj["Weld"] = {}
         uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
@@ -227,7 +301,8 @@ class Maincontroller(QMainWindow):
         Returns: Set the dictionary to user inputs
 
         """
-        if uiObj is not None :
+
+        if uiObj is not None:
             self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
             if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
                 self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
@@ -235,7 +310,7 @@ class Maincontroller(QMainWindow):
                 self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
                 self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
                 self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce"]))
+                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce (kN)"]))
                 self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
                 self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
                 self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
@@ -249,12 +324,37 @@ class Maincontroller(QMainWindow):
         else:
             pass
 
+    def designParameters(self):
+        """
+
+        Returns:
+
+        """
+        self.uiObj = self.get_user_inputs()
+        if self.designPrefDialog.saved is not True:
+            design_pref = self.designPrefDialog.save_default_para()
+        else:
+            design_pref = self.designPrefDialog.saved_designPref
+        self.uiObj.update(design_pref)
+        return self.uiObj
+
     def design_btnclicked(self):
+        """
+
+        Returns:
+
+        """
         self.uiObj = self.get_user_inputs()
         print self.uiObj
-        outputs = bbExtendedEndPlateSplice(self.uiObj)
+        self.alist = self.designParameters()
+        outputs = bbExtendedEndPlateSplice(self.uiObj, self.alist)
 
     def reset_btnclicked(self):
+        """
+
+        Returns:
+
+        """
         self.ui.combo_beamSec.setCurrentIndex(0)
         self.ui.combo_connLoc.setCurrentIndex(0)
         self.ui.txt_Fu.clear()
@@ -339,11 +439,20 @@ class Maincontroller(QMainWindow):
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ''):
-            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
             widget.clear()
             widget.setFocus()
 
     def call_2D_drawing(self, view):
+        """
+
+        Args:
+            view: Front, Side & Top view of 2D svg drawings
+
+        Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
+                 parameters from Extended endplate GUI
+
+        """
         beam_beam = ExtendedEndPlate()
         if view == "Front":
             filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"

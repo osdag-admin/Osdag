@@ -1,3 +1,4 @@
+
 """
 Created on 8-November-2017
 
@@ -80,19 +81,17 @@ def get_beamdata(sect):
     return retDict
 
 def get_oldbeamcombolist():
-    """
-
-    Returns:  This function returns the list of Indian Standard Column Designation.
-
-
-    """
-    old_beamList = []
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
     columnQuery = QSqlQuery("SELECT Designation FROM Beams where Source = 'IS808_Old' order by id ASC")
     a = columnQuery.size()
 
     while(columnQuery.next()):
-        old_beamList.append(columnQuery.value(0))
+        old_columnList.append(columnQuery.value(0))
 
-    return old_beamList
+    return old_columnList
+
 
 

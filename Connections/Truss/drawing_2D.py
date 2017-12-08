@@ -38,15 +38,41 @@ class TrussBoltedConnection(object):
 
         self.angle_length = 1000
 
-        self.bolt_diameter = 20
-        self.bolt_hole_diameter = self.bolt_diameter + 2
-
-        self.theta = {"theta1": 45, "theta2": 135, "theta3": 225, "theta4": 315}
+        self.theta = {"theta1": 135, "theta2": 45, "theta3": 225, "theta4": 315}
         self.TrsDist = {"TrsDist1": 200, "TrsDist2": 200, "TrsDist3": 200, "TrsDist4": 200}
 
-        self.edge_dist = 40
-        self.end_dist = 40
-        self.gauge = 90
+        self.boltDia_1 = 12     #Bolting preferences for ANGLE MEMBER 1
+        self.row_1 = 2
+        self.col_1 = 4
+        self.pitch_1 = 60
+        self.gaugeDist_1 = 55
+        self.edgeDist_1 = 40
+        self.endDist_1 = self.edgeDist_1
+
+        self.boltDia_2 = 12  # Bolting preferences for ANGLE MEMBER 2
+        self.row_2 = 1
+        self.col_2 = 4
+        self.pitch_2 = 60
+        self.gaugeDist_2 = 55
+        self.edgeDist_2 = 40
+        self.endDist_2 = self.edgeDist_2
+
+        self.boltDia_3 = 12  # Bolting preferences for ANGLE MEMBER 3
+        self.row_3 = 1
+        self.col_3 = 4
+        self.pitch_3 = 60
+        self.gaugeDist_3 = 55
+        self.edgeDist_3 = 40
+        self.endDist_3 = self.edgeDist_3
+
+        self.boltDia_4 = 12  # Bolting preferences for ANGLE MEMBER 4
+        self.row_4 = 1
+        self.col_4 = 4
+        self.pitch_4 = 60
+        self.gaugeDist_4 = 55
+        self.edgeDist_4 = 40
+        self.endDist_4 = self.edgeDist_4
+
 
     def add_s_marker(self, dwg):
         """
@@ -593,5 +619,23 @@ class Truss2DFront(object):
         dwg.add(dwg.polyline(points=[self.A_4, self.C_4, self.D_4, self.F_4, self.A_4], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.line(self.pt_origin, self.pt_4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[15, 10, 5, 10]))  # CG line of Angle member 1
         dwg.add(dwg.line(self.B_4, self.E_4).stroke('blue', width=2.5, linecap='square'))
+
+        # ============ Bolts placement over Angle member 1 ================
+        list_of_pts_1 = []
+        row1 = self.data_object.row_1
+        col1 = self.data_object.col_1
+        bolt_rad_1 = self.data_object.boltDia_1 / 2
+
+        for i in range(col1):
+            for j in range(row1):
+                ptX_bolt_1 = (self.data_object.TrsDist["TrsDist1"] + self.data_object.endDist_1 + i * self.data_object.pitch_1)
+                ptY_bolt_1 = -(self.data_object.TrsDist["TrsDist1"] + self.data_object.endDist_1 +i*self.data_object.pitch_1)
+
+                ptX_bolt_1 = ptX_bolt_1 * cos(radians(self.data_object.theta["theta1"]))
+                ptY_bolt_1 = ptY_bolt_1 * sin(radians(self.data_object.theta["theta1"]))
+
+                pt_bolt_1 = np.array([ptX_bolt_1, ptY_bolt_1])
+                dwg.add(dwg.circle(center=pt_bolt_1, r=bolt_rad_1, stroke='blue', fill='none', stroke_width=1.5))
+                list_of_pts_1.append(pt_bolt_1)
 
         dwg.save()

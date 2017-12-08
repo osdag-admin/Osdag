@@ -15,8 +15,8 @@ class TrussBoltedConnection(object):
         self.angle1_A = 100
         self.angle1_B = 100
         self.angle1_T = 15
-        self.Cz1 = 30.3
-        self.Cy1 = 30.3
+        self.Cz1 = 35.3
+        self.Cy1 = 35.3
 
         self.angle2_A = 100
         self.angle2_B = 65
@@ -38,18 +38,18 @@ class TrussBoltedConnection(object):
 
         self.angle_length = 1000
 
-        self.theta = {"theta1": 135, "theta2": 45, "theta3": 225, "theta4": 315}
+        self.theta = {"theta1": 45, "theta2": 135, "theta3": 0, "theta4": 315}
         self.TrsDist = {"TrsDist1": 200, "TrsDist2": 200, "TrsDist3": 200, "TrsDist4": 200}
 
-        self.boltDia_1 = 12     #Bolting preferences for ANGLE MEMBER 1
-        self.row_1 = 2
+        self.boltDia_1 = 14     #Bolting preferences for ANGLE MEMBER 1
+        self.row_1 = 1
         self.col_1 = 4
         self.pitch_1 = 60
         self.gaugeDist_1 = 55
         self.edgeDist_1 = 40
         self.endDist_1 = self.edgeDist_1
 
-        self.boltDia_2 = 12  # Bolting preferences for ANGLE MEMBER 2
+        self.boltDia_2 = 14  # Bolting preferences for ANGLE MEMBER 2
         self.row_2 = 1
         self.col_2 = 4
         self.pitch_2 = 60
@@ -57,7 +57,7 @@ class TrussBoltedConnection(object):
         self.edgeDist_2 = 40
         self.endDist_2 = self.edgeDist_2
 
-        self.boltDia_3 = 12  # Bolting preferences for ANGLE MEMBER 3
+        self.boltDia_3 = 16  # Bolting preferences for ANGLE MEMBER 3
         self.row_3 = 1
         self.col_3 = 4
         self.pitch_3 = 60
@@ -629,7 +629,7 @@ class Truss2DFront(object):
         for i in range(col1):
             for j in range(row1):
                 ptX_bolt_1 = (self.data_object.TrsDist["TrsDist1"] + self.data_object.endDist_1 + i * self.data_object.pitch_1)
-                ptY_bolt_1 = -(self.data_object.TrsDist["TrsDist1"] + self.data_object.endDist_1 +i*self.data_object.pitch_1)
+                ptY_bolt_1 = -(self.data_object.TrsDist["TrsDist1"] + self.data_object.endDist_1 + i * self.data_object.pitch_1)
 
                 ptX_bolt_1 = ptX_bolt_1 * cos(radians(self.data_object.theta["theta1"]))
                 ptY_bolt_1 = ptY_bolt_1 * sin(radians(self.data_object.theta["theta1"]))
@@ -637,5 +637,43 @@ class Truss2DFront(object):
                 pt_bolt_1 = np.array([ptX_bolt_1, ptY_bolt_1])
                 dwg.add(dwg.circle(center=pt_bolt_1, r=bolt_rad_1, stroke='blue', fill='none', stroke_width=1.5))
                 list_of_pts_1.append(pt_bolt_1)
+
+        # ============ Bolts placement over Angle member 2 ================
+        list_of_pts_2 = []
+        row2 = self.data_object.row_2
+        col2 = self.data_object.col_2
+        bolt_rad_2 = self.data_object.boltDia_2 / 2
+
+        for i in range(col2):
+            for j in range(row2):
+                ptX_bolt_2 = (self.data_object.TrsDist["TrsDist2"] + self.data_object.endDist_2 + i * self.data_object.pitch_2)
+                ptY_bolt_2 = -(self.data_object.TrsDist["TrsDist2"] + self.data_object.endDist_2 + i * self.data_object.pitch_2)
+
+                ptX_bolt_2 = ptX_bolt_2 * cos(radians(self.data_object.theta["theta2"]))
+                ptY_bolt_2 = ptY_bolt_2 * sin(radians(self.data_object.theta["theta2"]))
+
+                pt_bolt_2 = np.array([ptX_bolt_2, ptY_bolt_2])
+                dwg.add(dwg.circle(center=pt_bolt_2, r=bolt_rad_2, stroke='blue', fill='none', stroke_width=1.5))
+                list_of_pts_2.append(pt_bolt_2)
+
+        # ============ Bolts placement over Angle member 3 ================
+        list_of_pts_3 = []
+        row3 = self.data_object.row_3
+        col3 = self.data_object.col_3
+        bolt_rad_3 = self.data_object.boltDia_3 / 2
+
+        for i in range(col3):
+            for j in range(row3):
+                ptX_bolt_3 = (self.data_object.TrsDist["TrsDist3"] + self.data_object.endDist_3 + i * self.data_object.pitch_3)
+                ptY_bolt_3 = -(self.data_object.TrsDist["TrsDist3"] + self.data_object.endDist_3 + i * self.data_object.pitch_3)
+
+                ptX_bolt_3 = ptX_bolt_3 * cos(radians(self.data_object.theta["theta3"]))
+                ptY_bolt_3 = ptY_bolt_3 * sin(radians(self.data_object.theta["theta3"]))
+
+                pt_bolt_3 = np.array([ptX_bolt_3, ptY_bolt_3])
+                dwg.add(dwg.circle(center=pt_bolt_3, r=bolt_rad_3, stroke='blue', fill='none', stroke_width=1.5))
+                list_of_pts_3.append(pt_bolt_3)
+
+
 
         dwg.save()

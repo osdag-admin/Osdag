@@ -251,7 +251,7 @@ def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
     Tdb2 = ((0.9 * Avn * fu) / (math.sqrt(3))) + ((Atg * fy) / gamma_m0)
     Tdb = min(Tdb1, Tdb2)
 
-    return Tdb
+    return (Tdb / 1000)
 
 ########################################################################################################################
 # Check for shear yielding of web splice plate (Clause 8.4.1, IS 800 : 2007)
@@ -785,7 +785,7 @@ def coverplateboltedconnection(uiObj, desigpre):
         boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
         boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
         boltParam["WebPlateWidth"] = web_plate_w_req
-        boltParam["WebPlateCapcity"] = web_splice_capacity
+        boltParam["WebPlateCapacity"] = web_splice_capacity
 
     ####### For reference and validation
         boltParam["WebBlockShear"] = Tdb
@@ -794,7 +794,7 @@ def coverplateboltedconnection(uiObj, desigpre):
         return boltParam
 
     ## When height of web splice plate is zero
-    if web_plate_l == 0 and web_plate_w != 0:
+    elif web_plate_l == 0 and web_plate_w != 0:
         boltParam = {}
         boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
@@ -809,7 +809,7 @@ def coverplateboltedconnection(uiObj, desigpre):
         boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
         boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
         boltParam["WebPlateWidth"] = web_plate_w_req
-        boltParam["WebPlateCapcity"] = web_splice_capacity
+        boltParam["WebPlateCapacity"] = web_splice_capacity
 
     ####### For reference and validation
         boltParam["WebBlockShear"] = Tdb
@@ -818,28 +818,27 @@ def coverplateboltedconnection(uiObj, desigpre):
         return boltParam
 
     else:
-        if web_plate_l != 0 and web_plate_w != 0:
-            boltParam = {}
-            boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-            boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-            boltParam["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-            boltParam["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-            boltParam["Pitch"] = new_bolt_param["Pitch"]
-            boltParam["End"] = new_bolt_param["End"]
-            boltParam["Edge"] = new_bolt_param["Edge"]
-            boltParam["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-            boltParam["WebPH"] = new_bolt_param["WebPH"]
-            boltParam["WebGauge"] = new_bolt_param["WebGauge"]
-            boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-            boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-            boltParam["WebPlateWidth"] = web_plate_w_req
-            boltParam["WebPlateCapcity"] = web_splice_capacity
+        boltParam = {}
+        boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
+        boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
+        boltParam["CapacityBolt"] = new_bolt_param["CapacityBolt"]
+        boltParam["BoltsRequired"] = new_bolt_param["BoltsRequired"]
+        boltParam["Pitch"] = new_bolt_param["Pitch"]
+        boltParam["End"] = new_bolt_param["End"]
+        boltParam["Edge"] = new_bolt_param["Edge"]
+        boltParam["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
+        boltParam["WebPH"] = new_bolt_param["WebPH"]
+        boltParam["WebGauge"] = new_bolt_param["WebGauge"]
+        boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
+        boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
+        boltParam["WebPlateWidth"] = web_plate_w_req
+        boltParam["WebPlateCapacity"] = web_splice_capacity
 
-            ####### For reference and validation
-            boltParam["WebBlockShear"] = Tdb
-            boltParam["ShearYielding"] = V_d
-            boltParam["ShearRupture"] = R_n
-            return boltParam
+        ####### For reference and validation
+        boltParam["WebBlockShear"] = Tdb
+        boltParam["ShearYielding"] = V_d
+        boltParam["ShearRupture"] = R_n
+        return boltParam
 
 
 

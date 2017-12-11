@@ -47,7 +47,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref = {}
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
-        # self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
+        self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -487,8 +487,7 @@ class MainController(QMainWindow):
             pass
 
     def design_prefer(self):
-        section = DesignPreferences(self)
-        section.show()
+        self.designPrefDialog.show()
 
     def designParameters(self):
         """

@@ -234,8 +234,7 @@ class Maincontroller(QMainWindow):
         return uiObj
 
     def design_prefer(self):
-        section = DesignPreference(self)
-        section.show()
+        self.designPrefDialog.show()
 
     def closeEvent(self, event):
         """

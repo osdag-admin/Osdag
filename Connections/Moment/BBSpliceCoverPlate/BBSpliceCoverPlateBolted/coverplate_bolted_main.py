@@ -25,7 +25,7 @@ class DesignPreferences(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
-        self.saved = None
+        self.save = None
         self.ui.tabWidget.removeTab(1)
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
@@ -76,7 +76,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
         self.saved_designPref["design"] = {}
         self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
-        self.saved = True
+        self.save = True
 
         QMessageBox.about(self, 'Information', "Preferences saved")
 
@@ -118,7 +118,7 @@ class DesignPreferences(QDialog):
 
         designPref["design"] = {}
         designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
-        self.saved = False
+        self.save = False
         return designPref
 
     def set_boltFu(self):
@@ -194,7 +194,7 @@ class MainController(QMainWindow):
         self.ui.setupUi(self)
 
         self.get_beamdata()
-          # self.ui.combo_connLoc.setCurrentIndex(0)
+        # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
@@ -236,6 +236,7 @@ class MainController(QMainWindow):
 
         from osdagMainSettings import backend_name
         self.display, _ = self.init_display(backend_str=backend_name())
+        self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreferences(self)
 
@@ -377,7 +378,6 @@ class MainController(QMainWindow):
         uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
         return uiObj
 
-
     def reset_btnclicked(self):
         self.ui.combo_beamSec.setCurrentIndex(0)
         self.ui.combo_connLoc.setCurrentIndex(0)
@@ -395,7 +395,6 @@ class MainController(QMainWindow):
         self.ui.combo_webplateThick.setCurrentIndex(0)
         self.ui.txt_webplateWidth.clear()
         self.ui.txt_webplateHeight.clear()
-
 
     def closeEvent(self, event):
         """
@@ -498,12 +497,17 @@ class MainController(QMainWindow):
 
         """
         self.uiObj = self.get_user_inputs()
-        if self.designPrefDialog.saved is not True:
+        if self.designPrefDialog.save is not True:
             design_pref = self.designPrefDialog.save_default_para()
+            print "default design prefer", design_pref
         else:
             design_pref = self.designPrefDialog.saved_designPref
         self.uiObj.update(design_pref)
-        return self.uiObj
+        print "saved design prefer", self.uiObj
+
+        dictbeamdata = self.fetchBeamPara()
+
+        return [self.uiObj, dictbeamdata]
 
     def design_btnclicked(self):
         """
@@ -511,9 +515,12 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        self.uiObj = self.get_user_inputs()
+        # self.uiObj = self.get_user_inputs()
         self.alist = self.designParameters()
-        outputs = coverplateboltedconnection(self.uiObj, self.alist)
+        print "alist printing", self.alist[0]
+        outputs = coverplateboltedconnection(self.alist[0], self.alist[1]) #, self.alist[2],
+                                             # self.alist[3], self.alist[4], self.alist[5],
+                                             # self.alist[6], self.alist[7], self.alist[8], self.display)
 
         # self.resultObj = outputs
         # alist =self.resultObj.values()
@@ -577,6 +584,10 @@ class MainController(QMainWindow):
         self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
 
+    def call_calculation(self):
+        outputs = coverplateboltedconnection()
+        return outputs
+
     def call_2D_drawing(self, view):
         """
 
@@ -586,16 +597,23 @@ class MainController(QMainWindow):
         Returns: Saves 2D svg drawings
 
         """
-        beam_beam = CoverEndPlate()
-        if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
-            beam_beam.save_to_svg(filename, view)
-        elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
-            beam_beam.save_to_svg(filename, view)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
-            beam_beam.save_to_svg(filename, view)
+        # self.uiObj =self.get_user_inputs()
+        self.resultObj = self.call_calculation()
+        # self.alist = self.designParameters()
+        beam_beam = CoverEndPlate(self.resultObj) #, self.resultObj)
+
+        if view != 'All':
+
+            if view == "Front":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+                beam_beam.save_to_svg(filename, view)
+            elif view == "Side":
+                pass
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+                beam_beam.save_to_svg(filename, view)
+            else:
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+                beam_beam.save_to_svg(filename, view)
 
     def flangesplice_plate(self):
         section = Flangespliceplate(self)

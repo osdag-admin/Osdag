@@ -112,7 +112,7 @@ class DesignPreference(QDialog):
         return designPref
 
     def set_boltFu(self):
-        uiObj = self.main_controller.getuser_inputs()
+        uiObj = self.maincontroller.get_user_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
         if boltGrade != '':
             boltfu = str(self.get_boltFu(boltGrade))
@@ -177,6 +177,8 @@ class Maincontroller(QMainWindow):
         self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
         self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
+        self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
+        self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
@@ -235,6 +237,12 @@ class Maincontroller(QMainWindow):
 
     def design_prefer(self):
         self.designPrefDialog.show()
+
+    def bolt_hole_clearance(self):
+        self.designPrefDialog.get_clearance()
+
+    def call_bolt_fu(self):
+        self.designPrefDialog.set_boltFu()
 
     def closeEvent(self, event):
         """

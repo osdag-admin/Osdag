@@ -623,11 +623,43 @@ class MainController(QMainWindow):
         section = Webspliceplate(self)
         section.show()
 
+
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("coverplate.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     module_setup()
     window = MainController()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
     main()

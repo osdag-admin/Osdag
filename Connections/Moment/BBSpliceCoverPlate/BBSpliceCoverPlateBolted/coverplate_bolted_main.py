@@ -525,14 +525,9 @@ class MainController(QMainWindow):
         # self.uiObj = self.get_user_inputs()
         self.alist = self.designParameters()
         print "alist printing", self.alist[0]
-        outputs = coverplateboltedconnection(self.alist[0]) #, self.alist[2],
+        self.outputs = coverplateboltedconnection(self.alist[0]) #, self.alist[2],
                                              # self.alist[3], self.alist[4], self.alist[5],
                                              # self.alist[6], self.alist[7], self.alist[8], self.display)
-
-        self.result = self.call_calculation()
-        # alist =self.result.values()
-        self.display_output(self.result)
-        # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
     def display_output(self, outputObj):
         for k in outputObj.keys():

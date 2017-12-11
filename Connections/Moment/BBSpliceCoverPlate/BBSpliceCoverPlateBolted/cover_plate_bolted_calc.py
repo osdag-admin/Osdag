@@ -301,7 +301,7 @@ def fetchBeamPara(self):
 ########################################################################################################################
 # Start of main program
 
-def coverplateboltedconnection(uiObj, desginParam):
+def coverplateboltedconnection(uiObj):
 
     global logger
     global design_status

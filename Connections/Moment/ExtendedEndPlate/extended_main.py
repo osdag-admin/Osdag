@@ -25,16 +25,16 @@ class DesignPreference(QDialog):
         self.saved = None
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
-        # self.set_default_para()
+        self.save_default_para()
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
         self.ui.txt_weldFu.setValidator(dbl_validator)
         self.ui.txt_weldFu.setMaxLength(7)
-        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_defaults.clicked.connect(self.save_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
     def save_designPref_para(self):
         uiObj = self.maincontroller.get_user_inputs()
@@ -119,6 +119,7 @@ class DesignPreference(QDialog):
             self.ui.txt_boltFu.setText(boltfu)
         else:
             pass
+
     def get_clearance(self):
 
         uiObj = self.maincontroller.get_user_inputs()
@@ -162,10 +163,8 @@ class Maincontroller(QMainWindow):
         self.ui.setupUi(self)
 
         self.get_beamdata()
-        self.resultobj = None
 
-        self.designPrefDialog = DesignPreference(self)
-        # self.ui.combo_connLoc.setCurrentIndex(0)
+       # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.ui.combo_beamSec.setCurrentIndex(0)
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
@@ -201,6 +200,10 @@ class Maincontroller(QMainWindow):
         min_fy = 165
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+
+        self.uiObj = None
+        self.resultobj = None
+        self.designPrefDialog = DesignPreference(self)
 
     def get_user_inputs(self):
         uiObj = {}
@@ -336,7 +339,9 @@ class Maincontroller(QMainWindow):
         else:
             design_pref = self.designPrefDialog.saved_designPref
         self.uiObj.update(design_pref)
-        return self.uiObj
+
+        dictbeamdata = self.fetchBeamPara()
+        return [self.uiObj, dictbeamdata]
 
     def design_btnclicked(self):
         """
@@ -344,10 +349,10 @@ class Maincontroller(QMainWindow):
         Returns:
 
         """
-        self.uiObj = self.get_user_inputs()
-        print self.uiObj
+        # self.uiObj = self.get_user_inputs()
+        # print self.uiObj
         self.alist = self.designParameters()
-        outputs = bbExtendedEndPlateSplice(self.uiObj, self.alist)
+        outputs = bbExtendedEndPlateSplice(self.alist[0], self.alist[1])
 
     def reset_btnclicked(self):
         """
@@ -443,6 +448,10 @@ class Maincontroller(QMainWindow):
             widget.clear()
             widget.setFocus()
 
+
+    def call_calculation(self):
+        outputs = bbExtendedEndPlateSplice()
+        return outputs
     def call_2D_drawing(self, view):
         """
 
@@ -453,23 +462,56 @@ class Maincontroller(QMainWindow):
                  parameters from Extended endplate GUI
 
         """
-        beam_beam = ExtendedEndPlate()
-        if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
-            beam_beam.save_to_svg(filename, view)
-        elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
-            beam_beam.save_to_svg(filename, view)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
-            beam_beam.save_to_svg(filename, view)
+        self.resultobj = self.call_calculation()
+        beam_beam = ExtendedEndPlate(self.resultobj)
+        if view != "All":
+            if view == "Front":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
+                beam_beam.save_to_svg(filename, view)
+            elif view == "Side":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
+                beam_beam.save_to_svg(filename, view)
+            else:
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
+                beam_beam.save_to_svg(filename, view)
+
+
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("extnd.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
 
 
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     module_setup()
     window = Maincontroller()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == "__main__":
     main()

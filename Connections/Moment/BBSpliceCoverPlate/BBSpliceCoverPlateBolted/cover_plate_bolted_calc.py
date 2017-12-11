@@ -553,7 +553,7 @@ def coverplateboltedconnection(uiObj, desginParam):
             flange_bolt_planes = 1
             number_of_bolts = 1
             if bolt_type == "Bearing Bolt":
-                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, flange_bolt_planes, bolt_fu)
+                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, number_of_bolts, bolt_fu)
                 flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
                                                                                 kb, int(flange_plate_fu))
                 flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
@@ -574,7 +574,7 @@ def coverplateboltedconnection(uiObj, desginParam):
         max_gauge = int(min((32 * web_t_thinner), 300))
 
     # Maximim pitch and gauge distance for flange splice plate
-        max_pitch_flange = int(min((32 * flange_t_thinner), 300))
+        max_pitch_flange = int(min((32.0 * flange_t_thinner), 300))
         max_gauge_flange = int(min((32 * flange_t_thinner), 300))
 
     # Calculation of number of bolts required for web splice plate
@@ -583,12 +583,28 @@ def coverplateboltedconnection(uiObj, desginParam):
         else:
             web_bolts_required = 0
 
+    # Calculation of number of bolts required for flange splice plate
+        ff = flange_force(beam_d, beam_f_t, axial_force, moment_load)
+        if ff != 0:
+            flange_bolts_required = int(math.ceil(ff/ flange_bolt_capacity))
+        else:
+            flange_bolts_required = 0
+
     # From practical considerations, minimum number of bolts required for web splice plate is 3 [Reference: ML Gambhir page 10.84]
         if web_bolts_required > 0 and web_bolts_required <=2:
             web_bolts_required = 3
 
-     # Calculation of bolt group capacity for web splice plate
+    # Number of bolts in even number (for design of flange splice plate)
+        if flange_bolts_required % 2 == 0:
+            flange_bolts_required = flange_bolts_required
+        else:
+            flange_bolts_required = flange_bolts_required + 1
+
+    # Calculation of bolt group capacity for web splice plate
         web_bolt_group_capcity = web_bolts_required * web_bolt_capacity
+
+    # Calculation of bolt group capacity for flange splice plate
+        flange_bolt_group_capacity = flange_bolts_required * flange_bolt_capacity
 
 
     # Roundup pitch and end distances as a whole number in the multiples of 10

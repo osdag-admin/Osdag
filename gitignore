@@ -3,7 +3,7 @@
 *.xml
 **/*.txt
 *.pyc
-.idea/
+.idea/workspace.xml
 *~
 *.html
 *.xml

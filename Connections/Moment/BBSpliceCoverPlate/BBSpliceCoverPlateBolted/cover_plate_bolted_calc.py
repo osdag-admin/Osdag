@@ -413,9 +413,42 @@ def coverplateboltedconnection(uiObj, desginParam):
     else:
         pass
 
-    # Plate height input and check for maximum and minimum values
-    webmaxh = web_max_h(beam_d, beam_f_t, beam_r1);
-    webminh = web_min_h(beam_d);
+
+    # Input for flange splice plate dimensions (for optional inputs) and validation
+
+    # Check for thickness of flange splice plate
+    # if flange_plate_t < beam_f_t: # TODO: Yet to be finalized
+    #     flange_plate_t = thk_flange_plate
+    #     design_status = False
+    #     logger.error(": Chosen flange splice plate thickness is not sufficient")
+    #     logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm") % thk_flange_plate
+    #     logger.info(": Increase thickness of flange splice plate")
+    thkflangeplate = thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load, beam_b, beam_fy, dia_hole)
+    if thkflangeplate < min((beam_f_t / 2), 10):
+        thkflangeplate = max((beam_f_t / 2), 10)
+    else:
+        pass
+
+    if flange_plate_t < (beam_f_t / 2):
+        flange_plate_t = thkflangeplate
+        design_status = False
+        logger.error(": Chosen flange splice plate thickness is not sufficient")
+        logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm") % thkflangeplate
+        logger.info(": Increase thickness of flange splice plate")
+
+
+    elif flange_plate_t < 10: # 10 mm
+        flange_plate_t = thkflangeplate
+        logger.error(": Chosen flange splice plate thickness is not sufficient")
+        logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm") % thkflangeplate
+        logger.info(": Increase thickness of flange splice plate")
+
+    else:
+        pass
+
+    # Web splice plate height input and check for maximum and minimum values
+    webmaxh = web_max_h(beam_d, beam_f_t, beam_r1)
+    webminh = web_min_h(beam_d)
     if web_plate_l != 0:
         if web_plate_l > web_max_h:
             if connectivity =="Beam-Beam":
@@ -441,6 +474,28 @@ def coverplateboltedconnection(uiObj, desginParam):
                 logger.info(": Increase the height of web splice plate")
         else:
             pass
+
+    # Width of flange splice plate (maximum and minimum values)
+    if flange_plate_w != 0:
+        if flange_plate_w < (beam_b - 2 * 12.7): # AISC Essential detailing requirements for a splice --> B - Half inch on both sides
+            # Note: half inch (0.5 inch) = 12.7 mm
+            flangeplatewidth = beam_b - (2 * 12.7)
+            design_status = False
+            logger.error(": Width of flange splice plate is not sufficient")
+            logger.warning(": Minimum width of flange splice plate is restricted to %2.2f mm") % flangeplatewidth
+            logger.info(": Increase the width of flange splice plate")
+
+        elif flange_plate_w > beam_b:
+            flangeplatewidth = beam_b
+            design_status = False
+            logger.error(": Width of flange splice plate is greater than the maximum width as mentioned in AISC")
+            logger.warning(": Maximum width of flange splice plate is restricted to %2.2f mm") % flangeplatewidth
+            logger.info(": Decrease the width of flange splice plate")
+
+        else:
+            pass
+
+
 
     ########################################################################################################################
     def boltdesignweb (web_plate_l):
@@ -491,32 +546,37 @@ def coverplateboltedconnection(uiObj, desginParam):
             web_bolt_capacity = web_bolt_shear_capacity
 
             print web_bolt_bearing_capacity, web_bolt_shear_capacity, web_bolt_capacity
-        # # Bolt capacity calculation for flange splice
-        #     # Bolt capacity calculation for web splice plate
-        #
-        #     flange_t_thinner = min(beam_f_t, flange_plate_t.real)
-        #     flange_bolt_planes = 1
-        #     number_of_bolts = 1
-        #     if bolt_type == "Bearing Bolt":
-        #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, flange_bolt_planes, bolt_fu)
-        #         flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
-        #                                                                         kb, int(flange_plate_fu))
-        #         flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
-        #
-        #     elif bolt_type == "HSFG":
-        #         muf = mu_f
-        #         bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
-        #         n_e = 2  # number of effective surfaces offering frictional resistance
-        #         flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
-        #                                                                          bolt_hole_type)
-        #         flange_bolt_bearing_capacity = 'N/A'
-        #         flange_bolt_capacity = flange_bolt_shear_capacity
-        #
-        #         print flange_bolt_bearing_capacity, flange_bolt_shear_capacity, flange_bolt_capacity
 
-    # Maximum pitch and gauge distance
+        # Bolt capacity calculation for flange splice
+
+            flange_t_thinner = min(beam_f_t, flange_plate_t.real)
+            flange_bolt_planes = 1
+            number_of_bolts = 1
+            if bolt_type == "Bearing Bolt":
+                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, flange_bolt_planes, bolt_fu)
+                flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
+                                                                                kb, int(flange_plate_fu))
+                flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
+
+            elif bolt_type == "HSFG":
+                muf = mu_f
+                bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
+                n_e = 1  # number of effective surfaces offering frictional resistance
+                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
+                                                                                 bolt_hole_type)
+                flange_bolt_bearing_capacity = 'N/A'
+                flange_bolt_capacity = flange_bolt_shear_capacity
+
+                print flange_bolt_bearing_capacity, flange_bolt_shear_capacity, flange_bolt_capacity
+
+    # Maximum pitch and gauge distance for web splice plate
         max_pitch = int(min((32 * web_t_thinner), 300))
         max_gauge = int(min((32 * web_t_thinner), 300))
+
+    # Maximim pitch and gauge distance for flange splice plate
+        max_pitch_flange = int(min((32 * flange_t_thinner), 300))
+        max_gauge_flange = int(min((32 * flange_t_thinner), 300))
+
     # Calculation of number of bolts required for web splice plate
         if shear_load != 0:
             web_bolts_required = int(math.ceil(shear_load/ web_bolt_capacity))
@@ -838,6 +898,14 @@ def coverplateboltedconnection(uiObj, desginParam):
         boltParam["ShearYielding"] = V_d
         boltParam["ShearRupture"] = R_n
         return boltParam
+
+########################################################################################################################
+############################################ Flange Splice Plate Design ################################################
+########################################################################################################################
+
+
+
+
 
 
 

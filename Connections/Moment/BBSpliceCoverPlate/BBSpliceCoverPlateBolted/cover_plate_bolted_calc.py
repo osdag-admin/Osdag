@@ -63,6 +63,7 @@ ASCII diagram - Beam-Beam Bolted Splice Connection with Cover Plates
                  +----||---------||--------||----++----||---------||---------||---+
                       ++         ++        ++          ++         ++         ++
 '''
+
 ########################################################################################################################
 # Total moment acting on the section (kN-m)
 def total_moment(beam_d, beam_f_t, axial_force, moment_load):
@@ -498,7 +499,7 @@ def coverplateboltedconnection(uiObj, desginParam):
 
 
     ########################################################################################################################
-    def boltdesignweb (web_plate_l):
+    def boltdesignweb (web_plate_l, flange_plate_w, flange_plate_l):
         # Bolt fu and fy calculation
         bolt_fu = int(bolt_grade) * 100
         bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
@@ -514,8 +515,8 @@ def coverplateboltedconnection(uiObj, desginParam):
             min_end_dist = int(float(1.5 * dia_hole))
         min_edge_dist = min_end_dist
 
-        min_end_dist = 1.7 * dia_hole
-        min_edge_dist = min_end_dist
+        # min_end_dist = 1.7 * dia_hole
+        # min_edge_dist = min_end_dist
 
         # max_end_distance  = 12 * web_t_thinner * (fy/25)^0.5
 
@@ -600,6 +601,36 @@ def coverplateboltedconnection(uiObj, desginParam):
         else:
             flange_bolts_required = flange_bolts_required + 1
 
+    # Number of rows of bolts in flange splice
+
+
+            '''
+
+            ASCII Diagram to represent flange splice plate
+                            row 1                 row 4   Gap between beams
+                          +---->                  +-->   ++-----+
+                          |                       |      ||
+            +--------+----|-----------------------|------||-----------------------------------+---------+
+            |        |    +                       |      vv                                   |         |
+            |        |                            |      ||                                   |         |
+            |        |    +       +       +       +      ||    +       +       +       +      |         |
+            |        |                                   ||                                   |         |
+            |        |                                   ||                                   |         |
+            |        |                                   ||                   ++-+            |         |
+            |        |    +       +       +       +      ||    +       +      |+ |     +      |         |
+            |        |                                   ||                   +--v            |         |
+            |   ^    |            ^                      ||                      |            |         |
+            +---|----+------------|--------------- ------++----------------------|------------+---------+
+                |                 |                                              | Bolt
+                | Beam            |Flange splice plate                           +------+
+                +-----+           +--------+
+
+                                   In the above diagram total number of bolts along one side of beam is 8
+
+                                     number of rows = 8/2 = 4
+            '''
+        number_of_rows_flange = flange_bolts_required / 2
+
     # Calculation of bolt group capacity for web splice plate
         web_bolt_group_capcity = web_bolts_required * web_bolt_capacity
 
@@ -633,6 +664,7 @@ def coverplateboltedconnection(uiObj, desginParam):
             # Consider web splice plate equal to minimum required height of web splice plate & calc pitch
             web_plate_l_opt = web_min_h(beam_d)
             web_pitch = (web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)
+            web_plate_l = web_plate_l_opt
             ## In the above case if "pitch < required min pitch" then recalculate height of web splice plate
             if web_pitch <= min_pitch:
                 web_plate_l_opt = (web_bolts_required - 1) * min_pitch + 2 * min_end_dist
@@ -643,13 +675,68 @@ def coverplateboltedconnection(uiObj, desginParam):
                     web_pitch = (web_plate_l_opt - 2 * min_end_dist) / (web_bolts_required - 1)
                 else:
                     pass
+                web_plate_l = web_plate_l_opt
 
             elif web_pitch >= max_pitch:
                 web_plate_l_opt = (web_bolts_required - 1) * max_pitch + 2 * min_end_dist
                 web_pitch = max_pitch
+                web_plate_l = web_plate_l_opt
 
             else:
                 pass
+
+        else:
+            pass
+
+    # Calculation of width of flange splice plate (When user doesn't specify the value)
+
+        '''
+        ASCII Diagram to represent length and height of flange splice plate
+
+                 <----------------length = (2 * Ltp) + Gap------------------>
+                 +----------------------------++----------------------------+  ^
+                 |                            ||                            |  |
+                 |   +        +       +       ||    +         +       +     |
+                 |                            ||                            | width
+                 |   +        +       +       ||    +         +       +     |
+                 |                            ||                            |  |
+                 +----------------------------++----------------------------+  v
+                                              ||
+                 <---------+  Ltp  +--------->||<---------+  Ltp  +--------->
+                                             Gap
+                                              vv
+        '''
+        if flange_plate_w == 0:
+            flange_plate_w = beam_b
+        elif flange_plate_w != 0:
+            flange_plate_w = flange_plate_w
+        else:
+            pass
+
+    # Calculation of length of flange splice plate (optional input)
+        Ltp = (2 * min_end_dist) + (min_pitch * (number_of_rows_flange - 1))
+        if Ltp < max(beam_b, 225): # Note: Ltp > 225 mm and Ltp > width of beam
+            Ltp = max(beam_b, 225)
+        else:
+            pass
+        flange_plate_l_opt = 2 * Ltp + gap
+    #### 1. Check if Ltp > width of beam (beam_b) and 225 mm ; Note: refer above ASCII diagram
+        ## Reference: Steel Designer's Manual - SCI - 6th edition, page 754
+        if flange_plate_l != 0:
+            Ltp_input = (flange_plate_l - gap) / 2
+            if Ltp_input < Ltp:
+                design_status = False
+                logger.error(": Chosen length of flange splice plate is not sufficient")
+                logger.warning(": Minimum required length of flange splice plate is %2.2f") % flange_plate_l_opt
+                logger.info(": Increase the length of flange splice plate")
+            else:
+                pass
+            flange_plate_l = flange_plate_l
+            flange_pitch = (flange_plate_l - (2 * min_end_dist)) /(number_of_rows_flange - 1)
+
+        elif flange_plate_l == 0:
+            flange_plate_l = flange_plate_l_opt
+            flange_pitch = (flange_plate_l_opt - (2 * min_end_dist)) /(number_of_rows_flange - 1)
 
         else:
             pass
@@ -682,11 +769,22 @@ def coverplateboltedconnection(uiObj, desginParam):
             boltParam["Pitch"] = web_pitch
             boltParam["End"] = min_end_dist
             boltParam["Edge"] = min_edge_dist
-            boltParam["WebPlateHeight"] = web_plate_l_opt
             boltParam["WebPH"] = web_plate_l
             boltParam["WebGauge"] = min_gauge
             boltParam["WebGaugeMax"] = max_gauge
-            boltParam["webPlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
+            boltParam["webPlateDemand"] = shear_load
+
+            boltParam["ShearCapacityF"] = flange_bolt_shear_capacity
+            boltParam["BearingCapacityF"] = flange_bolt_bearing_capacity
+            boltParam["CapacityBoltF"] = flange_bolt_capacity
+            boltParam["BoltsRequiredF"] = flange_bolts_required # Note: This outputs number of bolts required in one side of splice
+            boltParam["PitchF"] = flange_pitch
+            boltParam["EndF"] = min_end_dist
+            boltParam["EdgeF"] = min_edge_dist
+            boltParam["FlangePlateHeight"] = flange_plate_l
+            boltParam["FlangePlateWidth"] = flange_plate_w
+            boltParam["FlangeGauge"] = 90 # TODO: Need to fetch values
+            boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
             boltParam["bolt_fu"] = bolt_fu
@@ -703,11 +801,23 @@ def coverplateboltedconnection(uiObj, desginParam):
             boltParam["Pitch"] = web_pitch
             boltParam["End"] = min_end_dist
             boltParam["Edge"] = min_edge_dist
-            boltParam["WebPlateHeight"] = web_plate_l # Note the difference
             boltParam["WebPH"] = web_plate_l
             boltParam["WebGauge"] = min_gauge
             boltParam["WebGaugeMax"] = max_gauge
             boltParam["webPlateDemand"] = shear_load
+
+            boltParam["ShearCapacityF"] = flange_bolt_shear_capacity
+            boltParam["BearingCapacityF"] = flange_bolt_bearing_capacity
+            boltParam["CapacityBoltF"] = flange_bolt_capacity
+            boltParam[
+                "BoltsRequiredF"] = flange_bolts_required  # Note: This outputs number of bolts required in one side of splice
+            boltParam["PitchF"] = flange_pitch
+            boltParam["EndF"] = min_end_dist
+            boltParam["EdgeF"] = min_edge_dist
+            boltParam["FlangePlateHeight"] = flange_plate_l
+            boltParam["FlangePlateWidth"] = flange_plate_w
+            boltParam["FlangeGauge"] = 90  # TODO: Need to fetch values
+            boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
             boltParam["bolt_fu"] = bolt_fu
@@ -716,7 +826,7 @@ def coverplateboltedconnection(uiObj, desginParam):
             boltParam["kb"] = kb
             return boltParam
         # Call function for bolt design output
-    boltparameters = boltdesignweb(web_plate_l)
+    boltparameters = boltdesignweb(web_plate_l, flange_plate_w, flange_plate_l)
     print "boltparmameters", boltparameters
 
     # check for long joint provisions [Reference: Clause 10.3.3.1, page 75, IS 800 : 2007]
@@ -805,7 +915,7 @@ def coverplateboltedconnection(uiObj, desginParam):
     #####################################################################################################################
     # Check for block shear capacity of web splice plate
     min_thk = min(web_plate_t, beam_w_t)
-    Tdb = web_block_shear(boltparameters["WebPlateHeight"], boltparameters["Edge"], min_thk, boltparameters["BoltsRequired"],\
+    Tdb = web_block_shear(boltparameters["WebPH"], boltparameters["Edge"], min_thk, boltparameters["BoltsRequired"],\
                           boltparameters["dia_hole"], beam_fy, beam_fu)
 
     if Tdb < shear_load:
@@ -816,7 +926,7 @@ def coverplateboltedconnection(uiObj, desginParam):
 
     #####################################################################################################################
     # Check for shear yielding of web splice plate
-    web_plate_l = boltparameters["WebPlateHeight"]
+    web_plate_l = boltparameters["WebPH"]
     A_v = web_plate_l * web_plate_t
     V_d = shear_yielding(A_v, beam_fy)
     if V_d < shear_load:
@@ -827,7 +937,7 @@ def coverplateboltedconnection(uiObj, desginParam):
 
     #####################################################################################################################
     # Check for shear rupture of web splice plate
-    web_plate_l = boltparameters["WebPlateHeight"]
+    web_plate_l = boltparameters["WebPH"]
     n_bolts = boltparameters["BoltsRequired"]
     A_vn = (web_plate_l -  n_bolts * 2 * dia_hole) * web_plate_t
     R_n = shear_rupture(A_vn, beam_fu)
@@ -845,78 +955,87 @@ def coverplateboltedconnection(uiObj, desginParam):
     # End of calculation for design of web splice plate
     # Output
     ## When height and width of web splice plate are zero
-    if web_plate_l != 0 and web_plate_w != 0:
-        boltParam = {}
-        boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-        boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-        boltParam["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-        boltParam["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-        boltParam["Pitch"] = new_bolt_param["Pitch"]
-        boltParam["End"] = new_bolt_param["End"]
-        boltParam["Edge"] = new_bolt_param["Edge"]
-        boltParam["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-        boltParam["WebPH"] = new_bolt_param["WebPH"]
-        boltParam["WebGauge"] = new_bolt_param["WebGauge"]
-        boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-        boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-        boltParam["WebPlateWidth"] = web_plate_w_req
-        boltParam["WebPlateCapacity"] = web_splice_capacity
+    if web_plate_l == 0 and web_plate_w == 0 and flange_plate_l == 0 and flange_plate_w == 0:
+        outputObj = {}
+        outputObj["ShearCapacity"] = new_bolt_param["ShearCapacity"]
+        outputObj["BearingCapacity"] = new_bolt_param["BearingCapacity"]
+        outputObj["CapacityBolt"] = new_bolt_param["CapacityBolt"]
+        outputObj["BoltsRequired"] = new_bolt_param["BoltsRequired"]
+        outputObj["Pitch"] = new_bolt_param["Pitch"]
+        outputObj["End"] = new_bolt_param["End"]
+        outputObj["Edge"] = new_bolt_param["Edge"]
+        outputObj["WebPH"] = new_bolt_param["WebPH"]
+        outputObj["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
+        outputObj["webPlateDemand"] = new_bolt_param["webPlateDemand"]
+        outputObj["WebPlateWidth"] = web_plate_w_req
+        outputObj["WebPlateCapacity"] = web_splice_capacity
+
+        outputObj["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
+        outputObj["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
+        outputObj["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
+        outputObj["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["PitchF"] = new_bolt_param["PitchF"]
+        outputObj["EndF"] = new_bolt_param["EndF"]
+        outputObj["EdgeF"] = new_bolt_param["EdgeF"]
+        outputObj["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
+        outputObj["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
+        outputObj["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
+
+
 
     ####### For reference and validation
-        boltParam["WebBlockShear"] = Tdb
-        boltParam["ShearYielding"] = V_d
-        boltParam["ShearRupture"] = R_n
-        return boltParam
-
-    ## When height of web splice plate is zero
-    elif web_plate_l == 0 and web_plate_w != 0:
-        boltParam = {}
-        boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-        boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-        boltParam["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-        boltParam["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-        boltParam["Pitch"] = new_bolt_param["Pitch"]
-        boltParam["End"] = new_bolt_param["End"]
-        boltParam["Edge"] = new_bolt_param["Edge"]
-        boltParam["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-        boltParam["WebPH"] = new_bolt_param["WebPH"]
-        boltParam["WebGauge"] = new_bolt_param["WebGauge"]
-        boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-        boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-        boltParam["WebPlateWidth"] = web_plate_w_req
-        boltParam["WebPlateCapacity"] = web_splice_capacity
-
-    ####### For reference and validation
-        boltParam["WebBlockShear"] = Tdb
-        boltParam["ShearYielding"] = V_d
-        boltParam["ShearRupture"] = R_n
-        return boltParam
+        outputObj["WebBlockShear"] = Tdb
+        outputObj["ShearYielding"] = V_d
+        outputObj["ShearRupture"] = R_n
 
     else:
-        boltParam = {}
-        boltParam["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-        boltParam["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-        boltParam["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-        boltParam["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-        boltParam["Pitch"] = new_bolt_param["Pitch"]
-        boltParam["End"] = new_bolt_param["End"]
-        boltParam["Edge"] = new_bolt_param["Edge"]
-        boltParam["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-        boltParam["WebPH"] = new_bolt_param["WebPH"]
-        boltParam["WebGauge"] = new_bolt_param["WebGauge"]
-        boltParam["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-        boltParam["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-        boltParam["WebPlateWidth"] = web_plate_w_req
-        boltParam["WebPlateCapacity"] = web_splice_capacity
+        outputObj = {}
+        outputObj["ShearCapacity"] = new_bolt_param["ShearCapacity"]
+        outputObj["BearingCapacity"] = new_bolt_param["BearingCapacity"]
+        outputObj["CapacityBolt"] = new_bolt_param["CapacityBolt"]
+        outputObj["BoltsRequired"] = new_bolt_param["BoltsRequired"]
+        outputObj["Pitch"] = new_bolt_param["Pitch"]
+        outputObj["End"] = new_bolt_param["End"]
+        outputObj["Edge"] = new_bolt_param["Edge"]
+        outputObj["WebPH"] = new_bolt_param["WebPH"]
+        outputObj["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
+        outputObj["webPlateDemand"] = new_bolt_param["webPlateDemand"]
+        outputObj["WebPlateWidth"] = web_plate_w_req
+        outputObj["WebPlateCapacity"] = web_splice_capacity
+
+        outputObj["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
+        outputObj["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
+        outputObj["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
+        outputObj["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["PitchF"] = new_bolt_param["PitchF"]
+        outputObj["EndF"] = new_bolt_param["EndF"]
+        outputObj["EdgeF"] = new_bolt_param["EdgeF"]
+        outputObj["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
+        outputObj["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
+        outputObj["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
 
         ####### For reference and validation
-        boltParam["WebBlockShear"] = Tdb
-        boltParam["ShearYielding"] = V_d
-        boltParam["ShearRupture"] = R_n
-        return boltParam
+        outputObj["WebBlockShear"] = Tdb
+        outputObj["ShearYielding"] = V_d
+        outputObj["ShearRupture"] = R_n
+
+    if design_status == True:
+
+        logger.info(": Overall fin plate connection design is safe \n")
+        logger.debug(" :=========End Of design===========")
+    else:
+        logger.error(": Design is not safe \n ")
+        logger.debug(" :=========End Of design===========")
+
+    return outputObj
+    print
 
 ########################################################################################################################
-############################################ Flange Splice Plate Design ################################################
+############################################ End of Design ################################################
 ########################################################################################################################
 
 

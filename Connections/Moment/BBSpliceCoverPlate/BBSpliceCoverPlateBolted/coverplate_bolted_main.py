@@ -3,6 +3,7 @@ Created on 7-November-2017
 
 @author: Reshma Konjari
 """
+
 from ui_coverplatebolted import Ui_MainWindow
 from ui_flangespliceplate import Ui_Flangespliceplate
 from ui_webspliceplate import Ui_Webspliceplate
@@ -10,7 +11,7 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
-from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
+from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
@@ -96,7 +97,6 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
@@ -212,6 +212,7 @@ class MainController(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -522,14 +523,24 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        # self.uiObj = self.get_user_inputs()
         self.alist = self.designParameters()
         print "alist printing", self.alist[0]
-        self.outputs = coverplateboltedconnection(self.alist[0]) #, self.alist[2],
-                                             # self.alist[3], self.alist[4], self.alist[5],
-                                             # self.alist[6], self.alist[7], self.alist[8], self.display)
+        self.outputs = coverplateboltedconnection(self.alist[0])
+        # a = self.outputs[self.outputs.keys()[0]]
+        # if len(str(a[a.keys()[0]])) == 0:
+        #     self.ui.btn_Design.setEnabled(False)
+        # self.display_output(self.outputs)
+        self.display_log_to_textedit()
 
     def display_output(self, outputObj):
+        """
+
+        Args:
+            outputObj: Output dictionary from calculation file
+
+        Returns: Design result values to the respective textboxes in the output window
+
+        """
         for k in outputObj.keys():
             for key in outputObj[k].keys():
                 if (outputObj[k][key] == ""):
@@ -585,6 +596,16 @@ class MainController(QMainWindow):
         web_edgedist = resultObj["WebBolt"]["Edge"]
         self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
+    def display_log_to_textedit(self):
+        file = QFile('coverplate.log')
+        if not file.open(QtCore.QIODevice.ReadOnly):
+            QMessageBox.information(None, 'info', file.errorString())
+        stream = QtCore.QTextStream(file)
+        self.ui.textEdit.clear()
+        self.ui.textEdit.setHtml(stream.readAll())
+        vscroll_bar = self.ui.textEdit.verticalScrollBar()
+        vscroll_bar.setValue(vscroll_bar.maximum())
+        file.close()
 
     def call_calculation(self):
         outputs = coverplateboltedconnection(self.uiObj)
@@ -625,6 +646,10 @@ class MainController(QMainWindow):
         section = Webspliceplate(self)
         section.show()
 
+    def showFontDialogue(self):
+        font, ok = QFontDialog.getFont()
+        if ok:
+            self.ui.textEdit.setFont()
 
 def set_osdaglogger():
     global logger

@@ -207,6 +207,8 @@ class MainController(QMainWindow):
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
         self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
+        self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
+        self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
@@ -235,37 +237,37 @@ class MainController(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        # from osdagMainSettings import backend_name
-        
-        # self.display, _ = self.init_display(backend_str=backend_name())
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+        self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreferences(self)
 
-    # def init_display(self, backend_str=None, size=(1024, 768)):
-    #     from OCC.Display.backend import load_backend, get_qt_modules
-    #
-    #     used_backend = load_backend(backend_str)
-    #
-    #     global display, start_display, app, _, USED_BACKEND
-    #     if 'qt' in used_backend:
-    #         from OCC.Display.qtDisplay import qtViewer3d
-    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-    #
-    #     from OCC.Display.qtDisplay import qtViewer3d
-    #     self.ui.modelTab = qtViewer3d(self)
-    #     display = self.ui.modelTab._display
-    #
-    #     # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-    #     # display.View.SetProj(1, 1, 1)
-    #
-    #     def centerOnScreen(self):
-    #         resolution = QtGui.QDesktopWidget().screenGeometry()
-    #         self.move((resolution.width()/2) - (self.frameSize().width()/2),
-    #                   (resolution.height()/2) - (self.frameSize().height()/2))
-    #
-    #     def start_display():
-    #         self.ui.modelTab.raise_()
-    #     return display, start_display
+    def init_display(self, backend_str=None, size=(1024, 768)):
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+        display = self.ui.modelTab._display
+
+        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width()/2) - (self.frameSize().width()/2),
+                      (resolution.height()/2) - (self.frameSize().height()/2))
+
+        def start_display():
+            self.ui.modelTab.raise_()
+        return display, start_display
 
     def get_beamdata(self):
         """
@@ -490,8 +492,13 @@ class MainController(QMainWindow):
             pass
 
     def design_prefer(self):
-        section = DesignPreferences(self)
-        section.show()
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearance(self):
+        self.designPrefDialog.get_clearance()
+
+    def call_bolt_fu(self):
+        self.designPrefDialog.set_boltFu()
 
     def designParameters(self):
         """
@@ -514,8 +521,8 @@ class MainController(QMainWindow):
 
         """
         self.alist = self.designParameters()
-        print "alist printing", self.alist[0]
-        self.outputs = coverplateboltedconnection(self.alist[0])
+        print "alist printing", self.alist
+        self.outputs = coverplateboltedconnection(self.alist)
         # a = self.outputs[self.outputs.keys()[0]]
         # if len(str(a[a.keys()[0]])) == 0:
         #     self.ui.btn_Design.setEnabled(False)
@@ -607,16 +614,18 @@ class MainController(QMainWindow):
         Returns: Saves 2D svg drawings
 
         """
-        beam_beam = CoverEndPlate()
-        if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
-            beam_beam.save_to_svg(filename, view)
-        elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
-            beam_beam.save_to_svg(filename, view)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
-            beam_beam.save_to_svg(filename, view)
+        self.resultObj = self.call_calculation()
+        beam_beam = CoverEndPlate(self.resultObj)
+        if view != 'All':
+            if view == "Front":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+                beam_beam.save_to_svg(filename, view)
+            elif view == "Side":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+                beam_beam.save_to_svg(filename, view)
+            else:
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+                beam_beam.save_to_svg(filename, view)
 
     def flangesplice_plate(self):
         section = Flangespliceplate(self)
@@ -660,10 +669,13 @@ def set_osdaglogger():
 
 
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     module_setup()
     window = MainController()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
     main()

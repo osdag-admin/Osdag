@@ -320,7 +320,7 @@ def fetchBeamPara(self):
 #######################################################################
 # Start of Main Program
 
-def bbExtendedEndPlateSplice(uiObj, desginParam):
+def bbExtendedEndPlateSplice(uiObj):
     global logger
     global design_status
     design_status = True
@@ -338,11 +338,11 @@ def bbExtendedEndPlateSplice(uiObj, desginParam):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
-    mu_f = float(desginParam["bolt"]["slip_factor"])
-    gamma_mw = float(desginParam["weld"]["safety_factor"])
-    dp_bolt_hole_type = desginParam["bolt"]["bolt_hole_type"]
-    dia_hole = bolt_dia + int(desginParam["bolt"]["bolt_hole_clrnce"])
-    weld_type = desginParam["weld"]["typeof_weld"]
+    mu_f = float(uiObj["bolt"]["slip_factor"])
+    gamma_mw = float(uiObj["weld"]["safety_factor"])
+    dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
+    dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
+    weld_type = uiObj["weld"]["typeof_weld"]
     dp_bolt_type = uiObj["Bolt"]["Grade"]
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])

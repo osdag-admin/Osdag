@@ -10,6 +10,7 @@ from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
+from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
 import sys
 import os
@@ -178,6 +179,8 @@ class Maincontroller(QMainWindow):
         self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
         self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
+        self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
+        self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
@@ -201,6 +204,38 @@ class Maincontroller(QMainWindow):
         min_fy = 165
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+        self.uiObj = None
+        self.resultObj = None
+        self.designPrefDialog = DesignPreference(self)
+
+    def init_display(self, backend_str=None, size=(1024, 768)):
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+        display = self.ui.modelTab._display
+
+        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width()/2) - (self.frameSize().width()/2),
+                      (resolution.height()/2) - (self.frameSize().height()/2))
+
+        def start_display():
+            self.ui.modelTab.raise_()
+        return display, start_display
 
     def get_user_inputs(self):
         uiObj = {}
@@ -231,8 +266,13 @@ class Maincontroller(QMainWindow):
         return uiObj
 
     def design_prefer(self):
-        section = DesignPreference(self)
-        section.show()
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearance(self):
+        self.designPrefDialog.get_clearance()
+
+    def call_bolt_fu(self):
+        self.designPrefDialog.set_boltFu()
 
     def closeEvent(self, event):
         """
@@ -344,10 +384,22 @@ class Maincontroller(QMainWindow):
         Returns:
 
         """
-        self.uiObj = self.get_user_inputs()
-        print self.uiObj
+        # self.uiObj = self.get_user_inputs()
+        # print self.uiObj
         self.alist = self.designParameters()
-        outputs = bbExtendedEndPlateSplice(self.uiObj, self.alist)
+        outputs = bbExtendedEndPlateSplice(self.alist)
+        self.display_log_to_textedit()
+
+    def display_log_to_textedit(self):
+        file = QFile('extnd.log')
+        if not file.open(QtCore.QIODevice.ReadOnly):
+            QMessageBox.information(None, 'info', file.errorString())
+        stream = QtCore.QTextStream(file)
+        self.ui.textEdit.clear()
+        self.ui.textEdit.setHtml(stream.readAll())
+        vscroll_bar = self.ui.textEdit.verticalScrollBar()
+        vscroll_bar.setValue(vscroll_bar.maximum())
+        file.close()
 
     def reset_btnclicked(self):
         """
@@ -453,23 +505,56 @@ class Maincontroller(QMainWindow):
                  parameters from Extended endplate GUI
 
         """
-        beam_beam = ExtendedEndPlate()
-        if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
-            beam_beam.save_to_svg(filename, view)
-        elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
-            beam_beam.save_to_svg(filename, view)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
-            beam_beam.save_to_svg(filename, view)
+        self.resultobj = self.call_calculation()
+        beam_beam = ExtendedEndPlate(self.resultobj)
+        if view != "All":
+            if view == "Front":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
+                beam_beam.save_to_svg(filename, view)
+            elif view == "Side":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
+                beam_beam.save_to_svg(filename, view)
+            else:
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
+                beam_beam.save_to_svg(filename, view)
+
+
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("extnd.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
 
 
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     module_setup()
     window = Maincontroller()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == "__main__":
     main()

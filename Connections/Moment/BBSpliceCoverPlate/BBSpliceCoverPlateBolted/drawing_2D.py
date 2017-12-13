@@ -11,7 +11,7 @@ import os
 
 
 class CoverEndPlate(object):
-    def __init__(self):
+    def __init__(self, input):
         # self.filename = filename
         self.beam_length_L1 = 1000
         self.beam_length_L2 = 1000
@@ -37,12 +37,12 @@ class CoverEndPlate(object):
         self.flange_thickness_T1 = 17.4
         self.flange_thickness_T2 = 17.4
 
-        self.web_thickness_tw1 = 9.4
+        self.web_thickness_tw1 = float(input["WebPlate"]["Thickness (mm)"])  #9.4
         self.web_thickness_tw2 = 9.4
 
-        self.gap_btwn_2beam = 5
+        self.gap_btwn_2beam = float(input["detailing"]["gap"])     #5
 
-        self.bolt_diameter = 20
+        self.bolt_diameter = int(input["Bolt"]["Diameter (mm)"])
         self.bolt_hole_diameter =22
 
         self.edge_dist1 = 40
@@ -55,8 +55,8 @@ class CoverEndPlate(object):
         self.pitch1 = 60
         self.pitch2 = 100
 
-        self.bolt_type = "HSFG Bolt" # TODO value should come from dict
-        self.grade = 8.8        # TODO value should come from dict
+        self.bolt_type = input["Bolt"]["Type"]
+        self.grade = float(input["Bolt"]["Grade"])
 
         self.bolts_top_flange1_col = 4
         self.bolts_top_flange1_row = 1  # TODO value should come from dict

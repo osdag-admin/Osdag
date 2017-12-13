@@ -11,7 +11,7 @@ import os
 
 
 class ExtendedEndPlate(object):
-    def __init__(self):
+    def __init__(self, input):
         # self.filename = filename
         self.beam_length_L1 = 1000
         self.beam_length_L2 = 1000
@@ -40,15 +40,15 @@ class ExtendedEndPlate(object):
         self.flange_weld_thickness = 12
         self.web_weld_thickness = 8
 
-        self.bolt_diameter = 24
+        self.bolt_diameter = int(input['Bolt']['Diameter (mm)'])  #24
         self.bolt_hole_diameter =26
         self.edge_dist = 44.2
         self.end_dist = self.edge_dist
         self.cross_centre_gauge_dist = 90
         self.pitch = 60
 
-        self.bolt_type = "Bearing Bolt" # TODO value should come from dict
-        self.grade = 8.8        # TODO value should come from dict
+        self.bolt_type =  input["Bolt"]["Type"]
+        self.grade = float(input["Bolt"]["Grade"])        #8.8
 
         self.bolts_outside_top_flange_col = 2
         self.bolts_outside_top_flange_row = 1  # TODO value should come from dict

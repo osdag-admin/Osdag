@@ -3,6 +3,7 @@ Created on 7-November-2017
 
 @author: Reshma Konjari
 """
+
 from ui_coverplatebolted import Ui_MainWindow
 from ui_flangespliceplate import Ui_Flangespliceplate
 from ui_webspliceplate import Ui_Webspliceplate
@@ -10,7 +11,7 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
-from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication
+from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
@@ -69,7 +70,7 @@ class DesignPreferences(QDialog):
             self.saved_designPref["detailing"]["min_edgend_dist"] = float(1.5)
         if self.ui.txt_detailingGap.text() == '':
 
-            self.saved_designPref["detailing"]["gap"] = float(10)
+            self.saved_designPref["detailing"]["gap"] = float(5)
         else:
             self.saved_designPref["detailing"]["gap"] = float(self.ui.txt_detailingGap.text())
 
@@ -96,7 +97,6 @@ class DesignPreferences(QDialog):
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
         designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
-        self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.ui.combo_weldType.setCurrentIndex(0)
@@ -112,7 +112,7 @@ class DesignPreferences(QDialog):
         typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
         designPref["detailing"]["typeof_edge"] = typeOfEdge
         designPref["detailing"]["min_edgend_dist"] = float(1.7)
-        designPref["detailing"]["gap"] = int(10)
+        designPref["detailing"]["gap"] = int(5)
         self.ui.combo_detailing_memebers.setCurrentIndex(0)
         designPref["detailing"]["is_env_corrosive"] = str(self.ui.combo_detailing_memebers.currentText())
 
@@ -207,9 +207,12 @@ class MainController(QMainWindow):
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
         self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
         self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
+        self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
+        self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -234,37 +237,37 @@ class MainController(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        # from osdagMainSettings import backend_name
-        
-        # self.display, _ = self.init_display(backend_str=backend_name())
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+        self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreferences(self)
 
-    # def init_display(self, backend_str=None, size=(1024, 768)):
-    #     from OCC.Display.backend import load_backend, get_qt_modules
-    #
-    #     used_backend = load_backend(backend_str)
-    #
-    #     global display, start_display, app, _, USED_BACKEND
-    #     if 'qt' in used_backend:
-    #         from OCC.Display.qtDisplay import qtViewer3d
-    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-    #
-    #     from OCC.Display.qtDisplay import qtViewer3d
-    #     self.ui.modelTab = qtViewer3d(self)
-    #     display = self.ui.modelTab._display
-    #
-    #     # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-    #     # display.View.SetProj(1, 1, 1)
-    #
-    #     def centerOnScreen(self):
-    #         resolution = QtGui.QDesktopWidget().screenGeometry()
-    #         self.move((resolution.width()/2) - (self.frameSize().width()/2),
-    #                   (resolution.height()/2) - (self.frameSize().height()/2))
-    #
-    #     def start_display():
-    #         self.ui.modelTab.raise_()
-    #     return display, start_display
+    def init_display(self, backend_str=None, size=(1024, 768)):
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+        display = self.ui.modelTab._display
+
+        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width()/2) - (self.frameSize().width()/2),
+                      (resolution.height()/2) - (self.frameSize().height()/2))
+
+        def start_display():
+            self.ui.modelTab.raise_()
+        return display, start_display
 
     def get_beamdata(self):
         """
@@ -489,8 +492,13 @@ class MainController(QMainWindow):
             pass
 
     def design_prefer(self):
-        section = DesignPreferences(self)
-        section.show()
+        self.designPrefDialog.show()
+
+    def bolt_hole_clearance(self):
+        self.designPrefDialog.get_clearance()
+
+    def call_bolt_fu(self):
+        self.designPrefDialog.set_boltFu()
 
     def designParameters(self):
         """
@@ -512,16 +520,25 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        self.uiObj = self.get_user_inputs()
         self.alist = self.designParameters()
-        outputs = coverplateboltedconnection(self.uiObj, self.alist)
+        print "alist printing", self.alist
+        self.outputs = coverplateboltedconnection(self.alist)
+        # a = self.outputs[self.outputs.keys()[0]]
+        # if len(str(a[a.keys()[0]])) == 0:
+        #     self.ui.btn_Design.setEnabled(False)
+        # self.display_output(self.outputs)
+        self.display_log_to_textedit()
 
-        # self.resultObj = outputs
-        # alist =self.resultObj.values()
-        # self.display_output(self.resultObj)
-        # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
     def display_output(self, outputObj):
+        """
+
+        Args:
+            outputObj: Output dictionary from calculation file
+
+        Returns: Design result values to the respective textboxes in the output window
+
+        """
         for k in outputObj.keys():
             for key in outputObj[k].keys():
                 if (outputObj[k][key] == ""):
@@ -577,6 +594,16 @@ class MainController(QMainWindow):
         web_edgedist = resultObj["WebBolt"]["Edge"]
         self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
+    def display_log_to_textedit(self):
+        file = QFile('coverplate.log')
+        if not file.open(QtCore.QIODevice.ReadOnly):
+            QMessageBox.information(None, 'info', file.errorString())
+        stream = QtCore.QTextStream(file)
+        self.ui.textEdit.clear()
+        self.ui.textEdit.setHtml(stream.readAll())
+        vscroll_bar = self.ui.textEdit.verticalScrollBar()
+        vscroll_bar.setValue(vscroll_bar.maximum())
+        file.close()
 
     def call_2D_drawing(self, view):
         """
@@ -587,16 +614,18 @@ class MainController(QMainWindow):
         Returns: Saves 2D svg drawings
 
         """
-        beam_beam = CoverEndPlate()
-        if view == "Front":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
-            beam_beam.save_to_svg(filename, view)
-        elif view == "Side":
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
-            beam_beam.save_to_svg(filename, view)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
-            beam_beam.save_to_svg(filename, view)
+        self.resultObj = self.call_calculation()
+        beam_beam = CoverEndPlate(self.resultObj)
+        if view != 'All':
+            if view == "Front":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+                beam_beam.save_to_svg(filename, view)
+            elif view == "Side":
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+                beam_beam.save_to_svg(filename, view)
+            else:
+                filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+                beam_beam.save_to_svg(filename, view)
 
     def flangesplice_plate(self):
         section = Flangespliceplate(self)
@@ -606,11 +635,47 @@ class MainController(QMainWindow):
         section = Webspliceplate(self)
         section.show()
 
+    def showFontDialogue(self):
+        font, ok = QFontDialog.getFont()
+        if ok:
+            self.ui.textEdit.setFont()
+
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("coverplate.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     module_setup()
     window = MainController()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
     main()

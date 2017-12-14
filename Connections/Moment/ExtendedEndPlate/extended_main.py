@@ -549,6 +549,16 @@ def set_osdaglogger():
 
 def main():
     set_osdaglogger()
+    # --------------- To display log messages in different colors ---------------
+    rawLogger = logging.getLogger("raw")
+    rawLogger.setLevel(logging.INFO)
+    fh = logging.FileHandler("coverplate.log", mode="w")
+    formatter = logging.Formatter('''%(message)s''')
+    fh.setFormatter(formatter)
+    rawLogger.addHandler(fh)
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    # ----------------------------------------------------------------------------
+
     app = QApplication(sys.argv)
     module_setup()
     window = Maincontroller()

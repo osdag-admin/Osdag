@@ -122,7 +122,7 @@ class DesignPreferences(QDialog):
         return designPref
 
     def set_boltFu(self):
-        uiObj = self.main_controller.getuser_inputs()
+        uiObj = self.maincontroller.get_user_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
         if boltGrade != '':
             boltfu = str(self.get_boltFu(boltGrade))
@@ -173,11 +173,14 @@ class Flangespliceplate(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
-        uiObj = self.maincontroller # TODO pass dictionary
-        # resultObj_flangeplate = coverplateboltedconnection(uiObj)
+        uiObj = self.maincontroller.designParameters()
+        resultObj_flangeplate = coverplateboltedconnection(uiObj)
+        print "flange ", resultObj_flangeplate
 
-        # self.ui.txt_plateHeight.setText()
-
+        self.ui.txt_plateHeight.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateHeight"]))
+        self.ui.txt_plateWidth.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateWidth"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateDemand"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangeCapacity"]))
 
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
@@ -186,6 +189,13 @@ class Webspliceplate(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
+        uiObj = self.maincontroller.designParameters()
+        resultObj_webplate = coverplateboltedconnection(uiObj)
+
+        self.ui.txt_plateHeight.setText(str(resultObj_webplate["WebBolt"]["WebPlateHeight"]))
+        self.ui.txt_plateWidth.setText(str(resultObj_webplate["WebBolt"]["WebPlateWidth"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_webplate["WebBolt"]["WebPlateCapacity"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_webplate["WebBolt"]["webPlateDemand"]))
 
 class MainController(QMainWindow):
     def __init__(self):
@@ -237,37 +247,37 @@ class MainController(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        from osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+    #     from osdagMainSettings import backend_name
+    #     self.display, _ = self.init_display(backend_str=backend_name())
         self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreferences(self)
-
-    def init_display(self, backend_str=None, size=(1024, 768)):
-        from OCC.Display.backend import load_backend, get_qt_modules
-
-        used_backend = load_backend(backend_str)
-
-        global display, start_display, app, _, USED_BACKEND
-        if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
-            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-        from OCC.Display.qtDisplay import qtViewer3d
-        self.ui.modelTab = qtViewer3d(self)
-        display = self.ui.modelTab._display
-
-        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        # display.View.SetProj(1, 1, 1)
-
-        def centerOnScreen(self):
-            resolution = QtGui.QDesktopWidget().screenGeometry()
-            self.move((resolution.width()/2) - (self.frameSize().width()/2),
-                      (resolution.height()/2) - (self.frameSize().height()/2))
-
-        def start_display():
-            self.ui.modelTab.raise_()
-        return display, start_display
+    #
+    # def init_display(self, backend_str=None, size=(1024, 768)):
+    #     from OCC.Display.backend import load_backend, get_qt_modules
+    #
+    #     used_backend = load_backend(backend_str)
+    #
+    #     global display, start_display, app, _, USED_BACKEND
+    #     if 'qt' in used_backend:
+    #         from OCC.Display.qtDisplay import qtViewer3d
+    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+    #
+    #     from OCC.Display.qtDisplay import qtViewer3d
+    #     self.ui.modelTab = qtViewer3d(self)
+    #     display = self.ui.modelTab._display
+    #
+    #     # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+    #     # display.View.SetProj(1, 1, 1)
+    #
+    #     def centerOnScreen(self):
+    #         resolution = QtGui.QDesktopWidget().screenGeometry()
+    #         self.move((resolution.width()/2) - (self.frameSize().width()/2),
+    #                   (resolution.height()/2) - (self.frameSize().height()/2))
+    #
+    #     def start_display():
+    #         self.ui.modelTab.raise_()
+    #     return display, start_display
 
     def get_beamdata(self):
         """
@@ -523,10 +533,10 @@ class MainController(QMainWindow):
         self.alist = self.designParameters()
         print "alist printing", self.alist
         self.outputs = coverplateboltedconnection(self.alist)
-        # a = self.outputs[self.outputs.keys()[0]]
+        a = self.outputs[self.outputs.keys()[0]]
         # if len(str(a[a.keys()[0]])) == 0:
         #     self.ui.btn_Design.setEnabled(False)
-        # self.display_output(self.outputs)
+        self.display_output(self.outputs)
         self.display_log_to_textedit()
 
 
@@ -540,11 +550,13 @@ class MainController(QMainWindow):
 
         """
         for k in outputObj.keys():
-            for key in outputObj[k].keys():
-                if (outputObj[k][key] == ""):
+            for value in outputObj.values():
+                if outputObj.items() == " ":
+                # if value == ' ':
                     resultObj = outputObj
                 else:
                     resultObj = outputObj
+        print resultObj
 
         flange_shear_capacity = resultObj["FlangeBolt"]["ShearCapacityF"]
         self.ui.txt_shearCapacity.setText(str(flange_shear_capacity))
@@ -561,7 +573,7 @@ class MainController(QMainWindow):
         flange_pitch = resultObj["FlangeBolt"]["PitchF"]
         self.ui.txt_pitch.setText(str(flange_pitch))
 
-        flange_gauge = resultObj["FlangeBolt"]["GaugeF"]
+        flange_gauge = resultObj["FlangeBolt"]["FlangeGauge"]
         self.ui.txt_gauge.setText(str(flange_gauge))
 
         flange_enddist = resultObj["FlangeBolt"]["EndF"]
@@ -585,7 +597,7 @@ class MainController(QMainWindow):
         web_pitch = resultObj["WebBolt"]["Pitch"]
         self.ui.txt_pitch_2.setText(str(web_pitch))
 
-        web_gauge = resultObj["WebBolt"]["Gauge"]
+        web_gauge = resultObj["WebBolt"]["WebGauge"]
         self.ui.txt_gauge_2.setText(str(web_gauge))
 
         web_enddist = resultObj["WebBolt"]["End"]
@@ -639,6 +651,7 @@ class MainController(QMainWindow):
         font, ok = QFontDialog.getFont()
         if ok:
             self.ui.textEdit.setFont()
+
 
 def set_osdaglogger():
     global logger

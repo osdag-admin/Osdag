@@ -2337,6 +2337,8 @@ class Maincontroller(QMainWindow):
         self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
         self.ui.combo_type.setCurrentIndex(0)
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.retrieve_prevstate()
 
         validator = QIntValidator()
@@ -2563,6 +2565,21 @@ class Maincontroller(QMainWindow):
             conn_members.save_to_svg(filename, view)
         else:
             pass
+
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
 
 
 def main():

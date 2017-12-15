@@ -1,5 +1,6 @@
 from numpy import math
 import svgwrite
+from svgwrite.text import Text
 import cairosvg
 import numpy as np
 from math import radians, sin, cos
@@ -38,7 +39,7 @@ class TrussBoltedConnection(object):
 
         self.angle_length = 1000
 
-        self.theta = {"theta1": 225, "theta2": 135, "theta3": 45, "theta4": 315}
+        self.theta = {"theta1": 70, "theta2": 135, "theta3": 225, "theta4": 315}
         self.TrsDist = {"TrsDist1": 200, "TrsDist2": 200, "TrsDist3": 200, "TrsDist4": 200}
 
         self.boltDia_1 = 14     #Bolting preferences for ANGLE MEMBER 1
@@ -286,7 +287,7 @@ class TrussBoltedConnection(object):
         """
         #Right Up.
         theta = math.radians(theta)
-        char_width = 16
+        char_width = 26
         x_vector = np.array([1, 0])
         y_vector = np.array([0, 1])
 
@@ -341,10 +342,10 @@ class TrussBoltedConnection(object):
         emarker = self.add_e_marker(dwg)
         self.draw_start_arrow(line, emarker)
 
-        dwg.add(dwg.text(textup, insert=text_point_up, fill='black', font_family='sans-serif', font_size=28))
-        dwg.add(dwg.text(textdown, insert=text_point_down, fill='black', font_family='sans-serif', font_size=28))
+        dwg.add(dwg.text(textup, insert=text_point_up, fill='black', font_family='sans-serif', font_size=42))
+        dwg.add(dwg.text(textdown, insert=text_point_down, fill='black', font_family='sans-serif', font_size=42))
 
-        print "successful"
+        # print "successful"
 
     def save_to_svg(self, filename, view):
 
@@ -392,11 +393,11 @@ class Truss2DFront(object):
 
         ptAx_1 = 0
         ptAy_1 = -(self.data_object.angle1_A - self.data_object.Cz1)
-        A_1 = [ptAx_1,ptAy_1]
-        self.A_1 = np.dot(A_1,rot_mat_1)
+        A_1 = [ptAx_1, ptAy_1]
+        self.A_1 = np.dot(A_1, rot_mat_1)
         self.A_1[0] = self.A_1[0] + self.data_object.TrsDist["TrsDist1"]*cos(radians(self.data_object.theta["theta1"]))
         self.A_1[1] = self.A_1[1] - self.data_object.TrsDist["TrsDist1"]*sin(radians(self.data_object.theta["theta1"]))
-        self.A_1 = [self.A_1[0],self.A_1[1]]
+        self.A_1 = [self.A_1[0], self.A_1[1]]
 
         ptBx_1 = 0
         ptBy_1 = self.data_object.Cz1 - self.data_object.angle1_T
@@ -602,7 +603,7 @@ class Truss2DFront(object):
         self.F_4 = [self.F_4[0], self.F_4[1]]
 
     def  call_Truss_2DFront(self, filename):
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1400 -980 2840 1940'), debug=True)  # 230 = move towards left ,
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-1330 -1100 3040 2140'), debug=True)  # 230 = move towards left ,
 
         dwg.add(dwg.polyline(points=[self.A, self.B, self.C, self.D, self.A], stroke='blue', fill='none', stroke_width=2.5))    #Gusset Plate
         # boarder
@@ -636,6 +637,23 @@ class Truss2DFront(object):
 
                 pt_bolt_1 = np.array([ptX_bolt_1, ptY_bolt_1])
                 dwg.add(dwg.circle(center=pt_bolt_1, r=bolt_rad_1, stroke='blue', fill='none', stroke_width=1.5))
+
+                ptX_C_1 = pt_bolt_1[0] - (bolt_rad_1 + 4) * cos(radians(self.data_object.theta["theta1"]))
+                ptY_C_1 = pt_bolt_1[1] + (bolt_rad_1 + 4) * sin(radians(self.data_object.theta["theta1"]))
+                pt_C_1 = [ptX_C_1, ptY_C_1]
+                ptX_D_1 = pt_bolt_1[0] + (bolt_rad_1 + 4) * cos(radians(self.data_object.theta["theta1"]))
+                ptY_D_1 = pt_bolt_1[1] - (bolt_rad_1 + 4) * sin(radians(self.data_object.theta["theta1"]))
+                pt_D_1 = [ptX_D_1, ptY_D_1]
+                dwg.add(dwg.line(pt_C_1, pt_D_1).stroke('red', width=1.0, linecap='square'))
+
+                ptX_C1_1 = pt_bolt_1[0] - (bolt_rad_1 + 4) * sin(radians(self.data_object.theta["theta1"]))
+                ptY_C1_1 = pt_bolt_1[1] - (bolt_rad_1 + 4) * cos(radians(self.data_object.theta["theta1"]))
+                pt_C1_1 = [ptX_C1_1, ptY_C1_1]
+                ptX_D1_1 = pt_bolt_1[0] + (bolt_rad_1 + 4) * sin(radians(self.data_object.theta["theta1"]))
+                ptY_D1_1 = pt_bolt_1[1] + (bolt_rad_1 + 4) * cos(radians(self.data_object.theta["theta1"]))
+                pt_D1_1 = [ptX_D1_1, ptY_D1_1]
+                dwg.add(dwg.line(pt_C1_1, pt_D1_1).stroke('red', width=1.0, linecap='square'))
+
                 list_of_pts_1.append(pt_bolt_1)
 
         # ============ Bolts placement over Angle member 2 ================
@@ -654,6 +672,22 @@ class Truss2DFront(object):
 
                 pt_bolt_2 = np.array([ptX_bolt_2, ptY_bolt_2])
                 dwg.add(dwg.circle(center=pt_bolt_2, r=bolt_rad_2, stroke='blue', fill='none', stroke_width=1.5))
+
+                ptX_C_2 = pt_bolt_2[0] - (bolt_rad_2 + 4) * cos(radians(self.data_object.theta["theta2"]))
+                ptY_C_2 = pt_bolt_2[1] + (bolt_rad_2 + 4) * sin(radians(self.data_object.theta["theta2"]))
+                pt_C_2 = [ptX_C_2, ptY_C_2]
+                ptX_D_2 = pt_bolt_2[0] + (bolt_rad_2 + 4) * cos(radians(self.data_object.theta["theta2"]))
+                ptY_D_2 = pt_bolt_2[1] - (bolt_rad_2 + 4) * sin(radians(self.data_object.theta["theta2"]))
+                pt_D_2 = [ptX_D_2, ptY_D_2]
+                dwg.add(dwg.line(pt_C_2, pt_D_2).stroke('red', width=1.0, linecap='square'))
+
+                ptX_C1_2 = pt_bolt_2[0] - (bolt_rad_2 + 4) * sin(radians(self.data_object.theta["theta2"]))
+                ptY_C1_2 = pt_bolt_2[1] - (bolt_rad_2 + 4) * cos(radians(self.data_object.theta["theta2"]))
+                pt_C1_2 = [ptX_C1_2, ptY_C1_2]
+                ptX_D1_2 = pt_bolt_2[0] + (bolt_rad_2 + 4) * sin(radians(self.data_object.theta["theta2"]))
+                ptY_D1_2 = pt_bolt_2[1] + (bolt_rad_2 + 4) * cos(radians(self.data_object.theta["theta2"]))
+                pt_D1_2 = [ptX_D1_2, ptY_D1_2]
+                dwg.add(dwg.line(pt_C1_2, pt_D1_2).stroke('red', width=1.0, linecap='square'))
                 list_of_pts_2.append(pt_bolt_2)
 
         # ============ Bolts placement over Angle member 3 ================
@@ -661,9 +695,9 @@ class Truss2DFront(object):
         col3 = self.data_object.col_3
         bolt_rad_3 = self.data_object.boltDia_3 / 2
 
-        pt_inside_column_list = []
+        pt_inside_column_list_3 = []
         for i in range(col3):
-            col_inside_list = []
+            col_inside_list_3 = []
             for j in range(row3):
                 pt_boltX_3 = self.A_3[0] + (self.data_object.endDist_3 + i * self.data_object.pitch_3) * cos(radians(self.data_object.theta["theta3"]))
                 pt_boltY_3 = self.A_3[1] - (self.data_object.endDist_3 + i * self.data_object.pitch_3) * sin(radians(self.data_object.theta["theta3"]))
@@ -677,31 +711,33 @@ class Truss2DFront(object):
 
                 dwg.add(dwg.circle(center=pt_bolt_3, r=bolt_rad_3, stroke='blue', fill='none', stroke_width=1.5))
 
-                col_inside_list.append(pt_bolt_3)
+                col_inside_list_3.append(pt_bolt_3)
 
-                pt_C = pt_bolt_3[0] - (bolt_rad_3 + 4) * np.array([1, 0])
-                pt_D = pt_bolt_3[0] + (bolt_rad_3 + 4) * np.array([1, 0])
-                # pt_C = pt_C * cos(radians(self.data_object.theta["theta3"]))
-                # pt_D = pt_D * cos(radians(self.data_object.theta["theta3"]))
-                # dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+                ptX_C_3 = pt_bolt_3[0] - (bolt_rad_3 + 4) * cos(radians(self.data_object.theta["theta3"]))
+                ptY_C_3 = pt_bolt_3[1] + (bolt_rad_3 + 4) * sin(radians(self.data_object.theta["theta3"]))
+                pt_C_3 = [ptX_C_3, ptY_C_3]
+                ptX_D_3 = pt_bolt_3[0] + (bolt_rad_3 + 4) * cos(radians(self.data_object.theta["theta3"]))
+                ptY_D_3 = pt_bolt_3[1] - (bolt_rad_3 + 4) * sin(radians(self.data_object.theta["theta3"]))
+                pt_D_3 = [ptX_D_3, ptY_D_3]
+                dwg.add(dwg.line(pt_C_3, pt_D_3).stroke('red', width=1.0, linecap='square'))
 
-                pt_C1 = pt_bolt_3[1] - (bolt_rad_3 + 4) * np.array([0, 1])
-                pt_D1 = pt_bolt_3[1] + (bolt_rad_3 + 4) * np.array([0, 1])
-                # pt_C1 = pt_C1 * sin(radians(self.data_object.theta["theta3"]))
-                # pt_D1 = pt_D1 * sin(radians(self.data_object.theta["theta3"]))
-                # dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
-
-            pt_inside_column_list.append(col_inside_list)
+                ptX_C1_3 = pt_bolt_3[0] - (bolt_rad_3 + 4) * sin(radians(self.data_object.theta["theta3"]))
+                ptY_C1_3 = pt_bolt_3[1] - (bolt_rad_3 + 4) * cos(radians(self.data_object.theta["theta3"]))
+                pt_C1_3 = [ptX_C1_3, ptY_C1_3]
+                ptX_D1_3 = pt_bolt_3[0] + (bolt_rad_3 + 4) * sin(radians(self.data_object.theta["theta3"]))
+                ptY_D1_3 = pt_bolt_3[1] + (bolt_rad_3 + 4) * cos(radians(self.data_object.theta["theta3"]))
+                pt_D1_3= [ptX_D1_3, ptY_D1_3]
+                dwg.add(dwg.line(pt_C1_3, pt_D1_3).stroke('red', width=1.0, linecap='square'))
+            pt_inside_column_list_3.append(col_inside_list_3)
 
         # ============ Bolts placement over Angle member 4 ================
-
         row4 = self.data_object.row_4
         col4 = self.data_object.col_4
         bolt_rad_4 = self.data_object.boltDia_4 / 2
 
-        pt_inside_column_list = []
+        pt_inside_column_list_4 = []
         for i in range(col4):
-            col_inside_list = []
+            col_inside_list_4 = []
             for j in range(row4):
                 pt_boltX_4 = self.A_4[0] + (self.data_object.endDist_4 + i * self.data_object.pitch_4) * cos(radians(self.data_object.theta["theta4"]))
                 pt_boltY_4 = self.A_4[1] - (self.data_object.endDist_4 + i * self.data_object.pitch_4) * sin(radians(self.data_object.theta["theta4"]))
@@ -714,8 +750,154 @@ class Truss2DFront(object):
                 pt_bolt_4[1] = pt_bolt_4[1] + j * self.data_object.gaugeDist_4 * cos(radians(self.data_object.theta["theta4"]))
 
                 dwg.add(dwg.circle(center=pt_bolt_4, r=bolt_rad_4, stroke='blue', fill='none', stroke_width=1.5))
-                col_inside_list.append(pt_bolt_4)
-            pt_inside_column_list.append(col_inside_list)
+                col_inside_list_4.append(pt_bolt_4)
 
+                ptX_C_4 = pt_bolt_4[0] - (bolt_rad_4 + 4) * cos(radians(self.data_object.theta["theta4"]))
+                ptY_C_4 = pt_bolt_4[1] + (bolt_rad_4 + 4) * sin(radians(self.data_object.theta["theta4"]))
+                pt_C_4 = [ptX_C_4, ptY_C_4]
+                ptX_D_4 = pt_bolt_4[0] + (bolt_rad_4 + 4) * cos(radians(self.data_object.theta["theta4"]))
+                ptY_D_4 = pt_bolt_4[1] - (bolt_rad_4 + 4) * sin(radians(self.data_object.theta["theta4"]))
+                pt_D_4 = [ptX_D_4, ptY_D_4]
+                dwg.add(dwg.line(pt_C_4, pt_D_4).stroke('red', width=1.0, linecap='square'))
+
+                ptX_C1_4 = pt_bolt_4[0] - (bolt_rad_4 + 4) * sin(radians(self.data_object.theta["theta4"]))
+                ptY_C1_4 = pt_bolt_4[1] - (bolt_rad_4 + 4) * cos(radians(self.data_object.theta["theta4"]))
+                pt_C1_4 = [ptX_C1_4, ptY_C1_4]
+                ptX_D1_4 = pt_bolt_4[0] + (bolt_rad_4 + 4) * sin(radians(self.data_object.theta["theta4"]))
+                ptY_D1_4 = pt_bolt_4[1] + (bolt_rad_4 + 4) * cos(radians(self.data_object.theta["theta4"]))
+                pt_D1_4 = [ptX_D1_4, ptY_D1_4]
+                dwg.add(dwg.line(pt_C1_4, pt_D1_4).stroke('red', width=1.0, linecap='square'))
+            pt_inside_column_list_4.append(col_inside_list_4)
+
+        # ============ Label for Gusset Plate  ================
+        point = self.C - (self.data_object.plate_length/10) * np.array([1, 0])
+        theta = 60
+        offset = 100
+        textup = "Gusset plate " + str(self.data_object.plate_length) + " x " + str(self.data_object.plate_width) + " x " + str(self.data_object.plate_thick)
+        textdown = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+
+        # ============ Labels for Angle members 1 ================
+        point = self.D_1 - ((self.data_object.angle1_A/3) * sin(radians(self.data_object.theta["theta1"]))) * np.array([1,0]) - ((self.data_object.angle1_A/3) * cos(radians(self.data_object.theta["theta1"]))) * np.array([0, 1])
+        textup = str(self.data_object.angle1_A) + " x " + str(self.data_object.angle1_B) + " x " + str(self.data_object.angle1_T)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+
+        ptx_lab_1 = list_of_pts_1[0]
+        pty_lab_1 = ptx_lab_1 + (1.2*self.data_object.angle1_A)*sin(radians(self.data_object.theta["theta1"]))*np.array([1,0]) + (1.2*self.data_object.angle1_A)*cos(radians(self.data_object.theta["theta1"]))*np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab_1, pty_lab_1, dwg)
+
+        ptx_lab1_1 = list_of_pts_1[-1]
+        pty_lab1_1 = ptx_lab1_1 + (1.2 * self.data_object.angle1_A) * sin(radians(self.data_object.theta["theta1"])) * np.array([1,0]) + (1.2*self.data_object.angle1_A) * cos(radians(self.data_object.theta["theta1"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab1_1, pty_lab1_1, dwg)
+
+        # point1 = ptx2 + (self.data_object.edge_dist1) * np.array([-1, 0])
+        params = {"offset": (self.data_object.angle1_A), "textoffset": 20, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+        text_1 = str(len(list_of_pts_1) - 1) + "@" + str(self.data_object.pitch_1) + "mm c/c"
+        self.data_object.draw_dimension_outer_arrow(dwg, ptx_lab_1, ptx_lab1_1, text_1, params)
+
+        ptx_end_1 = self.C_1
+        pty_end_1 = self.C_1 + (self.data_object.Cz1) *sin(radians(self.data_object.theta["theta1"]))* np.array([1, 0])
+        pty_end_1 = pty_end_1 + (self.data_object.Cz1) *cos(radians(self.data_object.theta["theta1"]))* np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_end_1, pty_end_1, dwg)
+
+        ptx_end1_1 = self.C_1 + (self.data_object.endDist_1) *cos(radians(self.data_object.theta["theta1"])) * np.array([1, 0])
+        pty_end1_1 = ptx_end1_1 - (self.data_object.endDist_1) *sin(radians(self.data_object.theta["theta1"])) * np.array([0, 1])
+        ptx_end1_1 = pty_end1_1+ (self.data_object.Cz1) * sin(radians(self.data_object.theta["theta1"])) * np.array([1, 0])
+        pty_end1_1 = ptx_end1_1 + (self.data_object.Cz1) * cos(radians(self.data_object.theta["theta1"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_end1_1, pty_end1_1, dwg)
+
+        params = {"offset": (10), "textoffset": 30, "lineori": "right", "endlinedim": 5, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pty_end_1, pty_end1_1, str(self.data_object.edgeDist_1), params)
+
+        textup = "M" + str(self.data_object.boltDia_1)
+        self.data_object.draw_oriented_arrow(dwg, list_of_pts_1[-1], theta, "NW", offset, textup, textdown)
+
+        # ============ Labels for Angle members 2 ================
+        point = self.D_2 - ((self.data_object.angle2_A / 3) * sin(radians(self.data_object.theta["theta2"]))) * np.array([1,0]) - ((self.data_object.angle2_A / 3) * cos(radians(self.data_object.theta["theta2"]))) * np.array([0, 1])
+        textup = str(self.data_object.angle2_A) + " x " + str(self.data_object.angle2_B) + " x " + str(self.data_object.angle2_T)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+
+        ptx_lab_2 = list_of_pts_2[0]
+        pty_lab_2 = ptx_lab_2 - (1.2 * self.data_object.angle2_A) * sin(radians(self.data_object.theta["theta2"])) * np.array([1, 0]) - (1.2*self.data_object.angle2_A) * cos(radians(self.data_object.theta["theta2"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab_2, pty_lab_2, dwg)
+
+        ptx_lab1_2 = list_of_pts_2[-1]
+        pty_lab1_2 = ptx_lab1_2 - (1.2 * self.data_object.angle2_A) * sin(radians(self.data_object.theta["theta2"])) * np.array([1,0]) - (1.2 *self.data_object.angle1_A) * cos(radians(self.data_object.theta["theta2"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab1_2, pty_lab1_2, dwg)
+
+        # point1 = ptx2 + (self.data_object.edge_dist1) * np.array([-1, 0])
+        params = {"offset": (self.data_object.angle2_A), "textoffset": 100, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
+        text_2 = str(len(list_of_pts_2) - 1) + "@" + str(self.data_object.pitch_2) + "mm c/c"
+        self.data_object.draw_dimension_outer_arrow(dwg, ptx_lab_2, ptx_lab1_2, text_2, params)
+
+        ptx_end_2 = list_of_pts_2[0]
+        ptx_end_2 = ptx_end_2 + self.data_object.endDist_2 * sin(radians(self.data_object.theta["theta2"])) * np.array([1, 0])
+        pty_end_2 = ptx_end_2 - self.data_object.endDist_2 * cos(radians(self.data_object.theta["theta2"])) * np.array([0, 1])
+
+        ptx_end1_2 = pty_end_2 - (1.2 * self.data_object.angle2_A) * sin(radians(self.data_object.theta["theta2"])) * np.array([1, 0])
+        pty_end1_2 = ptx_end1_2 - (1.2 * self.data_object.angle2_A) * cos(radians(self.data_object.theta["theta2"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(pty_end_2, pty_end1_2, dwg)
+
+        params = {"offset": (20), "textoffset": 30, "lineori": "right", "endlinedim": 5, "arrowlen": 20}
+        self.data_object.draw_dimension_outer_arrow(dwg, pty_lab_2, pty_end1_2, str(self.data_object.edgeDist_2), params)
+
+        textup = "M" + str(self.data_object.boltDia_2)
+        theta = 75
+        offset = 200
+        self.data_object.draw_oriented_arrow(dwg, list_of_pts_2[-1], theta, "NE", offset, textup, textdown)
+
+        # ============ Labels for Angle members 3 ================
+
+        point = self.D_3 - ((self.data_object.angle3_A / 3) * sin(radians(self.data_object.theta["theta3"]))) * np.array([1,0]) - ((self.data_object.angle3_A / 3) * cos(radians(self.data_object.theta["theta3"]))) * np.array([0, 1])
+        textup = str(self.data_object.angle3_A) + " x " + str(self.data_object.angle3_B) + " x " + str(self.data_object.angle3_T)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+
+        ptx_lab_3 = pt_inside_column_list_3[0][0]
+        pty_lab_3 = ptx_lab_3 - (1.2 * self.data_object.angle3_A) * sin(radians(self.data_object.theta["theta3"])) * np.array([1, 0]) - (1.2 * self.data_object.angle3_A) * cos(radians(self.data_object.theta["theta3"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab_3, pty_lab_3, dwg)
+
+        ptx_lab1_3 = pt_inside_column_list_3[-1][0]
+        pty_lab1_3 = ptx_lab1_3 - (1.2 * self.data_object.angle3_A) * sin(radians(self.data_object.theta["theta3"])) * np.array([1, 0]) - (1.2 * self.data_object.angle3_A) * cos(radians(self.data_object.theta["theta3"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab1_3, pty_lab1_3, dwg)
+
+        ptx_end_3 = pt_inside_column_list_3[0][0]
+        ptx_end_3 = ptx_end_3 + self.data_object.endDist_3 * cos(radians(self.data_object.theta["theta3"])) * np.array([1, 0])
+        pty_end_3 = ptx_end_3 - self.data_object.endDist_3 * sin(radians(self.data_object.theta["theta3"])) * np.array([0, 1])
+
+        ptx_end1_3 = pty_end_3 - (1.2 * self.data_object.angle3_A) * sin(radians(self.data_object.theta["theta3"])) * np.array([1, 0])
+        pty_end1_3 = ptx_end1_3 - (1.2 * self.data_object.angle3_A) * cos(radians(self.data_object.theta["theta3"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(pty_end_3, pty_end1_3, dwg)
+
+        textup = "M" + str(self.data_object.boltDia_3)
+        theta = 75
+        offset = 200
+        self.data_object.draw_oriented_arrow(dwg, pt_inside_column_list_3[-1][-1], theta, "NW", offset, textup, textdown)
+
+        # ============ Labels for Angle members 4 ================
+
+        point = self.D_4 - ((self.data_object.angle4_A / 3) * sin(radians(self.data_object.theta["theta4"]))) * np.array([1,0]) - ((self.data_object.angle4_A / 3) * cos(radians(self.data_object.theta["theta4"]))) * np.array([0, 1])
+        textup = str(self.data_object.angle4_A) + " x " + str(self.data_object.angle4_B) + " x " + str(self.data_object.angle4_T)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown)     #Angle member designation
+
+        ptx_lab_4 = pt_inside_column_list_4[0][0]
+        pty_lab_4 = ptx_lab_4 - (1.2 * self.data_object.angle4_A) * sin(radians(self.data_object.theta["theta4"])) * np.array([1, 0]) - (1.2 *self.data_object.angle4_A) * cos(radians(self.data_object.theta["theta4"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab_4, pty_lab_4, dwg)     #Pitch dimension line first bolt
+
+        ptx_lab1_4 = pt_inside_column_list_4[-1][0]
+        pty_lab1_4 = ptx_lab1_4 - (1.2 * self.data_object.angle4_A) * sin(radians(self.data_object.theta["theta4"])) * np.array([1,0]) - (1.2 * self.data_object.angle4_A) * cos(radians(self.data_object.theta["theta4"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(ptx_lab1_4, pty_lab1_4, dwg)   #Pitch dimension line last bolt
+
+        ptx_end_4 = pt_inside_column_list_4[0][0]                       #For end distance
+        ptx_end_4 = ptx_end_4 + self.data_object.endDist_4 * cos(radians(self.data_object.theta["theta4"])) * np.array([1, 0])
+        pty_end_4 = ptx_end_4 - self.data_object.endDist_4 * sin(radians(self.data_object.theta["theta4"])) * np.array([0, 1])
+
+        ptx_end1_4 = pty_end_4 - (1.2 * self.data_object.angle4_A) * sin(radians(self.data_object.theta["theta4"])) * np.array([1, 0])
+        pty_end1_4 = ptx_end1_4 - (1.2 * self.data_object.angle4_A) * cos(radians(self.data_object.theta["theta4"])) * np.array([0, 1])
+        self.data_object.draw_faint_line(pty_end_4, pty_end1_4, dwg)
+
+        textup = "M" + str(self.data_object.boltDia_4)
+        theta = 75
+        offset = 200
+        self.data_object.draw_oriented_arrow(dwg, pt_inside_column_list_4[-1][-1], theta, "SW", offset, textup, textdown)
 
         dwg.save()

@@ -115,11 +115,11 @@ class OsdagMainWindow(QMainWindow):
 
     def show_design_connection(self):
 
-        config = ConfigParser.ConfigParser()
-        config.read(open('Osdag.config'))
-        default_workspace_path = config.get('default_workspace', 'path1')
-        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', default_workspace_path)
-        folder = str(folder)
+        # config = ConfigParser.ConfigParser()
+        # config.read(open(r'Osdag.config'))
+        # default_workspace_path = config.get('default_workspace', 'path1')
+        # folder = QFileDialog.getExistingDirectory(self, 'Select Folder', default_workspace_path)
+        folder = "F:\Osdag\Osdag_workspace"
         if not os.path.exists(folder):
             if folder == '':
                 pass

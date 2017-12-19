@@ -54,6 +54,8 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.bbExtendedEndPlateSpliceCalc")
+
+
 module_setup()
 
 #######################################################################
@@ -82,6 +84,7 @@ def netArea_thread(dia):
 # Function for net area of bolts at threaded portion of bolts
 # Reference: Design of steel structures by N. Subramanian, page 348 or 358
 
+
 def netarea_shank(dia):
     """
 
@@ -100,6 +103,7 @@ def netarea_shank(dia):
 #Source: Cl 10.3.3.1
 #Reference: Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
+
 def long_joint(dia, l_j):
     """
 
@@ -114,12 +118,11 @@ def long_joint(dia, l_j):
     return beta_lj
 
 
-
 #######################################################################
 
-#Function for Shear Capacity of bearing bolt (also known as black bolt)
-#Reference: Cl 10.3.3 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-#Assumption: The shear planes are assumed to be passing through the threads of the bolt
+# Function for Shear Capacity of bearing bolt (also known as black bolt)
+# Reference: Cl 10.3.3 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Assumption: The shear planes are assumed to be passing through the threads of the bolt
 
 def bolt_shear(dia, n, bolt_fu):
     """
@@ -138,11 +141,10 @@ def bolt_shear(dia, n, bolt_fu):
     return V_dsb
 
 
-
 #######################################################################
 
-#Function for Bearing Capacity of bearing bolt (also known as black bolt)
-#Reference: Cl 10.3.4 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for Bearing Capacity of bearing bolt (also known as black bolt)
+# Reference: Cl 10.3.4 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 def bolt_bearing(dia, t, k_b, bolt_fu):
     """
@@ -163,8 +165,8 @@ def bolt_bearing(dia, t, k_b, bolt_fu):
 
 #######################################################################
 
-#Function for minimum height of end plate
-#Reference: Based on reasoning
+# Function for minimum height of end plate
+# Reference: Based on reasoning
 
 def min_plate_height(beam_D, l_v, n_r, min_pitch, e_1):
     """
@@ -185,8 +187,8 @@ def min_plate_height(beam_D, l_v, n_r, min_pitch, e_1):
 
 #######################################################################
 
-#Function for minimum width of end plate
-#Reference: Based on reasoning
+# Function for minimum width of end plate
+# Reference: Based on reasoning
 
 def min_plate_width(g_1, n, min_gauge, e_2):
     """
@@ -206,8 +208,8 @@ def min_plate_width(g_1, n, min_gauge, e_2):
 
 #######################################################################
 
-#Function for calculation of Prying Force in bolts
-#Reference: Cl 10.4.7 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for calculation of Prying Force in bolts
+# Reference: Cl 10.4.7 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
     """
@@ -230,8 +232,9 @@ def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
 
 #######################################################################
 
-#Function for calculating Tension capacity of HSFG bolt
-#Reference: Cl 10.4.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for calculating Tension capacity of HSFG bolt
+# Reference: Cl 10.4.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+
 
 def bolt_tension_hsfg(bolt_fu, netArea):
     """
@@ -249,8 +252,8 @@ def bolt_tension_hsfg(bolt_fu, netArea):
 
 #######################################################################
 
-#Function for calculating Tension capacity of bearing bolt (also known as black bolt)
-#Reference: Cl 10.3.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for calculating Tension capacity of bearing bolt (also known as black bolt)
+# Reference: Cl 10.3.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 def bolt_tension_bearing(bolt_fu, netArea):
     """
@@ -268,8 +271,8 @@ def bolt_tension_bearing(bolt_fu, netArea):
 
 #######################################################################
 
-#Function for calculating Shear yielding capacity of End Plate
-#Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for calculating Shear yielding capacity of End Plate
+# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 def shear_yielding(A_v, plate_fy):
     """
@@ -287,8 +290,8 @@ def shear_yielding(A_v, plate_fy):
 
 #######################################################################
 
-#Function for calculating Shear rupture capacity of End Plate
-#Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Function for calculating Shear rupture capacity of End Plate
+# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 def shear_rupture(A_vn, plate_fu):
     """
@@ -335,18 +338,12 @@ def bbExtendedEndPlateSplice(uiObj):
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
 
-    mu_f = 0.30
-    gamma_mw = 1.25
-    dp_bolt_hole_type = "Standard"
-    dia_hole = bolt_dia + 2
-    weld_type = "Shop weld"
-    dp_bolt_type = "HSFG"
-    # mu_f = float(uiObj["bolt"]["slip_factor"])
-    # gamma_mw = float(uiObj["weld"]["safety_factor"])
-    # dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
-    # dia_hole = int(uiObj['bolt']['bolt_hole_clrnce']) + bolt_dia
-    # weld_type = uiObj['weld']['typeof_weld']
-    # dp_bolt_type = uiObj['bolt']['bolt_type']
+    mu_f = float(uiObj["bolt"]["slip_factor"])
+    gamma_mw = float(uiObj["weld"]["safety_factor"])
+    dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
+    dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
+    weld_type = uiObj["weld"]["typeof_weld"]
+    dp_bolt_type = uiObj["Bolt"]["Grade"]
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
@@ -1142,7 +1139,8 @@ def bbExtendedEndPlateSplice(uiObj):
     # Assumption: The size of weld at flange will be greater than the size of weld at the web
     # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
 
-    # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) (Reference: Design of Steel structures by Dr. N. Subramanian)
+    # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
+    # (Reference: Design of Steel structures by Dr. N. Subramanian)
     # TODO add condition to retrieve weld fu and fy from design preference
     weld_fu = 410  # Mpa
     weld_fy = 250  # Mpa
@@ -1507,6 +1505,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener']['height'] = h_st
         outputobj['Stiffener']['length'] = l_st
         outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
+
 
 
 

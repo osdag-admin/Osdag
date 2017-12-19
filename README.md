@@ -45,8 +45,13 @@
 				2. If an error message appears saying, “The installation directory has 2 spaces”, ignore it by clicking OK.
         c) Advanced Options: Check both the options:
             i) Add Anaconda to my PATH environment variable
-            ii) Register Anaconda as my default Python 2.7            
-    2) Run Osdag_setup_x86.exe    and follow on-screen instructions
+            ii) Register Anaconda as my default Python 2.7     
+	    
+    2) Run wkhtmltox-0.12.4_msvc2015-win32.exe
+        # Follow on-screen instructions AND select the following option in the Setup:
+        a) Destination Folder: ["C:\Program Files (x86)\wkhtmltopdf"]
+
+    3) Run Osdag_setup_x86.exe    and follow on-screen instructions
         # The default directory to install Osdag is the User’s Desktop.  
         You may choose any other location. However, DO NOT choose any of the following locations:
             a) Program Files  

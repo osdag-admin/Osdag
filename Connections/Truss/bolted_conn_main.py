@@ -2103,10 +2103,8 @@ class BoltOutput(QDialog):
         self.ui.lineEdit_shr6.setValidator(dbl_validator)
         self.ui.lineEdit_shr7.setValidator(dbl_validator)
 
-        # ui_obj = self.maincontroller.get_user_inputs()
-        # no_of_member = ui_obj["Member"]["No. of members"]
-        ui_obj = self.maincontroller.no_of_members()
-        no_of_member = ui_obj
+        members = self.maincontroller.no_of_members()
+        no_of_member = members
         print no_of_member, "no of members"
         if no_of_member == '2':
             self.ui.lbl_mem3.hide()
@@ -2312,6 +2310,86 @@ class BoltOutput(QDialog):
             self.ui.lineEdit_edge7.hide()
             self.ui.lineEdit_tens7.hide()
             self.ui.lineEdit_block7.hide()
+
+        uiObj = self.maincontroller.get_user_inputs()
+        resultObj = trussboltedconnection(uiObj)
+        self.ui.lineEdit_shr.setText(str(resultObj["ShearCapacity"]))
+        self.ui.lineEdit_shr2.setText(str(resultObj["ShearCapacity2"]))
+        self.ui.lineEdit_shr3.setText(str(resultObj["ShearCapacity3"]))
+        self.ui.lineEdit_shr4.setText(str(resultObj["ShearCapacity4"]))
+        self.ui.lineEdit_shr5.setText(str(resultObj["ShearCapacity5"]))
+        self.ui.lineEdit_shr6.setText(str(resultObj["ShearCapacity6"]))
+        self.ui.lineEdit_shr7.setText(str(resultObj["ShearCapacity7"]))
+        self.ui.lineEdit_ber.setText(str(resultObj["BearingCapacity"]))
+        self.ui.lineEdit_ber2.setText(str(resultObj["BearingCapacity2"]))
+        self.ui.lineEdit_ber3.setText(str(resultObj["BearingCapacity3"]))
+        self.ui.lineEdit_ber4.setText(str(resultObj["BearingCapacity4"]))
+        self.ui.lineEdit_ber5.setText(str(resultObj["BearingCapacity5"]))
+        self.ui.lineEdit_ber6.setText(str(resultObj["BearingCapacity6"]))
+        self.ui.lineEdit_ber7.setText(str(resultObj["BearingCapacity7"]))
+        self.ui.lineEdit_req.setText(str(resultObj["NoOfBoltsReq"]))
+        self.ui.lineEdit_req2.setText(str(resultObj["NoOfBoltsReq2"]))
+        self.ui.lineEdit_req3.setText(str(resultObj["NoOfBoltsReq3"]))
+        self.ui.lineEdit_req4.setText(str(resultObj["NoOfBoltsReq4"]))
+        self.ui.lineEdit_req5.setText(str(resultObj["NoOfBoltsReq5"]))
+        self.ui.lineEdit_req6.setText(str(resultObj["NoOfBoltsReq6"]))
+        self.ui.lineEdit_req7.setText(str(resultObj["NoOfBoltsReq7"]))
+        self.ui.lineEdit_row.setText(str(resultObj["NoOfRow"]))
+        self.ui.lineEdit_row2.setText(str(resultObj["NoOfRow2"]))
+        self.ui.lineEdit_row3.setText(str(resultObj["NoOfRow3"]))
+        self.ui.lineEdit_row4.setText(str(resultObj["NoOfRow4"]))
+        self.ui.lineEdit_row5.setText(str(resultObj["NoOfRow5"]))
+        self.ui.lineEdit_row6.setText(str(resultObj["NoOfRow6"]))
+        self.ui.lineEdit_row7.setText(str(resultObj["NoOfRow7"]))
+        self.ui.lineEdit_col.setText(str(resultObj["NoOfColumns"]))
+        self.ui.lineEdit_col2.setText(str(resultObj["NoOfColumns2"]))
+        self.ui.lineEdit_col3.setText(str(resultObj["NoOfColumns3"]))
+        self.ui.lineEdit_col4.setText(str(resultObj["NoOfColumns4"]))
+        self.ui.lineEdit_col5.setText(str(resultObj["NoOfColumns5"]))
+        self.ui.lineEdit_col6.setText(str(resultObj["NoOfColumns6"]))
+        self.ui.lineEdit_col7.setText(str(resultObj["NoOfColumns7"]))
+        self.ui.lineEdit_pitch.setText(str(resultObj["Pitch"]))
+        self.ui.lineEdit_pitch2.setText(str(resultObj["Pitch2"]))
+        self.ui.lineEdit_pitch3.setText(str(resultObj["Pitch3"]))
+        self.ui.lineEdit_pitch4.setText(str(resultObj["Pitch4"]))
+        self.ui.lineEdit_pitch5.setText(str(resultObj["Pitch5"]))
+        self.ui.lineEdit_pitch6.setText(str(resultObj["Pitch6"]))
+        self.ui.lineEdit_pitch7.setText(str(resultObj["Pitch7"]))
+        self.ui.lineEdit_gauge.setText(str(resultObj["Gauge"]))
+        self.ui.lineEdit_gauge2.setText(str(resultObj["Gauge2"]))
+        self.ui.lineEdit_gauge3.setText(str(resultObj["Gauge3"]))
+        self.ui.lineEdit_gauge4.setText(str(resultObj["Gauge4"]))
+        self.ui.lineEdit_gauge5.setText(str(resultObj["Gauge5"]))
+        self.ui.lineEdit_gauge6.setText(str(resultObj["Gauge6"]))
+        self.ui.lineEdit_gauge7.setText(str(resultObj["Gauge7"]))
+        self.ui.lineEdit_end.setText(str(resultObj["End"]))
+        self.ui.lineEdit_end2.setText(str(resultObj["End2"]))
+        self.ui.lineEdit_end3.setText(str(resultObj["End3"]))
+        self.ui.lineEdit_end4.setText(str(resultObj["End4"]))
+        self.ui.lineEdit_end5.setText(str(resultObj["End5"]))
+        self.ui.lineEdit_end6.setText(str(resultObj["End6"]))
+        self.ui.lineEdit_end7.setText(str(resultObj["End7"]))
+        self.ui.lineEdit_edge.setText(str(resultObj["Edge"]))
+        self.ui.lineEdit_edge2.setText(str(resultObj["Edge2"]))
+        self.ui.lineEdit_edge3.setText(str(resultObj["Edge3"]))
+        self.ui.lineEdit_edge4.setText(str(resultObj["Edge4"]))
+        self.ui.lineEdit_edge5.setText(str(resultObj["Edge5"]))
+        self.ui.lineEdit_edge6.setText(str(resultObj["Edge6"]))
+        self.ui.lineEdit_edge7.setText(str(resultObj["Edge7"]))
+        self.ui.lineEdit_tens.setText(str(resultObj["TensionCapacity"]))
+        self.ui.lineEdit_tens2.setText(str(resultObj["TensionCapacity2"]))
+        self.ui.lineEdit_tens3.setText(str(resultObj["TensionCapacity3"]))
+        self.ui.lineEdit_tens4.setText(str(resultObj["TensionCapacity4"]))
+        self.ui.lineEdit_tens5.setText(str(resultObj["TensionCapacity5"]))
+        self.ui.lineEdit_tens6.setText(str(resultObj["TensionCapacity6"]))
+        self.ui.lineEdit_tens7.setText(str(resultObj["TensionCapacity7"]))
+        self.ui.lineEdit_block.setText(str(resultObj["BlockShearCapacity"]))
+        self.ui.lineEdit_block2.setText(str(resultObj["BlockShearCapacity2"]))
+        self.ui.lineEdit_block3.setText(str(resultObj["BlockShearCapacity3"]))
+        self.ui.lineEdit_block4.setText(str(resultObj["BlockShearCapacity4"]))
+        self.ui.lineEdit_block5.setText(str(resultObj["BlockShearCapacity5"]))
+        self.ui.lineEdit_block6.setText(str(resultObj["BlockShearCapacity6"]))
+        self.ui.lineEdit_block7.setText(str(resultObj["BlockShearCapacity7"]))
 
 
 class Maincontroller(QMainWindow):
@@ -2543,12 +2621,31 @@ class Maincontroller(QMainWindow):
         """
         self.uiObj = self.get_user_inputs()
         self.dmObj = self.definemembers_para()
-        outputs = trussboltedconnection(self.uiObj, self.dmObj)
+        self.outputs = trussboltedconnection(self.uiObj, self.dmObj)
         print "Designbtn", self.dmObj
+        self.display_output(self.outputs)
         # self.resultObj = outputs
         # alist =self.resultObj.values()
         # self.display_output(self.resultObj)
         # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
+    def display_output(self, outputObj):
+        for k in outputObj.keys():
+            for value in outputObj.vaules():
+                if outputObj.items() == " ":
+                    resultObj = outputObj
+                else:
+                    resultObj = outputObj
+        print resultObj
+
+        plate_length = resultObj["Plate"]["Length"]
+        self.ui.txt_plateLength.setText(str(plate_length))
+
+        plate_width = resultObj["Plate"]["Width"]
+        self.ui.txt_plateWidth.setText(str(plate_width))
+
+        combine_capacity = resultObj["Plate"]["CombineCapacity"]
+        self.ui.txt_combineCapacity.setText(str(combine_capacity))
 
     def call_2D_drawing(self, view):
         """
@@ -2582,12 +2679,43 @@ class Maincontroller(QMainWindow):
             widgets.hide()
 
 
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("trussbolted.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     window = Maincontroller()
     module_setup()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
     main()
 

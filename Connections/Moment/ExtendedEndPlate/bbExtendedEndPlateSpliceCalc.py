@@ -932,50 +932,294 @@ def bbExtendedEndPlateSplice(uiObj):
     # Assuming the Neutral axis to pass through the centre of the bottom flange
     # T1, T2, ..., Tn are the Tension in the bolts starting from top of the end plate and y1, y2, ..., yn are its corresponding distances from N.A
     # TODO : check the working of the below loop
-    if number_of_bolts == 8:
-        y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-        y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-        y3 = weld_thickness_flange + l_v + (beam_tf/2)
-        y = (y1**2 + y2**2 + y3**2)
-        T1 = (M_u * y1) / y  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-        T2 = (M_u * y2) / y
-        T3 = (M_u * y3) / y
-        T_f = (T1 * (beam_d - beam_tf)) / y1
 
-    elif number_of_bolts == 12:
-        y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-        y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-        y3 = y2 - pitch_dist_min
-        y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
-        y5 = y4 - pitch_dist_min
-        y = (y1**2 + y2**2 + y3**2 + y4**2 + y5**2)
-        T1 = (M_u * y1) / y
-        T2 = (M_u * y2) / y
-        T3 = (M_u * y3) / y
-        T4 = (M_u * y4) / y
-        T5 = (M_u * y5) / y
-        T_f = (T1 * (beam_d - beam_tf)) / y1
+    # Case 1: When the height and the width of end plate is not specified by user
+    if end_plate_height == 0 and end_plate_width == 0:
+        if number_of_bolts == 8:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = weld_thickness_flange + l_v + (beam_tf/2)
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
 
-    elif number_of_bolts == 16:
-        y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-        y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-        y3 = y2 - pitch_dist_min
-        y4 = y3 - pitch_dist_min
-        y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-        y6 = y5 - pitch_dist_min
-        y7 = y6 - pitch_dist_min
-        y = (y1**2 + y2**2 + y3**2 + y4**2 + y5**2 + y6**2 + y7**2)
-        T1 = (M_u * y1) / y
-        T2 = (M_u * y2) / y
-        T3 = (M_u * y3) / y
-        T4 = (M_u * y4) / y
-        T5 = (M_u * y5) / y
-        T6 = (M_u * y6) / y
-        T7 = (M_u * y7) / y
-        T_f = (T1 * (beam_d - beam_tf)) / y1
+            T1 = (M_u * y1) / y  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
 
-    else:
-        pass
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 12:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
+            y5 = y4 - pitch_distance_4_5
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 16:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 20:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+            y4 = y3 - pitch_distance_3_4
+            y5 = y4 - pitch_distance_4_5
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y8 = y7 - pitch_distance_7_8
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+            T8 = (M_u * y8) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+    # Case 2: When the height of end plate is specified but the width is not specified by the user
+    elif end_plate_height != 0 and end_plate_width == 0:
+        if number_of_bolts == 8:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = weld_thickness_flange + l_v + (beam_tf/2)
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+            T1 = (M_u * y1) / y  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 12:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
+            y5 = y4 - pitch_distance_4_5
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 16:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 20:
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+            y4 = y3 - pitch_distance_3_4
+            y5 = y4 - pitch_distance_4_5
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y8 = y7 - pitch_distance_7_8
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+            T8 = (M_u * y8) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+    # Case 3: When the height of end plate is not specified but the width is specified by the user
+    elif end_plate_height == 0 and end_plate_width != 0:
+        if number_of_bolts == 8:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = weld_thickness_flange + l_v + (beam_tf/2)
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+            T1 = (M_u * y1) / y  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 12:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
+            y5 = y4 - pitch_distance_4_5
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 16:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 20:
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+            y4 = y3 - pitch_distance_3_4
+            y5 = y4 - pitch_distance_4_5
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y8 = y7 - pitch_distance_7_8
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+            T8 = (M_u * y8) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+    # Case 4: When the height and the width of End Plate is specified by the user
+    elif end_plate_height != 0 and end_plate_width != 0:
+        if number_of_bolts == 8:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = weld_thickness_flange + l_v + (beam_tf/2)
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+            T1 = (M_u * y1) / y  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 12:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
+            y5 = y4 - pitch_distance_4_5
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 16:
+            y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        elif number_of_bolts == 20:
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+            y4 = y3 - pitch_distance_3_4
+            y5 = y4 - pitch_distance_4_5
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y8 = y7 - pitch_distance_7_8
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+            T1 = (M_u * y1) / y
+            T2 = (M_u * y2) / y
+            T3 = (M_u * y3) / y
+            T4 = (M_u * y4) / y
+            T5 = (M_u * y5) / y
+            T6 = (M_u * y6) / y
+            T7 = (M_u * y7) / y
+            T8 = (M_u * y8) / y
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
 
     #######################################################################
     # Calculating actual required thickness of End Plate (tp_required) as per bending criteria

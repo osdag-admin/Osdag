@@ -184,6 +184,8 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
 
         validator = QIntValidator()
@@ -387,8 +389,72 @@ class Maincontroller(QMainWindow):
         # self.uiObj = self.get_user_inputs()
         # print self.uiObj
         self.alist = self.designParameters()
-        outputs = bbExtendedEndPlateSplice(self.alist)
+        self.outputs = bbExtendedEndPlateSplice(self.alist)
+        self.display_output(self.outputs)
         self.display_log_to_textedit()
+
+    def display_output(self, outputObj):
+        for k in outputObj.keys():
+            for value in outputObj.vaules():
+                if outputObj.items() == " ":
+                    resultObj = outputObj
+                else:
+                    resultObj = outputObj
+        print resultObj
+
+        critical_tension = resultObj["Bolt"]["CriticalTension"]
+        self.ui.txt_tensionCritical.setText(str(critical_tension))
+
+        tension_capacity = resultObj["Bolt"]["TensionCapacity"]
+        self.ui.txt_tensionCapacity.setText(str(tension_capacity))
+
+        shear_capacity = resultObj["Bolt"]["ShearCapacity"]
+        self.ui.txt_shearCapacity.setText(str(shear_capacity))
+
+        bearing_capacity = resultObj["Bolt"]["BearingCapacity"]
+        self.ui.txt_bearCapacity.setText(str(bearing_capacity))
+
+        combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
+        self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
+
+        bolts_required = resultObj["Bolt"]["BoltsRequired"]
+        self.ui.txt_noBolts.setText(str(bolts_required))
+
+        bolts_in_rows = resultObj["Bolt"]["BoltsRows"]
+        self.ui.txt_rowBolts.setText(str(bolts_in_rows))
+
+        pitch = resultObj["Bolt"]["Pitch"]
+        self.ui.txt_pitch.setText(str(pitch))
+
+        gauge = resultObj["Bolt"]["Gauge"]
+        self.ui.txt_gauge.setText(str(gauge))
+
+        cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
+        self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
+
+        end_distance = resultObj["Bolt"]["End"]
+        self.ui.txt_endDist.setText(str(end_distance))
+
+        edge_distance = resultObj["Bolt"]["Edge"]
+        self.ui.txt_edgeDist.setText(str(edge_distance))
+
+        plate_height = resultObj["Plate"]["Height"]
+        self.ui.txt_plateHeight_2.setText(str(plate_height))
+
+        plate_width = resultObj["Plate"]["Width"]
+        self.ui.txt_plateWidth_2.setText(str(plate_width))
+
+        moment_demand = resultObj["Plate"]["MomentDemand"]
+        self.ui.txt_momentDemand.setText(str(moment_demand))
+
+        moment_capacity = resultObj["Plate"]["MomentCapacity"]
+        self.ui.txt_momentCapacity.setText(str(moment_capacity))
+
+        weld_stress_flange = resultObj["Plate"]["CriticalFlange"]
+        self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
+
+        weld_stress_web = resultObj["Plate"]["CriticalWeb"]
+        self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
     def display_log_to_textedit(self):
         file = QFile('extnd.log')
@@ -517,6 +583,21 @@ class Maincontroller(QMainWindow):
             else:
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
                 beam_beam.save_to_svg(filename, view)
+
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
 
 
 def set_osdaglogger():

@@ -221,6 +221,8 @@ class MainController(QMainWindow):
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
@@ -651,6 +653,21 @@ class MainController(QMainWindow):
         font, ok = QFontDialog.getFont()
         if ok:
             self.ui.textEdit.setFont()
+
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
 
 
 def set_osdaglogger():

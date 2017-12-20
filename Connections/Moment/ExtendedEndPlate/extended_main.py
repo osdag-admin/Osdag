@@ -370,6 +370,7 @@ class Maincontroller(QMainWindow):
         Returns:
 
         """
+
         self.uiObj = self.get_user_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.save_default_para()

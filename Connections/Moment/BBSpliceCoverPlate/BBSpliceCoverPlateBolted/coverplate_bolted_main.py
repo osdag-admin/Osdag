@@ -182,6 +182,7 @@ class Flangespliceplate(QDialog):
         self.ui.txt_plateDemand.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateDemand"]))
         self.ui.txt_plateCapacity.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangeCapacity"]))
 
+
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)

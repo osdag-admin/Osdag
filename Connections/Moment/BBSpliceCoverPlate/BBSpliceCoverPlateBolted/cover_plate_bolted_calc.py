@@ -100,7 +100,7 @@ def flange_force(beam_d, beam_f_t, axial_force, moment_load):
 
     """
     tm = total_moment(beam_d, beam_f_t, axial_force, moment_load)
-    return (tm*1000)/(beam_d - beam_f_t)        # kN
+    return round((tm*1000)/(beam_d - beam_f_t), 2)        # kN
 
 ########################################################################################################################
 # Thickness of flange splice plate [Reference: N. Subramanian (Page 428), M.L. Gambhir (Page 10.84)]
@@ -123,7 +123,7 @@ def thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, 
     ff = flange_force(beam_d, beam_f_t, axial_force, moment_load)
     flangeplatethickness = ff / ((beam_b - n * dia_hole) * (beam_fy / (gamma_m0 * 1000)))
 
-    return flangeplatethickness # mm
+    return round(flangeplatethickness, 2) # mm
 
 
 ########################################################################################################################
@@ -143,7 +143,7 @@ def flange_capacity(beam_f_t,beam_b,dia_hole,beam_fy):
     gamma_m0 = 1.10 # Partial safety factor against yield stress and buckling = 1.10 (float)
     eff_area =(beam_b - 2 * dia_hole) * beam_f_t # eff area = (bf-n*d0)tf ## where n = number of bolts in a row (here it is 2)
     flangecapacity = (eff_area * beam_fy)/(gamma_m0*1000)
-    return flangecapacity  # kN
+    return round(flangecapacity, 2)  # kN
 
 ########################################################################################################################
 ## Height of web splice plate
@@ -157,7 +157,7 @@ def web_min_h(beam_d):
     Returns: Minimum height of web splice plate (float)
 
     """
-    minwebh = round((0.5 * beam_d), 3)
+    minwebh = round((0.5 * beam_d), 2)
     return minwebh
 
 # Maximum height of web splice plate [Reference: Previous DDCL] assumed gap clearance is 5mm based on reasoning
@@ -172,7 +172,7 @@ def web_max_h(beam_d, beam_f_t, beam_r1):
     Returns: Maximum height of web splice plate in mm (float)
 
     """
-    maxwebheight = round((beam_d - 2 * beam_f_t - 2 * beam_r1 - 2 * 5), 3)
+    maxwebheight = round((beam_d - 2 * beam_f_t - 2 * beam_r1 - 2 * 5), 2)
     return maxwebheight
 
 ########################################################################################################################
@@ -202,7 +202,7 @@ def web_max_t(bolt_diameter):
     Returns: Maximum thickness of web splice plate in mm (float)
 
     """
-    max_web_t = 0.5 * bolt_diameter
+    max_web_t = round(0.5 * bolt_diameter, 2)
     return max_web_t
 
 ########################################################################################################################
@@ -233,7 +233,7 @@ def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
     Tdb2 = ((0.9 * Avn * fu) / (math.sqrt(3))) + ((Atg * fy) / gamma_m0)
     Tdb = min(Tdb1, Tdb2)
 
-    return (Tdb / 1000)
+    return round((Tdb / 1000), 2)
 
 ########################################################################################################################
 # Calculation of block shear capacity of flange splice plate
@@ -266,7 +266,7 @@ def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, fla
     Tdb2 = 2 * (((0.9 * Avn * fu) / (math.sqrt(3))) + ((Atg * fy) / gamma_m0))
     Tdb_flange = min(Tdb1, Tdb2)
 
-    return (Tdb_flange / 1000)
+    return round((Tdb_flange / 1000), 2)
 
 ########################################################################################################################
 # Check for shear yielding of web splice plate (Clause 8.4.1, IS 800 : 2007)
@@ -282,7 +282,7 @@ def shear_yielding(A_v, beam_fy):
     """
     gamma_m0 = 1.10
     V_p = (0.6 * A_v * beam_fy) / (math.sqrt(3) * gamma_m0 * 1000) # kN
-    return V_p
+    return round(V_p, 2)
 
 ########################################################################################################################
 # Check for shear rupture of web splice plate (Clause 8.4.1, IS 800 : 2007)
@@ -297,7 +297,7 @@ def shear_rupture(A_vn, beam_fu):
 
     """
     R_n = (0.6 * beam_fu * A_vn) / 1000 # kN
-    return R_n
+    return round(R_n, 2)
 
 ########################################################################################################################
 def fetchBeamPara(self):
@@ -546,16 +546,16 @@ def coverplateboltedconnection(uiObj):
         web_bolt_planes = 1
         number_of_bolts = 1
         if bolt_type == "Bearing Bolt":
-            web_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, web_bolt_planes, bolt_fu)
-            web_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter,number_of_bolts, web_t_thinner,\
-                                                                            kb, web_plate_fu)
+            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear(bolt_diameter, web_bolt_planes, bolt_fu), 2)
+            web_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter,number_of_bolts, web_t_thinner,\
+                                                                            kb, web_plate_fu), 2)
             web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
 
         elif bolt_type == "HSFG":
             muf = mu_f
             bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
             n_e = 2  # number of effective surfaces offering frictional resistance
-            web_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type)
+            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type), 2)
             web_bolt_bearing_capacity = 'N/A'
             web_bolt_capacity = web_bolt_shear_capacity
 
@@ -567,17 +567,17 @@ def coverplateboltedconnection(uiObj):
             flange_bolt_planes = 1
             number_of_bolts = 1
             if bolt_type == "Bearing Bolt":
-                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter, number_of_bolts, bolt_fu)
-                flange_bolt_bearing_capacity = ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
-                                                                                kb, int(flange_plate_fu))
+                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear(bolt_diameter, number_of_bolts, bolt_fu), 2)
+                flange_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
+                                                                                kb, int(flange_plate_fu)), 2)
                 flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
 
             elif bolt_type == "HSFG":
                 muf = mu_f
                 bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
                 n_e = 1  # number of effective surfaces offering frictional resistance
-                flange_bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
-                                                                                 bolt_hole_type)
+                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
+                                                                                 bolt_hole_type), 2)
                 flange_bolt_bearing_capacity = 'N/A'
                 flange_bolt_capacity = flange_bolt_shear_capacity
 

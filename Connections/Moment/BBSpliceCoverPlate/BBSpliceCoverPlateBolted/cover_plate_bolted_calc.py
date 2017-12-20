@@ -782,7 +782,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["Pitch"] = web_pitch
             boltParam["End"] = min_end_dist
             boltParam["Edge"] = min_edge_dist
-            boltParam["WebPH"] = web_plate_l
+            boltParam["WebPlateHeight"] = web_plate_l
             boltParam["WebGauge"] = min_gauge
             boltParam["WebGaugeMax"] = max_gauge
             boltParam["webPlateDemand"] = shear_load
@@ -814,7 +814,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["Pitch"] = web_pitch
             boltParam["End"] = min_end_dist
             boltParam["Edge"] = min_edge_dist
-            boltParam["WebPH"] = web_plate_l
+            boltParam["WebPlateHeight"] = web_plate_l
             boltParam["WebGauge"] = min_gauge
             boltParam["WebGaugeMax"] = max_gauge
             boltParam["webPlateDemand"] = shear_load
@@ -854,7 +854,7 @@ def coverplateboltedconnection(uiObj):
     length_joint_flange = ((boltparameters["BoltsRequiredF"] / 2) - 1) * boltparameters["PitchF"]
     if length_joint_flange > 15 * bolt_diameter:
         beta_lj = (1.075 - length_joint_flange) / (200 * bolt_diameter)
-        flange_bolt_shear_capacity = beta_lj * boltparameters["ShearCapacity"]
+        flange_bolt_shear_capacity = beta_lj * boltparameters["ShearCapacityF"]
         new_bolt_param = boltdesignweb(web_plate_l, flange_plate_w, flange_plate_l)
     else:
         new_bolt_param = boltparameters
@@ -935,7 +935,7 @@ def coverplateboltedconnection(uiObj):
     #####################################################################################################################
     # Check for block shear capacity of web splice plate
     min_thk = min(web_plate_t, beam_w_t)
-    Tdb = web_block_shear(boltparameters["WebPH"], boltparameters["Edge"], min_thk, boltparameters["BoltsRequired"],\
+    Tdb = web_block_shear(boltparameters["WebPlateHeight"], boltparameters["Edge"], min_thk, boltparameters["BoltsRequired"],\
                           boltparameters["dia_hole"], beam_fy, beam_fu)
 
     if Tdb < shear_load:
@@ -948,7 +948,7 @@ def coverplateboltedconnection(uiObj):
 
     #####################################################################################################################
     # Check for shear yielding of web splice plate
-    web_plate_l = boltparameters["WebPH"]
+    web_plate_l = boltparameters["WebPlateHeight"]
     A_v = web_plate_l * web_plate_t
     V_d = shear_yielding(A_v, beam_fy)
     if V_d < shear_load:
@@ -961,7 +961,7 @@ def coverplateboltedconnection(uiObj):
 
     #####################################################################################################################
     # Check for shear rupture of web splice plate
-    web_plate_l = boltparameters["WebPH"]
+    web_plate_l = boltparameters["WebPlateHeight"]
     n_bolts = boltparameters["BoltsRequired"]
     A_vn = (web_plate_l -  n_bolts * 2 * dia_hole) * web_plate_t
     R_n = shear_rupture(A_vn, beam_fu)
@@ -976,6 +976,7 @@ def coverplateboltedconnection(uiObj):
     #####################################################################################################################
     # Capacity of web splice plate
     web_splice_capacity = min(Tdb, V_d, R_n)
+
 
     #####################################################################################################################
     # Check for capacity of flange splice plate
@@ -1017,7 +1018,9 @@ def coverplateboltedconnection(uiObj):
     min_thk = min(flange_plate_t, beam_f_t)
     n_bolts = boltparameters["BoltsRequiredF"] / 2
     Ltp = (boltparameters["FlangePlateHeight"] - gap) / 2
-    Tdb_flange = flange_block_shear(Ltp, boltparameters["Edge"], min_thk, n_bolts, dia_hole, boltparameters["FlangePlateWidth"], boltparameters["FlangeGauge"], flange_plate_fy, flange_plate_fu)
+    Tdb_flange = flange_block_shear(Ltp, boltparameters["EdgeF"], min_thk, n_bolts, dia_hole,
+                                    boltparameters["FlangePlateWidth"], boltparameters["FlangeGauge"],
+                                    flange_plate_fy, flange_plate_fu)
 
     if Tdb_flange < ff:
         design_status = False
@@ -1027,82 +1030,92 @@ def coverplateboltedconnection(uiObj):
     else:
         pass
 
+    # Capacity of flange splice plate
+    flange_splice_capacity = min(Tdg_flange_plate, Tdn_flange_plate, Tdb_flange)
+
     #####################################################################################################################
     # End of calculation for design of web splice plate
     # Output
     ## When height and width of web splice plate are zero
     if web_plate_l == 0 and web_plate_w == 0 and flange_plate_l == 0 and flange_plate_w == 0:
         outputObj = {}
-        outputObj["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-        outputObj["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-        outputObj["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-        outputObj["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-        outputObj["Pitch"] = new_bolt_param["Pitch"]
-        outputObj["End"] = new_bolt_param["End"]
-        outputObj["Edge"] = new_bolt_param["Edge"]
-        outputObj["WebPH"] = new_bolt_param["WebPH"]
-        outputObj["WebGauge"] = new_bolt_param["WebGauge"]
-        outputObj["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-        outputObj["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-        outputObj["WebPlateWidth"] = web_plate_w_req
-        outputObj["WebPlateCapacity"] = web_splice_capacity
+        outputObj["WebBolt"] = {}
+        outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
+        outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
+        outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
+        outputObj["WebBolt"]["BoltsRequired"] = new_bolt_param["BoltsRequired"]
+        outputObj["WebBolt"]["Pitch"] = new_bolt_param["Pitch"]
+        outputObj["WebBolt"]["End"] = new_bolt_param["End"]
+        outputObj["WebBolt"]["Edge"] = new_bolt_param["Edge"]
+        outputObj["WebBolt"]["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
+        outputObj["WebBolt"]["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebBolt"]["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
+        outputObj["WebBolt"]["webPlateDemand"] = new_bolt_param["webPlateDemand"]
+        outputObj["WebBolt"]["WebPlateWidth"] = web_plate_w_req
+        outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
-        outputObj["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
-        outputObj["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
-        outputObj["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
-        outputObj["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
-        outputObj["PitchF"] = new_bolt_param["PitchF"]
-        outputObj["EndF"] = new_bolt_param["EndF"]
-        outputObj["EdgeF"] = new_bolt_param["EdgeF"]
-        outputObj["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
-        outputObj["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeGauge"] = 90  # TODO: Need to fetch values
-        outputObj["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
+        outputObj["FlangeBolt"] = {}
+        outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
+        outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
+        outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
+        outputObj["FlangeBolt"]["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
+        outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
+        outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
+        outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
+        outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
+        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
+        outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
         ####### For reference and validation
-        outputObj["WebBlockShear"] = Tdb
-        outputObj["ShearYielding"] = V_d
-        outputObj["ShearRupture"] = R_n
-        outputObj["FlangeCapacity"] = flangecapacity
-        outputObj["ShearYielding"] = Tdg_flange_plate
-        outputObj["ShearRupture"] = Tdn_flange_plate
-        outputObj["FlangeBlockShear"] = Tdb_flange
+        outputObj["WebBolt"]["WebBlockShear"] = Tdb
+        outputObj["WebBolt"]["ShearYielding"] = V_d
+        outputObj["WebBolt"]["ShearRupture"] = R_n
+        outputObj["FlangeBolt"]["FlangeCapacity"] = flangecapacity
+        outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
+        outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
+        outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
+
     else:
         outputObj = {}
-        outputObj["ShearCapacity"] = new_bolt_param["ShearCapacity"]
-        outputObj["BearingCapacity"] = new_bolt_param["BearingCapacity"]
-        outputObj["CapacityBolt"] = new_bolt_param["CapacityBolt"]
-        outputObj["BoltsRequired"] = new_bolt_param["BoltsRequired"]
-        outputObj["Pitch"] = new_bolt_param["Pitch"]
-        outputObj["End"] = new_bolt_param["End"]
-        outputObj["Edge"] = new_bolt_param["Edge"]
-        outputObj["WebPH"] = new_bolt_param["WebPH"]
-        outputObj["WebGauge"] = new_bolt_param["WebGauge"]
-        outputObj["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
-        outputObj["webPlateDemand"] = new_bolt_param["webPlateDemand"]
-        outputObj["WebPlateWidth"] = web_plate_w_req
-        outputObj["WebPlateCapacity"] = web_splice_capacity
+        outputObj["WebBolt"] = {}
+        outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
+        outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
+        outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
+        outputObj["WebBolt"]["BoltsRequired"] = new_bolt_param["BoltsRequired"]
+        outputObj["WebBolt"]["Pitch"] = new_bolt_param["Pitch"]
+        outputObj["WebBolt"]["End"] = new_bolt_param["End"]
+        outputObj["WebBolt"]["Edge"] = new_bolt_param["Edge"]
+        outputObj["WebBolt"]["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
+        outputObj["WebBolt"]["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebBolt"]["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
+        outputObj["WebBolt"]["webPlateDemand"] = new_bolt_param["webPlateDemand"]
+        outputObj["WebBolt"]["WebPlateWidth"] = web_plate_w_req
+        outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
-        outputObj["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
-        outputObj["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
-        outputObj["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
-        outputObj["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
-        outputObj["PitchF"] = new_bolt_param["PitchF"]
-        outputObj["EndF"] = new_bolt_param["EndF"]
-        outputObj["EdgeF"] = new_bolt_param["EdgeF"]
-        outputObj["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
-        outputObj["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeGauge"] = 90  # TODO: Need to fetch values
-        outputObj["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
+        outputObj["FlangeBolt"] = {}
+        outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
+        outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
+        outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
+        outputObj["FlangeBolt"]["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
+        outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
+        outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
+        outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
+        outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
+        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
+        outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
         ####### For reference and validation
-        outputObj["WebBlockShear"] = Tdb
-        outputObj["ShearYielding"] = V_d
-        outputObj["ShearRupture"] = R_n
-        outputObj["FlangeCapacity"] = flangecapacity
-        outputObj["ShearYielding"] = Tdg_flange_plate
-        outputObj["ShearRupture"] = Tdn_flange_plate
-        outputObj["FlangeBlockShear"] = Tdb_flange
+        outputObj["WebBolt"]["WebBlockShear"] = Tdb
+        outputObj["WebBolt"]["ShearYielding"] = V_d
+        outputObj["WebBolt"]["ShearRupture"] = R_n
+        outputObj["FlangeBolt"]["FlangeCapacity"] = flangecapacity
+        outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
+        outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
+        outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
 
     if design_status == True:
 

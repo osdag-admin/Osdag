@@ -3471,7 +3471,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>170</y>
+       <y>200</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3490,7 +3490,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>170</y>
+       <y>200</y>
        <width>191</width>
        <height>25</height>
       </rect>
@@ -3535,7 +3535,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>230</y>
+       <y>260</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3554,7 +3554,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>290</y>
+       <y>320</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3573,7 +3573,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>200</y>
+       <y>230</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3592,7 +3592,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>290</y>
+       <y>320</y>
        <width>211</width>
        <height>25</height>
       </rect>
@@ -3630,31 +3630,11 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_153">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>320</y>
-       <width>179</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>End distance (mm)</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_154">
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>230</y>
+       <y>260</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -3670,7 +3650,7 @@ QMenu::item:selected {
       <string>Pitch (mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_edgeDist">
+    <widget class="QLineEdit" name="txt_endedgeDist">
      <property name="geometry">
       <rect>
        <x>202</x>
@@ -3693,7 +3673,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>200</y>
+       <y>230</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -3714,7 +3694,7 @@ QMenu::item:selected {
       <rect>
        <x>2</x>
        <y>350</y>
-       <width>179</width>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
@@ -3726,7 +3706,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Edge distance (mm)</string>
+      <string>End/Edge distance (mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_156">
@@ -3747,25 +3727,6 @@ QMenu::item:selected {
      </property>
      <property name="text">
       <string>Tension capacity (kN)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_endDist">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>320</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_157">
@@ -4126,7 +4087,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>140</y>
+       <y>170</y>
        <width>200</width>
        <height>22</height>
       </rect>
@@ -4149,7 +4110,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>140</y>
+       <y>170</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4213,7 +4174,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>260</y>
+       <y>290</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4232,7 +4193,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>260</y>
+       <y>290</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -4290,6 +4251,51 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>2</x>
+       <y>140</y>
+       <width>200</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Combined shear and tension capacity of bolt</string>
+     </property>
+     <property name="text">
+      <string>Bolt capacity</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_boltcapacity">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>140</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
     <zorder>txt_noBolts</zorder>
     <zorder>t_7</zorder>
     <zorder>txt_tensionCapacity</zorder>
@@ -4298,13 +4304,11 @@ QMenu::item:selected {
     <zorder>txt_rowBolts</zorder>
     <zorder>label_152</zorder>
     <zorder>txt_bearCapacity</zorder>
-    <zorder>label_153</zorder>
     <zorder>label_154</zorder>
-    <zorder>txt_edgeDist</zorder>
+    <zorder>txt_endedgeDist</zorder>
     <zorder>lbl_row_7</zorder>
     <zorder>label_155</zorder>
     <zorder>label_156</zorder>
-    <zorder>txt_endDist</zorder>
     <zorder>label_157</zorder>
     <zorder>label_158</zorder>
     <zorder>label_160</zorder>
@@ -4331,6 +4335,8 @@ QMenu::item:selected {
     <zorder>label_159</zorder>
     <zorder>txt_shearCapacity</zorder>
     <zorder>label_167</zorder>
+    <zorder>label_11</zorder>
+    <zorder>txt_boltcapacity</zorder>
    </widget>
   </widget>
   <action name="actionInput">
@@ -4835,8 +4841,7 @@ QMenu::item:selected {
   <tabstop>txt_pitch</tabstop>
   <tabstop>txt_gauge</tabstop>
   <tabstop>txt_crossGauge</tabstop>
-  <tabstop>txt_endDist</tabstop>
-  <tabstop>txt_edgeDist</tabstop>
+  <tabstop>txt_endedgeDist</tabstop>
   <tabstop>txt_plateHeight_2</tabstop>
   <tabstop>txt_plateWidth_2</tabstop>
   <tabstop>txt_momentDemand</tabstop>

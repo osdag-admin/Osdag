@@ -543,6 +543,8 @@ def bbExtendedEndPlateSplice(uiObj):
             V_dsf = Vdsf * long_joint(bolt_dia, l_j)
         else:
             V_dsf = Vdsf
+        bolt_capacity = V_dsf  # Capacity of HSFG bolt
+        bearing_capacity = "N/A"
     else:
         Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)      # 1. Check for Shear capacity of bearing bolt
 
@@ -554,6 +556,8 @@ def bbExtendedEndPlateSplice(uiObj):
         Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)  # 2. Check for Bearing capacity of bearing bolt
 
         V_db = min(V_dsb, Vdpb)   # Capacity of bearing bolt (V_db) is minimum of V_dsb and Vdpb
+        bolt_capacity = V_db
+        bearing_capacity = Vdpb
 
     #######################################################################
     # Calculation for number of bolts in each column
@@ -1275,7 +1279,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     if bolt_type == "HSFG":
         Tdf = bolt_tension_hsfg(bolt_fu, netArea_thread(bolt_dia))
-
+        bolt_tension_capacity = Tdf
         if Tdf > Tdf_1:
             design_status = False
             logger.error(": Tension capacity of HSFG bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
@@ -1283,6 +1287,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Re-design the connection using bolt of smaller diameter")
     else:
         Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
+        bolt_tension_capacity = Tdb
 
         if Tdb > Tdf_1:
             design_status = False
@@ -1512,7 +1517,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Height of stiffener (mm) (AISC Design guide 4, page 16)
     # TODO: Do calculation for actual height of end plate above
-    h_st = (end_plate_height - beam_d) / 2
+    h_st = (end_plate_height_provided - beam_d) / 2
 
     # Length of stiffener
     cf = math.pi/180  # conversion factor to convert degree into radian
@@ -1545,11 +1550,10 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
         outputobj['Bolt']['criticaltension'] = T_b
-        outputobj['Bolt']['tensioncapacityhsfg'] = Tdf
-        outputobj['Bolt']['tensioncapacitybearing'] = Tdb
+        outputobj['Bolt']['tensioncapacity'] = bolt_tension_capacity
         outputobj['Bolt']['shearcapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['bearingcapacity'] = Vdpb
-        outputobj['Bolt']['boltcapacity'] = V_db
+        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
+        outputobj['Bolt']['boltcapacity'] = bolt_capacity
         outputobj['Bolt']['numberofbolts'] = number_of_bolts
         outputobj['Bolt']['numberofrows'] = number_rows
 
@@ -1567,12 +1571,12 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['pitch'] = pitch_distance_4_5
         elif number_of_bolts == 20:
             outputobj['Bolt']['pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['pitch'] = pitch_distance_9_10
             outputobj['Bolt']['pitch'] = pitch_distance_3_4
             outputobj['Bolt']['pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['pitch'] = pitch_distance_5_6
             outputobj['Bolt']['pitch'] = pitch_distance_6_7
             outputobj['Bolt']['pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['pitch'] = pitch_distance_9_10
 
         outputobj['Bolt']['gauge'] = minimum_gauge_distance
         outputobj['Bolt']['crosscentregauge'] = g_1
@@ -1589,7 +1593,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Weld']['crticalstressflange'] = f_a_flange
         outputobj['Weld']['criticalstressweb'] = f_e
 
-        outputobj['Stiffener']['height'] = h_st
+        outputobj['Weld']['height'] = h_st
         outputobj['Stiffener']['length'] = l_st
         outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
 

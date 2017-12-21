@@ -433,11 +433,11 @@ class Maincontroller(QMainWindow):
         cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
         self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
 
-        end_distance = resultObj["Bolt"]["End"]
-        self.ui.txt_endDist.setText(str(end_distance))
+        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
+        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
 
-        edge_distance = resultObj["Bolt"]["Edge"]
-        self.ui.txt_edgeDist.setText(str(edge_distance))
+        endedge_distance = resultObj["Bolt"]["EndEdge"]
+        self.ui.txt_endedgeDist.setText(str(endedge_distance))
 
         plate_height = resultObj["Plate"]["Height"]
         self.ui.txt_plateHeight_2.setText(str(plate_height))

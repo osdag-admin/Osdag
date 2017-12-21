@@ -569,19 +569,20 @@ def bbExtendedEndPlateSplice(uiObj):
         bolt_shear_capacity = V_dsb
 
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
-    n = math.sqrt((6 * M_u) / (2 * pitch_dist_min * bolt_shear_capacity))
+    n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_shear_capacity))
     n = math.ceil(n)
 
     # number_of_bolts = Total number of bolts in the configuration
-    number_of_bolts = 2 * n
+    # TODO: Update number of bolts after review
+    number_of_bolts = n
 
     if number_of_bolts <= 8:
         number_of_bolts = 8
-    elif number_of_bolts > 8 or number_of_bolts <= 12:
+    elif number_of_bolts > 8 and number_of_bolts <= 12:
         number_of_bolts = 12
-    elif number_of_bolts > 12 or number_of_bolts <= 16:
+    elif number_of_bolts > 12 and number_of_bolts <= 16:
         number_of_bolts = 16
-    elif number_of_bolts > 16 or number_of_bolts <= 20:
+    elif number_of_bolts > 16 and number_of_bolts <= 20:
         number_of_bolts = 20
     # TODO : validate else statement. (Discuss with sir)
     else:
@@ -632,7 +633,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 12:
-            pitch_distance_2_3, pitch_distance_4_5 = pitch_dist_min  # Distance between 2nd and 3rd bolt and 4th and 5th bolt from top
+            pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min  # Distance between 2nd and 3rd bolt and 4th and 5th bolt from top
             pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
             if pitch_distance_2_3 or pitch_distance_4_5 or pitch_distance_3_4 < pitch_dist_min:
@@ -647,7 +648,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 16:
-            pitch_distance_2_3, pitch_distance_3_4, pitch_distance_5_6, pitch_distance_6_7 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
             pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
 
             if pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5 < pitch_dist_min:
@@ -662,8 +663,8 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 20:
-            pitch_distance_1_2, pitch_distance_9_10 = pitch_dist_min
-            pitch_distance_3_4, pitch_distance_4_5, pitch_distance_6_7, pitch_distance_7_8 = pitch_dist_min
+            pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+            pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
             pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
 
             if pitch_distance_1_2 or pitch_distance_3_4 or pitch_distance_4_5 or pitch_distance_6_7 or pitch_distance_7_8 or pitch_distance_9_10 or pitch_distance_5_6 < pitch_dist_min:
@@ -703,7 +704,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 12:
-            pitch_distance_2_3, pitch_distance_4_5 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
             pitch_distance_3_4 = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
             if pitch_distance_2_3 or pitch_distance_4_5 or pitch_distance_3_4 < pitch_dist_min:
@@ -718,7 +719,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 16:
-            pitch_distance_2_3, pitch_distance_3_4, pitch_distance_5_6, pitch_distance_6_7 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
             pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
 
             if pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5 < pitch_dist_min:
@@ -733,8 +734,8 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 20:
-            pitch_distance_1_2, pitch_distance_9_10 = pitch_dist_min
-            pitch_distance_3_4, pitch_distance_4_5, pitch_distance_6_7, pitch_distance_7_8 = pitch_dist_min
+            pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+            pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
             pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
 
             if pitch_distance_1_2 or pitch_distance_3_4 or pitch_distance_4_5 or pitch_distance_6_7 or pitch_distance_7_8 or pitch_distance_9_10 or pitch_distance_5_6 < pitch_dist_min:
@@ -769,7 +770,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 12:
-            pitch_distance_2_3, pitch_distance_4_5 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
             pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
             if pitch_distance_2_3 or pitch_distance_4_5 or pitch_distance_3_4 < pitch_dist_min:
@@ -784,7 +785,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 16:
-            pitch_distance_2_3, pitch_distance_3_4, pitch_distance_5_6, pitch_distance_6_7 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
             pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
 
             if pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5 < pitch_dist_min:
@@ -799,8 +800,8 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 20:
-            pitch_distance_1_2, pitch_distance_9_10 = pitch_dist_min
-            pitch_distance_3_4, pitch_distance_4_5, pitch_distance_6_7, pitch_distance_7_8 = pitch_dist_min
+            pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+            pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
             pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
 
             if pitch_distance_1_2 or pitch_distance_3_4 or pitch_distance_4_5 or pitch_distance_6_7 or pitch_distance_7_8 or pitch_distance_9_10 or pitch_distance_5_6 < pitch_dist_min:
@@ -842,7 +843,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 12:
-            pitch_distance_2_3, pitch_distance_4_5 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
             pitch_distance_3_4 = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
             if pitch_distance_2_3 or pitch_distance_4_5 or pitch_distance_3_4 < pitch_dist_min:
@@ -857,7 +858,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 16:
-            pitch_distance_2_3, pitch_distance_3_4, pitch_distance_5_6, pitch_distance_6_7 = pitch_dist_min
+            pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
             pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
 
             if pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5 < pitch_dist_min:
@@ -872,8 +873,8 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         elif number_of_bolts == 20:
-            pitch_distance_1_2, pitch_distance_9_10 = pitch_dist_min
-            pitch_distance_3_4, pitch_distance_4_5, pitch_distance_6_7, pitch_distance_7_8 = pitch_dist_min
+            pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+            pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
             pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
 
             if pitch_distance_1_2 or pitch_distance_3_4 or pitch_distance_4_5 or pitch_distance_6_7 or pitch_distance_7_8 or pitch_distance_9_10 or pitch_distance_5_6 < pitch_dist_min:

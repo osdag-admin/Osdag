@@ -113,7 +113,7 @@ class DesignPreference(QDialog):
         return designPref
 
     def set_boltFu(self):
-        uiObj = self.main_controller.getuser_inputs()
+        uiObj = self.maincontroller.get_user_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
         if boltGrade != '':
             boltfu = str(self.get_boltFu(boltGrade))

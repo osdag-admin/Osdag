@@ -467,7 +467,11 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_width_mini = max(g_1 + (2 * edge_dist_mini), beam_B)
     end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
 
-    if end_plate_width < end_plate_width_mini:
+    # if end_plate_width == 0:
+    #     pass
+    # else:
+
+    if end_plate_width == 0 and end_plate_width < end_plate_width_mini:
         design_status = False
         logger.error(": Width of the End Plate is less than the minimum required value ")
         logger.warning(": Minimum End Plate width required is %2.2f mm" % end_plate_width_mini)
@@ -521,8 +525,8 @@ def bbExtendedEndPlateSplice(uiObj):
     sum_plate_thickness = 2 * end_plate_thickness
 
     # Calculation of k_b
-    kb_1 = end_dist_mini / (3 * dia_hole)
-    kb_2 = (pitch_dist_min / (3 * dia_hole)) - 0.25
+    kb_1 = float(end_dist_mini) / (3 * dia_hole)
+    kb_2 = (float(pitch_dist_min) / (3 * dia_hole)) - 0.25
     kb_3 = bolt_fu / end_plate_fu
     kb_4 = 1.0
     k_b = min(kb_1, kb_2, kb_3, kb_4)
@@ -1314,13 +1318,14 @@ def bbExtendedEndPlateSplice(uiObj):
     # Here, Vsb = Factored shear load acting on single bolt, Vdb = shear capacity of single bearing bolt
     # Tb = External factored tension acting on single bearing bolt, Tdb = Tension capacity of single bearing bolt
 
-    Vsf = factored_shear_load / number_of_bolts
-    Vdf = V_dsf
-    Tf = T_b
-
-    Vsb = Vsf
-    Vdb = V_db
-    Tb = T_b
+    if bolt_type == "HSFG":
+        Vsf = factored_shear_load / number_of_bolts
+        Vdf = V_dsf
+        Tf = T_b
+    else:
+        Vsb = factored_shear_load / number_of_bolts
+        Vdb = V_db
+        Tb = T_b
 
     if bolt_type == "HSFG":
         combined_capacity_hsfg = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2

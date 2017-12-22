@@ -1333,17 +1333,17 @@ def bbExtendedEndPlateSplice(uiObj):
         Tb = T_b
 
     if bolt_type == "HSFG":
-        combined_capacity_hsfg = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
+        combined_capacity = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
 
-        if combined_capacity_hsfg > 1.0:
+        if combined_capacity > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected HSFG bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
-        combined_capacity_bearing = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
+        combined_capacity = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
 
-        if combined_capacity_bearing > 1.0:
+        if combined_capacity > 1.0:
             design_status = False
             logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
@@ -1549,158 +1549,162 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj = {}
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
-        outputobj['Bolt']['criticaltension'] = T_b
-        outputobj['Bolt']['tensioncapacity'] = bolt_tension_capacity
-        outputobj['Bolt']['shearcapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
-        outputobj['Bolt']['boltcapacity'] = bolt_capacity
-        outputobj['Bolt']['numberofbolts'] = number_of_bolts
-        outputobj['Bolt']['numberofrows'] = number_rows
+        outputobj['Bolt']['CriticalTension'] = T_b
+        outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
+        outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = bolt_capacity
+        outputobj['Bolt']['CombinedCapacity'] = combined_capacity
+        outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
+        outputobj['Bolt']['NumberOfRows'] = number_rows
 
         if number_of_bolts == 8:
-            outputobj['Bolt']['pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = pitch_distance
         elif number_of_bolts == 12:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
         elif number_of_bolts == 16:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
         elif number_of_bolts == 20:
-            outputobj['Bolt']['pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
+            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
 
-        outputobj['Bolt']['gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['crosscentregauge'] = g_1
-        outputobj['Bolt']['enddistance'] = minimum_end_distance
-        outputobj['Bolt']['edgedistance'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
+        outputobj['Bolt']['CrossCentreGauge'] = g_1
+        outputobj['Bolt']['End'] = minimum_end_distance
+        outputobj['Bolt']['Edge'] = minimum_edge_distance
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['height'] = end_plate_height_provided
-        outputobj['Plate']['width'] = end_plate_width_provided
-        outputobj['Plate']['momentdemand'] = M_d
-        outputobj['Plate']['momentcapacity'] = M_c
+        outputobj['Plate']['Height'] = end_plate_height_provided
+        outputobj['Plate']['Width'] = end_plate_width_provided
+        outputobj['Plate']['MomentDemand'] = M_d
+        outputobj['Plate']['MomentCapacity'] = M_c
 
         outputobj['Weld'] = {}
-        outputobj['Weld']['crticalstressflange'] = f_a_flange
-        outputobj['Weld']['criticalstressweb'] = f_e
+        outputobj['Weld']['CriticalStressflange'] = f_a_flange
+        outputobj['Weld']['CriticalStressWeb'] = f_e
 
-        outputobj['Weld']['height'] = h_st
-        outputobj['Stiffener']['length'] = l_st
-        outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
+        outputobj['Stiffener'] = {}
+        outputobj['Stiffener']['Height'] = h_st
+        outputobj['Stiffener']['Length'] = l_st
+        outputobj['Stiffener']['Thickness'] = thickness_stiffener_provided
 
     # Case 2: When the height of end plate is specified but the width is not specified by the user
     elif end_plate_height != 0 and end_plate_width == 0:
         outputobj = {}
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
-        outputobj['Bolt']['criticaltension'] = T_b
-        outputobj['Bolt']['tensioncapacityhsfg'] = Tdf
-        outputobj['Bolt']['tensioncapacitybearing'] = Tdb
-        outputobj['Bolt']['shearcapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['bearingcapacity'] = Vdpb
-        outputobj['Bolt']['boltcapacity'] = V_db
-        outputobj['Bolt']['numberofbolts'] = number_of_bolts
-        outputobj['Bolt']['numberofrows'] = number_rows
+        outputobj['Bolt']['CriticalTension'] = T_b
+        outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
+        outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
+        outputobj['Bolt']['BearingCapacity'] = Vdpb
+        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['CombinedCapacity'] = combined_capacity
+        outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
+        outputobj['Bolt']['NumberOfRows'] = number_rows
 
         if number_of_bolts == 8:
-            outputobj['Bolt']['pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = pitch_distance
         elif number_of_bolts == 12:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
         elif number_of_bolts == 16:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
         elif number_of_bolts == 20:
-            outputobj['Bolt']['pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['pitch'] = pitch_distance_9_10
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
+            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
 
-        outputobj['Bolt']['gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['crosscentregauge'] = g_1
-        outputobj['Bolt']['enddistance'] = minimum_end_distance
-        outputobj['Bolt']['edgedistance'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
+        outputobj['Bolt']['CrossCentreGauge'] = g_1
+        outputobj['Bolt']['End'] = minimum_end_distance
+        outputobj['Bolt']['Edge'] = minimum_edge_distance
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['height'] = end_plate_height_provided
-        outputobj['Plate']['width'] = end_plate_width_provided
-        outputobj['Plate']['momentdemand'] = M_d
-        outputobj['Plate']['momentcapacity'] = M_c
+        outputobj['Plate']['Height'] = end_plate_height_provided
+        outputobj['Plate']['Width'] = end_plate_width_provided
+        outputobj['Plate']['MomentDemand'] = M_d
+        outputobj['Plate']['MomentCapacity'] = M_c
 
         outputobj['Weld'] = {}
-        outputobj['Weld']['crticalstressflange'] = f_a_flange
-        outputobj['Weld']['criticalstressweb'] = f_e
+        outputobj['Weld']['CriticalStressflange'] = f_a_flange
+        outputobj['Weld']['CriticalStressWeb'] = f_e
 
-        outputobj['Stiffener']['height'] = h_st
-        outputobj['Stiffener']['length'] = l_st
-        outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
+        outputobj['Stiffener'] = {}
+        outputobj['Stiffener']['Height'] = h_st
+        outputobj['Stiffener']['Length'] = l_st
+        outputobj['Stiffener']['Thickness'] = thickness_stiffener_provided
 
     # Case 3: When the height of end plate is not specified but the width is specified by the user
     elif end_plate_height == 0 and end_plate_width != 0:
         outputobj = {}
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
-        outputobj['Bolt']['criticaltension'] = T_b
-        outputobj['Bolt']['tensioncapacityhsfg'] = Tdf
-        outputobj['Bolt']['tensioncapacitybearing'] = Tdb
-        outputobj['Bolt']['shearcapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['bearingcapacity'] = Vdpb
-        outputobj['Bolt']['boltcapacity'] = V_db
-        outputobj['Bolt']['numberofbolts'] = number_of_bolts
-        outputobj['Bolt']['numberofrows'] = number_rows
+        outputobj['Bolt']['CriticalTension'] = T_b
+        outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
+        outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
+        outputobj['Bolt']['BearingCapacity'] = Vdpb
+        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['CombinedCapacity'] = combined_capacity
+        outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
+        outputobj['Bolt']['NumberOfRows'] = number_rows
 
         if number_of_bolts == 8:
-            outputobj['Bolt']['pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = pitch_distance
         elif number_of_bolts == 12:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
         elif number_of_bolts == 16:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
         elif number_of_bolts == 20:
-            outputobj['Bolt']['pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['pitch'] = pitch_distance_9_10
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
+            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
 
-        outputobj['Bolt']['gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['crosscentregauge'] = g_1
-        outputobj['Bolt']['enddistance'] = minimum_end_distance
-        outputobj['Bolt']['edgedistance'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
+        outputobj['Bolt']['CrossCentreGauge'] = g_1
+        outputobj['Bolt']['End'] = minimum_end_distance
+        outputobj['Bolt']['Edge'] = minimum_edge_distance
 
         outputobj['Plate'] = {}
         outputobj['Plate']['height'] = end_plate_height_provided
         outputobj['Plate']['width'] = end_plate_width_provided
-        outputobj['Plate']['momentdemand'] = M_d
-        outputobj['Plate']['momentcapacity'] = M_c
+        outputobj['Plate']['MomentDemand'] = M_d
+        outputobj['Plate']['MomentCapacity'] = M_c
 
         outputobj['Weld'] = {}
-        outputobj['Weld']['crticalstressflange'] = f_a_flange
-        outputobj['Weld']['criticalstressweb'] = f_e
+        outputobj['Weld']['CriticalStressflange'] = f_a_flange
+        outputobj['Weld']['CriticalStressWeb'] = f_e
 
+        outputobj['Stiffener'] = {}
         outputobj['Stiffener']['height'] = h_st
         outputobj['Stiffener']['length'] = l_st
         outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
@@ -1710,56 +1714,57 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj = {}
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
-        outputobj['Bolt']['criticaltension'] = T_b
-        outputobj['Bolt']['tensioncapacityhsfg'] = Tdf
-        outputobj['Bolt']['tensioncapacitybearing'] = Tdb
-        outputobj['Bolt']['shearcapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['bearingcapacity'] = Vdpb
-        outputobj['Bolt']['boltcapacity'] = V_db
-        outputobj['Bolt']['numberofbolts'] = number_of_bolts
-        outputobj['Bolt']['numberofrows'] = number_rows
+        outputobj['Bolt']['CriticalTension'] = T_b
+        outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
+        outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
+        outputobj['Bolt']['BearingCapacity'] = Vdpb
+        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['CombinedCapacity'] = combined_capacity
+        outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
+        outputobj['Bolt']['NumberOfRows'] = number_rows
 
         if number_of_bolts == 8:
-            outputobj['Bolt']['pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = pitch_distance
         elif number_of_bolts == 12:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
         elif number_of_bolts == 16:
-            outputobj['Bolt']['pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
         elif number_of_bolts == 20:
-            outputobj['Bolt']['pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['pitch'] = pitch_distance_9_10
-            outputobj['Bolt']['pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['pitch'] = pitch_distance_5_6
+            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
+            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
+            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
+            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
 
-        outputobj['Bolt']['gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['crosscentregauge'] = g_1
-        outputobj['Bolt']['enddistance'] = minimum_end_distance
-        outputobj['Bolt']['edgedistance'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
+        outputobj['Bolt']['CrossCentreGauge'] = g_1
+        outputobj['Bolt']['End'] = minimum_end_distance
+        outputobj['Bolt']['Edge'] = minimum_edge_distance
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['height'] = end_plate_height_provided
-        outputobj['Plate']['width'] = end_plate_width_provided
-        outputobj['Plate']['momentdemand'] = M_d
-        outputobj['Plate']['momentcapacity'] = M_c
+        outputobj['Plate']['Height'] = end_plate_height_provided
+        outputobj['Plate']['Width'] = end_plate_width_provided
+        outputobj['Plate']['MomentDemand'] = M_d
+        outputobj['Plate']['MomentCapacity'] = M_c
 
         outputobj['Weld'] = {}
-        outputobj['Weld']['crticalstressflange'] = f_a_flange
-        outputobj['Weld']['criticalstressweb'] = f_e
+        outputobj['Weld']['CriticalStressflange'] = f_a_flange
+        outputobj['Weld']['CriticalStressWeb'] = f_e
 
-        outputobj['Stiffener']['height'] = h_st
-        outputobj['Stiffener']['length'] = l_st
-        outputobj['Stiffener']['thickness'] = thickness_stiffener_provided
+        outputobj['Stiffener'] = {}
+        outputobj['Stiffener']['Height'] = h_st
+        outputobj['Stiffener']['Length'] = l_st
+        outputobj['Stiffener']['Thickness'] = thickness_stiffener_provided
 
-
+    return outputobj
 
 
 

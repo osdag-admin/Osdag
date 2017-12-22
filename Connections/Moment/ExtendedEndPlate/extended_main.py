@@ -167,10 +167,10 @@ class Plate(QDialog):
 
         uiObj = self.maincontroller.get_user_inputs()
         resultObj_plate = bbExtendedEndPlateSplice(uiObj)
-        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["width"]))
-        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["height"]))
-        self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["momentdemand"]))
-        self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["momentcapacity"]))
+        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
+        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
 
 
 class Stiffener(QDialog):
@@ -182,9 +182,9 @@ class Stiffener(QDialog):
 
         uiObj = self.maincontroller.get_user_inputs()
         resultObj_plate = bbExtendedEndPlateSplice(uiObj)
-        self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["height"]))
-        self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["length"]))
-        self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["thickness"]))
+        self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
+        self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
+        self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 
 
 class Maincontroller(QMainWindow):
@@ -424,12 +424,14 @@ class Maincontroller(QMainWindow):
         # print self.uiObj
         self.alist = self.designParameters()
         self.outputs = bbExtendedEndPlateSplice(self.alist)
+        print "output list ", self.outputs
+        a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
-            for value in outputObj.vaules():
+            for value in outputObj.values():
                 if outputObj.items() == " ":
                     resultObj = outputObj
                 else:
@@ -451,10 +453,13 @@ class Maincontroller(QMainWindow):
         combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
         self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
 
-        bolts_required = resultObj["Bolt"]["BoltsRequired"]
+        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
+        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
+
+        bolts_required = resultObj["Bolt"]["NumberOfBolts"]
         self.ui.txt_noBolts.setText(str(bolts_required))
 
-        bolts_in_rows = resultObj["Bolt"]["BoltsRows"]
+        bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
         self.ui.txt_rowBolts.setText(str(bolts_in_rows))
 
         pitch = resultObj["Bolt"]["Pitch"]
@@ -466,28 +471,16 @@ class Maincontroller(QMainWindow):
         cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
         self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
 
-        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
-        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
+        end_distance = resultObj["Bolt"]["End"]
+        self.ui.txt_endDist.setText(str(end_distance))
 
-        endedge_distance = resultObj["Bolt"]["EndEdge"]
-        self.ui.txt_endedgeDist.setText(str(endedge_distance))
+        edge_distance = resultObj["Bolt"]["Edge"]
+        self.ui.txt_edgeDist.setText(str(edge_distance))
 
-        plate_height = resultObj["Plate"]["Height"]
-        self.ui.txt_plateHeight_2.setText(str(plate_height))
-
-        plate_width = resultObj["Plate"]["Width"]
-        self.ui.txt_plateWidth_2.setText(str(plate_width))
-
-        moment_demand = resultObj["Plate"]["MomentDemand"]
-        self.ui.txt_momentDemand.setText(str(moment_demand))
-
-        moment_capacity = resultObj["Plate"]["MomentCapacity"]
-        self.ui.txt_momentCapacity.setText(str(moment_capacity))
-
-        weld_stress_flange = resultObj["Plate"]["CriticalFlange"]
+        weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
         self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 
-        weld_stress_web = resultObj["Plate"]["CriticalWeb"]
+        weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
         self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
     def display_log_to_textedit(self):
@@ -674,7 +667,7 @@ def main():
     # --------------- To display log messages in different colors ---------------
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    fh = logging.FileHandler("coverplate.log", mode="w")
+    fh = logging.FileHandler("extnd.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)

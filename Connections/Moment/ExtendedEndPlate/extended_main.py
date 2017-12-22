@@ -10,7 +10,7 @@ from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
@@ -165,7 +165,7 @@ class Plate(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
-        uiObj = self.maincontroller.get_user_inputs()
+        uiObj = self.maincontroller.designParameters()
         resultObj_plate = bbExtendedEndPlateSplice(uiObj)
         self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
         self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
@@ -180,7 +180,7 @@ class Stiffener(QDialog):
         self.ui.setupUi(self)
         self.maincontroller = parent
 
-        uiObj = self.maincontroller.get_user_inputs()
+        uiObj = self.maincontroller.designParameters()
         resultObj_plate = bbExtendedEndPlateSplice(uiObj)
         self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
         self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
@@ -218,6 +218,7 @@ class Maincontroller(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 
@@ -625,6 +626,12 @@ class Maincontroller(QMainWindow):
             widgets.show()
         else:
             widgets.hide()
+
+    def show_font_dialogue(self):
+        font, ok = QFontDialog.getFont()
+        if ok:
+            self.ui.textEdit.setFont(font)
+
 
     def plate_details(self):
         section = Plate(self)

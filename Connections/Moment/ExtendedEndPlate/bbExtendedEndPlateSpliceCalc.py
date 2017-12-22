@@ -1607,8 +1607,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CriticalTension'] = T_b
         outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
         outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['BearingCapacity'] = Vdpb
-        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = bolt_capacity
         outputobj['Bolt']['CombinedCapacity'] = combined_capacity
         outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
         outputobj['Bolt']['NumberOfRows'] = number_rows
@@ -1662,8 +1662,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CriticalTension'] = T_b
         outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
         outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['BearingCapacity'] = Vdpb
-        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = bolt_capacity
         outputobj['Bolt']['CombinedCapacity'] = combined_capacity
         outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
         outputobj['Bolt']['NumberOfRows'] = number_rows
@@ -1717,8 +1717,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CriticalTension'] = T_b
         outputobj['Bolt']['TensionCapacity'] = bolt_tension_capacity
         outputobj['Bolt']['ShearCapacity'] = bolt_shear_capacity
-        outputobj['Bolt']['BearingCapacity'] = Vdpb
-        outputobj['Bolt']['BoltCapacity'] = V_db
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = bolt_capacity
         outputobj['Bolt']['CombinedCapacity'] = combined_capacity
         outputobj['Bolt']['NumberOfBolts'] = number_of_bolts
         outputobj['Bolt']['NumberOfRows'] = number_rows

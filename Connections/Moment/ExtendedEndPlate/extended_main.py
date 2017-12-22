@@ -6,6 +6,8 @@ Created on 24-Aug-2017
 
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
+from ui_plate import Ui_Plate
+from ui_stiffener import Ui_Stiffener
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
@@ -156,6 +158,35 @@ class DesignPreference(QDialog):
         self.close()
 
 
+class Plate(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Plate()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.get_user_inputs()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["width"]))
+        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["height"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["momentdemand"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["momentcapacity"]))
+
+
+class Stiffener(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Stiffener()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.get_user_inputs()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["height"]))
+        self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["length"]))
+        self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["thickness"]))
+
+
 class Maincontroller(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -187,6 +218,8 @@ class Maincontroller(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.btn_plateDetail.clicked.connect(self.plate_details)
+        self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 
         validator = QIntValidator()
         self.ui.txt_Fu.setValidator(validator)
@@ -600,6 +633,13 @@ class Maincontroller(QMainWindow):
         else:
             widgets.hide()
 
+    def plate_details(self):
+        section = Plate(self)
+        section.show()
+
+    def stiffener_details(self):
+        section = Stiffener(self)
+        section.show()
 
 def set_osdaglogger():
     global logger

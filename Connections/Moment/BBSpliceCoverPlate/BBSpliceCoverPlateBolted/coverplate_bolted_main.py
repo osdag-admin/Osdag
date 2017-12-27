@@ -225,7 +225,7 @@ class MainController(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
-        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -650,10 +650,10 @@ class MainController(QMainWindow):
         section = Webspliceplate(self)
         section.show()
 
-    def showFontDialogue(self):
+    def show_font_dialogue(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.textEdit.setFont()
+            self.ui.textEdit.setFont(font)
 
     def dockbtn_clicked(self, widgets):
         """

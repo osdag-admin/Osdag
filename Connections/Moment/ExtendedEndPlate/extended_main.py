@@ -6,9 +6,11 @@ Created on 24-Aug-2017
 
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
+# from ui_plate import Ui_Plate
+# from ui_stiffener import Ui_Stiffener
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
@@ -156,6 +158,35 @@ class DesignPreference(QDialog):
         self.close()
 
 
+class Plate(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Plate()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
+        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
+
+
+class Stiffener(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Stiffener()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
+        self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
+        self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+
+
 class Maincontroller(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -187,6 +218,9 @@ class Maincontroller(QMainWindow):
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
+        self.ui.btn_plateDetail.clicked.connect(self.plate_details)
+        self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 
         validator = QIntValidator()
         self.ui.txt_Fu.setValidator(validator)
@@ -391,12 +425,14 @@ class Maincontroller(QMainWindow):
         # print self.uiObj
         self.alist = self.designParameters()
         self.outputs = bbExtendedEndPlateSplice(self.alist)
+        print "output list ", self.outputs
+        a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
-            for value in outputObj.vaules():
+            for value in outputObj.values():
                 if outputObj.items() == " ":
                     resultObj = outputObj
                 else:
@@ -415,13 +451,16 @@ class Maincontroller(QMainWindow):
         bearing_capacity = resultObj["Bolt"]["BearingCapacity"]
         self.ui.txt_bearCapacity.setText(str(bearing_capacity))
 
-        combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
-        self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
+        # combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
+        # self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
 
-        bolts_required = resultObj["Bolt"]["BoltsRequired"]
+        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
+        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
+
+        bolts_required = resultObj["Bolt"]["NumberOfBolts"]
         self.ui.txt_noBolts.setText(str(bolts_required))
 
-        bolts_in_rows = resultObj["Bolt"]["BoltsRows"]
+        bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
         self.ui.txt_rowBolts.setText(str(bolts_in_rows))
 
         pitch = resultObj["Bolt"]["Pitch"]
@@ -433,28 +472,16 @@ class Maincontroller(QMainWindow):
         cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
         self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
 
-        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
-        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
+        end_distance = resultObj["Bolt"]["End"]
+        self.ui.txt_endDist.setText(str(end_distance))
 
-        endedge_distance = resultObj["Bolt"]["EndEdge"]
-        self.ui.txt_endedgeDist.setText(str(endedge_distance))
+        edge_distance = resultObj["Bolt"]["Edge"]
+        self.ui.txt_edgeDist.setText(str(edge_distance))
 
-        plate_height = resultObj["Plate"]["Height"]
-        self.ui.txt_plateHeight_2.setText(str(plate_height))
-
-        plate_width = resultObj["Plate"]["Width"]
-        self.ui.txt_plateWidth_2.setText(str(plate_width))
-
-        moment_demand = resultObj["Plate"]["MomentDemand"]
-        self.ui.txt_momentDemand.setText(str(moment_demand))
-
-        moment_capacity = resultObj["Plate"]["MomentCapacity"]
-        self.ui.txt_momentCapacity.setText(str(moment_capacity))
-
-        weld_stress_flange = resultObj["Plate"]["CriticalFlange"]
+        weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
         self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 
-        weld_stress_web = resultObj["Plate"]["CriticalWeb"]
+        weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
         self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
     def display_log_to_textedit(self):
@@ -600,6 +627,19 @@ class Maincontroller(QMainWindow):
         else:
             widgets.hide()
 
+    def show_font_dialogue(self):
+        font, ok = QFontDialog.getFont()
+        if ok:
+            self.ui.textEdit.setFont(font)
+
+
+    def plate_details(self):
+        section = Plate(self)
+        section.show()
+
+    def stiffener_details(self):
+        section = Stiffener(self)
+        section.show()
 
 def set_osdaglogger():
     global logger
@@ -634,7 +674,7 @@ def main():
     # --------------- To display log messages in different colors ---------------
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    fh = logging.FileHandler("coverplate.log", mode="w")
+    fh = logging.FileHandler("extnd.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)

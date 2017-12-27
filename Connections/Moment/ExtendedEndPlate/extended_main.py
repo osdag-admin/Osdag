@@ -630,6 +630,7 @@ class Maincontroller(QMainWindow):
     def show_font_dialogue(self):
         font, ok = QFontDialog.getFont()
         if ok:
+            # self.ui.textEdit.setFont()
             self.ui.textEdit.setFont(font)
 
 

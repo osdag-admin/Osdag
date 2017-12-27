@@ -1565,7 +1565,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['criticaltension'] = round(T_b, 3)
         outputobj['Bolt']['tensioncapacity'] = round(bolt_tension_capacity, 3)
         outputobj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-        outputobj['Bolt']['bearingcapacity'] = round(bearing_capacity, 3)
+        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
         outputobj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['numberofbolts'] = round(number_of_bolts, 3)
         outputobj['Bolt']['numberofrows'] = round(number_rows, 3)
@@ -1619,7 +1619,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['criticaltension'] = round(T_b, 3)
         outputobj['Bolt']['tensioncapacity'] = round(bolt_tension_capacity, 3)
         outputobj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-        outputobj['Bolt']['bearingcapacity'] = round(bearing_capacity, 3)
+        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
         outputobj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['numberofbolts'] = round(number_of_bolts, 3)
         outputobj['Bolt']['numberofrows'] = round(number_rows, 3)
@@ -1673,7 +1673,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['criticaltension'] = round(T_b, 3)
         outputobj['Bolt']['tensioncapacity'] = round(bolt_tension_capacity, 3)
         outputobj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-        outputobj['Bolt']['bearingcapacity'] = round(bearing_capacity, 3)
+        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
         outputobj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['numberofbolts'] = round(number_of_bolts, 3)
         outputobj['Bolt']['numberofrows'] = round(number_rows, 3)
@@ -1727,7 +1727,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['criticaltension'] = round(T_b, 3)
         outputobj['Bolt']['tensioncapacity'] = round(bolt_tension_capacity, 3)
         outputobj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
-        outputobj['Bolt']['bearingcapacity'] = round(bearing_capacity, 3)
+        outputobj['Bolt']['bearingcapacity'] = bearing_capacity
         outputobj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['numberofbolts'] = round(number_of_bolts, 3)
         outputobj['Bolt']['numberofrows'] = round(number_rows, 3)

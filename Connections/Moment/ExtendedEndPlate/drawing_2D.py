@@ -11,30 +11,30 @@ import os
 
 
 class ExtendedEndPlate(object):
-    def __init__(self, input):
+    def __init__(self, input,dictbeamdata):
         # self.filename = filename
         self.beam_length_L1 = 1000
         self.beam_length_L2 = 1000
 
-        self.beam_depth_D1 = 400
-        self.beam_depth_D2 = 400
+        self.beam_depth_D1 = float(dictbeamdata["D"])
+        self.beam_depth_D2 = self.beam_depth_D1
 
-        self.beam_width_B1 = 140
+        self.beam_width_B1 = float(dictbeamdata["B"])
         self.beam_width_B2 = 140
 
         self.plate_thickness_p1 = 20
         self.plate_thickness_p2 = 20
 
-        self.plate_width_B1 = 178.4
+        self.plate_width_B1 = int(input['Plate']['Width'])
         self.plate_width_B2 = 178.4
 
-        self.plate_length_L1 = 613.4
+        self.plate_length_L1 = int(input['Plate']['Height'])
         self.plate_length_L2 = 613.4
 
-        self.flange_thickness_T1 = 16
+        self.flange_thickness_T1 = float(dictbeamdata["T"])
         self.flange_thickness_T2 = 16
 
-        self.web_thickness_tw1 = 8.9
+        self.web_thickness_tw1 = float(dictbeamdata["tw"])
         self.web_thickness_tw2 = 8.9
 
         self.flange_weld_thickness = 12

@@ -200,6 +200,17 @@ class Maincontroller(QMainWindow):
         # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.ui.combo_beamSec.setCurrentIndex(0)
+
+        # import math
+        # beam_section = self.fetchBeamPara()
+        # t_w = float(beam_section["tw"])
+        # t_f = float(beam_section["T"])
+        # print t_w, t_f
+        # t_thicker = math.ceil(max(t_w, t_f))
+        # t_thicker = (t_thicker / 2.) * 2
+        #
+        # self.plate_thickness = {'Select plate thickness':[t_thicker, t_thicker+2]}
+
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -549,7 +560,7 @@ class Maincontroller(QMainWindow):
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
         dictbeamdata = get_beamdata(beamdata_sec)
-        return  dictbeamdata
+        return dictbeamdata
 
     def combotype_current_index_changed(self, index):
         """
@@ -599,8 +610,9 @@ class Maincontroller(QMainWindow):
                  parameters from Extended endplate GUI
 
         """
-        self.resultobj = self.call_calculation()
-        beam_beam = ExtendedEndPlate(self.resultobj)
+        self.resultobj = self.designParameters()
+        self.beam_data = self.fetchBeamPara()
+        beam_beam = ExtendedEndPlate(self.resultobj, self.beam_data)
         if view != "All":
             if view == "Front":
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"

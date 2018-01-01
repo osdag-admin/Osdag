@@ -6,8 +6,8 @@ Created on 24-Aug-2017
 
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
-# from ui_plate import Ui_Plate
-# from ui_stiffener import Ui_Stiffener
+from ui_plate import Ui_Plate
+from ui_stiffener import Ui_Stiffener
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
@@ -241,37 +241,37 @@ class Maincontroller(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        from osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+        # from osdagMainSettings import backend_name
+        # self.display, _ = self.init_display(backend_str=backend_name())
         self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreference(self)
 
-    def init_display(self, backend_str=None, size=(1024, 768)):
-        from OCC.Display.backend import load_backend, get_qt_modules
-
-        used_backend = load_backend(backend_str)
-
-        global display, start_display, app, _, USED_BACKEND
-        if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
-            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-        from OCC.Display.qtDisplay import qtViewer3d
-        self.ui.modelTab = qtViewer3d(self)
-        display = self.ui.modelTab._display
-
-        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        # display.View.SetProj(1, 1, 1)
+    # def init_display(self, backend_str=None, size=(1024, 768)):
+    #     from OCC.Display.backend import load_backend, get_qt_modules
+    #
+    #     used_backend = load_backend(backend_str)
+    #
+    #     global display, start_display, app, _, USED_BACKEND
+    #     if 'qt' in used_backend:
+    #         from OCC.Display.qtDisplay import qtViewer3d
+    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+    #
+    #     from OCC.Display.qtDisplay import qtViewer3d
+    #     self.ui.modelTab = qtViewer3d(self)
+    #     display = self.ui.modelTab._display
+    #
+    #     display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+    #     display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width()/2) - (self.frameSize().width()/2),
                       (resolution.height()/2) - (self.frameSize().height()/2))
 
-        def start_display():
-            self.ui.modelTab.raise_()
-        return display, start_display
+        # def start_display():
+        #     self.ui.modelTab.raise_()
+        # return display, start_display
 
     def get_user_inputs(self):
         uiObj = {}
@@ -451,8 +451,8 @@ class Maincontroller(QMainWindow):
         bearing_capacity = resultObj["Bolt"]["BearingCapacity"]
         self.ui.txt_bearCapacity.setText(str(bearing_capacity))
 
-        # combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
-        # self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
+        combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
+        self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
 
         bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
         self.ui.txt_boltcapacity.setText(str(bolt_capacity))

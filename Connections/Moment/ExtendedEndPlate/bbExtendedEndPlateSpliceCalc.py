@@ -333,6 +333,10 @@ def bbExtendedEndPlateSplice(uiObj):
     factored_moment = float(uiObj['Load']['Moment (kNm)'])
     factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
     factored_axial_load = float(uiObj['Load']['AxialForce (kN)'])
+    if factored_axial_load == '':
+        factored_axial_load = 0
+    else:
+        factored_axial_load = float(factored_axial_load)
 
     bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
     bolt_type = uiObj["Bolt"]["Type"]
@@ -675,7 +679,7 @@ def bbExtendedEndPlateSplice(uiObj):
         else:
             end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_pitch_distance) + (2 * minimum_end_distance))
 
-        end_plate_width_provided = g_1 + (2 * minimum_edge_distance)
+        end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
 
     # Case 2: When the height of end plate is specified but the width is not specified by the user
     elif end_plate_height != 0 and end_plate_width == 0:
@@ -742,7 +746,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
         end_plate_height_provided = height_available
-        end_plate_width_provided = g_1 + (2 * minimum_edge_distance)
+        end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
 
     # Case 3: When the height of end plate is not specified but the width is specified by the user
     elif end_plate_height == 0 and end_plate_width != 0:
@@ -1530,11 +1534,11 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Height of stiffener (mm) (AISC Design guide 4, page 16)
     # TODO: Do calculation for actual height of end plate above
-    h_st = (end_plate_height_provided - beam_d) / 2
+    h_st = math.ceil((end_plate_height_provided - beam_d) / 2)
 
     # Length of stiffener
     cf = math.pi/180  # conversion factor to convert degree into radian
-    l_st = ((h_st - 25) / math.tan(30 * cf)) + 25
+    l_st = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
 
     # Thickness of stiffener
     ts1 = beam_tw
@@ -1567,34 +1571,34 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-        # TODO: Add output for combined capacity
-        outputobj['Bolt']['NumberOfBolts'] = round(number_of_bolts, 3)
-        outputobj['Bolt']['NumberOfRows'] = round(number_rows, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
 
-        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['CrossCentreGauge'] = g_1
-        outputobj['Bolt']['End'] = minimum_end_distance
-        outputobj['Bolt']['Edge'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['End'] = float(minimum_end_distance)
+        outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
@@ -1609,7 +1613,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)
         outputobj['Stiffener']['Length'] = round(l_st, 3)
-        outputobj['Stiffener']['Thickness'] = round(thickness_stiffener_provided, 3)
+        outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
 
     # Case 2: When the height of end plate is specified but the width is not specified by the user
     elif end_plate_height != 0 and end_plate_width == 0:
@@ -1621,33 +1625,34 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = round(number_of_bolts, 3)
-        outputobj['Bolt']['NumberOfRows'] = round(number_rows, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
 
-        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['CrossCentreGauge'] = g_1
-        outputobj['Bolt']['End'] = minimum_end_distance
-        outputobj['Bolt']['Edge'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['End'] = float(minimum_end_distance)
+        outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
@@ -1662,7 +1667,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)
         outputobj['Stiffener']['Length'] = round(l_st, 3)
-        outputobj['Stiffener']['Thickness'] = round(thickness_stiffener_provided, 3)
+        outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
 
     # Case 3: When the height of end plate is not specified but the width is specified by the user
     elif end_plate_height == 0 and end_plate_width != 0:
@@ -1674,33 +1679,34 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = round(number_of_bolts, 3)
-        outputobj['Bolt']['NumberOfRows'] = round(number_rows, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
 
-        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['CrossCentreGauge'] = g_1
-        outputobj['Bolt']['End'] = minimum_end_distance
-        outputobj['Bolt']['Edge'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['End'] = float(minimum_end_distance)
+        outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
@@ -1715,7 +1721,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)
         outputobj['Stiffener']['Length'] = round(l_st, 3)
-        outputobj['Stiffener']['Thickness'] = round(thickness_stiffener_provided, 3)
+        outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
 
     # Case 4: When the height and the width of End Plate is specified by the user
     elif end_plate_height != 0 and end_plate_width != 0:
@@ -1727,33 +1733,34 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = round(number_of_bolts, 3)
-        outputobj['Bolt']['NumberOfRows'] = round(number_rows, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = pitch_distance
+            outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = pitch_distance_2_3
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = pitch_distance_1_2
-            outputobj['Bolt']['Pitch'] = pitch_distance_3_4
-            outputobj['Bolt']['Pitch'] = pitch_distance_4_5
-            outputobj['Bolt']['Pitch'] = pitch_distance_5_6
-            outputobj['Bolt']['Pitch'] = pitch_distance_6_7
-            outputobj['Bolt']['Pitch'] = pitch_distance_7_8
-            outputobj['Bolt']['Pitch'] = pitch_distance_9_10
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
 
-        outputobj['Bolt']['Gauge'] = minimum_gauge_distance
-        outputobj['Bolt']['CrossCentreGauge'] = g_1
-        outputobj['Bolt']['End'] = minimum_end_distance
-        outputobj['Bolt']['Edge'] = minimum_edge_distance
+        outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['End'] = float(minimum_end_distance)
+        outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
@@ -1768,7 +1775,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)
         outputobj['Stiffener']['Length'] = round(l_st, 3)
-        outputobj['Stiffener']['Thickness'] = round(thickness_stiffener_provided, 3)
+        outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
 
     ###########################################################################
     # End of Output dictionary

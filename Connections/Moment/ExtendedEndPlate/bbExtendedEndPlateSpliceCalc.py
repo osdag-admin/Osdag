@@ -325,14 +325,14 @@ def bbExtendedEndPlateSplice(uiObj):
     global design_status
     design_status = True
 
-    connectivity = uiObj['Member']['Connectivity']
+    connectivity = str(uiObj['Member']['Connectivity'])
     beam_sec = uiObj['Member']['BeamSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])
     beam_fy = float(uiObj['Member']['fy (MPa)'])
 
     factored_moment = float(uiObj['Load']['Moment (kNm)'])
     factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
-    factored_axial_load = float(uiObj['Load']['AxialForce (kN)'])
+    factored_axial_load = uiObj['Load']['AxialForce (kN)']
     if factored_axial_load == '':
         factored_axial_load = 0
     else:
@@ -447,7 +447,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
     if end_plate_thickness < max(beam_tf, beam_tw):
-        end_plate_thickness = max(math.ceil(beam_tf, beam_tw))
+        end_plate_thickness = math.ceil(max(beam_tf, beam_tw))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
@@ -1231,14 +1231,13 @@ def bbExtendedEndPlateSplice(uiObj):
     tension_flange = T_f
     M_p = (tension_flange * l_v) / 2  # kN-mm
     tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
-    tp_required = math.ceil(tp_required)
 
     tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
 
     if end_plate_thickness < tp_provided:
         design_status = False
         logger.error(": Chosen end plate thickness in not sufficient")
-        logger.warning(": Minimum required thickness of end plate is %2.2f mm" % tp_required)
+        logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
         logger.info(": Increase end plate thickness")
     else:
         pass
@@ -1266,7 +1265,7 @@ def bbExtendedEndPlateSplice(uiObj):
     f_0 = 0.7 * bolt_fu / 1000  # kN/mm**2
     l_e = min(end_dist_mini, 1.1 * tp_required * math.sqrt((beta * f_0 * 10 ** 3) / bolt_fy))
     T_e = T_f
-    t_p = tp_required
+    t_p = tp_provided
 
     Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
     Q = round(Q.real, 3)
@@ -1577,15 +1576,15 @@ def bbExtendedEndPlateSplice(uiObj):
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
         elif number_of_bolts == 20:
             outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
             outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
@@ -1631,15 +1630,15 @@ def bbExtendedEndPlateSplice(uiObj):
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
         elif number_of_bolts == 20:
             outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
             outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
@@ -1685,15 +1684,15 @@ def bbExtendedEndPlateSplice(uiObj):
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
         elif number_of_bolts == 20:
             outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
             outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
@@ -1739,15 +1738,15 @@ def bbExtendedEndPlateSplice(uiObj):
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(pitch_distance)
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
         elif number_of_bolts == 20:
             outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
             outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)

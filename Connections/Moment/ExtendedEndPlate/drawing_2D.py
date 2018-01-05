@@ -4,6 +4,7 @@ Created on 24-Aug-2017
 @author: reshma
 '''
 from numpy import math
+from Connections.connection_calculations import ConnectionCalculations
 import svgwrite
 import cairosvg
 import numpy as np
@@ -11,7 +12,8 @@ import os
 
 
 class ExtendedEndPlate(object):
-    def __init__(self, input,dictbeamdata):
+    def __init__(self, input, resultobj, dictbeamdata):
+        print "calculation", input
         # self.filename = filename
         self.beam_length_L1 = 1000
         self.beam_length_L2 = 1000
@@ -20,34 +22,36 @@ class ExtendedEndPlate(object):
         self.beam_depth_D2 = self.beam_depth_D1
 
         self.beam_width_B1 = float(dictbeamdata["B"])
-        self.beam_width_B2 = 140
+        self.beam_width_B2 = self.beam_width_B1
 
         self.plate_thickness_p1 = 20
         self.plate_thickness_p2 = 20
 
-        self.plate_width_B1 = int(input['Plate']['Width'])
-        self.plate_width_B2 = 178.4
+        self.plate_width_B1 = (resultobj['Plate']['Width'])
+        self.plate_width_B2 = self.plate_width_B1
 
-        self.plate_length_L1 = int(input['Plate']['Height'])
-        self.plate_length_L2 = 613.4
+        self.plate_length_L1 = int(resultobj['Plate']['Height'])
+        self.plate_length_L2 = self.plate_length_L1
 
         self.flange_thickness_T1 = float(dictbeamdata["T"])
-        self.flange_thickness_T2 = 16
+        self.flange_thickness_T2 = self.flange_thickness_T1
 
         self.web_thickness_tw1 = float(dictbeamdata["tw"])
-        self.web_thickness_tw2 = 8.9
+        self.web_thickness_tw2 = self.web_thickness_tw1
 
-        self.flange_weld_thickness = 12
-        self.web_weld_thickness = 8
+        self.flange_weld_thickness = int(input['Weld']['Flange (mm)'])#12
+        self.web_weld_thickness = int(input["Weld"]['Web (mm)'])#8
 
         self.bolt_diameter = int(input['Bolt']['Diameter (mm)'])  #24
-        self.bolt_hole_diameter =26
-        self.edge_dist = 44.2
-        self.end_dist = self.edge_dist
-        self.cross_centre_gauge_dist = 90
+        self.bolt_type = input["Bolt"]["Type"]
+        self.bolt_hole_type = input['bolt']['bolt_hole_type']
+        self.cal_bolt_holedia = ConnectionCalculations.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter)
+        self.bolt_hole_diameter = self.cal_bolt_holedia + self.bolt_diameter
+        self.edge_dist = float(resultobj['Bolt']['Edge'])
+        self.end_dist = float(resultobj['Bolt']['End'])
+        self.cross_centre_gauge_dist = float(resultobj['Bolt']['CrossCentreGauge']) #90
         self.pitch = 60
 
-        self.bolt_type =  input["Bolt"]["Type"]
         self.grade = float(input["Bolt"]["Grade"])        #8.8
 
         self.bolts_outside_top_flange_col = 2

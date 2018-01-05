@@ -308,8 +308,8 @@ class Maincontroller(QMainWindow):
         uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
         uiObj["Weld"] = {}
-        uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
-        uiObj["Weld"]["Web (mm)"] = self.ui.combo_webSize.currentText()
+        uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
+        uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
         return uiObj
 
     def design_prefer(self):
@@ -610,9 +610,11 @@ class Maincontroller(QMainWindow):
                  parameters from Extended endplate GUI
 
         """
-        self.resultobj = self.designParameters()
+        # self.resultobj = self.designParameters()
+        self.alist = self.designParameters()
+        self.resultobj = bbExtendedEndPlateSplice(self.alist)
         self.beam_data = self.fetchBeamPara()
-        beam_beam = ExtendedEndPlate(self.resultobj, self.beam_data)
+        beam_beam = ExtendedEndPlate(self.alist, self.resultobj, self.beam_data)
         if view != "All":
             if view == "Front":
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"

@@ -8,6 +8,7 @@ from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
+from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
@@ -187,6 +188,92 @@ class Stiffener(QDialog):
         self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 
 
+class Pitch(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Pitch()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        print "result plate", resultObj_plate
+        no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
+        if no_of_bolts == 8:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+            self.ui.lbl_1.setText('Pitch')
+            self.ui.lbl_mem2.hide()
+            self.ui.lbl_mem3.hide()
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_2.hide()
+            self.ui.lbl_3.hide()
+            self.ui.lbl_4.hide()
+            self.ui.lbl_5.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch2.hide()
+            self.ui.lineEdit_pitch3.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 12:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lbl_1.setText('Pitch_2_3')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_4.hide()
+            self.ui.lbl_5.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 16:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+            self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+            self.ui.lbl_1.setText('Pitch_2_3')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_4.setText('Pitch_5_6')
+            self.ui.lbl_5.setText('Pitch_6_7')
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 20:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+            self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+            self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
+            self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
+            self.ui.lbl_1.setText('Pitch_1_2')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_4.setText('Pitch_5_6')
+            self.ui.lbl_5.setText('Pitch_6_7')
+            self.ui.lbl_6.setText('Pitch_7_8')
+            self.ui.lbl_7.setText('Pitch_9_10')
+
+
+
 class Maincontroller(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -230,6 +317,7 @@ class Maincontroller(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
+        self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 
@@ -437,6 +525,7 @@ class Maincontroller(QMainWindow):
         self.alist = self.designParameters()
         self.outputs = bbExtendedEndPlateSplice(self.alist)
         print "output list ", self.outputs
+        self.ui.outputDock.setFixedSize(310, 710)
         a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
@@ -474,8 +563,8 @@ class Maincontroller(QMainWindow):
         bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
         self.ui.txt_rowBolts.setText(str(bolts_in_rows))
 
-        pitch = resultObj["Bolt"]["Pitch"]
-        self.ui.txt_pitch.setText(str(pitch))
+        # pitch = resultObj["Bolt"]["Pitch"]
+        # self.ui.txt_pitch.setText(str(pitch))
 
         gauge = resultObj["Bolt"]["Gauge"]
         self.ui.txt_gauge.setText(str(gauge))
@@ -647,6 +736,9 @@ class Maincontroller(QMainWindow):
             # self.ui.textEdit.setFont()
             self.ui.textEdit.setFont(font)
 
+    def pitch_details(self):
+        section = Pitch(self)
+        section.show()
 
     def plate_details(self):
         section = Plate(self)

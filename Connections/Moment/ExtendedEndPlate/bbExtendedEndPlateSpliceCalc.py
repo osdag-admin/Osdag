@@ -348,6 +348,7 @@ def bbExtendedEndPlateSplice(uiObj):
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
     weld_type = uiObj["weld"]["typeof_weld"]
     dp_bolt_type = uiObj["Bolt"]["Grade"]
+    edge_factor = float(uiObj["detailing"]["typeof_edge"])
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
@@ -1587,6 +1588,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
         outputobj['Bolt']['EndMax'] = maximum_end_distance
         outputobj['Bolt']['EndMini'] = minimum_end_distance
+        outputobj['Bolt']['DiaHole'] = int(dia_hole)
+
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(pitch_distance)
             outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
@@ -1626,10 +1629,20 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
+        outputobj['Plate']['ThickRequired'] = float(tp_required)
+        outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
         outputobj['Weld'] = {}
         outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
         outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+        outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+        outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+        outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+        outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+        outputobj['Weld']['FaWeb'] = float(f_a_web)
+        outputobj['Weld']['Qweb'] = float(q_web)
+        outputobj['Weld']['Resultant'] = float(R)
+        outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
 
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)

@@ -348,7 +348,7 @@ def bbExtendedEndPlateSplice(uiObj):
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
     weld_type = uiObj["weld"]["typeof_weld"]
     dp_bolt_type = uiObj["Bolt"]["Grade"]
-    edge_factor = float(uiObj["detailing"]["typeof_edge"])
+    edge_factor = uiObj["detailing"]["typeof_edge"]
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
@@ -1327,7 +1327,7 @@ def bbExtendedEndPlateSplice(uiObj):
         Vdf = V_dsf
         Tf = T_b
     else:
-        Vsb = factored_shear_load / number_of_bolts
+        Vsb = factored_shear_load / float(number_of_bolts)
         Vdb = V_db
         Tb = T_b
 

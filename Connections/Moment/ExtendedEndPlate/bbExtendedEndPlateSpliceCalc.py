@@ -1574,16 +1574,20 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
         outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-        outputobj['Bolt']['kb'] = float(round(k_b,3))
+        outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-        outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-        outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-        outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-        outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-        outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-        outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-        outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-        outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+
+        if bolt_type == "HSFG":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+
         outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
         outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
         outputobj['Bolt']['EndMax'] = maximum_end_distance
@@ -1664,14 +1668,18 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-        outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-        outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-        outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-        outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-        outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-        outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-        outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-        outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+
+        if bolt_type == "HSFG":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+
         outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
         outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
         outputobj['Bolt']['EndMax'] = maximum_end_distance
@@ -1752,14 +1760,18 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-        outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-        outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-        outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-        outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-        outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-        outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-        outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-        outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+
+        if bolt_type == "HSFG":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+
         outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
         outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
         outputobj['Bolt']['EndMax'] = maximum_end_distance
@@ -1840,14 +1852,18 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-        outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-        outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-        outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-        outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-        outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-        outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-        outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-        outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+
+        if bolt_type == "HSFG":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+
         outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
         outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
         outputobj['Bolt']['EndMax'] = maximum_end_distance

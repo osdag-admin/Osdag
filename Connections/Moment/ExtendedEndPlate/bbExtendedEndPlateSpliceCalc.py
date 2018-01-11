@@ -1613,15 +1613,13 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
             outputobj['Bolt']['PryingForce'] = Q
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
-            outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = Q
+            outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
         outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
@@ -1705,15 +1703,13 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
             outputobj['Bolt']['PryingForce'] = Q
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
-            outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = Q
+            outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
         outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
@@ -1797,15 +1793,13 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
             outputobj['Bolt']['PryingForce'] = Q
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
-            outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = Q
+            outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
         outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
@@ -1889,15 +1883,13 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
             outputobj['Bolt']['PryingForce'] = Q
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_1_2)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_6_7)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_7_8)
-            outputobj['Bolt']['Pitch'] = float(pitch_distance_9_10)
-            outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = Q
+            outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+            outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
         outputobj['Bolt']['CrossCentreGauge'] = float(g_1)

@@ -1297,8 +1297,192 @@ def save_html(outObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+    # ######################################### End of checks #########################################
+    # Header of the pdf fetched from dialogbox
+
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
     rstr += t('/tr')
-    
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # ################################### Page 6: Views###################################################
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+
+    row = [0, "Views", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    png = folder + "/images_html/3D_Model.png"
+    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+
+    side = folder + "/images_html/finSide.png"
+    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+
+    top = folder + "/images_html/finTop.png"
+    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+
+    front = folder + "/images_html/finFront.png"
+    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+
+    if status == 'True':
+        row = [0, datapng, datatop]
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        rstr += t('/tr')
+
+        row = [0, dataside, datafront]
+        rstr += t('tr')
+        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+        rstr += t('/tr')
+
+    else:
+        pass
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+    # ###########################################################################################
+    # Header of the pdf fetched from dialougebox
+
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Additional comments
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    rstr += t('''col width=30%''')
+    rstr += t('''col width=70%''')
+
+    rstr += t('tr')
+    row = [0, "Additional Comments", addtionalcomments]
+    rstr += t('td class= "detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class= "detail2" align="justified"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+
+    myfile.write(rstr)
+    myfile.write(t('/body'))
+    myfile.write(t('/html'))
+    myfile.close()
+
+
 def space(n):
     rstr = "&nbsp;" * 4 * n
     return rstr

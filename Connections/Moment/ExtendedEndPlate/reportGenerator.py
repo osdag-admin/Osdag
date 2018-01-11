@@ -14,9 +14,10 @@ from Connections.connection_calculations import ConnectionCalculations
 
 ######################################################################
 # Start of Report
-def save_html(outObj, uiObj, dictbeamdata, reportsummary, filename, folder):
+# def save_html(outObj, uiObj, dictbeamdata, reportsummary, filename, folder):
+def save_html(outObj, uiObj, dictbeamdata, filename):
     filename = filename
-    myfile = open(fileName, "w")
+    myfile = open(filename, "w")
     myfile.write(t('! DOCTYPE html'))
     myfile.write(t('html'))
     myfile.write(t('head'))

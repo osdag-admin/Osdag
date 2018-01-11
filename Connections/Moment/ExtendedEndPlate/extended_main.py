@@ -8,7 +8,7 @@ from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
-from ui_pitch import Ui_Pitch
+# from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
@@ -751,7 +751,7 @@ class Maincontroller(QMainWindow):
         section.show()
 
     def design_report(self):
-        fileName = os.path.join("/Html_Report.html")
+        fileName = ("Html_Report.html")
         fileName = str(fileName)
         self.alist = self.designParameters()
         self.resultobj = bbExtendedEndPlateSplice(self.alist)

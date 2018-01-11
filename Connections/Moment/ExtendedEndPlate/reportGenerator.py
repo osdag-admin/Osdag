@@ -45,15 +45,15 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
 ######################################################################
 # Project Summary data
-    companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
-    companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
-    groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
-    designer = str(reportsummary["ProfileSummary"]['Designer'])
-    projecttitle = str(reportsummary['ProjectTitle'])
-    subtitle = str(reportsummary['Subtitle'])
-    jobnumber = str(reportsummary['JobNumber'])
-    client = str(reportsummary['Client'])
-    addtionalcomments = str(reportsummary['AdditionalComments'])
+#     companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
+#     companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
+#     groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
+#     designer = str(reportsummary["ProfileSummary"]['Designer'])
+#     projecttitle = str(reportsummary['ProjectTitle'])
+#     subtitle = str(reportsummary['Subtitle'])
+#     jobnumber = str(reportsummary['JobNumber'])
+#     client = str(reportsummary['Client'])
+#     addtionalcomments = str(reportsummary['AdditionalComments'])
 
 ######################################################################
 # Extended End Plate Data

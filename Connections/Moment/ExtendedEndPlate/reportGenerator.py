@@ -71,26 +71,26 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     beam_fu = str(float(uiObj['Member']['fu (MPa)']))
     beam_fy = str(float(uiObj['Member']['fy (MPa)']))
 
-    factored_moment = float(uiObj['Load']['Moment (kNm)'])
-    factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
-    factored_axial_load = uiObj['Load']['AxialForce (kN)']
+    factored_moment = str(float(uiObj['Load']['Moment (kNm)']))
+    factored_shear_load = str(float(uiObj['Load']['ShearForce (kN)']))
+    factored_axial_load = str(float(uiObj['Load']['AxialForce (kN)']))
 
-    bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
+    bolt_dia = str(int(uiObj['Bolt']['Diameter (mm)']))
     bolt_type = uiObj["Bolt"]["Type"]
-    bolt_grade = float(uiObj['Bolt']['Grade'])
-    bolt_fu = int(bolt_grade) * 100
-    bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
-    net_area_thread = {12: 84.3, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}[bolt_dia]
-    net_area_shank = {12: 113, 16: 201, 20: 314, 22: 380, 24: 452, 27: 572, 30: 706, 36: 1017}[bolt_dia]
+    bolt_grade = str(float(uiObj['Bolt']['Grade']))
+    bolt_fu = str((int(float(bolt_grade)) * 100))
+    # bolt_fy = str((float(bolt_grade) - int(float(bolt_grade)))) * bolt_fu
+    # bolt_fy = (float(bolt_grade) - float(int(float(bolt_grade)))) * bolt_fu
+    bolt_fy = str(float(outObj['Bolt']['BoltFy']))
+    net_area_thread = {12: str(84.3), 16: str(157), 20: str(245), 22: str(303), 24: str(353), 27: str(459), 30: str(561), 36: str(817)}[int(bolt_dia)]
+    net_area_shank = {12: str(113), 16: str(201), 20: str(314), 22: str(380), 24: str(452), 27: str(572), 30: str(706), 36: str(1017)}[int(bolt_dia)]
 
-    end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
-    end_plate_width = str(outObj['Plate']['Width (mm)'])
-    end_plate_height = str(outObj['Plate']['Height (mm)'])
-    end_plate_fu = float(uiObj['Member']['fu (MPa)'])
-    end_plate_fy = float(uiObj['Member']['fy (MPa)'])
+    end_plate_thickness = str(float(uiObj['Plate']['Thickness (mm)']))
+    end_plate_fu = str(float(uiObj['Member']['fu (MPa)']))
+    end_plate_fy = str(float(uiObj['Member']['fy (MPa)']))
 
-    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+    weld_thickness_flange = str(float(uiObj['Weld']['Flange (mm)']))
+    weld_thickness_web = str(float(uiObj['Weld']['Web (mm)']))
 
     # Design Preferences
 
@@ -98,7 +98,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     bolt_hole_type = str(uiObj["bolt"]["bolt_hole_type"])
     bolt_grade_fu = str(float(uiObj["bolt"]["bolt_fu"]))
     slip_factor = str(float(uiObj["bolt"]["slip_factor"]))
-    bolt_Type = float(uiObj['bolt']['bolt_type'])  # for pre-tensioned/ non- pretensioned bolts
+    bolt_Type = str(uiObj['bolt']['bolt_type'])  # for pre-tensioned/ non- pretensioned bolts
 
     typeof_weld = str(uiObj["weld"]["typeof_weld"])
     safety_factor = str(float(uiObj["weld"]["safety_factor"]))
@@ -106,55 +106,61 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
     typeof_edge = str(uiObj["detailing"]["typeof_edge"])
     min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"]))  # factor: 1.7 or 1.5 depending on type of edge, IS 800- Cl 10.2.4.2
-    gap = str(float(uiObj["detailing"]["gap"]))
+    # gap = float(uiObj["detailing"]["gap"])
     corrosive = str(uiObj["detailing"]["is_env_corrosive"])
     design_method = str(uiObj["design"]["design_method"])
 
     # Bolt
-    number_of_bolts = int(round(outObj['Bolt']['NumberOfBolts']))
-    number_of_rows = int(round(outObj['Bolt']['NumberOfRows']))
-    end_distance = float(outObj['Bolt']['End'])
-    edge_distance = float(outObj['Bolt']['Edge'])
-    gauge_distance = float(outObj['Bolt']['Gauge'])
-    tension_capacity = float(outObj['Bolt']['TensionCapacity'])
-    bearingcapacity = outObj['Bolt']['BearingCapacity']
-    shearcapacity = outObj['Bolt']['ShearCapacity']
-    boltcapacity = outObj['Bolt']['BoltCapacity']
-    kb = outObj['Bolt']['kb']
-    plate_thk = outObj['Bolt']['SumPlateThick']  # Sum of plate thickness experiencing bearing in same direction
-    combinedcapacity = float(outObj['Bolt']['CombinedCapacity'])
-    Vsb = outObj['Bolt']['Vsb']
-    Vdb = outObj['Bolt']['Vdb']
-    Tb = outObj['Bolt']['Tb']
-    Tdb = outObj['Bolt']['Tdb']
-    Vsf = outObj['Bolt']['Vsf']
-    Vdf = ['Bolt']['Vdf']
-    Tf = ['Bolt']['Tf']
-    Tdf = ['Bolt']['Tdf']
-    pitch_mini = outObj['Bolt']['PitchMini']
-    pitch_max = outObj['Bolt']['PitchMax']
-    gauge_mini = pitch_mini
-    gauge_max = pitch_max
-    end_mini = outObj['Bolt']['EndMini']
-    end_max = outObj['Bolt']['EndMax']
-    edge_mini = end_mini
-    edge_max = end_max
-    dia_hole = int(outObj['Bolt']['DiaHole'])
+    # print "out", outObj
+    number_of_bolts = str(float(int(outObj['Bolt']['NumberOfBolts'])))
+    number_of_rows = str(int(round(outObj['Bolt']['NumberOfRows'])))
+    bolts_per_column = str(outObj['Bolt']['BoltsPerColumn'])
+    end_distance = str(float(outObj['Bolt']['End']))
+    edge_distance = str(float(outObj['Bolt']['Edge']))
+    gauge_distance = str(float(outObj['Bolt']['Gauge']))
+    tension_capacity = str(float(outObj['Bolt']['TensionCapacity']))
+    bearingcapacity = str(outObj['Bolt']['BearingCapacity'])
+    shearcapacity = str(outObj['Bolt']['ShearCapacity'])
+    boltcapacity = str(outObj['Bolt']['BoltCapacity'])
+    kb = str(outObj['Bolt']['kb'])
+    plate_thk = str(outObj['Bolt']['SumPlateThick'])  # Sum of plate thickness experiencing bearing in same direction
+    combinedcapacity = str(float(outObj['Bolt']['CombinedCapacity']))
+    if bolt_type == "HSFG":
+        Vsf = str(float(outObj['Bolt']['Vsf']))
+        Vdf = str(float(outObj['Bolt']['Vdf']))
+        Tf = str(float(outObj['Bolt']['Tf']))
+        Tdf = str(float(outObj['Bolt']['Tdf']))
+    else:
+        Vsb = str(float(outObj['Bolt']['Vsb']))
+        Vdb = str(float(outObj['Bolt']['Vdb']))
+        Tb = str(float(outObj['Bolt']['Tb']))
+        Tdb = str(float(outObj['Bolt']['Tdb']))
+
+    pitch_mini = str(outObj['Bolt']['PitchMini'])
+    pitch_max = str(outObj['Bolt']['PitchMax'])
+    gauge_mini = str(pitch_mini)
+    gauge_max = str(pitch_max)
+    end_mini = str(outObj['Bolt']['EndMini'])
+    end_max = str(outObj['Bolt']['EndMax'])
+    edge_mini = str(end_mini)
+    edge_max = str(end_max)
+    dia_hole = str(int(outObj['Bolt']['DiaHole']))
 
     # Plate
-    tp_required = float(outObj['Plate']['ThickRequired'])
-    b_e = float(beam_B / 2)
-    M_p = float(outObj['Plate']['Mp'])
-    plate_height = float(outObj['Plate']['Height'])
-    plate_width = float(outObj['Plate']['Width'])
-    plate_moment_demand = float(outObj['Plate']['MomentDemand'])
-    plate_moment_capacity = float(outObj['Plate']['MomentCapacity'])
+    tp_required = str(float(outObj['Plate']['ThickRequired']))
+    be = float(beam_B / 2)
+    b_e = str(be)
+    M_p = str(float(outObj['Plate']['Mp']))
+    plate_height = str(float(outObj['Plate']['Height']))
+    plate_width = str(float(outObj['Plate']['Width']))
+    plate_moment_demand = str(float(outObj['Plate']['MomentDemand']))
+    plate_moment_capacity = str(float(outObj['Plate']['MomentCapacity']))
 
     # Weld
-    critical_stress_flange = float(outObj['Weld']['CriticalStressflange'])
-    critical_stress_web = float(outObj['Weld']['CriticalStressWeb'])
-    weld_strength = float(outObj['Weld']['WeldStrength'])
-    force_flange = float(outObj['Weld']['ForceFlange'])
+    critical_stress_flange = str(float(outObj['Weld']['CriticalStressflange']))
+    critical_stress_web = str(float(outObj['Weld']['CriticalStressWeb']))
+    weld_strength = str(float(outObj['Weld']['WeldStrength']))
+    force_flange = str(float(outObj['Weld']['ForceFlange']))
     effective_length_flange = float(outObj['Weld']['LeffectiveFlange'])
     effective_length_web = float(outObj['Weld']['LeffectiveWeb'])
     fa_web = float(outObj['Weld']['FaWeb'])
@@ -163,114 +169,114 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     capacity_flange = float(outObj['Weld']['UnitCapacity'])
 
     # Stiffener
-    stiffener_height = float(outObj['Stiffener']['Height'])
-    stiffener_length = float(outObj['Stiffener']['Length'])
-    stiffener_thickness = float(outObj['Stiffener']['Thickness'])
+    stiffener_height = str(float(outObj['Stiffener']['Height']))
+    stiffener_length = str(float(outObj['Stiffener']['Length']))
+    stiffener_thickness = str(float(outObj['Stiffener']['Thickness']))
 
     # Calling pitch distance values from Output dict of calc file
-    if number_of_bolts == 8:
-        pitch_distance = float(outObj['Bolt']['Pitch'])
-        tension_critical = float(outObj['Bolt']['TensionCritical'])
-        prying_force = float(outObj['Bolt']['PryingForce'])
-    elif number_of_bolts == 12:
-        pitch_distance_2_3 = float(outObj['Bolt']['Pitch23'])
-        pitch_distance_3_4 = float(outObj['Bolt']['Pitch34'])
-        pitch_distance_4_5 = float(outObj['Bolt']['Pitch45'])
-        tension_critical = float(outObj['Bolt']['TensionCritical'])
-        prying_force = float(outObj['Bolt']['PryingForce'])
-    elif number_of_bolts == 16:
-        pitch_distance_2_3 = float(outObj['Bolt']['Pitch23'])
-        pitch_distance_3_4 = float(outObj['Bolt']['Pitch34'])
-        pitch_distance_4_5 = float(outObj['Bolt']['Pitch45'])
-        pitch_distance_5_6 = float(outObj['Bolt']['Pitch56'])
-        pitch_distance_6_7 = float(outObj['Bolt']['Pitch67'])
-        tension_critical = float(outObj['Bolt']['TensionCritical'])
-        prying_force = float(outObj['Bolt']['PryingForce'])
-    elif number_of_bolts == 20:
-        pitch_distance_1_2 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_3_4 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_4_5 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_5_6 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_6_7 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_7_8 = float(outObj['Bolt']['Pitch'])
-        pitch_distance_9_10 = float(outObj['Bolt']['Pitch'])
-        tension_critical = float(outObj['Bolt']['TensionCritical'])
-        prying_force = float(outObj['Bolt']['PryingForce'])
+    if str(int(float(number_of_bolts))) == str(8):
+        pitch_distance = str(float(outObj['Bolt']['Pitch']))
+        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+        prying_force = str(float(outObj['Bolt']['PryingForce']))
+    elif str(int(float(number_of_bolts))) == str(12):
+        pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
+        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
+        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
+        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+        prying_force = str(float(outObj['Bolt']['PryingForce']))
+    elif str(int(float(number_of_bolts))) == str(16):
+        pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
+        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
+        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
+        pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch56']))
+        pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
+        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+        prying_force = str(float(outObj['Bolt']['PryingForce']))
+    elif str(int(float(number_of_bolts))) == str(20):
+        pitch_distance_1_2 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_7_8 = str(float(outObj['Bolt']['Pitch']))
+        pitch_distance_9_10 = str(float(outObj['Bolt']['Pitch']))
+        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+        prying_force = str(float(outObj['Bolt']['PryingForce']))
 
     # Calls from connection calculations file
-    k_h = float(ConnectionCalculations.calculate_k_h(bolt_hole_type))
-    F_0 = float(ConnectionCalculations.proof_load_F_0(bolt_dia, bolt_fu))
+    k_h = str(float(ConnectionCalculations.calculate_k_h(bolt_hole_type)))
+    F_0 = str(float(ConnectionCalculations.proof_load_F_0(bolt_dia, bolt_fu)))
 
     # End Plate
-    plateDimension = end_plate_height + 'X' + end_plate_width + 'X' + end_plate_thickness
+    plateDimension = str(plate_height) + "X" + str(plate_width) + "X" + str(end_plate_thickness)
 
     status = str(outObj['Bolt']['status'])
 
     ######################################################################
     # Header of the pdf fetched from dialogbox
 
-    rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
+    # rstr += t('tr')
+    # row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+    #        '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    # rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    # rstr += t('/tr')
 
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-    rstr += t('/hr')
+    # rstr += t('tr')
+    # row = [0, 'Company Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, companyname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #
+    # row = [0, 'Project Title']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, projecttitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Group/Team Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, groupteamname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Subtitle']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, subtitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Designer']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, designer]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Job Number']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, jobnumber]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Date']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, time.strftime("%d /%m /%Y")]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, "Client"]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, client]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # rstr += t('/table')
+    #
+    # rstr += t('hr')
+    # rstr += t('/hr')
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Page 1 & 2 of report
     # Design Conclusion
 
-    rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ')
+    rstr = t('table border-collapse= "collapse" border="1px solid black" width= 100% ')
 
     row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
     rstr += t('tr')
@@ -390,13 +396,13 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Width (mm)", end_plate_width]
+    row = [2, "Width (mm)", plate_width]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Depth (mm)", end_plate_height]
+    row = [2, "Depth (mm)", plate_height]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -605,62 +611,62 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Header of the pdf fetched from dialogbox
 
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
+    # rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    # rstr += t('tr')
+    # row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+    #        '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    # rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    # rstr += t('/tr')
 
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-    rstr += t('/hr')
+    # rstr += t('tr')
+    # row = [0, 'Company Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, companyname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #
+    # row = [0, 'Project Title']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, projecttitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Group/Team Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, groupteamname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Subtitle']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, subtitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Designer']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, designer]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Job Number']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, jobnumber]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Date']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, time.strftime("%d /%m /%Y")]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, "Client"]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, client]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # rstr += t('/table')
+    #
+    # rstr += t('hr')
+    # rstr += t('/hr')
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Start of page 3
@@ -706,9 +712,9 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('/tr')
 
     if bolt_Type == "pre-tensioned":
-        row = [1, "Beta (pre-tensioned bolt)", float(1)]
+        row = [1, "Beta (pre-tensioned bolt)", str(1)]
     else:
-        row = [1, "Beta (non pre-tensioned)", float(2)]
+        row = [1, "Beta (non pre-tensioned)", str(2)]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -784,61 +790,61 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
     # Header of the pdf fetched from dialogue
 
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-    rstr += t('hr')
-    rstr += t('/hr')
+    # rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    # rstr += t('tr')
+    # row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+    #        '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    # rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Company Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, companyname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #
+    # row = [0, 'Project Title']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, projecttitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Group/Team Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, groupteamname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Subtitle']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, subtitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Designer']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, designer]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Job Number']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, jobnumber]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Date']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, time.strftime("%d /%m /%Y")]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, "Client"]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, client]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # rstr += t('/table')
+    # rstr += t('hr')
+    # rstr += t('/hr')
 
     # Check for tension in critical bolt
     row = [0, "Tension in critical bolt (kN)", " ", "Tension due to moment + Prying force = ((" + tension_critical + "*" + prying_force + " <br> [cl. 10.4.7]", ""]
@@ -861,7 +867,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
         rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
         rstr += t('/tr')
     else:
-        row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt," = (("  "0.9" "*" + bolt_fu + "*" + net_area_thread + "/" "1.25 = "
+        row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt ," = (("  "0.9" "*" + bolt_fu + "*" + net_area_thread + "/" "1.25 = "
                + tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:green><b>Pass</b></p> "]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -972,7 +978,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
     # Number of bolts per column
     rstr += t('tr')
-    row = [0, "No. of bolts column", " ", number_of_bolts / 2, ""]
+    row = [0, "No. of bolts column", " ", bolts_per_column, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1124,12 +1130,17 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('/tr')
 
     # Plate Height
+    hp_mini = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_mini)))  # for 20 number of bolts
+    hp_max = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_max)))  # for 20 number of bolts
+    hp_minimum = str(float(beam_d) + float(50) + float(2 * float(end_mini)))  # for bolts less than 20
+    hp_maximum = str(float(beam_d) + float(50) + float(2 * float(end_max)))  # for bolts less than 20
+
     if number_of_bolts == 20:
-        plate_height_mini = beam_d + 50 + (2 * pitch_mini) + (2 * end_mini)
-        plate_height_max = beam_d + 50 + (2 * pitch_mini) + (2 * end_max)
+        plate_height_mini = hp_mini
+        plate_height_max = hp_max
     else:
-        plate_height_mini = beam_d + 50 + (2 * end_mini)
-        plate_height_max = beam_d + 50 + (2 * end_max)
+        plate_height_mini = hp_minimum
+        plate_height_max = hp_maximum
 
     rstr += t('tr')
     if number_of_bolts == 20:
@@ -1149,12 +1160,12 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     else:
         if plate_height < plate_height_mini or plate_height > plate_height_max:
             row = [0, "Plate height (mm)",
-                   "&#8805; " + beam_d + "+ 50 +" " 2* " + end_mini + ", &#8804; " + beam_d + "+ 50 +" "2*" + end_max +
+                   "&#8805; " + str(beam_d) + "+ 50 +" " 2* " + end_mini + ", &#8804; " + str(beam_d) + "+ 50 +" "2*" + end_max +
                    "<br> [based on reasoning (detailing requirements)]", plate_height, " <p align=left style=color:red><b>Fail</b></p>",
                    "300", ""]
         else:
             row = [0, "Plate height (mm)",
-                   "&#8805; " + beam_d + "+ 50 + 2*" + pitch_mini + "+ 2* " + end_mini + ", &#8804; " + beam_d + "+ 50 + 2*" + pitch_mini +
+                   "&#8805; " + str(beam_d) + "+ 50 + 2*" + pitch_mini + "+ 2* " + end_mini + ", &#8804; " + str(beam_d) + "+ 50 + 2*" + pitch_mini +
                    "+ 2*" + end_max + "<br> [based on reasoning (detailing requirements)]", plate_height, " <p align=left style=color:green><b>Pass</b></p>",
                    "300", ""]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1165,15 +1176,15 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
     # Plate Width
     g_1 = float(90)  # cross centre gauge distance
-    plate_width_mini = max(float((g_1 + (2 * edge_mini)), beam_B))
-    plate_width_max = max(float((beam_B + 25), plate_width_mini))
+    plate_width_mini = max(float((g_1 + (2 * float(edge_mini)))), beam_B)
+    plate_width_max = max(float((beam_B + 25)), float(plate_width_mini))
 
     rstr += t('tr')
     if plate_width < plate_width_mini or plate_width > plate_width_max:
-        row = [0, "Plate width (mm)", "&#8805; max ((" + g_1 + "+ (2*" + edge_mini + ")), " + beam_B + ", &#8804; max ((" + beam_B + "+ 25), " + plate_width_mini +
+        row = [0, "Plate width (mm)", "&#8805; max ((" + str(g_1) + "+ (2*" + edge_mini + ")), " + str(beam_B) + ", &#8804; max ((" + str(beam_B) + "+ 25), " + str(plate_width_mini) +
                "<br> [based on reasoning (detailing requirements)]", plate_height, " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
     else:
-        row = [0, "Plate width (mm)", "&#8805; max ((" + g_1 + "+ (2*" + edge_mini + ")), " + beam_B + ", &#8804; max ((" + beam_B + "+ 25), " + plate_width_mini +
+        row = [0, "Plate width (mm)", "&#8805; max ((" + str(g_1) + "+ (2*" + edge_mini + ")), " + str(beam_B) + ", &#8804; max ((" + str(beam_B) + "+ 25), " + str(plate_width_mini) +
                "<br> [based on reasoning (detailing requirements)]", plate_height, " <p align=left style=color:green><b>Pass</b></p>", "300", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1186,13 +1197,13 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
 
     if plate_moment_demand > plate_moment_capacity:
         row = [0, "Plate moment capacity (kNm)",
-               "Moment demand <i>M</i><sub>d</sub> = ((" + tp_required ** 2 + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_demand,
-               "Moment capacity <i>M</i><sub>c</sub> = ((" + end_plate_thickness ** 2 + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_capacity +
+               "Moment demand <i>M</i><sub>d</sub> = ((" + tp_required + "<sup>2</sup>" + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_demand,
+               "Moment capacity <i>M</i><sub>c</sub> = ((" + end_plate_thickness + "<sup>2</sup>" + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_capacity +
                "<br>[Design of Steel Structures - N. Subramanian, 2014]", "<p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Plate moment capacity (kNm)",
-               "Moment demand <i>M</i><sub>d</sub> = ((" + tp_required ** 2 + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_demand,
-               "Moment capacity <i>M</i><sub>c</sub> = ((" + end_plate_thickness ** 2 + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_capacity +
+               "Moment demand <i>M</i><sub>d</sub> = ((" + tp_required + "<sup>2</sup>" + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_demand,
+               "Moment capacity <i>M</i><sub>c</sub> = ((" + end_plate_thickness + "<sup>2</sup>" + "*" + end_plate_fy + "*" + b_e + ")/(4.4*10**3)) * 10 ** -6 = " + plate_moment_capacity +
                "<br>[Design of Steel Structures - N. Subramanian, 2014]", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1203,17 +1214,17 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # Weld thickness at flange
     rstr += t('tr')
 
-    flange_weld_req = (resultant * 10 ** 3) / capacity_flange
+    flange_weld_req = str((resultant * 10 ** 3) / capacity_flange)
 
     if weld_thickness_flange < flange_weld_req:
         row = [0, "Weld thickness at flange (mm)",
-               "&#8805; (" + resultant + "* 10 ** 3" ")/" + capacity_flange + "=" + flange_weld_req +
-               "<br> [Design of Steel Structures - N. Subramanian, 2014]",  + weld_thickness_flange,
+               "&#8805; (" + str(resultant) + "* 10 ** 3" ")/" + str(capacity_flange) + "=" + flange_weld_req +
+               "<br> [Design of Steel Structures - N. Subramanian, 2014]", weld_thickness_flange,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Weld thickness at flange (mm)",
-               "&#8805; (" + resultant + "* 10 ** 3" ")/" + capacity_flange + "=" + flange_weld_req +
-               "<br> [Design of Steel Structures - N. Subramanian, 2014]", + weld_thickness_flange,
+               "&#8805; (" + str(resultant) + "* 10 ** 3" ")/" + str(capacity_flange) + "=" + flange_weld_req +
+               "<br> [Design of Steel Structures - N. Subramanian, 2014]", weld_thickness_flange,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1224,15 +1235,15 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # Weld thickness at web
     rstr += t('tr')
 
-    web_weld_req = int(min(beam_tw, tp_required))
+    web_weld_req = str(int(min(beam_tw, tp_required)))
 
     if weld_thickness_web < web_weld_req:
         row = [0, "Weld thickness at web (mm)",
-               "&#8804; minimum(" + beam_tw + "," + tp_required + ")" "<br> [based on reasoning]", + weld_thickness_web,
+               "&#8804; minimum(" + str(beam_tw) + "," + tp_required + ")" "<br> [based on reasoning]", weld_thickness_web,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Weld thickness at web (mm)",
-               "&#8804; minimum(" + beam_tw + "," + tp_required + ")" "<br> [based on reasoning]", + weld_thickness_web,
+               "&#8804; minimum(" + str(beam_tw) + "," + tp_required + ")" "<br> [based on reasoning]", weld_thickness_web,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1241,9 +1252,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('/tr')
 
     # Effective length of weld on flange
-    length_flange = float(effective_length_flange / 2)
+    length_flange_effective = float(effective_length_flange / 2)
+    length_flange = str(length_flange_effective)
     rstr += t('tr')
-    row = [0, "Effective weld length on flange (each side)", "", + length_flange, ""]
+    row = [0, "Effective weld length on flange (each side)", "", length_flange, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1251,9 +1263,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('/tr')
 
     # Effective length of weld on web
-    length_web = float(effective_length_web / 2)
+    length_web_effective = float(effective_length_web / 2)
+    length_web = str(length_web_effective)
     rstr += t('tr')
-    row = [0, "Effective weld length on flange (each side)", "", + length_web, ""]
+    row = [0, "Effective weld length on flange (each side)", "", length_web, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1263,17 +1276,17 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # Weld at flange
     rstr += t('tr')
     # TODO Check values of fu and fy
-    weld_fu = 410
-    weld_fy = 250
+    weld_fu = str(410)
+    weld_fy = str(250)
     if critical_stress_flange > weld_strength:
         row = [0, "Critical stress in weld at flange (N/mm ** 2)",
                "&#8804; (" + weld_fu + ")/(&#8730;(3) * 1.25) = " + weld_strength +
-               "<br> [cl. 10.5.7]", "((" + force_flange + "* 10 ** 3)/(3 * " + effective_length_flange + "))" "=" + critical_stress_flange,
+               "<br> [cl. 10.5.7]", "((" + force_flange + "* 10 ** 3)/(3 * " + str(effective_length_flange) + "))" "=" + critical_stress_flange,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Critical stress in weld at flange (N/mm ** 2)",
                "&#8804; (" + weld_fu + ")/(&#8730;(3) * 1.25) = " + weld_strength +
-               "<br> [cl. 10.5.7]", "((" + force_flange + "* 10 ** 3)/(3 * " + effective_length_flange + "))",
+               "<br> [cl. 10.5.7]", "((" + force_flange + "* 10 ** 3)/(3 * " + str(effective_length_flange) + "))",
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1284,15 +1297,19 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # Weld at web
 
     rstr += t('tr')
+    f_a_web = float(fa_web ** 2)
+    fa_web = str(f_a_web)
+    q_Web = float(q_web ** 2)
+    q_web = str(q_Web)
     if critical_stress_web > weld_strength:
         row = [0, "Critical stress in weld at web (N/mm ** 2)",
                "&#8804; (" + weld_fu + ")/(&#8730;(3) * 1.25) = " + weld_strength +
-               "<br> [cl. 10.5.7 and cl. 10.5.10]", "&#8730;(" + fa_web ** 2 + "+" + q_web ** 2 + ") =" + critical_stress_web,
+               "<br> [cl. 10.5.7 and cl. 10.5.10]", "&#8730;(" + fa_web + "+" + q_web + ") =" + critical_stress_web,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Critical stress in weld at web (N/mm ** 2)",
                "&#8804; (" + weld_fu + ")/(&#8730;(3) * 1.25) = " + weld_strength +
-               "<br> [cl. 10.5.7 and cl. 10.5.10]", "&#8730;(" + fa_web ** 2 + "+" + q_web ** 2 + ") =" + critical_stress_web,
+               "<br> [cl. 10.5.7 and cl. 10.5.10]", "&#8730;(" + fa_web + "+" + q_web + ") =" + critical_stress_web,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1306,102 +1323,102 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     # ######################################### End of checks #########################################
     # Header of the pdf fetched from dialogbox
 
-    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
-    rstr += t('tr')
-    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
-           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
-    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-    rstr += t('/hr')
+    # rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    # rstr += t('tr')
+    # row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+    #        '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    # rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Company Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, companyname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #
+    # row = [0, 'Project Title']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, projecttitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Group/Team Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, groupteamname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Subtitle']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, subtitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Designer']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, designer]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Job Number']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, jobnumber]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Date']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, time.strftime("%d /%m /%Y")]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, "Client"]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, client]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # rstr += t('/table')
+    #
+    # rstr += t('hr')
+    # rstr += t('/hr')
 
     # ################################### Page 6: Views###################################################
 
-    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    # rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    #
+    # row = [0, "Views", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # png = folder + "/images_html/3D_Model.png"
+    # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+    #
+    # side = folder + "/images_html/finSide.png"
+    # dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+    #
+    # top = folder + "/images_html/finTop.png"
+    # datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+    #
+    # front = folder + "/images_html/finFront.png"
+    # datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
-    row = [0, "Views", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    png = folder + "/images_html/3D_Model.png"
-    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
-
-    side = folder + "/images_html/finSide.png"
-    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
-
-    top = folder + "/images_html/finTop.png"
-    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
-
-    front = folder + "/images_html/finFront.png"
-    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
-
-    if status == 'True':
-        row = [0, datapng, datatop]
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-        rstr += t('/tr')
-
-        row = [0, dataside, datafront]
-        rstr += t('tr')
-        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-        rstr += t('/tr')
-
-    else:
-        pass
-
-    rstr += t('/table')
-    rstr += t('h1 style="page-break-before:always"')  # page break
-    rstr += t('/h1')
+    # if status == 'True':
+    #     row = [0, datapng, datatop]
+    #     rstr += t('tr')
+    #     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+    #     rstr += t('/tr')
+    #
+    #     row = [0, dataside, datafront]
+    #     rstr += t('tr')
+    #     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+    #     rstr += t('/tr')
+    #
+    # else:
+    #     pass
+    #
+    # rstr += t('/table')
+    # rstr += t('h1 style="page-break-before:always"')  # page break
+    # rstr += t('/h1')
 
     # ###########################################################################################
     # Header of the pdf fetched from dialougebox
@@ -1414,68 +1431,68 @@ def save_html(outObj, uiObj, dictbeamdata, filename):
     rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    rstr += t('tr')
-    row = [0, 'Company Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, companyname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-
-    row = [0, 'Project Title']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, projecttitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Group/Team Name']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, groupteamname]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Subtitle']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, subtitle]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Designer']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, designer]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, 'Job Number']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, jobnumber]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    row = [0, 'Date']
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, time.strftime("%d /%m /%Y")]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, "Client"]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    row = [0, client]
-    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    rstr += t('/table')
-
-    rstr += t('hr')
-    rstr += t('/hr')
+    # rstr += t('tr')
+    # row = [0, 'Company Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, companyname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #
+    # row = [0, 'Project Title']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, projecttitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Group/Team Name']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, groupteamname]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Subtitle']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, subtitle]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Designer']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, designer]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, 'Job Number']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, jobnumber]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row = [0, 'Date']
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, time.strftime("%d /%m /%Y")]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, "Client"]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # row = [0, client]
+    # rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # rstr += t('/table')
+    #
+    # rstr += t('hr')
+    # rstr += t('/hr')
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # Additional comments
 
-    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    rstr += t('''col width=30%''')
-    rstr += t('''col width=70%''')
-
-    rstr += t('tr')
-    row = [0, "Additional Comments", addtionalcomments]
-    rstr += t('td class= "detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class= "detail2" align="justified"') + row[2] + t('/td')
-    rstr += t('/tr')
-
+    # rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    # rstr += t('''col width=30%''')
+    # rstr += t('''col width=70%''')
+    #
+    # rstr += t('tr')
+    # row = [0, "Additional Comments", addtionalcomments]
+    # rstr += t('td class= "detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class= "detail2" align="justified"') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
     rstr += t('/table')
 
     myfile.write(rstr)

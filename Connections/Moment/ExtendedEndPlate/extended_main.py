@@ -192,7 +192,7 @@ class Stiffener(QDialog):
 class Pitch(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_Pitch()
+        # self.ui = Ui_Pitch()
         self.ui.setupUi(self)
         self.maincontroller = parent
 
@@ -754,9 +754,10 @@ class Maincontroller(QMainWindow):
         fileName = ("Html_Report.html")
         fileName = str(fileName)
         self.alist = self.designParameters()
-        self.resultobj = bbExtendedEndPlateSplice(self.alist)
+        self.result = bbExtendedEndPlateSplice(self.alist)
+        print "resultobj", self.result
         self.beam_data = self.fetchBeamPara()
-        save_html(self.resultObj, self.alist, self.beam_data, fileName)
+        save_html(self.result, self.alist, self.beam_data, fileName)
 
 
 def set_osdaglogger():

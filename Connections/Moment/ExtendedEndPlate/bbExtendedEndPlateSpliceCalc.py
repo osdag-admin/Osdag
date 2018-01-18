@@ -583,7 +583,7 @@ def bbExtendedEndPlateSplice(uiObj):
         number_of_bolts = 20
     # TODO : validate else statement. (Discuss with sir)
     else:
-        logger.error(": The number of bolts exceeds 16")
+        logger.error(": The number of bolts exceeds 20")
         logger.warning(": Maximum number of bolts that can be accommodated in Extended End plate configuration is 16")
         logger.info(": Use Bolted cover plate splice connection for higher moments")
 
@@ -597,6 +597,9 @@ def bbExtendedEndPlateSplice(uiObj):
     elif number_of_bolts == 20:
         number_rows = 10
 
+    # Number of bolts per column
+
+    n_c = int(number_of_bolts / 2)
     #######################################################################
     minimum_pitch_distance = pitch_dist_min
     maximum_pitch_distance = pitch_dist_max
@@ -1323,7 +1326,7 @@ def bbExtendedEndPlateSplice(uiObj):
     # Tb = External factored tension acting on single bearing bolt, Tdb = Tension capacity of single bearing bolt
 
     if bolt_type == "HSFG":
-        Vsf = factored_shear_load / number_of_bolts
+        Vsf = factored_shear_load / float(number_of_bolts)
         Vdf = V_dsf
         Tf = T_b
     else:
@@ -1572,10 +1575,12 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
         if bolt_type == "HSFG":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
@@ -1627,8 +1632,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
-        outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
         outputobj['Plate']['ThickRequired'] = float(tp_required)
@@ -1662,10 +1667,12 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
         if bolt_type == "HSFG":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
@@ -1717,8 +1724,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
-        outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
         outputobj['Plate']['ThickRequired'] = float(tp_required)
@@ -1752,10 +1759,12 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
         if bolt_type == "HSFG":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
@@ -1807,8 +1816,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
-        outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
         outputobj['Plate']['ThickRequired'] = float(tp_required)
@@ -1842,10 +1851,12 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['BearingCapacity'] = bearing_capacity
         outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-        outputobj['Bolt']['NumberOfBolts'] = int(round(number_of_bolts, 3))
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
         outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
         outputobj['Bolt']['kb'] = float(round(k_b, 3))
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
         if bolt_type == "HSFG":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
@@ -1897,8 +1908,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
         outputobj['Plate'] = {}
-        outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
-        outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
         outputobj['Plate']['ThickRequired'] = float(tp_required)

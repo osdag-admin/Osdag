@@ -9,25 +9,16 @@ from ui_singleangle import Ui_Singleangle
 from ui_doubleangle import Ui_Doubleangle
 from ui_channel import Ui_Channel
 from ui_output import Ui_BoltOutput
-# from newoutput import Ui_Table
 from drawing_2D import TrussBoltedConnection
+from truss_bolted_conn_calc import trussboltedconnection
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QTableWidgetItem
 from PyQt5.QtGui import QIntValidator, QPalette, QDoubleValidator
 from PyQt5.Qt import Qt
+from PyQt5.QtCore import pyqtSignal, QFile
 from model import *
+import pickle
 import sys
 import os
-
-class NewTable(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_Table()
-        self.ui.setupUi(self)
-        self.maincontroller = parent
-
-        item = "23.341343"
-        self.ui.tableWidget.setItem(2, 2, QTableWidgetItem(item))
-        self.ui.tableWidget.setRowHidden(6, True)
 
 
 class SingleAngleSelection(QDialog):
@@ -45,7 +36,6 @@ class SingleAngleSelection(QDialog):
         # self.ui.btn_save.clicked.connect(self.save_singledata_para)
         self.ui.btn_save.clicked.connect(self.lbl_section)
         self.ui.btn_close.clicked.connect(self.close_singledata_para)
-
 
     def save_singledata_para(self):
         """
@@ -1575,18 +1565,20 @@ class ChannelSelectionSeven(QDialog):
 
 class SectionSelection(QDialog):
     def __init__(self, parent=None):
-        super(SectionSelection, self).__init__(parent)
+        # super(SectionSelection, self).__init__(parent)
         QDialog.__init__(self, parent)
         self.ui = Ui_Selection()
         self.ui.setupUi(self)
         self.maincontroller = parent
+        self.saved = None
 
         self.singledataparams = SingleAngleSelection(self)
         self.doubledataparams = DoubleAngleSelection(self)
         self.channeldataparams = ChannelSelection(self)
-        self.ui.btn_save.clicked.connect(self.save_definemembrs_para)
+        self.ui.btn_save.clicked.connect(self.save_user_inputs)
+        self.ui.btn_reset.clicked.connect(self.reset_btnclicked)
         self.ui.btn_close.clicked.connect(self.close_definemembrs_para)
-
+        self.retrieve_prevstate()
 
         self.ui.comboBx_selection.setCurrentIndex(0)
         self.ui.comboBx_selection_2.setCurrentIndex(0)
@@ -1595,6 +1587,8 @@ class SectionSelection(QDialog):
         self.ui.comboBx_selection_5.setCurrentIndex(0)
         self.ui.comboBx_selection_6.setCurrentIndex(0)
         self.ui.comboBx_selection_7.setCurrentIndex(0)
+
+
         self.ui.comboBx_selection.currentIndexChanged.connect(self.single_angle_selection1)
         self.ui.comboBx_selection_2.currentIndexChanged.connect(self.single_angle_selection2)
         self.ui.comboBx_selection_3.currentIndexChanged.connect(self.single_angle_selection3)
@@ -1738,18 +1732,92 @@ class SectionSelection(QDialog):
             self.ui.comboBx_selection_7.hide()
             self.ui.lineEdit_loads_7.hide()
 
-            # self.ui.buttonBox.clicked.connect(self.save_user_inputs)
 
         # QMessageBox.about(self, 'Information', 'Define members saved')
 
-
     def save_user_inputs(self):
-        pass
-        # self.save_section = {}
-        # self.save_section["members"] = {}
-        # self.save_section["members"]["no. of members"] = str(self.ui.lineEdit_no_of_member.text())
-        # self.save_section["angle"] = {}
-        # print self.save_section, "inputs"
+        # pass
+        # ui_Obj = self.maincontroller.get_user_inputs()
+        self.save_section = {}
+        self.save_section["member"] = {}
+        self.save_section["member"]["member_one"] = str(self.ui.lineEdit_no_of_member.text())
+        self.save_section["member"]["member_two"] = str(self.ui.lineEdit_no_of_member_2.text())
+        self.save_section["member"]["member_three"] = str(self.ui.lineEdit_no_of_member_3.text())
+        self.save_section["member"]["member_four"] = str(self.ui.lineEdit_no_of_member_4.text())
+        self.save_section["member"]["member_five"] = str(self.ui.lineEdit_no_of_member_5.text())
+        self.save_section["member"]["member_six"] = str(self.ui.lineEdit_no_of_member_6.text())
+        self.save_section["member"]["member_seven"] = str(self.ui.lineEdit_no_of_member_7.text())
+        self.save_section["inclination"] = {}
+        self.save_section["inclination"]["angle_one"] = str(self.ui.lineEdit_angle.text())
+        self.save_section["inclination"]["angle_two"] = str(self.ui.lineEdit_angle_2.text())
+        self.save_section["inclination"]["angle_three"] = str(self.ui.lineEdit_angle_3.text())
+        self.save_section["inclination"]["angle_four"] = str(self.ui.lineEdit_angle_4.text())
+        self.save_section["inclination"]["angle_five"] = str(self.ui.lineEdit_angle_5.text())
+        self.save_section["inclination"]["angle_six"] = str(self.ui.lineEdit_angle_6.text())
+        self.save_section["inclination"]["angle_seven"] = str(self.ui.lineEdit_angle_7.text())
+        self.save_section["force"]={}
+        self.save_section["force"]["force_one"] = str(self.ui.lineEdit_loads.text())
+        self.save_section["force"]["force_two"] = str(self.ui.lineEdit_loads_2.text())
+        self.save_section["force"]["force_three"] = str(self.ui.lineEdit_loads_3.text())
+        self.save_section["force"]["force_four"] = str(self.ui.lineEdit_loads_4.text())
+        self.save_section["force"]["force_fivr"] = str(self.ui.lineEdit_loads_5.text())
+        self.save_section["force"]["force_six"] = str(self.ui.lineEdit_loads_6.text())
+        self.save_section["force"]["force_seven"] = str(self.ui.lineEdit_loads_7.text())
+        self.save_section["type"] = {}
+        self.save_section["type"]["type_one"] = (self.ui.comboBx_selection.currentText())
+        self.save_section["type"]["type_two"] = (self.ui.comboBx_selection_2.currentText())
+        self.save_section["type"]["type_three"] = (self.ui.comboBx_selection_3.currentText())
+        self.save_section["type"]["type_four"] = str(self.ui.comboBx_selection_4.currentText())
+        self.save_section["type"]["type_five"] = str(self.ui.comboBx_selection_5.currentText())
+        self.save_section["type"]["type_six"] = str(self.ui.comboBx_selection_6.currentText())
+        self.save_section["type"]["type_seven"] = str(self.ui.comboBx_selection_7.currentText())
+        self.save_section["section"] = {}
+        self.save_section["section"]["sec_one"] = str(self.ui.lbl_sectionSelection.text())
+        self.save_section["section"]["sec_two"] = str(self.ui.lbl_sectionSelection_2.text())
+        self.save_section["section"]["sec_three"] = str(self.ui.lbl_sectionSelection_3.text())
+        self.save_section["section"]["sec_four"] = str(self.ui.lbl_sectionSelection_4.text())
+        self.save_section["section"]["sec_five"] = str(self.ui.lbl_sectionSelection_5.text())
+        self.save_section["section"]["sec_six"] = str(self.ui.lbl_sectionSelection_6.text())
+        self.save_section["section"]["sec_seven"] = str(self.ui.lbl_sectionSelection_7.text())
+        self.saved = True
+        print self.save_section, "inputs"
+        QMessageBox.about(self, 'Information', "Define members data saved")
+
+        return self.save_section
+
+    def reset_btnclicked(self):
+
+        self.ui.comboBx_selection.setCurrentIndex(0)
+        self.ui.comboBx_selection_2.setCurrentIndex(0)
+        self.ui.comboBx_selection_3.setCurrentIndex(0)
+        self.ui.comboBx_selection_4.setCurrentIndex(0)
+        self.ui.comboBx_selection_5.setCurrentIndex(0)
+        self.ui.comboBx_selection_6.setCurrentIndex(0)
+        self.ui.comboBx_selection_7.setCurrentIndex(0)
+
+        self.ui.lineEdit_loads.clear()
+        self.ui.lineEdit_loads_2.clear()
+        self.ui.lineEdit_loads_3.clear()
+        self.ui.lineEdit_loads_4.clear()
+        self.ui.lineEdit_loads_5.clear()
+        self.ui.lineEdit_loads_6.clear()
+        self.ui.lineEdit_loads_7.clear()
+
+        self.ui.lineEdit_angle.clear()
+        self.ui.lineEdit_angle_2.clear()
+        self.ui.lineEdit_angle_3.clear()
+        self.ui.lineEdit_angle_4.clear()
+        self.ui.lineEdit_angle_5.clear()
+        self.ui.lineEdit_angle_6.clear()
+        self.ui.lineEdit_angle_7.clear()
+
+        self.ui.lbl_sectionSelection.clear()
+        self.ui.lbl_sectionSelection_2.clear()
+        self.ui.lbl_sectionSelection_3.clear()
+        self.ui.lbl_sectionSelection_4.clear()
+        self.ui.lbl_sectionSelection_5.clear()
+        self.ui.lbl_sectionSelection_6.clear()
+        self.ui.lbl_sectionSelection_7.clear()
 
     def single_angle_selection1(self):
         """
@@ -1908,6 +1976,99 @@ class SectionSelection(QDialog):
     def close_definemembrs_para(self):
         self.close()
 
+    def closeEvent(self, event):
+        """
+
+        Args:
+            event: Yes or No
+
+        Returns: Ask for the confirmation while closing the window
+
+        """
+        uiInput = self.save_user_inputs()
+        self.save_inputs_totext(uiInput)
+        action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+        if action == QMessageBox.Yes:
+            # self.close.emit()
+            self.close()
+            event.accept()
+        else:
+            event.ignore()
+
+    def save_inputs_totext(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Save the user input to txt format
+
+        """
+        input_file = QFile(os.path.join("saveINPUT1.txt"))
+        if not input_file.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s: \n%s"
+                                % (input_file.fileName(), input_file.errorString()))
+        pickle.dump(uiObj, input_file)
+
+    def get_prevstate(self):
+        """
+
+        Returns: Read for the previous user inputs design
+
+        """
+        filename = os.path.join("saveINPUT1.txt")
+        if os.path.isfile(filename):
+            file_object = open(filename, 'r')
+            uiObj = pickle.load(file_object)
+            return uiObj
+        else:
+            return None
+
+    def retrieve_prevstate(self):
+        """
+
+        Returns: Retrieve the previous design parameters done by user
+
+        """
+        uiObj = self.get_prevstate()
+        self.set_dict_touser_inputs(uiObj)
+
+    def set_dict_touser_inputs(self, uiObj):
+
+        if uiObj is not None:
+            self.ui.lineEdit_angle.setText(str(uiObj["inclination"]["angle_one"]))
+            self.ui.lineEdit_angle_2.setText(str(uiObj["inclination"]["angle_two"]))
+            self.ui.lineEdit_angle_3.setText(str(uiObj["inclination"]["angle_three"]))
+            self.ui.lineEdit_angle_4.setText(str(uiObj["inclination"]["angle_four"]))
+            self.ui.lineEdit_angle_5.setText(str(uiObj["inclination"]["angle_five"]))
+            self.ui.lineEdit_angle_6.setText(str(uiObj["inclination"]["angle_six"]))
+            self.ui.lineEdit_angle_7.setText(str(uiObj["inclination"]["angle_seven"]))
+            self.ui.lineEdit_loads.setText(str(uiObj["force"]["force_one"]))
+            self.ui.lineEdit_loads_2.setText(str(uiObj["force"]["force_two"]))
+            self.ui.lineEdit_loads_3.setText(str(uiObj["force"]["force_three"]))
+            self.ui.lineEdit_loads_4.setText(str(uiObj["force"]["force_four"]))
+            self.ui.lineEdit_loads_5.setText(str(uiObj["force"]["force_fivr"]))
+            self.ui.lineEdit_loads_6.setText(str(uiObj["force"]["force_six"]))
+            self.ui.lineEdit_loads_7.setText(str(uiObj["force"]["force_seven"]))
+
+            self.ui.lbl_sectionSelection.setText(str(uiObj["section"]["sec_one"]))
+            self.ui.lbl_sectionSelection_2.setText(str(uiObj["section"]["sec_two"]))
+            self.ui.lbl_sectionSelection_3.setText(str(uiObj["section"]["sec_three"]))
+            self.ui.lbl_sectionSelection_4.setText(str(uiObj["section"]["sec_four"]))
+            self.ui.lbl_sectionSelection_5.setText(str(uiObj["section"]["sec_five"]))
+            self.ui.lbl_sectionSelection_6.setText(str(uiObj["section"]["sec_six"]))
+            self.ui.lbl_sectionSelection_7.setText(str(uiObj["section"]["sec_seven"]))
+
+            self.ui.comboBx_selection.setCurrentIndex(self.ui.comboBx_selection.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_2.setCurrentIndex(self.ui.comboBx_selection_2.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_3.setCurrentIndex(self.ui.comboBx_selection_3.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_4.setCurrentIndex(self.ui.comboBx_selection_4.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_5.setCurrentIndex(self.ui.comboBx_selection_5.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_6.setCurrentIndex(self.ui.comboBx_selection_6.findText(uiObj["type"]["type_one"]))
+            self.ui.comboBx_selection_7.setCurrentIndex(self.ui.comboBx_selection_7.findText(uiObj["type"]["type_one"]))
+
+
 class BoltOutput(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -1924,10 +2085,8 @@ class BoltOutput(QDialog):
         self.ui.lineEdit_shr6.setValidator(dbl_validator)
         self.ui.lineEdit_shr7.setValidator(dbl_validator)
 
-        # ui_obj = self.maincontroller.get_user_inputs()
-        # no_of_member = ui_obj["Member"]["No. of members"]
-        ui_obj = self.maincontroller.no_of_members()
-        no_of_member = ui_obj
+        members = self.maincontroller.no_of_members()
+        no_of_member = members
         print no_of_member, "no of members"
         if no_of_member == '2':
             self.ui.lbl_mem3.hide()
@@ -2134,12 +2293,96 @@ class BoltOutput(QDialog):
             self.ui.lineEdit_tens7.hide()
             self.ui.lineEdit_block7.hide()
 
+        uiObj = self.maincontroller.get_user_inputs()
+        resultObj = trussboltedconnection(uiObj)
+        self.ui.lineEdit_shr.setText(str(resultObj["ShearCapacity"]))
+        self.ui.lineEdit_shr2.setText(str(resultObj["ShearCapacity2"]))
+        self.ui.lineEdit_shr3.setText(str(resultObj["ShearCapacity3"]))
+        self.ui.lineEdit_shr4.setText(str(resultObj["ShearCapacity4"]))
+        self.ui.lineEdit_shr5.setText(str(resultObj["ShearCapacity5"]))
+        self.ui.lineEdit_shr6.setText(str(resultObj["ShearCapacity6"]))
+        self.ui.lineEdit_shr7.setText(str(resultObj["ShearCapacity7"]))
+        self.ui.lineEdit_ber.setText(str(resultObj["BearingCapacity"]))
+        self.ui.lineEdit_ber2.setText(str(resultObj["BearingCapacity2"]))
+        self.ui.lineEdit_ber3.setText(str(resultObj["BearingCapacity3"]))
+        self.ui.lineEdit_ber4.setText(str(resultObj["BearingCapacity4"]))
+        self.ui.lineEdit_ber5.setText(str(resultObj["BearingCapacity5"]))
+        self.ui.lineEdit_ber6.setText(str(resultObj["BearingCapacity6"]))
+        self.ui.lineEdit_ber7.setText(str(resultObj["BearingCapacity7"]))
+        self.ui.lineEdit_req.setText(str(resultObj["NoOfBoltsReq"]))
+        self.ui.lineEdit_req2.setText(str(resultObj["NoOfBoltsReq2"]))
+        self.ui.lineEdit_req3.setText(str(resultObj["NoOfBoltsReq3"]))
+        self.ui.lineEdit_req4.setText(str(resultObj["NoOfBoltsReq4"]))
+        self.ui.lineEdit_req5.setText(str(resultObj["NoOfBoltsReq5"]))
+        self.ui.lineEdit_req6.setText(str(resultObj["NoOfBoltsReq6"]))
+        self.ui.lineEdit_req7.setText(str(resultObj["NoOfBoltsReq7"]))
+        self.ui.lineEdit_row.setText(str(resultObj["NoOfRow"]))
+        self.ui.lineEdit_row2.setText(str(resultObj["NoOfRow2"]))
+        self.ui.lineEdit_row3.setText(str(resultObj["NoOfRow3"]))
+        self.ui.lineEdit_row4.setText(str(resultObj["NoOfRow4"]))
+        self.ui.lineEdit_row5.setText(str(resultObj["NoOfRow5"]))
+        self.ui.lineEdit_row6.setText(str(resultObj["NoOfRow6"]))
+        self.ui.lineEdit_row7.setText(str(resultObj["NoOfRow7"]))
+        self.ui.lineEdit_col.setText(str(resultObj["NoOfColumns"]))
+        self.ui.lineEdit_col2.setText(str(resultObj["NoOfColumns2"]))
+        self.ui.lineEdit_col3.setText(str(resultObj["NoOfColumns3"]))
+        self.ui.lineEdit_col4.setText(str(resultObj["NoOfColumns4"]))
+        self.ui.lineEdit_col5.setText(str(resultObj["NoOfColumns5"]))
+        self.ui.lineEdit_col6.setText(str(resultObj["NoOfColumns6"]))
+        self.ui.lineEdit_col7.setText(str(resultObj["NoOfColumns7"]))
+        self.ui.lineEdit_pitch.setText(str(resultObj["Pitch"]))
+        self.ui.lineEdit_pitch2.setText(str(resultObj["Pitch2"]))
+        self.ui.lineEdit_pitch3.setText(str(resultObj["Pitch3"]))
+        self.ui.lineEdit_pitch4.setText(str(resultObj["Pitch4"]))
+        self.ui.lineEdit_pitch5.setText(str(resultObj["Pitch5"]))
+        self.ui.lineEdit_pitch6.setText(str(resultObj["Pitch6"]))
+        self.ui.lineEdit_pitch7.setText(str(resultObj["Pitch7"]))
+        self.ui.lineEdit_gauge.setText(str(resultObj["Gauge"]))
+        self.ui.lineEdit_gauge2.setText(str(resultObj["Gauge2"]))
+        self.ui.lineEdit_gauge3.setText(str(resultObj["Gauge3"]))
+        self.ui.lineEdit_gauge4.setText(str(resultObj["Gauge4"]))
+        self.ui.lineEdit_gauge5.setText(str(resultObj["Gauge5"]))
+        self.ui.lineEdit_gauge6.setText(str(resultObj["Gauge6"]))
+        self.ui.lineEdit_gauge7.setText(str(resultObj["Gauge7"]))
+        self.ui.lineEdit_end.setText(str(resultObj["End"]))
+        self.ui.lineEdit_end2.setText(str(resultObj["End2"]))
+        self.ui.lineEdit_end3.setText(str(resultObj["End3"]))
+        self.ui.lineEdit_end4.setText(str(resultObj["End4"]))
+        self.ui.lineEdit_end5.setText(str(resultObj["End5"]))
+        self.ui.lineEdit_end6.setText(str(resultObj["End6"]))
+        self.ui.lineEdit_end7.setText(str(resultObj["End7"]))
+        self.ui.lineEdit_edge.setText(str(resultObj["Edge"]))
+        self.ui.lineEdit_edge2.setText(str(resultObj["Edge2"]))
+        self.ui.lineEdit_edge3.setText(str(resultObj["Edge3"]))
+        self.ui.lineEdit_edge4.setText(str(resultObj["Edge4"]))
+        self.ui.lineEdit_edge5.setText(str(resultObj["Edge5"]))
+        self.ui.lineEdit_edge6.setText(str(resultObj["Edge6"]))
+        self.ui.lineEdit_edge7.setText(str(resultObj["Edge7"]))
+        self.ui.lineEdit_tens.setText(str(resultObj["TensionCapacity"]))
+        self.ui.lineEdit_tens2.setText(str(resultObj["TensionCapacity2"]))
+        self.ui.lineEdit_tens3.setText(str(resultObj["TensionCapacity3"]))
+        self.ui.lineEdit_tens4.setText(str(resultObj["TensionCapacity4"]))
+        self.ui.lineEdit_tens5.setText(str(resultObj["TensionCapacity5"]))
+        self.ui.lineEdit_tens6.setText(str(resultObj["TensionCapacity6"]))
+        self.ui.lineEdit_tens7.setText(str(resultObj["TensionCapacity7"]))
+        self.ui.lineEdit_block.setText(str(resultObj["BlockShearCapacity"]))
+        self.ui.lineEdit_block2.setText(str(resultObj["BlockShearCapacity2"]))
+        self.ui.lineEdit_block3.setText(str(resultObj["BlockShearCapacity3"]))
+        self.ui.lineEdit_block4.setText(str(resultObj["BlockShearCapacity4"]))
+        self.ui.lineEdit_block5.setText(str(resultObj["BlockShearCapacity5"]))
+        self.ui.lineEdit_block6.setText(str(resultObj["BlockShearCapacity6"]))
+        self.ui.lineEdit_block7.setText(str(resultObj["BlockShearCapacity7"]))
+
 
 class Maincontroller(QMainWindow):
+    closed = pyqtSignal()
     def __init__(self):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.uiObj = None
+        self.defineMembers = SectionSelection(self)
 
         self.ui.btn_section.clicked.connect(self.section_selection)
         self.ui.combo_member.setItemText(0, "Select no.of members")
@@ -2148,6 +2391,65 @@ class Maincontroller(QMainWindow):
         self.ui.btn_Reset.clicked.connect(self.reset_button_clicked)
         self.ui.btn_bolt_output.clicked.connect(self.bolt_output)
         self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
+        self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
+                          'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
+        self.ui.combo_type.addItems(self.gradeType.keys())
+        self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
+        self.ui.combo_type.setCurrentIndex(0)
+        self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
+        self.retrieve_prevstate()
+
+        validator = QIntValidator()
+        self.ui.txt_Fu.setValidator(validator)
+        self.ui.txt_Fy.setValidator(validator)
+
+        min_fu = 290
+        max_fu = 590
+        self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+
+        min_fy = 165
+        max_fy = 450
+        self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+
+    def check_range(self, widget, min_val, max_val):
+        """
+
+        Args:
+            widget: Fu , Fy lineedit
+            min_val: min value
+            max_val: max value
+
+        Returns: Check for the value mentioned for the given range
+
+        """
+        text_str = widget.text()
+        text_str = int(text_str)
+        if (text_str < min_val or text_str > max_val or text_str == ' '):
+            QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
+            widget.clear()
+            widget.setFocus()
+
+    def combotype_current_index_changed(self, index):
+        """
+
+        Args:
+            index: Number
+
+        Returns: Types of Grade
+
+        """
+        items = self.gradeType[str(index)]
+        if items != 0 :
+            self.ui.combo_grade.clear()
+            stritems = []
+            for val in items:
+                stritems.append(str(val))
+
+            self.ui.combo_grade.addItems(stritems)
+        else:
+            pass
 
     def no_of_members(self):
         """
@@ -2182,11 +2484,15 @@ class Maincontroller(QMainWindow):
         self.ui.combo_type.setCurrentIndex(0)
         self.ui.combo_grade.setCurrentIndex(0)
 
+        self.defineMembers.ui.lineEdit_loads.clear()
+        self.defineMembers.ui.comboBx_selection.setCurrentIndex(0)
+
+
     def get_user_inputs(self):
         """
 
         Returns: The dictionary objects with user input fields for designing truss bolted connection
-
+                ui_Obj = User input objects
         """
         ui_obj = {}
         ui_obj["Member"] = {}
@@ -2205,6 +2511,124 @@ class Maincontroller(QMainWindow):
         print ui_obj, "ui_obj"
         return ui_obj
 
+    def closeEvent(self, event):
+        """
+
+        Args:
+            event: Yes or No
+
+        Returns: Ask for the confirmation while closing the window
+
+        """
+        uiInput = self.get_user_inputs()
+        self.save_inputs_totext(uiInput)
+        action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+        if action == QMessageBox.Yes:
+            # self.close.emit()
+            self.close()
+            event.accept()
+        else:
+            event.ignore()
+
+    def save_inputs_totext(self, uiObj):
+        """
+
+        Args:
+            uiObj: User inputs
+
+        Returns: Save the user input to txt format
+
+        """
+        input_file = QFile(os.path.join("saveINPUT.txt"))
+        if not input_file.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s: \n%s"
+                                % (input_file.fileName(), input_file.errorString()))
+        pickle.dump(uiObj, input_file)
+
+    def get_prevstate(self):
+        """
+
+        Returns: Read for the previous user inputs design
+
+        """
+        filename = os.path.join("saveINPUT.txt")
+        if os.path.isfile(filename):
+            file_object = open(filename, 'r')
+            uiObj = pickle.load(file_object)
+            return uiObj
+        else:
+            return None
+
+    def retrieve_prevstate(self):
+        """
+
+        Returns: Retrieve the previous design parameters done by user
+
+        """
+        uiObj = self.get_prevstate()
+        self.set_dict_touser_inputs(uiObj)
+
+    def set_dict_touser_inputs(self, uiObj):
+
+        if uiObj is not None:
+            self.ui.combo_member.setCurrentIndex(self.ui.combo_member.findText(str(uiObj["Member"]["No. of members"])))
+            self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
+            self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
+            self.ui.combo_gussetSize.setCurrentIndex(self.ui.combo_gussetSize.findText(str(uiObj["Gusset"]["Thickness (mm)"])))
+            self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
+            self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
+            self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+        else:
+            pass
+
+    def definemembers_para(self):
+
+        dmObj = self.defineMembers.save_section()
+        print dmObj
+
+        # self.uiObj = self.get_user_inputs()
+        # if self.defineMembers.saved is True:
+        #     define_membr = None
+        # else:
+        #     define_membr = self.defineMembers.save_section
+        # self.uiObj.update(define_membr)
+        # print "saved members", self.uiObj
+
+    def design_btnclicked(self):
+        """
+
+        Returns:
+
+        """
+        self.uiObj = self.get_user_inputs()
+        self.dmObj = self.definemembers_para()
+        self.outputs = trussboltedconnection(self.uiObj, self.dmObj)
+        print "Designbtn", self.dmObj
+        self.display_output(self.outputs)
+        # self.resultObj = outputs
+        # alist =self.resultObj.values()
+        # self.display_output(self.resultObj)
+        # isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
+    def display_output(self, outputObj):
+        for k in outputObj.keys():
+            for value in outputObj.vaules():
+                if outputObj.items() == " ":
+                    resultObj = outputObj
+                else:
+                    resultObj = outputObj
+        print resultObj
+
+        plate_length = resultObj["Plate"]["Length"]
+        self.ui.txt_plateLength.setText(str(plate_length))
+
+        plate_width = resultObj["Plate"]["Width"]
+        self.ui.txt_plateWidth.setText(str(plate_width))
+
+        combine_capacity = resultObj["Plate"]["CombineCapacity"]
+        self.ui.txt_combineCapacity.setText(str(combine_capacity))
+
     def call_2D_drawing(self, view):
         """
 
@@ -2221,12 +2645,59 @@ class Maincontroller(QMainWindow):
         else:
             pass
 
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
+
+
+def set_osdaglogger():
+    global logger
+    if logger is None:
+
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # create the logging file handler
+    fh = logging.FileHandler("trussbolted.log", mode="a")
+
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+
 def main():
+    set_osdaglogger()
     app = QApplication(sys.argv)
     window = Maincontroller()
     module_setup()
     window.show()
     sys.exit(app.exec_())
+
+
 if __name__ == '__main__':
     main()
 

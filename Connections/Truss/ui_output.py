@@ -21,7 +21,7 @@ class Ui_BoltOutput(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1244, 273))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1236, 273))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -858,7 +858,7 @@ class Ui_BoltOutput(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Member output"))
-        self.label.setText(_translate("Dialog", "Members"))
+        self.label.setText(_translate("Dialog", "Member"))
         self.label_2.setText(_translate("Dialog", "Shear\n"
 "capacity (kN)"))
         self.label_3.setText(_translate("Dialog", "Bearing\n"

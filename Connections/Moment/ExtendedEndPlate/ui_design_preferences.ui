@@ -755,23 +755,6 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>Gap between beam &amp; support (mm)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="txt_detailingGap">
-             <property name="text">
-              <string>10</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
             <widget class="QLabel" name="label_40">
              <property name="text">
               <string>Are the members exposed to
@@ -779,7 +762,7 @@ corrosive influences?</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="1" column="1">
             <widget class="QComboBox" name="combo_detailing_memebers">
              <item>
               <property name="text">

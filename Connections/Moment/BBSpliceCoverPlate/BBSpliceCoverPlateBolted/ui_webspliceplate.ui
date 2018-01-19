@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
-    <widget class="QLineEdit" name="txt_plateHeight_2">
+    <widget class="QLineEdit" name="txt_plateHeight">
      <property name="font">
       <font>
        <pointsize>10</pointsize>
@@ -74,7 +74,7 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QLineEdit" name="txt_plateStrength_2">
+    <widget class="QLineEdit" name="txt_plateDemand">
      <property name="font">
       <font>
        <pointsize>10</pointsize>
@@ -88,7 +88,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="txt_plateWidth_2">
+    <widget class="QLineEdit" name="txt_plateWidth">
      <property name="font">
       <font>
        <pointsize>10</pointsize>
@@ -131,7 +131,13 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="txt_plateCapacity">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

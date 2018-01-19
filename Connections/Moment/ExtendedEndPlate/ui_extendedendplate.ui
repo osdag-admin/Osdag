@@ -1117,11 +1117,6 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>22</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>24</string>
       </property>
      </item>
@@ -1308,6 +1303,26 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>20</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>22</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>24</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>26</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30</string>
       </property>
      </item>
     </widget>
@@ -3471,7 +3486,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>170</y>
+       <y>210</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3490,7 +3505,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>170</y>
+       <y>210</y>
        <width>191</width>
        <height>25</height>
       </rect>
@@ -3510,7 +3525,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>50</y>
+       <y>60</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3531,30 +3546,11 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_pitch">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>230</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="txt_crossGauge">
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>290</y>
+       <y>330</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3573,7 +3569,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>200</y>
+       <y>240</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3592,7 +3588,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>290</y>
+       <y>330</y>
        <width>211</width>
        <height>25</height>
       </rect>
@@ -3612,7 +3608,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>110</y>
+       <y>120</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3630,31 +3626,11 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="label_153">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>320</y>
-       <width>179</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>End distance (mm)</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_154">
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>230</y>
+       <y>270</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -3670,11 +3646,11 @@ QMenu::item:selected {
       <string>Pitch (mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_edgeDist">
+    <widget class="QLineEdit" name="txt_endDist">
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>350</y>
+       <y>360</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3693,7 +3669,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>200</y>
+       <y>240</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -3713,8 +3689,8 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>350</y>
-       <width>179</width>
+       <y>360</y>
+       <width>201</width>
        <height>25</height>
       </rect>
      </property>
@@ -3726,14 +3702,14 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Edge distance (mm)</string>
+      <string>End distance (mm)</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_156">
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>50</y>
+       <y>60</y>
        <width>191</width>
        <height>25</height>
       </rect>
@@ -3747,25 +3723,6 @@ QMenu::item:selected {
      </property>
      <property name="text">
       <string>Tension capacity (kN)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_endDist">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>320</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_157">
@@ -3795,7 +3752,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>110</y>
+       <y>120</y>
        <width>179</width>
        <height>25</height>
       </rect>
@@ -3811,50 +3768,11 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bearing capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_160">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>490</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Moment capacity (kNm)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_momentCapacity">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>490</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_161">
      <property name="geometry">
       <rect>
        <x>-1</x>
-       <y>380</y>
+       <y>430</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -3868,53 +3786,11 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Plate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_momentDemand">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>460</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_162">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>460</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moment demand (kNm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="txt_criticalWeb">
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>570</y>
+       <y>550</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3933,7 +3809,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>540</y>
+       <y>520</y>
        <width>201</width>
        <height>25</height>
       </rect>
@@ -3953,7 +3829,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>570</y>
+       <y>550</y>
        <width>191</width>
        <height>25</height>
       </rect>
@@ -3973,7 +3849,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>540</y>
+       <y>520</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3992,7 +3868,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>-1</x>
-       <y>520</y>
+       <y>490</y>
        <width>130</width>
        <height>25</height>
       </rect>
@@ -4044,89 +3920,11 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="plateHeight">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>400</y>
-       <width>100</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Height (mm)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_plateHeight_2">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>400</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_plateWidth_2">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>430</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>430</y>
-       <width>100</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Width (mm)</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>140</y>
+       <y>180</y>
        <width>200</width>
        <height>22</height>
       </rect>
@@ -4149,7 +3947,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>140</y>
+       <y>180</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4168,7 +3966,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>-1</x>
-       <y>20</y>
+       <y>30</y>
        <width>211</width>
        <height>25</height>
       </rect>
@@ -4188,7 +3986,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>20</y>
+       <y>30</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4213,7 +4011,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>260</y>
+       <y>300</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4232,7 +4030,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>260</y>
+       <y>300</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -4252,7 +4050,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>80</y>
+       <y>90</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4274,7 +4072,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>2</x>
-       <y>80</y>
+       <y>90</y>
        <width>179</width>
        <height>25</height>
       </rect>
@@ -4290,28 +4088,206 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Shear capacity (kN)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>2</x>
+       <y>150</y>
+       <width>200</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Combined shear and tension capacity of bolt</string>
+     </property>
+     <property name="text">
+      <string>Bolt capacity</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_boltcapacity">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>150</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_plateDetail">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>430</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Plate details</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_162">
+     <property name="geometry">
+      <rect>
+       <x>-1</x>
+       <y>460</y>
+       <width>130</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Stiffener&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_stiffnrDetail">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>460</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Details</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_160">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>390</y>
+       <width>201</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Edge distance (mm)</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_edgeDist">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>390</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="txt_boltcapacity">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>140</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btn_pitchDetail">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>270</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Pitch details</string>
+     </property>
+    </widget>
+    <zorder>txt_boltcapacity</zorder>
     <zorder>txt_noBolts</zorder>
     <zorder>t_7</zorder>
     <zorder>txt_tensionCapacity</zorder>
-    <zorder>txt_pitch</zorder>
     <zorder>txt_crossGauge</zorder>
     <zorder>txt_rowBolts</zorder>
     <zorder>label_152</zorder>
     <zorder>txt_bearCapacity</zorder>
-    <zorder>label_153</zorder>
     <zorder>label_154</zorder>
-    <zorder>txt_edgeDist</zorder>
+    <zorder>txt_endDist</zorder>
     <zorder>lbl_row_7</zorder>
     <zorder>label_155</zorder>
     <zorder>label_156</zorder>
-    <zorder>txt_endDist</zorder>
     <zorder>label_157</zorder>
     <zorder>label_158</zorder>
-    <zorder>label_160</zorder>
-    <zorder>txt_momentCapacity</zorder>
     <zorder>label_161</zorder>
-    <zorder>txt_momentDemand</zorder>
-    <zorder>label_162</zorder>
     <zorder>txt_criticalWeb</zorder>
     <zorder>label_163</zorder>
     <zorder>label_164</zorder>
@@ -4319,10 +4295,6 @@ QMenu::item:selected {
     <zorder>label_166</zorder>
     <zorder>btn_SaveMessages</zorder>
     <zorder>btn_CreateDesign</zorder>
-    <zorder>plateHeight</zorder>
-    <zorder>txt_plateHeight_2</zorder>
-    <zorder>txt_plateWidth_2</zorder>
-    <zorder>label_2</zorder>
     <zorder>label_10</zorder>
     <zorder>txt_boltgrpcapacity</zorder>
     <zorder>txt_tensionCritical</zorder>
@@ -4331,6 +4303,14 @@ QMenu::item:selected {
     <zorder>label_159</zorder>
     <zorder>txt_shearCapacity</zorder>
     <zorder>label_167</zorder>
+    <zorder>label_11</zorder>
+    <zorder>txt_boltcapacity</zorder>
+    <zorder>btn_plateDetail</zorder>
+    <zorder>label_162</zorder>
+    <zorder>btn_stiffnrDetail</zorder>
+    <zorder>label_160</zorder>
+    <zorder>txt_edgeDist</zorder>
+    <zorder>btn_pitchDetail</zorder>
    </widget>
   </widget>
   <action name="actionInput">
@@ -4832,15 +4812,9 @@ QMenu::item:selected {
   <tabstop>txt_boltgrpcapacity</tabstop>
   <tabstop>txt_noBolts</tabstop>
   <tabstop>txt_rowBolts</tabstop>
-  <tabstop>txt_pitch</tabstop>
   <tabstop>txt_gauge</tabstop>
   <tabstop>txt_crossGauge</tabstop>
   <tabstop>txt_endDist</tabstop>
-  <tabstop>txt_edgeDist</tabstop>
-  <tabstop>txt_plateHeight_2</tabstop>
-  <tabstop>txt_plateWidth_2</tabstop>
-  <tabstop>txt_momentDemand</tabstop>
-  <tabstop>txt_momentCapacity</tabstop>
   <tabstop>txt_criticalFlange</tabstop>
   <tabstop>txt_criticalWeb</tabstop>
   <tabstop>btn_SaveMessages</tabstop>

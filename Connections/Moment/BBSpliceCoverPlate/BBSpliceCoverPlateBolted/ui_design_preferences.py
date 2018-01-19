@@ -338,7 +338,7 @@ class Ui_DesignPreference(object):
 
         self.retranslateUi(Dialog)
         self.tabWidget.setCurrentIndex(0)
-        self.combo_slipfactor.setCurrentIndex(8)
+        self.combo_slipfactor.setCurrentIndex(6)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
     def retranslateUi(self, Dialog):
@@ -355,6 +355,7 @@ class Ui_DesignPreference(object):
         self.label_2.setText(_translate("Dialog", "Bolt hole type"))
         self.label_7.setText(_translate("Dialog", "HSFG bolt design parameters:"))
         self.label_15.setText(_translate("Dialog", "Slip factor (µ_f)"))
+        self.combo_slipfactor.setCurrentText(_translate("Dialog", "0.48"))
         self.combo_slipfactor.setItemText(0, _translate("Dialog", "0.2"))
         self.combo_slipfactor.setItemText(1, _translate("Dialog", "0.5"))
         self.combo_slipfactor.setItemText(2, _translate("Dialog", "0.1"))
@@ -490,7 +491,7 @@ class Ui_DesignPreference(object):
         self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut"))
         self.combo_detailingEdgeType.setItemText(1, _translate("Dialog", "b - Rolled, machine-flame cut, sawn and planed"))
         self.label_29.setText(_translate("Dialog", "Gap between beams (mm)"))
-        self.txt_detailingGap.setText(_translate("Dialog", "10"))
+        self.txt_detailingGap.setText(_translate("Dialog", "5"))
         self.label_40.setText(_translate("Dialog", "Are the members exposed to\n"
 "corrosive influences?"))
         self.combo_detailing_memebers.setItemText(0, _translate("Dialog", "No"))

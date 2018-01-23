@@ -36,6 +36,7 @@ from Svg_Window import SvgWindow
 from Connections.Shear.common_logic import CommonDesignLogic
 import shutil
 import pdfkit
+import cairosvg
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
@@ -263,9 +264,13 @@ class MyPopupDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-            self.desired_location(filename)
+			base_type = base[-4:]
+            self.desired_location(filename, base_type)
 
-    def desired_location(self, filename):
+    def desired_location(self, filename, base_type):	
+		if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+        else:
         shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
 
     def save_user_profile(self):

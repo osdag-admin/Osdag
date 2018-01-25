@@ -8,16 +8,21 @@ from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
-from ui_pitch import Ui_Pitch
+# from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
+from Connections.Component.ISection import ISection
 from model import *
 import sys
 import os
 import pickle
+import Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc
+from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
+from utilities import osdag_display_shape
+import copy
 
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
@@ -191,7 +196,7 @@ class Stiffener(QDialog):
 class Pitch(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_Pitch()
+        # self.ui = ui_Pitch()
         self.ui.setupUi(self)
         self.maincontroller = parent
 
@@ -332,6 +337,10 @@ class Maincontroller(QMainWindow):
         self.ui.txt_plateHeight.setValidator(doubl_validator)
         self.ui.txt_plateWidth.setValidator(doubl_validator)
 
+        # Initialising the qtviewer
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+
         min_fu = 290
         max_fu = 590
         self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
@@ -371,6 +380,29 @@ class Maincontroller(QMainWindow):
         # def start_display():
         #     self.ui.modelTab.raise_()
         # return display, start_display
+
+    def createExtendedBothWays(self):
+
+        beam_sec = 'MB 450'
+
+        dictbeamdata = get_beamdata(beam_sec)
+
+        beam_tw = float(dictbeamdata["tw"])
+        beam_tf = float(dictbeamdata["T"])
+        beam_d = float(dictbeamdata["D"])
+        beam_B = float(dictbeamdata["B"])
+        beam_R1 = float(dictbeamdata["R1"])
+        beam_R2 = float(dictbeamdata["R2"])
+        beam_alpha = float(dictbeamdata["FlangeSlope"])
+        beam_length = 800.0
+
+        beam_Left = ISection(B=beam_B, T=beam_tw, D=beam_d, t=beam_tf,
+                          R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                          length=beam_length, notchObj=None)
+        beam_Right = copy.copy(beam_Left)
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right)
+        extbothWays.create_3DModel()
+        return extbothWays
 
     def get_user_inputs(self):
         uiObj = {}
@@ -485,7 +517,7 @@ class Maincontroller(QMainWindow):
                 self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
                 self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
                 self.ui.txt_Shear.setText(str(uiObj["Load"]["ShearForce (kN)"]))
-                self.ui.txt_Axial.setText(str(uiObj["Load"]["AxialForce (kN)"]))
+                self.ui.txt_Axial.setText(str(uiObj['Load']['AxialForce (kN)']))
                 self.ui.txt_Moment.setText(str(uiObj["Load"]["Moment (kNm)"]))
                 self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
                 self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
@@ -522,6 +554,7 @@ class Maincontroller(QMainWindow):
         """
         # self.uiObj = self.get_user_inputs()
         # print self.uiObj
+        self.display.EraseAll()
         self.alist = self.designParameters()
         self.outputs = bbExtendedEndPlateSplice(self.alist)
         print "output list ", self.outputs
@@ -529,6 +562,29 @@ class Maincontroller(QMainWindow):
         a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+        self.call_3DModel()
+
+    def call_3DModel(self):
+        self.createExtendedBothWays()
+        self.display_3DModel("Model","gradient_bg")
+
+    def display_3DModel(self,component, bgcolor):
+        self.component = component
+
+        self.display.EraseAll()
+        self.display.View_Iso()
+        self.display.FitAll()
+
+        self.display.DisableAntiAliasing()
+        if bgcolor == "gradient_bg":
+
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        else:
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+
+        self.ExtObj = self.createExtendedBothWays()
+        osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
@@ -747,6 +803,54 @@ class Maincontroller(QMainWindow):
     def stiffener_details(self):
         section = Stiffener(self)
         section.show()
+
+    def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        # from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+
+        # self.setWindowTitle("Osdag Finplate")
+        self.ui.mytabWidget.resize(size[0], size[1])
+        self.ui.mytabWidget.addTab(self.ui.modelTab, "")
+
+        self.ui.modelTab.InitDriver()
+        display = self.ui.modelTab._display
+
+        # background gradient
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        display.display_trihedron()
+        display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            '''Centers the window on the screen.'''
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                      (resolution.height() / 2) - (self.frameSize().height() / 2))
+
+        def start_display():
+            self.ui.modelTab.raise_()
+
+        return display, start_display
+
+    def showColorDialog(self):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
 def set_osdaglogger():
     global logger

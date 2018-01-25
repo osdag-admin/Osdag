@@ -384,6 +384,7 @@ def bbExtendedEndPlateSplice(uiObj):
     #    beam_B  - Width of beam Flange
     #    beam_R1 - Radius of beam at root
 
+    # global dictbeamdata
     dictbeamdata = get_beamdata(beam_sec)
 
     beam_tw = float(dictbeamdata["tw"])
@@ -391,6 +392,9 @@ def bbExtendedEndPlateSplice(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
+    beam_R2 = float(dictbeamdata["R2"])
+    alpha = float(dictbeamdata["FlangeSlope"])
+    beam_length = 800.0
 
     #######################################################################
     # Calculation of Bolt strength in MPa
@@ -1788,22 +1792,3 @@ def bbExtendedEndPlateSplice(uiObj):
         logger.debug(" :=========End Of design===========")
 
     return outputobj
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

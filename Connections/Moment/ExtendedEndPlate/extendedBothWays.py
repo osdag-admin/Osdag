@@ -5,7 +5,7 @@ Commenced on
 '''
 
 import numpy
-import copy
+# import copy
 
 class ExtendedBothWays(object):
 
@@ -42,26 +42,28 @@ class ExtendedBothWays(object):
     def createBeamLGeometry(self):
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
-        beamL_vDir = numpy.array([0.0, 1.0, 0.0])
-        self.beamLeft.place(beamOriginL, beamL_uDir, beamL_vDir)
+        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-        beamOriginR = numpy.array([0.0, 850.0, 0.0])
+        gap = self.beamLeft.length + 2 * self.plateLeft.T
+        beamOriginR = numpy.array([0.0, gap, 0.0])
         beamR_uDir = numpy.array([1.0, 0.0, 0.0])
-        beamR_vDir = numpy.array([0.0, 1.0, 0.0])
-        self.beamRight.place(beamOriginR, beamR_uDir, beamR_vDir)
+        beamR_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateLGeometry(self):
-        plateOriginL = numpy.array([0.0, 800.0,0.0])
+        plateOriginL = numpy.array([0.0, self.beamLeft.length, 0.0])
         plateL_uDir = numpy.array([1.0, 0.0, 0.0])
-        plateL_vDir = numpy.array([0.0, 1.0, 0.0])
-        self.plateLeft.place(plateOriginL, plateL_uDir, plateL_vDir)
+        plateL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
     def createPlateRGeometry(self):
-        plateOriginR = numpy.array([0.0, 824.0, 0.0])
-        plateR_uDir = numpy.array([1.0, 0.0, 0.0])
-        plateR_vDir = numpy.array([0.0, 1.0, 0.0])
-        self.plateLeft.place(plateOriginR, plateR_uDir, plateR_vDir)
+        gap = self.beamLeft.length + self.plateLeft.T / 2
+        plateOriginR = numpy.array([-self.plateRight.W/2, gap, 0.0])
+        plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+        plateR_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.plateLeft.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def get_beamLModel(self):
         return self.beamLModel

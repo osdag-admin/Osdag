@@ -15,11 +15,12 @@ from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from Connections.Component.ISection import ISection
+from Connections.Component.plate import Plate
 from model import *
 import sys
 import os
 import pickle
-import Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc
+from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
 from utilities import osdag_display_shape
 import copy
@@ -164,7 +165,7 @@ class DesignPreference(QDialog):
         self.close()
 
 
-class Plate(QDialog):
+class plate(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_Plate()
@@ -286,7 +287,7 @@ class Maincontroller(QMainWindow):
         self.ui.setupUi(self)
 
         self.get_beamdata()
-        self.resultobj = None
+        # self.resultobj = None
 
         self.designPrefDialog = DesignPreference(self)
         # self.ui.combo_connLoc.setCurrentIndex(0)
@@ -400,7 +401,13 @@ class Maincontroller(QMainWindow):
                           R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                           length=beam_length, notchObj=None)
         beam_Right = copy.copy(beam_Left)
-        extbothWays = ExtendedBothWays(beam_Left, beam_Right)
+        outputobj = self.outputs
+        plate_Left = Plate(L=outputobj["Plate"]["Height"],
+                           W=outputobj["Plate"]["Width"],
+                           T=outputobj["Plate"]["Thickness"])
+        plate_Right = copy.copy(plate_Left)
+
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right)
         extbothWays.create_3DModel()
         return extbothWays
 
@@ -585,6 +592,8 @@ class Maincontroller(QMainWindow):
         self.ExtObj = self.createExtendedBothWays()
         osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
         osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
+        osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
     def display_output(self, outputObj):
         for k in outputObj.keys():

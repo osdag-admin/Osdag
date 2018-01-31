@@ -1607,6 +1607,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)
         outputobj['Plate']['Width'] = round(end_plate_width_provided, 3)
+        outputobj['Plate']['Thickness'] = round(end_plate_thickness, 3)
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
 

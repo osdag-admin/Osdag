@@ -424,7 +424,7 @@ class MainController(QMainWindow):
         # ************************************ Help button *******************************************************************************
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
-        self.ui.actionDesign_examples.triggered.connect(self.design_examples)
+        # self.ui.actionDesign_examples.triggered.connect(self.design_examples)
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)

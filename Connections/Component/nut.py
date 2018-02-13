@@ -38,10 +38,10 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
     '''
 
     def __init__(self, R, T, H, innerR1):
-        self.R = R
-        self.H = H
-        self.T = T
-        self.r1 = innerR1
+        self.R = R  # Radius/Edge length of hexagon
+        self.H = H  # Height of extrude, usually = T of bolt
+        self.T = T  # Thickness of Nut
+        self.r1 = innerR1   # Radius of inner circle, remove material
         # self.r2 = outerR2
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])

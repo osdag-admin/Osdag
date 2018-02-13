@@ -38,10 +38,10 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
     '''
 
     def __init__(self, R, T, H, r):
-        self.R = R
-        self.H = H
-        self.T = T
-        self.r = r
+        self.R = R  # Radius of bolt head
+        self.H = H  # Height of shank part
+        self.T = T  # Thickness of bolt head
+        self.r = r  # Radius of shank part (actual bolt)
         self.origin = None
         self.uDir = None
         self.shaftDir = None

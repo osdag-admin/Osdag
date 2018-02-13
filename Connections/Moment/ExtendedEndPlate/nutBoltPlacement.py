@@ -8,19 +8,23 @@ from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from Connections.Component.ModelUtils import getGpPt
+import numpy as np
 
 class NutBoltArray():
-    def __init__(self, boltPlaceObj, nut, bolt, nut_space):
+    def __init__(self, uiObjWeld, beamDim, boltPlaceObj, nut, bolt, numberOfBolts, nut_space):
 
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
         self.boltDir = None
 
-        self.initBoltPlaceParams(boltPlaceObj)
+        self.initBoltPlaceParams(boltPlaceObj, numberOfBolts)
 
+        self.uiObjW = uiObjWeld
+        self.beamDim = beamDim
         self.bolt = bolt
         self.nut = nut
+        self.numOfBolts = numberOfBolts
         self.gap = nut_space
 
         self.bolts = []
@@ -37,13 +41,306 @@ class NutBoltArray():
         '''
         b = self.bolt
         n = self.nut
-        for i in range(self.number_of_bolts):
+        for i in range(self.numOfBolts):
             bolt_length_required = float(b.T + self.gap)
-            b.H = bolt_length_required + (5 - bolt_length_required) % 5
+            # b.H = bolt_length_required + (5 - bolt_length_required) % 5
+            b.H = bolt_length_required + (bolt_length_required - 5) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
-    def initBoltPlaceParams(self, boltPlaceObj):
+    def initBoltPlaceParams(self, boltPlaceObj, numberOfBolts):
+        self.Lv = boltPlaceObj["Bolt"]["Lv"]
+        if numberOfBolts == 8:
+            self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
+            self.endDist = boltPlaceObj["Bolt"]["End"]
+            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.row = numberOfBolts / 2
+            self.col = 2
+        elif numberOfBolts == 12:
+            self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+            self.endDist = boltPlaceObj["Bolt"]["End"]
+            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.row = numberOfBolts / 2
+            self.col = 2
+        elif numberOfBolts == 16:
+            self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+            self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
+            self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
+            self.endDist = boltPlaceObj["Bolt"]["End"]
+            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.row = numberOfBolts / 2
+            self.col = 2
+        elif numberOfBolts == 20:
+            self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
+            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+            self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
+            self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
+            self.pitch78 = boltPlaceObj["Bolt"]["Pitch78"]
+            self.pitch910 = boltPlaceObj["Bolt"]["Pitch910"]
+            self.endDist = boltPlaceObj["Bolt"]["End"]
+            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.row = numberOfBolts / 2
+            self.col = 2
 
-        pass
+    def calculatePositions(self, numberOfBolts):
+        '''
+        :return: The position of bolts 
+        '''
+        self.positions = []
+        if numberOfBolts == 8:
+            self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
+            self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
+            self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+            for rw in range(1, self.row + 1):
+                if rw == 1:
+                    for col in range(self.col):
+                        pos = self.boltOrigin
+                        pos = pos + col * self.crossCgauge * self.gaugeDir
+                        self.positions.append(pos)
+                if rw == 2:
+                    for col in range(self.col):
+                        pos = np.array([0.0, 0.0, 0.0])
+                        space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"]
+                        pos = pos + self.boltOrigin + space12 * self.pitchDir
+                        pos = pos + col * self.crossCgauge * self.gaugeDir
+                        self.positions.append(pos)
+                if rw == 3:
+                    for col in range(self.col):
+                        pos = np.array([0.0, 0.0, 0.0])
+                        space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23
+                        pos = pos + self.boltOrigin + space23 * self.pitchDir
+                        pos = pos + col * self.crossCgauge * self.gaugeDir
+                        self.positions.append(pos)
+                if rw == 4:
+                    for col in range(self.col):
+                        pos = np.array([0.0, 0.0, 0.0])
+                        space23 = 4 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + 2 * self.beamDim["tw"] + self.pitch23
+                        pos = pos + self.boltOrigin + space23 * self.pitchDir
+                        pos = pos + col * self.crossCgauge * self.gaugeDir
+                        self.positions.append(pos)
 
+        elif numberOfBolts == 12:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
+                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
+                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"]
+                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23
+                            pos = pos + self.boltOrigin + space23 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 4:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space34 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34
+                            pos = pos + self.boltOrigin + space34 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 5:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space45 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34 \
+                                      + self.pitch45
+                            pos = pos + self.boltOrigin + space45 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 6:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space45 = 4 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + 2 * self.beamDim["tw"] + self.pitch23 + \
+                                                self.pitch34 + self.pitch45
+                            pos = pos + self.boltOrigin + space45 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+        elif numberOfBolts == 16:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
+                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
+                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"]
+                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space32 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.beamDim["tw"]
+                            pos = pos + self.boltOrigin + space32 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 4:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space34 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34
+                            pos = pos + self.boltOrigin + space34 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 5:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space45 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34 + self.pitch45
+                            pos = pos + self.boltOrigin + space45 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 6:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space56 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56
+                            pos = pos + self.boltOrigin + space56 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 7:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space67 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch23 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56 + self.pitch67
+                            pos = pos + self.boltOrigin + space67 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 8:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space78 = 4 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + 2 * self.beamDim["tw"] + self.pitch23 + \
+                                      self.pitch34 + self.pitch45 + self.pitch56 + self.pitch67
+                            pos = pos + self.boltOrigin + space78 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+        elif numberOfBolts == 20:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
+                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
+                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = self.pitch12
+                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12
+                            pos = pos + self.boltOrigin + space23 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 4:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space34 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12 + self.pitch34
+                            pos = pos + self.boltOrigin + space34 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 5:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space45 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12 + self.pitch34 + self.pitch45
+                            pos = pos + self.boltOrigin + space45 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 6:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space56 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56
+                            pos = pos + self.boltOrigin + space56 * self.pitchDir  #
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 7:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space67 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56 + self.pitch67
+                            pos = pos + self.boltOrigin + space67 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 8:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space78 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["tw"] + self.pitch12 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56 + self.pitch67 + self.pitch78
+                            pos = pos + self.boltOrigin + space78 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 9:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space89 = 4 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + 2 * self.beamDim["tw"] + self.pitch12 + \
+                                      self.pitch34 + self.pitch45 + self.pitch56 + self.pitch67 + self.pitch78
+                            pos = pos + self.boltOrigin + space89 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 10:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space910 = 4 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + 2 * self.beamDim["tw"] + self.pitch12 + self.pitch34 + self.pitch45 + \
+                                      self.pitch56 + self.pitch67 + self.pitch78 + self.pitch910
+                            pos = pos + self.boltOrigin + space910 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+
+    def place(self, origin, gaugeDir, pitchDir, boltDir):
+
+        self.origin = origin
+        self.gaugeDir = gaugeDir
+        self.pitchDir = pitchDir
+        self.boltDir = boltDir
+
+        self.calculatePositions(self.numOfBolts)
+
+        for index, pos in enumerate(self.positions):
+            self.bolts[index].place(pos, gaugeDir, boltDir)
+            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+
+    def create_model(self):
+        for bolt in self.bolts:
+            self.models.append(bolt.create_model())
+
+        for nut in self.nuts:
+            self.models.append(nut.create_model())
+
+        dbg = self.dbgSphere(self.origin)
+        self.models.append(dbg)
+
+    def dbgSphere(self, pt):
+        return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
+
+    def get_models(self):
+        return self.models

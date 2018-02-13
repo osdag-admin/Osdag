@@ -16,12 +16,16 @@ from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from Connections.Component.ISection import ISection
 from Connections.Component.plate import Plate
+from Connections.Component.bolt import Bolt
+from Connections.Component.nut import Nut
 from model import *
 import sys
 import os
 import pickle
 from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
+from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
+from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
 
@@ -384,17 +388,15 @@ class Maincontroller(QMainWindow):
 
     def createExtendedBothWays(self):
 
-        beam_sec = 'MB 450'
+        beam_data = self.fetchBeamPara()
 
-        dictbeamdata = get_beamdata(beam_sec)
-
-        beam_tw = float(dictbeamdata["tw"])
-        beam_tf = float(dictbeamdata["T"])
-        beam_d = float(dictbeamdata["D"])
-        beam_B = float(dictbeamdata["B"])
-        beam_R1 = float(dictbeamdata["R1"])
-        beam_R2 = float(dictbeamdata["R2"])
-        beam_alpha = float(dictbeamdata["FlangeSlope"])
+        beam_tw = float(beam_data["tw"])
+        beam_tf = float(beam_data["T"])
+        beam_d = float(beam_data["D"])
+        beam_B = float(beam_data["B"])
+        beam_R1 = float(beam_data["R1"])
+        beam_R2 = float(beam_data["R2"])
+        beam_alpha = float(beam_data["FlangeSlope"])
         beam_length = 800.0
 
         beam_Left = ISection(B=beam_B, T=beam_tw, D=beam_d, t=beam_tf,
@@ -406,10 +408,88 @@ class Maincontroller(QMainWindow):
                            W=outputobj["Plate"]["Width"],
                            T=outputobj["Plate"]["Thickness"])
         plate_Right = copy.copy(plate_Left)
+        alist = self.designParameters()
+        bolt_d = float(alist["Bolt"]["Diameter (mm)"])
+        bolt_r = bolt_d/2
+        bolt_T = self.bolt_head_thick_calculation(bolt_d)
+        bolt_R = self.bolt_head_dia_calculation(bolt_d) / 2
+        bolt_Ht = self.bolt_length_calculation(bolt_d)
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
 
-        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right)
+        nut_T = self.nut_thick_calculation(bolt_d)
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+
+        numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
+
+        nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + bolt_T
+
+        bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray)
         extbothWays.create_3DModel()
         return extbothWays
+
+    def bolt_head_thick_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        return bolt_head_thick[bolt_diameter]
+
+    def bolt_head_dia_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+        return bolt_head_dia[bolt_diameter]
+
+    def bolt_length_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__
+
+        '''
+        bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+
+        return bolt_head_dia[bolt_diameter]
+
+    def nut_thick_calculation(self, bolt_diameter):
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
+        nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+        return nut_dia[bolt_diameter]
 
     def get_user_inputs(self):
         uiObj = {}
@@ -594,6 +674,9 @@ class Maincontroller(QMainWindow):
         osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
         osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+        nutboltlist = self.ExtObj.nut_bolt_array.get_models()
+        for nutbolt in nutboltlist:
+            osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
     def display_output(self, outputObj):
         for k in outputObj.keys():

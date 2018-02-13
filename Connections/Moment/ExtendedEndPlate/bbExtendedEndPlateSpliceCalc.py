@@ -1603,6 +1603,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+        outputobj['Bolt']['Lv'] = float(l_v)
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = round(end_plate_height_provided, 3)

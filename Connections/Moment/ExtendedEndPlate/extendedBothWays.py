@@ -12,12 +12,14 @@ from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
 class ExtendedBothWays(object):
 
     # def __init__(self, beam, Fweld, Wweld, plate, nut_bolt_array):
-    def __init__(self, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array):
+    def __init__(self, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array, WeldModelsF, WeldModelsW):
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.plateLeft = plateLeft
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
+        self.WeldModelsF = WeldModelsF
+        self.WeldModelsW = WeldModelsW
         # self.beamModel = None
         # self.weldModelF = None
         # self.weldModelW = None
@@ -29,7 +31,8 @@ class ExtendedBothWays(object):
         self.createPlateLGeometry()
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
-        # self.createWebWeldGeometry()
+        self.createWeldGeometryF()
+        self.createWeldGeometryW()
         # self.create_nut_bolt_array()
 
         #call for create_model from Components
@@ -38,8 +41,8 @@ class ExtendedBothWays(object):
         self.plateLModel = self.plateLeft.create_model()
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
-        # self.plateModel = self.plate.create_model()
-        # self.weldModelF = self.Fweld.create_model()
+        self.WeldModelsF = self.WeldModelsF.create_model()
+        self.WeldModelsW = self.WeldModelsW.create_model()
         # self.weldModelW = self.Wweld.create_model()
         # self.nutBoltArrayModels = self.nut_bolt_array.create_model()
 
@@ -76,6 +79,18 @@ class ExtendedBothWays(object):
         boltDir = numpy.array([0, 1.0, 0])
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
+    def createWeldGeometryF(self):
+        weld1origin = numpy.array([self.beamLeft.B/2, self.beamLeft.length, self.beamLeft.D / 2])
+        uDir5 = numpy.array([0, -1.0, 0])
+        wDir5 = numpy.array([-1.0, 0, 0])
+        self.WeldModelsF.place(weld1origin, uDir5, wDir5)
+
+    def createWeldGeometryW(self):
+        weld2origin = numpy.array([-self.beamLeft.T / 2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
+        uDir6 = numpy.array([0, -1.0, 0])
+        wDir6 = numpy.array([0.0, 0, -1.0])
+        self.WeldModelsW.place(weld2origin, uDir6, wDir6)
+
     def get_beamLModel(self):
         return self.beamLModel
 
@@ -91,10 +106,9 @@ class ExtendedBothWays(object):
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
 
-    def createFlangeWeldGeometry(self):
-        pass
+    def get_weldmodelsF(self):
+        return self.WeldModelsF
 
-    def createWebWeldGeometry(self):
-        pass
-
+    def get_weldmodelsW(self):
+        return self.WeldModelsW
 

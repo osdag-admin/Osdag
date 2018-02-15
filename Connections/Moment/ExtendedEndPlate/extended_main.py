@@ -18,6 +18,7 @@ from Connections.Component.ISection import ISection
 from Connections.Component.plate import Plate
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
+from Connections.Component.filletweld import FilletWeld
 from model import *
 import sys
 import os
@@ -426,8 +427,13 @@ class Maincontroller(QMainWindow):
 
         bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
 
-        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray)
+        weldModelFlange = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_B)
+
+        weldModelWeb = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - beam_tf)
+
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray, weldModelFlange, weldModelWeb)
         extbothWays.create_3DModel()
+
         return extbothWays
 
     def bolt_head_thick_calculation(self, bolt_diameter):
@@ -677,6 +683,8 @@ class Maincontroller(QMainWindow):
         nutboltlist = self.ExtObj.nut_bolt_array.get_models()
         for nutbolt in nutboltlist:
             osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_weldmodelsF(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_weldmodelsW(), update=True, color='Red')
 
     def display_output(self, outputObj):
         for k in outputObj.keys():

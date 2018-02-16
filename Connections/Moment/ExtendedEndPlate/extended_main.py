@@ -26,6 +26,7 @@ import pickle
 from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
 from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
+from Connections.Component.quarterCone import QuarterCone
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
@@ -427,11 +428,72 @@ class Maincontroller(QMainWindow):
 
         bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
 
-        weldModelFlange = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_B)
+        ###########################
+        #       WELD SECTIONS     #
+        ###########################
+        '''
+        Following sections are for creating Fillet Welds. 
+        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+        '''
+        bbWeldAbvFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_B)
+        bbWeldAbvFlang_12 = copy.copy(bbWeldAbvFlang_11)
+        bbWeldAbvFlang_21 = copy.copy(bbWeldAbvFlang_11)
+        bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_11)
 
-        weldModelWeb = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - beam_tf)
+        bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+        bbWeldBelwFlang_12 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_13 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_14 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_21 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_11)
 
-        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray, weldModelFlange, weldModelWeb)
+        bbWeldSideFlange_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_tw)
+        bbWeldSideFlange_12 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_13 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_14 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_21 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_22 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_23 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_24 = copy.copy(bbWeldSideFlange_11)
+
+        bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_tf + float(alist[
+                                                                                                                                                 "Weld"]["Flange (mm)"]))
+        bbWeldSideWeb_12 = copy.copy(bbWeldSideWeb_11)
+        bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
+        bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)
+
+        weldQtrCone_11 = QuarterCone(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), coneAngle=90)
+        weldQtrCone_12 = copy.copy(weldQtrCone_11)
+        weldQtrCone_13 = copy.copy(weldQtrCone_11)
+        weldQtrCone_14 = copy.copy(weldQtrCone_11)
+        weldQtrCone_15 = copy.copy(weldQtrCone_11)
+        weldQtrCone_16 = copy.copy(weldQtrCone_11)
+        weldQtrCone_17 = copy.copy(weldQtrCone_11)
+        weldQtrCone_18 = copy.copy(weldQtrCone_11)
+
+        weldQtrCone_21 = copy.copy(weldQtrCone_11)
+        weldQtrCone_22 = copy.copy(weldQtrCone_11)
+        weldQtrCone_23 = copy.copy(weldQtrCone_11)
+        weldQtrCone_24 = copy.copy(weldQtrCone_11)
+        weldQtrCone_25 = copy.copy(weldQtrCone_11)
+        weldQtrCone_26 = copy.copy(weldQtrCone_11)
+        weldQtrCone_27 = copy.copy(weldQtrCone_11)
+        weldQtrCone_28 = copy.copy(weldQtrCone_11)
+
+
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
+                                       bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
+                                       bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
+                                       bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
+                                       bbWeldSideFlange_11, bbWeldSideFlange_12, bbWeldSideFlange_13, bbWeldSideFlange_14,
+                                       bbWeldSideFlange_21, bbWeldSideFlange_22, bbWeldSideFlange_23, bbWeldSideFlange_24,
+                                       bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                       weldQtrCone_11, weldQtrCone_12, weldQtrCone_13, weldQtrCone_14,
+                                       weldQtrCone_15, weldQtrCone_16, weldQtrCone_17, weldQtrCone_18,
+                                       weldQtrCone_21, weldQtrCone_22, weldQtrCone_23, weldQtrCone_24,
+                                       weldQtrCone_25, weldQtrCone_26, weldQtrCone_27, weldQtrCone_28)
         extbothWays.create_3DModel()
 
         return extbothWays
@@ -683,8 +745,33 @@ class Maincontroller(QMainWindow):
         nutboltlist = self.ExtObj.nut_bolt_array.get_models()
         for nutbolt in nutboltlist:
             osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
-        osdag_display_shape(self.display, self.ExtObj.get_weldmodelsF(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_weldmodelsW(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
     def display_output(self, outputObj):
         for k in outputObj.keys():

@@ -11,7 +11,7 @@ from ui_stiffener import Ui_Stiffener
 # from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog, QMessageBox
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from Connections.Component.ISection import ISection
@@ -287,10 +287,11 @@ class Pitch(QDialog):
 
 
 class Maincontroller(QMainWindow):
-    def __init__(self):
+    def __init__(self, folder):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.folder = folder
 
         self.get_beamdata()
         # self.resultobj = None
@@ -322,6 +323,7 @@ class Maincontroller(QMainWindow):
         self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
         self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
+        self.ui.action_save_input.triggered.connect(self.saveDesign_inputs)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
@@ -387,6 +389,12 @@ class Maincontroller(QMainWindow):
         # def start_display():
         #     self.ui.modelTab.raise_()
         # return display, start_display
+
+    def enableViewButtons(self):
+        self.ui.action_save_input.setEnabled(True)
+
+    def disableViewButtons(self):
+        self.ui.action_save_input.setEnabled(False)
 
     def createExtendedBothWays(self):
 
@@ -1032,6 +1040,7 @@ class Maincontroller(QMainWindow):
             QMessageBox.information(self, "Unable to open file",
                                     "There was an error opening \"%s\"" % fileName)
             return
+        QMessageBox.about(self, 'Information', "Input file saved")
 
         # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
         json.dump(self.uiObj, out_file)
@@ -1130,7 +1139,7 @@ def main():
 
     app = QApplication(sys.argv)
     module_setup()
-    window = Maincontroller()
+    window = Maincontroller(folder="F:\Osdag\Connections\Moment\Moment Workspace")
     window.show()
     sys.exit(app.exec_())
 

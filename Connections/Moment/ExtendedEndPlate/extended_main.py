@@ -3,7 +3,7 @@ Created on 24-Aug-2017
 
 @author: Reshma
 """
-
+import json
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
 from ui_plate import Ui_Plate
@@ -393,7 +393,7 @@ class Maincontroller(QMainWindow):
         beam_data = self.fetchBeamPara()
 
         beam_tw = float(beam_data["tw"])
-        beam_tf = float(beam_data["T"])
+        beam_T = float(beam_data["T"])
         beam_d = float(beam_data["D"])
         beam_B = float(beam_data["B"])
         beam_R1 = float(beam_data["R1"])
@@ -401,7 +401,7 @@ class Maincontroller(QMainWindow):
         beam_alpha = float(beam_data["FlangeSlope"])
         beam_length = 800.0
 
-        beam_Left = ISection(B=beam_B, T=beam_tw, D=beam_d, t=beam_tf,
+        beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
                           R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
                           length=beam_length, notchObj=None)
         beam_Right = copy.copy(beam_Left)
@@ -449,7 +449,7 @@ class Maincontroller(QMainWindow):
         bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_11)
         bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_11)
 
-        bbWeldSideFlange_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_tw)
+        bbWeldSideFlange_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_T)
         bbWeldSideFlange_12 = copy.copy(bbWeldSideFlange_11)
         bbWeldSideFlange_13 = copy.copy(bbWeldSideFlange_11)
         bbWeldSideFlange_14 = copy.copy(bbWeldSideFlange_11)
@@ -458,11 +458,16 @@ class Maincontroller(QMainWindow):
         bbWeldSideFlange_23 = copy.copy(bbWeldSideFlange_11)
         bbWeldSideFlange_24 = copy.copy(bbWeldSideFlange_11)
 
-        bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_tf + float(alist[
-                                                                                                                                                 "Weld"]["Flange (mm)"]))
+        # bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_tf + float(alist[
+        #                                                                                                                                          "Weld"]["Flange (mm)"]))
+        bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_T)
         bbWeldSideWeb_12 = copy.copy(bbWeldSideWeb_11)
         bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
         bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)
+
+        #######################################
+        #       WELD SECTIONS QUARTER CONE    #
+        #######################################
 
         weldQtrCone_11 = QuarterCone(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), coneAngle=90)
         weldQtrCone_12 = copy.copy(weldQtrCone_11)
@@ -738,13 +743,15 @@ class Maincontroller(QMainWindow):
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         self.ExtObj = self.createExtendedBothWays()
-        osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-        osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+        # osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+        # osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
         osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+
         nutboltlist = self.ExtObj.nut_bolt_array.get_models()
         for nutbolt in nutboltlist:
             osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
@@ -772,6 +779,24 @@ class Maincontroller(QMainWindow):
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
         osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
@@ -990,6 +1015,30 @@ class Maincontroller(QMainWindow):
     def stiffener_details(self):
         section = Stiffener(self)
         section.show()
+
+    def saveDesign_inputs(self):
+
+        fileName, _ = QFileDialog.getSaveFileName(self,
+                                                  "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+
+        if not fileName:
+            return
+
+        try:
+            out_file = open(str(fileName), 'wb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+
+        # yaml.dump(self.uiObj,out_file,allow_unicode=True, default_flow_style=False)
+        json.dump(self.uiObj, out_file)
+
+        out_file.close()
+
+        pass
 
     def init_display(self, backend_str=None, size=(1024, 768)):
 

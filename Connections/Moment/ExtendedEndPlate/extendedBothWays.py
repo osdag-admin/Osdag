@@ -16,10 +16,11 @@ class ExtendedBothWays(object):
                  bbWeldSideFlange_11, bbWeldSideFlange_12, bbWeldSideFlange_13, bbWeldSideFlange_14,
                  bbWeldSideFlange_21, bbWeldSideFlange_22, bbWeldSideFlange_23, bbWeldSideFlange_24,
                  bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
-                 weldQtrCone_11, weldQtrCone_12, weldQtrCone_13, weldQtrCone_14,
-                 weldQtrCone_15, weldQtrCone_16, weldQtrCone_17, weldQtrCone_18,
-                 weldQtrCone_21, weldQtrCone_22, weldQtrCone_23, weldQtrCone_24,
-                 weldQtrCone_25, weldQtrCone_26, weldQtrCone_27, weldQtrCone_28):
+                 bbWeldQtrCone_11, bbWeldQtrCone_12, bbWeldQtrCone_13, bbWeldQtrCone_14,
+                 bbWeldQtrCone_15, bbWeldQtrCone_16, bbWeldQtrCone_17, bbWeldQtrCone_18,
+                 bbWeldQtrCone_21, bbWeldQtrCone_22, bbWeldQtrCone_23, bbWeldQtrCone_24,
+                 bbWeldQtrCone_25, bbWeldQtrCone_26, bbWeldQtrCone_27, bbWeldQtrCone_28):
+
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.plateLeft = plateLeft
@@ -54,23 +55,23 @@ class ExtendedBothWays(object):
         self.bbWeldSideWeb_21 = bbWeldSideWeb_21
         self.bbWeldSideWeb_22 = bbWeldSideWeb_22
 
-        self.weldQtrCone_11 = weldQtrCone_11
-        self.weldQtrCone_12 = weldQtrCone_12
-        self.weldQtrCone_13 = weldQtrCone_13
-        self.weldQtrCone_14 = weldQtrCone_14
-        self.weldQtrCone_15 = weldQtrCone_15
-        self.weldQtrCone_16 = weldQtrCone_16
-        self.weldQtrCone_17 = weldQtrCone_17
-        self.weldQtrCone_18 = weldQtrCone_18
+        self.bbWeldQtrCone_11 = bbWeldQtrCone_11
+        self.bbWeldQtrCone_12 = bbWeldQtrCone_12
+        self.bbWeldQtrCone_13 = bbWeldQtrCone_13
+        self.bbWeldQtrCone_14 = bbWeldQtrCone_14
+        self.bbWeldQtrCone_15 = bbWeldQtrCone_15
+        self.bbWeldQtrCone_16 = bbWeldQtrCone_16
+        self.bbWeldQtrCone_17 = bbWeldQtrCone_17
+        self.bbWeldQtrCone_18 = bbWeldQtrCone_18
 
-        self.weldQtrCone_21 = weldQtrCone_21
-        self.weldQtrCone_22 = weldQtrCone_22
-        self.weldQtrCone_23 = weldQtrCone_23
-        self.weldQtrCone_24 = weldQtrCone_24
-        self.weldQtrCone_25 = weldQtrCone_25
-        self.weldQtrCone_26 = weldQtrCone_26
-        self.weldQtrCone_27 = weldQtrCone_27
-        self.weldQtrCone_28 = weldQtrCone_28
+        self.bbWeldQtrCone_21 = bbWeldQtrCone_21
+        self.bbWeldQtrCone_22 = bbWeldQtrCone_22
+        self.bbWeldQtrCone_23 = bbWeldQtrCone_23
+        self.bbWeldQtrCone_24 = bbWeldQtrCone_24
+        self.bbWeldQtrCone_25 = bbWeldQtrCone_25
+        self.bbWeldQtrCone_26 = bbWeldQtrCone_26
+        self.bbWeldQtrCone_27 = bbWeldQtrCone_27
+        self.bbWeldQtrCone_28 = bbWeldQtrCone_28
 
     def create_3DModel(self):
         self.createBeamLGeometry()
@@ -244,13 +245,13 @@ class ExtendedBothWays(object):
         self.bbWeldBelwFlang_11.place(weldBelwFlangOrigin_11, uDirBelw_11, wDirBelw_11)
 
     def create_bbWeldBelwFlang_12(self):
-        weldBelwFlangOrigin_12 = numpy.array([self.beamLeft.T / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
+        weldBelwFlangOrigin_12 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
         uDirBelw_12 = numpy.array([0, -1.0, 0])
         wDirBelw_12 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_12.place(weldBelwFlangOrigin_12, uDirBelw_12, wDirBelw_12)
 
     def create_bbWeldBelwFlang_13(self):
-        weldBelwFlangOrigin_13 = numpy.array([-self.beamLeft.T / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
+        weldBelwFlangOrigin_13 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
         uDirBelw_13 = numpy.array([0, -1.0, 0])
         wDirBelw_13 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_13.place(weldBelwFlangOrigin_13, uDirBelw_13, wDirBelw_13)
@@ -262,7 +263,7 @@ class ExtendedBothWays(object):
         self.bbWeldBelwFlang_14.place(weldBelwFlangOrigin_14, uDirBelw_14, wDirBelw_14)
 
     def create_bbWeldBelwFlang_21(self):
-        weldBelwFlangOrigin_21 = numpy.array([-self.beamLeft.T / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
+        weldBelwFlangOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
                                               self.beamLeft.T])
         uDirBelw_21 = numpy.array([0, 1.0, 0])
         wDirBelw_21 = numpy.array([-1.0, 0, 0])
@@ -283,7 +284,7 @@ class ExtendedBothWays(object):
         self.bbWeldBelwFlang_23.place(weldBelwFlangOrigin_23, uDirBelw_23, wDirBelw_23)
 
     def create_bbWeldBelwFlang_24(self):
-        weldBelwFlangOrigin_24 = numpy.array([self.beamLeft.T / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
+        weldBelwFlangOrigin_24 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
                                               self.beamLeft.T])
         uDirBelw_24 = numpy.array([0, 1.0, 0])
         wDirBelw_24 = numpy.array([1.0, 0, 0])
@@ -339,77 +340,125 @@ class ExtendedBothWays(object):
         self.bbWeldSideFlange_24.place(weldSideFlangOrigin_24, uDirSide_24, wDirSide_24)
 
     def create_bbWeldSideWeb_11(self):
-        weldSideWebOrigin_11 = numpy.array([-self.beamLeft.T/2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
+        weldSideWebOrigin_11 = numpy.array([-self.beamLeft.t/2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
         uDirWeb_11 = numpy.array([0, -1.0, 0])
         wDirWeb_11 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_11.place(weldSideWebOrigin_11, uDirWeb_11, wDirWeb_11)
 
     def create_bbWeldSideWeb_12(self):
-        weldSideWebOrigin_12 = numpy.array([self.beamLeft.T / 2, self.beamLeft.length, -self.beamLeft.D / 2 + self.beamLeft.T])
+        weldSideWebOrigin_12 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length, -self.beamLeft.D / 2 + self.beamLeft.T])
         uDirWeb_12 = numpy.array([0, -1.0, 0])
         wDirWeb_12 = numpy.array([0, 0, 1.0])
         self.bbWeldSideWeb_12.place(weldSideWebOrigin_12, uDirWeb_12, wDirWeb_12)
 
     def create_bbWeldSideWeb_21(self):
-        weldSideWebOrigin_21 = numpy.array([-self.beamLeft.T / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2 +
+        weldSideWebOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2 +
                                             self.beamLeft.T])
         uDirWeb_21 = numpy.array([0, 1.0, 0])
         wDirWeb_21 = numpy.array([0, 0, 1.0])
         self.bbWeldSideWeb_21.place(weldSideWebOrigin_21, uDirWeb_21, wDirWeb_21)
 
     def create_bbWeldSideWeb_22(self):
-        weldSideWebOrigin_22 = numpy.array([self.beamLeft.T / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2 - self.beamLeft.T])
+        weldSideWebOrigin_22 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2 - self.beamLeft.T])
         uDirWeb_22 = numpy.array([0, 1.0, 0])
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
 
-    def create_bbWeldQtrCone_11(self):
-        pass
+    def create_bbWeldQtrCone_11(self):  # Beam Left, upper flange, Left part of flange, upper side
+        QtrOrigin_11 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2])
+        uDirQtr_11 = numpy.array([0, 0, 1.0])
+        wDirQtr_11 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_11.place(QtrOrigin_11, uDirQtr_11, wDirQtr_11)
 
-    def create_bbWeldQtrCone_12(self):
-        pass
+    def create_bbWeldQtrCone_12(self):  # Beam Left, upper flange, Left part of flange, lower side
+        QtrOrigin_12 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
+        uDirQtr_12 = numpy.array([-1.0, 0, 0])
+        wDirQtr_12 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_12.place(QtrOrigin_12, uDirQtr_12, wDirQtr_12)
 
-    def create_bbWeldQtrCone_13(self):
-        pass
+    def create_bbWeldQtrCone_13(self):  # Beam Left, upper flange, Right part of flange, upper side
+        QtrOrigin_13 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2])
+        uDirQtr_13 = numpy.array([1.0, 0, 0])
+        wDirQtr_13 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_13.place(QtrOrigin_13, uDirQtr_13, wDirQtr_13)
 
-    def create_bbWeldQtrCone_14(self):
-        pass
+    def create_bbWeldQtrCone_14(self):  # Beam Left, upper flange, Right part of flange, lower side
+        QtrOrigin_14 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
+        uDirQtr_14 = numpy.array([0, 0, -1.0])
+        wDirQtr_14 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_14.place(QtrOrigin_14, uDirQtr_14, wDirQtr_14)
 
-    def create_bbWeldQtrCone_15(self):
-        pass
+    def create_bbWeldQtrCone_15(self):  # Beam Left, lower flange, Left part of flange, upper side
+        QtrOrigin_15 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length, -self.beamLeft.D / 2 + self.beamLeft.T])
+        uDirQtr_15 = numpy.array([0, 0, 1.0])
+        wDirQtr_15 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_15.place(QtrOrigin_15, uDirQtr_15, wDirQtr_15)
 
-    def create_bbWeldQtrCone_16(self):
-        pass
+    def create_bbWeldQtrCone_16(self):  # Beam Left, lower flange, Left part of flange, lower side
+        QtrOrigin_16 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length, -self.beamLeft.D / 2])
+        uDirQtr_16 = numpy.array([-1.0, 0, 0])
+        wDirQtr_16 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_16.place(QtrOrigin_16, uDirQtr_16, wDirQtr_16)
 
-    def create_bbWeldQtrCone_17(self):
-        pass
+    def create_bbWeldQtrCone_17(self):  # Beam Left, lower flange, Right part of flange, upper side
+        QtrOrigin_17 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, -self.beamLeft.D / 2 + self.beamLeft.T])
+        uDirQtr_17 = numpy.array([1.0, 0, 0])
+        wDirQtr_17 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_17.place(QtrOrigin_17, uDirQtr_17, wDirQtr_17)
 
-    def create_bbWeldQtrCone_18(self):
-        pass
+    def create_bbWeldQtrCone_18(self):  # Beam Left, lower flange, Right part of flange, lower side
+        QtrOrigin_18 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, -self.beamLeft.D / 2])
+        uDirQtr_18 = numpy.array([0, 0, -1.0])
+        wDirQtr_18 = numpy.array([0, -1.0, 0])
+        self.bbWeldQtrCone_18.place(QtrOrigin_18, uDirQtr_18, wDirQtr_18)
 
-    def create_bbWeldQtrCone_21(self):
-        pass
+    def create_bbWeldQtrCone_21(self):  # Replica of bbWeldQtrCone_11
+        QtrOrigin_21 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2])
+        uDirQtr_21 = numpy.array([-1.0, 0, 0])
+        wDirQtr_21 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_21.place(QtrOrigin_21, uDirQtr_21, wDirQtr_21)
 
-    def create_bbWeldQtrCone_22(self):
-        pass
+    def create_bbWeldQtrCone_22(self):  # Replica of bbWeldQtrCone_12
+        QtrOrigin_22 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2 - self.beamLeft.T])
+        uDirQtr_22 = numpy.array([0, 0, -1.0])
+        wDirQtr_22 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_22.place(QtrOrigin_22, uDirQtr_22, wDirQtr_22)
 
-    def create_bbWeldQtrCone_23(self):
-        pass
+    def create_bbWeldQtrCone_23(self):  # Replica of bbWeldQtrCone_13
+        QtrOrigin_23 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2])
+        uDirQtr_23 = numpy.array([0, 0, 1.0])
+        wDirQtr_23 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_23.place(QtrOrigin_23, uDirQtr_23, wDirQtr_23)
 
-    def create_bbWeldQtrCone_24(self):
-        pass
+    def create_bbWeldQtrCone_24(self):  # Replica of bbWeldQtrCone_14
+        QtrOrigin_24 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2 - self.beamLeft.T])
+        uDirQtr_24 = numpy.array([1.0, 0, 0])
+        wDirQtr_24 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_24.place(QtrOrigin_24, uDirQtr_24, wDirQtr_24)
 
-    def create_bbWeldQtrCone_25(self):
-        pass
+    def create_bbWeldQtrCone_25(self):  # Replica of bbWeldQtrCone_15
+        QtrOrigin_25 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2 + self.beamLeft.T])
+        uDirQtr_25 = numpy.array([-1.0, 0, 0])
+        wDirQtr_25 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_25.place(QtrOrigin_25, uDirQtr_25, wDirQtr_25)
 
-    def create_bbWeldQtrCone_26(self):
-        pass
+    def create_bbWeldQtrCone_26(self):  # Replica of bbWeldQtrCone_16
+        QtrOrigin_26 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2])
+        uDirQtr_26 = numpy.array([0, 0, -1.0])
+        wDirQtr_26 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_26.place(QtrOrigin_26, uDirQtr_26, wDirQtr_26)
 
     def create_bbWeldQtrCone_27(self):
-        pass
+        QtrOrigin_27 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2 + self.beamLeft.T])
+        uDirQtr_27 = numpy.array([0, 0, 1.0])
+        wDirQtr_27 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_27.place(QtrOrigin_27, uDirQtr_27, wDirQtr_27)
 
     def create_bbWeldQtrCone_28(self):
-        pass
+        QtrOrigin_28 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2])
+        uDirQtr_28 = numpy.array([1.0, 0, 0])
+        wDirQtr_28 = numpy.array([0, 1.0, 0])
+        self.bbWeldQtrCone_28.place(QtrOrigin_28, uDirQtr_28, wDirQtr_28)
 
     def get_beamLModel(self):
         return self.beamLModel

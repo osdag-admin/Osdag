@@ -416,7 +416,8 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen,self.ui.lbl_len_2))
-        self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
+		self.ui.txtPlateWidth.editingFinished.connect(lambda: self.check_plate_width(self.ui.txtPlateWidth, self.ui.lbl_width_2))
+		self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
         self.ui.btn_SaveMessages.clicked.connect(self.save_log)
 
@@ -675,12 +676,20 @@ class MainController(QMainWindow):
             clear_depth = 0.0
             if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
                 clear_depth = col_D - 2 * (col_T + col_R1 + 5)
+            #TODO else loop for beam to beam
 
-            if clear_depth < plate_width:
+            if clear_depth < plate_width: # TODO mini value should be given be
                 self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
+                widget.clear()
+                widget.setFocus()
+                palette = QPalette()
+                palette.setColor(QPalette.Foreground, Qt.red)
+                lblwidget.setPalette(palette)
             else:
                 self.ui.btn_Design.setDisabled(False)
+                palette = QPalette()
+                lblwidget.setPalette(palette)
 
     def populate_weld_thick_combo(self):
         '''
@@ -1018,7 +1027,7 @@ class MainController(QMainWindow):
 
     def openDesign_inputs(self):
 
-        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
         if not fileName:
             return
         try:

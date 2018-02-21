@@ -18,14 +18,14 @@ class NutBoltArray():
         self.pitchDir = None
         self.boltDir = None
 
-        self.initBoltPlaceParams(boltPlaceObj, numberOfBolts)
-
         self.uiObjW = uiObjWeld
         self.beamDim = beamDim
         self.bolt = bolt
         self.nut = nut
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
+
+        self.initBoltPlaceParams(boltPlaceObj, numberOfBolts)
 
         self.bolts = []
         self.nuts = []
@@ -53,7 +53,7 @@ class NutBoltArray():
             self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
             self.endDist = boltPlaceObj["Bolt"]["End"]
             self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
             self.row = numberOfBolts / 2
             self.col = 2
         elif numberOfBolts == 12:
@@ -62,7 +62,7 @@ class NutBoltArray():
             self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
             self.endDist = boltPlaceObj["Bolt"]["End"]
             self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
             self.row = numberOfBolts / 2
             self.col = 2
         elif numberOfBolts == 16:
@@ -73,7 +73,7 @@ class NutBoltArray():
             self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
             self.endDist = boltPlaceObj["Bolt"]["End"]
             self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
             self.row = numberOfBolts / 2
             self.col = 2
         elif numberOfBolts == 20:
@@ -86,7 +86,7 @@ class NutBoltArray():
             self.pitch910 = boltPlaceObj["Bolt"]["Pitch910"]
             self.endDist = boltPlaceObj["Bolt"]["End"]
             self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Bolt"]["CrossCentreGauge"]
+            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
             self.row = numberOfBolts / 2
             self.col = 2
 

@@ -1013,7 +1013,7 @@ class MainController(QMainWindow):
 
     def openDesign_inputs(self):
 
-        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName,_ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
         if not fileName:
             return
         try:

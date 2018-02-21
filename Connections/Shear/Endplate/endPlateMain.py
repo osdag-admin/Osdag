@@ -1978,7 +1978,7 @@ if __name__ == '__main__':
     set_osdaglogger()
     raw_logger = logging.getLogger("raw")
     raw_logger.setLevel(logging.INFO)
-    fh = logging.FileHandler("Connections/Shear/Endplate/fin.log", mode="w")
+    fh = logging.FileHandler("Connections/Shear/Endplate/end.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     raw_logger.addHandler(fh)

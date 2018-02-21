@@ -549,7 +549,7 @@ class MainController(QMainWindow):
         self.designPrefDialog.set_default_para()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
-            self.ui.lbl_beam.setText(" Secondary beam *")
+            self.ui.lbl_beam.setText("Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
 
             self.ui.chkBxBeam.setText("SBeam")
@@ -599,7 +599,7 @@ class MainController(QMainWindow):
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
-            self.ui.lbl_column.setText("Column Section *")
+            self.ui.lbl_column.setText("Column section *")
             self.ui.lbl_beam.setText("Beam section *")
             self.ui.chkBxBeam.setText("Beam")
             self.ui.actionShow_beam.setText("Show beam")

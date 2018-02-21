@@ -324,6 +324,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
         self.ui.action_save_input.triggered.connect(self.saveDesign_inputs)
+        self.ui.action_load_input.triggered.connect(self.openDesign_inputs)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
@@ -432,7 +433,7 @@ class Maincontroller(QMainWindow):
 
         numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
-        nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + bolt_T
+        nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T
 
         bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
 
@@ -751,8 +752,8 @@ class Maincontroller(QMainWindow):
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
         self.ExtObj = self.createExtendedBothWays()
-        # osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-        # osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
         osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
@@ -1023,6 +1024,21 @@ class Maincontroller(QMainWindow):
     def stiffener_details(self):
         section = Stiffener(self)
         section.show()
+
+    def openDesign_inputs(self):
+
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        if not fileName:
+            return
+        try:
+            in_file = open(str(fileName), 'rb')
+
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % fileName)
+            return
+        uiObj = json.load(in_file)
+        self.set_dict_touser_inputs(uiObj)
 
     def saveDesign_inputs(self):
 

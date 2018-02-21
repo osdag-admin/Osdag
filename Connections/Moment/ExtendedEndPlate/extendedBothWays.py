@@ -195,20 +195,20 @@ class ExtendedBothWays(object):
         self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateLGeometry(self):
-        plateOriginL = numpy.array([-0.5 * self.plateLeft.W, 1.5 * self.plateLeft.T + self.beamLeft.length, 0.0])
+        plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
         plateL_uDir = numpy.array([0.0, 1.0, 0.0])
         plateL_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.plateRight.place(plateOriginL, plateL_uDir, plateL_wDir)
+        self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
     def createPlateRGeometry(self):
-        gap = self.beamRight.length + 0.5 * self.plateRight.T
+        gap = 1.5 * self.plateRight.T + self.beamLeft.length
         plateOriginR = numpy.array([-self.plateRight.W/2, gap, 0.0])
         plateR_uDir = numpy.array([0.0, 1.0, 0.0])
         plateR_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.plateLeft.place(plateOriginR, plateR_uDir, plateR_wDir)
+        self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def create_nut_bolt_array(self):
-        nutboltArrayOrigin = self.plateLeft.sec_origin + numpy.array([0.0, 0.0, self.plateLeft.L/2])
+        nutboltArrayOrigin = self.plateLeft.sec_origin + numpy.array([0.0, -0.5 * self.plateLeft.T, self.plateLeft.L/2])
         gaugeDir = numpy.array([1.0, 0, 0])
         pitchDir = numpy.array([0, 0, -1.0])
         boltDir = numpy.array([0, 1.0, 0])

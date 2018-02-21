@@ -43,7 +43,6 @@ class NutBoltArray():
         n = self.nut
         for i in range(self.numOfBolts):
             bolt_length_required = float(b.T + self.gap)
-            # b.H = bolt_length_required + (5 - bolt_length_required) % 5
             b.H = bolt_length_required + (bolt_length_required - 5) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
@@ -100,7 +99,7 @@ class NutBoltArray():
         if numberOfBolts == 8:
             self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
             self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-            self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+            # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
             for rw in range(1, self.row + 1):
                 if rw == 1:
                     for col in range(self.col):
@@ -131,8 +130,8 @@ class NutBoltArray():
 
         elif numberOfBolts == 12:
                 self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
-                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
+                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -143,7 +142,7 @@ class NutBoltArray():
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
                             space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["T"]
-                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
                     if rw == 3:
@@ -179,8 +178,8 @@ class NutBoltArray():
 
         elif numberOfBolts == 16:
                 self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
-                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
+                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -191,7 +190,7 @@ class NutBoltArray():
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
                             space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["T"]
-                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
                     if rw == 3:
@@ -243,8 +242,8 @@ class NutBoltArray():
 
         elif numberOfBolts == 20:
                 self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin - self.endDist * self.pitchDir
-                self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
+                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -255,7 +254,7 @@ class NutBoltArray():
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
                             space12 = self.pitch12
-                            pos = pos + self.boltOrigin - space12 * self.pitchDir
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
                     if rw == 3:

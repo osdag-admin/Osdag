@@ -438,7 +438,7 @@ def finConn(uiObj):
 
 
         if shear_load != 0:
-            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1
+            bolts_required = int(math.ceil(shear_load / bolt_capacity)) #+ 1
         else:
             bolts_required = int(shear_load / bolt_capacity)
             

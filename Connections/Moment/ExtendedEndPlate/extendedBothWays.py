@@ -1,6 +1,6 @@
 '''
 Initialized on 22-01-2018
-Commenced on
+Commenced on 16-02-2018
 @author: Siddhesh S. Chavan
 '''
 
@@ -21,57 +21,59 @@ class ExtendedBothWays(object):
                  bbWeldQtrCone_21, bbWeldQtrCone_22, bbWeldQtrCone_23, bbWeldQtrCone_24,
                  bbWeldQtrCone_25, bbWeldQtrCone_26, bbWeldQtrCone_27, bbWeldQtrCone_28):
 
+        # Initializing the arguments
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.plateLeft = plateLeft
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
 
-        self.bbWeldAbvFlang_11 = bbWeldAbvFlang_11
-        self.bbWeldAbvFlang_12 = bbWeldAbvFlang_12
-        self.bbWeldAbvFlang_21 = bbWeldAbvFlang_21
-        self.bbWeldAbvFlang_22 = bbWeldAbvFlang_22
+        # Weld above flange for left and right beam
+        self.bbWeldAbvFlang_11 = bbWeldAbvFlang_11      # Left beam upper side
+        self.bbWeldAbvFlang_12 = bbWeldAbvFlang_12      # Left beam lower side
+        self.bbWeldAbvFlang_21 = bbWeldAbvFlang_21      # Right beam upper side
+        self.bbWeldAbvFlang_22 = bbWeldAbvFlang_22      # Right beam lower side
 
-        self.bbWeldBelwFlang_11 = bbWeldBelwFlang_11
-        self.bbWeldBelwFlang_12 = bbWeldBelwFlang_12
-        self.bbWeldBelwFlang_13 = bbWeldBelwFlang_13
-        self.bbWeldBelwFlang_14 = bbWeldBelwFlang_14
-        self.bbWeldBelwFlang_21 = bbWeldBelwFlang_21
-        self.bbWeldBelwFlang_22 = bbWeldBelwFlang_22
-        self.bbWeldBelwFlang_23 = bbWeldBelwFlang_23
-        self.bbWeldBelwFlang_24 = bbWeldBelwFlang_24
+        self.bbWeldBelwFlang_11 = bbWeldBelwFlang_11    # Left beam, upper, left
+        self.bbWeldBelwFlang_12 = bbWeldBelwFlang_12    # Left beam, upper, right
+        self.bbWeldBelwFlang_13 = bbWeldBelwFlang_13    # Left beam, lower, left
+        self.bbWeldBelwFlang_14 = bbWeldBelwFlang_14    # Left beam, lower, right
+        self.bbWeldBelwFlang_21 = bbWeldBelwFlang_21    # behind bbWeldBelwFlang_11
+        self.bbWeldBelwFlang_22 = bbWeldBelwFlang_22    # behind bbWeldBelwFlang_12
+        self.bbWeldBelwFlang_23 = bbWeldBelwFlang_23    # behind bbWeldBelwFlang_13
+        self.bbWeldBelwFlang_24 = bbWeldBelwFlang_24    # behind bbWeldBelwFlang_14
 
-        self.bbWeldSideFlange_11 = bbWeldSideFlange_11
-        self.bbWeldSideFlange_12 = bbWeldSideFlange_12
-        self.bbWeldSideFlange_13 = bbWeldSideFlange_13
-        self.bbWeldSideFlange_14 = bbWeldSideFlange_14
-        self.bbWeldSideFlange_21 = bbWeldSideFlange_21
-        self.bbWeldSideFlange_22 = bbWeldSideFlange_22
-        self.bbWeldSideFlange_23 = bbWeldSideFlange_23
-        self.bbWeldSideFlange_24 = bbWeldSideFlange_24
+        self.bbWeldSideFlange_11 = bbWeldSideFlange_11  # Left beam, upper, left
+        self.bbWeldSideFlange_12 = bbWeldSideFlange_12  # Left beam, upper, right
+        self.bbWeldSideFlange_13 = bbWeldSideFlange_13  # Left beam, lower, left
+        self.bbWeldSideFlange_14 = bbWeldSideFlange_14  # Left beam, lower, right
+        self.bbWeldSideFlange_21 = bbWeldSideFlange_21  # behind bbWeldSideFlange_11
+        self.bbWeldSideFlange_22 = bbWeldSideFlange_22  # behind bbWeldSideFlange_12
+        self.bbWeldSideFlange_23 = bbWeldSideFlange_23  # behind bbWeldSideFlange_13
+        self.bbWeldSideFlange_24 = bbWeldSideFlange_24  # behind bbWeldSideFlange_14
 
-        self.bbWeldSideWeb_11 = bbWeldSideWeb_11
-        self.bbWeldSideWeb_12 = bbWeldSideWeb_12
-        self.bbWeldSideWeb_21 = bbWeldSideWeb_21
-        self.bbWeldSideWeb_22 = bbWeldSideWeb_22
+        self.bbWeldSideWeb_11 = bbWeldSideWeb_11        # Left beam, left of Web
+        self.bbWeldSideWeb_12 = bbWeldSideWeb_12        # Left beam, right of Web
+        self.bbWeldSideWeb_21 = bbWeldSideWeb_21        # Behind bbWeldSideWeb_11
+        self.bbWeldSideWeb_22 = bbWeldSideWeb_22        # Behind bbWeldSideWeb_12
 
-        self.bbWeldQtrCone_11 = bbWeldQtrCone_11
-        self.bbWeldQtrCone_12 = bbWeldQtrCone_12
-        self.bbWeldQtrCone_13 = bbWeldQtrCone_13
-        self.bbWeldQtrCone_14 = bbWeldQtrCone_14
-        self.bbWeldQtrCone_15 = bbWeldQtrCone_15
-        self.bbWeldQtrCone_16 = bbWeldQtrCone_16
-        self.bbWeldQtrCone_17 = bbWeldQtrCone_17
-        self.bbWeldQtrCone_18 = bbWeldQtrCone_18
+        self.bbWeldQtrCone_11 = bbWeldQtrCone_11        # Left beam, upper flange, left side, above flange
+        self.bbWeldQtrCone_12 = bbWeldQtrCone_12        # Left beam, upper flange, left side, below flange
+        self.bbWeldQtrCone_13 = bbWeldQtrCone_13        # Left beam, upper flange, right side, above flange
+        self.bbWeldQtrCone_14 = bbWeldQtrCone_14        # Left beam, upper flange, right side, below flange
+        self.bbWeldQtrCone_15 = bbWeldQtrCone_15        # Left beam, lower flange, left side, above flange
+        self.bbWeldQtrCone_16 = bbWeldQtrCone_16        # Left beam, lower flange, left side, below flange
+        self.bbWeldQtrCone_17 = bbWeldQtrCone_17        # Left beam, lower flange, right side, above flange
+        self.bbWeldQtrCone_18 = bbWeldQtrCone_18        # Left beam, lower flange, right side, below flange
 
-        self.bbWeldQtrCone_21 = bbWeldQtrCone_21
-        self.bbWeldQtrCone_22 = bbWeldQtrCone_22
-        self.bbWeldQtrCone_23 = bbWeldQtrCone_23
-        self.bbWeldQtrCone_24 = bbWeldQtrCone_24
-        self.bbWeldQtrCone_25 = bbWeldQtrCone_25
-        self.bbWeldQtrCone_26 = bbWeldQtrCone_26
-        self.bbWeldQtrCone_27 = bbWeldQtrCone_27
-        self.bbWeldQtrCone_28 = bbWeldQtrCone_28
+        self.bbWeldQtrCone_21 = bbWeldQtrCone_21        # behind bbWeldQtrCone_11
+        self.bbWeldQtrCone_22 = bbWeldQtrCone_22        # behind bbWeldQtrCone_12
+        self.bbWeldQtrCone_23 = bbWeldQtrCone_23        # behind bbWeldQtrCone_13
+        self.bbWeldQtrCone_24 = bbWeldQtrCone_24        # behind bbWeldQtrCone_14
+        self.bbWeldQtrCone_25 = bbWeldQtrCone_25        # behind bbWeldQtrCone_15
+        self.bbWeldQtrCone_26 = bbWeldQtrCone_26        # behind bbWeldQtrCone_16
+        self.bbWeldQtrCone_27 = bbWeldQtrCone_27        # behind bbWeldQtrCone_17
+        self.bbWeldQtrCone_28 = bbWeldQtrCone_28        # behind bbWeldQtrCone_18
 
     def create_3DModel(self):
         self.createBeamLGeometry()

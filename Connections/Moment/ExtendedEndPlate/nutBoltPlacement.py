@@ -48,6 +48,11 @@ class NutBoltArray():
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))
 
     def initBoltPlaceParams(self, boltPlaceObj, numberOfBolts):
+        '''
+        :param boltPlaceObj: Output dictionary of Calculation file 
+        :param numberOfBolts: Total number of bolts
+        :return: Bolt placement coordinates
+        '''
         self.Lv = boltPlaceObj["Bolt"]["Lv"]
         if numberOfBolts == 8:
             self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
@@ -92,14 +97,15 @@ class NutBoltArray():
 
     def calculatePositions(self, numberOfBolts):
         '''
+        The bolt placement is carried out in such a way that bolt @1X1 is considered as Bolt origin and w.r.t this bolt origin,
+        rest of the rows ob bolts are placed.
         :return: The position of bolts 
         '''
         self.positions = []
 
         if numberOfBolts == 8:
-            self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-            self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-            # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+            self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
+            self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
             for rw in range(1, self.row + 1):
                 if rw == 1:
                     for col in range(self.col):
@@ -129,9 +135,8 @@ class NutBoltArray():
                         self.positions.append(pos)
 
         elif numberOfBolts == 12:
-                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -177,9 +182,8 @@ class NutBoltArray():
                             self.positions.append(pos)
 
         elif numberOfBolts == 16:
-                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -241,9 +245,8 @@ class NutBoltArray():
                             self.positions.append(pos)
 
         elif numberOfBolts == 20:
-                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir
-                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir
-                # self.boltOrigin = self.boltOrigin - self.bolt.T * self.boltDir
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                 for rw in range(1, self.row + 1):
                     if rw == 1:
                         for col in range(self.col):
@@ -331,7 +334,7 @@ class NutBoltArray():
 
         for index, pos in enumerate(self.positions):
             self.bolts[index].place(pos, gaugeDir, boltDir)
-            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)
+            self.nuts[index].place((pos + self.gap * boltDir), gaugeDir, -boltDir)  # gap here is between bolt head and nut
 
     def create_model(self):
         for bolt in self.bolts:

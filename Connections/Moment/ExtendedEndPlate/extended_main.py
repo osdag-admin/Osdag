@@ -11,13 +11,14 @@ from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
-from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
 import sys
 import os
 import pickle
+import json
 
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
@@ -317,6 +318,9 @@ class Maincontroller(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
+        # self.ui.action_save_input.triggered.connect(self.save_design_inputs)
+        # self.ui.actio_load_input.triggered.connect(self.load_design_inputs)
+        # self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
@@ -371,6 +375,60 @@ class Maincontroller(QMainWindow):
         # def start_display():
         #     self.ui.modelTab.raise_()
         # return display, start_display
+
+    # TODO load input files
+    # def save_design_inputs(self):
+    #     filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+    #                                               "Input Files(*.osi)")
+    #     if not filename:
+    #         return
+    #     try:
+    #         out_file = open(str(filename), 'wb')
+    #     except IOError:
+    #         QMessageBox.information(self, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % filename)
+    #         return
+    #     json.dump(self.uiObj, out_file)
+    #     out_file.close()
+
+    # TODO save input files
+    # def load_design_inputs(self):
+    #     filename, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
+    #     if not filename:
+    #         return
+    #     try:
+    #         in_file = open(str(filename), 'rb')
+    #     except IOError:
+    #         QMessageBox.information(self, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % filename)
+    #         return
+    #     ui_obj = json.load(in_file)
+    #     self.set_dict_touser_inputs(ui_obj)
+
+    # TODO save log messages
+    # def save_log_messages(self):
+    #     filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
+    #                                                 "Text files (*.txt)")
+    #     return self.save_file(filename + ".txt")
+    #
+    # def save_file(self,filename):
+    #     """
+    #
+    #     Args:
+    #         filename: file name
+    #
+    #     Returns: open file for writing
+    #
+    #     """
+    #     fname = QFile(filename)
+    #     if not fname.open(QFile.WriteOnly | QFile.Text):
+    #         QMessageBox.warning(self, "Application",
+    #                             "Cannot write file %s:\n%s." % (filename, fname.errorString()))
+    #         return
+    #     outf = QTextStream(fname)
+    #     QApplication.setOverrideCursor(Qt.WaitCursor)
+    #     outf << self.ui.textEdit.toPlainText()
+    #     QApplication.restoreOverrideCursor()
 
     def get_user_inputs(self):
         uiObj = {}

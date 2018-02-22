@@ -11,13 +11,14 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
-from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
+from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
 import sys
 import os.path
 import pickle
+import json
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
@@ -226,6 +227,9 @@ class MainController(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
+        # self.ui.action_save_input.triggered.connect(self.save_design_inputs)
+        # self.ui.action_load_input.triggered.connect(self.load_design_inputs)
+        # self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -281,6 +285,8 @@ class MainController(QMainWindow):
     #     def start_display():
     #         self.ui.modelTab.raise_()
     #     return display, start_display
+
+
 
     def get_beamdata(self):
         """
@@ -359,6 +365,60 @@ class MainController(QMainWindow):
             QMessageBox.about(self, "Error", "Please enter a value between %s-%s"%(min_val, max_val))
             widget.clear()
             widget.setFocus()
+
+    # TODO load input files
+    # def save_design_inputs(self):
+    #     filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+    #                                               "Input Files(*.osi)")
+    #     if not filename:
+    #         return
+    #     try:
+    #         out_file = open(str(filename), 'wb')
+    #     except IOError:
+    #         QMessageBox.information(self, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % filename)
+    #         return
+    #     json.dump(self.uiObj, out_file)
+    #     out_file.close()
+
+    # TODO save input files
+    # def load_design_inputs(self):
+    #     filename, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
+    #     if not filename:
+    #         return
+    #     try:
+    #         in_file = open(str(filename), 'rb')
+    #     except IOError:
+    #         QMessageBox.information(self, "Unable to open file",
+    #                                 "There was an error opening \"%s\"" % filename)
+    #         return
+    #     ui_obj = json.load(in_file)
+    #     self.set_dict_touser_inputs(ui_obj)
+
+    # TODO save log messages
+    # def save_log_messages(self):
+    #     filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
+    #                                                 "Text files (*.txt)")
+    #     return self.save_file(filename + ".txt")
+    #
+    # def save_file(self,filename):
+    #     """
+    #
+    #     Args:
+    #         filename: file name
+    #
+    #     Returns: open file for writing
+    #
+    #     """
+    #     fname = QFile(filename)
+    #     if not fname.open(QFile.WriteOnly | QFile.Text):
+    #         QMessageBox.warning(self, "Application",
+    #                             "Cannot write file %s:\n%s." % (filename, fname.errorString()))
+    #         return
+    #     outf = QTextStream(fname)
+    #     QApplication.setOverrideCursor(Qt.WaitCursor)
+    #     outf << self.ui.textEdit.toPlainText()
+    #     QApplication.restoreOverrideCursor()
 
     def get_user_inputs(self):
         """

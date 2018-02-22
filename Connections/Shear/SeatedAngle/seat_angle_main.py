@@ -222,10 +222,10 @@ class DesignReportDialog(QDialog):
         return str(filename)
 
     def desired_location(self, filename, base_type):
-	    if base_type == ".svg":
+        if base_type == ".svg":
             cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
         else:
-			shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
+            shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()

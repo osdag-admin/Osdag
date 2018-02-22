@@ -274,7 +274,7 @@ class MyPopupDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-			base_type = base[-4:]
+            base_type = base[-4:]
             self.desired_location(filename, base_type)
 
         return str(filename)

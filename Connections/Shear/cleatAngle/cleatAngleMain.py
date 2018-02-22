@@ -264,14 +264,14 @@ class MyPopupDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-			base_type = base[-4:]
+            base_type = base[-4:]
             self.desired_location(filename, base_type)
 
-    def desired_location(self, filename, base_type):	
-		if base_type == ".svg":
+    def desired_location(self, filename, base_type):
+        if base_type == ".svg":
             cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
         else:
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+            shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
 
     def save_user_profile(self):
         input_data = self.get_design_report_inputs()

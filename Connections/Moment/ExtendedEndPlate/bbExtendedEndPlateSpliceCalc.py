@@ -416,10 +416,6 @@ def bbExtendedEndPlateSplice(uiObj):
     gauge_dist_min = pitch_dist_min
     gauge_dist_max = pitch_dist_max
 
-    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
-    # TODO validate g_1 with correct value
-    g_1 = 90
-
     # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         min_end_distance = int(math.ceil(1.7 * dia_hole))
@@ -436,6 +432,10 @@ def bbExtendedEndPlateSplice(uiObj):
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     edge_dist_mini = end_dist_mini
     edge_dist_max = end_dist_max
+
+    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
+    # TODO validate g_1 with correct value
+    g_1 = 90
 
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
@@ -685,6 +685,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
         end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
 
+        cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+
     # Case 2: When the height of end plate is specified but the width is not specified by the user
     elif end_plate_height != 0 and end_plate_width == 0:
         height_available = end_plate_height  # available height of end plate
@@ -751,6 +753,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
         end_plate_height_provided = height_available
         end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
+
+        cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
 
     # Case 3: When the height of end plate is not specified but the width is specified by the user
     elif end_plate_height == 0 and end_plate_width != 0:
@@ -823,6 +827,8 @@ def bbExtendedEndPlateSplice(uiObj):
         width_available = end_plate_width
         end_plate_width_provided = width_available
 
+        cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+
     # Case 4: When the height and the width of End Plate is specified by the user
     elif end_plate_height != 0 and end_plate_width != 0:
 
@@ -893,6 +899,8 @@ def bbExtendedEndPlateSplice(uiObj):
         width_available = end_plate_width
         end_plate_width_provided = width_available
 
+        cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+
     #######################################################################
     # Validation of calculated Height and Width of End Plate
 
@@ -931,6 +939,18 @@ def bbExtendedEndPlateSplice(uiObj):
         logger.error(": Width of the End Plate exceeds the maximum allowed width ")
         logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
         logger.info(": Decrease the width of End Plate")
+
+    # TODO: Add reference for the below g_1 values
+    #######################################################################
+    # Validation of calculated cross-centre gauge distance
+    if cross_centre_gauge < 90:
+        logger.error(": The cross-centre is less than the minimum required value (Steel designers manual, page 733, 6th edition - 2003) ")
+        logger.warning(": The minimum required value of cross centre gauge is %2.2f mm" % g_1)
+        logger.info(": Increase the width of the End Plate or decrease the diameter of the bolt")
+    if cross_centre_gauge > 140:
+        logger.error(": The cross-centre is greater than the maximum allowed value (Steel designers manual, page 733, 6th edition - 2003) ")
+        logger.warning(": The maximum allowed value of cross centre gauge is 140 mm")
+        logger.info(": Decrease the width of the End Plate or increase the diameter of the bolt")
 
     #######################################################################
     # Calculation of Tension in bolts
@@ -1627,7 +1647,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
-        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
@@ -1719,7 +1739,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
-        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
@@ -1811,7 +1831,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
-        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 
@@ -1903,7 +1923,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
-        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
 

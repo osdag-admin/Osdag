@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>709</width>
+    <height>402</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Define members</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="15" column="3" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_save">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_reset">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_close">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_2">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_3">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5" colspan="2">
+    <widget class="QLabel" name="label_10">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Section type              Section</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="9" colspan="2">
+    <widget class="QLabel" name="label_9">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Maximum factored 
+axial force (kN)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_4">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_5">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>5</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_5">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_2">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_2">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_2">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_5">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_4">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_6">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_9">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_6">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="8" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_4">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_5">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_5">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_6">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>6</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="7">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>7</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_11">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Inclination
+(degree)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_3">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_3">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_3">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads"/>
+   </item>
+   <item row="6" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_3">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="8" rowspan="15">
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Member</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="15">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_4">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_7">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_4">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="ResourceFiles/icons.qrc">:/newPrefix/images/inclination.png</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4" rowspan="15">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_2">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="2">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>235</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="12" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_6">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="10">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>235</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="13" column="5" rowspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_8">
+     <item>
+      <widget class="QComboBox" name="comboBx_selection_7">
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <item>
+        <property name="text">
+         <string>Select type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Single Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Double Angle</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Channel </string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_10">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbl_sectionSelection_7">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="14" column="0">
+    <widget class="QLineEdit" name="lineEdit_no_of_member_7">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>7</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="2" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_angle_7">
+     <property name="inputMethodHints">
+      <set>Qt::ImhDigitsOnly|Qt::ImhMultiLine</set>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_6">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>228</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="14" column="10">
+    <widget class="QLineEdit" name="lineEdit_loads_7">
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="6">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>235</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>lineEdit_angle</tabstop>
+  <tabstop>lineEdit_angle_2</tabstop>
+  <tabstop>lineEdit_angle_3</tabstop>
+  <tabstop>lineEdit_angle_4</tabstop>
+  <tabstop>lineEdit_angle_5</tabstop>
+  <tabstop>lineEdit_angle_6</tabstop>
+  <tabstop>lineEdit_angle_7</tabstop>
+  <tabstop>comboBx_selection</tabstop>
+  <tabstop>comboBx_selection_2</tabstop>
+  <tabstop>comboBx_selection_3</tabstop>
+  <tabstop>comboBx_selection_4</tabstop>
+  <tabstop>comboBx_selection_5</tabstop>
+  <tabstop>comboBx_selection_6</tabstop>
+  <tabstop>comboBx_selection_7</tabstop>
+  <tabstop>lineEdit_loads</tabstop>
+  <tabstop>lineEdit_loads_2</tabstop>
+  <tabstop>lineEdit_loads_3</tabstop>
+  <tabstop>lineEdit_loads_4</tabstop>
+  <tabstop>lineEdit_loads_5</tabstop>
+  <tabstop>lineEdit_loads_6</tabstop>
+  <tabstop>lineEdit_loads_7</tabstop>
+  <tabstop>lineEdit_no_of_member_4</tabstop>
+  <tabstop>lineEdit_no_of_member_3</tabstop>
+  <tabstop>lineEdit_no_of_member_5</tabstop>
+  <tabstop>lineEdit_no_of_member_7</tabstop>
+  <tabstop>lineEdit_no_of_member_6</tabstop>
+  <tabstop>lineEdit_no_of_member</tabstop>
+  <tabstop>lineEdit_no_of_member_2</tabstop>
+ </tabstops>
+ <resources>
+  <include location="ResourceFiles/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

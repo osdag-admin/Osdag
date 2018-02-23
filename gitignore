@@ -2,9 +2,13 @@
 *.pyo
 *.xml
 **/*.txt
-*.pyc
+**/*.pyc
+**/**/*.pyc
+**/**/**/*.pyc
+**/**/**/**/*.pyc
 .idea/*
 .idea/workspace.xml
+**/.idea/workspace.xml
 *~
 *.html
 *.xml

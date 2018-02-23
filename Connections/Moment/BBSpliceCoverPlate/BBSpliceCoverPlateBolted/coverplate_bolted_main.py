@@ -15,6 +15,12 @@ from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
+
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from Connections.Component.ISection import ISection
+from utilities import osdag_display_shape
+import copy
+
 import sys
 import os.path
 import pickle
@@ -242,6 +248,10 @@ class MainController(QMainWindow):
         self.ui.txt_webplateHeight.setValidator(doubl_validator)
         self.ui.txt_webplateWidth.setValidator(doubl_validator)
 
+        # Initialising the qtviewer
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
+
         min_fu = 290
         max_fu = 590
         self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
@@ -250,37 +260,52 @@ class MainController(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-    #     from osdagMainSettings import backend_name
-    #     self.display, _ = self.init_display(backend_str=backend_name())
         self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreferences(self)
-    #
-    # def init_display(self, backend_str=None, size=(1024, 768)):
-    #     from OCC.Display.backend import load_backend, get_qt_modules
-    #
-    #     used_backend = load_backend(backend_str)
-    #
-    #     global display, start_display, app, _, USED_BACKEND
-    #     if 'qt' in used_backend:
-    #         from OCC.Display.qtDisplay import qtViewer3d
-    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-    #
-    #     from OCC.Display.qtDisplay import qtViewer3d
-    #     self.ui.modelTab = qtViewer3d(self)
-    #     display = self.ui.modelTab._display
-    #
-    #     # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-    #     # display.View.SetProj(1, 1, 1)
-    #
-    #     def centerOnScreen(self):
-    #         resolution = QtGui.QDesktopWidget().screenGeometry()
-    #         self.move((resolution.width()/2) - (self.frameSize().width()/2),
-    #                   (resolution.height()/2) - (self.frameSize().height()/2))
-    #
-    #     def start_display():
-    #         self.ui.modelTab.raise_()
-    #     return display, start_display
+
+        def centerOnScreen(self):
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width()/2) - (self.frameSize().width()/2),
+                      (resolution.height()/2) - (self.frameSize().height()/2))
+
+        # def start_display():
+        #     self.ui.modelTab.raise_()
+        # return display, start_display
+
+    def showColorDialog(self):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+
+    def createBBCoverPlateBoltedCAD(self):
+        beam_data = self.fetchBeamPara()
+
+        beam_tw = float(beam_data["tw"])
+        beam_T = float(beam_data["T"])
+        beam_d = float(beam_data["D"])
+        beam_B = float(beam_data["B"])
+        beam_R1 = float(beam_data["R1"])
+        beam_R2 = float(beam_data["R2"])
+        beam_alpha = float(beam_data["FlangeSlope"])
+        beam_length = 800.0
+
+        beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+                             R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                             length=beam_length, notchObj=None)
+        beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+        outputobj = self.outputs  # Save all the calculated/displayed out in outputobj
+
+        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right)
+
+        bbCoverPlateBolted.create_3DModel()
+
+        return bbCoverPlateBolted
+
 
     def get_beamdata(self):
         """
@@ -541,7 +566,31 @@ class MainController(QMainWindow):
         #     self.ui.btn_Design.setEnabled(False)
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+        self.call_3DModel()
 
+    def call_3DModel(self):
+        self.createBBCoverPlateBoltedCAD()  # Call to calculate/create the Extended Both Way CAD model
+        self.display_3DModel("Model", "gradient_bg")  # Call to display the Extended Both Way CAD model
+
+    def display_3DModel(self, component, bgcolor):
+        self.component = component
+
+        self.display.EraseAll()
+        self.display.View_Iso()
+        self.display.FitAll()
+
+        self.display.DisableAntiAliasing()
+        if bgcolor == "gradient_bg":
+
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        else:
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+
+        self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()   # ExtObj is an object which gets all the calculated values of CAD models
+
+        # Displays the beams
+        osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
+        osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
 
     def display_output(self, outputObj):
         """
@@ -649,6 +698,45 @@ class MainController(QMainWindow):
     def websplice_plate(self):
         section = Webspliceplate(self)
         section.show()
+
+    def init_display(self, backend_str=None, size=(1024, 768)):
+
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        # from OCC.Display.pyqt4Display import qtViewer3d
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+
+        # self.setWindowTitle("Osdag Finplate")
+        self.ui.mytabWidget.resize(size[0], size[1])
+        self.ui.mytabWidget.addTab(self.ui.modelTab, "")
+
+        self.ui.modelTab.InitDriver()
+        display = self.ui.modelTab._display
+
+        # background gradient
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # display_2d.set_bg_gradient_color(255,255,255,255,255,255)
+        display.display_trihedron()
+        display.View.SetProj(1, 1, 1)
+
+        def centerOnScreen(self):
+            '''Centers the window on the screen.'''
+            resolution = QtGui.QDesktopWidget().screenGeometry()
+            self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+                      (resolution.height() / 2) - (self.frameSize().height() / 2))
+
+        def start_display():
+            self.ui.modelTab.raise_()
+
+        return display, start_display
 
     def show_font_dialogue(self):
         font, ok = QFontDialog.getFont()

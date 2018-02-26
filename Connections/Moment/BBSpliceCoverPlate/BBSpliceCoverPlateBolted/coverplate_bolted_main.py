@@ -18,6 +18,7 @@ from model import *
 
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from Connections.Component.ISection import ISection
+from Connections.Component.plate import Plate
 from utilities import osdag_display_shape
 import copy
 
@@ -299,8 +300,14 @@ class MainController(QMainWindow):
                              length=beam_length, notchObj=None)
         beam_Right = copy.copy(beam_Left)  # Since both the beams are same
         outputobj = self.outputs  # Save all the calculated/displayed out in outputobj
+        alist = self.designParameters()  # An object to save all input values entered by user
 
-        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right)
+        plateAbvFlange = Plate(L=outputobj["FlangeBolt"]["FlangePlateWidth"],
+                           W=outputobj["FlangeBolt"]["FlangePlateHeight"],
+                           T=float(alist["FlangePlate"]["Thickness (mm)"]))
+        plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the end plates are identical
+
+        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left,beam_Right,plateAbvFlange, plateBelwFlange)
 
         bbCoverPlateBolted.create_3DModel()
 
@@ -586,11 +593,14 @@ class MainController(QMainWindow):
         else:
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-        self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()   # ExtObj is an object which gets all the calculated values of CAD models
+        self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()   # CPBoltedObj (CoverPlateBoltedObj) is an object which gets all the calculated values of CAD models
 
         # Displays the beams
         osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
         osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+
+        osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
+        osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
 
     def display_output(self, outputObj):
         """

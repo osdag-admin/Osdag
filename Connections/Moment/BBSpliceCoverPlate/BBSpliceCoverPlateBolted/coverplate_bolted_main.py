@@ -307,7 +307,13 @@ class MainController(QMainWindow):
                            T=float(alist["FlangePlate"]["Thickness (mm)"]))
         plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the end plates are identical
 
-        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left,beam_Right,plateAbvFlange, plateBelwFlange)
+        WebPlateLeft = Plate(L=outputobj["WebBolt"]["WebPlateWidth"],
+                             W=outputobj["WebBolt"]["WebPlateHeight"],
+                             T=float(alist["WebPlate"]["Thickness (mm)"]))
+        WebPlateRight = copy.copy(WebPlateLeft)  # Since both the end plates are identical
+
+        bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
+                                                   WebPlateLeft, WebPlateRight)
 
         bbCoverPlateBolted.create_3DModel()
 
@@ -601,6 +607,9 @@ class MainController(QMainWindow):
 
         osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
+
+        osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
+        osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
 
     def display_output(self, outputObj):
         """

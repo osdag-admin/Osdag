@@ -1,25 +1,31 @@
 import numpy
 
 class BBCoverPlateBoltedCAD(object):
-    def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange):
+    def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight):
 
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.gap = 5.0
         self.plateAbvFlange = plateAbvFlange
         self.plateBelwFlange = plateBelwFlange
+        self.WebPlateLeft = WebPlateLeft
+        self.WebPlateRight = WebPlateRight
 
     def create_3DModel(self):
         self.createBeamLGeometry()
         self.createBeamRGeometry()
         self.createPlateAbvFlangeGeometry()
         self.createPlateBelwFlangeGeometry()
+        self.createWebPlateLeftGeometry()
+        self.createWebPlateRightGeometry()
 
 
         self.beamLModel = self.beamLeft.create_model()
         self.beamRModel = self.beamRight.create_model()
         self.plateAbvFlangeModel = self.plateAbvFlange.create_model()
         self.plateBelwFlangeModel = self.plateBelwFlange.create_model()
+        self.WebPlateLeftModel = self.WebPlateLeft.create_model()
+        self.WebPlateRightModel = self.WebPlateRight.create_model()
 
     def createBeamLGeometry(self):
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
@@ -50,6 +56,22 @@ class BBCoverPlateBoltedCAD(object):
         plateBF_wDir = numpy.array([0.0, 1.0, 0.0])
         self.plateBelwFlange.place(plateBelwFlangeOrigin, plateBF_uDir, plateBF_wDir)
 
+    def createWebPlateLeftGeometry(self):
+        WPL_shiftX = -(self.beamLeft.t + self.WebPlateLeft.T) / 2
+        WPL_shiftY = self.beamLeft.length + self.gap / 2 - self.WebPlateLeft.W / 2
+        WebPlateLeftOrigin = numpy.array([WPL_shiftX, WPL_shiftY, 0.0])
+        WPL_uDir = numpy.array([1.0, 0.0, 0.0])
+        WPL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.WebPlateLeft.place(WebPlateLeftOrigin, WPL_uDir, WPL_wDir)
+
+    def createWebPlateRightGeometry(self):
+        WPR_shiftX = (self.beamLeft.t + self.WebPlateLeft.T) / 2
+        WPR_shiftY = self.beamLeft.length + self.gap / 2 - self.WebPlateLeft.W / 2
+        WebPlateRightOrigin = numpy.array([WPR_shiftX, WPR_shiftY, 0.0])
+        WPR_uDir = numpy.array([1.0, 0.0, 0.0])
+        WPR_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
+
     def get_beamLModel(self):
         return self.beamLModel
 
@@ -61,3 +83,9 @@ class BBCoverPlateBoltedCAD(object):
 
     def get_plateBelwFlangeModel(self):
         return self.plateBelwFlangeModel
+
+    def get_WebPlateLeftModel(self):
+        return self.WebPlateLeftModel
+
+    def get_WebPlateRightModel(self):
+        return self.WebPlateRightModel

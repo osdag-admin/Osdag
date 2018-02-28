@@ -6,9 +6,12 @@ Created on 24-Aug-2017
 
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
+from ui_plate import Ui_Plate
+from ui_stiffener import Ui_Stiffener
+from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from drawing_2D import ExtendedEndPlate
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
@@ -113,7 +116,7 @@ class DesignPreference(QDialog):
         return designPref
 
     def set_boltFu(self):
-        uiObj = self.main_controller.getuser_inputs()
+        uiObj = self.maincontroller.get_user_inputs()
         boltGrade = str(uiObj["Bolt"]["Grade"])
         if boltGrade != '':
             boltfu = str(self.get_boltFu(boltGrade))
@@ -156,6 +159,121 @@ class DesignPreference(QDialog):
         self.close()
 
 
+class Plate(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Plate()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
+        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
+        self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+        self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
+
+
+class Stiffener(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Stiffener()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
+        self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
+        self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+
+
+class Pitch(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Pitch()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+        print "result plate", resultObj_plate
+        no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
+        if no_of_bolts == 8:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+            self.ui.lbl_1.setText('Pitch')
+            self.ui.lbl_mem2.hide()
+            self.ui.lbl_mem3.hide()
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_2.hide()
+            self.ui.lbl_3.hide()
+            self.ui.lbl_4.hide()
+            self.ui.lbl_5.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch2.hide()
+            self.ui.lineEdit_pitch3.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 12:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lbl_1.setText('Pitch_2_3')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_mem4.hide()
+            self.ui.lbl_mem5.hide()
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_4.hide()
+            self.ui.lbl_5.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch4.hide()
+            self.ui.lineEdit_pitch5.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 16:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+            self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+            self.ui.lbl_1.setText('Pitch_2_3')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_4.setText('Pitch_5_6')
+            self.ui.lbl_5.setText('Pitch_6_7')
+            self.ui.lbl_mem6.hide()
+            self.ui.lbl_mem7.hide()
+            self.ui.lbl_6.hide()
+            self.ui.lbl_7.hide()
+            self.ui.lineEdit_pitch6.hide()
+            self.ui.lineEdit_pitch7.hide()
+        elif no_of_bolts == 20:
+            self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+            self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+            self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+            self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+            self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+            self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
+            self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
+            self.ui.lbl_1.setText('Pitch_1_2')
+            self.ui.lbl_2.setText('Pitch_3_4')
+            self.ui.lbl_3.setText('Pitch_4_5')
+            self.ui.lbl_4.setText('Pitch_5_6')
+            self.ui.lbl_5.setText('Pitch_6_7')
+            self.ui.lbl_6.setText('Pitch_7_8')
+            self.ui.lbl_7.setText('Pitch_9_10')
+
+
+
 class Maincontroller(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
@@ -169,6 +287,17 @@ class Maincontroller(QMainWindow):
         # self.ui.combo_connLoc.setCurrentIndex(0)
         # self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
         # self.ui.combo_beamSec.setCurrentIndex(0)
+
+        # import math
+        # beam_section = self.fetchBeamPara()
+        # t_w = float(beam_section["tw"])
+        # t_f = float(beam_section["T"])
+        # print t_w, t_f
+        # t_thicker = math.ceil(max(t_w, t_f))
+        # t_thicker = (t_thicker / 2.) * 2
+        #
+        # self.plate_thickness = {'Select plate thickness':[t_thicker, t_thicker+2]}
+
         self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
                           'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_type.addItems(self.gradeType.keys())
@@ -184,7 +313,13 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
+        self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
+        self.ui.btn_plateDetail.clicked.connect(self.plate_details)
+        self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 
         validator = QIntValidator()
         self.ui.txt_Fu.setValidator(validator)
@@ -205,37 +340,37 @@ class Maincontroller(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        from osdagMainSettings import backend_name
-        self.display, _ = self.init_display(backend_str=backend_name())
+        # from osdagMainSettings import backend_name
+        # self.display, _ = self.init_display(backend_str=backend_name())
         self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreference(self)
 
-    def init_display(self, backend_str=None, size=(1024, 768)):
-        from OCC.Display.backend import load_backend, get_qt_modules
-
-        used_backend = load_backend(backend_str)
-
-        global display, start_display, app, _, USED_BACKEND
-        if 'qt' in used_backend:
-            from OCC.Display.qtDisplay import qtViewer3d
-            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-
-        from OCC.Display.qtDisplay import qtViewer3d
-        self.ui.modelTab = qtViewer3d(self)
-        display = self.ui.modelTab._display
-
-        # display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-        # display.View.SetProj(1, 1, 1)
+    # def init_display(self, backend_str=None, size=(1024, 768)):
+    #     from OCC.Display.backend import load_backend, get_qt_modules
+    #
+    #     used_backend = load_backend(backend_str)
+    #
+    #     global display, start_display, app, _, USED_BACKEND
+    #     if 'qt' in used_backend:
+    #         from OCC.Display.qtDisplay import qtViewer3d
+    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+    #
+    #     from OCC.Display.qtDisplay import qtViewer3d
+    #     self.ui.modelTab = qtViewer3d(self)
+    #     display = self.ui.modelTab._display
+    #
+    #     display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+    #     display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width()/2) - (self.frameSize().width()/2),
                       (resolution.height()/2) - (self.frameSize().height()/2))
 
-        def start_display():
-            self.ui.modelTab.raise_()
-        return display, start_display
+        # def start_display():
+        #     self.ui.modelTab.raise_()
+        # return display, start_display
 
     def get_user_inputs(self):
         uiObj = {}
@@ -261,8 +396,8 @@ class Maincontroller(QMainWindow):
         uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
         uiObj["Weld"] = {}
-        uiObj["Weld"]["Flange (mm)"] = self.ui.combo_flangeSize.currentText()
-        uiObj["Weld"]["Web (mm)"] = self.ui.combo_webSize.currentText()
+        uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
+        uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
         return uiObj
 
     def design_prefer(self):
@@ -370,6 +505,7 @@ class Maincontroller(QMainWindow):
         Returns:
 
         """
+
         self.uiObj = self.get_user_inputs()
         if self.designPrefDialog.saved is not True:
             design_pref = self.designPrefDialog.save_default_para()
@@ -387,8 +523,66 @@ class Maincontroller(QMainWindow):
         # self.uiObj = self.get_user_inputs()
         # print self.uiObj
         self.alist = self.designParameters()
-        outputs = bbExtendedEndPlateSplice(self.alist)
+        self.outputs = bbExtendedEndPlateSplice(self.alist)
+        print "output list ", self.outputs
+        self.ui.outputDock.setFixedSize(310, 710)
+        a = self.outputs[self.outputs.keys()[0]]
+        self.display_output(self.outputs)
         self.display_log_to_textedit()
+
+    def display_output(self, outputObj):
+        for k in outputObj.keys():
+            for value in outputObj.values():
+                if outputObj.items() == " ":
+                    resultObj = outputObj
+                else:
+                    resultObj = outputObj
+        print resultObj
+
+        critical_tension = resultObj["Bolt"]["CriticalTension"]
+        self.ui.txt_tensionCritical.setText(str(critical_tension))
+
+        tension_capacity = resultObj["Bolt"]["TensionCapacity"]
+        self.ui.txt_tensionCapacity.setText(str(tension_capacity))
+
+        shear_capacity = resultObj["Bolt"]["ShearCapacity"]
+        self.ui.txt_shearCapacity.setText(str(shear_capacity))
+
+        bearing_capacity = resultObj["Bolt"]["BearingCapacity"]
+        self.ui.txt_bearCapacity.setText(str(bearing_capacity))
+
+        combined_capacity = resultObj["Bolt"]["CombinedCapacity"]
+        self.ui.txt_boltgrpcapacity.setText(str(combined_capacity))
+
+        bolt_capacity = resultObj["Bolt"]["BoltCapacity"]
+        self.ui.txt_boltcapacity.setText(str(bolt_capacity))
+
+        bolts_required = resultObj["Bolt"]["NumberOfBolts"]
+        self.ui.txt_noBolts.setText(str(bolts_required))
+
+        bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
+        self.ui.txt_rowBolts.setText(str(bolts_in_rows))
+
+        # pitch = resultObj["Bolt"]["Pitch"]
+        # self.ui.txt_pitch.setText(str(pitch))
+
+        gauge = resultObj["Bolt"]["Gauge"]
+        self.ui.txt_gauge.setText(str(gauge))
+
+        cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
+        self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
+
+        end_distance = resultObj["Bolt"]["End"]
+        self.ui.txt_endDist.setText(str(end_distance))
+
+        edge_distance = resultObj["Bolt"]["Edge"]
+        self.ui.txt_edgeDist.setText(str(edge_distance))
+
+        weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
+        self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
+
+        weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
+        self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
     def display_log_to_textedit(self):
         file = QFile('extnd.log')
@@ -455,7 +649,7 @@ class Maincontroller(QMainWindow):
     def fetchBeamPara(self):
         beamdata_sec = self.ui.combo_beamSec.currentText()
         dictbeamdata = get_beamdata(beamdata_sec)
-        return  dictbeamdata
+        return dictbeamdata
 
     def combotype_current_index_changed(self, index):
         """
@@ -505,8 +699,11 @@ class Maincontroller(QMainWindow):
                  parameters from Extended endplate GUI
 
         """
-        self.resultobj = self.call_calculation()
-        beam_beam = ExtendedEndPlate(self.resultobj)
+        # self.resultobj = self.designParameters()
+        self.alist = self.designParameters()
+        self.resultobj = bbExtendedEndPlateSplice(self.alist)
+        self.beam_data = self.fetchBeamPara()
+        beam_beam = ExtendedEndPlate(self.alist, self.resultobj, self.beam_data)
         if view != "All":
             if view == "Front":
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
@@ -518,6 +715,38 @@ class Maincontroller(QMainWindow):
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
                 beam_beam.save_to_svg(filename, view)
 
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
+
+    def show_font_dialogue(self):
+        font, ok = QFontDialog.getFont()
+        if ok:
+            # self.ui.textEdit.setFont()
+            self.ui.textEdit.setFont(font)
+
+    def pitch_details(self):
+        section = Pitch(self)
+        section.show()
+
+    def plate_details(self):
+        section = Plate(self)
+        section.show()
+
+    def stiffener_details(self):
+        section = Stiffener(self)
+        section.show()
 
 def set_osdaglogger():
     global logger
@@ -549,6 +778,16 @@ def set_osdaglogger():
 
 def main():
     set_osdaglogger()
+    # --------------- To display log messages in different colors ---------------
+    rawLogger = logging.getLogger("raw")
+    rawLogger.setLevel(logging.INFO)
+    fh = logging.FileHandler("extnd.log", mode="w")
+    formatter = logging.Formatter('''%(message)s''')
+    fh.setFormatter(formatter)
+    rawLogger.addHandler(fh)
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    # ----------------------------------------------------------------------------
+
     app = QApplication(sys.argv)
     module_setup()
     window = Maincontroller()

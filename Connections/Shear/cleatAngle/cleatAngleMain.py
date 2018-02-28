@@ -36,6 +36,7 @@ from Svg_Window import SvgWindow
 from Connections.Shear.common_logic import CommonDesignLogic
 import shutil
 import pdfkit
+import cairosvg
 
 class DesignPreferences(QDialog):
     def __init__(self, parent=None):
@@ -263,9 +264,13 @@ class MyPopupDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-            self.desired_location(filename)
+			base_type = base[-4:]
+            self.desired_location(filename, base_type)
 
-    def desired_location(self, filename):
+    def desired_location(self, filename, base_type):	
+		if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+        else:
         shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
 
     def save_user_profile(self):
@@ -986,7 +991,7 @@ class MainController(QMainWindow):
 
     def openDesign_inputs(self):
 
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
         if not fileName:
             return
         try:
@@ -1770,7 +1775,7 @@ class MainController(QMainWindow):
         ui_input = self.getuser_inputs()
         self.save_inputs(ui_input)
         reply = QMessageBox.question(self, 'Message',
-                                           "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+                                           "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.closed.emit()

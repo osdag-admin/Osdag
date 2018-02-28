@@ -182,6 +182,7 @@ class Flangespliceplate(QDialog):
         self.ui.txt_plateDemand.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateDemand"]))
         self.ui.txt_plateCapacity.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangeCapacity"]))
 
+
 class Webspliceplate(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -221,8 +222,10 @@ class MainController(QMainWindow):
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
-        self.ui.actionEnlarge_font_size.triggered.connect(self.showFontDialogue)
+        self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -647,10 +650,25 @@ class MainController(QMainWindow):
         section = Webspliceplate(self)
         section.show()
 
-    def showFontDialogue(self):
+    def show_font_dialogue(self):
         font, ok = QFontDialog.getFont()
         if ok:
-            self.ui.textEdit.setFont()
+            self.ui.textEdit.setFont(font)
+
+    def dockbtn_clicked(self, widgets):
+        """
+
+        Args:
+            widgets: Input , Output dock
+
+        Returns: Dock & undock the widgets
+
+        """
+        flag = widgets.isHidden()
+        if flag:
+            widgets.show()
+        else:
+            widgets.hide()
 
 
 def set_osdaglogger():
@@ -683,6 +701,15 @@ def set_osdaglogger():
 
 def main():
     set_osdaglogger()
+    # --------------- To display log messages in different colors ---------------
+    rawLogger = logging.getLogger("raw")
+    rawLogger.setLevel(logging.INFO)
+    fh = logging.FileHandler("coverplate.log", mode="w")
+    formatter = logging.Formatter('''%(message)s''')
+    fh.setFormatter(formatter)
+    rawLogger.addHandler(fh)
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    # ----------------------------------------------------------------------------
     app = QApplication(sys.argv)
     module_setup()
     window = MainController()
@@ -691,4 +718,5 @@ def main():
 
 
 if __name__ == '__main__':
+
     main()

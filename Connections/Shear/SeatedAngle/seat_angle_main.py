@@ -4,7 +4,7 @@ import os.path
 import sys
 import subprocess
 import pdfkit
-
+import cairosvg
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QColor
@@ -216,12 +216,16 @@ class DesignReportDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-            self.desired_location(filename)
+            base_type = base[-4:]
+            self.desired_location(filename, base_type)
 
         return str(filename)
 
-    def desired_location(self, filename):
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
+    def desired_location(self, filename, base_type):
+	    if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+        else:
+			shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
@@ -745,7 +749,7 @@ class MainController(QMainWindow):
 
     def load_design_inputs(self):
 
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
         if not fileName:
             return
         try:
@@ -1423,7 +1427,7 @@ class MainController(QMainWindow):
         uiInput = self.getuser_inputs()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.closed.emit()

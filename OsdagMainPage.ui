@@ -1139,6 +1139,25 @@ color:#ffffff;
            <attribute name="title">
             <string>Truss Connection</string>
            </attribute>
+           <widget class="QLabel" name="label_6">
+            <property name="geometry">
+             <rect>
+              <x>270</x>
+              <y>300</y>
+              <width>541</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="font">
+             <font>
+              <family>Arial</family>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>This module is not available in the current version.</string>
+            </property>
+           </widget>
           </widget>
          </widget>
         </item>

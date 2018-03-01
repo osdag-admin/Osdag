@@ -759,7 +759,7 @@ def set_osdaglogger():
     logger.addHandler(fh)
 
 
-def main():
+def launch_coverplate_controller():
     set_osdaglogger()
     # --------------- To display log messages in different colors ---------------
     rawLogger = logging.getLogger("raw")
@@ -778,5 +778,4 @@ def main():
 
 
 if __name__ == '__main__':
-
-    main()
+    launch_coverplate_controller()

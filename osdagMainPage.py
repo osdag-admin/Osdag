@@ -20,6 +20,7 @@ import os
 from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleController
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.coverplate_bolted_main import launch_coverplate_controller
 import os.path
 import subprocess
 import shutil
@@ -56,7 +57,7 @@ class OsdagMainWindow(QMainWindow):
         #show_msg = pyqtSignal()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'tensionpage': 2, 'compressionpage': 3, 'flexuralpage': 4}
+        list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'beamtobeampage': 2, 'compressionpage': 3, 'flexuralpage': 4}
 
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
@@ -73,6 +74,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_plate.clicked.connect(self.unavailable)
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
+        self.ui.rdbtn_beamtobeam.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtobeampage'], list_of_items['Osdagpage']))
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
@@ -155,6 +157,10 @@ class OsdagMainWindow(QMainWindow):
 
         elif self.ui.rdbtn_seat.isChecked():
             launchSeatedAngleController(self, folder)
+            self.ui.myStackedWidget.setCurrentIndex(0)
+
+        elif self.ui.rdbtn_coverplate.isChecked():
+            launch_coverplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         else:

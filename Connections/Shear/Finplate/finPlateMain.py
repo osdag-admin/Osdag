@@ -1395,7 +1395,7 @@ class MainController(QMainWindow):
         from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        self.setWindowTitle("Osdag Finplate")
+        self.setWindowTitle("Osdag Fin Plate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 

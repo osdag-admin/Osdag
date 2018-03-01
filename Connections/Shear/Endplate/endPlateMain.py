@@ -1436,7 +1436,7 @@ class MainController(QMainWindow):
         self.ui.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
-        self.setWindowTitle("Osdag Endplate")
+        self.setWindowTitle("Osdag End Plate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 

@@ -63,6 +63,7 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
         self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_start.clicked.connect(self.show_design_connection)
+        self.ui.btn_start_2.clicked.connect(self.show_design_connection)
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)

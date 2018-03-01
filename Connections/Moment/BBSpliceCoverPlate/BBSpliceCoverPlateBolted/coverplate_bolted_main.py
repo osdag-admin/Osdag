@@ -19,6 +19,10 @@ from model import *
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
 from Connections.Component.ISection import ISection
 from Connections.Component.plate import Plate
+from Connections.Component.nut import Nut
+from Connections.Component.bolt import Bolt
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement import NutBoltArray
+from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
 
@@ -312,12 +316,92 @@ class MainController(QMainWindow):
                              T=float(alist["WebPlate"]["Thickness (mm)"]))
         WebPlateRight = copy.copy(WebPlateLeft)  # Since both the end plates are identical
 
+        bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
+        bolt_r = bolt_d / 2
+        bolt_T = self.bolt_head_thick_calculation(bolt_d)
+        bolt_R = self.bolt_head_dia_calculation(bolt_d) / 2
+        bolt_Ht = self.bolt_length_calculation(bolt_d)
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
+        nut_T = self.nut_thick_calculation(bolt_d)
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+
+        numOfBoltsF = 2 * int(outputobj["FlangeBolt"]["BoltsRequiredF"])
+        nutSpaceF = float(alist["FlangePlate"]["Thickness (mm)"]) + beam_T  # Space between bolt head and nut
+
+        numOfBoltsW = 2 * int(outputobj["WebBolt"]["BoltsRequired"])
+        nutSpaceW = 2 * float(alist["WebPlate"]["Thickness (mm)"]) + beam_tw    # Space between bolt head and nut
+
+        CoverPlateBoltedNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF, numOfBoltsW, nutSpaceW)
+
         bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
-                                                   WebPlateLeft, WebPlateRight)
+                                                   WebPlateLeft, WebPlateRight, CoverPlateBoltedNutBoltArray)
 
         bbCoverPlateBolted.create_3DModel()
 
         return bbCoverPlateBolted
+
+    def bolt_head_thick_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        return bolt_head_thick[bolt_diameter]
+
+    def bolt_head_dia_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+        return bolt_head_dia[bolt_diameter]
+
+    def bolt_length_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__
+
+        '''
+        bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+
+        return bolt_head_dia[bolt_diameter]
+
+    def nut_thick_calculation(self, bolt_diameter):
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
+        nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+        return nut_dia[bolt_diameter]
 
 
     def get_beamdata(self):
@@ -610,6 +694,11 @@ class MainController(QMainWindow):
 
         osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+
+        nutboltlistAF = self.CPBoltedObj.nut_bolt_array.get_modelsAF()
+        for nutboltAF in nutboltlistAF:
+            osdag_display_shape(self.display, nutboltAF, update=True, color=Quantity_NOC_SADDLEBROWN)
+            # osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
 
     def display_output(self, outputObj):
         """

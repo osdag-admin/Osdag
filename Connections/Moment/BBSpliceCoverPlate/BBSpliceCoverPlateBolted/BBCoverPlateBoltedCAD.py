@@ -1,7 +1,7 @@
 import numpy
 
 class BBCoverPlateBoltedCAD(object):
-    def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight):
+    def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight, nut_bolt_array):
 
         self.beamLeft = beamLeft
         self.beamRight = beamRight
@@ -10,6 +10,7 @@ class BBCoverPlateBoltedCAD(object):
         self.plateBelwFlange = plateBelwFlange
         self.WebPlateLeft = WebPlateLeft
         self.WebPlateRight = WebPlateRight
+        self.nut_bolt_array = nut_bolt_array
 
     def create_3DModel(self):
         self.createBeamLGeometry()
@@ -18,7 +19,7 @@ class BBCoverPlateBoltedCAD(object):
         self.createPlateBelwFlangeGeometry()
         self.createWebPlateLeftGeometry()
         self.createWebPlateRightGeometry()
-
+        self.create_nut_bolt_array()
 
         self.beamLModel = self.beamLeft.create_model()
         self.beamRModel = self.beamRight.create_model()
@@ -26,6 +27,7 @@ class BBCoverPlateBoltedCAD(object):
         self.plateBelwFlangeModel = self.plateBelwFlange.create_model()
         self.WebPlateLeftModel = self.WebPlateLeft.create_model()
         self.WebPlateRightModel = self.WebPlateRight.create_model()
+        self.nutBoltArrayModels = self.nut_bolt_array.create_modelAF()
 
     def createBeamLGeometry(self):
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
@@ -72,6 +74,13 @@ class BBCoverPlateBoltedCAD(object):
         WPR_wDir = numpy.array([0.0, 1.0, 0.0])
         self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
 
+    def create_nut_bolt_array(self):
+        nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
+        gaugeDirAF = numpy.array([1.0, 0, 0])
+        pitchDirAF = numpy.array([0, 1.0, 0])
+        boltDirAF = numpy.array([0, 0, -1.0])
+        self.nut_bolt_array.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF)
+
     def get_beamLModel(self):
         return self.beamLModel
 
@@ -89,3 +98,6 @@ class BBCoverPlateBoltedCAD(object):
 
     def get_WebPlateRightModel(self):
         return self.WebPlateRightModel
+
+    def get_nutboltmodelsAF(self):
+        return self.nut_bolt_array.get_models()

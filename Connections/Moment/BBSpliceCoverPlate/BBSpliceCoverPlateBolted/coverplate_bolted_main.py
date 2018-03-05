@@ -21,7 +21,8 @@ from Connections.Component.ISection import ISection
 from Connections.Component.plate import Plate
 from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
-from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement import NutBoltArray
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement_AF import NutBoltArray_AF
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement_BF import NutBoltArray_BF
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
@@ -333,10 +334,12 @@ class MainController(QMainWindow):
         numOfBoltsW = 2 * int(outputobj["WebBolt"]["BoltsRequired"])
         nutSpaceW = 2 * float(alist["WebPlate"]["Thickness (mm)"]) + beam_tw    # Space between bolt head and nut
 
-        CoverPlateBoltedNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF, numOfBoltsW, nutSpaceW)
+        bolting_AF = NutBoltArray_AF(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF)
+
+        bolting_BF = NutBoltArray_BF(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF)
 
         bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
-                                                   WebPlateLeft, WebPlateRight, CoverPlateBoltedNutBoltArray)
+                                                   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF)
 
         bbCoverPlateBolted.create_3DModel()
 
@@ -695,10 +698,14 @@ class MainController(QMainWindow):
         osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
         osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
 
-        nutboltlistAF = self.CPBoltedObj.nut_bolt_array.get_modelsAF()
+        nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
         for nutboltAF in nutboltlistAF:
             osdag_display_shape(self.display, nutboltAF, update=True, color=Quantity_NOC_SADDLEBROWN)
-            # osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+        nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
+        for nutboltBF in nutboltlistBF:
+            osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
+
 
     def display_output(self, outputObj):
         """

@@ -1,6 +1,6 @@
 '''
 Created on 30-Oct-2017
-
+Revised on 5-March-2018
 @author: Swathi M.
 '''
 
@@ -300,6 +300,40 @@ def shear_rupture(A_vn, beam_fu):
     return round(R_n, 2)
 
 ########################################################################################################################
+# Calculation of cross center gauge of flange
+'''
+           <--  gauge  --->
+           |     (g)      |
+          +-+            +-+
+    +----------------------------+
+    +----------------------------+
+    +     +-+     ||     +-+
+g = (b-tw)/4      ||      ^
+                  ||      +----Bolt+
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+          +-+     ||     +-+
+    +----------------------------+
+    +----------------------------+
+          +-+            +-+
+
+
+'''
+# Note: As per discussion with Prof. on 28/02/2018,
+# Gauge distance shall be emperically calculated as g = (b - tw)/4
+# where,
+#### b = Width of flange in mm
+#### tw = Thickness of web in mm
+def flange_gauge(b, tw):
+    g = b- 2*((b - tw) / 4)
+    return int(5 * round(float(g)/5))
+
+########################################################################################################################
 def fetchBeamPara(self):
     beam_section = self.ui.combo_Beam.currentText()
     dictbeamdata = get_beamdata(beam_section)
@@ -399,6 +433,8 @@ def coverplateboltedconnection(uiObj):
     beam_r1 = float(dictbeamdata["R1"])
     beam_b = float(dictbeamdata["B"])
 
+    # cross center gauge of a flange
+    flange_g = flange_gauge(beam_b, beam_w_t)
     # return uiObj
     ########################################################################################################################
 
@@ -773,6 +809,7 @@ def coverplateboltedconnection(uiObj):
 
         ################################################################################################################
         # Fetch bolt design output parameters dictionary
+
         if web_plate_l == 0 and flange_plate_l == 0 and flange_plate_w == 0:
             boltParam = {}
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
@@ -796,7 +833,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = 90 # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g # TODO: Need to fetch values
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -828,7 +865,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = 90  # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g  # TODO: Need to fetch values
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -1064,7 +1101,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g # TODO: Need to fetch values
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
@@ -1104,7 +1141,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g  # TODO: Need to fetch values
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 

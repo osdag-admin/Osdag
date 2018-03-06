@@ -15,7 +15,22 @@ from Connections.Component.ModelUtils import getGpPt
 
 class NutBoltArray_BF():
     def __init__(self, alist, beam_data, outputobj, nut, bolt, numOfboltsF, nutSpaceF):
-        self.origin = None
+        """
+        :param alist: Input values, entered by user 
+        :param beam_data: Beam dimensions
+        :param outputobj: Output dictionary
+        :param nut: Nut dimensions
+        :param bolt: Bolt dimensions
+        :param numOfboltsF: Number of bolts required for over plate above flange
+        :param nutSpaceF: Spacing between bolt head and nut
+        """
+        self.boltOrigin_BF = None
+        self.pitch_new_BF = None
+        self.originBF = None
+        self.gaugeDirBF = None
+        self.pitchDirBF = None
+        self.boltDirBF = None
+
         self.uiObj = alist
         self.beamDim = beam_data
         self.bolt = bolt
@@ -23,8 +38,6 @@ class NutBoltArray_BF():
         self.outputobj = outputobj
         self.numOfboltsF = numOfboltsF
         self.nutSpaceF = nutSpaceF
-        # self.numOfboltsW = numOfboltsW
-        # self.nutSpaceW = nutSpaceW
 
         self.initBoltPlaceParams_BF(outputobj)
         self.bolts_BF = []
@@ -39,7 +52,7 @@ class NutBoltArray_BF():
 
     def initialiseNutBolts_BF(self):
         '''
-        :return: This initializes nut & bolt for bolts above flange 
+        :return: This initializes required number of bolts and nuts for below flange. 
         '''
         b_BF = self.bolt
         n_BF = self.nut
@@ -57,13 +70,17 @@ class NutBoltArray_BF():
         self.edge_BF = outputobj["FlangeBolt"]["EdgeF"]
         self.end_BF = outputobj["FlangeBolt"]["EndF"]
         self.pitch_BF = outputobj["FlangeBolt"]["PitchF"]
-        self.gauge_BF = self.beamDim["B"] - 2 * self.edge_BF
+        self.gauge_BF = outputobj["FlangeBolt"]["FlangeGauge"]
         self.row_BF = outputobj["FlangeBolt"]["BoltsRequiredF"]
         self.col_BF = 2
 
     def calculatePositions_BF(self):
+        """
+        :return: The positions/coordinates to place the bolts in the form of list, positions_BF = [list of bolting coordinates] 
+        """
         self.positions_BF = []
-        self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + self.edge_BF * self.gaugeDirBF
+        # self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + self.edge_BF * self.gaugeDirBF
+        self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + (self.gauge_BF / 2) * self.gaugeDirBF
         for rw_BF in range(self.row_BF):
             for cl_BF in range(self.col_BF):
                 pos_BF = self.boltOrigin_BF

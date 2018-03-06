@@ -769,7 +769,7 @@ def launch_coverplate_controller(osdagMainWindow, folder):
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\log.css"/>''')
     # ----------------------------------------------------------------------------
     module_setup()
     window = MainController(folder)
@@ -782,7 +782,7 @@ if __name__ == '__main__':
     # --------------- To display log messages in different colors ---------------
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
-    fh = logging.FileHandler("coverplate.log", mode="w")
+    fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)

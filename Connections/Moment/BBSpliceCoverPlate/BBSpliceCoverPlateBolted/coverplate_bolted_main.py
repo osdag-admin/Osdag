@@ -12,7 +12,7 @@ from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
 import sys
@@ -200,10 +200,13 @@ class Webspliceplate(QDialog):
         self.ui.txt_plateDemand.setText(str(resultObj_webplate["WebBolt"]["webPlateDemand"]))
 
 class MainController(QMainWindow):
-    def __init__(self):
+    closed = pyqtSignal()
+
+    def __init__(self, folder):
         QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.folder = folder
 
         self.get_beamdata()
           # self.ui.combo_connLoc.setCurrentIndex(0)
@@ -227,9 +230,9 @@ class MainController(QMainWindow):
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
-        # self.ui.action_save_input.triggered.connect(self.save_design_inputs)
-        # self.ui.action_load_input.triggered.connect(self.load_design_inputs)
-        # self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
+        self.ui.action_save_input.triggered.connect(self.save_design_inputs)
+        self.ui.action_load_input.triggered.connect(self.load_design_inputs)
+        self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
         self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
         self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -366,59 +369,56 @@ class MainController(QMainWindow):
             widget.clear()
             widget.setFocus()
 
-    # TODO load input files
-    # def save_design_inputs(self):
-    #     filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),
-    #                                               "Input Files(*.osi)")
-    #     if not filename:
-    #         return
-    #     try:
-    #         out_file = open(str(filename), 'wb')
-    #     except IOError:
-    #         QMessageBox.information(self, "Unable to open file",
-    #                                 "There was an error opening \"%s\"" % filename)
-    #         return
-    #     json.dump(self.uiObj, out_file)
-    #     out_file.close()
+    def save_design_inputs(self):
+        filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),
+                                                  "Input Files(*.osi)")
+        if not filename:
+            return
+        try:
+            out_file = open(str(filename), 'wb')
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % filename)
+            return
+        json.dump(self.uiObj, out_file)
+        out_file.close()
 
-    # TODO save input files
-    # def load_design_inputs(self):
-    #     filename, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
-    #     if not filename:
-    #         return
-    #     try:
-    #         in_file = open(str(filename), 'rb')
-    #     except IOError:
-    #         QMessageBox.information(self, "Unable to open file",
-    #                                 "There was an error opening \"%s\"" % filename)
-    #         return
-    #     ui_obj = json.load(in_file)
-    #     self.set_dict_touser_inputs(ui_obj)
+    def load_design_inputs(self):
+        filename, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
+        if not filename:
+            return
+        try:
+            in_file = open(str(filename), 'rb')
+        except IOError:
+            QMessageBox.information(self, "Unable to open file",
+                                    "There was an error opening \"%s\"" % filename)
+            return
+        ui_obj = json.load(in_file)
+        self.set_dict_touser_inputs(ui_obj)
 
-    # TODO save log messages
-    # def save_log_messages(self):
-    #     filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
-    #                                                 "Text files (*.txt)")
-    #     return self.save_file(filename + ".txt")
-    #
-    # def save_file(self,filename):
-    #     """
-    #
-    #     Args:
-    #         filename: file name
-    #
-    #     Returns: open file for writing
-    #
-    #     """
-    #     fname = QFile(filename)
-    #     if not fname.open(QFile.WriteOnly | QFile.Text):
-    #         QMessageBox.warning(self, "Application",
-    #                             "Cannot write file %s:\n%s." % (filename, fname.errorString()))
-    #         return
-    #     outf = QTextStream(fname)
-    #     QApplication.setOverrideCursor(Qt.WaitCursor)
-    #     outf << self.ui.textEdit.toPlainText()
-    #     QApplication.restoreOverrideCursor()
+    def save_log_messages(self):
+        filename, pat = QFileDialog.getSaveFileName(self, "Save File As", os.path.join(str(self.folder), "LogMessages"),
+                                                    "Text files (*.txt)")
+        return self.save_file(filename + ".txt")
+
+    def save_file(self,filename):
+        """
+
+        Args:
+            filename: file name
+
+        Returns: open file for writing
+
+        """
+        fname = QFile(filename)
+        if not fname.open(QFile.WriteOnly | QFile.Text):
+            QMessageBox.warning(self, "Application",
+                                "Cannot write file %s:\n%s." % (filename, fname.errorString()))
+            return
+        outf = QTextStream(fname)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        outf << self.ui.textEdit.toPlainText()
+        QApplication.restoreOverrideCursor()
 
     def get_user_inputs(self):
         """
@@ -595,6 +595,7 @@ class MainController(QMainWindow):
         """
         self.alist = self.designParameters()
         print "alist printing", self.alist
+        self.ui.outputDock.setFixedSize(310, 710)
         self.outputs = coverplateboltedconnection(self.alist)
         a = self.outputs[self.outputs.keys()[0]]
         # if len(str(a[a.keys()[0]])) == 0:
@@ -670,7 +671,7 @@ class MainController(QMainWindow):
         self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
     def display_log_to_textedit(self):
-        file = QFile('coverplate.log')
+        file = QFile('Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log')
         if not file.open(QtCore.QIODevice.ReadOnly):
             QMessageBox.information(None, 'info', file.errorString())
         stream = QtCore.QTextStream(file)
@@ -743,7 +744,7 @@ def set_osdaglogger():
     logger.setLevel(logging.DEBUG)
 
     # create the logging file handler
-    fh = logging.FileHandler("coverplate.log", mode="a")
+    fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="a")
 
     # ,datefmt='%a, %d %b %Y %H:%M:%S'
     # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -759,8 +760,25 @@ def set_osdaglogger():
     logger.addHandler(fh)
 
 
-def launch_coverplate_controller(folder):
+def launch_coverplate_controller(osdagMainWindow, folder):
     set_osdaglogger()
+    # --------------- To display log messages in different colors ---------------
+    rawLogger = logging.getLogger("raw")
+    rawLogger.setLevel(logging.INFO)
+    fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+    formatter = logging.Formatter('''%(message)s''')
+    fh.setFormatter(formatter)
+    rawLogger.addHandler(fh)
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    # ----------------------------------------------------------------------------
+    module_setup()
+    window = MainController(folder)
+    osdagMainWindow.hide()
+    window.show()
+    window.closed.connect(osdagMainWindow.show)
+
+
+if __name__ == '__main__':
     # --------------- To display log messages in different colors ---------------
     rawLogger = logging.getLogger("raw")
     rawLogger.setLevel(logging.INFO)
@@ -770,12 +788,8 @@ def launch_coverplate_controller(folder):
     rawLogger.addHandler(fh)
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
     # ----------------------------------------------------------------------------
+    folder = "D:\Osdag_Workspace\coverplate"
+    window = MainController(folder)
     app = QApplication(sys.argv)
-    module_setup()
-    window = MainController()
-    window.show()
     sys.exit(app.exec_())
-
-
-if __name__ == '__main__':
-    launch_coverplate_controller()
+    # launch_coverplate_controller()

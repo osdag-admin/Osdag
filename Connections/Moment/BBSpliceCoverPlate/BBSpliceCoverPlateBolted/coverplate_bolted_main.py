@@ -226,6 +226,7 @@ class MainController(QMainWindow):
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
@@ -473,6 +474,26 @@ class MainController(QMainWindow):
         self.ui.txt_webplateWidth.clear()
         self.ui.txt_webplateHeight.clear()
 
+        self.ui.txt_shearCapacity.clear()
+        self.ui.txt_bearCapacity.clear()
+        self.ui.txt_capacityOfbolt.clear()
+        self.ui.txt_noBolts.clear()
+        self.ui.txt_pitch.clear()
+        self.ui.txt_gauge.clear()
+        self.ui.txt_edgeDist.clear()
+        self.ui.txt_endDist.clear()
+        self.ui.txt_shearCapacity_2.clear()
+        self.ui.txt_bearCapacity_2.clear()
+        self.ui.txt_capacityOfbolt_2.clear()
+        self.ui.txt_noBolts_2.clear()
+        self.ui.txt_pitch_2.clear()
+        self.ui.txt_gauge_2.clear()
+        self.ui.txt_endDist_2.clear()
+        self.ui.txt_edgeDist_2.clear()
+
+        self.ui.btn_flangePlate.setDisabled(True)
+        self.ui.btn_webPlate.setDisabled(True)
+
 
     def closeEvent(self, event):
         """
@@ -602,6 +623,8 @@ class MainController(QMainWindow):
         #     self.ui.btn_Design.setEnabled(False)
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+        self.ui.btn_flangePlate.setDisabled(False)
+        self.ui.btn_webPlate.setDisabled(False)
 
 
     def display_output(self, outputObj):
@@ -790,6 +813,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------
     folder = "D:\Osdag_Workspace\coverplate"
     window = MainController(folder)
+    window.show()
     app = QApplication(sys.argv)
     sys.exit(app.exec_())
     # launch_coverplate_controller()

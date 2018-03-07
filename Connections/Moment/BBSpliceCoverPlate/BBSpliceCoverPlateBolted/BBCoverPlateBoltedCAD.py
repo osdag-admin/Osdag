@@ -1,21 +1,30 @@
-'''
+"""
 created on 06-03-2018
 
 @author: Siddhesh Chavan
 
 This file is for creating CAD model for cover plate bolted moment connection for connectivity Beam-Beam
-'''
+
+"""""
 
 import numpy
+
 
 class BBCoverPlateBoltedCAD(object):
     def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight, nut_bolt_array_AF,
                  nut_bolt_array_BF, nut_bolt_array_Web):
 
-        '''
-        These many parameters are needed to create the CAD model of beam-beam cover plate bolted connection. 
-        '''
-
+        """
+        :param beamLeft: Left beam 
+        :param beamRight: Right beam
+        :param plateAbvFlange: Flange plate present above the flange
+        :param plateBelwFlange: Flange plate present below the flange 
+        :param WebPlateLeft: Web plate present left of flange
+        :param WebPlateRight: Web plate present right of flange
+        :param nut_bolt_array_AF: Bolt placement of flange plate present above flange
+        :param nut_bolt_array_BF: Bolt placement of flange plate present below flange
+        :param nut_bolt_array_Web: Bolt placement of web plate
+        """
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.gap = 5.0      # TODO: For time being gap between two beams is kept as 5.0, later on it could change in Design Preferences
@@ -97,7 +106,6 @@ class BBCoverPlateBoltedCAD(object):
         self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
 
     def create_nut_bolt_array_AF(self):
-        # nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 1.0, 0])

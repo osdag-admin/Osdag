@@ -1,14 +1,14 @@
-'''
+"""
 Initialized on 22-01-2018
 Commenced on 16-02-2018
 @author: Siddhesh S. Chavan
-'''
+"""""
 
 import numpy
 
+
 class ExtendedBothWays(object):
 
-    # def __init__(self, beam, Fweld, Wweld, plate, nut_bolt_array):
     def __init__(self, beamLeft, beamRight, plateLeft, plateRight, nut_bolt_array,
                  bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
@@ -76,6 +76,9 @@ class ExtendedBothWays(object):
         self.bbWeldQtrCone_28 = bbWeldQtrCone_28        # behind bbWeldQtrCone_18
 
     def create_3DModel(self):
+        """
+        :return: CAD model of each entity such as Left beam, right beam, both end plates and so on 
+        """
         self.createBeamLGeometry()
         self.createBeamRGeometry()
         self.createPlateLGeometry()
@@ -128,9 +131,7 @@ class ExtendedBothWays(object):
         self.create_bbWeldQtrCone_27()
         self.create_bbWeldQtrCone_28()
 
-        # self.create_nut_bolt_array()
-
-        #call for create_model from Components
+        # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
         self.beamRModel = self.beamRight.create_model()
         self.plateLModel = self.plateLeft.create_model()
@@ -182,6 +183,11 @@ class ExtendedBothWays(object):
         self.bbWeldQtrCone_26Model = self.bbWeldQtrCone_26.create_model()
         self.bbWeldQtrCone_27Model = self.bbWeldQtrCone_27.create_model()
         self.bbWeldQtrCone_28Model = self.bbWeldQtrCone_28.create_model()
+
+#############################################################################################################
+#   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
+#   same component at appropriate place                                                                     #
+#############################################################################################################
 
     def createBeamLGeometry(self):
         beamOriginL = numpy.array([0.0, 0.0, 0.0])
@@ -462,6 +468,9 @@ class ExtendedBothWays(object):
         wDirQtr_28 = numpy.array([0, 1.0, 0])
         self.bbWeldQtrCone_28.place(QtrOrigin_28, uDirQtr_28, wDirQtr_28)
 
+#############################################################################################################
+#   Following functions returns the CAD model to the function display_3DModel of main file                  #
+#############################################################################################################
     def get_beamLModel(self):
         return self.beamLModel
 

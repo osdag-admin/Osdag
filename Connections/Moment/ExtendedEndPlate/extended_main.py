@@ -1170,7 +1170,7 @@ def main():
 
     app = QApplication(sys.argv)
     module_setup()
-    window = Maincontroller(folder="F:\Osdag\Connections\Moment\Moment Workspace")
+    window = Maincontroller(folder="F:\Osdag\Connections\Moment\Moment Workspace")  # TODO Path to my Osdag workspace
     window.show()
     sys.exit(app.exec_())
 

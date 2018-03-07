@@ -1,4 +1,4 @@
-'''
+"""
 created on 25-02-2018
 
 @author: Siddhesh Chavan
@@ -6,12 +6,14 @@ created on 25-02-2018
 AF abbreviation used here is for Above Flange for bolting.
 BF abbreviation used here is for Below Flange for bolting.
 W is for bolting over Web.
-'''
+"""""
+
 
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from Connections.Component.ModelUtils import getGpPt
+
 
 class NutBoltArray_Web():
     def __init__(self, alist, beam_data, outputobj, nut, bolt, numOfboltsW, nutSpaceW):
@@ -89,6 +91,13 @@ class NutBoltArray_Web():
                 self.positions_W.append(pos_W)
 
     def placeW(self, originW, gaugeDirW, pitchDirW, boltDirW):
+        """
+        :param originW: Origin for bolt placement 
+        :param gaugeDirW: Gauge direction for gauge distance
+        :param pitchDirW: Pitch direction for pitch distance
+        :param boltDirW: Bolt screwing direction
+        :return: 
+        """
         self.originW = originW
         self.gaugeDirW = gaugeDirW
         self.pitchDirW = pitchDirW

@@ -1,18 +1,25 @@
-'''
-created on 19-01-2018
+"""created on 19-01-2018
 
 @author: Siddhesh C.
-'''
-
+"""
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from Connections.Component.ModelUtils import getGpPt
 import numpy as np
 
-class NutBoltArray():
-    def __init__(self, uiObjWeld, beamDim, boltPlaceObj, nut, bolt, numberOfBolts, nut_space):
 
+class NutBoltArray(object):
+    def __init__(self, uiObjWeld, beamDim, boltPlaceObj, nut, bolt, numberOfBolts, nut_space):
+        """
+        :param uiObjWeld: User inputs 
+        :param beamDim: Beam dimensions
+        :param boltPlaceObj: Output dictionary required for bolt placement
+        :param nut: Required nut dimensions
+        :param bolt: Required bolt dimensions
+        :param numberOfBolts: Required number of bolts
+        :param nut_space: Gap between bolt head and nut
+        """
         self.origin = None
         self.gaugeDir = None
         self.pitchDir = None
@@ -324,6 +331,13 @@ class NutBoltArray():
                             self.positions.append(pos)
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):
+        """
+        :param origin: Origin for bolt placement 
+        :param gaugeDir: gauge distance direction
+        :param pitchDir: pitch distance direction
+        :param boltDir: bolts screwing direction
+        :return: 
+        """
 
         self.origin = origin
         self.gaugeDir = gaugeDir

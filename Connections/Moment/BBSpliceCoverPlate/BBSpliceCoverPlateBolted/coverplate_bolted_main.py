@@ -713,9 +713,9 @@ class MainController(QMainWindow):
         osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
 
         # Displays the bolts which are above the Flange Plate, debugging will give more clarity
-        # nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-        # for nutboltAF in nutboltlistAF:
-        #     osdag_display_shape(self.display, nutboltAF, update=True, color=Quantity_NOC_SADDLEBROWN)
+        nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
+        for nutboltAF in nutboltlistAF:
+            osdag_display_shape(self.display, nutboltAF, update=True, color=Quantity_NOC_SADDLEBROWN)
 
         # Displays the bolts which are below the Flange Plate, debugging will give more clarity
         nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
@@ -723,9 +723,9 @@ class MainController(QMainWindow):
             osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
 
         # Displays the bolts which are on the right side of web plate, debugging will give more clarity
-        # nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-        # for nutboltW in nutboltlistW:
-        #     osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
+        nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
+        for nutboltW in nutboltlistW:
+            osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
     def display_output(self, outputObj):
         """

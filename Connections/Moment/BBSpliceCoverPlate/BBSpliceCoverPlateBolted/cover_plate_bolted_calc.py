@@ -1,6 +1,6 @@
 '''
 Created on 30-Oct-2017
-
+Revised on 5-March-2018
 @author: Swathi M.
 '''
 
@@ -34,9 +34,7 @@ module_setup()
 
 
 '''
-
 ASCII diagram - Beam-Beam Bolted Splice Connection with Cover Plates
-
                                                            +-----+ Flange splice plate
                                                            |
                       ++         ++        ++          ++  |      ++        ++
@@ -68,16 +66,13 @@ ASCII diagram - Beam-Beam Bolted Splice Connection with Cover Plates
 # Total moment acting on the section (kN-m)
 def total_moment(beam_d, beam_f_t, axial_force, moment_load):
     """
-
     Args:
         beam_d: Overall depth of the beam section in mm (float)
         beam_f_t: Thickness of flange in mm (float)
         axial_force: Factored axial force in kN (float)
         moment_load: Factored bending moment in kN-m (float)
-
     Returns:
         Total moment acting on the section in kN-m (float)
-
     """
     cg = (beam_d/2)-(beam_f_t/2)  # Assumption: Axial force acts exactly at the center of the section
     moment_axial_force = (axial_force * cg)/1000  # Moment due to factored axial force = F * centroidal distance  (kN-m)
@@ -88,16 +83,13 @@ def total_moment(beam_d, beam_f_t, axial_force, moment_load):
 # Force in flange (kN)  [Reference: M.L. Gambhir (page 10.83), N. Subramanian (page 427)]
 def flange_force(beam_d, beam_f_t, axial_force, moment_load):
     """
-
     Args:
        beam_d: Overall depth of the beam section in mm (float)
        beam_f_t: Thickness of flange in mm (float)
        axial_force: Factored axial force in kN (float)
        moment_load: Factored bending moment in kN-m (float)
-
     Returns:
         Force in flange in kN (float)
-
     """
     tm = total_moment(beam_d, beam_f_t, axial_force, moment_load)
     return round((tm*1000)/(beam_d - beam_f_t), 2)        # kN
@@ -106,7 +98,6 @@ def flange_force(beam_d, beam_f_t, axial_force, moment_load):
 # Thickness of flange splice plate [Reference: N. Subramanian (Page 428), M.L. Gambhir (Page 10.84)]
 def thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, dia_hole):
     """
-
     Args:
         beam_d: Overall depth of the beam section in mm (float)
         beam_f_t: Thickness of flange in mm (float)
@@ -114,9 +105,7 @@ def thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, 
         moment_load: Factored bending moment in kN-m (float)
         beam_b: Width of flange in mm (float)
         beam_fy: Characteristic yield stress in N/mm^2 (float)
-
     Returns:
-
     """
     n = 2 # number of bolts along flange width
     gamma_m0 = 1.10 # Partial safety factor against yield stress and buckling = 1.10 (float)
@@ -130,15 +119,12 @@ def thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load,beam_b,beam_fy, 
 # Capacity of flange [Reference: N. Subramanian (Page 428), M.L. Gambhir (Page 10.84)]
 def flange_capacity(beam_f_t,beam_b,dia_hole,beam_fy):
     """
-
     Args:
         tf: Thickness of flange in mm (float)
         bf: Width of flange in mm (float)
         bolt_hole_diameter: Diameter of bolt hole in mm
         fy: Characteristic yield stress in kN/m2 (float)
-
     Returns: Calculates flange capacity (kN) (float)(
-
     """
     gamma_m0 = 1.10 # Partial safety factor against yield stress and buckling = 1.10 (float)
     eff_area =(beam_b - 2 * dia_hole) * beam_f_t # eff area = (bf-n*d0)tf ## where n = number of bolts in a row (here it is 2)
@@ -150,12 +136,9 @@ def flange_capacity(beam_f_t,beam_b,dia_hole,beam_fy):
 # Minimum height of web splice plate [Reference: Steel Designer`s Manual - SCI - 6th edition, page 754]
 def web_min_h(beam_d):
     """
-
     Args:
         beam_d: Overall depth of supported beam (float) in mm
-
     Returns: Minimum height of web splice plate (float)
-
     """
     minwebh = round((0.5 * beam_d), 2)
     return minwebh
@@ -163,14 +146,11 @@ def web_min_h(beam_d):
 # Maximum height of web splice plate [Reference: Previous DDCL] assumed gap clearance is 5mm based on reasoning
 def web_max_h(beam_d, beam_f_t, beam_r1):
     """
-
     Args:
         beam_d: Overall depth of supported beam (float) in mm
         beam_f_t: Thickness of flange in mm (float)
         beam_R1: Root radius of the beam section in mm (float)
-
     Returns: Maximum height of web splice plate in mm (float)
-
     """
     maxwebheight = round((beam_d - 2 * beam_f_t - 2 * beam_r1 - 2 * 5), 2)
     return maxwebheight
@@ -195,12 +175,9 @@ def web_max_h(beam_d, beam_f_t, beam_r1):
 ## Maximum thickness of web splice plate [Reference: Handbook on structural steel detailing, INSDAG - Chapter 5, section 5.2.3 page 5.7]
 def web_max_t(bolt_diameter):
     """
-
     Args:
         bolt_dia: Nominal bolt diameter in mm (int)
-
     Returns: Maximum thickness of web splice plate in mm (float)
-
     """
     max_web_t = round(0.5 * bolt_diameter, 2)
     return max_web_t
@@ -209,7 +186,6 @@ def web_max_t(bolt_diameter):
 # Calculation of block shear capacity of web splice plate
 def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
     """
-
     Args:
         web_plate_l: Height of web splice plate in mm (float)
         edge_dist: Edge/end distance in mm (Assumption: edge distance = end distance) (float)
@@ -218,9 +194,7 @@ def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
         dia_hole: Diameter of bolt hole in mm (int)
         fy: Characteristic yield stress in N/mm^2 (float)
         fu: Ultimate tensile stress of the material in N/mm^2 (float)
-
     Returns: Block shear capacity of web splice plate in kN
-
     """
     gamma_m0 = 1.10
     gamma_m1 = 1.25
@@ -239,7 +213,6 @@ def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
 # Calculation of block shear capacity of flange splice plate
 def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, flange_gauge, fy, fu):
     """
-
     Args:
         Ltp: ((Length of flange splice plate - gap) / 2) in mm (float)
         edge_dist: Edge/end distance in mm (Assumption: edge distance = end distance) (float)
@@ -250,9 +223,7 @@ def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, fla
         flange_gauge: Gauge distance between bolts in flange in mm (float)
         fy: Characteristic yield stress in N/mm^2 (float)
         fu: Ultimate tensile stress of the material in N/mm^2 (float)
-
     Returns: Block shear capacity of flange splice plate in mm
-
     """
 
     gamma_m0 = 1.10
@@ -272,13 +243,10 @@ def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, fla
 # Check for shear yielding of web splice plate (Clause 8.4.1, IS 800 : 2007)
 def shear_yielding(A_v, beam_fy):
     """
-
     Args:
         A_v: Total cross sectional area in shear in mm^2 (float)
         beam_fy: Characteristic yield stress in N/mm^2 (float)
-
     Returns: Strength of web splice plate under shear yielding (kN) ----> (float)
-
     """
     gamma_m0 = 1.10
     V_p = (0.6 * A_v * beam_fy) / (math.sqrt(3) * gamma_m0 * 1000) # kN
@@ -288,16 +256,45 @@ def shear_yielding(A_v, beam_fy):
 # Check for shear rupture of web splice plate (Clause 8.4.1, IS 800 : 2007)
 def shear_rupture(A_vn, beam_fu):
     """
-
     Args:
         A_vn: Net area of the total cross section in shear mm^2 (float)
         beam_fu: Ultimate tensile stress of the material in N/mm^2 (float)
-
     Returns: Strength of web splice plate under shear rupture (kN) ----> (float)
-
     """
     R_n = (0.6 * beam_fu * A_vn) / 1000 # kN
     return round(R_n, 2)
+
+########################################################################################################################
+# Calculation of cross center gauge of flange
+'''
+           <--  gauge  --->
+           |     (g)      |
+          +-+            +-+
+    +----------------------------+
+    +----------------------------+
+    +     +-+     ||     +-+
+g = (b-tw)/4      ||      ^
+                  ||      +----Bolt+
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+                  ||
+          +-+     ||     +-+
+    +----------------------------+
+    +----------------------------+
+          +-+            +-+
+'''
+# Note: As per discussion with Prof. on 28/02/2018,
+# Gauge distance shall be emperically calculated as g = (b - tw)/4
+# where,
+#### b = Width of flange in mm
+#### tw = Thickness of web in mm
+def flange_gauge(b, tw):
+    g = b- 2*((b - tw) / 4)
+    return int(5 * round(float(g)/5))
 
 ########################################################################################################################
 def fetchBeamPara(self):
@@ -399,6 +396,8 @@ def coverplateboltedconnection(uiObj):
     beam_r1 = float(dictbeamdata["R1"])
     beam_b = float(dictbeamdata["B"])
 
+    # cross center gauge of a flange
+    flange_g = flange_gauge(beam_b, beam_w_t)
     # return uiObj
     ########################################################################################################################
 
@@ -618,7 +617,6 @@ def coverplateboltedconnection(uiObj):
 
 
             '''
-
             ASCII Diagram to represent flange splice plate
                             row 1                 row 4   Gap between beams
                           +---->                  +-->   ++-----+
@@ -637,9 +635,7 @@ def coverplateboltedconnection(uiObj):
                 |                 |                                              | Bolt
                 | Beam            |Flange splice plate                           +------+
                 +-----+           +--------+
-
                                    In the above diagram total number of bolts along one side of beam is 8
-
                                      number of rows = 8/2 = 4
             '''
         number_of_rows_flange = flange_bolts_required / 2
@@ -705,7 +701,6 @@ def coverplateboltedconnection(uiObj):
 
         '''
         ASCII Diagram to represent length and height of flange splice plate
-
                  <----------------length = (2 * Ltp) + Gap------------------>
                  +----------------------------++----------------------------+  ^
                  |                            ||                            |  |
@@ -773,6 +768,7 @@ def coverplateboltedconnection(uiObj):
 
         ################################################################################################################
         # Fetch bolt design output parameters dictionary
+
         if web_plate_l == 0 and flange_plate_l == 0 and flange_plate_w == 0:
             boltParam = {}
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
@@ -796,7 +792,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = 90 # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g # TODO: Need to fetch values
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -828,7 +824,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = 90  # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g  # TODO: Need to fetch values
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -1064,7 +1060,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g # TODO: Need to fetch values
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
@@ -1104,7 +1100,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = 90  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g  # TODO: Need to fetch values
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
@@ -1129,21 +1125,6 @@ def coverplateboltedconnection(uiObj):
 
 
 ########################################### End of Design ################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

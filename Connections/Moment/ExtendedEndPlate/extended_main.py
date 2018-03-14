@@ -6,9 +6,10 @@ Created on 24-Aug-2017
 
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
+from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
-# from ui_pitch import Ui_Pitch
+from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
@@ -19,7 +20,12 @@ from model import *
 import sys
 import os
 import pickle
+import pdfkit
 import json
+import ConfigParser
+import cairosvg
+import shutil
+
 
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
@@ -193,7 +199,7 @@ class Stiffener(QDialog):
 class Pitch(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        # self.ui = Ui_Pitch()
+        self.ui = Ui_Pitch()
         self.ui.setupUi(self)
         self.maincontroller = parent
 
@@ -275,6 +281,85 @@ class Pitch(QDialog):
             self.ui.lbl_7.setText('Pitch_9_10')
 
 
+class DesignReportDialog(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_DesignReport()
+        self.ui.setupUi(self)
+        self.mainController = parent
+        self.setWindowTitle("Design Profile")
+        self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
+        self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+        self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
+        self.accepted.connect(self.save_inputSummary)
+
+    def save_inputSummary(self):
+        report_summary = self.get_report_summary()
+        self.mainController.save_design(report_summary)
+
+    def getLogoFilePath(self, lblwidget):
+        self.ui.lbl_browse.clear()
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None,
+                                                  QFileDialog.DontUseNativeDialog)
+        flag = True
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            base = os.path.basename(str(filename))
+            lblwidget.setText(base)
+            base_type = base[-4:]
+            self.desired_location(filename, base_type)
+
+        return str(filename)
+
+    def desired_location(self, filename, base_type):
+        if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+        else:
+            shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoExtendEndplate.png"))
+
+    def saveUserProfile(self):
+        inputData = self.get_report_summary()
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
+        if filename == '':
+            flag = False
+            return flag
+        else:
+            infile = open(filename, 'w')
+            pickle.dump(inputData, infile)
+            infile.close()
+
+    def get_report_summary(self):
+        report_summary = {"ProfileSummary": {}}
+        report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+        report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+        report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+        report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+        report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+        report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+        report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+        report_summary["Client"] = str(self.ui.lineEdit_client.text())
+        report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+
+        return report_summary
+
+    def useUserProfile(self):
+        filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+                                                  os.path.join(str(self.mainController.folder), "Profile"),
+                                                  "All Files (*)")
+        if os.path.isfile(filename):
+            outfile = open(filename, 'r')
+            reportsummary = pickle.load(outfile)
+            self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+            self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+            self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+            self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+        else:
+            pass
+
 
 class Maincontroller(QMainWindow):
     closed = pyqtSignal()
@@ -317,6 +402,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
+        self.ui.btn_Design.clicked.connect(self.osdag_header)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -432,6 +518,50 @@ class Maincontroller(QMainWindow):
         outf << self.ui.textEdit.toPlainText()
         QApplication.restoreOverrideCursor()
 
+    def save_design(self, report_summary):
+        # status = self.resultObj['Bolt']['status']
+        # if status is True:
+        #     self.call_3DModel("white_bg")
+        #     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+        #     self.display.ExportToImage(data)
+        #     self.display.FitAll()
+        # else:
+        #     pass
+
+        filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
+        file_name = str(filename)
+        self.call_designreport(file_name, report_summary)
+        # self.commLogicObj.call_designReport(file_name, report_summary)
+
+        # Creates PDF
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
+        options = {
+            'margin-bottom': '10mm',
+            'footer-right': '[page]'
+        }
+        file_type = "PDF(*.pdf)"
+        fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+        fname = str(fname)
+        flag = True
+        if fname == '':
+            flag = False
+            return flag
+        else:
+            pdfkit.from_file(filename, fname, configuration=config, options=options)
+            QMessageBox.about(self, 'Information', "Report Saved")
+
+    def call_designreport(self, fileName, report_summary):
+        self.alist = self.designParameters()
+        self.result = bbExtendedEndPlateSplice(self.alist)
+        print "resultobj", self.result
+        self.beam_data = self.fetchBeamPara()
+        save_html(self.result, self.alist, self.beam_data, fileName, report_summary)
+
     def get_user_inputs(self):
         uiObj = {}
         uiObj["Member"] = {}
@@ -459,6 +589,10 @@ class Maincontroller(QMainWindow):
         uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
         uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
         return uiObj
+
+    def osdag_header(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
     def design_prefer(self):
         self.designPrefDialog.show()
@@ -809,13 +943,16 @@ class Maincontroller(QMainWindow):
         section.show()
 
     def design_report(self):
-        fileName = ("Connections\Moment\ExtendedEndPlate\Html_Report.html")
-        fileName = str(fileName)
-        self.alist = self.designParameters()
-        self.result = bbExtendedEndPlateSplice(self.alist)
-        print "resultobj", self.result
-        self.beam_data = self.fetchBeamPara()
-        save_html(self.result, self.alist, self.beam_data, fileName)
+        design_report_dialog = DesignReportDialog(self)
+        design_report_dialog.show()
+
+        # fileName = ("Connections\Moment\ExtendedEndPlate\Html_Report.html")
+        # fileName = str(fileName)
+        # self.alist = self.designParameters()
+        # self.result = bbExtendedEndPlateSplice(self.alist)
+        # print "resultobj", self.result
+        # self.beam_data = self.fetchBeamPara()
+        # save_html(self.result, self.alist, self.beam_data, fileName)
 
 
 def set_osdaglogger():

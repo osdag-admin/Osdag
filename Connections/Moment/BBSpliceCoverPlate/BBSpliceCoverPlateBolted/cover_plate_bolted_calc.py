@@ -286,6 +286,11 @@ g = (b-tw)/4      ||      ^
     +----------------------------+
     +----------------------------+
           +-+            +-+
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 94722ee56e923275db9ec8440b1654483cadcf96
 '''
 # Note: As per discussion with Prof. on 28/02/2018,
 # Gauge distance shall be emperically calculated as g = (b - tw)/4
@@ -1125,9 +1130,3 @@ def coverplateboltedconnection(uiObj):
 
 
 ########################################### End of Design ################################################
-
-
-
-
-
-

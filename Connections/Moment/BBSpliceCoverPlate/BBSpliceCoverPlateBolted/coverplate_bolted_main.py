@@ -811,8 +811,8 @@ if __name__ == '__main__':
     rawLogger.addHandler(fh)
     rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
     # ----------------------------------------------------------------------------
-    folder = "D:\Osdag_Workspace\coverplate"
-    window = MainController(folder)
+    folder_path = "D:\Osdag_Workspace\coverplate"
+    window = MainController(folder_path)
     window.show()
     app = QApplication(sys.argv)
     sys.exit(app.exec_())

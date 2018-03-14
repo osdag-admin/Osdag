@@ -21,6 +21,7 @@ from Connections.Shear.SeatedAngle.seat_angle_main import launchSeatedAngleContr
 from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_controller
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.coverplate_bolted_main import launch_coverplate_controller
+from Connections.Moment.ExtendedEndPlate.extended_main import launch_extendedendplate_controller
 import os.path
 import subprocess
 import shutil
@@ -162,6 +163,10 @@ class OsdagMainWindow(QMainWindow):
 
         elif self.ui.rdbtn_coverplate.isChecked():
             launch_coverplate_controller(self, folder)
+            self.ui.myStackedWidget.setCurrentIndex(0)
+
+        elif self.ui.rdbtn_endplate_ext.isChecked():
+            launch_extendedendplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         else:

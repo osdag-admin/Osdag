@@ -8,8 +8,9 @@ from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreference
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
-from ui_pitch import Ui_Pitch
+# from ui_pitch import Ui_Pitch
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
+from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream
@@ -192,7 +193,7 @@ class Stiffener(QDialog):
 class Pitch(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_Pitch()
+        # self.ui = Ui_Pitch()
         self.ui.setupUi(self)
         self.maincontroller = parent
 
@@ -324,6 +325,7 @@ class Maincontroller(QMainWindow):
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
+        self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
         validator = QIntValidator()
         self.ui.txt_Fu.setValidator(validator)
@@ -805,6 +807,16 @@ class Maincontroller(QMainWindow):
     def stiffener_details(self):
         section = Stiffener(self)
         section.show()
+
+    def design_report(self):
+        fileName = ("Html_Report.html")
+        fileName = str(fileName)
+        self.alist = self.designParameters()
+        self.result = bbExtendedEndPlateSplice(self.alist)
+        print "resultobj", self.result
+        self.beam_data = self.fetchBeamPara()
+        save_html(self.result, self.alist, self.beam_data, fileName)
+
 
 def set_osdaglogger():
     global logger

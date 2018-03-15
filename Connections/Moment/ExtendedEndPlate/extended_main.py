@@ -50,16 +50,16 @@ class DesignPreference(QDialog):
         self.saved = None
         self.ui.combo_design_method.model().item(1).setEnabled(False)
         self.ui.combo_design_method.model().item(2).setEnabled(False)
-        # self.set_default_para()
+        self.save_default_para()
         dbl_validator = QDoubleValidator()
         self.ui.txt_boltFu.setValidator(dbl_validator)
         self.ui.txt_boltFu.setMaxLength(7)
         self.ui.txt_weldFu.setValidator(dbl_validator)
         self.ui.txt_weldFu.setMaxLength(7)
-        # self.ui.btn_defaults.clicked.connect(self.set_default_para)
+        self.ui.btn_defaults.clicked.connect(self.save_default_para)
         self.ui.btn_save.clicked.connect(self.save_designPref_para)
         self.ui.btn_close.clicked.connect(self.close_designPref)
-        # self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+        self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
     def save_designPref_para(self):
         uiObj = self.maincontroller.get_user_inputs()
@@ -144,11 +144,12 @@ class DesignPreference(QDialog):
             self.ui.txt_boltFu.setText(boltfu)
         else:
             pass
+
     def get_clearance(self):
 
         uiObj = self.maincontroller.get_user_inputs()
         boltDia = str(uiObj["Bolt"]["Diameter (mm)"])
-        if boltDia != 'Diameter of Bolt':
+        if boltDia != 'Select diameter':
 
             standard_clrnce = {12: 1, 14: 1, 16: 2, 18: 2, 20: 2, 22: 2, 24: 2, 30: 3, 34: 3, 36: 3}
             overhead_clrnce = {12: 3, 14: 3, 16: 4, 18: 4, 20: 4, 22: 4, 24: 6, 30: 8, 34: 8, 36: 8}
@@ -422,7 +423,7 @@ class Maincontroller(QMainWindow):
         self.ui.actionDesign_Preferences.triggered.connect(self.design_prefer)
         self.ui.actionEnlarge_font_size.triggered.connect(self.show_font_dialogue)
         self.ui.action_save_input.triggered.connect(self.save_design_inputs)
-        self.ui.actio_load_input.triggered.connect(self.load_design_inputs)
+        self.ui.action_load_input.triggered.connect(self.load_design_inputs)
         self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
@@ -748,6 +749,9 @@ class Maincontroller(QMainWindow):
         a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+        self.ui.btn_pitchDetail.setDisabled(False)
+        self.ui.btn_plateDetail.setDisabled(False)
+        self.ui.btn_stiffnrDetail.setDisabled(False)
         self.call_3DModel()
 
     def display_output(self, outputObj):
@@ -836,6 +840,25 @@ class Maincontroller(QMainWindow):
         self.ui.txt_plateWidth.clear()
         self.ui.combo_flangeSize.setCurrentIndex(0)
         self.ui.combo_webSize.setCurrentIndex(0)
+
+        self.ui.txt_tensionCritical.clear()
+        self.ui.txt_tensionCapacity.clear()
+        self.ui.txt_shearCapacity.clear()
+        self.ui.txt_bearCapacity.clear()
+        self.ui.txt_boltcapacity.clear()
+        self.ui.txt_boltgrpcapacity.clear()
+        self.ui.txt_noBolts.clear()
+        self.ui.txt_rowBolts.clear()
+        self.ui.txt_gauge.clear()
+        self.ui.txt_crossGauge.clear()
+        self.ui.txt_endDist.clear()
+        self.ui.txt_edgeDist.clear()
+        self.ui.txt_criticalFlange.clear()
+        self.ui.txt_criticalWeb.clear()
+
+        self.ui.btn_pitchDetail.setDisabled(True)
+        self.ui.btn_plateDetail.setDisabled(True)
+        self.ui.btn_stiffnrDetail.setDisabled(True)
 
     def get_beamdata(self):
         loc = self.ui.combo_connLoc.currentText()
@@ -961,7 +984,7 @@ class Maincontroller(QMainWindow):
         section.show()
 
     def plate_details(self):
-        section = Plate(self)
+        section = PlateDetails(self)
         section.show()
 
     def stiffener_details(self):

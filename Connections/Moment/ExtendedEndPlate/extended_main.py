@@ -430,6 +430,10 @@ class Maincontroller(QMainWindow):
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
         self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
+        self.ui.btn3D.clicked.connect(lambda : self.call_3DModel())
+        self.ui.chkBx_beamSec.clicked.connect(lambda : self.call_3DBeam("gradient_bg"))
+        self.ui.chkBx_connector.clicked.connect(lambda :self.call_3DConnector("gradient_bg"))
+
         validator = QIntValidator()
         self.ui.txt_Fu.setValidator(validator)
         self.ui.txt_Fy.setValidator(validator)
@@ -749,6 +753,7 @@ class Maincontroller(QMainWindow):
         a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+
         self.ui.btn_pitchDetail.setDisabled(False)
         self.ui.btn_plateDetail.setDisabled(False)
         self.ui.btn_stiffnrDetail.setDisabled(False)
@@ -1196,9 +1201,33 @@ class Maincontroller(QMainWindow):
         nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
         return nut_dia[bolt_diameter]
 
-    def call_3DModel(self):
-        self.createExtendedBothWays()   # Call to calculate/create the Extended Both Way CAD model
-        self.display_3DModel("Model", "gradient_bg")     # Call to display the Extended Both Way CAD model
+    def call_3DModel(self): #, bgcolor):
+        # Call to calculate/create the Extended Both Way CAD model
+        self.createExtendedBothWays()
+        self.ui.btn3D.setChecked(Qt.Checked)
+        if self.ui.btn3D.isChecked():
+            self.ui.chkBx_beamSec.setChecked(Qt.Unchecked)
+            self.ui.chkBx_connector.setChecked(Qt.Unchecked)
+            self.ui.mytabWidget.setCurrentIndex(0)
+
+        # Call to display the Extended Both Way CAD model
+        self.display_3DModel("Model", "gradient_bg")
+
+    def call_3DBeam(self, bgcolor):
+        self.ui.chkBx_beamSec.setChecked(Qt.Checked)
+        if self.ui.chkBx_beamSec.isChecked():
+            self.ui.btn3D.setChecked(Qt.Unchecked)
+            self.ui.chkBx_connector.setChecked(Qt.Unchecked)
+            self.ui.mytabWidget.setCurrentIndex(0)
+        self.display_3DModel("Beam", bgcolor)
+
+    def call_3DConnector(self, bgcolor):
+        self.ui.chkBx_connector.setChecked(Qt.Checked)
+        if self.ui.chkBx_connector.isChecked():
+            self.ui.btn3D.setChecked(Qt.Unchecked)
+            self.ui.chkBx_beamSec.setChecked(Qt.Unchecked)
+            self.ui.mytabWidget.setCurrentIndex(0)
+        self.display_3DModel("Connector", bgcolor)
 
     def display_3DModel(self,component, bgcolor):
         self.component = component
@@ -1214,67 +1243,127 @@ class Maincontroller(QMainWindow):
         else:
             self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
 
-        self.ExtObj = self.createExtendedBothWays()     # ExtObj is an object which gets all the calculated values of CAD models
+        # ExtObj is an object which gets all the calculated values of CAD models
+        self.ExtObj = self.createExtendedBothWays()
 
         # Displays the beams
-        osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-        osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+        if component == "Beam":
+            osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+            osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
 
-        # Displays the end plates
-        osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
-        osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+        elif component == "Connector":
+            # Displays the end plates
+            osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
+            osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+            # Display all nut-bolts, call to nutBoltPlacement.py
+            nutboltlist = self.ExtObj.nut_bolt_array.get_models()
+            for nutbolt in nutboltlist:
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            # Display all the Welds including the quarter cone
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
 
-        # Display all nut-bolts, call to nutBoltPlacement.py
-        nutboltlist = self.ExtObj.nut_bolt_array.get_models()
-        for nutbolt in nutboltlist:
-            osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
 
-        # Display all the Welds including the quarter cone
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
 
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_11Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_12Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_13Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_14Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_21Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_22Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
 
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
+        elif component == "Model":
+            osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+            osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+            # Displays the end plates
+            osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
+            osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
-        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
+            # Display all nut-bolts, call to nutBoltPlacement.py
+            nutboltlist = self.ExtObj.nut_bolt_array.get_models()
+            for nutbolt in nutboltlist:
+                osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+            # Display all the Welds including the quarter cone
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
+
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
+
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
+
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
+
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
+            osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
     # =================================================================================
 

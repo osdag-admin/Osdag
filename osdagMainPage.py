@@ -63,8 +63,8 @@ class OsdagMainWindow(QMainWindow):
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
         self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
-        self.ui.btn_start.clicked.connect(self.show_design_connection)
-        self.ui.btn_start_2.clicked.connect(self.show_design_connection)
+        self.ui.btn_start.clicked.connect(self.show_shear_connection)
+        self.ui.btn_start_2.clicked.connect(self.show_moment_connection)
         self.ui.btn_beamCol.clicked.connect(self.unavailable)
         self.ui.btn_compression.clicked.connect(self.unavailable)
         self.ui.btn_flexural.clicked.connect(self.unavailable)
@@ -117,7 +117,7 @@ class OsdagMainWindow(QMainWindow):
 
         self.ui.myStackedWidget.setCurrentIndex(current)
 
-    def show_design_connection(self):
+    def show_shear_connection(self):
 
         config = ConfigParser.ConfigParser()
         config.readfp(open(r'Osdag.config'))
@@ -139,10 +139,10 @@ class OsdagMainWindow(QMainWindow):
                 return flag
             else:
                 try:
-                    os.mkdir(os.path.join(root_path, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder), 0755)
                 except OSError:
                     shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder)), 0755
 
         if self.ui.rdbtn_finplate.isChecked():
             launchFinPlateController(self, folder)
@@ -161,7 +161,37 @@ class OsdagMainWindow(QMainWindow):
             launchSeatedAngleController(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
-        elif self.ui.rdbtn_coverplate.isChecked():
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
+    def show_moment_connection(self):
+
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(r'Osdag.config'))
+        default_workspace_path = config.get('default_workspace', 'path1')
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', default_workspace_path)
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder), 0755)
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder)), 0755
+
+        if self.ui.rdbtn_coverplate.isChecked():
             launch_coverplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 

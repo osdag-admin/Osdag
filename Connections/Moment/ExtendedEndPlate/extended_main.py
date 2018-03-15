@@ -14,7 +14,7 @@ from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
-from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
 import sys
@@ -25,6 +25,19 @@ import json
 import ConfigParser
 import cairosvg
 import shutil
+
+from Connections.Component.ISection import ISection
+from Connections.Component.nut import Nut
+from Connections.Component.bolt import Bolt
+from Connections.Component.filletweld import FilletWeld
+from Connections.Component.plate import Plate
+from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
+from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
+from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
+from Connections.Component.quarterCone import QuarterCone
+from OCC.Quantity import Quantity_NOC_SADDLEBROWN
+from utilities import osdag_display_shape
+import copy
 
 
 class DesignPreference(QDialog):
@@ -167,7 +180,7 @@ class DesignPreference(QDialog):
         self.close()
 
 
-class Plate(QDialog):
+class PlateDetails(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.ui = Ui_Plate()
@@ -435,37 +448,49 @@ class Maincontroller(QMainWindow):
         max_fy = 450
         self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
-        # from osdagMainSettings import backend_name
-        # self.display, _ = self.init_display(backend_str=backend_name())
+        from osdagMainSettings import backend_name
+        self.display, _ = self.init_display(backend_str=backend_name())
         self.uiObj = None
         self.resultObj = None
         self.designPrefDialog = DesignPreference(self)
 
-    # def init_display(self, backend_str=None, size=(1024, 768)):
-    #     from OCC.Display.backend import load_backend, get_qt_modules
-    #
-    #     used_backend = load_backend(backend_str)
-    #
-    #     global display, start_display, app, _, USED_BACKEND
-    #     if 'qt' in used_backend:
-    #         from OCC.Display.qtDisplay import qtViewer3d
-    #         QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
-    #
-    #     from OCC.Display.qtDisplay import qtViewer3d
-    #     self.ui.modelTab = qtViewer3d(self)
-    #     display = self.ui.modelTab._display
-    #
-    #     display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
-    #     display.View.SetProj(1, 1, 1)
+    def init_display(self, backend_str=None, size=(1024, 768)):
+        from OCC.Display.backend import load_backend, get_qt_modules
+
+        used_backend = load_backend(backend_str)
+
+        global display, start_display, app, _, USED_BACKEND
+        if 'qt' in used_backend:
+            from OCC.Display.qtDisplay import qtViewer3d
+            QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
+
+        from OCC.Display.qtDisplay import qtViewer3d
+        self.ui.modelTab = qtViewer3d(self)
+
+        # ========================  CAD ========================
+        # self.setWindowTitle("Osdag Finplate")
+        self.ui.mytabWidget.resize(size[0], size[1])
+        self.ui.mytabWidget.addTab(self.ui.modelTab, "")
+        self.ui.modelTab.InitDriver()
+        # ===========================================================
+        display = self.ui.modelTab._display
+
+        display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
+        # ========================  CAD ========================
+        display.display_trihedron()
+        # ===========================================================
+        display.View.SetProj(1, 1, 1)
 
         def centerOnScreen(self):
+            '''Centers the window on the screen.'''
             resolution = QtGui.QDesktopWidget().screenGeometry()
             self.move((resolution.width()/2) - (self.frameSize().width()/2),
                       (resolution.height()/2) - (self.frameSize().height()/2))
 
-        # def start_display():
-        #     self.ui.modelTab.raise_()
-        # return display, start_display
+        def start_display():
+            self.ui.modelTab.raise_()
+
+        return display, start_display
 
     def save_design_inputs(self):
         filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),
@@ -723,6 +748,7 @@ class Maincontroller(QMainWindow):
         a = self.outputs[self.outputs.keys()[0]]
         self.display_output(self.outputs)
         self.display_log_to_textedit()
+        self.call_3DModel()
 
     def display_output(self, outputObj):
         for k in outputObj.keys():
@@ -954,6 +980,280 @@ class Maincontroller(QMainWindow):
         # self.beam_data = self.fetchBeamPara()
         # save_html(self.result, self.alist, self.beam_data, fileName)
 
+    # ===========================  CAD ===========================
+    def showColorDialog(self):
+
+        col = QColorDialog.getColor()
+        colorTup = col.getRgb()
+        r = colorTup[0]
+        g = colorTup[1]
+        b = colorTup[2]
+        self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+
+    def createExtendedBothWays(self):
+
+        beam_data = self.fetchBeamPara()
+
+        beam_tw = float(beam_data["tw"])
+        beam_T = float(beam_data["T"])
+        beam_d = float(beam_data["D"])
+        beam_B = float(beam_data["B"])
+        beam_R1 = float(beam_data["R1"])
+        beam_R2 = float(beam_data["R2"])
+        beam_alpha = float(beam_data["FlangeSlope"])
+        beam_length = 800.0
+
+        beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+                          R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+                          length=beam_length, notchObj=None)
+        beam_Right = copy.copy(beam_Left)   # Since both the beams are same
+
+        outputobj = self.outputs    # Save all the claculated/displayed out in outputobj
+
+        plate_Left = Plate(W=outputobj["Plate"]["Width"],
+                           L=outputobj["Plate"]["Height"],
+                           T=outputobj["Plate"]["Thickness"])
+        plate_Right = copy.copy(plate_Left)     # Since both the end plates are identical
+
+        alist = self.designParameters()         # An object to save all input values entered by user
+
+        bolt_d = float(alist["Bolt"]["Diameter (mm)"])      # Bolt diameter, entered by user
+        bolt_r = bolt_d/2
+        bolt_T = self.bolt_head_thick_calculation(bolt_d)
+        bolt_R = self.bolt_head_dia_calculation(bolt_d) / 2
+        bolt_Ht = self.bolt_length_calculation(bolt_d)
+
+        bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)    # Call to create Bolt from Component repo
+        nut_T = self.nut_thick_calculation(bolt_d)
+        nut_Ht = nut_T
+        nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+
+        numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
+
+        nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
+
+        bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+
+        ###########################
+        #       WELD SECTIONS     #
+        ###########################
+        '''
+        Following sections are for creating Fillet Welds. 
+        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+        '''
+
+        # Followings welds are welds above beam flange, Qty = 4
+        bbWeldAbvFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_B)
+        bbWeldAbvFlang_12 = copy.copy(bbWeldAbvFlang_11)
+        bbWeldAbvFlang_21 = copy.copy(bbWeldAbvFlang_11)
+        bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_11)
+
+        # Followings welds are welds below beam flange, Qty = 8
+        bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+        bbWeldBelwFlang_12 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_13 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_14 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_21 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_11)
+        bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_11)
+
+        # Followings welds are welds placed aside beam flange, Qty = 8
+        bbWeldSideFlange_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_T)
+        bbWeldSideFlange_12 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_13 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_14 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_21 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_22 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_23 = copy.copy(bbWeldSideFlange_11)
+        bbWeldSideFlange_24 = copy.copy(bbWeldSideFlange_11)
+
+        # Followings welds are welds placed aside of beam web, Qty = 4
+        bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_T)
+        bbWeldSideWeb_12 = copy.copy(bbWeldSideWeb_11)
+        bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
+        bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)
+
+        #######################################
+        #       WELD SECTIONS QUARTER CONE    #
+        #######################################
+
+        # Following weld cones are placed for Left beam
+        weldQtrCone_11 = QuarterCone(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), coneAngle=90)
+        weldQtrCone_12 = copy.copy(weldQtrCone_11)
+        weldQtrCone_13 = copy.copy(weldQtrCone_11)
+        weldQtrCone_14 = copy.copy(weldQtrCone_11)
+        weldQtrCone_15 = copy.copy(weldQtrCone_11)
+        weldQtrCone_16 = copy.copy(weldQtrCone_11)
+        weldQtrCone_17 = copy.copy(weldQtrCone_11)
+        weldQtrCone_18 = copy.copy(weldQtrCone_11)
+
+        # Following weld cones are placed for Right beam
+        weldQtrCone_21 = copy.copy(weldQtrCone_11)
+        weldQtrCone_22 = copy.copy(weldQtrCone_11)
+        weldQtrCone_23 = copy.copy(weldQtrCone_11)
+        weldQtrCone_24 = copy.copy(weldQtrCone_11)
+        weldQtrCone_25 = copy.copy(weldQtrCone_11)
+        weldQtrCone_26 = copy.copy(weldQtrCone_11)
+        weldQtrCone_27 = copy.copy(weldQtrCone_11)
+        weldQtrCone_28 = copy.copy(weldQtrCone_11)
+
+
+        extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
+                                       bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
+                                       bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
+                                       bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
+                                       bbWeldSideFlange_11, bbWeldSideFlange_12, bbWeldSideFlange_13, bbWeldSideFlange_14,
+                                       bbWeldSideFlange_21, bbWeldSideFlange_22, bbWeldSideFlange_23, bbWeldSideFlange_24,
+                                       bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                       weldQtrCone_11, weldQtrCone_12, weldQtrCone_13, weldQtrCone_14,
+                                       weldQtrCone_15, weldQtrCone_16, weldQtrCone_17, weldQtrCone_18,
+                                       weldQtrCone_21, weldQtrCone_22, weldQtrCone_23, weldQtrCone_24,
+                                       weldQtrCone_25, weldQtrCone_26, weldQtrCone_27, weldQtrCone_28)
+        extbothWays.create_3DModel()
+
+        return extbothWays
+
+    def bolt_head_thick_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+        return bolt_head_thick[bolt_diameter]
+
+    def bolt_head_dia_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        '''
+        bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
+        return bolt_head_dia[bolt_diameter]
+
+    def bolt_length_calculation(self, bolt_diameter):
+        '''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__
+        '''
+        bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+
+        return bolt_head_dia[bolt_diameter]
+
+    def nut_thick_calculation(self, bolt_diameter):
+        '''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
+        nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+        return nut_dia[bolt_diameter]
+
+    def call_3DModel(self):
+        self.createExtendedBothWays()   # Call to calculate/create the Extended Both Way CAD model
+        self.display_3DModel("Model", "gradient_bg")     # Call to display the Extended Both Way CAD model
+
+    def display_3DModel(self,component, bgcolor):
+        self.component = component
+
+        self.display.EraseAll()
+        self.display.View_Iso()
+        self.display.FitAll()
+
+        self.display.DisableAntiAliasing()
+        if bgcolor == "gradient_bg":
+
+            self.display.set_bg_gradient_color(51, 51, 102, 150, 150, 170)
+        else:
+            self.display.set_bg_gradient_color(255, 255, 255, 255, 255, 255)
+
+        self.ExtObj = self.createExtendedBothWays()     # ExtObj is an object which gets all the calculated values of CAD models
+
+        # Displays the beams
+        osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+        osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+
+        # Displays the end plates
+        osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
+        osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+
+        # Display all nut-bolts, call to nutBoltPlacement.py
+        nutboltlist = self.ExtObj.nut_bolt_array.get_models()
+        for nutbolt in nutboltlist:
+            osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
+
+        # Display all the Welds including the quarter cone
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
+
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
+        osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
+
+    # =================================================================================
 
 def set_osdaglogger():
     global logger

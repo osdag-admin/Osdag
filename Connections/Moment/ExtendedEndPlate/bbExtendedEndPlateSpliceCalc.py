@@ -392,7 +392,11 @@ def bbExtendedEndPlateSplice(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
-
+    # ===================  CAD ===================
+    beam_R2 = float(dictbeamdata["R2"])
+    alpha = float(dictbeamdata["FlangeSlope"])
+    beam_length = 800.0
+    # =======================================================
     #######################################################################
     # Calculation of Bolt strength in MPa
     bolt_fu = int(bolt_grade) * 100
@@ -1650,10 +1654,16 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+        # ===================  CAD ===================
+        outputobj['Bolt']['Lv'] = float(l_v)
+        # ===================  CAD ===================
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
         outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
+        # ===================  CAD ===================
+        outputobj['Plate']['Thickness'] = round(end_plate_thickness, 3)
+        # ===================  CAD ===================
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
         outputobj['Plate']['ThickRequired'] = float(tp_required)
@@ -1742,6 +1752,9 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
         outputobj['Bolt']['End'] = float(minimum_end_distance)
         outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+        # ===================  CAD ===================
+        outputobj['Bolt']['Lv'] = float(l_v)
+        # ===================  CAD ===================
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))

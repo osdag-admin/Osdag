@@ -142,7 +142,7 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder), 0755)
                 except OSError:
                     shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder)), 0755
+                    os.mkdir(os.path.join(root_path, create_folder), 0755)
 
         if self.ui.rdbtn_finplate.isChecked():
             launchFinPlateController(self, folder)
@@ -189,7 +189,7 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder), 0755)
                 except OSError:
                     shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder)), 0755
+                    os.mkdir(os.path.join(root_path, create_folder), 0755)
 
         if self.ui.rdbtn_coverplate.isChecked():
             launch_coverplate_controller(self, folder)

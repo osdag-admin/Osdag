@@ -479,7 +479,6 @@ class Maincontroller(QMainWindow):
         self.ui.modelTab.InitDriver()
         # ===========================================================
         display = self.ui.modelTab._display
-
         display.set_bg_gradient_color(23, 1, 32, 23, 1, 32)
         # ========================  CAD ========================
         display.display_trihedron()

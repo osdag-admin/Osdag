@@ -255,8 +255,13 @@ class Ui_MainWindow(object):
         self.mytabWidget.setStyleSheet("QTabBar::tab {\n"
 "    margin-right: 10;\n"
 " }\n"
-"QTabBar::tab::hover\n"
-"{\n"
+"\n"
+"QTabBar::tab::selected{\n"
+"    background-color: #d97f7f;\n"
+"   color:#000000 ;\n"
+"}\n"
+"\n"
+"QTabBar::tab::hover{\n"
 "   background-color: #d97f7f;\n"
 "   color:#000000 ;\n"
 "}\n"
@@ -267,6 +272,7 @@ class Ui_MainWindow(object):
 "background-color: #925a5b;\n"
 "color:#ffffff;\n"
 "}\n"
+"\n"
 "QTabBar::tab{\n"
 "border-top-left-radius: 2px ;\n"
 "border-top-right-radius: 2px ;\n"
@@ -469,16 +475,6 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addItem(spacerItem19, 0, 0, 1, 1)
         spacerItem20 = QtWidgets.QSpacerItem(20, 398, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_4.addItem(spacerItem20, 4, 1, 2, 1)
-        self.rdbtn_peb = QtWidgets.QRadioButton(self.tab2_momentconnection)
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(12)
-        self.rdbtn_peb.setFont(font)
-        self.rdbtn_peb.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.rdbtn_peb.setObjectName("rdbtn_peb")
-        self.gridLayout_4.addWidget(self.rdbtn_peb, 3, 4, 1, 1)
-        spacerItem21 = QtWidgets.QSpacerItem(20, 398, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_4.addItem(spacerItem21, 4, 4, 2, 1)
         self.rdbtn_colcol = QtWidgets.QRadioButton(self.tab2_momentconnection)
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -486,7 +482,17 @@ class Ui_MainWindow(object):
         self.rdbtn_colcol.setFont(font)
         self.rdbtn_colcol.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.rdbtn_colcol.setObjectName("rdbtn_colcol")
-        self.gridLayout_4.addWidget(self.rdbtn_colcol, 3, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.rdbtn_colcol, 3, 4, 1, 1)
+        spacerItem21 = QtWidgets.QSpacerItem(20, 398, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_4.addItem(spacerItem21, 4, 4, 2, 1)
+        self.rdbtn_peb = QtWidgets.QRadioButton(self.tab2_momentconnection)
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(12)
+        self.rdbtn_peb.setFont(font)
+        self.rdbtn_peb.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.rdbtn_peb.setObjectName("rdbtn_peb")
+        self.gridLayout_4.addWidget(self.rdbtn_peb, 3, 1, 1, 1)
         spacerItem22 = QtWidgets.QSpacerItem(496, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_4.addItem(spacerItem22, 3, 2, 1, 2)
         self.rdbtn_beamcolumn = QtWidgets.QRadioButton(self.tab2_momentconnection)
@@ -813,7 +819,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.comboBox_help.setCurrentIndex(0)
-        self.myStackedWidget.setCurrentIndex(1)
+        self.myStackedWidget.setCurrentIndex(0)
         self.mytabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.btn_connection, self.btn_tension)
@@ -856,8 +862,8 @@ class Ui_MainWindow(object):
         self.btn_start.setText(_translate("MainWindow", "Start"))
         self.btn_start.setShortcut(_translate("MainWindow", "Return"))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab1_shearconnection), _translate("MainWindow", "Shear Connection"))
+        self.rdbtn_colcol.setText(_translate("MainWindow", "Coulmn-Column"))
         self.rdbtn_peb.setText(_translate("MainWindow", "PEB"))
-        self.rdbtn_colcol.setText(_translate("MainWindow", "Column-Column"))
         self.rdbtn_beamcolumn.setText(_translate("MainWindow", "Beam-Column"))
         self.rdbtn_beamtobeam.setText(_translate("MainWindow", "Beam-Beam"))
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab2_momentconnection), _translate("MainWindow", "Moment Connection"))

@@ -1420,7 +1420,7 @@ if __name__ == "__main__":
     formatter = logging.Formatter('''%(message)s''')
     fh.setFormatter(formatter)
     rawLogger.addHandler(fh)
-    rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+    rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\ExtendedEndPlate\log.css"/>''')
     # ----------------------------------------------------------------------------
     folder_path = "D:\Osdag_Workspace\extendedendplate"
     window = Maincontroller(folder_path)

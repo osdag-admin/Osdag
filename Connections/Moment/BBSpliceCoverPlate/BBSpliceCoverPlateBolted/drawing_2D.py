@@ -11,69 +11,74 @@ import os
 
 
 class CoverEndPlate(object):
-    def __init__(self, input):
+    def __init__(self, input, resultobj, dictbeamdata):
         # self.filename = filename
-        self.beam_length_L1 = 1000
-        self.beam_length_L2 = 1000
+        self.beam_length_L1 = 750
+        self.beam_length_L2 = 750
 
-        self.beam_depth_D1 = 450
-        self.beam_depth_D2 = 450
+        self.beam_depth_D1 = float(dictbeamdata["D"])
+        self.beam_depth_D2 = self.beam_depth_D1
 
-        self.beam_width_B1 = 150
-        self.beam_width_B2 = 150
+        self.beam_width_B1 = float(dictbeamdata["B"])
+        self.beam_width_B2 = self.beam_width_B1
 
-        self.plate_thickness_p1 = 16
+        self.plate_thickness_p1 = float(input["FlangePlate"]["Thickness (mm)"])   #  flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"])
         self.plate_thickness_p2 = 16
-        self.plate_thickness_p3 = 10
+        self.plate_thickness_p3 = float(input["WebPlate"]["Thickness (mm)"])     #10  web_plate_t = float(uiObj["WebPlate"]["Thickness (mm)"])
 
-        self.plate_width_B1 = 150
-        self.plate_width_B2 = 150
-        self.plate_width_B3 = 180
 
-        self.plate_length_L1 = 520
-        self.plate_length_L2 = 520
-        self.plate_length_L3 = 280
+        self.plate_width_B1 = resultobj["FlangeBolt"]["FlangePlateWidth"] #boltParam["FlangePlateWidth"] = flange_plate_w
+        self.plate_width_B2 = self.plate_width_B1 #150
+        self.plate_width_B3 = resultobj["WebBolt"]["WebPlateWidth"] #180 outputObj["WebBolt"]["WebPlateWidth"] = web_plate_w_req
 
-        self.flange_thickness_T1 = 17.4
-        self.flange_thickness_T2 = 17.4
+        self.plate_length_L1 = resultobj["FlangeBolt"]["FlangePlateHeight"]      #  520 outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
+        self.plate_length_L2 = self.plate_length_L1
+        self.plate_length_L3 = resultobj["WebBolt"]["WebPlateHeight"]     # 280    outputObj["WebBolt"]["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
 
-        self.web_thickness_tw1 = float(input["WebPlate"]["Thickness (mm)"])  #9.4
-        self.web_thickness_tw2 = 9.4
+
+        self.flange_thickness_T1 = float(dictbeamdata["T"])#17.4  beam_f_t = float(dictbeamdata["T"])
+        self.flange_thickness_T2 = self.flange_thickness_T1
+
+        self.web_thickness_tw1 = float(dictbeamdata["tw"])#9.4  beam_w_t = float(dictbeamdata["tw"])
+        self.web_thickness_tw2 = self.web_thickness_tw1
 
         self.gap_btwn_2beam = float(input["detailing"]["gap"])     #5
 
         self.bolt_diameter = int(input["Bolt"]["Diameter (mm)"])
-        self.bolt_hole_diameter =22
+        self.bolt_hole_diameter = int(input["bolt"]["bolt_hole_clrnce"]) + self.bolt_diameter   # 22  dia_hole = int(uiObj["bolt"]["bolt_hole_clrnce"]) + bolt_diameter
 
-        self.edge_dist1 = 40
-        self.edge_dist2 = 40
-        self.end_dist = 40
 
-        self.cross_centre_gauge_dist = 100
-        self.gauge = 90
+        self.edge_dist1 = resultobj["FlangeBolt"]["EndF"]  #40 outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
+        self.edge_dist2 = resultobj["WebBolt"]["Edge"] #40 outputObj["WebBolt"]["Edge"] = new_bolt_param["Edge"]
+        self.end_dist = resultobj["WebBolt"]["End"] #40 outputObj["WebBolt"]["End"] = new_bolt_param["End"]
 
-        self.pitch1 = 60
-        self.pitch2 = 100
+        self.cross_centre_gauge_dist = 100 #resultobj["WebBolt"]["WebGaugeMax"]
+        self.gauge = resultobj["FlangeBolt"]["FlangeGauge"] #90  outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
+
+
+        self.pitch1 = resultobj["FlangeBolt"]["PitchF"]  #60 outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
+        self.pitch2 = resultobj["WebBolt"]["Pitch"]    # 100 outputObj["WebBolt"]["Pitch"] = new_bolt_param["Pitch"]
+
 
         self.bolt_type = input["Bolt"]["Type"]
         self.grade = float(input["Bolt"]["Grade"])
 
-        self.bolts_top_flange1_col = 4
-        self.bolts_top_flange1_row = 1  # TODO value should come from dict
-        self.bolts_top_of_flange1_row = 2    # TODO value should come from dict
+        self.bolts_top_flange1_col = 4 # TODO value should come from dict
+        # self.bolts_top_flange1_row = 1
+        self.bolts_top_of_flange1_row = 2
 
-        self.bolts_top_flange2_col = 4
-        self.bolts_top_flange2_row = 1  # TODO value should come from dict
-        self.bolts_top_of_flange2_row = 2    # TODO value should come from dict
+        self.bolts_top_flange2_col =  self.bolts_top_flange1_col
+        # self.bolts_top_flange2_row = 1
+        self.bolts_top_of_flange2_row = 2
 
         self.bolts_inside_web_col = 2
         self.bolts_inside_web_row = 3    # TODO value should come from dict
 
-        self.bolts_bottom_flange1_col = 4
-        self.bolts_bottom_flange1_row = 1   # TODO value should come from dict
+        self.bolts_bottom_flange1_col = self.bolts_top_flange1_col
+        # self.bolts_bottom_flange1_row = 1
 
-        self.bolts_bottom_flange2_col = 4
-        self.bolts_bottom_flange2_row = 1   # TODO value should come from dict
+        self.bolts_bottom_flange2_col = self.bolts_bottom_flange1_col
+        # self.bolts_bottom_flange2_row = 1
 
     def add_s_marker(self, dwg):
         """

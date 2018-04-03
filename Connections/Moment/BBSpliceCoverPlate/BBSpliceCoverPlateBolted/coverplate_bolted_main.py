@@ -11,7 +11,7 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
-from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog
+from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
@@ -529,7 +529,8 @@ class MainController(QMainWindow):
         Returns: Ask for the confirmation while closing the window
 
         """
-        uiInput = self.get_user_inputs()
+        # uiInput = self.get_user_inputs()
+        uiInput = self.designParameters()
         self.save_inputs_totext(uiInput)
         action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
         if action == QMessageBox.Yes:
@@ -548,7 +549,7 @@ class MainController(QMainWindow):
         Returns: Save the user input to txt format
 
         """
-        input_file = QFile(os.path.join("saveINPUT.txt"))
+        input_file = QFile(os.path.join("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\saveINPUT.txt"))
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
                                 "Cannot write file %s: \n%s"
@@ -561,7 +562,7 @@ class MainController(QMainWindow):
         Returns: Read for the previous user inputs design
 
         """
-        filename = os.path.join("saveINPUT.txt")
+        filename = os.path.join("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\saveINPUT.txt")
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
             uiObj = pickle.load(file_object)
@@ -738,8 +739,10 @@ class MainController(QMainWindow):
         Returns: Saves 2D svg drawings
 
         """
-        self.resultObj = self.call_calculation()
-        beam_beam = CoverEndPlate(self.resultObj)
+        self.alist = self.designParameters()
+        self.resultObj = coverplateboltedconnection(self.alist)
+        self.beam_data = self.fetchBeamPara()
+        beam_beam = CoverEndPlate(self.alist, self.resultObj, self.beam_data)
         if view != 'All':
             if view == "Front":
                 filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
@@ -1004,20 +1007,20 @@ class MainController(QMainWindow):
             osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
             osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
 
-            # # Displays the bolts which are above the Flange Plate, debugging will give more clarity
-            # nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-            # for nutboltAF in nutboltlistAF:
-            #     osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+            # Displays the bolts which are above the Flange Plate, debugging will give more clarity
+            nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
+            for nutboltAF in nutboltlistAF:
+                osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
 
-            # # Displays the bolts which are below the Flange Plate, debugging will give more clarity
-            # nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
-            # for nutboltBF in nutboltlistBF:
-            #     osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
+            # Displays the bolts which are below the Flange Plate, debugging will give more clarity
+            nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
+            for nutboltBF in nutboltlistBF:
+                osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
 
-            # # Displays the bolts which are on the right side of web plate, debugging will give more clarity
-            # nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-            # for nutboltW in nutboltlistW:
-            #     osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
+            # Displays the bolts which are on the right side of web plate, debugging will give more clarity
+            nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
+            for nutboltW in nutboltlistW:
+                osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
     # =================================================================================
 

@@ -797,7 +797,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = flange_g # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -829,7 +829,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["EdgeF"] = min_edge_dist
             boltParam["FlangePlateHeight"] = flange_plate_l
             boltParam["FlangePlateWidth"] = flange_plate_w
-            boltParam["FlangeGauge"] = flange_g  # TODO: Need to fetch values
+            boltParam["FlangeGauge"] = flange_g
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
 
             # bolt parameters required for calculation
@@ -1065,7 +1065,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 
@@ -1105,7 +1105,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
-        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g  # TODO: Need to fetch values
+        outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
 

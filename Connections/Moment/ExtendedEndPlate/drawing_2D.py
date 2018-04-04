@@ -1119,20 +1119,21 @@ class ExtendedEnd2DSide(object):
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5 , self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 
-        pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
-        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 1 1)"))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5)) #, rotate=pcRotate))
+
         dwg.add(dwg.rect(insert=self.P, size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D1 - (2 * self.data_object.flange_thickness_T1))), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=self.A4, size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D2 - (2 * self.data_object.flange_thickness_T2))), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
-        # TODO hatching lines flange welding (horizontally)
-        # pattern1 = dwg.defs.add(dwg.pattern(id="diagonalHatch1", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)", ))
-        # pattern1.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5, angle="90"))
-        # dwg.add(dwg.rect(insert=self.A1, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
-        # dwg.add(dwg.rect(insert=self.T, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
-        # dwg.add(dwg.rect(insert=self.S, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
-        # dwg.add(dwg.rect(insert=self.S, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
-        # dwg.add(dwg.rect(insert=self.S, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
-        # dwg.add(dwg.rect(insert=self.S, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
+
+        pattern1 = dwg.defs.add(dwg.pattern(id="diagonalHatch1", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)", ))
+        pattern1.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=(self.A1-self.data_object.flange_weld_thickness * np.array([0, 1])), size=(self.data_object.beam_width_B1, self.data_object.flange_weld_thickness), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=(self.A8-self.data_object.flange_weld_thickness * np.array([0, 1])), size=(self.data_object.beam_width_B1, self.data_object.flange_weld_thickness), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
+
+        # TODO hatching lines flange welding for sides of flange
+        # dwg.add(dwg.rect(insert=(self.A1-self.data_object.flange_weld_thickness * np.array([1, 0])), size=(self.data_object.flange_weld_thickness, self.data_object.flange_thickness_T1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
+        # dwg.add(dwg.rect(insert=self.A2, size=(self.data_object.flange_weld_thickness, self.data_object.flange_thickness_T1), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
 
         nofc = self.data_object.no_of_columns
         botfr = self.data_object.bolts_outside_top_flange_row

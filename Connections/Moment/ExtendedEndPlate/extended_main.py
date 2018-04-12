@@ -300,7 +300,7 @@ class DesignReportDialog(QDialog):
 		QDialog.__init__(self, parent)
 		self.ui = Ui_DesignReport()
 		self.ui.setupUi(self)
-		self.mainController = parent
+		self.maincontroller = parent
 		self.setWindowTitle("Design Profile")
 		self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
 		self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
@@ -309,7 +309,7 @@ class DesignReportDialog(QDialog):
 
 	def save_inputSummary(self):
 		report_summary = self.get_report_summary()
-		self.mainController.save_design(report_summary)
+		self.maincontroller.save_design(report_summary)
 
 	def getLogoFilePath(self, lblwidget):
 		self.ui.lbl_browse.clear()
@@ -329,14 +329,14 @@ class DesignReportDialog(QDialog):
 
 	def desired_location(self, filename, base_type):
 		if base_type == ".svg":
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoCleat.png"))
 		else:
-			shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoExtendEndplate.png"))
+			shutil.copyfile(filename, os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
 
 	def saveUserProfile(self):
 		inputData = self.get_report_summary()
 		filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
-												  os.path.join(str(self.mainController.folder), "Profile"), '*.txt')
+												  os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
 		if filename == '':
 			flag = False
 			return flag
@@ -362,7 +362,7 @@ class DesignReportDialog(QDialog):
 
 	def useUserProfile(self):
 		filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
-												  os.path.join(str(self.mainController.folder), "Profile"),
+												  os.path.join(str(self.maincontroller.folder), "Profile"),
 												  "All Files (*)")
 		if os.path.isfile(filename):
 			outfile = open(filename, 'r')

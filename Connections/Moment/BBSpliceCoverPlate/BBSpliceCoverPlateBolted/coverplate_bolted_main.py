@@ -11,14 +11,20 @@ from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
+from ui_design_summary import Ui_DesignReport
+from reportGenerator import save_html
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
-import sys
+import cairosvg
+import ConfigParser
+import json
 import os.path
 import pickle
-import json
+import pdfkit
+import shutil
+import sys
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -214,6 +220,86 @@ class Webspliceplate(QDialog):
 		self.ui.txt_plateDemand.setText(str(resultObj_webplate["WebBolt"]["webPlateDemand"]))
 
 
+class DesignReportDialog(QDialog):
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_DesignReport()
+		self.ui.setupUi(self)
+		self.maincontroller = parent
+		self.setWindowTitle("Design Profile")
+		self.ui.btn_browse.clicked.connect(lambda: self.getLogoFilePath(self.ui.lbl_browse))
+		self.ui.btn_saveProfile.clicked.connect(self.saveUserProfile)
+		self.ui.btn_useProfile.clicked.connect(self.useUserProfile)
+		self.accepted.connect(self.save_inputSummary)
+
+	def save_inputSummary(self):
+		report_summary = self.get_report_summary()
+		self.maincontroller.save_design(report_summary)
+
+	def getLogoFilePath(self, lblwidget):
+		self.ui.lbl_browse.clear()
+		filename, _ = QFileDialog.getOpenFileName(self, 'Open File', "../../ ", 'Images (*.png *.svg *.jpg)', None,
+												  QFileDialog.DontUseNativeDialog)
+		flag = True
+		if filename == '':
+			flag = False
+			return flag
+		else:
+			base = os.path.basename(str(filename))
+			lblwidget.setText(base)
+			base_type = base[-4:]
+			self.desired_location(filename, base_type)
+
+		return str(filename)
+
+	def desired_location(self, filename, base_type):
+		if base_type == ".svg":
+			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoCleat.png"))
+		else:
+			shutil.copyfile(filename, os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
+
+	def saveUserProfile(self):
+		inputData = self.get_report_summary()
+		filename, _ = QFileDialog.getSaveFileName(self, 'Save Files',
+												  os.path.join(str(self.maincontroller.folder), "Profile"), '*.txt')
+		if filename == '':
+			flag = False
+			return flag
+		else:
+			infile = open(filename, 'w')
+			pickle.dump(inputData, infile)
+			infile.close()
+
+	def get_report_summary(self):
+		report_summary = {"ProfileSummary": {}}
+		report_summary["ProfileSummary"]["CompanyName"] = str(self.ui.lineEdit_companyName.text())
+		report_summary["ProfileSummary"]["CompanyLogo"] = str(self.ui.lbl_browse.text())
+		report_summary["ProfileSummary"]["Group/TeamName"] = str(self.ui.lineEdit_groupName.text())
+		report_summary["ProfileSummary"]["Designer"] = str(self.ui.lineEdit_designer.text())
+
+		report_summary["ProjectTitle"] = str(self.ui.lineEdit_projectTitle.text())
+		report_summary["Subtitle"] = str(self.ui.lineEdit_subtitle.text())
+		report_summary["JobNumber"] = str(self.ui.lineEdit_jobNumber.text())
+		report_summary["Client"] = str(self.ui.lineEdit_client.text())
+		report_summary["AdditionalComments"] = str(self.ui.txt_additionalComments.toPlainText())
+
+		return report_summary
+
+	def useUserProfile(self):
+		filename, _ = QFileDialog.getOpenFileName(self, 'Open Files',
+												  os.path.join(str(self.maincontroller.folder), "Profile"),
+												  "All Files (*)")
+		if os.path.isfile(filename):
+			outfile = open(filename, 'r')
+			reportsummary = pickle.load(outfile)
+			self.ui.lineEdit_companyName.setText(reportsummary["ProfileSummary"]['CompanyName'])
+			self.ui.lbl_browse.setText(reportsummary["ProfileSummary"]['CompanyLogo'])
+			self.ui.lineEdit_groupName.setText(reportsummary["ProfileSummary"]['Group/TeamName'])
+			self.ui.lineEdit_designer.setText(reportsummary["ProfileSummary"]['Designer'])
+		else:
+			pass
+
+
 class MainController(QMainWindow):
 	closed = pyqtSignal()
 
@@ -255,6 +341,7 @@ class MainController(QMainWindow):
 		self.ui.btn3D.clicked.connect(lambda: self.call_3DModel())
 		self.ui.chkBx_beamSec1.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.chkBx_extndPlate.clicked.connect(lambda: self.call_3DConnector("gradient_bg"))
+		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
 		validator = QIntValidator()
 		self.ui.txt_Fu.setValidator(validator)
@@ -451,6 +538,50 @@ class MainController(QMainWindow):
 		outf << self.ui.textEdit.toPlainText()
 		QApplication.restoreOverrideCursor()
 
+	def save_design(self, report_summary):
+		# status = self.resultObj['Bolt']['status']
+		# if status is True:
+		#     self.call_3DModel("white_bg")
+		#     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+		#     self.display.ExportToImage(data)
+		#     self.display.FitAll()
+		# else:
+		#     pass
+
+		filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
+		file_name = str(filename)
+		self.call_designreport(file_name, report_summary)
+		# self.commLogicObj.call_designReport(file_name, report_summary)
+
+		# Creates PDF
+		config = ConfigParser.ConfigParser()
+		config.readfp(open(r'Osdag.config'))
+		wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
+
+		config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+
+		options = {
+			'margin-bottom': '10mm',
+			'footer-right': '[page]'
+		}
+		file_type = "PDF(*.pdf)"
+		fname, _ = QFileDialog.getSaveFileName(self, "Save File As", self.folder + "/", file_type)
+		fname = str(fname)
+		flag = True
+		if fname == '':
+			flag = False
+			return flag
+		else:
+			pdfkit.from_file(filename, fname, configuration=config, options=options)
+			QMessageBox.about(self, 'Information', "Report Saved")
+
+	def call_designreport(self, fileName, report_summary):
+		self.alist = self.designParameters()
+		self.result = coverplateboltedconnection(self.alist)
+		print "resultobj", self.result
+		self.beam_data = self.fetchBeamPara()
+		save_html(self.result, self.alist, self.beam_data, fileName, report_summary)
+
 	def get_user_inputs(self):
 		"""
 
@@ -529,7 +660,6 @@ class MainController(QMainWindow):
 		self.ui.actionSave_Top_View.setEnabled(True)
 		self.ui.menuGraphics.setEnabled(True)
 
-
 	def reset_btnclicked(self):
 		self.ui.combo_beamSec.setCurrentIndex(0)
 		self.ui.combo_connLoc.setCurrentIndex(0)
@@ -568,7 +698,6 @@ class MainController(QMainWindow):
 		self.ui.btn_flangePlate.setDisabled(True)
 		self.ui.btn_webPlate.setDisabled(True)
 
-
 	def closeEvent(self, event):
 		"""
 
@@ -589,7 +718,6 @@ class MainController(QMainWindow):
 		else:
 			event.ignore()
 
-
 	def save_inputs_totext(self, uiObj):
 		"""
 
@@ -606,7 +734,6 @@ class MainController(QMainWindow):
 			                    % (input_file.fileName(), input_file.errorString()))
 		pickle.dump(uiObj, input_file)
 
-
 	def get_prevstate(self):
 		"""
 
@@ -621,7 +748,6 @@ class MainController(QMainWindow):
 		else:
 			return None
 
-
 	def retrieve_prevstate(self):
 		"""
 
@@ -630,7 +756,6 @@ class MainController(QMainWindow):
 		"""
 		uiObj = self.get_prevstate()
 		self.set_dict_touser_inputs(uiObj)
-
 
 	def set_dict_touser_inputs(self, uiObj):
 		"""
@@ -664,18 +789,14 @@ class MainController(QMainWindow):
 		else:
 			pass
 
-
 	def design_prefer(self):
 		self.designPrefDialog.show()
-
 
 	def bolt_hole_clearance(self):
 		self.designPrefDialog.get_clearance()
 
-
 	def call_bolt_fu(self):
 		self.designPrefDialog.set_boltFu()
-
 
 	def designParameters(self):
 		"""
@@ -690,7 +811,6 @@ class MainController(QMainWindow):
 			design_pref = self.designPrefDialog.saved_designPref
 		self.uiObj.update(design_pref)
 		return self.uiObj
-
 
 	def design_btnclicked(self):
 		"""
@@ -713,7 +833,6 @@ class MainController(QMainWindow):
 		self.ui.btn_flangePlate.setDisabled(False)
 		self.ui.btn_webPlate.setDisabled(False)
 		self.call_3DModel()
-
 
 	def display_output(self, outputObj):
 		"""
@@ -781,7 +900,6 @@ class MainController(QMainWindow):
 		web_edgedist = resultObj["WebBolt"]["Edge"]
 		self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
-
 	def display_log_to_textedit(self):
 		file = QFile('Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log')
 		if not file.open(QtCore.QIODevice.ReadOnly):
@@ -792,7 +910,6 @@ class MainController(QMainWindow):
 		vscroll_bar = self.ui.textEdit.verticalScrollBar()
 		vscroll_bar.setValue(vscroll_bar.maximum())
 		file.close()
-
 
 	def call_2D_drawing(self, view):
 		"""
@@ -818,22 +935,22 @@ class MainController(QMainWindow):
 				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
 				beam_beam.save_to_svg(filename, view)
 
-
 	def flangesplice_plate(self):
 		section = Flangespliceplate(self)
 		section.show()
-
 
 	def websplice_plate(self):
 		section = Webspliceplate(self)
 		section.show()
 
+	def design_report(self):
+		design_report_dialog = DesignReportDialog(self)
+		design_report_dialog.show()
 
 	def show_font_dialogue(self):
 		font, ok = QFontDialog.getFont()
 		if ok:
 			self.ui.textEdit.setFont(font)
-
 
 	def dockbtn_clicked(self, widgets):
 		"""
@@ -850,7 +967,6 @@ class MainController(QMainWindow):
 		else:
 			widgets.hide()
 
-
 	# ===========================  CAD ===========================
 	def show_color_dialog(self):
 		col = QColorDialog.getColor()
@@ -859,7 +975,6 @@ class MainController(QMainWindow):
 		g = colorTup[1]
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
-
 
 	def createBBCoverPlateBoltedCAD(self):
 		'''
@@ -929,7 +1044,6 @@ class MainController(QMainWindow):
 
 		return bbCoverPlateBolted
 
-
 	def bolt_head_thick_calculation(self, bolt_diameter):
 		'''
 		This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
@@ -945,7 +1059,6 @@ class MainController(QMainWindow):
 		bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
 		return bolt_head_thick[bolt_diameter]
 
-
 	def bolt_head_dia_calculation(self, bolt_diameter):
 		'''
 		This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
@@ -960,7 +1073,6 @@ class MainController(QMainWindow):
 		'''
 		bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
 		return bolt_head_dia[bolt_diameter]
-
 
 	def bolt_length_calculation(self, bolt_diameter):
 		'''
@@ -986,14 +1098,12 @@ class MainController(QMainWindow):
 
 		return bolt_head_dia[bolt_diameter]
 
-
 	def nut_thick_calculation(self, bolt_diameter):
 		'''
 		Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
 		'''
 		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
-
 
 	def call_3DModel(self):
 		# Call to calculate/create the BB Cover Plate Bolted CAD model

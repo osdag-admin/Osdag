@@ -1,6 +1,7 @@
 '''
 Created on 30-Oct-2017
 Revised on 5-March-2018
+Revised on 13-April-2018
 @author: Swathi M.
 '''
 
@@ -612,6 +613,8 @@ def coverplateboltedconnection(uiObj):
         if web_bolts_required > 0 and web_bolts_required <=2:
             web_bolts_required = 3
 
+        # number_of_rows_web = web_bolts_required
+
     # Number of bolts in even number (for design of flange splice plate)
         if flange_bolts_required % 2 == 0:
             flange_bolts_required = flange_bolts_required
@@ -792,6 +795,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["BearingCapacityF"] = flange_bolt_bearing_capacity
             boltParam["CapacityBoltF"] = flange_bolt_capacity
             boltParam["BoltsRequiredF"] = flange_bolts_required # Note: This outputs number of bolts required in one side of splice
+            boltParam["NumberBoltColFlange"] = number_of_rows_flange
             boltParam["PitchF"] = flange_pitch
             boltParam["EndF"] = min_end_dist
             boltParam["EdgeF"] = min_edge_dist
@@ -824,6 +828,7 @@ def coverplateboltedconnection(uiObj):
             boltParam["BearingCapacityF"] = flange_bolt_bearing_capacity
             boltParam["CapacityBoltF"] = flange_bolt_capacity
             boltParam["BoltsRequiredF"] = flange_bolts_required  # Note: This outputs number of bolts required in one side of splice
+            boltParam["NumberBoltColFlange"] = number_of_rows_flange
             boltParam["PitchF"] = flange_pitch
             boltParam["EndF"] = min_end_dist
             boltParam["EdgeF"] = min_edge_dist
@@ -1060,6 +1065,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
         outputObj["FlangeBolt"]["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["FlangeBolt"]["NumberBoltColFlange"] = new_bolt_param["NumberBoltColFlange"]
         outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
         outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
@@ -1100,6 +1106,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
         outputObj["FlangeBolt"]["BoltsRequiredF"] = new_bolt_param["BoltsRequiredF"]  # Note: This outputs number of bolts required in one side of splice
+        outputObj["FlangeBolt"]["NumberBoltColFlange"] = new_bolt_param["NumberBoltColFlange"]
         outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
         outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]

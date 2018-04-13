@@ -63,7 +63,7 @@ class CoverEndPlate(object):
         self.bolt_type = input["Bolt"]["Type"]
         self.grade = float(input["Bolt"]["Grade"])
 
-        self.bolts_top_flange1_col = 4 # TODO value should come from dict
+        self.bolts_top_flange1_col = resultobj["FlangeBolt"]["NumberBoltColFlange"]
         # self.bolts_top_flange1_row = 1
         self.bolts_top_of_flange1_row = 2
 
@@ -72,7 +72,7 @@ class CoverEndPlate(object):
         self.bolts_top_of_flange2_row = 2
 
         self.bolts_inside_web_col = 2
-        self.bolts_inside_web_row = 3    # TODO value should come from dict
+        self.bolts_inside_web_row = resultobj["WebBolt"]["BoltsRequired"]
 
         self.bolts_bottom_flange1_col = self.bolts_top_flange1_col
         # self.bolts_bottom_flange1_row = 1

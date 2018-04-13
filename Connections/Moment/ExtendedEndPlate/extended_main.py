@@ -1012,16 +1012,16 @@ class Maincontroller(QMainWindow):
 		self.alist = self.designParameters()
 		self.resultobj = bbExtendedEndPlateSplice(self.alist)
 		self.beam_data = self.fetchBeamPara()
-		beam_beam = ExtendedEndPlate(self.alist, self.resultobj, self.beam_data)
+		beam_beam = ExtendedEndPlate(self.alist, self.resultobj, self.beam_data, self.folder)
 		if view != "All":
 			if view == "Front":
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Front.svg"
+				filename = os.path.join(self.folder, "images_html", "extendFront.svg")
 				beam_beam.save_to_svg(filename, view)
 			elif view == "Side":
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Side.svg"
+				filename = os.path.join(self.folder, "images_html", "extendSide.svg")
 				beam_beam.save_to_svg(filename, view)
 			else:
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\ExtendedEndPlate\Top.svg"
+				filename = os.path.join(self.folder, "images_html", "extendTop.svg")
 				beam_beam.save_to_svg(filename, view)
 
 	def dockbtn_clicked(self, widgets):

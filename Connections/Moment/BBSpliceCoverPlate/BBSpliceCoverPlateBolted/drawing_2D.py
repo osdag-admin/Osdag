@@ -11,8 +11,9 @@ import os
 
 
 class CoverEndPlate(object):
-    def __init__(self, input, resultobj, dictbeamdata):
+    def __init__(self, input, resultobj, dictbeamdata, folder):
         # self.filename = filename
+        self.folder = folder
         self.beam_length_L1 = 750
         self.beam_length_L2 = 750
 
@@ -371,15 +372,18 @@ class CoverEndPlate(object):
         cover_end_2d_side = CoverEnd2DSide(self)
         if view == "Front":
             cover_end_2d_front.call_CoverEnd_front(filename)
-            # cairosvg.svg2png(file_obj=filename, write_to="D:\PyCharmWorkspace\Osdag\Connections\Moment\Beam-Beam")
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "coverboltedFront.png"))
+
         elif view == "Top":
             cover_end_2d_top.call_CoverEnd_top(filename)
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "coverboltedTop.png"))
 
         elif view == "Side":
             cover_end_2d_side.call_CoverEnd_side(filename)
-        else:
-            filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Cover_plate\TFront.svg"
-            cover_end_2d_front.call_CoverEnd_front(filename)
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "coverboltedSide.png"))
+        # else:
+        #     filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\Cover_plate\TFront.svg"
+        #     cover_end_2d_front.call_CoverEnd_front(filename)
 
 class CoverEnd2DFront(object):
     """

@@ -335,6 +335,7 @@ class MainController(QMainWindow):
 
 		self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 		self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
+		self.ui.btn_Design.clicked.connect(self.osdag_header)
 		self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
 		self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
@@ -615,6 +616,10 @@ class MainController(QMainWindow):
 		uiObj["WebPlate"]["Height (mm)"] = self.ui.txt_webplateHeight.text()
 		uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
 		return uiObj
+
+	def osdag_header(self):
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def disable_buttons(self):
 		self.ui.btn_CreateDesign.setEnabled(False)
@@ -923,16 +928,16 @@ class MainController(QMainWindow):
 		self.alist = self.designParameters()
 		self.resultObj = coverplateboltedconnection(self.alist)
 		self.beam_data = self.fetchBeamPara()
-		beam_beam = CoverEndPlate(self.alist, self.resultObj, self.beam_data)
+		beam_beam = CoverEndPlate(self.alist, self.resultObj, self.beam_data, self.folder)
 		if view != 'All':
 			if view == "Front":
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Front.svg"
+				filename = os.path.join(self.folder, "images_html", "coverboltedFront.svg")
 				beam_beam.save_to_svg(filename, view)
 			elif view == "Side":
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Side.svg"
+				filename = os.path.join(self.folder, "images_html", "coverboltedSide.svg")
 				beam_beam.save_to_svg(filename, view)
 			else:
-				filename = "D:\PyCharmWorkspace\Osdag\Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\Top.svg"
+				filename = os.path.join(self.folder, "images_html", "coverboltedTop.svg")
 				beam_beam.save_to_svg(filename, view)
 
 	def flangesplice_plate(self):

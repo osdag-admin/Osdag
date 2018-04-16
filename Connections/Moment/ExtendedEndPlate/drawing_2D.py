@@ -12,83 +12,94 @@ import os
 
 
 class ExtendedEndPlate(object):
-	def __init__(self, input, resultobj, dictbeamdata, folder):
-		print "calculation", input
-		# self.filename = filename
+	def __init__(self, input_dict, output_dict, beam_data, folder):
+		"""
+
+		Args:
+			input_dict: input parameters from GUI
+			output_dict:  output parameters based on calculation
+			beam_data:  geometric properties of beam
+			folder: path to save the generated images
+
+		Returns:
+			None
+
+		"""
+		print "calculation", input_dict
 		self.folder = folder
 		self.beam_length_L1 = 1000
 		self.beam_length_L2 = 1000
 
-		self.beam_depth_D1 = (dictbeamdata["D"])
+		self.beam_depth_D1 = (beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
 
-		self.beam_width_B1 = (dictbeamdata["B"])
+		self.beam_width_B1 = (beam_data["B"])
 		self.beam_width_B2 = self.beam_width_B1
 
 		self.plate_thickness_p1 = 20
 		self.plate_thickness_p2 = 20
 
-		self.plate_width_B1 = (resultobj['Plate']['Width'])
+		self.plate_width_B1 = (output_dict['Plate']['Width'])
 		self.plate_width_B2 = self.plate_width_B1
 
-		self.plate_length_L1 = int(resultobj['Plate']['Height'])
+		self.plate_length_L1 = int(output_dict['Plate']['Height'])
 		self.plate_length_L2 = self.plate_length_L1
 
-		self.flange_thickness_T1 = (dictbeamdata["T"])
+		self.flange_thickness_T1 = (beam_data["T"])
 		self.flange_thickness_T2 = self.flange_thickness_T1
 
-		self.web_thickness_tw1 = (dictbeamdata["tw"])
+		self.web_thickness_tw1 = (beam_data["tw"])
 		self.web_thickness_tw2 = self.web_thickness_tw1
 
-		self.flange_weld_thickness = int(input['Weld']['Flange (mm)'])  # 12
-		self.web_weld_thickness = int(input["Weld"]['Web (mm)'])  # 8
+		self.flange_weld_thickness = int(input_dict['Weld']['Flange (mm)'])  # 12
+		self.web_weld_thickness = int(input_dict["Weld"]['Web (mm)'])  # 8
 
-		self.bolt_diameter = int(input['Bolt']['Diameter (mm)'])  # 24
-		self.bolt_type = input["Bolt"]["Type"]
-		self.bolt_hole_type = input['bolt']['bolt_hole_type']
+		self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])  # 24
+		self.bolt_type = input_dict["Bolt"]["Type"]
+		self.bolt_hole_type = input_dict['bolt']['bolt_hole_type']
 		self.cal_bolt_holedia = ConnectionCalculations.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter)
 		self.bolt_hole_diameter = self.cal_bolt_holedia + self.bolt_diameter
-		self.edge_dist = int(resultobj['Bolt']['Edge'])
-		self.end_dist = int(resultobj['Bolt']['End'])
-		self.cross_centre_gauge_dist = int(resultobj['Bolt']['CrossCentreGauge'])  # 90
+		self.edge_dist = int(output_dict['Bolt']['Edge'])
+		self.end_dist = int(output_dict['Bolt']['End'])
+		self.cross_centre_gauge_dist = int(output_dict['Bolt']['CrossCentreGauge'])  # 90
 		# self.pitch = 60
 
-		self.grade = float(input["Bolt"]["Grade"])  # 8.8
+		self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
 
 		self.no_of_columns = 2
-		self.no_of_bolts = resultobj['Bolt']['NumberOfBolts']
+		self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
 		if self.no_of_bolts == 8:
-			self.pitch = int(resultobj['Bolt']['Pitch'])
+			self.pitch = int(output_dict['Bolt']['Pitch'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 1
 			self.bolts_inside_bottom_flange_row = 1
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 12:
-			self.pitch23 = int(resultobj['Bolt']['Pitch23'])
-			self.pitch34 = int(resultobj['Bolt']['Pitch34'])
-			self.pitch45 = int(resultobj['Bolt']['Pitch45'])
+			self.pitch23 = int(output_dict['Bolt']['Pitch23'])
+			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 2
 			self.bolts_inside_bottom_flange_row = 2
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 16:
-			self.pitch23 = int(resultobj['Bolt']['Pitch23'])
-			self.pitch34 = int(resultobj['Bolt']['Pitch34'])
-			self.pitch45 = int(resultobj['Bolt']['Pitch45'])
-			self.pitch56 = int(resultobj['Bolt']['Pitch56'])
-			self.pitch67 = int(resultobj['Bolt']['Pitch67'])
+			self.pitch23 = int(output_dict['Bolt']['Pitch23'])
+			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
+			self.pitch56 = int(output_dict['Bolt']['Pitch56'])
+			self.pitch67 = int(output_dict['Bolt']['Pitch67'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 3
 			self.bolts_inside_bottom_flange_row = 3
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 20:
-			self.pitch12 = int(resultobj['Bolt']['Pitch12'])
-			self.pitch34 = int(resultobj['Bolt']['Pitch34'])
-			self.pitch45 = int(resultobj['Bolt']['Pitch45'])
-			self.pitch56 = int(resultobj['Bolt']['Pitch56'])
-			self.pitch67 = int(resultobj['Bolt']['Pitch67'])
-			self.pitch78 = int(resultobj['Bolt']['Pitch78'])
-			self.pitch910 = int(resultobj['Bolt']['Pitch910'])
+			self.pitch12 = int(output_dict['Bolt']['Pitch12'])
+			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
+			self.pitch56 = int(output_dict['Bolt']['Pitch56'])
+			self.pitch67 = int(output_dict['Bolt']['Pitch67'])
+			self.pitch78 = int(output_dict['Bolt']['Pitch78'])
+			self.pitch910 = int(output_dict['Bolt']['Pitch910'])
 			self.bolts_outside_top_flange_row = 2
 			self.bolts_inside_top_flange_row = 3
 			self.bolts_inside_bottom_flange_row = 3
@@ -100,7 +111,8 @@ class ExtendedEndPlate(object):
 		Args:
 			dwg: svgwrite (obj)
 
-		Returns: Container for all svg elements
+		Returns:
+			Container for all svg elements
 
 		"""
 		smarker = dwg.marker(insert=(8, 3), size=(30, 30), orient="auto")
@@ -114,7 +126,8 @@ class ExtendedEndPlate(object):
 		Args:
 			dwg: svgwrite (obj)
 
-		Returns: Container for all svg elements
+		Returns:
+			Container for all svg elements
 
 		"""
 		section_marker = dwg.marker(insert=(0, 5), size=(10, 10), orient="auto")
@@ -128,7 +141,8 @@ class ExtendedEndPlate(object):
 		Args:
 			dwg: svgwrite (obj)
 
-		Returns: Container for all svg elements
+		Returns:
+			Container for all svg elements
 
 		"""
 		emarker = dwg.marker(insert=(0, 3), size=(30, 20), orient="auto")
@@ -144,6 +158,7 @@ class ExtendedEndPlate(object):
 			s_arrow: start arrow
 
 		Returns:
+			None
 
 		"""
 		line["marker-start"] = s_arrow.get_funciri()
@@ -156,6 +171,7 @@ class ExtendedEndPlate(object):
 			e_arrow: end arrow
 
 		Returns:
+			None
 
 		"""
 		line["marker-end"] = e_arrow.get_funciri()
@@ -169,6 +185,7 @@ class ExtendedEndPlate(object):
 			dwg: svgwrite (obj)
 
 		Returns:
+			None
 
 		"""
 		dwg.add(dwg.line(pt_one, pt_two).stroke("#D8D8D8", width=2.5, linecap="square", opacity=0.70))
@@ -186,6 +203,7 @@ class ExtendedEndPlate(object):
 			params:
 
 		Returns:
+			None
 
 		"""
 		smarker = self.add_s_marker(dwg)
@@ -219,9 +237,10 @@ class ExtendedEndPlate(object):
 		"""
 
 		Args:
-			vector: vector
+			vector: list containing X, Y ordinates of vector
 
 		Returns:
+			vector containing normalized X and Y ordinates
 
 		"""
 		a = vector[0]
@@ -240,6 +259,7 @@ class ExtendedEndPlate(object):
 			text: text message
 
 		Returns:
+			None
 
 		"""
 		line = dwg.add(dwg.line(pt_a, pt_b).stroke("black", width=2.5, linecap="square"))
@@ -257,7 +277,14 @@ class ExtendedEndPlate(object):
 			pt_b: point B
 			text: text message
 			params:
+				params["offset"] (float): offset of the dimension line
+				params["textoffset"] (float): offset of text from dimension line
+				params["lineori"] (float): orientation of line [right/left]
+                params["endlinedim"] (float): dimension line at the end of the outer arrow
+                params["arrowlen"] (float): size of the arrow
+
 		Returns:
+			None
 
 		"""
 		smarker = self.add_s_marker(dwg)
@@ -302,6 +329,7 @@ class ExtendedEndPlate(object):
 			textdown: text written below line
 
 		Returns:
+			None
 
 		"""
 		# Right Up.
@@ -410,8 +438,7 @@ class ExtendedEndPlate(object):
 
 class ExtendedEnd2DFront(object):
 	"""
-	Contains functions for generating the front view of the Extended bothway endplate
-	 connection.
+	Contains functions for generating the front view of the Extended bothway endplate connection.
 	"""
 
 	def __init__(self, extnd_common_object):
@@ -566,6 +593,15 @@ class ExtendedEnd2DFront(object):
 		self.Lv = self.PP2 + ((self.data_object.plate_length_L2 - self.data_object.beam_depth_D2) / 2 - self.data_object.end_dist - self.data_object.flange_weld_thickness)
 
 	def call_ExtndBoth_front(self, filename):
+		"""
+
+		Args:
+			filename: path of the images to be saved
+
+		Returns:
+			Saves the image in the folder
+
+		"""
 		vb_width = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
 		vb_ht = (int(3 * self.data_object.plate_length_L1))
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
@@ -821,6 +857,7 @@ class ExtendedEnd2DFront(object):
 
 class ExtendedEnd2DTop(object):
 	"""
+	Contains functions for generating the top view of the Extended bothway endplate connection.
 
 	"""
 
@@ -953,6 +990,15 @@ class ExtendedEnd2DTop(object):
 		self.BB6 = self.BB4 + self.data_object.web_weld_thickness * np.array([0, 1])
 
 	def call_ExtndBoth_top(self, filename):
+		"""
+
+		Args:
+			filename: path of the images to be saved
+
+		Returns:
+			Saves the image in the folder
+
+		"""
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -700 3300 1800'))
 		dwg.add(dwg.line(self.A5, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A6, self.A7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1074,6 +1120,7 @@ class ExtendedEnd2DTop(object):
 
 class ExtendedEnd2DSide(object):
 	"""
+	Contains functions for generating the side view of the Extended bothway endplate connection.
 
 	"""
 
@@ -1154,6 +1201,15 @@ class ExtendedEnd2DSide(object):
 		print L_v
 
 	def call_ExtndBoth_side(self, filename):
+		"""
+
+		Args:
+			filename: path of the images to be saved
+
+		Returns:
+			Saves the image in the folder
+
+		"""
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-580 -500 1200 1400'))
 		dwg.add(dwg.polyline(
 			points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],

@@ -717,8 +717,7 @@ class MainController(QMainWindow):
 		self.save_inputs_totext(uiInput)
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
-			# self.close.emit()
-			self.close()
+			self.closed.emit()
 			event.accept()
 		else:
 			event.ignore()
@@ -1174,7 +1173,7 @@ class MainController(QMainWindow):
 			# # Displays the bolts which are above the Flange Plate, debugging will give more clarity
 			# nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
 			# for nutboltAF in nutboltlistAF:
-			#     osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+			# 	osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
 
 			# # Displays the bolts which are below the Flange Plate, debugging will give more clarity
 			# nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
@@ -1202,13 +1201,13 @@ class MainController(QMainWindow):
 			# # Displays the bolts which are above the Flange Plate, debugging will give more clarity
 			# nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
 			# for nutboltAF in nutboltlistAF:
-			#     osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
+			# 	osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
 			#
 			# # Displays the bolts which are below the Flange Plate, debugging will give more clarity
 			# nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
 			# for nutboltBF in nutboltlistBF:
 			#     osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
-			#
+
 			# # Displays the bolts which are on the right side of web plate, debugging will give more clarity
 			# nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
 			# for nutboltW in nutboltlistW:

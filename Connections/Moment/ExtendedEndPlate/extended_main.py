@@ -10,6 +10,7 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
+from svg_window import SvgWindow
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
@@ -1031,13 +1032,16 @@ class Maincontroller(QMainWindow):
 		if view != "All":
 			if view == "Front":
 				filename = os.path.join(self.folder, "images_html", "extendFront.svg")
-				beam_beam.save_to_svg(filename, view)
+
 			elif view == "Side":
 				filename = os.path.join(self.folder, "images_html", "extendSide.svg")
-				beam_beam.save_to_svg(filename, view)
+
 			else:
 				filename = os.path.join(self.folder, "images_html", "extendTop.svg")
-				beam_beam.save_to_svg(filename, view)
+
+			beam_beam.save_to_svg(filename, view)
+			svg_file = SvgWindow()
+			svg_file.call_svgwindow(filename, view, self.folder)
 
 	def dockbtn_clicked(self, widgets):
 		"""

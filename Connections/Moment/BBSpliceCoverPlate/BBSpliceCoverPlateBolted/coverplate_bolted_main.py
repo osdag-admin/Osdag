@@ -12,6 +12,7 @@ from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
 from ui_design_summary import Ui_DesignReport
+from svg_window import SvgWindow
 from reportGenerator import save_html
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal
@@ -931,13 +932,16 @@ class MainController(QMainWindow):
 		if view != 'All':
 			if view == "Front":
 				filename = os.path.join(self.folder, "images_html", "coverboltedFront.svg")
-				beam_beam.save_to_svg(filename, view)
+
 			elif view == "Side":
 				filename = os.path.join(self.folder, "images_html", "coverboltedSide.svg")
-				beam_beam.save_to_svg(filename, view)
+
 			else:
 				filename = os.path.join(self.folder, "images_html", "coverboltedTop.svg")
-				beam_beam.save_to_svg(filename, view)
+
+			beam_beam.save_to_svg(filename, view)
+			svg_file = SvgWindow()
+			svg_file.call_svgwindow(filename, view, self.folder)
 
 	def flangesplice_plate(self):
 		section = Flangespliceplate(self)

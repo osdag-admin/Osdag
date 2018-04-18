@@ -73,12 +73,15 @@ class CoverEndPlate(object):
 		# self.bolts_top_flange1_row = 1
 		self.bolts_top_of_flange1_row = 2
 
-		self.bolts_top_flange2_col =  self.bolts_top_flange1_col
+		self.bolts_top_flange2_col = self.bolts_top_flange1_col
 		# self.bolts_top_flange2_row = 1
 		self.bolts_top_of_flange2_row = 2
 
 		self.bolts_inside_web_col = 2
 		self.bolts_inside_web_row = output_dict["WebBolt"]["BoltsRequired"]
+
+		self.bolts_bottom_flange1_col = self.bolts_top_flange1_col
+		self.bolts_bottom_flange2_col = self.bolts_bottom_flange1_col
 
 	def add_s_marker(self, dwg):
 		"""

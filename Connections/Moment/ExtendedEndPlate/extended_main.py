@@ -57,7 +57,8 @@ class DesignPreference(QDialog):
 		self.ui.txt_weldFu.setValidator(dbl_validator)
 		self.ui.txt_weldFu.setMaxLength(7)
 		self.ui.btn_defaults.clicked.connect(self.save_default_para)
-		self.ui.btn_save.clicked.connect(self.save_designPref_para)
+		# self.ui.btn_save.clicked.connect(self.save_designPref_para)
+		self.ui.btn_save.hide()
 		self.ui.btn_close.clicked.connect(self.close_designPref)
 		self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
@@ -93,7 +94,7 @@ class DesignPreference(QDialog):
 		self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
 		self.saved = True
 
-		QMessageBox.about(self, 'Information', "Preferences saved")
+		# QMessageBox.about(self, 'Information', "Preferences saved")
 
 		return self.saved_designPref
 
@@ -105,6 +106,7 @@ class DesignPreference(QDialog):
 			bolt_grade = float(uiObj["Bolt"]["Grade"])
 			bolt_fu = str(self.get_boltFu(bolt_grade))
 			self.ui.txt_boltFu.setText(bolt_fu)
+		self.ui.combo_boltType.setCurrentIndex(1)
 		self.ui.combo_boltHoleType.setCurrentIndex(0)
 		designPref = {}
 		designPref["bolt"] = {}
@@ -179,6 +181,10 @@ class DesignPreference(QDialog):
 
 	def close_designPref(self):
 		self.close()
+
+	def closeEvent(self, QCloseEvent):
+		self.save_designPref_para()
+		QCloseEvent.accept()
 
 
 class PlateDetails(QDialog):
@@ -649,8 +655,7 @@ class Maincontroller(QMainWindow):
 		self.save_inputs_totext(uiInput)
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
-			# self.close.emit()
-			self.close()
+			self.closed.emit()
 			event.accept()
 		else:
 			event.ignore()
@@ -742,13 +747,23 @@ class Maincontroller(QMainWindow):
 
 		"""
 
+		# self.uiObj = self.get_user_inputs()
+		# if self.designPrefDialog.saved is not True:
+		# 	design_pref = self.designPrefDialog.save_default_para()
+		# else:
+		# 	design_pref = self.designPrefDialog.saved_designPref
+		# self.uiObj.update(design_pref)
+		# return self.uiObj
+
 		self.uiObj = self.get_user_inputs()
-		if self.designPrefDialog.saved is not True:
-			design_pref = self.designPrefDialog.save_default_para()
-		else:
-			design_pref = self.designPrefDialog.saved_designPref
+		# if self.designPrefDialog.saved is not True:
+		# 	design_pref = self.designPrefDialog.save_default_para()
+		# else:
+		design_pref = self.designPrefDialog.save_designPref_para()
 		self.uiObj.update(design_pref)
 		return self.uiObj
+
+
 
 	def design_btnclicked(self):
 		"""

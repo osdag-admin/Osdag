@@ -476,7 +476,7 @@ QMenu::item:selected {
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionCut"/>
+    <addaction name="actionClear"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="actionDesign_Preferences"/>
@@ -595,8 +595,7 @@ QMenu::item:selected {
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
     <addaction name="actionShow_beam"/>
-    <addaction name="actionShow_column"/>
-    <addaction name="actionShow_finplate"/>
+    <addaction name="actionShow_connector"/>
     <addaction name="actionShow_all"/>
     <addaction name="separator"/>
     <addaction name="actionChange_background"/>
@@ -4396,9 +4395,9 @@ QMenu::item:selected {
     <string>Print</string>
    </property>
   </action>
-  <action name="actionCut">
+  <action name="actionClear">
    <property name="text">
-    <string>Cut</string>
+    <string>Clear</string>
    </property>
    <property name="font">
     <font>
@@ -4688,9 +4687,9 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionShow_finplate">
+  <action name="actionShow_connector">
    <property name="text">
-    <string>Show finplate</string>
+    <string>Show connector</string>
    </property>
    <property name="font">
     <font>

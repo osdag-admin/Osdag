@@ -331,6 +331,21 @@ class MainController(QMainWindow):
 		self.ui.action_save_input.triggered.connect(self.save_design_inputs)
 		self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 		self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
+		self.ui.actionCreate_design_report.triggered.connect(self.design_report)
+		self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
+		self.ui.actionSave_Front_View.triggered.connect(lambda : self.call_2D_drawing("Front"))
+		self.ui.actionSave_Side_View.triggered.connect(lambda : self.call_2D_drawing("Side"))
+		self.ui.actionSave_Top_View.triggered.connect(lambda : self.call_2D_drawing("Top"))
+		self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel())
+		self.ui.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
+		self.ui.actionShow_connector.triggered.connect(lambda: self.call_3DConnector("gradient_bg"))
+		self.ui.actionSave_current_image.triggered.connect(self.save_CAD_images)
+		self.ui.actionZoom_in.triggered.connect(self.call_zoomin)
+		self.ui.actionZoom_out.triggered.connect(self.call_zoomout)
+		self.ui.actionPan.triggered.connect(self.call_pannig)
+		self.ui.actionRotate_3D_model.triggered.connect(self.call_rotation)
+		self.ui.actionClear.triggered.connect(self.clear_log_messages)
+
 		self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
 		self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
 
@@ -983,6 +998,37 @@ class MainController(QMainWindow):
 		g = colorTup[1]
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
+
+	def save_CAD_images(self):
+		# status = self.resultObj['Bolt']['status']
+		# if status is True:
+
+		files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+		fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+		fName = str(fileName)
+		file_extension = fName.split(".")[-1]
+
+		if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+			self.display.ExportToImage(fName)
+			QMessageBox.about(self, 'Information', "File saved")
+		# else:
+		# 	self.ui.actionSave_current_image.setEnabled(False)
+		# 	QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+
+	def call_zoomin(self):
+		self.display.ZoomFactor(2)
+
+	def call_zoomout(self):
+		self.display.ZoomFactor(0.5)
+
+	def call_rotation(self):
+		self.display.Rotation(15, 0)
+
+	def call_pannig(self):
+		self.display.Pan(50, 0)
+
+	def clear_log_messages(self):
+		self.ui.textEdit.clear()
 
 	def createBBCoverPlateBoltedCAD(self):
 		'''

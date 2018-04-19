@@ -881,7 +881,7 @@ class MainController(QMainWindow):
 		flange_capacity_bolt = resultObj["FlangeBolt"]["CapacityBoltF"]
 		self.ui.txt_capacityOfbolt.setText(str(flange_capacity_bolt))
 
-		flange_bolt_req = resultObj["FlangeBolt"]["BoltsRequiredF"]
+		flange_bolt_req = resultObj["FlangeBolt"]["TotalBoltsRequiredF"]
 		self.ui.txt_noBolts.setText(str(flange_bolt_req))
 
 		flange_pitch = resultObj["FlangeBolt"]["PitchF"]
@@ -905,7 +905,7 @@ class MainController(QMainWindow):
 		web_capacity_bolt = resultObj["WebBolt"]["CapacityBolt"]
 		self.ui.txt_capacityOfbolt_2.setText(str(web_capacity_bolt))
 
-		web_bolt_req = resultObj["WebBolt"]["BoltsRequired"]
+		web_bolt_req = resultObj["WebBolt"]["TotalBoltsRequired"]
 		self.ui.txt_noBolts_2.setText(str(web_bolt_req))
 
 		web_pitch = resultObj["WebBolt"]["Pitch"]

@@ -265,7 +265,7 @@ class MyPopupDialog(QDialog):
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(
             self, 'Open File', " ../../",
-            'Images (*.png *.svg*.jpg)',
+            'Images (*.png *.svg *.jpg)',
             None, QFileDialog.DontUseNativeDialog)
         flag = True
         if filename == '':
@@ -815,8 +815,7 @@ class MainController(QMainWindow):
             else:
                 clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
             if clear_depth < plate_height or min_plate_height > plate_height:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                QMessageBox.about(self, 'Information', "Height of the fin plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
                 widget.clear()
                 widget.setFocus()
                 palette = QPalette()
@@ -844,8 +843,7 @@ class MainController(QMainWindow):
                 clear_depth = col_D - 2 * (col_T + col_R1 + 5)
 
             if clear_depth < plate_width:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
+                QMessageBox.about(self, 'Information', "Height of the fin plate should be less than %s mm" % (int(clear_depth)))
             else:
                 self.ui.btn_Design.setDisabled(False)
 

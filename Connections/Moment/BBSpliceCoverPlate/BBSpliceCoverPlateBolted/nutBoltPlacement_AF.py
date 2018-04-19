@@ -117,7 +117,7 @@ class NutBoltArray_AF():
         self.models_AF.append(dbg)
 
     def dbgSphere(self, pt):
-        return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Sphere()
+        return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()
 
     def get_modelsAF(self):
         return self.models_AF

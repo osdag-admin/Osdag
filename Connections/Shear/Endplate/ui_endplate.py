@@ -1746,7 +1746,7 @@ class Ui_MainWindow(object):
         self.chkBxCol.setToolTip(_translate("MainWindow", "Column only"))
         self.chkBxCol.setText(_translate("MainWindow", "Column"))
         self.chkBxEndplate.setToolTip(_translate("MainWindow", "Endplate only"))
-        self.chkBxEndplate.setText(_translate("MainWindow", "Endplate"))
+        self.chkBxEndplate.setText(_translate("MainWindow", "End Plate"))
         self.btn_front.setToolTip(_translate("MainWindow", "Front View"))
         self.btn_top.setToolTip(_translate("MainWindow", "Top View"))
         self.btn_side.setToolTip(_translate("MainWindow", "Side View"))

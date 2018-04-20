@@ -661,7 +661,7 @@ class MainController(QMainWindow):
                 palette = QPalette()
                 lblwidget.setPalette(palette)
 
-    def check_plate_width(self, widget):
+    def check_plate_width(self, widget, lblwidget):
         loc = self.ui.comboConnLoc.currentText()
         plate_width = widget.text()
         plate_width = float(plate_width)

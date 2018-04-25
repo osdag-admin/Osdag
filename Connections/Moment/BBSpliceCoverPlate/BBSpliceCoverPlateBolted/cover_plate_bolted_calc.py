@@ -1051,6 +1051,9 @@ def coverplateboltedconnection(uiObj):
     ## When height and width of web splice plate are zero
     if web_plate_l == 0 and web_plate_w == 0 and flange_plate_l == 0 and flange_plate_w == 0:
         outputObj = {}
+        outputObj["Bolt"] = {}
+        outputObj["Bolt"]["status"] = design_status
+
         outputObj["WebBolt"] = {}
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
@@ -1094,6 +1097,9 @@ def coverplateboltedconnection(uiObj):
 
     else:
         outputObj = {}
+        outputObj["Bolt"] = {}
+        outputObj["Bolt"]["status"] = design_status
+
         outputObj["WebBolt"] = {}
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]

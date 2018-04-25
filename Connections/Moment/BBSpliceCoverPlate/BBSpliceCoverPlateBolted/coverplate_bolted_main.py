@@ -336,7 +336,7 @@ class MainController(QMainWindow):
 		self.ui.actionSave_Front_View.triggered.connect(lambda : self.call_2D_drawing("Front"))
 		self.ui.actionSave_Side_View.triggered.connect(lambda : self.call_2D_drawing("Side"))
 		self.ui.actionSave_Top_View.triggered.connect(lambda : self.call_2D_drawing("Top"))
-		self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel())
+		self.ui.actionShow_all.triggered.connect(lambda: self.call_3D_model())
 		self.ui.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.actionShow_connector.triggered.connect(lambda: self.call_3DConnector("gradient_bg"))
 		self.ui.actionSave_current_image.triggered.connect(self.save_CAD_images)
@@ -556,19 +556,18 @@ class MainController(QMainWindow):
 		QApplication.restoreOverrideCursor()
 
 	def save_design(self, report_summary):
-		# status = self.resultObj['Bolt']['status']
-		# if status is True:
-		#     self.call_3DModel("white_bg")
-		#     data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
-		#     self.display.ExportToImage(data)
-		#     self.display.FitAll()
-		# else:
-		#     pass
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			self.call_3DModel("white_bg")
+			data = os.path.join(str(self.folder), "images_html", "3D_Model.png")
+			self.display.ExportToImage(data)
+			self.display.FitAll()
+		else:
+			pass
 
 		filename = os.path.join(str(self.folder), "images_html", "Html_Report.html")
 		file_name = str(filename)
 		self.call_designreport(file_name, report_summary)
-		# self.commLogicObj.call_designReport(file_name, report_summary)
 
 		# Creates PDF
 		config = ConfigParser.ConfigParser()
@@ -846,13 +845,24 @@ class MainController(QMainWindow):
 
 		self.outputs = coverplateboltedconnection(self.alist)
 		a = self.outputs[self.outputs.keys()[0]]
-		# if len(str(a[a.keys()[0]])) == 0:
-		#     self.ui.btn_Design.setEnabled(False)
+		self.resultObj = self.outputs
+		alist = self.resultObj.values()
+
 		self.display_output(self.outputs)
 		self.display_log_to_textedit()
-		self.ui.btn_flangePlate.setDisabled(False)
-		self.ui.btn_webPlate.setDisabled(False)
-		self.call_3DModel()
+		isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+
+		if isempty[0] is True:
+			status = self.resultObj['Bolt']['status']
+			self.call_3DModel(status)
+			if status is True:
+				self.call_2D_drawing("All")
+			else:
+				self.ui.btn_flangePlate.setDisabled(False)
+				self.ui.btn_webPlate.setDisabled(False)
+				self.ui.chkBx_extndPlate.setDisabled(True)
+				self.ui.chkBx_beamSec1.setDisabled(True)
+				self.ui.btn3D.setDisabled(True)
 
 	def display_output(self, outputObj):
 		"""
@@ -944,19 +954,23 @@ class MainController(QMainWindow):
 		self.resultObj = coverplateboltedconnection(self.alist)
 		self.beam_data = self.fetchBeamPara()
 		beam_beam = CoverEndPlate(self.alist, self.resultObj, self.beam_data, self.folder)
-		if view != 'All':
-			if view == "Front":
-				filename = os.path.join(self.folder, "images_html", "coverboltedFront.svg")
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			if view != 'All':
+				if view == "Front":
+					filename = os.path.join(self.folder, "images_html", "coverboltedFront.svg")
 
-			elif view == "Side":
-				filename = os.path.join(self.folder, "images_html", "coverboltedSide.svg")
+				elif view == "Side":
+					filename = os.path.join(self.folder, "images_html", "coverboltedSide.svg")
 
-			else:
-				filename = os.path.join(self.folder, "images_html", "coverboltedTop.svg")
+				else:
+					filename = os.path.join(self.folder, "images_html", "coverboltedTop.svg")
 
-			beam_beam.save_to_svg(filename, view)
-			svg_file = SvgWindow()
-			svg_file.call_svgwindow(filename, view, self.folder)
+				beam_beam.save_to_svg(filename, view)
+				svg_file = SvgWindow()
+				svg_file.call_svgwindow(filename, view, self.folder)
+		else:
+			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 
 	def flangesplice_plate(self):
 		section = Flangespliceplate(self)
@@ -1000,20 +1014,20 @@ class MainController(QMainWindow):
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
 	def save_CAD_images(self):
-		# status = self.resultObj['Bolt']['status']
-		# if status is True:
+		status = self.resultObj['Bolt']['status']
+		if status is True:
 
-		files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-		fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
-		fName = str(fileName)
-		file_extension = fName.split(".")[-1]
+			files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
+			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+			fName = str(fileName)
+			file_extension = fName.split(".")[-1]
 
-		if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
-			self.display.ExportToImage(fName)
-			QMessageBox.about(self, 'Information', "File saved")
-		# else:
-		# 	self.ui.actionSave_current_image.setEnabled(False)
-		# 	QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
+			if file_extension == 'png' or file_extension == 'jpeg' or file_extension == 'bmp' or file_extension == 'tiff':
+				self.display.ExportToImage(fName)
+				QMessageBox.about(self, 'Information', "File saved")
+		else:
+			self.ui.actionSave_current_image.setEnabled(False)
+			QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
 
 	def call_zoomin(self):
 		self.display.ZoomFactor(2)
@@ -1159,35 +1173,46 @@ class MainController(QMainWindow):
 		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
 
-	def call_3DModel(self):
+	def call_3D_model(self):
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			self.call_3DModel(status)
+
+	def call_3DModel(self, flag):
 		# Call to calculate/create the BB Cover Plate Bolted CAD model
-		self.createBBCoverPlateBoltedCAD()
-		self.ui.btn3D.setChecked(Qt.Checked)
-		if self.ui.btn3D.isChecked():
-			self.ui.chkBx_beamSec1.setChecked(Qt.Unchecked)
-			self.ui.chkBx_extndPlate.setChecked(Qt.Unchecked)
-			self.ui.mytabWidget.setCurrentIndex(0)
+		if flag is True:
+			self.createBBCoverPlateBoltedCAD()
+			self.ui.btn3D.setChecked(Qt.Checked)
+			if self.ui.btn3D.isChecked():
+				self.ui.chkBx_beamSec1.setChecked(Qt.Unchecked)
+				self.ui.chkBx_extndPlate.setChecked(Qt.Unchecked)
+				self.ui.mytabWidget.setCurrentIndex(0)
 
-		# Call to display the BB Cover Plate Bolted CAD model
-		self.display_3DModel("Model", "gradient_bg")
-
+			# Call to display the BB Cover Plate Bolted CAD model
+			self.display_3DModel("Model", "gradient_bg")
+		else:
+			self.display.EraseAll()
 
 	def call_3DBeam(self, bgcolor):
-		self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-		if self.ui.chkBx_beamSec1.isChecked():
-			self.ui.btn3D.setChecked(Qt.Unchecked)
-			self.ui.chkBx_extndPlate.setChecked(Qt.Unchecked)
-			self.ui.mytabWidget.setCurrentIndex(0)
-		self.display_3DModel("Beam", bgcolor)
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
+			if self.ui.chkBx_beamSec1.isChecked():
+				self.ui.btn3D.setChecked(Qt.Unchecked)
+				self.ui.chkBx_extndPlate.setChecked(Qt.Unchecked)
+				self.ui.mytabWidget.setCurrentIndex(0)
+			self.display_3DModel("Beam", bgcolor)
 
 
 	def call_3DConnector(self, bgcolor):
-		self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
-		if self.ui.chkBx_extndPlate.isChecked():
-			self.ui.btn3D.setChecked(Qt.Unchecked)
-			self.ui.chkBx_beamSec1.setChecked(Qt.Unchecked)
-			self.ui.mytabWidget.setCurrentIndex(0)
-		self.display_3DModel("Connector", bgcolor)
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
+			if self.ui.chkBx_extndPlate.isChecked():
+				self.ui.btn3D.setChecked(Qt.Unchecked)
+				self.ui.chkBx_beamSec1.setChecked(Qt.Unchecked)
+				self.ui.mytabWidget.setCurrentIndex(0)
+			self.display_3DModel("Connector", bgcolor)
 
 
 	def display_3DModel(self, component, bgcolor):

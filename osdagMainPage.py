@@ -121,8 +121,8 @@ class OsdagMainWindow(QMainWindow):
 
         config = ConfigParser.ConfigParser()
         config.readfp(open(r'Osdag.config'))
-        default_workspace_path = config.get('default_workspace', 'path1')
-        folder = QFileDialog.getExistingDirectory(self,'Select Folder', default_workspace_path)
+        desktop_path = config.get("desktop_path", "path1")
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':
@@ -168,8 +168,8 @@ class OsdagMainWindow(QMainWindow):
 
         config = ConfigParser.ConfigParser()
         config.readfp(open(r'Osdag.config'))
-        default_workspace_path = config.get('default_workspace', 'path1')
-        folder = QFileDialog.getExistingDirectory(self, 'Select Folder', default_workspace_path)
+        desktop_path = config.get("desktop_path", "path1")
+        folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
         folder = str(folder)
         if not os.path.exists(folder):
             if folder == '':

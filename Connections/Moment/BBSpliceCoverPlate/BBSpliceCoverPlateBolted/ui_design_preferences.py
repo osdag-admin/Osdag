@@ -8,7 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_DesignPreference(object):
+class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(808, 519)
@@ -302,8 +302,8 @@ class Ui_DesignPreference(object):
         self.gridLayout_4.addWidget(self.combo_detailing_memebers, 2, 1, 1, 1)
         self.gridLayout_17.addLayout(self.gridLayout_4, 1, 0, 1, 1)
         self.gridLayout_18.addLayout(self.gridLayout_17, 0, 0, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_18.addItem(spacerItem7, 0, 1, 1, 1)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 255, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_18.addItem(spacerItem7, 1, 0, 1, 1)
         self.gridLayout_10 = QtWidgets.QGridLayout()
         self.gridLayout_10.setObjectName("gridLayout_10")
         self.line_6 = QtWidgets.QFrame(self.tab_Detailing)
@@ -318,9 +318,7 @@ class Ui_DesignPreference(object):
         self.textBrowser_detailingDescription.setMinimumSize(QtCore.QSize(210, 0))
         self.textBrowser_detailingDescription.setObjectName("textBrowser_detailingDescription")
         self.gridLayout_10.addWidget(self.textBrowser_detailingDescription, 2, 0, 1, 1)
-        self.gridLayout_18.addLayout(self.gridLayout_10, 0, 2, 2, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 255, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_18.addItem(spacerItem8, 1, 0, 1, 1)
+        self.gridLayout_18.addLayout(self.gridLayout_10, 0, 1, 2, 1)
         self.tabWidget.addTab(self.tab_Detailing, "")
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
@@ -477,6 +475,8 @@ class Ui_DesignPreference(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">IS 800 Table 5 Partial Safety Factors</p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p></body></html>"))
         self.label_6.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
@@ -519,7 +519,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_DesignPreference()
+    ui = Ui_Dialog()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

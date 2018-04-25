@@ -1843,7 +1843,7 @@ class MainController(QMainWindow):
                 self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
         else:
-            QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be saved' %(view))
+            QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be viewed' %(view))
 
 
     def closeEvent(self, event):

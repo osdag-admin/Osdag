@@ -15,7 +15,7 @@ from ui_design_summary import Ui_DesignReport
 from svg_window import SvgWindow
 from reportGenerator import save_html
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal, QPixmap
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
 import cairosvg
@@ -831,12 +831,99 @@ class MainController(QMainWindow):
 		self.uiObj.update(design_pref)
 		return self.uiObj
 
+	def setimage_connection(self):
+		'''
+		Setting image to connectivity.
+		'''
+		self.ui.lbl_connectivity.show()
+		loc = self.ui.combo_connLoc.currentText()
+		if loc == "Flush":
+			pixmap = QPixmap(":/newPrefix/images/colF2.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		# self.ui.lbl_connectivity.show()
+		elif (loc == "Extended one way"):
+			picmap = QPixmap(":/newPrefix/images/colW3.png")
+			picmap.scaledToHeight(60)
+			picmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(picmap)
+		else:
+			picmap = QPixmap(":/newPrefix/images/b-b.png")
+			picmap.scaledToHeight(60)
+			picmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(picmap)
+
+		return True
+
+	def generate_incomplete_string(self, incomplete_list):
+		"""
+
+		Args:
+			incomplete_list: list of fields that are not selected or entered
+
+		Returns:
+			error string that has to be displayed
+
+		"""
+		information = "Please input the following required field(s): "
+		for item in incomplete_list:
+			information = information + item + ", "
+		information = information[:-2]
+		information += "."
+		return information
+
+
+	def validate_inputs_on_design_btn(self):
+		flag = True
+		incomplete_list = []
+		if self.ui.combo_connLoc.currentIndex() == 0:
+			incomplete_list.append("Connectivity")
+
+		if self.ui.combo_beamSec.currentIndex() == 0:
+			incomplete_list.append("Beam section")
+
+		if self.ui.txt_Fu.text() == "":
+			incomplete_list.append("Ultimate strength")
+
+		if self.ui.txt_Fy.text() == "":
+			incomplete_list.append("Yield strength")
+
+		if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
+			incomplete_list.append("Axial force")
+
+		if self.ui.txt_Moment.text() == '' or float(self.ui.txt_Moment.text()) == 0:
+			incomplete_list.append("Moment")
+
+		if self.ui.txt_Shear.text() == '' or float(self.ui.txt_Shear.text()) == 0:
+			incomplete_list.append("Shear force")
+
+		if self.ui.combo_diameter.currentIndex() == 0:
+			incomplete_list.append("Diameter of bolt")
+
+		if self.ui.combo_type.currentIndex() == 0:
+			incomplete_list.append("Type of bolt")
+
+		if self.ui.combo_flangeplateThick.currentIndex() == 0:
+			incomplete_list.append("Flange splice plate thickness")
+
+		if self.ui.combo_webplateThick.currentIndex() == 0:
+			incomplete_list.append("Web splice plate thickness")
+
+		if len(incomplete_list) > 0:
+			flag = False
+			QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
+		return flag
+
 	def design_btnclicked(self):
 		"""
 
 		Returns:
 
 		"""
+		if self.validate_inputs_on_design_btn() is not True:
+			return
 		self.alist = self.designParameters()
 		print "alist printing", self.alist
 

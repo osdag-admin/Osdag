@@ -600,7 +600,7 @@ def coverplateboltedconnection(uiObj):
         if shear_load != 0:
             web_bolts_required = int(math.ceil(shear_load/ web_bolt_capacity))
         else:
-            web_bolts_required = 0
+            web_bolts_required = 3
 
     # Calculation of number of bolts required for flange splice plate
         ff = flange_force(beam_d, beam_f_t, axial_force, moment_load)
@@ -885,10 +885,10 @@ def coverplateboltedconnection(uiObj):
         ## Case 3: when gauge distance is less than 2 times the end distance
         ### Note: gauge_web > (End distance of one beam + end distance of other beam)
         web_plate_w_3 = 2 * edge_distance + 2 * edge_distance + gap
-        ## Case 4: when gauge distance is less than 90 mm TODO: To be reviewed
-        web_plate_w_4 = 90 + 2 * edge_distance + gap
-        ## Case 5: when gauge distance is greater than 140 mm TODO: To be reviewed
-        web_plate_w_5 = 140 + 2 * edge_distance + gap
+        ## Case 4: when gauge distance is less than 90 mm
+        # web_plate_w_4 = 90 + 2 * edge_distance + gap
+        ## Case 5: when gauge distance is greater than 140 mm
+        # web_plate_w_5 = 140 + 2 * edge_distance + gap
         ## Case 6: when gauge distance is greater than maximum gauge [min(32t, 300)]
         web_plate_w_6 = max_gauge + 2 * edge_distance + gap
 
@@ -906,20 +906,20 @@ def coverplateboltedconnection(uiObj):
             logger.error(": Chosen width of web splice plate is not sufficient")
             logger.warning(": Minimum width of web splice plate required is %2.2f mm" % (web_plate_w_3))
             logger.info(": Increase the width of web splice plate")
-        ## Case 4
-        elif gauge_web < (90 + gap):
-            web_plate_w_req = web_plate_w_4
-            design_status = False
-            logger.error(": Chosen width of web splice plate is not sufficient")
-            logger.warning(": Minimum width of web splice plate required is %2.2f mm" % (web_plate_w_4))
-            logger.info(": Increase the width of web splice plate")
+        # ## Case 4
+        # elif gauge_web < (90 + gap):
+        #     web_plate_w_req = web_plate_w_4
+        #     design_status = False
+        #     logger.error(": Chosen width of web splice plate is not sufficient")
+        #     logger.warning(": Minimum width of web splice plate required is %2.2f mm" % (web_plate_w_4))
+        #     logger.info(": Increase the width of web splice plate")
         ## Case 5
-        elif gauge_web > (140 + gap):
-            web_plate_w_req = web_plate_w_5
-            design_status = False
-            logger.error(": Width is greater than the maximum allowed width of web splice plate")
-            logger.warning(": Maximum width of web splice plate allowed is %2.2f mm" % (web_plate_w_5))
-            logger.info(": Decrease the width of web splice plate")
+        # elif gauge_web > (140 + gap):
+        #     web_plate_w_req = web_plate_w_5
+        #     design_status = False
+        #     logger.error(": Width is greater than the maximum allowed width of web splice plate")
+        #     logger.warning(": Maximum width of web splice plate allowed is %2.2f mm" % (web_plate_w_5))
+        #     logger.info(": Decrease the width of web splice plate")
         ## Case 6
         elif gauge_web > (max_gauge + gap):
             web_plate_w_req = web_plate_w_6
@@ -933,12 +933,13 @@ def coverplateboltedconnection(uiObj):
         min_gauge = boltparameters["WebGauge"]
         max_gauge = boltparameters["WebGaugeMax"]
         web_plate_w_req = 4 * edge_distance + gap
+        gauge_web = web_plate_w_req - 2 * edge_distance
         if (2 * edge_distance) < min_gauge:
             web_plate_w_req = min_gauge + (2 * edge_distance) + gap
-        elif (2 * edge_distance) < 90:
-            web_plate_w_req = 100 + (2 * edge_distance) + gap
-        elif (2 * edge_distance) > 140:
-            web_plate_w_req = 140 + (2 * edge_distance) + gap
+        # elif (2 * edge_distance) < 90:
+        #     web_plate_w_req = 100 + (2 * edge_distance) + gap
+        # elif (2 * edge_distance) > 140:
+        #     web_plate_w_req = 140 + (2 * edge_distance) + gap
         elif (2 * edge_distance) > max_gauge:
             web_plate_w_req = max_gauge + (2 * edge_distance) + gap
         else:
@@ -1064,7 +1065,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["End"] = new_bolt_param["End"]
         outputObj["WebBolt"]["Edge"] = new_bolt_param["Edge"]
         outputObj["WebBolt"]["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-        outputObj["WebBolt"]["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebBolt"]["WebGauge"] = gauge_web
         outputObj["WebBolt"]["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
         outputObj["WebBolt"]["webPlateDemand"] = new_bolt_param["webPlateDemand"]
         outputObj["WebBolt"]["WebPlateWidth"] = web_plate_w_req
@@ -1110,7 +1111,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["End"] = new_bolt_param["End"]
         outputObj["WebBolt"]["Edge"] = new_bolt_param["Edge"]
         outputObj["WebBolt"]["WebPlateHeight"] = new_bolt_param["WebPlateHeight"]
-        outputObj["WebBolt"]["WebGauge"] = new_bolt_param["WebGauge"]
+        outputObj["WebBolt"]["WebGauge"] = gauge_web
         outputObj["WebBolt"]["WebGaugeMax"] = new_bolt_param["WebGaugeMax"]
         outputObj["WebBolt"]["webPlateDemand"] = new_bolt_param["webPlateDemand"]
         outputObj["WebBolt"]["WebPlateWidth"] = web_plate_w_req

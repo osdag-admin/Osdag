@@ -117,96 +117,107 @@ class OsdagMainWindow(QMainWindow):
 
 		self.ui.myStackedWidget.setCurrentIndex(current)
 
-	def show_shear_connection(self):
+	def select_workspace_folder(self):
+		# This function prompts the user to select the workspace folder and returns the name of the workspace folder
+
 
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(r'Osdag.config'))
 		desktop_path = config.get("desktop_path", "path1")
 		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
-		if ' ' in folder:
+
+		while ' ' in folder:
+			"""
+			The workspace folder shouldn't have any spaces
+
+			As long as the user enters spaces in the name of the workspace folder, 
+			this while loops prompts the user not to use spaces and prompts the user again 
+			to select the workspace folder
+
+			"""
 			QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
-		else:
-			folder = str(folder)
-			if not os.path.exists(folder):
-				if folder == '':
-					pass
-				else:
-					os.mkdir(folder, 0755)
+			folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
 
-			root_path = folder
-			images_html_folder = ['images_html']
-			flag = True
-			for create_folder in images_html_folder:
-				if root_path == '':
-					flag = False
-					return flag
-				else:
-					try:
-						os.mkdir(os.path.join(root_path, create_folder))
-					except OSError:
-						shutil.rmtree(os.path.join(folder, create_folder))
-						os.mkdir(os.path.join(root_path, create_folder))
+		# Return the folder name (without any spaces)
+		return folder
 
-			if self.ui.rdbtn_finplate.isChecked():
-				launchFinPlateController(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-
-			elif self.ui.rdbtn_cleat.isChecked():
-				launch_cleatangle_controller(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-
-			elif self.ui.rdbtn_endplate.isChecked():
-				launch_endplate_controller(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-				# QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
-
-			elif self.ui.rdbtn_seat.isChecked():
-				launchSeatedAngleController(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-
+	def show_shear_connection(self):
+		folder = select_workspace_folder()		
+		folder = str(folder)
+		if not os.path.exists(folder):
+			if folder == '':
+				pass
 			else:
-				QMessageBox.about(self, "INFO", "Please select appropriate connection")
+				os.mkdir(folder, 0755)
+
+		root_path = folder
+		images_html_folder = ['images_html']
+		flag = True
+		for create_folder in images_html_folder:
+			if root_path == '':
+				flag = False
+				return flag
+			else:
+				try:
+					os.mkdir(os.path.join(root_path, create_folder))
+				except OSError:
+					shutil.rmtree(os.path.join(folder, create_folder))
+					os.mkdir(os.path.join(root_path, create_folder))
+
+		if self.ui.rdbtn_finplate.isChecked():
+			launchFinPlateController(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+
+		elif self.ui.rdbtn_cleat.isChecked():
+			launch_cleatangle_controller(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+
+		elif self.ui.rdbtn_endplate.isChecked():
+			launch_endplate_controller(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+			# QMessageBox.about(self,"INFO","End plate connection design is coming soon!")
+
+		elif self.ui.rdbtn_seat.isChecked():
+			launchSeatedAngleController(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+
+		else:
+			QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
 	def show_moment_connection(self):
 
-		config = ConfigParser.ConfigParser()
-		config.readfp(open(r'Osdag.config'))
-		desktop_path = config.get("desktop_path", "path1")
-		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
-		if ' ' in folder:
-			QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
-		else:
-			folder = str(folder)
-			if not os.path.exists(folder):
-				if folder == '':
-					pass
-				else:
-					os.mkdir(folder, 0755)
-
-			root_path = folder
-			images_html_folder = ['images_html']
-			flag = True
-			for create_folder in images_html_folder:
-				if root_path == '':
-					flag = False
-					return flag
-				else:
-					try:
-						os.mkdir(os.path.join(root_path, create_folder))
-					except OSError:
-						shutil.rmtree(os.path.join(folder, create_folder))
-						os.mkdir(os.path.join(root_path, create_folder))
-
-			if self.ui.rdbtn_coverplate.isChecked():
-				launch_coverplate_controller(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-
-			elif self.ui.rdbtn_endplate_ext.isChecked():
-				launch_extendedendplate_controller(self, folder)
-				self.ui.myStackedWidget.setCurrentIndex(0)
-
+		folder = select_workspace_folder()
+		folder = str(folder)
+		if not os.path.exists(folder):
+			if folder == '':
+				pass
 			else:
-				QMessageBox.about(self, "INFO", "Please select appropriate connection")
+				os.mkdir(folder, 0755)
+
+		root_path = folder
+		images_html_folder = ['images_html']
+		flag = True
+		for create_folder in images_html_folder:
+			if root_path == '':
+				flag = False
+				return flag
+			else:
+				try:
+					os.mkdir(os.path.join(root_path, create_folder))
+				except OSError:
+					shutil.rmtree(os.path.join(folder, create_folder))
+					os.mkdir(os.path.join(root_path, create_folder))
+
+		if self.ui.rdbtn_coverplate.isChecked():
+			launch_coverplate_controller(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+
+		elif self.ui.rdbtn_endplate_ext.isChecked():
+			launch_extendedendplate_controller(self, folder)
+			self.ui.myStackedWidget.setCurrentIndex(0)
+
+		else:
+			QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
 	# ********************************* Help Action *********************************************************************************************
 

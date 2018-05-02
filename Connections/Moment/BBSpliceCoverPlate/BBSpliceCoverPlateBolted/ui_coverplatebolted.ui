@@ -3352,7 +3352,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Axial Force (kN)</string>
+      <string>Axial force (kN)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_Axial">

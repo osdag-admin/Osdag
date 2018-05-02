@@ -2049,7 +2049,7 @@ class Ui_MainWindow(object):
         self.combo_webplateThick.setItemText(14, _translate("MainWindow", "26"))
         self.combo_webplateThick.setItemText(15, _translate("MainWindow", "28"))
         self.lbl_moment.setText(_translate("MainWindow", "Moment (kNm) *"))
-        self.lbl_axial.setText(_translate("MainWindow", "Axial Force (kN)"))
+        self.lbl_axial.setText(_translate("MainWindow", "Axial force (kN)"))
         self.label_92.setText(_translate("MainWindow", "<html><head/><body><p>Height (mm)</p></body></html>"))
         self.label_93.setText(_translate("MainWindow", "<html><head/><body><p>Width</p></body></html>"))
         self.txt_webplateHeight.setPlaceholderText(_translate("MainWindow", "0"))

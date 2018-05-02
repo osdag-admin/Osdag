@@ -124,7 +124,7 @@ class OsdagMainWindow(QMainWindow):
 		desktop_path = config.get("desktop_path", "path1")
 		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
 		if ' ' in folder:
-			QMessageBox.information(self, "Information", "Please do not use space between the words")
+			QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
 		else:
 			folder = str(folder)
 			if not os.path.exists(folder):
@@ -174,7 +174,7 @@ class OsdagMainWindow(QMainWindow):
 		desktop_path = config.get("desktop_path", "path1")
 		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
 		if ' ' in folder:
-			QMessageBox.information(self, "Information", "Please do not use space between the words")
+			QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
 		else:
 			folder = str(folder)
 			if not os.path.exists(folder):

@@ -30,16 +30,18 @@ class ExtendedEndPlate(object):
 		self.beam_length_L1 = 1000
 		self.beam_length_L2 = 1000
 
-		self.beam_depth_D1 = (beam_data["D"])
+		self.beam_depth_D1 = int(beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
 
-		self.beam_width_B1 = (beam_data["B"])
+		self.beam_designation = beam_data['Designation']
+
+		self.beam_width_B1 = int(beam_data["B"])
 		self.beam_width_B2 = self.beam_width_B1
 
 		self.plate_thickness_p1 = 20
 		self.plate_thickness_p2 = 20
 
-		self.plate_width_B1 = (output_dict['Plate']['Width'])
+		self.plate_width_B1 = int(output_dict['Plate']['Width'])
 		self.plate_width_B2 = self.plate_width_B1
 
 		self.plate_length_L1 = int(output_dict['Plate']['Height'])
@@ -605,7 +607,7 @@ class ExtendedEnd2DFront(object):
 		vb_width = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
 		vb_ht = (int(3 * self.data_object.plate_length_L1))
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-			'-300 -600 2840 1740'))  # 230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
+			'-200 -600 2300 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A8, self.A7).stroke('blue', width=2.5, linecap='square'))
@@ -676,23 +678,23 @@ class ExtendedEnd2DFront(object):
 				ptx = self.PP2 + ((self.data_object.plate_length_L2 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv) * np.array(
 					[0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
 
-		ptx1 = ptx - bolt_r * np.array([0, 1])
-		rect_width = self.data_object.bolt_diameter
-		rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
-		dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+			ptx1 = ptx - bolt_r * np.array([0, 1])
+			rect_width = self.data_object.bolt_diameter
+			rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-		pt_Cx = ptx + np.array([1, 0])
-		pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-		dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-		pt_inside_top_column_list.append(ptx)
+			pt_Cx = ptx + np.array([1, 0])
+			pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+			dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+			pt_inside_top_column_list.append(ptx)
 
-		pt_Cx1 = ptx + np.array([-1, 0])
-		pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-		dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-		pt_inside_top_column_list.append(ptx)
+			pt_Cx1 = ptx + np.array([-1, 0])
+			pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+			dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+			pt_inside_top_column_list.append(ptx)
 
-		bobfr = self.data_object.bolts_outside_bottom_flange_row
-		bibfr = self.data_object.bolts_inside_bottom_flange_row
+			bobfr = self.data_object.bolts_outside_bottom_flange_row
+			bibfr = self.data_object.bolts_inside_bottom_flange_row
 
 		# ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
 		pt_outside_bottom_column_list = []
@@ -812,8 +814,7 @@ class ExtendedEnd2DFront(object):
 		point = self.A1 + (self.data_object.beam_length_L1 / 3) * np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "Primary beam 1 " + str(self.data_object.beam_length_L1) + " x " + str(self.data_object.beam_depth_D1) + " x " + str(
-			self.data_object.beam_width_B1)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
@@ -821,8 +822,7 @@ class ExtendedEnd2DFront(object):
 		point = self.AA1 + (self.data_object.beam_length_L2 / 2) * np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "Primary beam 2 " + str(self.data_object.beam_length_L2) + " x " + str(self.data_object.beam_depth_D2) + " x " + str(
-			self.data_object.beam_width_B2)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
@@ -831,7 +831,7 @@ class ExtendedEnd2DFront(object):
 		point = self.P1
 		theta = 60
 		offset = 100
-		textup = "End Plate 1 " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(
+		textup = "End Plate " + str(self.data_object.plate_length_L1) + "x" + str(self.data_object.plate_width_B1) + "x" + str(
 			self.data_object.plate_thickness_p1)
 		textdown = " "
 		element = " "
@@ -840,7 +840,7 @@ class ExtendedEnd2DFront(object):
 		point = self.PP2
 		theta = 60
 		offset = 100
-		textup = "End Plate 2 " + str(self.data_object.plate_length_L2) + " x " + str(self.data_object.plate_width_B2) + " x " + str(
+		textup = "End Plate " + str(self.data_object.plate_length_L2) + "x" + str(self.data_object.plate_width_B2) + "x" + str(
 			self.data_object.plate_thickness_p2)
 		textdown = " "
 		element = " "
@@ -848,9 +848,9 @@ class ExtendedEnd2DFront(object):
 
 		# ------------------------------------------  View details-------------------------------------------
 		ptx = self.P4 - 100 * np.array([1, 0]) + 200 * np.array([0, 1])
-		dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('Front view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
 		dwg.save()
 
@@ -999,7 +999,7 @@ class ExtendedEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -700 3300 1800'))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -700 2700 1800'))
 		dwg.add(dwg.line(self.A5, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A6, self.A7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
@@ -1067,16 +1067,14 @@ class ExtendedEnd2DTop(object):
 		theta = 60
 		offset = 150
 		textup = " "
-		textdown = "Primary Beam1 " + str(self.data_object.beam_length_L1) + " x " + str(self.data_object.beam_depth_D1) + " x " + str(
-			self.data_object.beam_width_B1)
+		textdown = "Beam " + str(self.data_object.beam_designation)
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
 
 		point = self.AA2 - self.data_object.beam_length_L2 / 2 * np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "Primary Beam2 " + str(self.data_object.beam_length_L2) + " x " + str(self.data_object.beam_depth_D2) + " x " + str(
-			self.data_object.beam_width_B2)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
@@ -1086,7 +1084,7 @@ class ExtendedEnd2DTop(object):
 		theta = 60
 		offset = 50
 		textup = " "
-		textdown = "End Plate1 " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(
+		textdown = "End Plate " + str(self.data_object.plate_length_L1) + "x" + str(self.data_object.plate_width_B1) + "x" + str(
 			self.data_object.plate_thickness_p1)
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
@@ -1094,7 +1092,7 @@ class ExtendedEnd2DTop(object):
 		point = self.PP1 + self.data_object.plate_thickness_p1 / 2 * np.array([1, 0])
 		theta = 60
 		offset = 100
-		textup = "End Plate2 " + str(self.data_object.plate_length_L2) + " x " + str(self.data_object.plate_width_B2) + " x " + str(
+		textup = "End Plate " + str(self.data_object.plate_length_L2) + "x" + str(self.data_object.plate_width_B2) + "x" + str(
 			self.data_object.plate_thickness_p2)
 		textdown = " "
 		element = " "
@@ -1113,7 +1111,7 @@ class ExtendedEnd2DTop(object):
 		ptx = self.P4 - 50 * np.array([1, 0]) + 400 * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
 		dwg.save()
 
@@ -1210,7 +1208,7 @@ class ExtendedEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-580 -500 1200 1400'))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 1400'))
 		dwg.add(dwg.polyline(
 			points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],
 			stroke='blue', fill='none', stroke_width=2.5))
@@ -1528,7 +1526,8 @@ class ExtendedEnd2DSide(object):
 		point = self.P2 - 10 * np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "End plate " + str(self.data_object.plate_width_B1)
+		textup = "End plate " + str(self.data_object.plate_length_L1) + "x"+ str(self.data_object.plate_width_B1)+ "x" + str(
+			self.data_object.plate_thickness_p1)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
@@ -1537,8 +1536,7 @@ class ExtendedEnd2DSide(object):
 		point = self.A1
 		theta = 70
 		offset = 100
-		textup = "Primary Beam " + str(self.data_object.flange_thickness_T1) + " x " + str(self.data_object.beam_width_B1) + " x " + str(
-			self.data_object.beam_depth_D1)
+		textup = "Beam " +  str(self.data_object.beam_designation)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
@@ -1565,6 +1563,6 @@ class ExtendedEnd2DSide(object):
 		ptx = self.P4 * np.array([0, 1]) + 100 * np.array([0, 1])
 		dwg.add(dwg.text('Side view (Sec B-B) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
 		dwg.save()

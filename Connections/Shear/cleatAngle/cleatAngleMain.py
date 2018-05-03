@@ -1481,12 +1481,13 @@ class MainController(QMainWindow):
             # QMessageBox.information(self, "Information", "Please select Cleat angle")
             # flag = False
 
-        if flag:
-            flag = self.checkbeam_b()
-
         if len(incomplete_list) > 0:
             flag = False
             QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
+        if flag:
+            flag = self.checkbeam_b()
+
 
         return flag
 

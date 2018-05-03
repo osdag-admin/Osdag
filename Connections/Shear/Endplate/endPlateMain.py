@@ -1393,7 +1393,7 @@ class MainController(QMainWindow):
 
         flag = True
         incomplete_list = []
-        
+
         if self.ui.comboConnLoc.currentIndex() == 0:
             incomplete_list.append("Connectivity")
             flag = False
@@ -1437,12 +1437,13 @@ class MainController(QMainWindow):
         if self.ui.comboWldSize.currentIndex() == 0:
             incomplete_list.append("Weld thickness")
 
-        if flag:
-            flag = self.checkbeam_b()
-        
         if len(incomplete_list) > 0:
             flag = False
             QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
+        if flag:
+            flag = self.checkbeam_b()
+        
 
         return flag
 

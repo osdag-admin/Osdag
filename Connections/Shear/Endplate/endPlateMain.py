@@ -1361,58 +1361,86 @@ class MainController(QMainWindow):
         vscroll_bar.setValue(vscroll_bar.maximum())
         afile.close()
 
+    def generate_incomplete_string(self, incomplete_list):
+        """
+
+        Args:
+            incomplete_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(incomplete_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+        for item in incomplete_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
     def validate_inputs_on_design_button(self):
 
         flag = True
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select connectivity")
+            incomplete_list.append("Connectivity")
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select column section")
-                    flag = False
+                    incomplete_list.append("Column section")
 
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select beam section")
-                    flag = False
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    incomplete_list.append("Beam section")
+                    
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
-                    flag = False
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
-                    flag = False
+                    incomplete_list.append("Primary beam section")
+
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    incomplete_list.append("Secondary beam section")
+
         if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
-            flag = False
+            incomplete_list.append("Ultimate strength of steel")
 
-        elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
-            flag = False
+        if self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
+            incomplete_list.append("Yield strength of steel")
 
-        elif self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Factored shear load")
-            flag = False
+        if self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
+            incomplete_list.append("Factored shear load")
 
-        elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
-            flag = False
+        if self.ui.comboDiameter.currentIndex() == 0:
+            incomplete_list.append("Diameter of bolt")
 
-        elif self.ui.comboType.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Type of  bolt")
-            flag = False
+        if self.ui.comboType.currentIndex() == 0:
+            incomplete_list.append("Type of bolt")
 
-        elif self.ui.comboPlateThick_2.currentIndex() == 0:
-            QMessageBox.information(self,"information", "Please select Plate thickness")
-            flag = False
+        if self.ui.comboPlateThick_2.currentIndex() == 0:
+            incomplete_list.append("Plate thickness")
 
-        elif self.ui.comboWldSize.currentIndex() == 0:
-            QMessageBox.information(self, "information", "Please select Weld thickness")
-            flag = False
-        else:
+        if self.ui.comboWldSize.currentIndex() == 0:
+            incomplete_list.append("Weld thickness")
+
+        if flag:
             flag = self.checkbeam_b()
+        
+        if len(incomplete_list) > 0:
+            flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
 
         return flag
 

@@ -1424,7 +1424,7 @@ class MainController(QMainWindow):
     def validate_inputs_on_design_button(self):
         flag = True
         incomplete_list = []
-        
+
         if self.ui.comboConnLoc.currentIndex() == 0:
             incomplete_list.append("Connectivity")
             flag = False

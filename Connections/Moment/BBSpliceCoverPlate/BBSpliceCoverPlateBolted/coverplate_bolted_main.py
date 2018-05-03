@@ -866,11 +866,22 @@ class MainController(QMainWindow):
 			error string that has to be displayed
 
 		"""
-		information = "Please input the following required field(s): "
+
+		# The base string which should be displayed
+		information = "Please input the following required field"
+		if len(incomplete_list) > 1:
+			# Adds 's' to the above sentence if there are multiple missing input fields
+			information += "s"
+		information += ": "
+
+		# Loops through the list of the missing fields and adds each field to the above sentence with a comma
 		for item in incomplete_list:
 			information = information + item + ", "
+
+		# Removes the last comma
 		information = information[:-2]
 		information += "."
+
 		return information
 
 

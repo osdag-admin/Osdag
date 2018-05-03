@@ -142,7 +142,7 @@ class OsdagMainWindow(QMainWindow):
 		return folder
 
 	def show_shear_connection(self):
-		folder = select_workspace_folder()		
+		folder = self.select_workspace_folder()		
 		folder = str(folder)
 		if not os.path.exists(folder):
 			if folder == '':
@@ -186,7 +186,7 @@ class OsdagMainWindow(QMainWindow):
 
 	def show_moment_connection(self):
 
-		folder = select_workspace_folder()
+		folder = self.select_workspace_folder()
 		folder = str(folder)
 		if not os.path.exists(folder):
 			if folder == '':

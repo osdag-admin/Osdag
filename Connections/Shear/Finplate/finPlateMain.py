@@ -1557,7 +1557,7 @@ class MainController(QMainWindow):
             QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
 
         if flag:
-            flag = self.checkbeam_b()
+            flag = self.checkBeam_B()
 
 
         return flag

@@ -1422,57 +1422,15 @@ class MainController(QMainWindow):
         return information
 
     def validate_inputs_on_design_button(self):
-
-        # flag = True
-        # if self.ui.comboConnLoc.currentIndex() == 0:
-        #     QMessageBox.information(self, "Information", "Please select connectivity")
-        #     flag = False
-        # state = self.setimage_connection()
-        # if state is True:
-        #     if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
-        #         if self.ui.comboColSec.currentIndex() == 0:
-        #             QMessageBox.information(self, "Information", "Please select column section")
-        #             flag = False
-        #
-        #         elif self.ui.combo_Beam.currentIndex() == 0:
-        #             QMessageBox.information(self, "Information", "Please select beam section")
-        #             flag = False
-        #     else:
-        #         if self.ui.comboColSec.currentIndex() == 0:
-        #             QMessageBox.information(self, "Information", "Please select Primary beam  section")
-        #             flag = False
-        #         elif self.ui.combo_Beam.currentIndex() == 0:
-        #             QMessageBox.information(self, "Information", "Please select Secondary beam  section")
-        #             flag = False
-        # if self.ui.txtFu.text()== '' or float(self.ui.txtFu.text()) == 0:
-        #     QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
-        #     flag = False
-        #
-        # elif self.ui.txtFy.text()== '' or float(self.ui.txtFy.text()) == 0:
-        #     QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
-        #     flag = False
-        #
-        # elif self.ui.txtShear.text()== '' or str(self.ui.txtShear.text())== 0:
-        #     reply = QMessageBox.information(self, "Information", "Please select Factored shear load")
-        #     flag = False
-        #
-        # elif self.ui.comboDiameter.currentIndex() == 0:
-        #     QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
-        #     flag = False
-        #
-        # elif self.ui.comboBoltType.currentIndex() == 0:
-        #     QMessageBox.information(self, "Information", "Please select Type of  bolt")
-        #     flag = False
-        # elif self.ui.comboCleatSection.currentIndex() == 0:
-        #     QMessageBox.information(self, "Information", "Please select Cleat angle")
-        #     flag = False
-        # else:
-        #     flag = self.checkbeam_b()
-        # return flag
         flag = True
         incomplete_list = []
+        
         if self.ui.comboConnLoc.currentIndex() == 0:
             incomplete_list.append("Connectivity")
+            flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":

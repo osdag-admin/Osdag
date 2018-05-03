@@ -1191,50 +1191,81 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
 
+    def generate_incomplete_string(self, incomplete_list):
+        """
+
+        Args:
+            incomplete_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(incomplete_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+        for item in incomplete_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
     def validate_inputs_on_design_button(self):
         flag = True
+        incomplete_list = []
+
         if self.ui.combo_connectivity.currentIndex() == 0:
-            QMessageBox.about(self,"Information", "Please select connectivity")
+            incomplete_list.append("Connectivity")
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.combo_connectivity.currentText() == "Column flange-Beam flange" or self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
                 if self.ui.combo_beam_section.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
-                    flag = False
+                    incomplete_list.append("Beam section")
+
                 if self.ui.combo_column_section.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
-                    flag = False
+                    incomplete_list.append("Column section")
+
             else:
                 pass
 
         if self.ui.txt_fu.text() == '' or float(self.ui.txt_fu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of steel")
-            flag = False
+            incomplete_list.append("Ultimate strength of steel")
 
-        elif self.ui.txt_fy.text() == '' or float(self.ui.txt_fy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yield strength of steel")
-            flag = False
+        if self.ui.txt_fy.text() == '' or float(self.ui.txt_fy.text()) == 0:
+            incomplete_list.append("Yield strength of steel")
 
-        elif self.ui.txt_shear_force.text() == '' or float(self.ui.txt_shear_force.text()) == str(0):
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
-            flag = False
+        if self.ui.txt_shear_force.text() == '' or float(self.ui.txt_shear_force.text()) == str(0):
+            incomplete_list.append("Factored shear load")
 
-        elif self.ui.combo_bolt_diameter.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Diameter of bolt")
-            flag = False
+        if self.ui.combo_bolt_diameter.currentIndex() == 0:
+            incomplete_list.append("Diameter of bolt")
 
-        elif self.ui.combo_bolt_type.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of bolt")
-            flag = False
+        if self.ui.combo_bolt_type.currentIndex() == 0:
+            incomplete_list.append("Type of bolt")
 
-        elif self.ui.combo_angle_section.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Angle section")
-            flag = False
+        if self.ui.combo_angle_section.currentIndex() == 0:
+            incomplete_list.append("Angle section")
 
-        elif self.ui.combo_topangle_section.currentIndex() ==0:
-            QMessageBox.about(self, "Information", "Please select Top angle section")
+        if self.ui.combo_topangle_section.currentIndex() ==0:
+            incomplete_list.append("Top angle section")
+
+        if len(incomplete_list) > 0:
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
         return flag
 
     def designParameters(self):

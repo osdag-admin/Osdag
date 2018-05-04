@@ -757,18 +757,9 @@ class Maincontroller(QMainWindow):
 	def designParameters(self):
 		"""
 
-		Returns:
+		Returns: Design preference inputs
 
 		"""
-
-		# self.uiObj = self.get_user_inputs()
-		# if self.designPrefDialog.saved is not True:
-		# 	design_pref = self.designPrefDialog.save_default_para()
-		# else:
-		# 	design_pref = self.designPrefDialog.saved_designPref
-		# self.uiObj.update(design_pref)
-		# return self.uiObj
-
 		self.uiObj = self.get_user_inputs()
 		# if self.designPrefDialog.saved is not True:
 		# 	design_pref = self.designPrefDialog.save_default_para()

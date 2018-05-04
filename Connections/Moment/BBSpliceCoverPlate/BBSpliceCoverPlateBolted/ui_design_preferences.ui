@@ -36,7 +36,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Close</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>

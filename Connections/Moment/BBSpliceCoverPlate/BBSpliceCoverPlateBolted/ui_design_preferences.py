@@ -343,7 +343,7 @@ class Ui_DesignPreference(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Design preferences"))
         self.btn_save.setText(_translate("Dialog", "Save"))
-        self.btn_close.setText(_translate("Dialog", "Close"))
+        self.btn_close.setText(_translate("Dialog", "Save"))
         self.btn_defaults.setText(_translate("Dialog", "Defaults"))
         self.txt_boltFu.setText(_translate("Dialog", "800"))
         self.combo_boltHoleType.setItemText(0, _translate("Dialog", "Standard"))

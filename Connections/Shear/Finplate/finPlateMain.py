@@ -1476,11 +1476,11 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         return check
 
-    def generate_missing_fields_error_string(self, incomplete_list):
+    def generate_missing_fields_error_string(self, missing_fields_list):
         """
 
         Args:
-            incomplete_list: list of fields that are not selected or entered
+            missing_fields_list: list of fields that are not selected or entered
 
         Returns:
             error string that has to be displayed
@@ -1489,13 +1489,13 @@ class MainController(QMainWindow):
 
         # The base string which should be displayed
         information = "Please input the following required field"
-        if len(incomplete_list) > 1:
+        if len(missing_fields_list) > 1:
             # Adds 's' to the above sentence if there are multiple missing input fields
             information += "s"
         information += ": "
 
         # Loops through the list of the missing fields and adds each field to the above sentence with a comma
-        for item in incomplete_list:
+        for item in missing_fields_list:
             information = information + item + ", "
 
         # Removes the last comma
@@ -1507,54 +1507,54 @@ class MainController(QMainWindow):
     def validateInputsOnDesignBtn(self):
 
         flag = True
-        incomplete_list = []
+        missing_fields_list = []
 
         if self.ui.comboConnLoc.currentIndex() == 0:
-            incomplete_list.append("Connectivity")
+            missing_fields_list.append("Connectivity")
             flag = False
-            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(incomplete_list))
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
             return flag
 
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    incomplete_list.append("Column section")
+                    missing_fields_list.append("Column section")
 
                 if self.ui.combo_Beam.currentIndex() == 0:
-                    incomplete_list.append("Beam section")
+                    missing_fields_list.append("Beam section")
 
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    incomplete_list.append("Primary beam section")
+                    missing_fields_list.append("Primary beam section")
 
                 if self.ui.combo_Beam.currentIndex() == 0:
-                    incomplete_list.append("Secondary beam section")
+                    missing_fields_list.append("Secondary beam section")
 
         if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
-            incomplete_list.append("Ultimate strength of steel")
+            missing_fields_list.append("Ultimate strength of steel")
 
         if self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
-            incomplete_list.append("Yield strength of steel")
+            missing_fields_list.append("Yield strength of steel")
 
         if self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
-            incomplete_list.append("Factored shear load")
+            missing_fields_list.append("Factored shear load")
 
         if self.ui.comboDiameter.currentIndex() == 0:
-            incomplete_list.append("Diameter of bolt")
+            missing_fields_list.append("Diameter of bolt")
 
         if self.ui.comboType.currentIndex() == 0:
-            incomplete_list.append("Type of bolt")
+            missing_fields_list.append("Type of bolt")
 
         if self.ui.comboPlateThick_2.currentIndex() == 0:
-            incomplete_list.append("Plate thickness")
+            missing_fields_list.append("Plate thickness")
 
         if self.ui.comboWldSize.currentIndex() == 0:
-            incomplete_list.append("Weld thickness")
+            missing_fields_list.append("Weld thickness")
 
-        if len(incomplete_list) > 0:
+        if len(missing_fields_list) > 0:
             flag = False
-            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(missing_fields_list))
 
         if flag:
             flag = self.checkBeam_B()

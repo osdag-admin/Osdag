@@ -1476,7 +1476,7 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         return check
 
-    def generate_incomplete_string(self, incomplete_list):
+    def generate_missing_fields_error_string(self, incomplete_list):
         """
 
         Args:
@@ -1512,7 +1512,7 @@ class MainController(QMainWindow):
         if self.ui.comboConnLoc.currentIndex() == 0:
             incomplete_list.append("Connectivity")
             flag = False
-            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(incomplete_list))
             return flag
 
         state = self.setimage_connection()

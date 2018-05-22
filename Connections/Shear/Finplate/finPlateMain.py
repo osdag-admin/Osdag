@@ -1634,7 +1634,7 @@ class MainController(QMainWindow):
 
     def call_3DModel(self, bgcolor):
         '''
-        This routine responsible for diasplaying 3D Cad model
+        This routine responsible for displaying 3D Cad model
         :param flag: boolean
         :return:
         '''

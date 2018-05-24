@@ -1554,7 +1554,7 @@ class MainController(QMainWindow):
 
         if len(missing_fields_list) > 0:
             flag = False
-            QMessageBox.information(self, "Information", self.generate_incomplete_string(missing_fields_list))
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
 
         if flag:
             flag = self.checkBeam_B()

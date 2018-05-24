@@ -649,7 +649,7 @@ class MainController(QMainWindow):
             else:
                 clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
             if clear_depth < plate_height or min_plate_height > plate_height:
-                self.ui.btn_Design.setDisabled(True)
+                #self.ui.btn_Design.setDisabled(True)
                 QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
                 widget.clear()
                 widget.setFocus()
@@ -671,25 +671,29 @@ class MainController(QMainWindow):
 
             dict_column_data = self.fetch_column_param()
             col_D = float(dict_column_data['D'])
+            col_B = float(dict_column_data['B'])
             col_T = float(dict_column_data['T'])
             col_R1 = float(dict_column_data['R1'])
             clear_depth = 0.0
-            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-                clear_depth = col_D - 2 * (col_T + col_R1 + 5)
+            if loc == "Column web-Beam web":
+                max_plate_width = col_D - 2 * (col_T + col_R1 + 5)
+            if loc == "Column flange-Beam web":
+                max_plate_width = col_B
             #TODO else loop for beam to beam
 
-            if clear_depth < plate_width: # TODO mini value should be given be
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
-                widget.clear()
-                widget.setFocus()
-                palette = QPalette()
-                palette.setColor(QPalette.Foreground, Qt.red)
-                lblwidget.setPalette(palette)
-            else:
-                self.ui.btn_Design.setDisabled(False)
-                palette = QPalette()
-                lblwidget.setPalette(palette)
+            if loc == "Column flange-Beam web" or loc == "Column web-Beam web":
+                if max_plate_width < plate_width: # TODO mini value should be given be
+                    #self.ui.btn_Design.setDisabled(True)
+                    QMessageBox.about(self, 'Information', "Width of the end plate should be less than %s mm" % (int(max_plate_width)))
+                    widget.clear()
+                    widget.setFocus()
+                    palette = QPalette()
+                    palette.setColor(QPalette.Foreground, Qt.red)
+                    lblwidget.setPalette(palette)
+                else:
+                    self.ui.btn_Design.setDisabled(False)
+                    palette = QPalette()
+                    lblwidget.setPalette(palette)
 
     def populate_weld_thick_combo(self):
         '''

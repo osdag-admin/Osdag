@@ -700,8 +700,8 @@ def end_connection(ui_obj):
                 design_check = False
                 logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
-                logger.warning(": Maximum required cross center gauge is 140 mm")
-
+                logger.warning(": Maximum allowed cross center gauge is 140 mm")
+                logger.info(": Decrease the plate width")
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
             end_plate_w = min_end_plate_w

@@ -265,7 +265,7 @@ def bolt_tension_bearing(bolt_fu, netArea):
     Returns: (float)- Tension capacity of Bearing bolt in kN
 
     """
-    T_db = 0.9 * bolt_fu * netArea / 1.25 * 1000
+    T_db = (0.9 * bolt_fu * netArea) / (1.25 * 1000)
     return T_db
 
 
@@ -726,7 +726,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
         elif number_of_bolts == 16:
             pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-            pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
+            pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
 
             if (pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5) < pitch_dist_min:
                 design_status = False
@@ -869,7 +869,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
         elif number_of_bolts == 16:
             pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-            pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
+            pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
 
             if (pitch_distance_2_3 or pitch_distance_3_4 or pitch_distance_5_6 or pitch_distance_6_7 or pitch_distance_4_5) < pitch_dist_min:
                 design_status = False
@@ -1544,7 +1544,7 @@ def bbExtendedEndPlateSplice(uiObj):
     q_web = factored_shear_load * 10 ** 3 / (3 * L_effective_web)
 
     # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
-    f_e = math.sqrt(f_a_web ** 2 + (3 * q_web) ** 2)
+    f_e = math.sqrt(f_a_web ** 2 + (3 * q_web ** 2))
 
     if f_e > f_wd:
         design_status = False
@@ -1666,7 +1666,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # ===================  CAD ===================
         outputobj['Plate']['MomentDemand'] = round(M_d, 3)
         outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-        outputobj['Plate']['ThickRequired'] = float(tp_required)
+        outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
         outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
         outputobj['Weld'] = {}
@@ -1676,10 +1676,10 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
         outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
         outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-        outputobj['Weld']['FaWeb'] = float(f_a_web)
-        outputobj['Weld']['Qweb'] = float(q_web)
-        outputobj['Weld']['Resultant'] = float(R)
-        outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
+        outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+        outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+        outputobj['Weld']['Resultant'] = float(round(R, 3))
+        outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
 
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = round(h_st, 3)

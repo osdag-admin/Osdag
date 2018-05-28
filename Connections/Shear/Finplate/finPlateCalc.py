@@ -884,12 +884,14 @@ def finConn(uiObj):
             design_status = False
             logger.error(": Plate height provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_l_req))
+            logger.info(": Increase the plate width")
             
     if web_plate_w != 0:
         if web_plate_w < web_plate_w_req:
             design_status = False
             logger.error(": Plate width provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_w_req))
+            logger.info(": Increase the plate width")
     else:
         pass
                 

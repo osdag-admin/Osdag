@@ -1827,7 +1827,7 @@ class Ui_MainWindow(object):
         self.chkBxCol.setToolTip(_translate("MainWindow", "Column only"))
         self.chkBxCol.setText(_translate("MainWindow", "Column"))
         self.chkBxFinplate.setToolTip(_translate("MainWindow", "Finplate only"))
-        self.chkBxFinplate.setText(_translate("MainWindow", "Finplate"))
+        self.chkBxFinplate.setText(_translate("MainWindow", "Fin Plate"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuView.setTitle(_translate("MainWindow", "View"))

@@ -265,7 +265,7 @@ class MyPopupDialog(QDialog):
         self.ui.lbl_browse.clear()
         filename, _ = QFileDialog.getOpenFileName(
             self, 'Open File', " ../../",
-            'Images (*.png *.svg*.jpg)',
+            'Images (*.png *.svg *.jpg)',
             None, QFileDialog.DontUseNativeDialog)
         flag = True
         if filename == '':
@@ -815,8 +815,7 @@ class MainController(QMainWindow):
             else:
                 clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
             if clear_depth < plate_height or min_plate_height > plate_height:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                QMessageBox.about(self, 'Information', "Height of the fin plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
                 widget.clear()
                 widget.setFocus()
                 palette = QPalette()
@@ -844,8 +843,7 @@ class MainController(QMainWindow):
                 clear_depth = col_D - 2 * (col_T + col_R1 + 5)
 
             if clear_depth < plate_width:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
+                QMessageBox.about(self, 'Information', "Height of the fin plate should be less than %s mm" % (int(clear_depth)))
             else:
                 self.ui.btn_Design.setDisabled(False)
 
@@ -1478,59 +1476,90 @@ class MainController(QMainWindow):
                 self.ui.btn_Design.setDisabled(False)
         return check
 
+    def generate_missing_fields_error_string(self, missing_fields_list):
+        """
+
+        Args:
+            missing_fields_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(missing_fields_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+        for item in missing_fields_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
     def validateInputsOnDesignBtn(self):
 
-
         flag = True
+        missing_fields_list = []
+
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select connectivity")
+            missing_fields_list.append("Connectivity")
             flag = False
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select column section")
-                    flag = False
+                    missing_fields_list.append("Column section")
 
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select beam section")
-                    flag = False
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    missing_fields_list.append("Beam section")
+
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
-                    flag = False
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
-                    flag = False
+                    missing_fields_list.append("Primary beam section")
+
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    missing_fields_list.append("Secondary beam section")
+
         if self.ui.txtFu.text() == '' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
-            flag = False
+            missing_fields_list.append("Ultimate strength of steel")
 
-        elif self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
-            flag = False
+        if self.ui.txtFy.text() == '' or float(self.ui.txtFy.text()) == 0:
+            missing_fields_list.append("Yield strength of steel")
 
-        elif self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Factored shear load")
-            flag = False
+        if self.ui.txtShear.text() == '' or str(self.ui.txtShear.text()) == 0:
+            missing_fields_list.append("Factored shear load")
 
-        elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
-            flag = False
+        if self.ui.comboDiameter.currentIndex() == 0:
+            missing_fields_list.append("Diameter of bolt")
 
-        elif self.ui.comboType.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Type of  bolt")
-            flag = False
+        if self.ui.comboType.currentIndex() == 0:
+            missing_fields_list.append("Type of bolt")
 
-        elif self.ui.comboPlateThick_2.currentIndex() == 0:
-            QMessageBox.information(self, "information", "Please Select plate thickness")
-            flag = False
+        if self.ui.comboPlateThick_2.currentIndex() == 0:
+            missing_fields_list.append("Plate thickness")
 
-        elif self.ui.comboWldSize.currentIndex() == 0:
-            QMessageBox.information(self, "information", "Please select Weld thickness")
+        if self.ui.comboWldSize.currentIndex() == 0:
+            missing_fields_list.append("Weld thickness")
+
+        if len(missing_fields_list) > 0:
             flag = False
-        else:
+            QMessageBox.information(self, "Information", self.generate_missing_fields_error_string(missing_fields_list))
+
+        if flag:
             flag = self.checkBeam_B()
+
+
         return flag
 
 
@@ -1605,7 +1634,7 @@ class MainController(QMainWindow):
 
     def call_3DModel(self, bgcolor):
         '''
-        This routine responsible for diasplaying 3D Cad model
+        This routine responsible for displaying 3D Cad model
         :param flag: boolean
         :return:
         '''
@@ -1845,7 +1874,7 @@ class MainController(QMainWindow):
                 self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
         else:
-            QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be saved' %(view))
+            QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be viewed' %(view))
 
 
     def closeEvent(self, event):

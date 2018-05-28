@@ -867,7 +867,7 @@ class MainController(QMainWindow):
                 QMessageBox.about(self, 'Information', "File saved")
         else:
             self.ui.actionSave_CAD_image.setEnabled(False)
-            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be saved')
+            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be viewed')
 
 
     def disable_view_buttons(self):
@@ -1393,55 +1393,104 @@ class MainController(QMainWindow):
 
         return display, start_display
 
+    def generate_incomplete_string(self, incomplete_list):
+        """
+
+        Args:
+            incomplete_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(incomplete_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+        for item in incomplete_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
 
     def validate_inputs_on_design_button(self):
-
         flag = True
+        incomplete_list = []
+
         if self.ui.comboConnLoc.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select connectivity")
+            incomplete_list.append("Connectivity")
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.comboConnLoc.currentText() == "Column web-Beam web" or self.ui.comboConnLoc.currentText() == "Column flange-Beam web":
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select column section")
-                    flag = False
+                    incomplete_list.append("Column section")
+                    # QMessageBox.information(self, "Information", "Please select column section")
+                    # flag = False
 
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select beam section")
-                    flag = False
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    incomplete_list.append("Beam section")
+                    # QMessageBox.information(self, "Information", "Please select beam section")
+                    # flag = False
             else:
                 if self.ui.comboColSec.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Primary beam  section")
-                    flag = False
-                elif self.ui.combo_Beam.currentIndex() == 0:
-                    QMessageBox.information(self, "Information", "Please select Secondary beam  section")
-                    flag = False
+                    incomplete_list.append("Primary beam section")
+                    # QMessageBox.information(self, "Information", "Please select Primary beam  section")
+                    # flag = False
+                if self.ui.combo_Beam.currentIndex() == 0:
+                    incomplete_list.append("Secondary beam section")
+                    # QMessageBox.information(self, "Information", "Please select Secondary beam  section")
+                    # flag = False
         if self.ui.txtFu.text()== '' or float(self.ui.txtFu.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
-            flag = False
+            incomplete_list.append("Ultimate strength of steel")
+            # QMessageBox.information(self, "Information", "Please select Ultimate strength of  steel")
+            # flag = False
 
-        elif self.ui.txtFy.text()== '' or float(self.ui.txtFy.text()) == 0:
-            QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
-            flag = False
+        if self.ui.txtFy.text()== '' or float(self.ui.txtFy.text()) == 0:
+            incomplete_list.append("Yield strength of steel")
+            # QMessageBox.information(self, "Information", "Please select Yeild  strength of  steel")
+            # flag = False
 
-        elif self.ui.txtShear.text()== '' or str(self.ui.txtShear.text())== 0:
-            reply = QMessageBox.information(self, "Information", "Please select Factored shear load")
-            flag = False
+        if self.ui.txtShear.text()== '' or str(self.ui.txtShear.text())== 0:
+            incomplete_list.append("Factored shear load")
+            # reply = QMessageBox.information(self, "Information", "Please select Factored shear load")
+            # flag = False
 
-        elif self.ui.comboDiameter.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
-            flag = False
+        if self.ui.comboDiameter.currentIndex() == 0:
+            incomplete_list.append("Diameter of bolt")
+            # QMessageBox.information(self, "Information", "Please select Diameter of  bolt")
+            # flag = False
 
-        elif self.ui.comboBoltType.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Type of  bolt")
+        if self.ui.comboBoltType.currentIndex() == 0:
+            incomplete_list.append("Type of bolt")
+            # QMessageBox.information(self, "Information", "Please select Type of  bolt")
+            # flag = False
+        if self.ui.comboCleatSection.currentIndex() == 0:
+            incomplete_list.append("Cleat angle")
+            # QMessageBox.information(self, "Information", "Please select Cleat angle")
+            # flag = False
+
+        if len(incomplete_list) > 0:
             flag = False
-        elif self.ui.comboCleatSection.currentIndex() == 0:
-            QMessageBox.information(self, "Information", "Please select Cleat angle")
-            flag = False
-        else:
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
+        if flag:
             flag = self.checkbeam_b()
+
+
         return flag
+
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''

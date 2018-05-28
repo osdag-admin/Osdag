@@ -476,7 +476,7 @@ QMenu::item:selected {
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="actionCut"/>
+    <addaction name="actionClear"/>
     <addaction name="actionCopy"/>
     <addaction name="actionPaste"/>
     <addaction name="actionDesign_Preferences"/>
@@ -595,8 +595,7 @@ QMenu::item:selected {
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
     <addaction name="actionShow_beam"/>
-    <addaction name="actionShow_column"/>
-    <addaction name="actionShow_finplate"/>
+    <addaction name="actionShow_connector"/>
     <addaction name="actionShow_all"/>
     <addaction name="separator"/>
     <addaction name="actionChange_background"/>
@@ -1303,6 +1302,26 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>20</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>22</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>24</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>26</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>28</string>
       </property>
      </item>
     </widget>
@@ -3235,6 +3254,36 @@ QMenu::item:selected {
        <string>16</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>18</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>20</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>22</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>24</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>26</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>28</string>
+      </property>
+     </item>
     </widget>
     <widget class="QLabel" name="lbl_connectivity">
      <property name="geometry">
@@ -3303,7 +3352,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>Axial Force (kN)</string>
+      <string>Axial force (kN)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="txt_Axial">
@@ -4347,9 +4396,9 @@ QMenu::item:selected {
     <string>Print</string>
    </property>
   </action>
-  <action name="actionCut">
+  <action name="actionClear">
    <property name="text">
-    <string>Cut</string>
+    <string>Clear</string>
    </property>
    <property name="font">
     <font>
@@ -4639,9 +4688,9 @@ QMenu::item:selected {
     <string>Alt+Shift+C</string>
    </property>
   </action>
-  <action name="actionShow_finplate">
+  <action name="actionShow_connector">
    <property name="text">
-    <string>Show finplate</string>
+    <string>Show connector</string>
    </property>
    <property name="font">
     <font>

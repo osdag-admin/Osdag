@@ -226,7 +226,7 @@
         <string>Endplate only</string>
        </property>
        <property name="text">
-        <string>Endplate</string>
+        <string>End Plate</string>
        </property>
       </widget>
       <widget class="QToolButton" name="btn_front">

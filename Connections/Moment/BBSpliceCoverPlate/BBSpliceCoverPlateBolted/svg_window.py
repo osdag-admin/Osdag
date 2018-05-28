@@ -61,7 +61,7 @@ class SvgWindow(object):
         flag = True
 
         if view == "Front":
-            png_image_path = os.path.join(self.folder, "images_html", "seatFront.png")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedFront.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':
@@ -72,7 +72,7 @@ class SvgWindow(object):
                 QMessageBox.about(None, 'Information', "Image Saved")
 
         elif view == "Side":
-            png_image_path = os.path.join(self.folder, "images_html", "seatSide.png")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedSide.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':
@@ -83,7 +83,7 @@ class SvgWindow(object):
                 QMessageBox.about(None, 'Information', "Image Saved")
 
         else:
-            png_image_path = os.path.join(self.folder, "images_html", "seatTop.png")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedTop.png")
             file_type = "PNG (*.png)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':
@@ -97,7 +97,7 @@ class SvgWindow(object):
         flag = True
 
         if view == "Front":
-            png_image_path = os.path.join(self.folder, "images_html", "seatFront.svg")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedFront.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':
@@ -108,7 +108,7 @@ class SvgWindow(object):
                 QMessageBox.about(None, 'Information', "Image Saved")
 
         elif view == "Side":
-            png_image_path = os.path.join(self.folder, "images_html", "seatSide.svg")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedSide.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':
@@ -119,7 +119,7 @@ class SvgWindow(object):
                 QMessageBox.about(None, 'Information', "Image Saved")
 
         else:
-            png_image_path = os.path.join(self.folder, "images_html", "seatTop.svg")
+            png_image_path = os.path.join(self.folder, "images_html", "coverboltedTop.svg")
             file_type = "SVG (*.svg)"
             file_name, _ = QFileDialog.getSaveFileName(None, "Save File As", self.folder + "/", file_type)
             if file_name == '':

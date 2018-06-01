@@ -835,8 +835,8 @@ class Maincontroller(QMainWindow):
 		if self.ui.txt_Fy.text() == "":
 			incomplete_list.append("Yield strength")
 
-		if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
-			incomplete_list.append("Axial force")
+		#if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
+		#	incomplete_list.append("Axial force")
 
 		if self.ui.txt_Moment.text() == '' or float(self.ui.txt_Moment.text()) == 0:
 			incomplete_list.append("Moment")

@@ -587,9 +587,13 @@ def bbExtendedEndPlateSplice(uiObj):
         number_of_bolts = 20
     # TODO : validate else statement. (Discuss with sir)
     else:
+        design_status = False
         logger.error(": The number of bolts exceeds 20")
-        logger.warning(": Maximum number of bolts that can be accommodated in Extended End plate configuration is 16")
-        logger.info(": Use Bolted cover plate splice connection for higher moments")
+        logger.warning(": Maximum number of bolts that can be accommodated in Extended End plate configuration is 20")
+        logger.info(": Re-design the connection")
+        pass
+        # quit()
+        # logger.info(": Use Bolted cover plate splice connection for higher moments")
 
     # Number of rows of bolt
     if number_of_bolts == 8:
@@ -600,6 +604,11 @@ def bbExtendedEndPlateSplice(uiObj):
         number_rows = 8
     elif number_of_bolts == 20:
         number_rows = 10
+    else:
+        design_status = False
+        logger.error(": The number of bolts exceeds 20")
+        logger.warning(": Maximum number of bolts that can be accommodated in Extended End plate configuration is 20")
+        logger.info(": Re-design the connection")
 
     # Number of bolts per column
 
@@ -682,6 +691,9 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
+        else:
+            design_status = False
+
         if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
             end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_end_distance))
         else:
@@ -755,6 +767,9 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
+        else:
+            design_status = False
+
         end_plate_height_provided = height_available
         end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
 
@@ -822,6 +837,9 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
                 logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
                 logger.info(": Re-design the connection using bolt of higher diameter")
+
+        else:
+            design_status = False
 
         if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
             end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_end_distance))
@@ -898,6 +916,9 @@ def bbExtendedEndPlateSplice(uiObj):
                 logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
                 logger.info(": Re-design the connection using bolt of higher diameter")
 
+        else:
+            design_status = False
+
         end_plate_height_provided = height_available
 
         width_available = end_plate_width
@@ -931,6 +952,8 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.error(": Height of End Plate exceeds the maximum allowed height")
             logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
             logger.info(": Decrease the Height of End Plate")
+    else:
+        design_status = False
 
     if end_plate_width_provided < end_plate_width_mini:
         design_status = False
@@ -1035,6 +1058,9 @@ def bbExtendedEndPlateSplice(uiObj):
 
             T_f = (T1 * (beam_d - beam_tf)) / y1
 
+        else:
+            design_status = False
+
     # Case 2: When the height of end plate is specified but the width is not specified by the user
     elif end_plate_height != 0 and end_plate_width == 0:
         if number_of_bolts == 8:
@@ -1106,6 +1132,9 @@ def bbExtendedEndPlateSplice(uiObj):
             T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
             T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        else:
+            design_status = False
 
     # Case 3: When the height of end plate is not specified but the width is specified by the user
     elif end_plate_height == 0 and end_plate_width != 0:
@@ -1179,6 +1208,9 @@ def bbExtendedEndPlateSplice(uiObj):
 
             T_f = (T1 * (beam_d - beam_tf)) / y1
 
+        else:
+            design_status = False
+
     # Case 4: When the height and the width of End Plate is specified by the user
     elif end_plate_height != 0 and end_plate_width != 0:
         if number_of_bolts == 8:
@@ -1250,6 +1282,9 @@ def bbExtendedEndPlateSplice(uiObj):
             T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
             T_f = (T1 * (beam_d - beam_tf)) / y1
+
+        else:
+            design_status = False
 
     #######################################################################
     # Calculating actual required thickness of End Plate (tp_required) as per bending criteria

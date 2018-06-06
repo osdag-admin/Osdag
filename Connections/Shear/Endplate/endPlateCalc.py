@@ -405,11 +405,11 @@ def end_connection(ui_obj):
     max_edge_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
     max_end_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
 
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
         bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0.85 - oversize hole
-        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
+        bolt_shear_capacity = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
         bolt_bearing_capacity = 'N/A'
         bolt_capacity = bolt_shear_capacity
 

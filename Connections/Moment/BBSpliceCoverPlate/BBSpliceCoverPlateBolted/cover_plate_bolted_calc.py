@@ -556,11 +556,11 @@ def coverplateboltedconnection(uiObj):
                                                                             kb, web_plate_fu), 2)
             web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
 
-        elif bolt_type == "HSFG":
+        elif bolt_type == "Friction Grip Bolt":
             muf = mu_f
             bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
             n_e = 2  # number of effective surfaces offering frictional resistance
-            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type), 2)
+            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type), 2)
             web_bolt_bearing_capacity = 'N/A'
             web_bolt_capacity = web_bolt_shear_capacity
 
@@ -577,11 +577,11 @@ def coverplateboltedconnection(uiObj):
                                                                                 kb, int(flange_plate_fu)), 2)
                 flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
 
-            elif bolt_type == "HSFG":
+            elif bolt_type == "Friction Grip Bolt":
                 muf = mu_f
                 bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
                 n_e = 1  # number of effective surfaces offering frictional resistance
-                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
+                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e,
                                                                                  bolt_hole_type), 2)
                 flange_bolt_bearing_capacity = 'N/A'
                 flange_bolt_capacity = flange_bolt_shear_capacity

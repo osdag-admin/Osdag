@@ -440,7 +440,7 @@ def coverplateboltedconnection(uiObj):
     #     flange_plate_t = thk_flange_plate
     #     design_status = False
     #     logger.error(": Chosen flange splice plate thickness is not sufficient")
-    #     logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm" % (thk_flange_plate))
+    #     logger.warning(": Minimum required thickness of flange splice plate is % 2.2f mm" % (thk_flange_plate))
     #     logger.info(": Increase thickness of flange splice plate")
     thkflangeplate = thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load, beam_b, beam_fy, dia_hole)
     if thkflangeplate < min((beam_f_t / 2), 10):
@@ -781,6 +781,7 @@ def coverplateboltedconnection(uiObj):
 
         if web_plate_l == 0 and flange_plate_l == 0 and flange_plate_w == 0:
             boltParam = {}
+            # outputObj['Bolt']['status'] = design_status
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
             boltParam["BearingCapacity"] = web_bolt_bearing_capacity
             boltParam["CapacityBolt"] = web_bolt_capacity
@@ -816,6 +817,7 @@ def coverplateboltedconnection(uiObj):
             return boltParam
         else:
             boltParam = {}
+            # outputObj['Bolt']['status'] = design_status
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
             boltParam["BearingCapacity"] = web_bolt_bearing_capacity
             boltParam["CapacityBolt"] = web_bolt_capacity
@@ -1056,6 +1058,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
+        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1072,6 +1075,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
+        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1095,6 +1099,11 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
         outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
         outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
+        outputObj['FlangeBolt']['beamdepth'] = beam_d
+        outputObj['FlangeBolt']['beamrootradius'] = beam_r1
+        outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
+
+
 
     else:
         outputObj = {}
@@ -1102,6 +1111,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
+        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1118,6 +1128,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
+        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1141,6 +1152,9 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
         outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
         outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
+        outputObj['FlangeBolt']['beamdepth'] = beam_d
+        outputObj['FlangeBolt']['beamrootradius'] = beam_r1
+        outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
 
     if design_status == True:
 

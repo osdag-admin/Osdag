@@ -1241,6 +1241,8 @@ class MainController(QMainWindow):
         # ------------------------------------ Erase Display -----------------------------------------------------------------
         self.display.EraseAll()
 
+        self.designPrefDialog.set_default_para()
+
     def dockbtn_clicked(self, widget):
         '''(QWidget) -> NoneType
         This method dock and undock widget(QdockWidget)

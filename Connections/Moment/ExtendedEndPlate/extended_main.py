@@ -480,7 +480,6 @@ class Maincontroller(QMainWindow):
 		self.uiObj = None
 		self.resultObj = None
 		self.disable_buttons()
-		self.designPrefDialog = DesignPreference(self)
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -792,6 +791,7 @@ class Maincontroller(QMainWindow):
 			self.ui.lbl_connectivity.setPixmap(picmap)
 
 		return True
+
 	def generate_incomplete_string(self, incomplete_list):
 		"""
 
@@ -1052,6 +1052,9 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)
 		self.ui.btn_stiffnrDetail.setDisabled(True)
+
+		self.display.EraseAll()
+		self.designPrefDialog.save_default_para()
 
 	def get_beamdata(self):
 		loc = self.ui.combo_connLoc.currentText()

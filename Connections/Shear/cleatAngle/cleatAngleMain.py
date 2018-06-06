@@ -789,40 +789,72 @@ class MainController(QMainWindow):
             range of cleat height
 
         '''
+
+        def clear_widget():
+            ''' Clear the widget and change the label colour in to red '''
+            widget.clear()
+            widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+            pass
+
         loc = self.ui.comboConnLoc.currentText()
-        cleatHeight = widget.text()
-        cleatHeight = float(cleatHeight)
-        if cleatHeight == 0:
-            self.ui.btn_Design.setDisabled(False)
+        if loc == "Select Connectivity":
+            QMessageBox.about(self, 'Information', "Please select the Connectivity")
+            clear_widget()
+
         else:
 
-            dict_beam_data = self.fetch_beam_param()
-            dictColumnData = self.fetch_column_param()
-            col_T = float(dictColumnData['T'])
-            col_R1 = float(dictColumnData['R1'])
-            beam_D = float(dict_beam_data['D'])
-            beam_T = float(dict_beam_data['T'])
-            beam_R1 = float(dict_beam_data['R1'])
-            clearDepth = 0.0
-            minCleatHeight = 0.6 * beam_D
-            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-                clearDepth = beam_D - 2 * (beam_T + beam_R1 + 5)
+            if loc == "Beam-Beam":
+                select_col = "Please select the primary beam"
+                select_beam = "Please select the secondary beam"
             else:
-                clearDepth = beam_D - (beam_R1 + beam_T + col_R1 + col_T)
-            if clearDepth < cleatHeight or cleatHeight < minCleatHeight:
-                self.ui.btn_Design.setDisabled(True)
-                # QMessageBox.about(self, 'Information', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
-                QMessageBox.warning(self, 'Warning', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
-                widget.clear()
-                widget.setFocus()
-                palette = QPalette()
-                palette.setColor(QPalette.Foreground, Qt.red)
-                lblwidget.setPalette(palette)
-                return
+                select_col = "Please select the column section"
+                select_beam = "Please select the beam section"
+
+            if self.ui.comboColSec.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_col)
+                clear_widget()
+
+            elif self.ui.combo_Beam.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_beam)
+                clear_widget()
+
             else:
-                self.ui.btn_Design.setDisabled(False)
-                palette = QPalette()
-                lblwidget.setPalette(palette)
+
+                cleatHeight = widget.text()
+                cleatHeight = float(cleatHeight)
+                if cleatHeight == 0:
+                    self.ui.btn_Design.setDisabled(False)
+                else:
+
+                    dict_beam_data = self.fetch_beam_param()
+                    dictColumnData = self.fetch_column_param()
+                    col_T = float(dictColumnData['T'])
+                    col_R1 = float(dictColumnData['R1'])
+                    beam_D = float(dict_beam_data['D'])
+                    beam_T = float(dict_beam_data['T'])
+                    beam_R1 = float(dict_beam_data['R1'])
+                    clearDepth = 0.0
+                    minCleatHeight = 0.6 * beam_D
+                    if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                        clearDepth = beam_D - 2 * (beam_T + beam_R1 + 5)
+                    else:
+                        clearDepth = beam_D - (beam_R1 + beam_T + col_R1 + col_T)
+                    if clearDepth < cleatHeight or cleatHeight < minCleatHeight:
+                        #self.ui.btn_Design.setDisabled(True)
+                        QMessageBox.warning(self, 'Warning', "Height of the Cleat Angle should be in between %s -%s mm" % (int(minCleatHeight), int(clearDepth)))
+                        widget.clear()
+                        widget.setFocus()
+                        palette = QPalette()
+                        palette.setColor(QPalette.Foreground, Qt.red)
+                        lblwidget.setPalette(palette)
+                        return
+                    else:
+                        self.ui.btn_Design.setDisabled(False)
+                        palette = QPalette()
+                        lblwidget.setPalette(palette)
 
     def show_font_dialog(self):
 

@@ -342,7 +342,7 @@ class MainController(QMainWindow):
 
         self.gradeType = {'Please Select Type':'',
                          'Friction Grip Bolt': [8.8, 10.9],
-                         'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 9.8, 10.9, 12.9]}
+                         'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.comboType.addItems(self.gradeType.keys())
         self.ui.comboType.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
         self.ui.comboType.setCurrentIndex(0)
@@ -628,68 +628,130 @@ class MainController(QMainWindow):
             range of plate height
 
         '''
+        def clear_widget():
+            ''' Clear the widget and change the label colour in to red '''
+            widget.clear()
+            widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+            pass
+
         loc = self.ui.comboConnLoc.currentText()
-        plate_height = widget.text()
-        plate_height = float(plate_height)
-        if plate_height == 0:
-            self.ui.btn_Design.setDisabled(False)
+        if loc == "Select Connectivity":
+            QMessageBox.about(self, 'Information', "Please select the Connectivity")
+            clear_widget()
+
         else:
 
-            dict_beam_data = self.fetch_beam_param()
-            dict_column_data = self.fetch_column_param()
-            beam_D = float(dict_beam_data['D'])
-            col_T = float(dict_column_data['T'])
-            col_R1 = float(dict_column_data['R1'])
-            beam_T = float(dict_beam_data['T'])
-            beam_R1 = float(dict_beam_data['R1'])
-            clear_depth = 0.0
-            min_plate_height = 0.6 * beam_D
-            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-                clear_depth = beam_D - 2 * (beam_T + beam_R1 + 5)
+            if loc == "Beam-Beam":
+                select_col = "Please select the primary beam"
+                select_beam = "Please select the secondary beam"
             else:
-                clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
-            if clear_depth < plate_height or min_plate_height > plate_height:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
-                widget.clear()
-                widget.setFocus()
-                palette = QPalette()
-                palette.setColor(QPalette.Foreground, Qt.red)
-                lblwidget.setPalette(palette)
+                select_col = "Please select the column section"
+                select_beam = "Please select the beam section"
+
+            if self.ui.comboColSec.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_col)
+                clear_widget()
+
+            elif self.ui.combo_Beam.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_beam)
+                clear_widget()
+
             else:
-                self.ui.btn_Design.setDisabled(False)
-                palette = QPalette()
-                lblwidget.setPalette(palette)
+
+                plate_height = widget.text()
+                plate_height = float(plate_height)
+                if plate_height == 0:
+                    self.ui.btn_Design.setDisabled(False)
+                else:
+
+                    dict_beam_data = self.fetch_beam_param()
+                    dict_column_data = self.fetch_column_param()
+                    beam_D = float(dict_beam_data['D'])
+                    col_T = float(dict_column_data['T'])
+                    col_R1 = float(dict_column_data['R1'])
+                    beam_T = float(dict_beam_data['T'])
+                    beam_R1 = float(dict_beam_data['R1'])
+                    clear_depth = 0.0
+                    min_plate_height = 0.6 * beam_D
+                    if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+                        clear_depth = beam_D - 2 * (beam_T + beam_R1 + 5)
+                    else:
+                        clear_depth = beam_D - (col_R1 + col_T + beam_R1 + beam_T + 5)
+                    if clear_depth < plate_height or min_plate_height > plate_height:
+                        #self.ui.btn_Design.setDisabled(True)
+                        QMessageBox.about(self, 'Information', "Height of the end plate should be in between %s-%s mm" % (int(min_plate_height), int(clear_depth)))
+                        clear_widget()
+
+                    else:
+                        self.ui.btn_Design.setDisabled(False)
+                        palette = QPalette()
+                        lblwidget.setPalette(palette)
 
     def check_plate_width(self, widget, lblwidget):
+
+        def clear_widget():
+            ''' Clear the widget and change the label colour in to red '''
+            widget.clear()
+            widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+            pass
+
         loc = self.ui.comboConnLoc.currentText()
-        plate_width = widget.text()
-        plate_width = float(plate_width)
-        if plate_width == 0:
-            self.ui.btn_Design.setDisabled(False)
+        if loc == "Select Connectivity":
+            QMessageBox.about(self, 'Information', "Please select the Connectivity")
+            clear_widget()
+
         else:
 
-            dict_column_data = self.fetch_column_param()
-            col_D = float(dict_column_data['D'])
-            col_T = float(dict_column_data['T'])
-            col_R1 = float(dict_column_data['R1'])
-            clear_depth = 0.0
-            if loc == "Column web-Beam web" or loc == "Column flange-Beam web":
-                clear_depth = col_D - 2 * (col_T + col_R1 + 5)
-            #TODO else loop for beam to beam
-
-            if clear_depth < plate_width: # TODO mini value should be given be
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Height of the end plate should be less than %s mm" % (int(clear_depth)))
-                widget.clear()
-                widget.setFocus()
-                palette = QPalette()
-                palette.setColor(QPalette.Foreground, Qt.red)
-                lblwidget.setPalette(palette)
+            if loc == "Beam-Beam":
+                select_col = "Please select the primary beam"
+                select_beam = "Please select the secondary beam"
             else:
-                self.ui.btn_Design.setDisabled(False)
-                palette = QPalette()
-                lblwidget.setPalette(palette)
+                select_col = "Please select the column section"
+                select_beam = "Please select the beam section"
+
+            if self.ui.comboColSec.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_col)
+                clear_widget()
+
+            elif self.ui.combo_Beam.currentText() == "Select section":
+                QMessageBox.about(self, 'Information', select_beam)
+                clear_widget()
+
+            else:
+
+                plate_width = widget.text()
+                plate_width = float(plate_width)
+                if plate_width == 0:
+                    self.ui.btn_Design.setDisabled(False)
+                else:
+
+                    dict_column_data = self.fetch_column_param()
+                    col_D = float(dict_column_data['D'])
+                    col_B = float(dict_column_data['B'])
+                    col_T = float(dict_column_data['T'])
+                    col_R1 = float(dict_column_data['R1'])
+                    clear_depth = 0.0
+                    if loc == "Column web-Beam web":
+                        max_plate_width = col_D - 2 * (col_T + col_R1 + 5)
+                    if loc == "Column flange-Beam web":
+                        max_plate_width = col_B
+                    #TODO else loop for beam to beam
+
+                    if loc == "Column flange-Beam web" or loc == "Column web-Beam web":
+                        if max_plate_width < plate_width: # TODO mini value should be given be
+                            #self.ui.btn_Design.setDisabled(True)
+                            QMessageBox.about(self, 'Information', "Width of the end plate should be less than %s mm" % (int(max_plate_width)))
+                            clear_widget()
+                        else:
+                            self.ui.btn_Design.setDisabled(False)
+                            palette = QPalette()
+                            lblwidget.setPalette(palette)
 
     def populate_weld_thick_combo(self):
         '''

@@ -584,11 +584,12 @@ def end_connection(ui_obj):
         no_row = bolts_required / 2
         no_col = 1
 
-        end_plate_l = (no_row - 1) * min_pitch + 2 * min_end_dist
-        pitch = min_pitch
-        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+        end_plate_l = 0.6 * beam_depth
+        avbl_length = (end_plate_l - 2 * min_end_dist)
+        pitch = avbl_length / (no_row - 1)
         end_dist = min_end_dist
         edge_dist = min_edge_dist
+        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
         test = True
         if end_plate_l > max_end_plate_l:
             test = False
@@ -699,8 +700,8 @@ def end_connection(ui_obj):
                 design_check = False
                 logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
-                logger.warning(": Maximum required cross center gauge is 140 mm")
-
+                logger.warning(": Maximum allowed cross center gauge is 140 mm")
+                logger.info(": Decrease the plate width")
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
             end_plate_w = min_end_plate_w

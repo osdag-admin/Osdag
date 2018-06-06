@@ -477,7 +477,9 @@ background-color: #abc250 ;
       <property name="font">
        <font>
         <pointsize>13</pointsize>
+        <weight>50</weight>
         <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="frameShape">
@@ -487,7 +489,7 @@ background-color: #abc250 ;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -1363,14 +1365,14 @@ color:#ffffff;
       </widget>
       <widget class="QWidget" name="beamtobeampage">
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <spacer name="horizontalSpacer_15">
+        <item row="0" column="2">
+         <spacer name="horizontalSpacer_12">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>143</width>
             <height>20</height>
            </size>
           </property>
@@ -1386,32 +1388,6 @@ color:#ffffff;
           </property>
           <property name="text">
            <string>Cover Plate Connection</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <spacer name="horizontalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>143</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <widget class="QRadioButton" name="rdbtn_endplate_ext">
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>End Plate Connection</string>
           </property>
          </widget>
         </item>
@@ -1440,6 +1416,19 @@ color:#ffffff;
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="0" column="3">
+         <widget class="QRadioButton" name="rdbtn_endplate_ext">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>End Plate Connection</string>
+          </property>
+         </widget>
         </item>
         <item row="1" column="3">
          <spacer name="verticalSpacer_13">
@@ -1480,18 +1469,6 @@ color:#ffffff;
           </property>
          </spacer>
         </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="btn_start_2">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Start</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="3" colspan="2">
          <spacer name="horizontalSpacer_18">
           <property name="orientation">
@@ -1501,6 +1478,63 @@ color:#ffffff;
            <size>
             <width>364</width>
             <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="2">
+         <widget class="QPushButton" name="btn_start_2">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QPushButton
+{
+background-color: #925a5b;
+color:#ffffff;
+}</string>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+S</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <spacer name="horizontalSpacer_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="2">
+         <spacer name="verticalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>

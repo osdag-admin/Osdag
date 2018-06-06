@@ -904,7 +904,7 @@ def finConn(uiObj):
     if Tdb < shear_load:
         design_status = False
         logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
-        logger.warning(": Minimum block shear capacity required is " % (shear_load))
+        logger.warning(": Minimum block shear capacity required is %2.2f kN" % (shear_load))
         logger.info(": Increase the plate thickness")
         
     ##################################################################################

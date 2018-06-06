@@ -1,3 +1,4 @@
+
 '''
 @author: Swathi M.
 Created on: 28 May 2018
@@ -10,6 +11,7 @@ import os
 from os.path import exists
 import pickle
 
+
 from Connections.connection_calculations import ConnectionCalculations
 
 def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
@@ -20,7 +22,6 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     myfile.write(t('head'))
     myfile.write(t('link type="text/css" rel="stylesheet" '))
 
-# mystyle.css is written here
     myfile.write(t('style'))
     myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
     myfile.write('th,td {padding:3px}')
@@ -55,7 +56,6 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     jobnumber = str(reportsummary['JobNumber'])
     client = str(reportsummary['Client'])
     addtionalcomments = str(reportsummary['AdditionalComments'])
-
 
 # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # BB Splice Cover Plate Bolted Main Data
@@ -291,6 +291,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+
     row = [1, "Beam Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
@@ -309,11 +310,13 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+
     row = [1, "Shear Force (kN)", shear_load]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
 
     row = [1, "Axial Force (kN)", axial_force]
     rstr += t('tr')
@@ -325,6 +328,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
+
 
     # row = [1, "Beam Section", "ISMB 400"]
     row = [1, "Beam Section", beam_section]
@@ -339,11 +343,13 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+
     row = [2, "Hole", dp_bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
 
     # row = [1, "Plate Section ", "PLT 300X10X100 "]
     row = [1, "Flange Splice Plate", FlangePlateDimension]
@@ -351,6 +357,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
 
     # row = [2, "Thickness (mm)", "10"]
     row = [2, "Thickness (mm)", flange_plate_t]
@@ -364,6 +371,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
 
     row = [2, "Width (mm)", FlangePlateWidth]
     rstr += t('tr')
@@ -407,6 +415,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
 
     row = [1, "Bolts ", " "]
     rstr += t('tr')

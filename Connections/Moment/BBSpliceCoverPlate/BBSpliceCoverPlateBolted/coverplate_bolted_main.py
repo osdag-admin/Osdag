@@ -177,7 +177,7 @@ class DesignPreferences(QDialog):
 		"""
 
 		Args:
-			boltGrade: HSFG or Bearing Bolt
+			boltGrade: Friction Grip Bolt or Bearing Bolt
 
 		Returns: ultimate strength of bolt depending upon grade of bolt chosen
 
@@ -324,7 +324,7 @@ class MainController(QMainWindow):
 		# self.ui.combo_connLoc.setCurrentIndex(0)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
-		self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
+		self.gradeType = {'Please select type': '', 'Friction Grip Bolt': [8.8, 10.9],
 						  'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
 		self.ui.combo_type.addItems(self.gradeType.keys())
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)

@@ -293,7 +293,7 @@ def finConn(uiObj):
 #     PBeam_R1 = 17
 #     shear_load = 140
 #     bolt_dia = 20
-#     bolt_type  = 'HSFG'
+#     bolt_type  = 'Friction Grip Bolt'
 #     bolt_grade = 8.8
 #     web_plate_t = 10
 #     web_plate_w = 100
@@ -428,11 +428,11 @@ def finConn(uiObj):
             bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, kb, beam_fu)
             bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
 
-        elif bolt_type == 'HSFG':
+        elif bolt_type == 'Friction Grip Bolt':
             muf = mu_f
             bolt_hole_type = dp_bolt_hole_type # 1 for standard, 0 for oversize hole
             n_e = 1 # number of effective surfaces offering fricitonal resistance
-            bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,muf,n_e,bolt_hole_type)
+            bolt_shear_capacity = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia,bolt_fu,muf,n_e,bolt_hole_type)
             bolt_bearing_capacity = 'N/A'
             bolt_capacity = bolt_shear_capacity
 

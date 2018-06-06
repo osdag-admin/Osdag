@@ -742,15 +742,15 @@ class Maincontroller(QMainWindow):
 				self.ui.combo_flangeSize.setCurrentIndex(self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
 				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
 
-				self.designPrefDialog.ui.combo_boltType.setCurrentIndex(self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))
-				self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
-				self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
-				self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
-				self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj["weld"]["typeof_weld"]))
-				self.designPrefDialog.ui.txt_weldFu.setText(str(uiObj["weld"]["fu_overwrite"]))
-				self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
-				self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
-				self.designPrefDialog.ui.combo_design_method.setCurrentIndex(self.designPrefDialog.ui.combo_design_method.findText(uiObj["design"]["design_method"]))
+				# self.designPrefDialog.ui.combo_boltType.setCurrentIndex(self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))
+				# self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+				# self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+				# self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+				# self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj["weld"]["typeof_weld"]))
+				# self.designPrefDialog.ui.txt_weldFu.setText(str(uiObj["weld"]["fu_overwrite"]))
+				# self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+				# self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
+				# self.designPrefDialog.ui.combo_design_method.setCurrentIndex(self.designPrefDialog.ui.combo_design_method.findText(uiObj["design"]["design_method"]))
 		else:
 			pass
 
@@ -1086,6 +1086,57 @@ class Maincontroller(QMainWindow):
 		beamdata_sec = self.ui.combo_beamSec.currentText()
 		dictbeamdata = get_beamdata(beamdata_sec)
 		return dictbeamdata
+
+	def populate_weld_thk_flange(self):
+		"""
+
+		Returns: The list of weld thickness in Gui
+
+		"""
+		if str(self.ui.combo_beamSec.currentText()) == "Select section":
+			self.ui.combo_plateThick.setCurrentIndex(0)
+			self.ui.combo_flangeSize.setCurrentIndex(0)
+			return
+
+		else:
+			newlist = []
+			newlist.append("Select thickness")
+			weldlist = [3, 4, 5, 6, 8, 10, 12, 16, 18, 20]
+			dictbeamdata = self.fetchBeamPara()
+			beam_tw = float(dictbeamdata["tw"])
+			plate_thickness = str(self.ui.combo_plateThick.currentText())
+
+			if plate_thickness != "Select plate thickness":
+				plate_thick = float(plate_thickness)
+
+				if str(self.ui.combo_connLoc.currentText()) == "Extended both ways":
+					if str(self.ui.combo_beamSec.currentText()) == "Select section":
+						self.ui.combo_flangeSize.clear()
+						return
+					else:
+						beam_tf = float(dictbeamdata["T"])
+						beam_tw = float(dictbeamdata["tw"])
+						# column_tf = float(dictbeamdata["T"])
+						thicker_part = max(beam_tf, beam_tw, plate_thick)
+
+				if thicker_part in range(0, 11):
+					weld_index = weldlist.index(3)
+					newlist.extend(weldlist[weld_index:])
+				elif thicker_part in range(11, 21):
+					weld_index = weldlist.index(5)
+					newlist.extend(weldlist[weld_index:])
+				elif thicker_part in range(21, 33):
+					weld_index = weldlist.index(6)
+					newlist.extend(weldlist[weld_index:])
+				else:
+					weld_index = weldlist.index(8)
+					newlist.extend(weldlist[weld_index:])
+
+				self.ui.combo_flangeSize.clear()
+				for element in newlist[:]:
+					self.ui.combo_flangeSize.addItem(str(element))
+			else:
+				pass
 
 	def combotype_current_index_changed(self, index):
 		"""

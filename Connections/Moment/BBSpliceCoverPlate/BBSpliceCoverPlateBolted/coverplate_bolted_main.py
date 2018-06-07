@@ -120,6 +120,7 @@ class DesignPreferences(QDialog):
 		designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
 		designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
 		designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+		self.ui.combo_slipfactor.setCurrentIndex(4)
 		designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
 		self.ui.combo_weldType.setCurrentIndex(0)
@@ -131,6 +132,7 @@ class DesignPreferences(QDialog):
 		designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
 		self.ui.combo_detailingEdgeType.setCurrentIndex(0)
+		self.ui.txt_detailingGap.setText(str(5))
 		designPref["detailing"] = {}
 		typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
 		designPref["detailing"]["typeof_edge"] = typeOfEdge
@@ -175,7 +177,7 @@ class DesignPreferences(QDialog):
 		"""
 
 		Args:
-			boltGrade: HSFG or Bearing Bolt
+			boltGrade: Friction Grip Bolt or Bearing Bolt
 
 		Returns: ultimate strength of bolt depending upon grade of bolt chosen
 
@@ -318,10 +320,11 @@ class MainController(QMainWindow):
 		self.folder = folder
 
 		self.get_beamdata()
+		self.designPrefDialog = DesignPreferences(self)
 		# self.ui.combo_connLoc.setCurrentIndex(0)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
-		self.gradeType = {'Please select type': '', 'HSFG': [8.8, 10.9],
+		self.gradeType = {'Please select type': '', 'Friction Grip Bolt': [8.8, 10.9],
 						  'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
 		self.ui.combo_type.addItems(self.gradeType.keys())
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
@@ -393,7 +396,6 @@ class MainController(QMainWindow):
 		self.uiObj = None
 		self.resultObj = None
 		self.disable_buttons()
-		self.designPrefDialog = DesignPreferences(self)
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -725,6 +727,18 @@ class MainController(QMainWindow):
 		self.ui.btn_flangePlate.setDisabled(True)
 		self.ui.btn_webPlate.setDisabled(True)
 
+		self.display.EraseAll()
+		self.designPrefDialog.save_default_para()
+
+	def design_prefer(self):
+		self.designPrefDialog.show()
+
+	def bolt_hole_clearance(self):
+		self.designPrefDialog.get_clearance()
+
+	def call_bolt_fu(self):
+		self.designPrefDialog.set_boltFu()
+
 	def closeEvent(self, event):
 		"""
 
@@ -814,17 +828,15 @@ class MainController(QMainWindow):
 				self.ui.txt_webplateHeight.setText(str(uiObj["WebPlate"]["Height (mm)"]))
 				self.ui.txt_webplateWidth.setText(str(uiObj["WebPlate"]["Width (mm)"]))
 
+				self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+				self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+				self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+				self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+				self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
+				self.designPrefDialog.ui.combo_design_method.setCurrentIndex(self.designPrefDialog.ui.combo_design_method.findText(uiObj["design"]["design_method"]))
+
 		else:
 			pass
-
-	def design_prefer(self):
-		self.designPrefDialog.show()
-
-	def bolt_hole_clearance(self):
-		self.designPrefDialog.get_clearance()
-
-	def call_bolt_fu(self):
-		self.designPrefDialog.set_boltFu()
 
 	def designParameters(self):
 		"""
@@ -908,8 +920,8 @@ class MainController(QMainWindow):
 		if self.ui.txt_Fy.text() == "":
 			incomplete_list.append("Yield strength")
 
-		if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
-			incomplete_list.append("Axial force")
+		#if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
+		#	incomplete_list.append("Axial force")
 
 		if self.ui.txt_Moment.text() == '' or float(self.ui.txt_Moment.text()) == 0:
 			incomplete_list.append("Moment")

@@ -287,11 +287,7 @@ g = (b-tw)/4      ||      ^
     +----------------------------+
     +----------------------------+
           +-+            +-+
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 94722ee56e923275db9ec8440b1654483cadcf96
 '''
 # Note: As per discussion with Prof. on 28/02/2018,
 # Gauge distance shall be emperically calculated as g = (b - tw)/4
@@ -556,11 +552,11 @@ def coverplateboltedconnection(uiObj):
                                                                             kb, web_plate_fu), 2)
             web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
 
-        elif bolt_type == "HSFG":
+        elif bolt_type == "Friction Grip Bolt":
             muf = mu_f
             bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
             n_e = 2  # number of effective surfaces offering frictional resistance
-            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type), 2)
+            web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e, bolt_hole_type), 2)
             web_bolt_bearing_capacity = 'N/A'
             web_bolt_capacity = web_bolt_shear_capacity
 
@@ -577,11 +573,11 @@ def coverplateboltedconnection(uiObj):
                                                                                 kb, int(flange_plate_fu)), 2)
                 flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
 
-            elif bolt_type == "HSFG":
+            elif bolt_type == "Friction Grip Bolt":
                 muf = mu_f
                 bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
                 n_e = 1  # number of effective surfaces offering frictional resistance
-                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_hsfg(bolt_diameter, bolt_fu, muf, n_e,
+                flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e,
                                                                                  bolt_hole_type), 2)
                 flange_bolt_bearing_capacity = 'N/A'
                 flange_bolt_capacity = flange_bolt_shear_capacity
@@ -781,6 +777,7 @@ def coverplateboltedconnection(uiObj):
 
         if web_plate_l == 0 and flange_plate_l == 0 and flange_plate_w == 0:
             boltParam = {}
+            # outputObj['Bolt']['status'] = design_status
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
             boltParam["BearingCapacity"] = web_bolt_bearing_capacity
             boltParam["CapacityBolt"] = web_bolt_capacity
@@ -816,6 +813,7 @@ def coverplateboltedconnection(uiObj):
             return boltParam
         else:
             boltParam = {}
+			# outputObj['Bolt']['status'] = design_status
             boltParam["ShearCapacity"] = web_bolt_shear_capacity
             boltParam["BearingCapacity"] = web_bolt_bearing_capacity
             boltParam["CapacityBolt"] = web_bolt_capacity
@@ -1056,6 +1054,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
+        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1072,6 +1071,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
+        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1095,6 +1095,9 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
         outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
         outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
+        outputObj['FlangeBolt']['beamdepth'] = beam_d
+        outputObj['FlangeBolt']['beamrootradius'] = beam_r1
+        outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
 
     else:
         outputObj = {}
@@ -1102,6 +1105,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
+        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1118,6 +1122,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
+        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1141,6 +1146,9 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["Yielding"] = Tdg_flange_plate
         outputObj["FlangeBolt"]["Rupture"] = Tdn_flange_plate
         outputObj["FlangeBolt"]["FlangeBlockShear"] = Tdb_flange
+        outputObj['FlangeBolt']['beamdepth'] = beam_d
+        outputObj['FlangeBolt']['beamrootradius'] = beam_r1
+        outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
 
     if design_status == True:
 

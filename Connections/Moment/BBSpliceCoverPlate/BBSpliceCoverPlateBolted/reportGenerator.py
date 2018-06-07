@@ -14,8 +14,8 @@ import pickle
 
 from Connections.connection_calculations import ConnectionCalculations
 
-def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
-    fileName = (filename)
+def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename):
+    fileName = str(filename)
     myfile = open(fileName, "w")
     myfile.write(t('! DOCTYPE html'))
     myfile.write(t('html'))
@@ -83,6 +83,8 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     gap = float(uiObj["detailing"]["gap"]) # gap between two beams
     mu_f = float(uiObj["bolt"]["slip_factor"])
     dp_bolt_hole_type = str(uiObj["bolt"]["bolt_hole_type"])
+    bolt_hole_clrnce = str(float(uiObj["bolt"]["bolt_hole_clrnce"]))
+    slip_factor = str(float(uiObj["bolt"]["slip_factor"]))
     dia_hole = int(uiObj["bolt"]["bolt_hole_clrnce"]) + bolt_diameter
     type_edge = str(uiObj["detailing"]["typeof_edge"])
 
@@ -133,6 +135,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     beamflangethk = str(int(round(outputObj['FlangeBolt']['beamflangethk'], 1)))
     beamrootradius = str(int(round(outputObj['FlangeBolt']['beamrootradius'], 1)))
     ShearCapacity = str(int(round(outputObj["WebBolt"]["ShearCapacity"], 1)))
+    BearingCapacity = str(int(round(outputObj["WebBolt"]["BearingCapacity"], 1)))
     CapacityBolt = str(int(round(outputObj["WebBolt"]["CapacityBolt"], 1)))
     BoltsRequired = str(int(round(outputObj["WebBolt"]["BoltsRequired"], 1)))
     TotalBoltsRequired = str(int(round(outputObj["WebBolt"]["TotalBoltsRequired"], 1)))
@@ -156,6 +159,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     EdgeF = str(int(round(outputObj["FlangeBolt"]["EdgeF"], 1)))
     FlangePlateHeight = str(int(round(outputObj["FlangeBolt"]["FlangePlateHeight"], 1)))
     FlangePlateWidth = str(int(round(outputObj["FlangeBolt"]["FlangePlateWidth"], 1)))
+    ThicknessFlangePlate = str(int(round(outputObj["FlangeBolt"]["ThicknessFlangePlate"], 1)))
     FlangeGauge = str(int(round(outputObj["FlangeBolt"]["FlangeGauge"], 1)))
     FlangePlateDemand = str(int(round(outputObj["FlangeBolt"]["FlangePlateDemand"], 1)))
     FlangeCapacity = str(int(round(outputObj["FlangeBolt"]["FlangeCapacity"], 1)))
@@ -168,10 +172,14 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     Rupture = str(int(round(outputObj["FlangeBolt"]["Rupture"], 1)))
     FlangeBlockShear = str(int(round(outputObj["FlangeBolt"]["FlangeBlockShear"], 1)))
 
-    status = str(outputObj['FlangeBolt']['status'])
-    status = str(outputObj['WebBolt']['status'])
+    status = str(outputObj['Bolt']['status'])
     FlangePlateDimension = FlangePlateHeight + 'X' + FlangePlateWidth + 'X' + flange_plate_t
     WebPlateDimension = WebPlateHeight + 'X' + WebPlateWidth + 'X' + web_plate_t
+
+    corrosive = str(uiObj["detailing"]["is_env_corrosive"])
+    design_method = str(uiObj["design"]["design_method"])
+    kb = str(outputObj['FlangeBolt']['k_b'])
+    min_edgend_dist = str(float(uiObj["detailing"]["min_edgend_dist"]))
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 # Header of the pdf fetched from dialogbox
@@ -443,50 +451,83 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+    # writing for Flange Splice plate
+    row = [2, "Flange Splice Plate ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
     # row = [2, "Bolt Numbers", "3"]
-    row = [2, "Bolt Numbers", noOfBolts]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    # row = [2, "Columns (Vertical Lines)", "1 "]
-    row = [2, "Columns (Vertical Lines)", noOfCol]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    # row = [2, "Bolts Per Column", "3"]
-    row = [2, "Bolts Per Column", noOfRows]
+    row = [3, "Bolt Numbers", TotalBoltsRequiredF]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
     # row = [2, "Gauge (mm)", "0"]
-    row = [2, "Gauge (mm)", gauge]
+    row = [3, "Gauge (mm)", FlangeGauge]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
     # row = [2, "Pitch (mm)", "100"]
-    row = [2, "Pitch (mm)", pitch]
+    row = [3, "Pitch (mm)", PitchF]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
     # row = [2, "End Distance (mm)", "50"]
-    row = [2, "End Distance (mm)", end]
+    row = [3, "End Distance (mm)", EndF]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
     # row = [2, "Edge Distance (mm)", "50"]
-    row = [2, "Edge Distance (mm)", edge]
+    row = [3, "Edge Distance (mm)", EdgeF]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # writing for Web Splice plate
+    row = [2, "Web Splice Plate ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    # row = [2, "Bolt Numbers", "3"]
+    row = [3, "Bolt Numbers", TotalBoltsRequired]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # row = [2, "Gauge (mm)", "0"]
+    row = [3, "Gauge (mm)", WebGauge]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # row = [2, "Pitch (mm)", "100"]
+    row = [3, "Pitch (mm)", Pitch]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # row = [2, "End Distance (mm)", "50"]
+    row = [3, "End Distance (mm)", End]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # row = [2, "Edge Distance (mm)", "50"]
+    row = [3, "Edge Distance (mm)", Edge]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -498,7 +539,7 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('/tr')
 
     # row = [1, "Column-Beam Clearance (mm)", "20"]
-    row = [1, "Column-Beam Clearance (mm)", gap]
+    row = [1, "Beam-Beam Clearance (mm)", gap]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -507,6 +548,662 @@ def save_html(outputObj, uiObj, dictbeamdata, reportsummary, filename, folder):
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+
+    # Design Preferences
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    row = [0, "Design Preferences", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    # --------------------------------      BOLT      -----------------------------------------------------------------------------------------------
+    row = [0, "Bolt ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Hole Type", dp_bolt_hole_type]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Hole Clearance (mm)", bolt_hole_clrnce]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Material Grade (MPa) (overwrite)", bolt_grade]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    if bolt_type == "Friction Grip Bolt":
+        row = [1, "Slip factor", ]
+    else:
+        row = [1, "Slip factor", "N/A"]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # --------------------------------      DETAILING      -----------------------------------------------------------------------------------------------
+    row = [0, "Detailing ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Type of Edges", type_edge[4:]]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Minimum Edge-End Distance", EndF + " times the hole diameter"]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Gap between Beams (mm)", gap]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Are members exposed to corrosive influences?", corrosive]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    # --------------------------------      DESIGN      -----------------------------------------------------------------------------------------------
+    row = [0, "Design ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Design Method", design_method]
+    rstr += t('tr')
+    rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Check
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    row = [0, "Design Check - Flange Splice Plate", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, "Check", "Required", "Provided", "Remark"]
+    rstr += t('td class="header1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    const = str(round(math.pi / 4 * 0.78, 4))
+    # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
+    n_e = str(1)
+    if BearingCapacityF == "N/A":
+        row = [0, "Bolt shear capacity (kN)", " ",
+               "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
+               ")/(1.25)) = " + ShearCapacityF + "<br> [cl. 10.4.3]", ""]
+    else:
+        row = [0, "Bolt shear capacity (kN)", " ",
+               "<i>V</i><sub>dsb</sub> = (" + beam_fu + "*" + const + "*" + bolt_diameter + "*" + bolt_diameter +
+               ")/(&#8730;3*1.25*1000) = " + ShearCapacityF + "<br> [cl. 10.3.3]", ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
+    if BearingCapacityF == "N/A":
+        row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
+    else:
+        row = [0, "Bolt bearing capacity (kN)", "",
+               " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" + beam_fu + ")/(1.25*1000)  = " +
+               BearingCapacityF + "<br> [cl. 10.3.4]", ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
+    if BearingCapacityF == "N/A":
+        boltCapacity = str(float(ShearCapacityF))
+        row = [0, "Bolt capacity (kN)", "", boltCapacity, "<p align=left style=color:green><b>Pass</b></p>"]
+    else:
+        # boltCapacity = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
+        boltCapacity = str(min(float(ShearCapacityF), float(BearingCapacityF)))
+        row = [0, "Bolt capacity (kN)", "", "Min (" + ShearCapacityF + ", " + BearingCapacityF + ") = " + boltCapacity,
+               ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
+    bolts = str(round(float(shear_load) / float(boltCapacity), 1))
+    if float(bolts) > int(BoltsRequiredF):
+        row = [0, "No. of bolts per flange", shear_load + "/" + boltCapacity + " = " + bolts, BoltsRequiredF,
+               " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "No. of bolts per flange", shear_load + "/" + boltCapacity + " = " + bolts, BoltsRequiredF,
+               " <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    if float(bolts) > int(BoltsRequiredF):
+        row = [0, "Total number of bolts", "4" + "*" + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
+               " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Total number of bolts", "4" + "*" + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
+               " <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"No.of column(s)","&#8804;2","1"]
+    row = [0, "No.of column(s)", " &#8804; 2", "2", ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # # row =[0,"No. of bolts per column"," ","3"]
+    # row = [0, "No. of bolts per column", " ", noOfRows, ""]
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
+    #
+    # rstr += t('tr')
+    # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
+    minPitch = str(int(2.5 * float(bolt_diameter)))
+    maxPitch = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
+    if int(PitchF) < int(minPitch) or int(PitchF) > int(maxPitch):
+        row = [0, "Bolt pitch (mm)",
+               " &#8805; 2.5* " + bolt_diameter + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t+ ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
+               PitchF, "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Bolt pitch (mm)",
+               " &#8805; 2.5* " + bolt_diameter + " = " + minPitch + ",  &#8804; Min(32*" + beam_w_t + ", 300) = " + maxPitch + "<br> [cl. 10.2.2]",
+               PitchF, "  <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
+    minGauge = str(int(2.5 * float(bolt_diameter)))
+    maxGauge = str(300) if 32 * float(beam_w_t) > 300 else str(int(math.ceil(32 * float(beam_w_t))))
+    if int(FlangeGauge) < int(minGauge) or int(FlangeGauge) > int(maxGauge):
+        row = [0, "Bolt gauge (mm)",
+               " &#8805; 2.5*" + bolt_diameter + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
+               FlangeGauge, ""]
+    else:
+        row = [0, "Bolt gauge (mm)",
+               " &#8805; 2.5*" + bolt_diameter + " = " + minGauge + ", &#8804; Min(32*" + beam_w_t + ", 300) = " + maxGauge + " <br> [cl. 10.2.2]",
+               FlangeGauge, ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
+    maxEnd = str(float(12 * float(beam_w_t)))
+    if int(EndF) < int(minEnd) or int(EndF) > float(maxEnd):
+        row = [0, "End distance (mm)",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
+               EndF,
+               "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "End distance (mm)",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEnd + ", &#8804; 12*" + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
+               EndF, "  <p align=left style=color:green><b>Pass</b></p>"]
+
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+    rstr += t('tr')
+
+    minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
+    maxEdge = str(float(12 * float(beam_w_t)))
+    if int(EdgeF) < int(minEdge) or int(EdgeF) > float(maxEdge):
+        row = [0, "Edge distance (mm)",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               EdgeF, "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Edge distance (mm)",
+               " &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + minEdge + ", &#8804; 12*" + beam_w_t + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               EdgeF, "  <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    if int(FlangeBlockShear) < int(shear_load):
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br>",
+               "  <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br>",
+               "  <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
+    minPlateThick = ThicknessFlangePlate
+    if float(minPlateThick) > int(flange_plate_t):
+        row = [0, "Plate thickness (mm)",
+               ThicknessFlangePlate + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Plate thickness (mm)", ThicknessFlangePlate +
+               "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    # Height of flange splice plate
+    minPlateHeight = flange_plate_l
+    if float(minPlateHeight) > int(flange_plate_l):
+        row = [0, "Plate height (mm)", " &#8805; " + "2*min(" + beam_b + ", 225)" + "+" + gap +
+               "<br> [SCI - 6th edition, page 754]", flange_plate_l, "<p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Plate height (mm)", " &#8805; " + "2*min(" + beam_b + ", 225)" + "+" + gap +
+               "<br> [SCI - 6th edition, page 754]", flange_plate_l, "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    # Width of flange splice plate
+    minPlateWidth = flange_plate_w
+    if float(minPlateWidth) > int(flange_plate_w):
+        row = [0, "Plate width (mm)", beam_b, flange_plate_l, "<p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Plate width (mm)", beam_b, flange_plate_l, "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Digram
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+
+    # row = [0, "Views", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    # png = folder + "/images_html/3D_Model.png"
+    # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+    #
+    # side = folder + "/images_html/finSide.png"
+    # dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+    #
+    # top = folder + "/images_html/finTop.png"
+    # datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+    #
+    # front = folder + "/images_html/finFront.png"
+    # datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+    #
+    # if status == 'True':
+    #     row = [0, datapng, datatop]
+    #     rstr += t('tr')
+    #     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+    #     rstr += t('/tr')
+    #
+    #     row = [0, dataside, datafront]
+    #     rstr += t('tr')
+    #     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+    #     rstr += t('/tr')
+    #
+    # else:
+    #     pass
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    #     rstr += t('p> &nbsp</p')
+    #     rstr += t('hr')
+    #     rstr += t('/hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Additional comments
+
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    rstr += t('''col width=30%''')
+    rstr += t('''col width=70%''')
+
+    rstr += t('tr')
+    row = [0, "Additional Comments", addtionalcomments]
+    rstr += t('td class= "detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class= "detail2" align="justified"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+
+    myfile.write(rstr)
+    myfile.write(t('/body'))
+    myfile.write(t('/html'))
+    myfile.close()
+
 
 
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&

@@ -318,7 +318,10 @@ def finConn(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_R1 = float(dictbeamdata["R1"])
     PBeam_T = float(dictcolumndata["T"])
+    PBeam_w_t = float(dictcolumndata["tw"])
     PBeam_R1 = float(dictcolumndata["R1"])
+    column_w_t = float(dictcolumndata["tw"])
+    column_f_t = float(dictcolumndata["T"])
 
     if connectivity == "Beam-Beam":
         notch_ht = max([PBeam_T, beam_f_t]) + max([PBeam_R1, beam_R1]) + max([(PBeam_T / 2), (beam_f_t / 2), 10])
@@ -983,8 +986,30 @@ def finConn(uiObj):
 #         logger.sug(": Increase the weld thickness or length of weld/finplate")
         logger.info(": Increase the weld thickness or length of weld/fin plate")
 
-    
+    ############## Check for maximum weld thickness: cl: 10.5.3.1 ; IS 800 ###########
+
+    """ Here t_thinner_beam_plate indicates thickness of thinner part of members
+        connected by the fillet weld.
+    """
+    if connectivity == "Column flange-Beam web":
+        t_thinner_col_plate = min(column_f_t.real, web_plate_t.real)
+
+    if connectivity == "Column web-Beam web":
+        t_thinner_col_plate = min(column_w_t.real, web_plate_t.real)
+
+    if connectivity == "Beam-Beam":
+        t_thinner_col_plate = min(PBeam_w_t.real, web_plate_t.real)
+
+    max_weld_t = t_thinner_col_plate
+
+    if weld_t > max_weld_t:
+        design_status = False
+        logger.error(": Weld thickness is more than maximum allowed weld thickness [cl. 10.5.3.1]")
+        logger.warning(": Maximum weld thickness allowed is %2.2f mm " % (max_weld_t))
+        logger.info(": Decrease the weld thickness")
+
     # End of calculation
+
     # Output for user given fin plate height
     if web_plate_l != 0 and web_plate_w != 0:
         outputObj = {}

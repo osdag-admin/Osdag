@@ -783,7 +783,23 @@ def end_connection(ui_obj):
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
         logger.info(": Increase the weld thickness or the length of weld/end plate")
 
+    ############## Check for maximum weld thickness: cl: 10.5.3.1 ; IS 800 ###########
+
+    """ Here t_thinner_beam_plate indicates thickness of thinner part of members
+        connected by the fillet weld. ie., Beam web and End plate
+    """
+    t_thinner_beam_plate = min(beam_w_t.real, end_plate_t.real)
+
+    max_weld_t = t_thinner_beam_plate
+
+    if weld_t > max_weld_t:
+        design_check = False
+        logger.error(": Weld thickness is more than maximum allowed weld thickness [cl. 10.5.3.1]")
+        logger.warning(": Maximum weld thickness allowed is %2.2f mm " % (max_weld_t))
+        logger.info(": Decrease the weld thickness")
+
     # End of calculation
+    
     output_obj = {}
     output_obj['Bolt'] = {}
     output_obj['Bolt']['status'] = design_check

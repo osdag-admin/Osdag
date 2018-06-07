@@ -114,17 +114,17 @@ def fin_min_thk(shear_load, beam_fy, web_plate_l):
 # [Source: INSDAG detailing manual, page: 5-7]
 
 
-def fin_max_thk(bolt_dia):
+def fin_max_thk(beam_depth):
     '''
 
     Args:
-        bolt_dia (int) diameter of bolt
+        beam_depth (float) : Depth of supporting beam
 
     Returns:
-        Maximum thickness of fin plate depending on diameter of bolt
+        Maximum thickness of fin plate depending on  of depth of beam
 
     '''
-    max_plate_thk = 0.5 * bolt_dia
+    max_plate_thk = 0.5 * beam_depth
     return max_plate_thk
 
 # Function for block shear capacity calculation
@@ -293,7 +293,7 @@ def finConn(uiObj):
 #     PBeam_R1 = 17
 #     shear_load = 140
 #     bolt_dia = 20
-#     bolt_type  = 'HSFG'
+#     bolt_type  = 'Friction Grip Bolt'
 #     bolt_grade = 8.8
 #     web_plate_t = 10
 #     web_plate_w = 100
@@ -428,17 +428,18 @@ def finConn(uiObj):
             bolt_bearing_capacity = bolt_bearing(bolt_dia, t_thinner, kb, beam_fu)
             bolt_capacity = min(bolt_shear_capacity, bolt_bearing_capacity)
 
-        elif bolt_type == 'HSFG':
+        elif bolt_type == 'Friction Grip Bolt':
             muf = mu_f
             bolt_hole_type = dp_bolt_hole_type # 1 for standard, 0 for oversize hole
             n_e = 1 # number of effective surfaces offering fricitonal resistance
-            bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia,bolt_fu,muf,n_e,bolt_hole_type)
+            bolt_shear_capacity = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia,bolt_fu,muf,n_e,bolt_hole_type)
             bolt_bearing_capacity = 'N/A'
             bolt_capacity = bolt_shear_capacity
 
 
         if shear_load != 0:
-            bolts_required = int(math.ceil(shear_load / bolt_capacity)) + 1
+            bolts_required = int(math.ceil(shear_load / bolt_capacity)) # + 1
+
         else:
             bolts_required = int(shear_load / bolt_capacity)
             
@@ -819,7 +820,7 @@ def finConn(uiObj):
             logger.info("Try to increase the plate thickness")
     
     # Calculation for maximum/minimum plate thickness
-    max_plate_thk = fin_max_thk(bolt_dia);
+    max_plate_thk = fin_max_thk(beam_d);
     max_plate_thk = round(max_plate_thk, 3);
     if web_plate_l != 0:
         min_plate_thk = fin_min_thk(shear_load, beam_fy, web_plate_l);
@@ -850,11 +851,11 @@ def finConn(uiObj):
             design_status = False
             logger.error(": Plate thickness provided is less than the minimum required [Ref. Owens and Cheal, 1989]")
             logger.warning(": Minimum plate thickness required is %2.2f mm " % (min_plate_thk))
-        elif web_plate_t > max_plate_thk:
-            design_status = False
-            logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
-            logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
-            logger.info(": Select a deeper secondary beam section")
+    if web_plate_t > max_plate_thk:
+        design_status = False
+        logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
+        logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
+        logger.info(": Select a deeper secondary beam section")
     
     # Calculation of plate height required (for optional input) 
     web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));
@@ -883,12 +884,14 @@ def finConn(uiObj):
             design_status = False
             logger.error(": Plate height provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_l_req))
+            logger.info(": Increase the plate width")
             
     if web_plate_w != 0:
         if web_plate_w < web_plate_w_req:
             design_status = False
             logger.error(": Plate width provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_w_req))
+            logger.info(": Increase the plate width")
     else:
         pass
                 
@@ -901,7 +904,7 @@ def finConn(uiObj):
     if Tdb < shear_load:
         design_status = False
         logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
-        logger.warning(": Minimum block shear capacity required is " % (shear_load))
+        logger.warning(": Minimum block shear capacity required is %2.2f kN" % (shear_load))
         logger.info(": Increase the plate thickness")
         
     ##################################################################################

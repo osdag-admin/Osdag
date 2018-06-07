@@ -405,11 +405,11 @@ def end_connection(ui_obj):
     max_edge_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
     max_end_dist = int((12 * end_plate_t * cmath.sqrt(250 / beam_fy)).real) - 1
 
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         muf = mu_f
         n_e = 1 # number of effective interfaces offering frictional resistance
         bolt_hole_type = dp_bolt_hole_type # 1 - standard hole, 0.85 - oversize hole
-        bolt_shear_capacity = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
+        bolt_shear_capacity = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia, bolt_fu, muf, n_e, bolt_hole_type)
         bolt_bearing_capacity = 'N/A'
         bolt_capacity = bolt_shear_capacity
 
@@ -527,7 +527,7 @@ def end_connection(ui_obj):
                         pass
 
         min_end_plate_l = 2 * min_end_dist + (no_row - 1) * min_pitch
-        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+        max_end_plate_l = beam_depth - (2 * (beam_f_t + beam_R1 + 5))  # 5mm is the gap
 
         if connectivity == "Column web-Beam web":
             max_end_plate_w = column_d - 2 * (column_f_t + column_R1)
@@ -579,6 +579,19 @@ def end_connection(ui_obj):
                     logger.error(": Calculated width of the end plate exceeds the width of the column")
                     logger.warning(": Minimum end plate width is %2.2f" % (min_end_plate_w))
 
+        # TODO: Check added by Danish Ansari --> Check the functioning (@ Ajmal Babu)
+        if end_plate_l < (0.6 * beam_depth):
+            design_check = False
+            logger.error(": The height of end plate is less than the minimum required height")
+            logger.warning(": The minimum required height of end plate is %2.2f" % min_end_plate_l)
+            logger.info(": Increase the height of end plate or choose a beam section of smaller depth")
+
+        if end_plate_l > max_end_plate_l:
+            design_check = False
+            logger.error(": The height of end plate exceeds the maximum allowed value")
+            logger.warning(": The maximum allowed height of end plate is %2.2f" % max_end_plate_l)
+            logger.info(": Decrease the height of end plate or choose a beam section of greater depth")
+
     else:
 
         no_row = bolts_required / 2
@@ -586,9 +599,11 @@ def end_connection(ui_obj):
 
         end_plate_l = (no_row - 1) * min_pitch + 2 * min_end_dist
         pitch = min_pitch
-        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+        min_end_plate_l = 0.6 * beam_depth
+        max_end_plate_l = beam_depth - (2 * (beam_f_t + beam_R1 + 5))  # 5mm is assumed the gap
         end_dist = min_end_dist
         edge_dist = min_edge_dist
+        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
         test = True
         if end_plate_l > max_end_plate_l:
             test = False
@@ -678,7 +693,21 @@ def end_connection(ui_obj):
             end_plate_l = 0.6 * beam_depth
             end_dist = (end_plate_l - (no_row - 1) * pitch) / 2
 
-# ############################ check end plate width ##########################################
+        # TODO: Check added by Danish Ansari --> Check the functioning (@ Ajmal Babu)
+        if end_plate_l < (0.6 * beam_depth):
+            design_check = False
+            logger.error(": The height of end plate is less than the minimum required height")
+            logger.warning(": The minimum required height of end plate is %2.2f" % min_end_plate_l)
+            logger.info(": Increase the height of end plate or choose a beam section of smaller depth")
+
+        if end_plate_l > max_end_plate_l:
+            design_check = False
+            logger.error(": The height of end plate exceeds the maximum allowed value")
+            logger.warning(": The maximum allowed height of end plate is %2.2f" % max_end_plate_l)
+            logger.info(": Decrease the height of end plate or choose a beam section of larger depth")
+
+
+            # ############################ check end plate width ##########################################
         if connectivity == "Column web-Beam web":
             max_end_plate_w = column_d - 2 * (column_f_t + column_R1)
         elif connectivity == "Column flange-Beam web":
@@ -699,8 +728,8 @@ def end_connection(ui_obj):
                 design_check = False
                 logger.error(": Cross center distance between the vertical bolt lines on either side of the beam is greater than "
                              "specified gauge [reference JSC : chap. 5 check 1]")
-                logger.warning(": Maximum required cross center gauge is 140 mm")
-
+                logger.warning(": Maximum allowed cross center gauge is 140 mm")
+                logger.info(": Decrease the plate width")
         if end_plate_w == 0:
             min_end_plate_w = 100 + 2 * (min_edge_dist + gauge)
             end_plate_w = min_end_plate_w

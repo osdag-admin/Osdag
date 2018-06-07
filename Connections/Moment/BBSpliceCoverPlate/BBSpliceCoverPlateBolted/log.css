@@ -1,0 +1,30 @@
+.INFO  {
+	color: green;
+}
+
+.WARNING {
+	color: orange;
+}
+
+
+.ERROR {
+	color: red;
+}
+
+
+.DEBUG {
+	color: blue;
+}
+
+
+.LOG span {
+	margin-right: 1em;
+}
+
+.LOG {
+	clear:left;
+}
+
+.DATE {
+	/*display:none;*/
+}

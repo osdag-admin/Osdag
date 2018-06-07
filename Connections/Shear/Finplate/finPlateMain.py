@@ -1001,6 +1001,15 @@ class MainController(QMainWindow):
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
 
+            # self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj))
+            # self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj))
+            # self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(uiObj))
+            # self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj))
+            # self.designPrefDialog.ui.txt_weldFu.
+            # self.designPrefDialog.ui.combo_detailingEdgeType
+            # self.designPrefDialog.ui.combo_detailing_memebers
+            # self.designPrefDialog.ui.txt_detailingGap
+
         else:
             pass
 

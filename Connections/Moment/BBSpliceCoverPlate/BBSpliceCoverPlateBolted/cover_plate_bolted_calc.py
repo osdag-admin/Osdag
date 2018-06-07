@@ -346,13 +346,13 @@ def coverplateboltedconnection(uiObj):
     if flange_plate_w == '':
         flange_plate_w = 0
     else:
-        flange_plate_w = int(flange_plate_w)
+        flange_plate_w = round(int(flange_plate_w), 2)
 
     flange_plate_l = str(uiObj["FlangePlate"]["Height (mm)"])
     if flange_plate_l == '':
         flange_plate_l = 0
     else:
-        flange_plate_l = int(flange_plate_l)
+        flange_plate_l = int(round(flange_plate_l), 2)
 
     # flange_plate_fu = float(uiObj["Member"]["fu (Mpa)"])
     # flange_plate_fy = float(uiObj["Member"]["fy (MPa)"])
@@ -370,7 +370,7 @@ def coverplateboltedconnection(uiObj):
     if web_plate_l == '':
         web_plate_l = 0
     else:
-        web_plate_l = int(web_plate_l)
+        web_plate_l = round(int(web_plate_l), 2)
 
     web_plate_fu = int(beam_fu)
     web_plate_fy = int(beam_fy)
@@ -494,14 +494,14 @@ def coverplateboltedconnection(uiObj):
     if flange_plate_w != 0:
         if flange_plate_w < (beam_b - 2 * 12.7): # AISC Essential detailing requirements for a splice --> B - Half inch on both sides
             # Note: half inch (0.5 inch) = 12.7 mm
-            flangeplatewidth = beam_b - (2 * 12.7)
+            flangeplatewidth = round(beam_b - (2 * 12.7) , 2)
             design_status = False
             logger.error(": Width of flange splice plate is not sufficient")
             logger.warning(": Minimum width of flange splice plate is restricted to %2.2f mm" % (flangeplatewidth))
             logger.info(": Increase the width of flange splice plate")
 
         elif flange_plate_w > beam_b:
-            flangeplatewidth = beam_b
+            flangeplatewidth = round(beam_b, 2)
             design_status = False
             logger.error(": Width of flange splice plate is greater than the maximum width as mentioned in AISC")
             logger.warning(": Maximum width of flange splice plate is restricted to %2.2f mm" % (flangeplatewidth))
@@ -678,8 +678,8 @@ def coverplateboltedconnection(uiObj):
         elif web_plate_l == 0:
             # Consider web splice plate equal to minimum required height of web splice plate & calc pitch
             web_plate_l_opt = web_min_h(beam_d)
-            web_pitch = (web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)
-            web_plate_l = web_plate_l_opt
+            web_pitch =  int(round((((web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)) / 5)) * 5 + 5)
+            web_plate_l = round(int(web_pitch * (web_bolts_required - 1) + (2 * min_end_dist)), 2)
             ## In the above case if "pitch < required min pitch" then recalculate height of web splice plate
             if web_pitch <= min_pitch:
                 web_plate_l_opt = (web_bolts_required - 1) * min_pitch + 2 * min_end_dist
@@ -733,7 +733,7 @@ def coverplateboltedconnection(uiObj):
             Ltp = max(beam_b, 225)
         else:
             pass
-        flange_plate_l_opt = 2 * Ltp + gap
+        flange_plate_l_opt = round((2 * Ltp + gap), 2)
     #### 1. Check if Ltp > width of beam (beam_b) and 225 mm ; Note: refer above ASCII diagram
         ## Reference: Steel Designer's Manual - SCI - 6th edition, page 754
         if flange_plate_l != 0:
@@ -930,8 +930,8 @@ def coverplateboltedconnection(uiObj):
         edge_distance = boltparameters["Edge"]
         min_gauge = boltparameters["WebGauge"]
         max_gauge = boltparameters["WebGaugeMax"]
-        web_plate_w_req = 4 * edge_distance + gap
-        gauge_web = web_plate_w_req - 2 * edge_distance
+        web_plate_w_req =  4 * edge_distance + gap
+        gauge_web = int(web_plate_w_req - 2 * edge_distance)
         if (2 * edge_distance) < min_gauge:
             web_plate_w_req = min_gauge + (2 * edge_distance) + gap
         # elif (2 * edge_distance) < 90:
@@ -1054,7 +1054,6 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
-        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1071,7 +1070,6 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
-        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1083,6 +1081,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
+        outputObj["FlangeBolt"]["ThicknessFlangePlate"] = flangeplatethickness
         outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
@@ -1098,6 +1097,8 @@ def coverplateboltedconnection(uiObj):
         outputObj['FlangeBolt']['beamdepth'] = beam_d
         outputObj['FlangeBolt']['beamrootradius'] = beam_r1
         outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
+        outputObj['FlangeBolt']['beam_fu'] = beam_fu
+        outputObj["FlangeBolt"]["kb"] = new_bolt_param["kb"]
 
     else:
         outputObj = {}
@@ -1105,7 +1106,6 @@ def coverplateboltedconnection(uiObj):
         outputObj["Bolt"]["status"] = design_status
 
         outputObj["WebBolt"] = {}
-        outputObj['WebBolt']['status'] = design_status
         outputObj["WebBolt"]["ShearCapacity"] = new_bolt_param["ShearCapacity"]
         outputObj["WebBolt"]["BearingCapacity"] = new_bolt_param["BearingCapacity"]
         outputObj["WebBolt"]["CapacityBolt"] = new_bolt_param["CapacityBolt"]
@@ -1122,7 +1122,6 @@ def coverplateboltedconnection(uiObj):
         outputObj["WebBolt"]["WebPlateCapacity"] = web_splice_capacity
 
         outputObj["FlangeBolt"] = {}
-        outputObj['FlangeBolt']['status'] = design_status
         outputObj["FlangeBolt"]["ShearCapacityF"] = new_bolt_param["ShearCapacityF"]
         outputObj["FlangeBolt"]["BearingCapacityF"] = new_bolt_param["BearingCapacityF"]
         outputObj["FlangeBolt"]["CapacityBoltF"] = new_bolt_param["CapacityBoltF"]
@@ -1132,6 +1131,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["PitchF"] = new_bolt_param["PitchF"]
         outputObj["FlangeBolt"]["EndF"] = new_bolt_param["EndF"]
         outputObj["FlangeBolt"]["EdgeF"] = new_bolt_param["EdgeF"]
+        outputObj["FlangeBolt"]["ThicknessFlangePlate"] = flangeplatethickness
         outputObj["FlangeBolt"]["FlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["FlangePlateWidth"] = new_bolt_param["FlangePlateWidth"]
         outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
@@ -1149,6 +1149,8 @@ def coverplateboltedconnection(uiObj):
         outputObj['FlangeBolt']['beamdepth'] = beam_d
         outputObj['FlangeBolt']['beamrootradius'] = beam_r1
         outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
+        outputObj["FlangeBolt"]["kb"] = new_bolt_param["kb"]
+
 
     if design_status == True:
 

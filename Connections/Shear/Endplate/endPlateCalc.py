@@ -783,28 +783,18 @@ def end_connection(ui_obj):
     ############## Check for minimum weld thickness: Table 21; IS 800 ###########
     # Here t_thicker indicates thickness of thicker part
 
-    if connectivity == "Column web-Beam web":
-        t_thicker = max(column_w_t.real, end_plate_t.real)
-    elif connectivity == "Column flange-Beam web":
-        t_thicker = max(column_f_t.real, end_plate_t.real)
-    else:
-        t_thicker = max(column_w_t.real, end_plate_t.real)
+    t_thicker = max(beam_w_t.real, end_plate_t.real)
 
-    if float(t_thicker) > 0 or float(t_thicker) <= 10:
+    if float(t_thicker) > 0 and float(t_thicker) <= 10:
         weld_t_min = int(3)
-    elif float(t_thicker) > 10 or float(t_thicker) <= 20:
+    elif float(t_thicker) > 10 and float(t_thicker) <= 20:
         weld_t_min = int(5)
-    elif float(t_thicker) >= 20 or float(t_thicker) <= 32:
+    elif float(t_thicker) >= 20 and float(t_thicker) <= 32:
         weld_t_min = int(6)
     else:
         weld_t_min = int(10)
 
     weld_t_req = weld_t_min
-
-    # if weld_t_req != int(weld_t_req):
-    #     weld_t_req = int(weld_t_req) + 1
-    # else:
-    #     weld_t_req = weld_t_req
 
     if weld_t < weld_t_req:
         design_check = False

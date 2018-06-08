@@ -927,8 +927,6 @@ class MainController(QMainWindow):
         else:
             newlist = ["Select weld thickness"]
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
-            plate_thickness = [6, 8, 10, 12, 14, 16, 18, 20]
-
             dict_beam_data = self.fetch_beam_param()
             beam_w_t = float(dict_beam_data['tw'])
 

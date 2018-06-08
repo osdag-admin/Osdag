@@ -307,11 +307,16 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
         self.ui.chkBxSeatAngle.clicked.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
 
-        validator = QIntValidator()
-        self.ui.txt_fu.setValidator(validator)
-        self.ui.txt_fy.setValidator(validator)
+        # # validator = QIntValidator()
+        # self.ui.txt_fu.setValidator(validator)
+        # self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
+        self.ui.txt_fu.setValidator(dbl_validator)
+        self.ui.txt_fu.setMaxLength(6)
+        self.ui.txt_fy.setValidator(dbl_validator)
+        self.ui.txt_fy.setMaxLength(6)
+
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -933,7 +938,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         """
         textStr = widget.text()
-        val = int(textStr)
+        val = float(textStr)
         if val < min_value or val > max_value:
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
             widget.clear()

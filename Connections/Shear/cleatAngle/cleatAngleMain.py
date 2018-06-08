@@ -391,11 +391,16 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3d_column("gradient_bg"))
         self.ui.checkBoxCleat.clicked.connect(lambda:self.call_3d_cleatangle("gradient_bg"))
 
-        validator = QIntValidator()
-        self.ui.txtFu.setValidator(validator)
-        self.ui.txtFy.setValidator(validator)
+        # validator = QIntValidator()
+        # self.ui.txtFu.setValidator(validator)
+        # self.ui.txtFy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
+        self.ui.txtFu.setValidator(dbl_validator)
+        self.ui.txtFu.setMaxLength(6)
+        self.ui.txtFy.setValidator(dbl_validator)
+        self.ui.txtFy.setMaxLength(6)
+
         self.ui.txtInputCleatHeight.setValidator(dbl_validator)
         self.ui.txtInputCleatHeight.setMaxLength(7)
         self.ui.txtShear.setValidator(dbl_validator)
@@ -1295,7 +1300,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         text_str = widget.text()
-        val = int(text_str)
+        val = float(text_str)
         if(val < min_val or val > max_val):
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_val, max_val))
             widget.clear()

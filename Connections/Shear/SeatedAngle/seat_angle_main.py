@@ -281,6 +281,7 @@ class MainController(QMainWindow):
 
         self.get_columndata()
         self.get_beamdata()
+        self.designPrefDialog = DesignPreferences(self)
         self.ui.combo_angle_section.addItems(get_anglecombolist())
         self.ui.combo_topangle_section.addItems(get_anglecombolist())
 
@@ -384,7 +385,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.designPrefDialog = DesignPreferences(self)
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
@@ -665,6 +665,14 @@ class MainController(QMainWindow):
             self.ui.combo_angle_section.setCurrentIndex(self.ui.combo_angle_section.findText(seat_angle))
             top_angle = str(uiObj['Angle']['TopAngleSection'])
             self.ui.combo_topangle_section.setCurrentIndex(self.ui.combo_topangle_section.findText(top_angle))
+
+            self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+            self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+            self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+            self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+            self.designPrefDialog.ui.txt_detailingGap.setText(str(uiObj["detailing"]["gap"]))
+            self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
+
         else:
             pass
 
@@ -1275,10 +1283,10 @@ class MainController(QMainWindow):
         This routine returns the necessary design parameters.
         """
         self.uiObj = self.getuser_inputs()
-        if self.designPrefDialog.saved is not True:
-            design_pref = self.designPrefDialog.set_default_para()
-        else:
-            design_pref = self.designPrefDialog.saved_designPref  # self.designPrefDialog.save_designPref_para()
+        # if self.designPrefDialog.saved is not True:
+        #     design_pref = self.designPrefDialog.set_default_para()
+        # else:
+        design_pref = self.designPrefDialog.save_designPref_para() # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
 
 
@@ -1457,7 +1465,8 @@ class MainController(QMainWindow):
         :param event:
         :return:
         """
-        uiInput = self.getuser_inputs()
+        # uiInput = self.getuser_inputs()
+        uiInput = self.designParameters()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

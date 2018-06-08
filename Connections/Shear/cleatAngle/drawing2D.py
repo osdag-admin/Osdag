@@ -881,7 +881,7 @@ class Cleat2DCreatorFront(object):
         ptx = self.BH + 100 * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BH + 140 * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
 
@@ -1146,7 +1146,7 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx = self.FG + (self.dataObj.col_B/2 + 40) * np.array([0, 1])   # + 2000 * np.array([0, 1])  # 1150
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
 
@@ -1373,7 +1373,7 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.D + (self.dataObj.beam_B + 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
 
@@ -1732,7 +1732,7 @@ class Cleat2DCreatorTop(object):
         ptx = self.BD + 100 * np.array([1, 0]) + 300 * np.array([0, 1])  # 640
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BD + 100 * np.array([1, 0]) + 340 * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
 
@@ -1943,7 +1943,7 @@ class Cleat2DCreatorTop(object):
         ptx = self.FG + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 740
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FG + (self.dataObj.beam_B * 2 + 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
 
@@ -2151,7 +2151,7 @@ class Cleat2DCreatorTop(object):
         ptx = self.G + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 1090
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
         ptx = self.G + (self.dataObj.beam_B * 2+ 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
 
@@ -2509,7 +2509,7 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side View (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx = self.BG + (self.dataObj.beam_B * 3+ 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CWBW_side(self, filename):
@@ -2744,7 +2744,7 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.G + (self.dataObj.beam_B + 140) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CFBW_side(self, filename):
@@ -2976,5 +2976,5 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.G + (self.dataObj.beam_B + 90) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()

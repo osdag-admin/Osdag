@@ -884,63 +884,60 @@ class MainController(QMainWindow):
         Returns:
 
         """
-        if str(self.ui.combo_Beam.currentText()) == "Select section":
+        if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return
 
         else:
-            newlist = []
-            newlist.append("Select thickness")
+            newlist = ["Select weld thickness"]
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
-            dictbeamdata = self.fetchBeamPara()
-            beam_tw = float(dictbeamdata["tw"])
+            # dictbeamdata = self.fetchBeamPara()
+            # beam_tw = float(dictbeamdata["tw"])
             column_sec = str(self.ui.comboColSec.currentText())
             if column_sec == 'Select section':
                 return
-            dictcoldata = self.fetchColumnPara()
+            dict_column_data = self.fetchColumnPara()
             plate_thickness = str(self.ui.comboPlateThick_2.currentText())
 
-            if plate_thickness != "Select plate thickness":
+            try:
                 plate_thick = float(plate_thickness)
+            except ValueError:
+                return
 
-                if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
-                    if str(self.ui.comboColSec.currentText()) == "Select section":
-                        self.ui.comboWldSize.clear()
-                        return
-                    else:
-                        column_tf = float(dictcoldata["T"])
-                        thickerPart = column_tf > plate_thick and column_tf or plate_thick
+            if str(self.ui.comboConnLoc.currentText()) == "Column flange-Beam web":
+                column_tf = float(dict_column_data["T"])
+                thicker_part = max(column_tf, plate_thick)
 
-                elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
-                    if str(self.ui.comboColSec.currentText()) == "Select section":
-                        self.ui.comboWldSize.clear()
-                        return
-                    else:
-                        column_tw = float(dictcoldata["tw"])
-                        thickerPart = column_tw > plate_thick and column_tw or plate_thick
-                else:
-                    PBeam_tw = float(dictcoldata["tw"])
-                    thickerPart = PBeam_tw > plate_thick and PBeam_tw or plate_thick
+            elif str(self.ui.comboConnLoc.currentText()) == "Column web-Beam web":
+                column_tw = float(dict_column_data["tw"])
+                thicker_part = max(column_tw, plate_thick)
 
-                if thickerPart in range(0, 11):
-                    weld_index = weldlist.index(3)
-                    newlist.extend(weldlist[weld_index:])
-                elif thickerPart in range(11, 21):
-                    weld_index = weldlist.index(5)
-                    newlist.extend(weldlist[weld_index:])
-                elif thickerPart in range(21, 33):
-                    weld_index = weldlist.index(6)
-                    newlist.extend(weldlist[weld_index:])
-                else:
-                    weld_index = weldlist.index(8)
-                    newlist.extend(weldlist[weld_index:])
+            elif str(self.ui.comboConnLoc.currentText()) == "Beam-Beam":
+                PBeam_tw = float(dict_column_data["tw"])
+                thicker_part = max(PBeam_tw, plate_thick)
 
-                self.ui.comboWldSize.clear()
-                for element in newlist[:]:
-                    self.ui.comboWldSize.addItem(str(element))
             else:
-                pass
+                    self.ui.comboWldSize.clear()
+                    return
+
+            if thicker_part <= 10:
+                weld_index = weldlist.index(3)
+                newlist.extend(weldlist[weld_index:])
+            elif thicker_part <= 20 and thicker_part > 10:
+                weld_index = weldlist.index(5)
+                newlist.extend(weldlist[weld_index:])
+            elif thicker_part <= 32 and thicker_part > 20:
+                weld_index = weldlist.index(6)
+                newlist.extend(weldlist[weld_index:])
+            else:
+                weld_index = weldlist.index(10)
+                newlist.extend(weldlist[weld_index:])
+
+            self.ui.comboWldSize.clear()
+            for element in newlist[:]:
+                self.ui.comboWldSize.addItem(str(element))
+
 
     def retrieve_prevstate(self):
         """Maintain previous session's data.

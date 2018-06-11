@@ -767,7 +767,7 @@ class MainController(QMainWindow):
 		Returns: Save the user input to txt format
 
 		"""
-		input_file = QFile(os.path.join("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\saveINPUT.txt"))
+		input_file = QFile(os.path.join("Connections","Moment","BBSpliceCoverPlate","BBSpliceCoverPlateBolted","saveINPUT.txt"))
 		if not input_file.open(QFile.WriteOnly | QFile.Text):
 			QMessageBox.warning(self, "Application",
 								"Cannot write file %s: \n%s"
@@ -780,7 +780,7 @@ class MainController(QMainWindow):
 		Returns: Read for the previous user inputs design
 
 		"""
-		filename = os.path.join("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\saveINPUT.txt")
+		filename = os.path.join("Connections", "Moment", "BBSpliceCoverPlate", "BBSpliceCoverPlateBolted", "saveINPUT.txt")
 		if os.path.isfile(filename):
 			file_object = open(filename, 'r')
 			uiObj = pickle.load(file_object)

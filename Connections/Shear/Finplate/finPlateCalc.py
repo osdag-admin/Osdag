@@ -114,17 +114,17 @@ def fin_min_thk(shear_load, beam_fy, web_plate_l):
 # [Source: INSDAG detailing manual, page: 5-7]
 
 
-def fin_max_thk(beam_depth):
+def fin_max_thk(bolt_dia):
     '''
 
     Args:
-        beam_depth (float) : Depth of supporting beam
+        bolt_dia (int) diameter of bolt
 
     Returns:
-        Maximum thickness of fin plate depending on  of depth of beam
+        Maximum thickness of fin plate depending on diameter of bolt
 
     '''
-    max_plate_thk = 0.5 * beam_depth
+    max_plate_thk = 0.5 * bolt_dia
     return max_plate_thk
 
 # Function for block shear capacity calculation
@@ -823,7 +823,7 @@ def finConn(uiObj):
             logger.info("Try to increase the plate thickness")
     
     # Calculation for maximum/minimum plate thickness
-    max_plate_thk = fin_max_thk(beam_d);
+    max_plate_thk = fin_max_thk(bolt_dia);
     max_plate_thk = round(max_plate_thk, 3);
     if web_plate_l != 0:
         min_plate_thk = fin_min_thk(shear_load, beam_fy, web_plate_l);
@@ -857,8 +857,10 @@ def finConn(uiObj):
     if web_plate_t > max_plate_thk:
         design_status = False
         logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
-        logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
-        logger.info(": Select a deeper secondary beam section")
+        logger.warning(": Maximum plate thickness allowed is half the diameter of bolt")
+        logger.info(": Increase the bolt diameter or decrease the plate thickness")
+        # logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
+        # logger.info(": Select a deeper secondary beam section")
     
     # Calculation of plate height required (for optional input) 
     web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));

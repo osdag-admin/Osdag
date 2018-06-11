@@ -444,7 +444,15 @@ def coverplateboltedconnection(uiObj):
     else:
         pass
 
+
     if flange_plate_t < (beam_f_t / 2):
+        flange_plate_t = thkflangeplate
+        design_status = False
+        logger.error(": Chosen flange splice plate thickness is not sufficient")
+        logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm" % (thkflangeplate))
+        logger.info(": Increase thickness of flange splice plate")
+
+    elif flange_plate_t < thkflangeplate:
         flange_plate_t = thkflangeplate
         design_status = False
         logger.error(": Chosen flange splice plate thickness is not sufficient")
@@ -804,6 +812,8 @@ def coverplateboltedconnection(uiObj):
             boltParam["FlangePlateWidth"] = flange_plate_w
             boltParam["FlangeGauge"] = flange_g
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
+            boltParam['MaxPitchF'] = max_pitch_flange
+            boltParam["FlangeTThinner"] = flange_t_thinner
 
             # bolt parameters required for calculation
             boltParam["bolt_fu"] = bolt_fu
@@ -840,6 +850,8 @@ def coverplateboltedconnection(uiObj):
             boltParam["FlangePlateWidth"] = flange_plate_w
             boltParam["FlangeGauge"] = flange_g
             boltParam["FlangePlateDemand"] = flange_force(beam_d, beam_f_t, axial_force, moment_load)
+            boltParam['MaxPitchF'] = max_pitch_flange
+            boltParam["FlangeTThinner"] = flange_t_thinner
 
             # bolt parameters required for calculation
             boltParam["bolt_fu"] = bolt_fu
@@ -1099,6 +1111,10 @@ def coverplateboltedconnection(uiObj):
         outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
         outputObj['FlangeBolt']['beam_fu'] = beam_fu
         outputObj["FlangeBolt"]["kb"] = new_bolt_param["kb"]
+        outputObj['FlangeBolt']['DiaHole'] = int(dia_hole)
+        outputObj['FlangeBolt']['FlangeForce'] = ff
+        outputObj['FlangeBolt']['MaxPitchF'] = new_bolt_param["MaxPitchF"]
+        outputObj["FlangeBolt"]["FlangeTThinner"] = new_bolt_param["FlangeTThinner"]
 
     else:
         outputObj = {}
@@ -1137,6 +1153,8 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["FlangeGauge"] = flange_g
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
+        outputObj['FlangeBolt']['MaxPitchF'] = new_bolt_param["MaxPitchF"]
+        outputObj["FlangeBolt"]["FlangeTThinner"] = new_bolt_param["FlangeTThinner"]
 
         ####### For reference and validation
         outputObj["WebBolt"]["WebBlockShear"] = Tdb
@@ -1150,6 +1168,8 @@ def coverplateboltedconnection(uiObj):
         outputObj['FlangeBolt']['beamrootradius'] = beam_r1
         outputObj['FlangeBolt']['beamflangethk'] = beam_f_t
         outputObj["FlangeBolt"]["kb"] = new_bolt_param["kb"]
+        outputObj['FlangeBolt']['DiaHole'] = int(dia_hole)
+        outputObj['FlangeBolt']['FlangeForce'] = ff
 
 
     if design_status == True:

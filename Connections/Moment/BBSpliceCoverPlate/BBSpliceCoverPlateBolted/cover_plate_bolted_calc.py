@@ -407,10 +407,12 @@ def coverplateboltedconnection(uiObj):
 
     # Check for web plate thickness
     if web_plate_t < beam_w_t:
+        web_min_t = (5 * shear_load * 1000) / (beam_fy * 0.5 * beam_d)
+        web_opt_thk = max(web_min_t, beam_w_t)
         web_plate_t = beam_w_t
         design_status = False
         logger.error(": Chosen web splice plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of web splice plate is %2.2f mm" % (beam_w_t))
+        logger.warning(": Minimum required thickness of web splice plate is %2.2f mm" % (web_opt_thk))
         logger.info(": Increase thickness of web splice plate")
 
     # elif web_plate_t < web_min_t(shear_load,beam_fy, web_plate_l):
@@ -766,13 +768,14 @@ def coverplateboltedconnection(uiObj):
 
     # Calculation of minimum web plate thickness and maximum end/edge distance
         if web_plate_l != 0:
-            web_min_t = (5 * shear_load * 1000) / (beam_fy * web_plate_l)
+            web_min_t = (5 * shear_load * 1000) / (beam_fy * 0.5 * beam_d)
             max_end_distance = int((12 * web_min_t * math.sqrt(250 / beam_fy)).real)
+            web_opt_thk = max(web_min_t, beam_w_t)
             max_edge_distance = max_end_distance
             if web_plate_t < web_min_t:
                 design_status = False
                 logger.error(": Chosen web splice plate thickness is not sufficient")
-                logger.warning(": Minimum required thickness of web splice plate is %2.2f mm" % (web_min_t))
+                logger.warning(": Minimum required thickness of web splice plate is %2.2f mm" % (web_opt_thk))
                 logger.info(": Increase the thickness of web splice plate")
 
         elif web_plate_l == 0:

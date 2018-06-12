@@ -637,7 +637,7 @@ class MainController(QMainWindow):
 		self.result = coverplateboltedconnection(self.alist)
 		print "resultobj", self.result
 		self.beam_data = self.fetchBeamPara()
-		save_html(self.result, self.alist, self.beam_data, fileName, report_summary)
+		save_html(self.result, self.alist, self.beam_data, fileName, report_summary, self.folder)
 
 	def get_user_inputs(self):
 		"""
@@ -1119,6 +1119,9 @@ class MainController(QMainWindow):
 				beam_beam.save_to_svg(filename, view)
 				svg_file = SvgWindow()
 				svg_file.call_svgwindow(filename, view, self.folder)
+			else:
+				fname = ''
+				beam_beam.save_to_svg(fname, view)
 		else:
 			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 

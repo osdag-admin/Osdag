@@ -12,6 +12,9 @@ from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
 from ui_design_preferences import Ui_DesignPreference
 from ui_design_summary import Ui_DesignReport
+from ui_ask_question import Ui_AskQuestion
+from ui_aboutosdag import Ui_AboutOsdag
+from ui_tutorial import Ui_Tutorial
 from svg_window import SvgWindow
 from reportGenerator import save_html
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
@@ -26,6 +29,7 @@ import pickle
 import pdfkit
 import shutil
 import sys
+import subprocess
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -39,6 +43,30 @@ from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlace
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
+
+
+class MyTutorials(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
+class MyAskQuestion(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
+class MyAboutOsdag(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AboutOsdag()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class DesignPreferences(QDialog):
@@ -355,6 +383,10 @@ class MainController(QMainWindow):
 		self.ui.actionPan.triggered.connect(self.call_pannig)
 		self.ui.actionRotate_3D_model.triggered.connect(self.call_rotation)
 		self.ui.actionClear.triggered.connect(self.clear_log_messages)
+		self.ui.actionSample_Tutorials.triggered.connect(self.open_tutorials)
+		self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
+		self.ui.actionAbout_Osdag_2.triggered.connect(self.open_about_osdag)
+		self.ui.actionDesign_examples.triggered.connect(self.design_examples)
 
 		self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
 		self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
@@ -1412,6 +1444,27 @@ class MainController(QMainWindow):
 				osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
 # 	        ============================================================================================
+	def open_about_osdag(self):
+		dialog = MyAboutOsdag(self)
+		dialog.show()
+
+	def open_tutorials(self):
+		dialog = MyTutorials(self)
+		dialog.show()
+
+	def open_ask_question(self):
+		dialog = MyAskQuestion(self)
+		dialog.show()
+
+	def design_examples(self):
+		root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
+		for html_file in os.listdir(root_path):
+			if html_file.startswith('index'):
+				if sys.platform == ("win32" or "win64"):
+					os.startfile("%s/%s" % (root_path, html_file))
+				else:
+					opener = "open" if sys.platform == "darwin" else "xdg-open"
+					subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
 
 def set_osdaglogger():

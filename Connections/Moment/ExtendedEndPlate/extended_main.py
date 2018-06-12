@@ -11,6 +11,9 @@ from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
 from svg_window import SvgWindow
+from ui_tutorial import Ui_Tutorial
+from ui_aboutosdag import Ui_AboutOsdag
+from ui_ask_question import Ui_AskQuestion
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
@@ -26,6 +29,7 @@ import json
 import ConfigParser
 import cairosvg
 import shutil
+import subprocess
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -39,6 +43,30 @@ from Connections.Component.quarterCone import QuarterCone
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from utilities import osdag_display_shape
 import copy
+
+
+class MyTutorials(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Tutorial()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
+class MyAskQuestion(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AskQuestion()
+        self.ui.setupUi(self)
+        self.mainController = parent
+
+
+class MyAboutOsdag(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_AboutOsdag()
+        self.ui.setupUi(self)
+        self.mainController = parent
 
 
 class DesignPreference(QDialog):
@@ -446,6 +474,10 @@ class Maincontroller(QMainWindow):
 		self.ui.actionPan.triggered.connect(self.call_pannig)
 		self.ui.actionRotate_3D_model.triggered.connect(self.call_rotation)
 		self.ui.actionClear.triggered.connect(self.clear_log_messages)
+		self.ui.actionAbout_Osdag_2.triggered.connect(self.open_about_osdag)
+		self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
+		self.ui.actionSample_Tutorials.triggered.connect(self.open_tutorials)
+		self.ui.actionDesign_examples.triggered.connect(self.design_examples)
 
 		self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
@@ -1658,6 +1690,28 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
 	# =================================================================================
+	def open_about_osdag(self):
+		dialog = MyAboutOsdag(self)
+		dialog.show()
+
+	def open_tutorials(self):
+		dialog = MyTutorials(self)
+		dialog.show()
+
+	def open_ask_question(self):
+		dialog =  MyAskQuestion(self)
+		dialog.show()
+
+	def design_examples(self):
+		root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
+		for html_file in os.listdir(root_path):
+			if html_file.startswith('index'):
+				if sys.platform == ("win32" or "win64"):
+					os.startfile("%s/%s" % (root_path, html_file))
+				else:
+					opener = "open" if sys.platform == "darwin" else "xdg-open"
+					subprocess.call([opener, "%s/%s" % (root_path, html_file)])
+
 
 def set_osdaglogger():
 	global logger

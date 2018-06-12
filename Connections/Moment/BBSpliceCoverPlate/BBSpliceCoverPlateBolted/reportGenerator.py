@@ -890,7 +890,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     MaxPitchF = str(float(outputObj['FlangeBolt']['MaxPitchF']))
     FlangeTThinner = str(float(outputObj["FlangeBolt"]["FlangeTThinner"]))
     #maxPitch = str(300) if 32 * float(beam_f_t) > 300 else str((math.ceil(32 * float(beam_w_t))))
-    if str(PitchF) < str(minPitch):
+    if float(PitchF) < float(minPitch):
         row = [0, "Bolt pitch (mm)", " &#8805; 2.5 * " + bolt_diameter + " = " + minPitch + ",  &#8804; min(32 * " + FlangeTThinner + ", 300) = " + MaxPitchF + "<br> [cl. 10.2.2]",
                PitchF, "<p align=left style=color:red><b>Fail</b></p>"]
 
@@ -911,7 +911,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     rstr += t('tr')
     # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
     minGauge = str(int(2.5 * float(bolt_diameter)))
-    if (FlangeGauge) < (minGauge):
+    if float(FlangeGauge) < float(minGauge):
         row = [0, "Bolt gauge (mm)", " &#8805; 2.5 * " + bolt_diameter + " = " + minGauge + ", &#8804; min(32 * " + FlangeTThinner + ", 300) = " + MaxPitchF + " <br> [cl. 10.2.2]",
                FlangeGauge, "<p align=left style=color:red><b>Fail</b></p>"]
     else:
@@ -927,7 +927,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEnd = str(float(12 * float(beam_w_t)))
-    if (EndF) < (minEnd):
+    if float(EndF) < float(minEnd):
         row = [0, "End distance (mm)",
                " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEnd + " <br> [cl. 10.2.4]",
                EndF,
@@ -946,7 +946,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEdge = str(float(12 * float(beam_w_t)))
-    if EdgeF < minEdge:
+    if float(EdgeF) < float(minEdge):
         row = [0, "Edge distance (mm)",
                " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEdge + " <br> [cl. 10.2.4]",
                EdgeF, "<p align=left style=color:red><b>Fail</b></p>"]
@@ -978,7 +978,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     minPlateThick1 = round(FlangeForce1 / ((beam_b1 - 2 * dia_hole1) * (beam_fy1/ (1.10 * 1000))), 1)
     minPlateThick = str(minPlateThick1)
-    if (flange_plate_t) < (minPlateThick):
+    if float(flange_plate_t) < float(minPlateThick):
         row = [0, "Flange plate thickness (mm)",
                minPlateThick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
@@ -996,7 +996,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # Height of flange splice plate
     minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
     minPlateHeight = str(minPlateHeight1)
-    if (FlangePlateHeight) < (minPlateHeight):
+    if float(FlangePlateHeight) < float(minPlateHeight):
         row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
                "<br> [SCI - 6th edition, page 754]", FlangePlateHeight, "<p align=left style=color:red><b>Fail</b></p>"]
     else:
@@ -1012,7 +1012,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     # Width of flange splice plate
     minPlateWidth = str(beam_b1 - 20) # Beam width - 20 mm (half inch on each side of the flange)
-    if (FlangePlateWidth) < (minPlateWidth):
+    if float(FlangePlateWidth) < float(minPlateWidth):
         row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:green><b>Pass</b></p>"]
@@ -1212,9 +1212,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # rstr += t('tr')
     # row =[0,"Bolt pitch (mm)","&#8805;2.5*20 = 50, &#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","100"]
     minPitch = str((2.5 * float(bolt_diameter)))
+    # minPitch1 = str((2.5 * float(bolt_diameter)))
     MaxPitchF = str(float(outputObj['FlangeBolt']['MaxPitchF']))
     # maxPitch = str(300) if 32 * float(beam_f_t) > 300 else str((math.ceil(32 * float(beam_w_t))))
-    if str(Pitch) < str(minPitch):
+    if float(Pitch) < float(minPitch):
         row = [0, "Bolt pitch (mm)",
                " &#8805; 2.5 * " + bolt_diameter + " = " + minPitch + ",  &#8804; min(32 * " + beam_w_t + ", 300) = " + MaxPitchF + "<br> [cl. 10.2.2]",
                Pitch, "<p align=left style=color:red><b>Fail</b></p>"]
@@ -1237,7 +1238,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     rstr += t('tr')
     # row =[0,"Bolt gauge (mm)","&#8805;2.5*20 = 50,&#8804; Min(32*8.9, 300) = 300 <br> [cl. 10.2.2]","0"]
     minGauge = str(int(2.5 * float(bolt_diameter)))
-    if (WebGauge) < (minGauge):
+    if float(WebGauge) < float(minGauge):
         row = [0, "Bolt gauge (mm)",
                " &#8805; 2.5 * " + bolt_diameter + " = " + minGauge + ", &#8804; min(32 * " + beam_w_t + ", 300) = " + MaxPitchF + " <br> [cl. 10.2.2]",
                WebGauge, "<p align=left style=color:red><b>Fail</b></p>"]
@@ -1255,7 +1256,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     minEnd = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEnd = str(float(12 * float(beam_w_t)))
-    if (EndF) < (minEnd):
+    if float(EndF) < float(minEnd):
         row = [0, "End distance (mm)",
                " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
                EndF,
@@ -1274,7 +1275,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     minEdge = str(int(float(min_edgend_dist) * float(dia_hole)))
     maxEdge = str(float(12 * float(beam_w_t)))
-    if EdgeF < minEdge:
+    if float(EdgeF) < float(minEdge):
         row = [0, "Edge distance (mm)",
                " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + beam_w_t + " = " + maxEdge + " <br> [cl. 10.2.4]",
                EdgeF, "<p align=left style=color:red><b>Fail</b></p>"]
@@ -1327,7 +1328,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # Height of flange splice plate
     minPlateHeight1W = float(beam_d) - 2 * float(beam_f_t) - 2 * float(beam_r1) - 2 * 10
     minPlateHeightW = str(minPlateHeight1W)
-    if (WebPlateHeight) > (minPlateHeightW):
+    if float(WebPlateHeight) > float(minPlateHeightW):
         row = [0, "Web plate height (mm)",
                " &#8804; " + beam_d + " - 2 * " + beam_f_t + " - 2 * " + beam_r1 + " - 2 * 5"+ " = " + minPlateHeightW +
                "<br> [SCI - 6th edition, page 754]", WebPlateHeight, "<p align=left style=color:red><b>Fail</b></p>"]

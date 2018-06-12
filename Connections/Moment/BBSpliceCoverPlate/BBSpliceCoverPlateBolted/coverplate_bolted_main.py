@@ -958,7 +958,7 @@ class MainController(QMainWindow):
 		if self.ui.txt_Moment.text() == '' or float(self.ui.txt_Moment.text()) == 0:
 			incomplete_list.append("Moment")
 
-		if self.ui.txt_Shear.text() == '' or float(self.ui.txt_Shear.text()) == 0:
+		if self.ui.txt_Shear.text() == '':
 			incomplete_list.append("Shear force")
 
 		if self.ui.combo_diameter.currentIndex() == 0:

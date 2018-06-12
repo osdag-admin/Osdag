@@ -820,7 +820,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     if BearingCapacityF == "N/A":
         boltCapacity = str(float(ShearCapacityF))
-        row = [0, "Bolt capacity (kN)", "", boltCapacity, "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [0, "Bolt capacity (kN)", "", boltCapacity, ""]
     else:
         # boltCapacity = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
         boltCapacity = str(min(float(ShearCapacityF), float(BearingCapacityF)))
@@ -1141,7 +1141,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
     if BearingCapacity == "N/A":
         boltCapacityW = (ShearCapacity)
-        row = [0, "Bolt capacity (kN)", "", boltCapacityW, "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [0, "Bolt capacity (kN)", "", boltCapacityW, ""]
     else:
         # boltCapacityW = bearingcapacity if bearingcapacity < shearCapacity else shearCapacity
         boltCapacityW = str(min(float(ShearCapacity), float(BearingCapacity)))
@@ -1310,13 +1310,14 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     minPlateThickW1 = round(((5 * float(shear_load) * 1000) / (beam_fy1 * 0.5 * float(beam_d))), 1)
     minPlateThickW = str(minPlateThickW1)
+    webplatet = str(max(minPlateThickW1, float(beam_w_t)))
     if float(web_plate_t) < float(minPlateThickW):
         row = [0, "Web plate thickness (mm)",
-               minPlateThickW + "<br> [Cl. 6.2]", web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
-        row = [0, "Web plate thickness (mm)", minPlateThickW +
-               "<br> [Cl. 6.2]", web_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [0, "Web plate thickness (mm)",
+               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

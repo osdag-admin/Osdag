@@ -768,10 +768,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     rstr += t('/hr')
 
     # *************************************************************************************************************************
-    # Design Check
+    # Design Check - Flange Splice Plate
 
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    row = [0, "Design Check - Flange Splice Plate", " "]
+    row = [0, "Design Check: Flange Splice Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -859,9 +859,16 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
+    row = [0, "No. of rows(s) of bolt on each side of connection", "", str(BoltsRequiredF1/2), ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
-    row = [0, "No. of column(s) of bolt", "", "2", ""]
+    row = [0, "No. of column(s) of bolt on each side of connection", "", "2", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -990,10 +997,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
     minPlateHeight = str(minPlateHeight1)
     if (FlangePlateHeight) < (minPlateHeight):
-        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min(" + beam_b + ", 225)" + "+" + gap + " = " + minPlateHeight +
+        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
                "<br> [SCI - 6th edition, page 754]", FlangePlateHeight, "<p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min(" + beam_b + ", 225)" + "+" + gap + " = " + minPlateHeight +
+        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
                "<br> [SCI - 6th edition, page-754]", FlangePlateHeight, "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1008,7 +1015,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     if (FlangePlateWidth) < (minPlateWidth):
         row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "Plate width (mm)", " &#8805; " + minPlateWidth + " &#8804;, " + beam_b, FlangePlateWidth, "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1021,10 +1028,71 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     # *************************************************************************************************************************
     # *************************************************************************************************************************
+    # Header of the pdf fetched from dialogbox
+    rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+    rstr += t('tr')
+    row = [0, '<object type= "image/PNG" data= "cmpylogoFin.png" height=60 ></object>',
+           '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+    rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Company Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    row = [0, companyname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+    row = [0, 'Project Title']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, projecttitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Group/Team Name']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, groupteamname]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Subtitle']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, subtitle]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Designer']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, designer]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, 'Job Number']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, jobnumber]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+    row = [0, 'Date']
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, time.strftime("%d /%m /%Y")]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, "Client"]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    row = [0, client]
+    rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+    rstr += t('/table')
+
+    rstr += t('hr')
+    rstr += t('/hr')
+
+    # *************************************************************************************************************************
+    # *************************************************************************************************************************
     # Design Check ## Web Splice Plate
 
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    row = [0, "Design Check - Web Splice Plate", " "]
+    row = [0, "Design Check: Web Splice Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="4" class="detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -1087,12 +1155,14 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     rstr += t('tr')
     # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-    boltsW = str((float(shear_load) / float(boltCapacityW)))
+    boltsW1 = round(float(shear_load) / float(boltCapacityW), 2)
+    boltsW2 = str(boltsW1)
+    boltsW = str(float(shear_load) / float(boltCapacityW))
     if float(boltsW) > float(BoltsRequired):
-        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW, BoltsRequired,
+        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW, BoltsRequired,
+        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1108,6 +1178,13 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
         row = [0, "Total number of bolts", "2" + " * " + BoltsRequired + " = " + TotalBoltsRequired,
                TotalBoltsRequired,
                " <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "No. of rows(s) of bolt on each side of connection", "", str(TotalBoltsRequired1/2), ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1116,7 +1193,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
 
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
-    row = [0, "No. of column(s) of bolt", "", "1", ""]
+    row = [0, "No. of column(s) of bolt on each side of connection", "", "1", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1180,12 +1257,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     maxEnd = str(float(12 * float(beam_w_t)))
     if (EndF) < (minEnd):
         row = [0, "End distance (mm)",
-               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEnd + " <br> [cl. 10.2.4]",
+               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
                EndF,
                "<p align=left style=color:red><b>Fail</b></p>"]
     else:
         row = [0, "End distance (mm)",
-               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEnd + " <br> [cl. 10.2.4]",
+               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEnd + ", &#8804; 12 * " + beam_w_t + " = " + maxEnd + " <br> [cl. 10.2.4]",
                EndF, "<p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1199,12 +1276,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     maxEdge = str(float(12 * float(beam_w_t)))
     if EdgeF < minEdge:
         row = [0, "Edge distance (mm)",
-               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + beam_w_t + " = " + maxEdge + " <br> [cl. 10.2.4]",
                EdgeF, "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
         row = [0, "Edge distance (mm)",
-               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + FlangeTThinner + " = " + maxEdge + " <br> [cl. 10.2.4]",
+               " &#8805; " + min_edgend_dist + " * " + dia_hole + " = " + minEdge + ", &#8804; 12 * " + beam_w_t + " = " + maxEdge + " <br> [cl. 10.2.4]",
                EdgeF, "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

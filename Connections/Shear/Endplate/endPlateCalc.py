@@ -597,10 +597,9 @@ def end_connection(ui_obj):
         no_row = bolts_required / 2
         no_col = 1
 
-        end_plate_l = (no_row - 1) * min_pitch + 2 * min_end_dist
-        pitch = min_pitch
-        min_end_plate_l = 0.6 * beam_depth
-        max_end_plate_l = beam_depth - (2 * (beam_f_t + beam_R1 + 5))  # 5mm is assumed the gap
+        end_plate_l = 0.6 * beam_depth
+        avbl_length = (end_plate_l - 2 * min_end_dist)
+        pitch = avbl_length / (no_row - 1)
         end_dist = min_end_dist
         edge_dist = min_edge_dist
         max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
@@ -783,28 +782,18 @@ def end_connection(ui_obj):
     ############## Check for minimum weld thickness: Table 21; IS 800 ###########
     # Here t_thicker indicates thickness of thicker part
 
-    if connectivity == "Column web-Beam web":
-        t_thicker = max(column_w_t.real, end_plate_t.real)
-    elif connectivity == "Column flange-Beam web":
-        t_thicker = max(column_f_t.real, end_plate_t.real)
-    else:
-        t_thicker = max(column_w_t.real, end_plate_t.real)
+    t_thicker = max(beam_w_t.real, end_plate_t.real)
 
-    if float(t_thicker) > 0 or float(t_thicker) <= 10:
+    if float(t_thicker) > 0 and float(t_thicker) <= 10:
         weld_t_min = int(3)
-    elif float(t_thicker) > 10 or float(t_thicker) <= 20:
+    elif float(t_thicker) > 10 and float(t_thicker) <= 20:
         weld_t_min = int(5)
-    elif float(t_thicker) >= 20 or float(t_thicker) <= 32:
+    elif float(t_thicker) >= 20 and float(t_thicker) <= 32:
         weld_t_min = int(6)
     else:
         weld_t_min = int(10)
 
     weld_t_req = weld_t_min
-
-    # if weld_t_req != int(weld_t_req):
-    #     weld_t_req = int(weld_t_req) + 1
-    # else:
-    #     weld_t_req = weld_t_req
 
     if weld_t < weld_t_req:
         design_check = False
@@ -812,7 +801,23 @@ def end_connection(ui_obj):
         logger.warning(": Minimum weld thickness required is %2.2f mm " % (weld_t_req))
         logger.info(": Increase the weld thickness or the length of weld/end plate")
 
+    ############## Check for maximum weld thickness: cl: 10.5.3.1 ; IS 800 ###########
+
+    """ Here t_thinner_beam_plate indicates thickness of thinner part of members
+        connected by the fillet weld. ie., Beam web and End plate
+    """
+    t_thinner_beam_plate = min(beam_w_t.real, end_plate_t.real)
+
+    max_weld_t = t_thinner_beam_plate
+
+    if weld_t > max_weld_t:
+        design_check = False
+        logger.error(": Weld thickness is more than maximum allowed weld thickness [cl. 10.5.3.1]")
+        logger.warning(": Maximum weld thickness allowed is %2.2f mm " % (max_weld_t))
+        logger.info(": Decrease the weld thickness")
+
     # End of calculation
+    
     output_obj = {}
     output_obj['Bolt'] = {}
     output_obj['Bolt']['status'] = design_check

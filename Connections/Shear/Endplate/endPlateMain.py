@@ -604,6 +604,165 @@ class MainController(QMainWindow):
         self.ui.btn_SaveMessages.setEnabled(True)
         self.ui.btn_CreateDesign.setEnabled(True)
 
+    def fetch_beam_param(self):
+        beam_sec = self.ui.combo_Beam.currentText()
+        dict_beam_data = get_beamdata(beam_sec)
+        return dict_beam_data
+
+    def fetch_column_param(self):
+        column_sec = self.ui.comboColSec.currentText()
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Beam-Beam":
+            dict_col_data = get_beamdata(column_sec)
+        else:
+            dict_col_data = get_columndata(column_sec)
+        return dict_col_data
+
+    def convert_col_combo_to_beam(self):
+        loc = self.ui.comboConnLoc.currentText()
+        if loc == "Beam-Beam":
+            self.ui.lbl_beam.setText(" Secondary beam *")
+            self.ui.lbl_column.setText("Primary beam *")
+
+            self.ui.chkBxBeam.setText("SBeam")
+            self.ui.actionShow_beam.setText("Show SBeam")
+            self.ui.chkBxBeam.setToolTip("Secondary  beam")
+            self.ui.chkBxCol.setText("PBeam")
+            self.ui.actionShow_column.setText("Show PBeam")
+            self.ui.chkBxCol.setToolTip("Primary beam")
+
+            self.ui.comboColSec.clear()
+            self.get_beamdata()
+            self.ui.comboColSec.addItems(get_beamcombolist())
+
+            self.ui.combo_Beam.setCurrentIndex((0))
+            self.ui.comboColSec.setCurrentIndex((0))
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.comboWldSize.setCurrentIndex((0))
+
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+
+        elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
+
+            self.ui.lbl_column.setText("Column Section *")
+            self.ui.lbl_beam.setText("Beam section *")
+
+            self.ui.chkBxBeam.setText("Beam")
+            self.ui.actionShow_beam.setText("Show beam")
+            self.ui.chkBxBeam.setToolTip("Beam only")
+            self.ui.chkBxCol.setText("Column")
+            self.ui.actionShow_column.setText("Show column")
+            self.ui.chkBxCol.setToolTip("Column only")
+
+            self.ui.comboColSec.clear()
+            self.get_columndata()
+            # self.ui.comboColSec.addItems(get_columncombolist())
+
+            self.ui.combo_Beam.setCurrentIndex(0)
+            self.ui.comboColSec.setCurrentIndex(0)
+            self.ui.combo_Beam.setCurrentIndex((0))
+            self.ui.comboColSec.setCurrentIndex((0))
+            self.ui.comboDiameter.setCurrentIndex(0)
+            self.ui.comboType.setCurrentIndex((0))
+            self.ui.comboGrade.setCurrentIndex((0))
+            self.ui.comboPlateThick_2.setCurrentIndex((0))
+            self.ui.comboWldSize.setCurrentIndex((0))
+
+            self.ui.txtFu.clear()
+            self.ui.txtFy.clear()
+            self.ui.txtShear.clear()
+            self.ui.txtPlateLen.clear()
+            self.ui.txtPlateWidth.clear()
+
+            self.ui.txtShrCapacity.clear()
+            self.ui.txtbearCapacity.clear()
+            self.ui.txtBoltCapacity.clear()
+            self.ui.txtNoBolts.clear()
+            self.ui.txtboltgrpcapacity.clear()
+            self.ui.txt_row.clear()
+            self.ui.txt_col.clear()
+            self.ui.txtPitch.clear()
+            self.ui.txtGuage.clear()
+            self.ui.txtEndDist.clear()
+            self.ui.txtEdgeDist.clear()
+
+            self.ui.txtplate_ht.clear()
+            self.ui.txtplate_width.clear()
+            self.ui.txtResltShr.clear()
+            self.ui.txtWeldStrng.clear()
+            self.ui.txtWeld_length.clear()
+
+    def checkbeam_b(self):
+        loc = self.ui.comboConnLoc.currentText()
+        check = True
+        if loc == "Column web-Beam web":
+
+            if self.ui.combo_Beam.currentText() == "Select section" or self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentText() == 'Select section':
+                return
+            dict_beam_data = self.fetch_beam_param()
+            dict_col_data = self.fetch_column_param()
+            column_D = float(dict_col_data["D"])
+            column_T = float(dict_col_data["T"])
+            column_R1 = float(dict_col_data["R1"])
+            column_web_depth = column_D - 2.0 * (column_T)
+
+            beam_B = float(dict_beam_data["B"])
+
+            if column_web_depth <= beam_B:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information',
+                                  "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
+                check = False
+            else:
+                self.ui.btn_Design.setDisabled(False)
+
+        elif loc == "Beam-Beam":
+
+            if self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
+                return
+
+            dict_sec_beam_data = self.fetch_beam_param()
+            dict_pri_beam_data = self.fetch_column_param()
+            pri_beam_D = float(dict_pri_beam_data["D"])
+            pri_beam_T = float(dict_pri_beam_data["T"])
+            pri_beam_web_depth = pri_beam_D - 2.0 * (pri_beam_T)
+
+            sec_beam_D = float(dict_sec_beam_data["D"])
+
+            if pri_beam_web_depth <= sec_beam_D:
+                self.ui.btn_Design.setDisabled(True)
+                QMessageBox.about(self, 'Information',
+                                  "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
+                check = False
+            else:
+                self.ui.btn_Design.setDisabled(False)
+
+        return check
+
     def fill_plate_thick_combo(self):
         '''Populates the plate thickness on the basis of beam web thickness and plate thickness check
         '''
@@ -760,11 +919,11 @@ class MainController(QMainWindow):
 
     def populate_weld_thick_combo(self):
         '''
-        Returns the weld thickness on the basis column flange and plate thickness check
-        ThickerPart between column Flange and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum 
+        Returns the weld thickness on the basis beam web and plate thickness check
+        ThickerPart between beam web and plate thickness again get checked according to the IS 800 Table 21 (Name of the table :Minimum Size of First Rum
         or of a Single Run Fillet Weld)
         '''
-        if str(self.ui.comboPlateThick_2.currentText()) == "Select plate thickness":
+        if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
             return
@@ -772,190 +931,34 @@ class MainController(QMainWindow):
         else:
             newlist = ["Select weld thickness"]
             weldlist = [3, 4, 5, 6, 8, 10, 12, 16]
-            plate_thickness = [6, 8, 10, 12, 14, 16, 18, 20]
+            dict_beam_data = self.fetch_beam_param()
+            beam_w_t = float(dict_beam_data['tw'])
 
-            plate_thickness = self.ui.comboPlateThick_2.currentText()
-            plate_thick = plate_thickness
-            if plate_thick <= 10:
+            plate_thickness = str(self.ui.comboPlateThick_2.currentText())
 
-                for i in weldlist[:]:
-                    newlist.append(str(i))
-            elif plate_thick <= 20 and plate_thick > 10:
+            try:
+                plate_thick = float(plate_thickness)
+            except ValueError:
+                return
 
-                for i in weldlist[2:]:
-                    newlist.append(str(i))
-            elif plate_thick <= 32 and plate_thick > 20:
-
-                for i in weldlist[3:]:
-                    newlist.append(str(i))
+            thicker_part = max(plate_thick, beam_w_t)
+            if thicker_part <= 10:
+                    weld_index = weldlist.index(3)
+                    newlist.extend(weldlist[weld_index:])
+            elif thicker_part <= 20 and thicker_part > 10:
+                weld_index = weldlist.index(5)
+                newlist.extend(weldlist[weld_index:])
+            elif thicker_part <= 32 and thicker_part > 20:
+                weld_index = weldlist.index(6)
+                newlist.extend(weldlist[weld_index:])
             else:
-
-                for i in weldlist[5:]:
-                    newlist.append(str(i))
+                weld_index = weldlist.index(10)
+                newlist.extend(weldlist[weld_index:])
 
             self.ui.comboWldSize.clear()
             for element in newlist[:]:
                 self.ui.comboWldSize.addItem(str(element))
-    
-    def fetch_beam_param(self):
-        beam_sec = self.ui.combo_Beam.currentText()
-        dict_beam_data = get_beamdata(beam_sec)
-        return dict_beam_data
 
-    def fetch_column_param(self):
-        column_sec = self.ui.comboColSec.currentText()
-        loc = self.ui.comboConnLoc.currentText()
-        if loc == "Beam-Beam":
-            dict_col_data = get_beamdata(column_sec)
-        else:
-            dict_col_data = get_columndata(column_sec)
-        return dict_col_data
-
-
-    def convert_col_combo_to_beam(self):
-        loc = self.ui.comboConnLoc.currentText()
-        if loc == "Beam-Beam":
-            self.ui.lbl_beam.setText(" Secondary beam *")
-            self.ui.lbl_column.setText("Primary beam *")
- 
-            self.ui.chkBxBeam.setText("SBeam")
-            self.ui.actionShow_beam.setText("Show SBeam")
-            self.ui.chkBxBeam.setToolTip("Secondary  beam")
-            self.ui.chkBxCol.setText("PBeam")
-            self.ui.actionShow_column.setText("Show PBeam")
-            self.ui.chkBxCol.setToolTip("Primary beam")
- 
-            self.ui.comboColSec.clear()
-            self.get_beamdata()
-            self.ui.comboColSec.addItems(get_beamcombolist())
- 
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-            self.ui.comboDiameter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
- 
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
- 
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
- 
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
- 
-        elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
- 
-            self.ui.lbl_column.setText("Column Section *")
-            self.ui.lbl_beam.setText("Beam section *")
- 
-            self.ui.chkBxBeam.setText("Beam")
-            self.ui.actionShow_beam.setText("Show beam")
-            self.ui.chkBxBeam.setToolTip("Beam only")
-            self.ui.chkBxCol.setText("Column")
-            self.ui.actionShow_column.setText("Show column")
-            self.ui.chkBxCol.setToolTip("Column only")
- 
-            self.ui.comboColSec.clear()
-            self.get_columndata()
-            #self.ui.comboColSec.addItems(get_columncombolist())
- 
-            self.ui.combo_Beam.setCurrentIndex(0)
-            self.ui.comboColSec.setCurrentIndex(0)
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-            self.ui.comboDiameter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
- 
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
- 
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
- 
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
-            self.ui.txtWeld_length.clear()
-
-    def checkbeam_b(self):
-        loc = self.ui.comboConnLoc.currentText()
-        check = True
-        if loc == "Column web-Beam web":
-
-            if self.ui.combo_Beam.currentText()== "Select section" or self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentText()=='Select section':
-                return
-            dict_beam_data = self.fetch_beam_param()
-            dict_col_data = self.fetch_column_param()
-            column_D = float(dict_col_data["D"])
-            column_T = float(dict_col_data["T"])
-            column_R1 = float(dict_col_data["R1"])
-            column_web_depth = column_D - 2.0 * (column_T)
-
-            beam_B = float(dict_beam_data["B"])
-
-            if column_web_depth <= beam_B:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information', "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
-                check = False
-            else:
-                self.ui.btn_Design.setDisabled(False)
-
-        elif loc == "Beam-Beam":
-
-            if self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentIndex() == 0 or self.ui.combo_Beam.currentIndex() == 0:
-                return
-
-            dict_sec_beam_data = self.fetch_beam_param()
-            dict_pri_beam_data = self.fetch_column_param()
-            pri_beam_D = float(dict_pri_beam_data["D"])
-            pri_beam_T = float(dict_pri_beam_data["T"])
-            pri_beam_web_depth = pri_beam_D - 2.0 * (pri_beam_T)
-
-            sec_beam_D = float(dict_sec_beam_data["D"])
-
-            if pri_beam_web_depth <= sec_beam_D:
-                self.ui.btn_Design.setDisabled(True)
-                QMessageBox.about(self, 'Information',
-                "Secondary beam depth is higher than clear depth of primary beam web (No provision in Osdag till now)")
-                check = False
-            else:
-                self.ui.btn_Design.setDisabled(False)
-
-        return check
-         
     def retrieve_prevstate(self):
         '''
         This routine is responsible for maintaining previous session's  data
@@ -1280,7 +1283,7 @@ class MainController(QMainWindow):
         self.ui.comboType.setCurrentIndex((0))
         self.ui.comboGrade.setCurrentIndex((0))
         
-        self.ui.comboPlateThick_2.setItemText(0, "Select Plate thickness")
+        self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
         self.ui.comboPlateThick_2.setCurrentIndex((0))
         self.ui.txtPlateLen.clear()
         self.ui.txtPlateWidth.clear()

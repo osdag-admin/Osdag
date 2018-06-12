@@ -1741,9 +1741,9 @@ class MainController(QMainWindow):
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
         else:
-            # cadlist = self.commLogicObj.connectivityObj.get_models()
-            cadlist = [self.commLogicObj.connectivityObj.angleModel,
-                       self.commLogicObj.connectivityObj.angleLeftModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
+            cadlist = self.commLogicObj.connectivityObj.get_models()
+            # cadlist = [self.commLogicObj.connectivityObj.angleModel,
+            #            self.commLogicObj.connectivityObj.angleLeftModel] + self.commLogicObj.connectivityObj.nut_bolt_array.get_models()
             final_model = cadlist[0]
             for model in cadlist[1:]:
                 final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()

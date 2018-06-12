@@ -128,7 +128,8 @@ class DesignPreferences(QDialog):
         self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = True
 
-        QMessageBox.about(self, 'Information', "Preferences saved")
+        # QMessageBox.about(self, 'Information', "Preferences saved")
+
 
         return self.saved_designPref
 
@@ -344,7 +345,7 @@ class MainController(QMainWindow):
 
         self.get_columndata()
         self.get_beamdata()
-
+        self.designPrefDialog = DesignPreferences(self)
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.gradeType = {'Please Select Type': '', 'Friction Grip Bolt': [8.8, 10.9],
@@ -369,11 +370,16 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
         self.ui.chkBxFinplate.clicked.connect(lambda:self.call_3DFinplate("gradient_bg"))
 
-        validator = QIntValidator()
-        self.ui.txtFu.setValidator(validator)
-        self.ui.txtFy.setValidator(validator)
+        # validator = QIntValidator()
+        # self.ui.txtFu.setValidator(validator)
+        # self.ui.txtFy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
+        self.ui.txtFu.setValidator(dbl_validator)
+        self.ui.txtFu.setMaxLength(6)
+        self.ui.txtFy.setValidator(dbl_validator)
+        self.ui.txtFy.setMaxLength(6)
+
         self.ui.txtPlateLen.setValidator(dbl_validator)
         self.ui.txtPlateLen.setMaxLength(7)
         self.ui.txtPlateWidth.setValidator(dbl_validator)
@@ -463,7 +469,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.designPrefDialog = DesignPreferences(self)
 
 
     def get_columndata(self):
@@ -998,14 +1003,14 @@ class MainController(QMainWindow):
 
             self.ui.comboWldSize.setCurrentIndex(self.ui.comboWldSize.findText(str(uiObj['Weld']['Size (mm)'])))
 
-            # self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj))
-            # self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj))
-            # self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(uiObj))
-            # self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj))
-            # self.designPrefDialog.ui.txt_weldFu.
-            # self.designPrefDialog.ui.combo_detailingEdgeType
-            # self.designPrefDialog.ui.combo_detailing_memebers
-            # self.designPrefDialog.ui.txt_detailingGap
+            self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+            self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+            self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+            self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj["weld"]["typeof_weld"]))
+            self.designPrefDialog.ui.txt_weldFu.setText(str(uiObj["weld"]["fu_overwrite"]))
+            self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+            self.designPrefDialog.ui.txt_detailingGap.setText(str(uiObj["detailing"]["gap"]))
+            self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
 
         else:
             pass
@@ -1320,7 +1325,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         textStr = widget.text()
-        val = int(textStr)
+        val = float(textStr)
         if (val < minVal or val > maxVal):
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s [cl 2.2.4.2]' % (minVal, maxVal))
             widget.clear()
@@ -1737,11 +1742,11 @@ class MainController(QMainWindow):
         This routine returns the neccessary design parameters.
         '''
         self.uiObj = self.getuser_inputs()
-        if self.designPrefDialog.saved is not True:
-            design_pref = self.designPrefDialog.set_default_para()
-            print "default_design_pref=",design_pref
-        else:
-            design_pref = self.designPrefDialog.saved_designPref  # self.designPrefDialog.save_designPref_para()
+        # if self.designPrefDialog.saved is not True:
+        #     design_pref = self.designPrefDialog.set_default_para()
+        #     print "default_design_pref=",design_pref
+        # else:
+        design_pref = self.designPrefDialog.save_designPref_para()  # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
         print "saved_design_pref = ", self.uiObj
 
@@ -1918,7 +1923,8 @@ class MainController(QMainWindow):
         '''
         Closing finPlate window.
         '''
-        uiInput = self.getuser_inputs()
+        # uiInput = self.getuser_inputs()
+        uiInput = self.designParameters()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

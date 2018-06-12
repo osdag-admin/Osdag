@@ -815,7 +815,7 @@ class CoverEnd2DFront(object):
 		ptx = self.PP2 + 100 * np.array([1, 0]) + 200 * np.array([0, 1])
 		dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
 
 		dwg.save()
@@ -1105,7 +1105,7 @@ class CoverEnd2DTop(object):
 		ptx = self.P4 + 100 * np.array([1, 0]) + 300 * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
 		dwg.save()
 
@@ -1406,6 +1406,6 @@ class CoverEnd2DSide(object):
 		ptx = self.PP2 * np.array([0, 1]) + 200 * np.array([0, 1]) + 60 * np.array([-1, 0])
 		dwg.add(dwg.text('Side view (Sec B-B) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
-		dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 		dwg.save()
 

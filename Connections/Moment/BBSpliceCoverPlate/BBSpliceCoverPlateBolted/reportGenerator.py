@@ -8,11 +8,10 @@ from __builtin__ import str
 import time
 import math
 import os
-from os.path import exists
 import pickle
 from Connections.connection_calculations import ConnectionCalculations
 
-def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
+def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     filename = (filename)
     myfile = open(filename, "w")
     myfile.write(t('! DOCTYPE html'))
@@ -1435,33 +1434,33 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary):
     rstr += t('tr')
     rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
-    # png = folder + "/images_html/3D_Model.png"
-    # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
-    #
-    # side = folder + "/images_html/finSide.png"
-    # dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
-    #
-    # top = folder + "/images_html/finTop.png"
-    # datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
-    #
-    # front = folder + "/images_html/finFront.png"
-    # datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
-    #
-    # if status == 'True':
-    #     row = [0, datapng, datatop]
-    #     rstr += t('tr')
-    #     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-    #     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-    #     rstr += t('/tr')
-    #
-    #     row = [0, dataside, datafront]
-    #     rstr += t('tr')
-    #     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-    #     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-    #     rstr += t('/tr')
-    #
-    # else:
-    #     pass
+    png = folder + "/images_html/3D_Model.png"
+    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+
+    side = folder + "/images_html/coverboltedSide.png"
+    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+
+    top = folder + "/images_html/coverboltedTop.png"
+    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+
+    front = folder + "/images_html/coverboltedFront.png"
+    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+
+    if status == 'True':
+        row = [0, datapng, datatop]
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        rstr += t('/tr')
+
+        row = [0, dataside, datafront]
+        rstr += t('tr')
+        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+        rstr += t('/tr')
+
+    else:
+        pass
 
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break

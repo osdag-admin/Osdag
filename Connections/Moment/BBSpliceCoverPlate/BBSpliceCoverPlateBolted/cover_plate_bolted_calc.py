@@ -386,7 +386,7 @@ def coverplateboltedconnection(uiObj):
     ########################################################################################################################
     # Read input values from Beam  database
 
-    if connectivity == "Beam-Beam":
+    if connectivity == "Bolted":
         dictbeamdata = get_beamdata(beam_section)
     else:
         pass
@@ -476,7 +476,7 @@ def coverplateboltedconnection(uiObj):
     webminh = web_min_h(beam_d)
     if web_plate_l != 0:
         if web_plate_l > web_max_h:
-            if connectivity =="Beam-Beam":
+            if connectivity =="Bolted":
                 design_status = False
                 logger.error(": Height of web splice plate is greater than the clear depth of beam")
                 logger.warning(": Maximum web splice plate height allowed is %2.2f mm" % (webmaxh))
@@ -485,7 +485,7 @@ def coverplateboltedconnection(uiObj):
             #     pass
 
         elif webminh > webmaxh:
-            if connectivity == "Beam-Beam":
+            if connectivity == "Bolted":
                 design_status = False
                 logger.error(": Minimum height of web splice plate is more than the clear depth of the beam")
                 logger.warning(": Height of web splice plate should be more than %2.2f mm" % (webminh))

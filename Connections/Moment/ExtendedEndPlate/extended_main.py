@@ -1241,6 +1241,9 @@ class Maincontroller(QMainWindow):
 				beam_beam.save_to_svg(filename, view)
 				svg_file = SvgWindow()
 				svg_file.call_svgwindow(filename, view, self.folder)
+			else:
+				fname = ''
+				beam_beam.save_to_svg(fname, view)
 		else:
 			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 

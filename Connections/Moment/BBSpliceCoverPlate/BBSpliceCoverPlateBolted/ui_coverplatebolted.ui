@@ -716,7 +716,12 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>Beam-Beam</string>
+       <string>Bolted</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Welded</string>
       </property>
      </item>
     </widget>

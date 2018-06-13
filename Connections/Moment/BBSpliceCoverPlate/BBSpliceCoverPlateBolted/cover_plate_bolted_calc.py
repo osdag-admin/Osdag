@@ -346,13 +346,13 @@ def coverplateboltedconnection(uiObj):
     if flange_plate_w == '':
         flange_plate_w = 0
     else:
-        flange_plate_w = round(int(flange_plate_w), 2)
+        flange_plate_w = flange_plate_w
 
     flange_plate_l = str(uiObj["FlangePlate"]["Height (mm)"])
     if flange_plate_l == '':
         flange_plate_l = 0
     else:
-        flange_plate_l = int(round(flange_plate_l), 2)
+        flange_plate_l = flange_plate_l
 
     # flange_plate_fu = float(uiObj["Member"]["fu (Mpa)"])
     # flange_plate_fy = float(uiObj["Member"]["fy (MPa)"])

@@ -1310,7 +1310,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     minPlateThickW1 = round(((5 * float(shear_load) * 1000) / (beam_fy1 * 0.5 * float(beam_d))), 1)
     minPlateThickW = str(minPlateThickW1)
     webplatet = str(max(minPlateThickW1, float(beam_w_t)))
-    if float(web_plate_t) < float(minPlateThickW):
+    if float(web_plate_t) < float(webplatet):
         row = [0, "Web plate thickness (mm)",
                " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 

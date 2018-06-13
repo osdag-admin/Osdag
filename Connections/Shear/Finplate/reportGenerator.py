@@ -9,7 +9,6 @@ from __builtin__ import str
 import time
 import math
 import os
-from os.path import exists
 import pickle
 
 from Connections.connection_calculations import ConnectionCalculations

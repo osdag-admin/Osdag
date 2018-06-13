@@ -374,7 +374,7 @@ class MainController(QMainWindow):
 		self.ui.actionSave_Front_View.triggered.connect(lambda: self.call_2D_drawing("Front"))
 		self.ui.actionSave_Side_View.triggered.connect(lambda: self.call_2D_drawing("Side"))
 		self.ui.actionSave_Top_View.triggered.connect(lambda: self.call_2D_drawing("Top"))
-		self.ui.actionShow_all.triggered.connect(lambda: self.call_3D_model())
+		self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
 		self.ui.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.actionShow_connector.triggered.connect(lambda: self.call_3DConnector("gradient_bg"))
 		self.ui.actionSave_current_image.triggered.connect(self.save_CAD_images)
@@ -397,7 +397,7 @@ class MainController(QMainWindow):
 		self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
 		self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
-		self.ui.btn3D.clicked.connect(lambda: self.call_3DModel())
+		self.ui.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
 		self.ui.chkBx_beamSec1.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.chkBx_extndPlate.clicked.connect(lambda: self.call_3DConnector("gradient_bg"))
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
@@ -1004,7 +1004,7 @@ class MainController(QMainWindow):
 
 		if isempty[0] is True:
 			status = self.resultObj['Bolt']['status']
-			self.call_3DModel(status)
+			self.call_3DModel("gradient_bg")
 			if status is True:
 				self.call_2D_drawing("All")
 			else:
@@ -1330,14 +1330,10 @@ class MainController(QMainWindow):
 				   30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
 
-	def call_3D_model(self):
+	def call_3DModel(self, bgcolor):
+		# Call to calculate/create the BB Cover Plate Bolted CAD model
 		status = self.resultObj['Bolt']['status']
 		if status is True:
-			self.call_3DModel(status)
-
-	def call_3DModel(self, flag):
-		# Call to calculate/create the BB Cover Plate Bolted CAD model
-		if flag is True:
 			self.createBBCoverPlateBoltedCAD()
 			self.ui.btn3D.setChecked(Qt.Checked)
 			if self.ui.btn3D.isChecked():
@@ -1346,7 +1342,7 @@ class MainController(QMainWindow):
 				self.ui.mytabWidget.setCurrentIndex(0)
 
 			# Call to display the BB Cover Plate Bolted CAD model
-			self.display_3DModel("Model", "gradient_bg")
+			self.display_3DModel("Model",bgcolor)# "gradient_bg")
 		else:
 			self.display.EraseAll()
 

@@ -153,8 +153,8 @@ class ConnectionCalculations(object):
         return k_h[bolt_hole_type]
 
     @staticmethod
-    def bolt_shear_hsfg(bolt_diameter, bolt_fu, mu_f, n_e, bolt_hole_type):
-        """ Calculate design shear capacity of a single HSFG bolt(s) based on Cl 10.4.3
+    def bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, mu_f, n_e, bolt_hole_type):
+        """ Calculate design shear capacity of a single Friction Grip Bolt bolt(s) based on Cl 10.4.3
 
         Args:
              bolt_diameter (int)
@@ -164,7 +164,7 @@ class ConnectionCalculations(object):
              bolt_hole_type (string) - "Standard" or "Over-sized"
 
         Returns:
-            v_db - Factored shear capacity of HSFG bolt as float
+            v_db - Factored shear capacity of Friction Grip Bolt bolt as float
 
         Note:
             Assumptions:
@@ -305,3 +305,17 @@ class ConnectionCalculations(object):
         # 40mm plus 4t, where t is the thickness of the thinner connected plate.
         if is_environ_corrosive == "Yes":
             self.max_edge_dist = min(self.max_edge_dist, 40 + 4 * thickness_governing_min)
+
+    @staticmethod
+    def round_to_next_five(distance):
+        """
+
+        Args:
+            distance: (float) takes value of distance in mm
+
+        Returns:
+            distance: (float) Value of distance rounded up to the nearest multiple of five
+
+        """
+        round_up_distance = distance + (5 - distance) % 5
+        return round_up_distance

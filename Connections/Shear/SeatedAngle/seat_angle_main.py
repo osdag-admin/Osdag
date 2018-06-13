@@ -4,7 +4,7 @@ import os.path
 import sys
 import subprocess
 import pdfkit
-
+import cairosvg
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5.QtGui import QBrush
 from PyQt5.QtGui import QColor
@@ -216,12 +216,16 @@ class DesignReportDialog(QDialog):
         else:
             base = os.path.basename(str(filename))
             lblwidget.setText(base)
-            self.desired_location(filename)
+            base_type = base[-4:]
+            self.desired_location(filename, base_type)
 
         return str(filename)
 
-    def desired_location(self, filename):
-        shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
+    def desired_location(self, filename, base_type):
+        if base_type == ".svg":
+            cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoCleat.png"))
+        else:
+            shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoSeatAngle.png"))
 
     def saveUserProfile(self):
         inputData = self.get_report_summary()
@@ -277,13 +281,14 @@ class MainController(QMainWindow):
 
         self.get_columndata()
         self.get_beamdata()
+        self.designPrefDialog = DesignPreferences(self)
         self.ui.combo_angle_section.addItems(get_anglecombolist())
         self.ui.combo_topangle_section.addItems(get_anglecombolist())
 
         self.ui.inputDock.setFixedSize(310, 710)
 
         self.grade_type = {'Please Select Type': '',
-                           'HSFG': [8.8, 10.9],
+                           'Friction Grip Bolt': [8.8, 10.9],
                            'Bearing Bolt': [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]}
         self.ui.combo_bolt_type.addItems(self.grade_type.keys())
         self.ui.combo_bolt_type.currentIndexChanged[str].connect(self.combotype_currentindexchanged)
@@ -302,11 +307,16 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.clicked.connect(lambda:self.call_3DColumn("gradient_bg"))
         self.ui.chkBxSeatAngle.clicked.connect(lambda:self.call_3DSeatAngle("gradient_bg"))
 
-        validator = QIntValidator()
-        self.ui.txt_fu.setValidator(validator)
-        self.ui.txt_fy.setValidator(validator)
+        # # validator = QIntValidator()
+        # self.ui.txt_fu.setValidator(validator)
+        # self.ui.txt_fy.setValidator(validator)
 
         dbl_validator = QDoubleValidator()
+        self.ui.txt_fu.setValidator(dbl_validator)
+        self.ui.txt_fu.setMaxLength(6)
+        self.ui.txt_fy.setValidator(dbl_validator)
+        self.ui.txt_fy.setMaxLength(6)
+
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
@@ -380,7 +390,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-        self.designPrefDialog = DesignPreferences(self)
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
@@ -489,7 +498,7 @@ class MainController(QMainWindow):
                 QMessageBox.about(self, 'Information', "File saved")
         else:
             self.ui.action_save_CAD_image.setEnabled(False)
-            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be saved')
+            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be viewed')
 
 
     def disableViewButtons(self):
@@ -661,6 +670,14 @@ class MainController(QMainWindow):
             self.ui.combo_angle_section.setCurrentIndex(self.ui.combo_angle_section.findText(seat_angle))
             top_angle = str(uiObj['Angle']['TopAngleSection'])
             self.ui.combo_topangle_section.setCurrentIndex(self.ui.combo_topangle_section.findText(top_angle))
+
+            self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+            self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+            self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+            self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+            self.designPrefDialog.ui.txt_detailingGap.setText(str(uiObj["detailing"]["gap"]))
+            self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
+
         else:
             pass
 
@@ -745,7 +762,7 @@ class MainController(QMainWindow):
 
     def load_design_inputs(self):
 
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "All Files(*)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
         if not fileName:
             return
         try:
@@ -891,6 +908,8 @@ class MainController(QMainWindow):
         # ------ Erase Display
         self.display.EraseAll()
 
+        self.designPrefDialog.set_default_para()
+
     def dockbtn_clicked(self, widget):
         """(QWidget) -> NoneType
 
@@ -919,7 +938,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         """
         textStr = widget.text()
-        val = int(textStr)
+        val = float(textStr)
         if val < min_value or val > max_value:
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
             widget.clear()
@@ -1096,7 +1115,7 @@ class MainController(QMainWindow):
         from OCC.Display.qtDisplay import qtViewer3d
         self.ui.modelTab = qtViewer3d(self)
 
-        self.setWindowTitle("Seated Angle Connection")
+        self.setWindowTitle("Osdag Seated Angle")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
 
@@ -1187,50 +1206,81 @@ class MainController(QMainWindow):
         self.ui.chkBxCol.setChecked(Qt.Unchecked)
         self.ui.chkBxSeatAngle.setChecked(Qt.Unchecked)
 
+    def generate_incomplete_string(self, incomplete_list):
+        """
+
+        Args:
+            incomplete_list: list of fields that are not selected or entered
+
+        Returns:
+            error string that has to be displayed
+
+        """
+
+        # The base string which should be displayed
+        information = "Please input the following required field"
+        if len(incomplete_list) > 1:
+            # Adds 's' to the above sentence if there are multiple missing input fields
+            information += "s"
+        information += ": "
+
+        # Loops through the list of the missing fields and adds each field to the above sentence with a comma
+        for item in incomplete_list:
+            information = information + item + ", "
+
+        # Removes the last comma
+        information = information[:-2]
+        information += "."
+
+        return information
+
     def validate_inputs_on_design_button(self):
         flag = True
+        incomplete_list = []
+
         if self.ui.combo_connectivity.currentIndex() == 0:
-            QMessageBox.about(self,"Information", "Please select connectivity")
+            incomplete_list.append("Connectivity")
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+            return flag
+
         state = self.setimage_connection()
         if state is True:
             if self.ui.combo_connectivity.currentText() == "Column flange-Beam flange" or self.ui.combo_connectivity.currentText() == "Column web-Beam flange":
                 if self.ui.combo_beam_section.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select beam section")
-                    flag = False
+                    incomplete_list.append("Beam section")
+
                 if self.ui.combo_column_section.currentIndex() == 0:
-                    QMessageBox.about(self, "Information", "Please select column section")
-                    flag = False
+                    incomplete_list.append("Column section")
+
             else:
                 pass
 
         if self.ui.txt_fu.text() == '' or float(self.ui.txt_fu.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Ultimate strength of steel")
-            flag = False
+            incomplete_list.append("Ultimate strength of steel")
 
-        elif self.ui.txt_fy.text() == '' or float(self.ui.txt_fy.text()) == 0:
-            QMessageBox.about(self, "Information", "Please select Yield strength of steel")
-            flag = False
+        if self.ui.txt_fy.text() == '' or float(self.ui.txt_fy.text()) == 0:
+            incomplete_list.append("Yield strength of steel")
 
-        elif self.ui.txt_shear_force.text() == '' or float(self.ui.txt_shear_force.text()) == str(0):
-            QMessageBox.about(self, "Information", "Please select Factored shear load")
-            flag = False
+        if self.ui.txt_shear_force.text() == '' or float(self.ui.txt_shear_force.text()) == str(0):
+            incomplete_list.append("Factored shear load")
 
-        elif self.ui.combo_bolt_diameter.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Diameter of bolt")
-            flag = False
+        if self.ui.combo_bolt_diameter.currentIndex() == 0:
+            incomplete_list.append("Diameter of bolt")
 
-        elif self.ui.combo_bolt_type.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Type of bolt")
-            flag = False
+        if self.ui.combo_bolt_type.currentIndex() == 0:
+            incomplete_list.append("Type of bolt")
 
-        elif self.ui.combo_angle_section.currentIndex() == 0:
-            QMessageBox.about(self, "Information", "Please select Angle section")
-            flag = False
+        if self.ui.combo_angle_section.currentIndex() == 0:
+            incomplete_list.append("Angle section")
 
-        elif self.ui.combo_topangle_section.currentIndex() ==0:
-            QMessageBox.about(self, "Information", "Please select Top angle section")
+        if self.ui.combo_topangle_section.currentIndex() ==0:
+            incomplete_list.append("Top angle section")
+
+        if len(incomplete_list) > 0:
             flag = False
+            QMessageBox.information(self, "Information", self.generate_incomplete_string(incomplete_list))
+
         return flag
 
     def designParameters(self):
@@ -1238,10 +1288,10 @@ class MainController(QMainWindow):
         This routine returns the necessary design parameters.
         """
         self.uiObj = self.getuser_inputs()
-        if self.designPrefDialog.saved is not True:
-            design_pref = self.designPrefDialog.set_default_para()
-        else:
-            design_pref = self.designPrefDialog.saved_designPref  # self.designPrefDialog.save_designPref_para()
+        # if self.designPrefDialog.saved is not True:
+        #     design_pref = self.designPrefDialog.set_default_para()
+        # else:
+        design_pref = self.designPrefDialog.save_designPref_para() # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
 
 
@@ -1420,10 +1470,11 @@ class MainController(QMainWindow):
         :param event:
         :return:
         """
-        uiInput = self.getuser_inputs()
+        # uiInput = self.getuser_inputs()
+        uiInput = self.designParameters()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
-                                     "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
+                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             self.closed.emit()

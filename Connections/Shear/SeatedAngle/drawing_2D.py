@@ -1038,7 +1038,7 @@ class Seat2DCreatorFront(object):
         ptx = self.SA + self.data_object.col_depth * np.array([1, 0]) + (self.data_object.col_length + 160) * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 =self.SA + self.data_object.col_depth * np.array([1, 0]) + (self.data_object.col_length + 200) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CWBF_front(self, file_name):
@@ -1335,7 +1335,7 @@ class Seat2DCreatorFront(object):
         ptx = self.SWA + np.array([1, 0]) + (self.data_object.col_length +130) * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWA + np.array([1, 0]) + (self.data_object.col_length + 170) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
 
@@ -1749,7 +1749,7 @@ class Seat2DCreatorTop(object):
         ptx = self.SG + 50 * np.array([-1, 0]) + (self.data_object.beam_length/1.5 + 50) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SG + 50 * np.array([-1, 0]) + (self.data_object.beam_length/1.5 +90) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CWBF_top(self, file_name):
@@ -1946,7 +1946,7 @@ class Seat2DCreatorTop(object):
         ptx = self.SWC + (self.data_object.beam_length + 40) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWC + (self.data_object.beam_length + 80) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
 
@@ -2479,7 +2479,7 @@ class Seat2DCreatorSide(object):
         ptx = self.SWA +  np.array([1, 0]) + (self.data_object.col_length + 50) * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWA +  np.array([1, 0]) + (self.data_object.col_length + 90) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black',
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black',
                          font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2727,7 +2727,7 @@ class Seat2DCreatorSide(object):
         ptx = self.SA + np.array([1, 0]) + (self.data_object.col_length + 50) * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SA + np.array([1, 0]) + (self.data_object.col_length + 90) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=ptx1, fill='black',
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black',
                          font_family="sans-serif", font_size=30))
         dwg.fit()
         dwg.save()

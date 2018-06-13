@@ -52,7 +52,7 @@ class Ui_AboutOsdag(object):
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">----------------------------------------------------</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><a href=\"ResourceFiles\\License\\License-dependencies.txt\"><span style=\" font-size:8pt; text-decoration: underline; color:#0000ff;\">Licensing Information</span></a></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; text-decoration: underline; color:#0000ff;\"><br /></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; color:#8a8a8a;\">Osdag and the Osdag logos are trademarks of the IIT Bombay foundaion.</span></p></body></html>"))
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; color:#8a8a8a;\">Osdag</span><span style=\" font-family:\'arial,sans-serif\'; font-size:8pt; color:#8a8a8a;\">®</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; color:#8a8a8a;\"> and the Osdag logo are registered trademarks of Indian Institute of Technology Bombay (IIT Bombay).</span></p></body></html>"))
 
 import icons_rc
 

@@ -237,16 +237,16 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     if status == 'True':
-        row = [1, "Cover Plate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, "Beam to Beam Spliced Cover Plate", "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Cover Plate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, "Beam to Beam Spliced Cover Plate", "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
     # rstr += t('td class="header1 safe"') + row[3] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Cover Plate", " "]
+    row = [0, "Beam to Beam Spliced Cover Plate", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -261,7 +261,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Connection Title", "Cover Plate"]
+    row = [1, "Connection Title", "Beam to Beam Spliced Cover Plate"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -284,12 +284,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-
-    row = [1, "Beam Connection", "Bolted"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    #
+    # row = [1, "Beam Connection", "Bolted"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
 
     row = [0, "Loading (Factored Load) ", " "]
     rstr += t('tr')
@@ -449,13 +449,13 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [4, "No. of rows (on each side)", str(BoltsRequiredF1/2)]
+    row = [4, "No. of Rows" + " <br> " + "(Parallel to Beam Length; Connecting Each Beam)", str(BoltsRequiredF1/2)]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [4, "No. of columns (on each side)", "2"]
+    row = [4, "No. of Columns <br> (Perpendicular to Beam Length; Connecting Each Beam)", "2"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -502,13 +502,13 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [4, "No. of rows (on each side)", str(TotalBoltsRequired1/2)]
+    row = [4, "No. of Rows <br> (Parallel to Beam Length; Connecting Each Beam)", str(TotalBoltsRequired1/2)]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [4, "No. of columns (on each side)", "1"]
+    row = [4, "No. of Columns <br> (Perpendicular to Beam Length; Connecting Each Beam)", "1"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -652,9 +652,9 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     if bolt_type == "Friction Grip Bolt":
-        row = [1, "Slip factor", slip_factor]
+        row = [1, "Slip Factor", slip_factor]
     else:
-        row = [1, "Slip factor", "N/A"]
+        row = [1, "Slip Factor", "N/A"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -672,7 +672,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Minimum Edge-End Distance", min_edgend_dist + " times the hole diameter"]
+    row = [1, "Minimum Edge/End Distance", min_edgend_dist + " times the hole diameter"]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -684,7 +684,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Are members exposed to corrosive influences?", corrosive]
+    row = [1, "Are Members Exposed to Corrosive Influences?", corrosive]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -858,7 +858,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "No. of rows(s) of bolt on each side of connection", "", str(BoltsRequiredF1/2), ""]
+    row = [0, "No. of rows of bolt (parallel to beam length; connecting each beam)", "", str(BoltsRequiredF1/2), ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -867,7 +867,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
-    row = [0, "No. of column(s) of bolt on each side of connection", "", "2", ""]
+    row = [0, "No. of column(s) of bolt (perpendicular to beam length; connecting each beam)", "", "2", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -963,10 +963,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('tr')
 
     if FlangeBlockShear1 < FlangeForce1:
-        row = [0, "Block shear capacity (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [0, "Block shear capacity (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
-        row = [0, "Block shear capacity (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [0, "Block shear capacity (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + FlangeBlockShear + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1183,7 +1183,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "No. of rows(s) of bolt on each side of connection", "", str(TotalBoltsRequired1/2), ""]
+    row = [0, "No. of rows of bolt (parallel to beam length; connecting each beam)", "", str(TotalBoltsRequired1/2), ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1192,7 +1192,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('tr')
     # row =[0,"No.of column(s)","&#8804;2","1"]
-    row = [0, "No. of column(s) of bolt on each side of connection", "", "1", ""]
+    row = [0, "No. of column(s) of bolt (perpendicular to beam length; connecting each beam)", "", "1", ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1293,11 +1293,11 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     if float(WebBlockShear) < float(shear_load):
         row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + WebBlockShear + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+               "<i>V</i><sub>db</sub> = " + WebBlockShear + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
         row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + WebBlockShear + "<br>",
+               "<i>V</i><sub>db</sub> = " + WebBlockShear + "<br> [cl. 6.4.1]" + "<br>",
                "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

@@ -349,7 +349,7 @@ class MainController(QMainWindow):
 
 		self.get_beamdata()
 		self.designPrefDialog = DesignPreferences(self)
-		# self.ui.combo_connLoc.setCurrentIndex(0)
+		self.ui.combo_connLoc.model().item(2).setEnabled(False)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
 		self.gradeType = {'Please select type': '', 'Friction Grip Bolt': [8.8, 10.9],
@@ -840,7 +840,7 @@ class MainController(QMainWindow):
 		"""
 		if uiObj is not None:
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
-			if uiObj["Member"]["Connectivity"] == "Beam-Beam" or "Select Connectivity":
+			if uiObj["Member"]["Connectivity"] == "Select Connectivity" or "Bolted" :
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
 				self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
 				self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))

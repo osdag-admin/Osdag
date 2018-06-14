@@ -30,12 +30,14 @@ class CoverEndPlate(object):
 		self.beam_depth_D1 = float(beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
 
+		self.beam_designation = beam_data['Designation']
+
 		self.beam_width_B1 = float(beam_data["B"])
 		self.beam_width_B2 = self.beam_width_B1
 
-		self.plate_thickness_p1 = float(input_dict["FlangePlate"]["Thickness (mm)"])
-		self.plate_thickness_p2 = 16
-		self.plate_thickness_p3 = float(input_dict["WebPlate"]["Thickness (mm)"])
+		self.plate_thickness_p1 = int(input_dict["FlangePlate"]["Thickness (mm)"])
+		self.plate_thickness_p2 = self.plate_thickness_p1
+		self.plate_thickness_p3 = int(input_dict["WebPlate"]["Thickness (mm)"])
 
 		self.plate_width_B1 = output_dict["FlangeBolt"]["FlangePlateWidth"]
 		self.plate_width_B2 = self.plate_width_B1 #150
@@ -60,7 +62,7 @@ class CoverEndPlate(object):
 		self.edge_dist2 = output_dict["WebBolt"]["Edge"]
 		self.end_dist = output_dict["WebBolt"]["End"]
 
-		self.cross_centre_gauge_dist = 100
+		self.cross_centre_gauge_dist = output_dict["WebBolt"]["WebGauge"]
 		self.gauge = output_dict["FlangeBolt"]["FlangeGauge"]
 
 		self.pitch1 = output_dict["FlangeBolt"]["PitchF"]
@@ -561,7 +563,7 @@ class CoverEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2840 1740'))      #230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2040 1740'))      #230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
 		dwg.add(dwg.polyline(points=[ self.A10, self.A3, self.A4, self.A1, self.A2, self.A9], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A8, self.A7).stroke('blue', width=2.5, linecap='square'))
@@ -781,14 +783,14 @@ class CoverEnd2DFront(object):
 		point = self.A1 + (self.data_object.beam_length_L1 /4) * np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "Beam " + str(self.data_object.beam_length_L1) + " x " + str(self.data_object.beam_width_B1) + " x " + str(self.data_object.flange_thickness_T1)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
 		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
 		theta = 60
 		offset = 50
-		textup = "Beam " + str(self.data_object.beam_length_L2) + " x " + str(self.data_object.beam_width_B2) + " x " + str(self.data_object.flange_thickness_T2)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
@@ -931,7 +933,7 @@ class CoverEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -700 3000 1500' ))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-350 -700 2100 1500' ))
 		dwg.add(dwg.line(self.A5, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A6, self.A7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A2, self.A3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1069,14 +1071,14 @@ class CoverEnd2DTop(object):
 		point = self.A1 + (self.data_object.beam_length_L1 / 4 )* np.array([1, 0])
 		theta = 60
 		offset = 50
-		textup = "Beam " + str(self.data_object.beam_length_L1) + " x " + str(self.data_object.beam_width_B1) + " x " + str(self.data_object.flange_thickness_T1)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
 		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
 		theta = 60
 		offset = 50
-		textup = "Beam " + str(self.data_object.beam_length_L2) + " x " + str(self.data_object.beam_width_B2) + " x " + str(self.data_object.flange_thickness_T2)
+		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
@@ -1292,8 +1294,8 @@ class CoverEnd2DSide(object):
 			biwr = self.data_object.bolts_inside_web_row
 			pt_inside_column_list = []
 			for i in range(1, (biwr + 1)):
-				ptx = self.W4 + ((self.data_object.beam_depth_D2 - self.data_object.plate_length_L3)/2 -  self.data_object.end_dist) * np.array([0, 1]) -\
-					  (self.data_object.plate_thickness_p3) * np.array([1, 0]) + (i * self.data_object.pitch2) * np.array([0, -1])
+				ptx = self.W1 - ((self.data_object.beam_depth_D2 - self.data_object.plate_length_L3)/2 + self.data_object.end_dist) * np.array([0, -1]) -\
+					  (self.data_object.plate_thickness_p3) * np.array([1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])
 
 				ptx1 = ptx - bolt_r * np.array([0, 1])
 				rect_width = self.data_object.bolt_diameter

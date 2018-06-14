@@ -41,6 +41,13 @@ from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWay
 from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
 from Connections.Component.quarterCone import QuarterCone
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
+from OCC import IGESControl, BRepTools
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Interface import Interface_Static_SetCVal
+from OCC.IFSelect import IFSelect_RetDone
+from OCC.StlAPI import StlAPI_Writer
+from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
+
 from utilities import osdag_display_shape
 import copy
 
@@ -423,7 +430,8 @@ class Maincontroller(QMainWindow):
 		self.result_obj = None
 
 		self.designPrefDialog = DesignPreference(self)
-		# self.ui.combo_connLoc.setCurrentIndex(0)
+		self.ui.combo_connLoc.model().item(1).setEnabled(False)
+		self.ui.combo_connLoc.model().item(2).setEnabled(False)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
 
@@ -460,6 +468,7 @@ class Maincontroller(QMainWindow):
 		self.ui.action_save_input.triggered.connect(self.save_design_inputs)
 		self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 		self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
+		# self.ui.actionSave_3D_model.triggered.connect(self.save_3D_cad_images)
 		self.ui.actionCreate_design_report.triggered.connect(self.design_report)
 		self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 		self.ui.actionSave_Front_View.triggered.connect(lambda : self.call_2D_drawing("Front"))
@@ -644,7 +653,7 @@ class Maincontroller(QMainWindow):
 		self.result = bbExtendedEndPlateSplice(self.alist)
 		print "resultobj", self.result
 		self.beam_data = self.fetchBeamPara()
-		save_html(self.result, self.alist, self.beam_data, fileName, report_summary)
+		save_html(self.result, self.alist, self.beam_data, fileName, report_summary, self.folder)
 
 	def get_user_inputs(self):
 		uiObj = {}
@@ -1302,6 +1311,62 @@ class Maincontroller(QMainWindow):
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
+	def create_2D_CAD(self):
+		pass
+
+	# def save_3D_cad_images(self):
+	# 	status = self.resultObj['Bolt']['status']
+	# 	if status is True:
+	# 		if self.fuse_model is None:
+	# 			self.fuse_model = self.create_2D_CAD()
+	# 		shape = self.fuse_model
+	#
+	# 		files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+	#
+	# 		fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+	# 		                                          files_types)
+	# 		fName = str(fileName)
+	#
+	# 		flag = True
+	# 		if fName == '':
+	# 			flag = False
+	# 			return flag
+	# 		else:
+	# 			file_extension = fName.split(".")[-1]
+	#
+	# 			if file_extension == 'igs':
+	# 				IGESControl.IGESControl_Controller().Init()
+	# 				iges_writer = IGESControl.IGESControl_Writer()
+	# 				iges_writer.AddShape(shape)
+	# 				iges_writer.Write(fName)
+	#
+	# 			elif file_extension == 'brep':
+	#
+	# 				BRepTools.breptools.Write(shape, fName)
+	#
+	# 			elif file_extension == 'stp':
+	# 				# initialize the STEP exporter
+	# 				step_writer = STEPControl_Writer()
+	# 				Interface_Static_SetCVal("write.step.schema", "AP203")
+	#
+	# 				# transfer shapes and write file
+	# 				step_writer.Transfer(shape, STEPControl_AsIs)
+	# 				status = step_writer.Write(fName)
+	#
+	# 				assert (status == IFSelect_RetDone)
+	#
+	# 			else:
+	# 				stl_writer = StlAPI_Writer()
+	# 				stl_writer.SetASCIIMode(True)
+	# 				stl_writer.Write(shape, fName)
+	#
+	# 			self.fuse_model = None
+	#
+	# 			QMessageBox.about(self, 'Information', "File saved")
+	# 	else:
+	# 		self.ui.actionSave_3D_model.setEnabled(False)
+	# 		QMessageBox.about(self, 'Information', 'Design Unsafe: 3D Model cannot be saved')
+
 	def save_CAD_images(self):
 		status = self.resultObj['Bolt']['status']
 		if status is True:
@@ -1515,11 +1580,6 @@ class Maincontroller(QMainWindow):
 		'''
 		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
-
-	def call_3D_model(self):
-		status = self.resultObj['Bolt']['status']
-		if status is True:
-			self.call_3DModel(status)
 
 	def call_3DModel(self, bgcolor):
 		# Call to calculate/create the Extended Both Way CAD model

@@ -71,37 +71,37 @@ class ExtendedEndPlate(object):
 		self.no_of_columns = 2
 		self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
 		if self.no_of_bolts == 8:
-			self.pitch = int(output_dict['Bolt']['Pitch'])
+			self.pitch = float(output_dict['Bolt']['Pitch'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 1
 			self.bolts_inside_bottom_flange_row = 1
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 12:
-			self.pitch23 = int(output_dict['Bolt']['Pitch23'])
-			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
+			self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 2
 			self.bolts_inside_bottom_flange_row = 2
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 16:
-			self.pitch23 = int(output_dict['Bolt']['Pitch23'])
-			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
-			self.pitch56 = int(output_dict['Bolt']['Pitch56'])
-			self.pitch67 = int(output_dict['Bolt']['Pitch67'])
+			self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+			self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+			self.pitch67 = float(output_dict['Bolt']['Pitch67'])
 			self.bolts_outside_top_flange_row = 1
 			self.bolts_inside_top_flange_row = 3
 			self.bolts_inside_bottom_flange_row = 3
 			self.bolts_outside_bottom_flange_row = 1
 		elif self.no_of_bolts == 20:
-			self.pitch12 = int(output_dict['Bolt']['Pitch12'])
-			self.pitch34 = int(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = int(output_dict['Bolt']['Pitch45'])
-			self.pitch56 = int(output_dict['Bolt']['Pitch56'])
-			self.pitch67 = int(output_dict['Bolt']['Pitch67'])
-			self.pitch78 = int(output_dict['Bolt']['Pitch78'])
-			self.pitch910 = int(output_dict['Bolt']['Pitch910'])
+			self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+			self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+			self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+			self.pitch78 = float(output_dict['Bolt']['Pitch78'])
+			self.pitch910 = float(output_dict['Bolt']['Pitch910'])
 			self.bolts_outside_top_flange_row = 2
 			self.bolts_inside_top_flange_row = 3
 			self.bolts_inside_bottom_flange_row = 3
@@ -1203,8 +1203,8 @@ class ExtendedEnd2DSide(object):
 
 		self.Lv = (((
 					            self.data_object.plate_length_L1 - self.data_object.beam_depth_D1) / 2 - self.data_object.end_dist - self.data_object.flange_weld_thickness))
-		L_v = str(self.Lv)
-		print L_v
+		# self.Lv = str(self.Lv)
+		# print self.Lv
 
 	def call_ExtndBoth_side(self, filename):
 		"""
@@ -1442,7 +1442,20 @@ class ExtendedEnd2DSide(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, point1, point2, str(self.data_object.cross_centre_gauge_dist), params)
 
 		# ------------------------------------------  Faint line for inside top flange bolts-------------------------------------------
-		if self.data_object.no_of_bolts == 12 or 16:
+		if self.data_object.no_of_bolts == 8:
+			ptx1 = np.array(pt_inside_top_column_list[0][0])
+			pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+			self.data_object.draw_faint_line(ptx1, pty1, dwg)
+
+			ptx2 = np.array(pt_inside_bottom_column_list[0][0])
+			pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+			self.data_object.draw_faint_line(ptx2, pty2, dwg)
+
+			point1 = ptx2 + self.data_object.pitch * np.array([0, -1])
+			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+			self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch), params)
+
+		elif self.data_object.no_of_bolts == 12 or 16:
 			ptx1 = np.array(pt_inside_top_column_list[1][1])
 			pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 			self.data_object.draw_faint_line(ptx1, pty1, dwg)
@@ -1480,7 +1493,10 @@ class ExtendedEnd2DSide(object):
 		# self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point2, str(self.data_object.pitch), params)
 
 		# ------------------------------------------  Faint line for inside bottom flange bolts-------------------------------------------
-		if self.data_object.no_of_bolts == 12 or 16:
+		if self.data_object.no_of_bolts == 8:
+			pass
+
+		elif self.data_object.no_of_bolts == 12 or 16:
 			ptx1 = np.array(pt_inside_bottom_column_list[1][1])
 			pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 			self.data_object.draw_faint_line(ptx1, pty1, dwg)
@@ -1551,7 +1567,7 @@ class ExtendedEnd2DSide(object):
 
 		# ---------------------------------------------  Web Welding ----------------------------------------------
 		point = self.A4 + self.data_object.beam_depth_D1 / 2 * np.array([0, 1])
-		theta = 1
+		theta = 60
 		offset = 1
 		textup = "     z         " + str(self.data_object.web_thickness_tw1)
 		textdown = " "

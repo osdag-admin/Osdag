@@ -1299,6 +1299,7 @@ class CoverEnd2DSide(object):
 				# ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) +\
 				# 	  (self.data_object.plate_thickness_p3) * np.array([-1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])# + self.data_object.end_dist * np.array([0, -1])
 
+
 				ptx1 = ptx - bolt_r * np.array([0, 1])
 				rect_width = self.data_object.bolt_diameter
 				rect_length = (2 * self.data_object.plate_thickness_p3) + self.data_object.web_thickness_tw2

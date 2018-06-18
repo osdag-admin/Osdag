@@ -1314,6 +1314,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     minPlateThickW = str(minPlateThickW1)
     webplatet = str(max(minPlateThickW1, (float(beam_w_t) / 2)))
     beam_w_t2 = str(float(beam_w_t) / 2)
+
     if float(web_plate_t) < float(webplatet):
         row = [0, "Web plate thickness (mm)",
                " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t2 + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]

@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="ResourceFiles/icons.qrc">
-    <normaloff>:/newPrefix/images/finwindow.png</normaloff>:/newPrefix/images/finwindow.png</iconset>
+    <normaloff>:/newPrefix/images/extendedbothways.png</normaloff>:/newPrefix/images/extendedbothways.png</iconset>
   </property>
   <property name="iconSize">
    <size>

@@ -1294,8 +1294,11 @@ class CoverEnd2DSide(object):
 			biwr = self.data_object.bolts_inside_web_row
 			pt_inside_column_list = []
 			for i in range(1, (biwr + 1)):
-				ptx = self.W1 - ((self.data_object.beam_depth_D2 - self.data_object.plate_length_L3)/2 + self.data_object.end_dist) * np.array([0, -1]) -\
+				ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) -\
 					  (self.data_object.plate_thickness_p3) * np.array([1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])
+				# ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) +\
+				# 	  (self.data_object.plate_thickness_p3) * np.array([-1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])# + self.data_object.end_dist * np.array([0, -1])
+
 
 				ptx1 = ptx - bolt_r * np.array([0, 1])
 				rect_width = self.data_object.bolt_diameter

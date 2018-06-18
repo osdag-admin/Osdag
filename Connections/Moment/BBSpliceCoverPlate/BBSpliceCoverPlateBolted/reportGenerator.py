@@ -2,6 +2,8 @@
 '''
 @author: Swathi M.
 Created on: 28 May 2018
+Revised on: 15 June 2018 (expert suggestions)
+Revised on: 18 June 2018 (expert suggestions)
 '''
 
 from __builtin__ import str
@@ -833,24 +835,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('tr')
     # row =[0,"No. of bolts","140/72.98 = 1.9","3","<p align=right style=color:green><b>Pass</b></p>"]
-    bolts = str(round(float(FlangeForce) / float(boltCapacity), 1))
+    bolts = str(round(1.05 * (float(FlangeForce) / float(boltCapacity)), 1))
     if float(bolts) > int(BoltsRequiredF):
-        row = [0, "No. of bolts on each side of connection", FlangeForce + " / " + boltCapacity + " = " + bolts, BoltsRequiredF,
+        row = [0, "No. of bolts parallel to beam length; connecting each beam, ", "(1.05 * " + FlangeForce + ") / " + boltCapacity + "<br>" + " = " + bolts, BoltsRequiredF,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "No. of bolts on each side of connection", FlangeForce + " / " + boltCapacity + " = " + bolts, BoltsRequiredF,
-               " <p align=left style=color:green><b>Pass</b></p>"]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    if float(bolts) > int(BoltsRequiredF):
-        row = [0, "Total number of bolts", "4" + " * " + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
-               " <p align=left style=color:red><b>Fail</b></p>"]
-    else:
-        row = [0, "Total number of bolts", "4" + " * " + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
+        row = [0, "No. of bolts parallel to beam length; connecting each beam", "(1.05 * " + FlangeForce + ") / " + boltCapacity + "<br>" + " = " + bolts, BoltsRequiredF,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -875,6 +865,19 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
+
+
+    if float(bolts) > int(BoltsRequiredF):
+        row = [0, "Total no. of bolts", "4" + " * " + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
+               " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Total no. of bolts", "4" + " * " + BoltsRequiredF + " = " + TotalBoltsRequiredF, TotalBoltsRequiredF,
+               " <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
     # # row =[0,"No. of bolts per column"," ","3"]
     # row = [0, "No. of bolts per column", " ", noOfRows, ""]
     # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1158,24 +1161,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     boltsW2 = str(boltsW1)
     boltsW = str(float(shear_load) / float(boltCapacityW))
     if float(boltsW) > float(BoltsRequired):
-        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
+        row = [0, "No. of bolts parallel to beam length; connecting each beam", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
                " <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "No. of bolts on each side of connection", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
-               " <p align=left style=color:green><b>Pass</b></p>"]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    if float(boltsW) > float(BoltsRequired):
-        row = [0, "Total number of bolts", "2" + " * " + BoltsRequired + " = " + TotalBoltsRequired,
-               TotalBoltsRequired,
-               " <p align=left style=color:red><b>Fail</b></p>"]
-    else:
-        row = [0, "Total number of bolts", "2" + " * " + BoltsRequired + " = " + TotalBoltsRequired,
-               TotalBoltsRequired,
+        row = [0, "No. of bolts parallel to beam length; connecting each beam", shear_load + " / " + boltCapacityW + " = " + boltsW2, BoltsRequired,
                " <p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1200,6 +1189,20 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
+
+    if float(boltsW) > float(BoltsRequired):
+        row = [0, "Total no. of bolts", "2" + " * " + BoltsRequired + " = " + TotalBoltsRequired,
+               TotalBoltsRequired,
+               " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "Total no. of bolts", "2" + " * " + BoltsRequired + " = " + TotalBoltsRequired,
+               TotalBoltsRequired,
+               " <p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
     # # row =[0,"No. of bolts per column"," ","3"]
     # row = [0, "No. of bolts per column", " ", noOfRows, ""]
     # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1309,14 +1312,15 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     minPlateThickW1 = round(((5 * float(shear_load) * 1000) / (beam_fy1 * 0.5 * float(beam_d))), 1)
     minPlateThickW = str(minPlateThickW1)
-    webplatet = str(max(minPlateThickW1, float(beam_w_t)))
+    webplatet = str(max(minPlateThickW1, (float(beam_w_t) / 2)))
+    beam_w_t2 = str(float(beam_w_t) / 2)
     if float(web_plate_t) < float(webplatet):
         row = [0, "Web plate thickness (mm)",
-               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t2 + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
         row = [0, "Web plate thickness (mm)",
-               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+               " &#8805; " + "max(" + minPlateThickW + ", " + beam_w_t2 + ")" + " = " + webplatet, web_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

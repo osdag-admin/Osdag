@@ -77,9 +77,9 @@ class OsdagMainWindow(QMainWindow):
 		self.ui.comboBox_help.setCurrentIndex(0)
 		self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
 		self.ui.rdbtn_beamtobeam.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtobeampage'], list_of_items['Osdagpage']))
-		self.ui.rdbtn_beamcolumn.clicked.connect(self.unavailable)
-		self.ui.rdbtn_colcol.clicked.connect(self.unavailable)
-		self.ui.rdbtn_peb.clicked.connect(self.unavailable)
+		self.ui.rdbtn_beamcolumn.setDisabled(True)
+		self.ui.rdbtn_peb.setDisabled(True)
+		self.ui.rdbtn_colcol.setDisabled(True)
 
 	def selection_change(self):
 		loc = self.ui.comboBox_help.currentText()

@@ -451,6 +451,7 @@ class Maincontroller(QMainWindow):
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
 		self.ui.combo_type.setCurrentIndex(0)
 		self.retrieve_prevstate()
+		self.ui.combo_connLoc.currentIndexChanged[str].connect(self.setimage_connection)
 
 		self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
@@ -519,6 +520,7 @@ class Maincontroller(QMainWindow):
 		from osdagMainSettings import backend_name
 		self.display, _ = self.init_display(backend_str=backend_name())
 		self.uiObj = None
+		self.fuse_model = None
 		self.resultObj = None
 		self.disable_buttons()
 
@@ -815,22 +817,13 @@ class Maincontroller(QMainWindow):
 		'''
 		self.ui.lbl_connectivity.show()
 		loc = self.ui.combo_connLoc.currentText()
-		if loc == "Flush":
-			pixmap = QPixmap(":/newPrefix/images/colF2.png")
+		if loc == "Extended both ways":
+			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
-		# self.ui.lbl_connectivity.show()
-		elif (loc == "Extended one way"):
-			picmap = QPixmap(":/newPrefix/images/colW3.png")
-			picmap.scaledToHeight(60)
-			picmap.scaledToWidth(50)
-			self.ui.lbl_connectivity.setPixmap(picmap)
 		else:
-			picmap = QPixmap(":/newPrefix/images/b-b.png")
-			picmap.scaledToHeight(60)
-			picmap.scaledToWidth(50)
-			self.ui.lbl_connectivity.setPixmap(picmap)
+			pass
 
 		return True
 
@@ -865,8 +858,12 @@ class Maincontroller(QMainWindow):
 	def validate_inputs_on_design_btn(self):
 		flag = True
 		incomplete_list = []
-		if self.ui.combo_connLoc.currentIndex() == 0:
-			incomplete_list.append("Connectivity")
+		state = self.setimage_connection()
+		if state is True:
+			if self.ui.combo_connLoc.currentIndex() == 0:
+				incomplete_list.append("Connectivity")
+		else:
+			pass
 
 		if self.ui.combo_beamSec.currentIndex() == 0:
 			incomplete_list.append("Beam section")
@@ -1062,6 +1059,7 @@ class Maincontroller(QMainWindow):
 		"""
 		self.ui.combo_beamSec.setCurrentIndex(0)
 		self.ui.combo_connLoc.setCurrentIndex(0)
+		self.ui.lbl_connectivity.clear()
 		self.ui.txt_Fu.clear()
 		self.ui.txt_Fy.clear()
 		self.ui.txt_Axial.clear()

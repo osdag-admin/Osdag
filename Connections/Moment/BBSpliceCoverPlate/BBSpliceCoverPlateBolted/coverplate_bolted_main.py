@@ -358,6 +358,7 @@ class MainController(QMainWindow):
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
 		self.ui.combo_type.setCurrentIndex(0)
 		self.retrieve_prevstate()
+		self.ui.combo_connLoc.currentIndexChanged[str].connect(self.setimage_connection)
 
 		self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
 		self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
@@ -724,6 +725,7 @@ class MainController(QMainWindow):
 	def reset_btnclicked(self):
 		self.ui.combo_beamSec.setCurrentIndex(0)
 		self.ui.combo_connLoc.setCurrentIndex(0)
+		self.ui.lbl_connectivity.clear()
 		self.ui.txt_Fu.clear()
 		self.ui.txt_Fy.clear()
 		self.ui.txt_Axial.clear()
@@ -890,22 +892,13 @@ class MainController(QMainWindow):
 		'''
 		self.ui.lbl_connectivity.show()
 		loc = self.ui.combo_connLoc.currentText()
-		if loc == "Flush":
-			pixmap = QPixmap(":/newPrefix/images/colF2.png")
+		if loc == "Bolted":
+			pixmap = QPixmap(":/newPrefix/images/coverplatewindow.png")
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
-		# self.ui.lbl_connectivity.show()
-		elif (loc == "Extended one way"):
-			picmap = QPixmap(":/newPrefix/images/colW3.png")
-			picmap.scaledToHeight(60)
-			picmap.scaledToWidth(50)
-			self.ui.lbl_connectivity.setPixmap(picmap)
 		else:
-			picmap = QPixmap(":/newPrefix/images/b-b.png")
-			picmap.scaledToHeight(60)
-			picmap.scaledToWidth(50)
-			self.ui.lbl_connectivity.setPixmap(picmap)
+			pass
 
 		return True
 
@@ -940,8 +933,12 @@ class MainController(QMainWindow):
 	def validate_inputs_on_design_btn(self):
 		flag = True
 		incomplete_list = []
-		if self.ui.combo_connLoc.currentIndex() == 0:
-			incomplete_list.append("Connectivity")
+		state = self.setimage_connection()
+		if state is True:
+			if self.ui.combo_connLoc.currentIndex() == 0:
+				incomplete_list.append("Connectivity")
+		else:
+			pass
 
 		if self.ui.combo_beamSec.currentIndex() == 0:
 			incomplete_list.append("Beam section")

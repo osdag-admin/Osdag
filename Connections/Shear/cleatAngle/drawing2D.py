@@ -847,7 +847,7 @@ class Cleat2DCreatorFront(object):
         theta = 55
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -861,7 +861,7 @@ class Cleat2DCreatorFront(object):
         theta = 70
         offset = (self.dataObj.D_col - self.dataObj.D_beam)  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1109,7 +1109,7 @@ class Cleat2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1123,7 +1123,7 @@ class Cleat2DCreatorFront(object):
         theta = 60
         offset = (self.dataObj.D_col + 10)
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1258,7 +1258,7 @@ class Cleat2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.col_L - self.dataObj.D_beam) /2
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1269,7 +1269,7 @@ class Cleat2DCreatorFront(object):
         theta = 65
         offset = (self.dataObj.col_B * 3) / 4
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1696,7 +1696,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = (self.dataObj.beam_B) + 100
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1708,7 +1708,7 @@ class Cleat2DCreatorTop(object):
         theta = 30
         offset = (self.beam_beam_length - 2 * self.dataObj.cleat_legsize) / 2 + 25
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1904,7 +1904,7 @@ class Cleat2DCreatorTop(object):
         theta = 70
         offset = (self.dataObj.beam_B) + 80
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1917,7 +1917,7 @@ class Cleat2DCreatorTop(object):
         theta = 70
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 80
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2114,7 +2114,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = (self.dataObj.beam_B)
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2126,7 +2126,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = self.dataObj.beam_B + 50
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2473,7 +2473,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2488,7 +2488,7 @@ class Cleat2DCreatorSide(object):
         theta = 75
         offset = (self.beam_beam_length / 2 + 50)  # #
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2720,7 +2720,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.D_col) / 2 + 10
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2733,7 +2733,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset =  (self.dataObj.D_col) / 2 + 10
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2951,7 +2951,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.col_B) / 2 + 130
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -2964,7 +2964,7 @@ class Cleat2DCreatorSide(object):
         theta = 55
         offset =  (self.dataObj.col_B) / 2.2 + 30
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"

@@ -863,7 +863,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth /1.5
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -876,7 +876,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -888,7 +888,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth - 30
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -900,7 +900,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth +20
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1232,7 +1232,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth / 1.6
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1244,7 +1244,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1256,7 +1256,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth/1.8
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1268,7 +1268,7 @@ class Seat2DCreatorFront(object):
         theta = 55
         offset = self.data_object.beam_depth/2 + 20
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1647,7 +1647,7 @@ class Seat2DCreatorTop(object):
         theta = 60
         offset = self.data_object.beam_depth/1.5 + 60
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1659,7 +1659,7 @@ class Seat2DCreatorTop(object):
         theta = 70
         offset = self.data_object.beam_depth/2 + 50
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1843,7 +1843,7 @@ class Seat2DCreatorTop(object):
         theta = 60
         offset = self.data_object.beam_width + 50
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -1855,7 +1855,7 @@ class Seat2DCreatorTop(object):
         theta = 90
         offset = (self.data_object.col_depth - self.data_object.beam_width)/ 2 + 50
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -2384,7 +2384,7 @@ class Seat2DCreatorSide(object):
         theta = 55
         offset =  self.data_object.beam_depth/3
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -2396,7 +2396,7 @@ class Seat2DCreatorSide(object):
         theta = 65
         offset =  self.data_object.beam_depth/1.5
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -2409,7 +2409,7 @@ class Seat2DCreatorSide(object):
         theta = 65
         offset =  self.data_object.beam_depth/1.5
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -2421,7 +2421,7 @@ class Seat2DCreatorSide(object):
         theta = 55
         offset =  self.data_object.beam_depth/3
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        if str(self.data_object.bolt_type) == "HSFG":
+        if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " " + "(grade " + str(self.data_object.grade) + ")"
@@ -2608,7 +2608,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/4
             text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-            if str(self.data_object.bolt_type) == "HSFG":
+            if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
             else:
@@ -2622,7 +2622,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/2
             text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-            if str(self.data_object.bolt_type) == "HSFG":
+            if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
             else:
@@ -2636,7 +2636,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/2
             text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-            if str(self.data_object.bolt_type) == "HSFG":
+            if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
             else:
@@ -2650,7 +2650,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/3
             text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-            if str(self.data_object.bolt_type) == "HSFG":
+            if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
             else:

@@ -812,7 +812,7 @@ class End2DCreatorFront(object):
         theta = 65
         offset = (self.dataObj.D_beam/1.4)
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -998,7 +998,7 @@ class End2DCreatorFront(object):
         theta = 65
         offset = (self.dataObj.D_beam * 3 + 400) / 8
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) +  u'\u00d8'  + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " " +"(grade" + " " + " " + str(self.dataObj.bolt_grade) + ")"
@@ -1166,7 +1166,7 @@ class End2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.D_beam * 3 + 400) / 8
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1513,7 +1513,7 @@ class End2DCreatorTop(object):
         theta = 75
         offset = (self.beam_beam_length / 2) + 25
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1673,7 +1673,7 @@ class End2DCreatorTop(object):
         theta = 85
         offset = (self.dataObj.beam_B) + 100
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1831,7 +1831,7 @@ class End2DCreatorTop(object):
         theta = 60
         offset = (self.dataObj.beam_B) +100
         text_up = str(self.dataObj.no_of_rows) + " rows " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2132,7 +2132,7 @@ class End2DCreatorSide(object):
         theta = 60
         offset = self.dataObj.notch_offset + self.dataObj.end_dist + 70
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2307,7 +2307,7 @@ class End2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.D_col - self.dataObj.plate_width) / 2 + self.dataObj.end_dist + 20
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2475,7 +2475,7 @@ class End2DCreatorSide(object):
         theta = 45
         offset = (self.dataObj.col_B - self.dataObj.plate_width) / 2 + self.dataObj.end_dist
         text_up = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:

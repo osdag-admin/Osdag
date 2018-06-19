@@ -65,7 +65,7 @@ class ExtendedEndPlateCalculation(ConnectionCalculations):
 		self.edge_factor = "b - Machine flame cut"
 		self.is_environ_corrosive = "No"
 		self.design_method = "Limit State Design"
-		self.is_hsfg = False
+		self.is_is_friction_grip_bolt = False
 		self.n_e = 1  # interfaces offering friction - for HSFG design
 		self.mu_f = 0.3  # slip factor - for HSFG design
 		self.bolt_fu_overwrite = 0

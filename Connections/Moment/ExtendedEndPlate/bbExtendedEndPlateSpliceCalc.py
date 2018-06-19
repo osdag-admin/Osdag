@@ -71,7 +71,7 @@ def netArea_thread(dia):
     """
 
     Args:
-        dia: (int)- diameter of bolt (HSFG/Bearing bolt)
+        dia: (int)- diameter of bolt (Friction Grip Bolt/Bearing bolt)
 
     Returns: (float)- Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
 
@@ -89,7 +89,7 @@ def netarea_shank(dia):
     """
 
     Args:
-        dia: (int) -  diameter of bolt (HSFG/Bearing bolt)
+        dia: (int) -  diameter of bolt (Friction Grip Bolt/Bearing bolt)
 
     Returns: (int)- Net area of bolts at shank portion (Ref. Table 5.11 Subramanian's book, page: 358 )
 
@@ -232,18 +232,18 @@ def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
 
 #######################################################################
 
-# Function for calculating Tension capacity of HSFG bolt
+# Function for calculating Tension capacity of Friction Grip Bolt bolt
 # Reference: Cl 10.4.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
 
-def bolt_tension_hsfg(bolt_fu, netArea):
+def bolt_tension_friction_grip_bolt(bolt_fu, netArea):
     """
 
     Args:
         bolt_fu: (float)- Ultimate tensile strength of a bolt
         netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
 
-    Returns: (float)- Tension capacity of HSFG bolt in kN
+    Returns: (float)- Tension capacity of Friction Grip Bolt bolt in kN
 
     """
     T_df = 0.9 * bolt_fu * netArea * (1.25 * 1000) ** -1
@@ -510,11 +510,11 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Decrease the Height of End Plate")
 
     #######################################################################
-    # Check for shear capacity of HSFG bolt (Cl. 10.4.3, IS 800:2007)
+    # Check for shear capacity of Friction Grip Bolt bolt (Cl. 10.4.3, IS 800:2007)
     # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
     # Here,
-    # Vdsf = nominal shear capacity of HSFG bolt
-    # V_dsf = nominal shear capacity of HSFG bolt after multiplying the correction factor(s)
+    # Vdsf = nominal shear capacity of Friction Grip Bolt bolt
+    # V_dsf = nominal shear capacity of Friction Grip Bolt bolt after multiplying the correction factor(s)
     # Vdsb = nominal shear capacity of Bearing bolt
     # V_dsb = nominal shear capacity of Bearing bolt after multiplying the correction factor(s)
 
@@ -534,14 +534,14 @@ def bbExtendedEndPlateSplice(uiObj):
     # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
     l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
 
         if l_j > 15 * bolt_dia:
             V_dsf = Vdsf * long_joint(bolt_dia, l_j)
         else:
             V_dsf = Vdsf
-        bolt_capacity = V_dsf  # Capacity of HSFG bolt
+        bolt_capacity = V_dsf  # Capacity of Friction Grip Bolt bolt
         bearing_capacity = "N/A"
     else:
         Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)      # 1. Check for Shear capacity of bearing bolt
@@ -565,7 +565,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Number of bolts in each column
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         bolt_shear_capacity = V_dsf
     else:
         bolt_shear_capacity = V_dsb
@@ -1364,12 +1364,12 @@ def bbExtendedEndPlateSplice(uiObj):
 
     Tdf_1 = (bolt_fy * netarea_shank(bolt_dia) * (1.25/1.10)) / 1000 # Here, Tdf_1 is the maximum allowed tension capacity of bolt (Cl 10.4.5, IS 800:2007 )
 
-    if bolt_type == "HSFG":
-        Tdf = bolt_tension_hsfg(bolt_fu, netArea_thread(bolt_dia))
+    if bolt_type == "Friction Grip Bolt":
+        Tdf = bolt_tension_friction_grip_bolt(bolt_fu, netArea_thread(bolt_dia))
         bolt_tension_capacity = Tdf
         if Tdf > Tdf_1:
             design_status = False
-            logger.error(": Tension capacity of HSFG bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
+            logger.error(": Tension capacity of Friction Grip Bolt bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
             logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
             logger.info(": Re-design the connection using bolt of smaller diameter")
     else:
@@ -1386,11 +1386,11 @@ def bbExtendedEndPlateSplice(uiObj):
     # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
     T_b = T1 + Q
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         if T_b >= Tdf:
             design_status = False
             logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.4.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension on HSFG bolt of selected diameter is %2.2f kN" % Tdf)
+            logger.warning(": Maximum allowed tension on Friction Grip Bolt bolt of selected diameter is %2.2f kN" % Tdf)
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
         if T_b >= Tdb:
@@ -1402,15 +1402,15 @@ def bbExtendedEndPlateSplice(uiObj):
     #######################################################################
     # Check for Combined shear and tension capacity of bolt
 
-    # 1. HSFG bolt (Cl. 10.4.6, IS 800:2007)
-    # Here, Vsf = Factored shear load acting on single bolt, Vdf = shear capacity of single HSFG bolt
-    # Tf = External factored tension acting on a single HSFG bolt, Tdf = Tension capacity of single HSFG bolt
+    # 1. Friction Grip Bolt bolt (Cl. 10.4.6, IS 800:2007)
+    # Here, Vsf = Factored shear load acting on single bolt, Vdf = shear capacity of single Friction Grip Bolt bolt
+    # Tf = External factored tension acting on a single Friction Grip Bolt bolt, Tdf = Tension capacity of single Friction Grip Bolt bolt
 
     # 2. Bearing bolt (Cl. 10.3.6, IS 800:2007)
     # Here, Vsb = Factored shear load acting on single bolt, Vdb = shear capacity of single bearing bolt
     # Tb = External factored tension acting on single bearing bolt, Tdb = Tension capacity of single bearing bolt
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         Vsf = factored_shear_load / float(number_of_bolts)
         Vdf = V_dsf
         Tf = T_b
@@ -1419,12 +1419,12 @@ def bbExtendedEndPlateSplice(uiObj):
         Vdb = V_db
         Tb = T_b
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         combined_capacity = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
 
         if combined_capacity > 1.0:
             design_status = False
-            logger.error(": Load due to combined shear and tension on selected HSFG bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
+            logger.error(": Load due to combined shear and tension on selected Friction Grip Bolt bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
             logger.warning(": The maximum allowable value is 1.0")
             logger.info(": Re-design the connection using bolt of higher diameter or grade")
     else:
@@ -1669,7 +1669,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
         outputobj['Bolt']['BoltFy'] = bolt_fy
 
-        if bolt_type == "HSFG":
+        if bolt_type == "Friction Grip Bolt":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
             outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
             outputobj['Bolt']['Tf'] = float(round(Tf, 3))
@@ -1769,7 +1769,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
         outputobj['Bolt']['BoltFy'] = bolt_fy
 
-        if bolt_type == "HSFG":
+        if bolt_type == "Friction Grip Bolt":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
             outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
             outputobj['Bolt']['Tf'] = float(round(Tf, 3))
@@ -1867,7 +1867,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
         outputobj['Bolt']['BoltFy'] = bolt_fy
 
-        if bolt_type == "HSFG":
+        if bolt_type == "Friction Grip Bolt":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
             outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
             outputobj['Bolt']['Tf'] = float(round(Tf, 3))
@@ -1965,7 +1965,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
         outputobj['Bolt']['BoltFy'] = bolt_fy
 
-        if bolt_type == "HSFG":
+        if bolt_type == "Friction Grip Bolt":
             outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
             outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
             outputobj['Bolt']['Tf'] = float(round(Tf, 3))

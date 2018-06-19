@@ -1351,21 +1351,21 @@ class CoverEnd2DSide(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.gauge), params)
 
 		# ------------------------------------------  Faint line for web  -------------------------------------------
-		ptx1 = self.WW3
-		pty1 = ptx1 + self.data_object.beam_width_B2 * np.array([1, 0])
-		self.data_object.draw_faint_line(ptx1, pty1, dwg)
+		# ptx1 = self.WW3
+		# pty1 = ptx1 + self.data_object.beam_width_B2 * np.array([1, 0])
+		# self.data_object.draw_faint_line(ptx1, pty1, dwg)
 
-		ptx2 = np.array(pt_inside_column_list[0])
+		ptx2 = np.array(pt_inside_column_list[2])
 		pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 		self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
-		point1 = ptx2 + self.data_object.edge_dist2 * np.array([0, 1])
-		params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-				  "endlinedim": 10, "arrowlen": 20}
-		self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.edge_dist2), params)
+		# point1 = ptx2 + self.data_object.edge_dist2 * np.array([0, 1])
+		# params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
+		# 		  "endlinedim": 10, "arrowlen": 20}
+		# self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.edge_dist2), params)
 		# -------------------------------------------------------------------------------------------
 
-		ptx2 = np.array(pt_inside_column_list[0]) + self.data_object.pitch2 * np.array([0, -1])
+		ptx2 = np.array(pt_inside_column_list[2]) + self.data_object.pitch2 * np.array([0, -1])
 		pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 		self.data_object.draw_faint_line(ptx2, pty2, dwg)
 

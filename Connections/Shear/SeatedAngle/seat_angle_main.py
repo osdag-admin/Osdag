@@ -81,7 +81,7 @@ class DesignPreferences(QDialog):
         self.ui.combo_design_method.setCurrentIndex(0)
         self.saved_designPref["design"]["design_method"] = self.ui.combo_design_method.currentText()
         self.saved = True
-        QMessageBox.about(self, 'Information', "Preferences saved")
+        # QMessageBox.about(self, 'Information', "Preferences saved")
 
         return self.saved_designPref
 
@@ -1471,7 +1471,7 @@ class MainController(QMainWindow):
         :return:
         """
         # uiInput = self.getuser_inputs()
-        uiInput = self.designParameters()
+        uiInput = self.designParameters()[0]
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

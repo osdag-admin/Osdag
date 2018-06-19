@@ -1991,7 +1991,7 @@ class MainController(QMainWindow):
         Closing endPlate window.
         '''
         # ui_input = self.getuser_inputs()
-        ui_input = self.designParameters()
+        ui_input = self.designParameters()[0]
         self.save_inputs(ui_input)
         reply = QMessageBox.question(self, 'Message',
                                            "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

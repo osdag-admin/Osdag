@@ -284,7 +284,7 @@ class MyPopupDialog(QDialog):
         if base_type == ".svg":
             cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
         else:
-			shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
+            shutil.copyfile(filename, os.path.join(str(self.mainController.folder), "images_html", "cmpylogoFin.png"))
 
     def saveUserProfile(self):
 
@@ -956,8 +956,8 @@ class MainController(QMainWindow):
 
     def setDictToUserInputs(self,uiObj):
 
-        if (uiObj is not None):
-            if uiObj["Connection"] != "Finplate":
+        if uiObj is not None:
+            if uiObj['Connection'] != 'Finplate':
                 QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
                 return
 
@@ -1070,7 +1070,9 @@ class MainController(QMainWindow):
 
         uiObj['Load'] = {}
         uiObj['Load']['ShearForce (kN)'] = self.ui.txtShear.text()
+
         uiObj["Connection"] = self.connection
+
         return uiObj
 
     def saveDesign_inputs(self):
@@ -1924,7 +1926,7 @@ class MainController(QMainWindow):
         Closing finPlate window.
         '''
         # uiInput = self.getuser_inputs()
-        uiInput = self.designParameters()
+        uiInput = self.designParameters()[0]
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

@@ -14,7 +14,7 @@ class ReportGenerator(SeatAngleCalculation):
         bolt_hole_clearance (float)
         bolt_hole_type (string): "Standard" or "Over-sized"
         bolt_fu_overwrite (float)
-        mu_f (float): slip factor for HSFG bolt calculations
+        mu_f (float): slip factor for Friction Grip Bolt bolt calculations
         min_edge_multiplier (float): multiplier for min edge distance check - based on edge type
         type_of_edge (string): The type is used in determining the min_edge_distance 
         is_environ_corrosive (string): 'Yes' or 'No'
@@ -123,8 +123,7 @@ class ReportGenerator(SeatAngleCalculation):
         self.design_method = sa_calc_object.design_method
         self.root_clearance_sa = sa_calc_object.root_clearance_sa
         self.root_clearance_col = sa_calc_object.root_clearance_col
-        self.is_hsfg = sa_calc_object.is_hsfg
-
+        self.is_friction_grip_bolt = sa_calc_object.is_friction_grip_bolt
         self.top_angle = sa_calc_object.top_angle
         self.top_angle_recommended = sa_calc_object.top_angle_recommended
         self.connectivity = sa_calc_object.connectivity
@@ -262,7 +261,8 @@ class ReportGenerator(SeatAngleCalculation):
         angle_fu = str(self.angle_fu)
 
         bolt_type = str(self.bolt_type)
-        is_hsfg = self.is_hsfg
+
+        is_friction_grip_bolt = self.is_friction_grip_bolt
         bolt_grade = str(self.bolt_grade)
         bolt_diameter = str(self.bolt_diameter)
         bolt_fu = str(self.bolt_fu)
@@ -377,7 +377,8 @@ class ReportGenerator(SeatAngleCalculation):
         rstr += design_summary_row(0, "Bolt ", "detail1", col_span="2")
         rstr += design_summary_row(1, "Hole Type", "detail2", text_two=str(bolt_hole_type) + " Hole")
         rstr += design_summary_row(1, "Material Grade Fu (MPa) (overwrite)", "detail2", text_two=str(bolt_fu_overwrite))
-        if is_hsfg:
+
+        if is_friction_grip_bolt:
             rstr += design_summary_row(1, "Slip Factor", "detail2", text_two=str(slip_factor_mu_f))
         rstr += design_summary_row(0, "Detailing", "detail1", col_span="2")
         rstr += design_summary_row(1, "Type of Edge", "detail2", text_two=str(type_of_edge)[4:])
@@ -415,17 +416,20 @@ class ReportGenerator(SeatAngleCalculation):
 
         # Bolt shear capacity (kN)
         const = str(round(math.pi / 4 * 0.78, 4))
-        if is_hsfg == False:
+
+        if is_friction_grip_bolt == False:
             req_field = "<i>V</i><sub>dsb</sub> = bolt_fu*(pi*0.78/4)*bolt_diameter^2/(&#8730;3)/" \
                         "<i>gamma<sub>mb</sub></i><br> [cl. 10.3.3]"
             prov_field = "<i>V</i><sub>dsb</sub> = " + bolt_fu + "*(" + const + ")*" + bolt_diameter + "^2/" \
                          + "(&#8730;3)/1.25/1000 <br> " + space(2) + "= " + shear_capacity
-        elif is_hsfg == True:
+
+        elif is_friction_grip_bolt == True:
             if bolt_hole_type == "Standard":
                 K_h = str(1.0)
             elif bolt_hole_type == "Oversized":
                 K_h = str(0.85)
-            req_field = "HSFG bolt shear capacity:"
+
+            req_field = "Friction Grip Bolt bolt shear capacity:"
             # req_field += "<br> <i>V</i><sub>dsf</sub> = mu_f*n_e*K_h*A_nb*f_0/<i>gamma<sub>mb</sub></i>"
             req_field += "<br> [cl. 10.3.3]"
             prov_field = "<i>V</i><sub>dsf</sub> = ("
@@ -438,10 +442,11 @@ class ReportGenerator(SeatAngleCalculation):
         # req_field = "<i>V<sub>dpb</sub></i> = 2.5*k<sub>b</sub>*bolt_diameter*critical_thickness" \
         #             +"<br> *<i>f</i><sub>u</sub>/<i>gamma<sub>mb</sub></i><br> [Cl. 10.3.4]"
         req_field = "<i>V<sub>dpb</sub></i>:<br> [Cl. 10.3.4]"
-        if is_hsfg == False:
+
+        if is_friction_grip_bolt == False:
             prov_field = "<i>V</i><sub>dpb</sub> = 2.5*" + kb + "*" + bolt_diameter + "*" + beam_w_t + "*" \
                         + beam_fu + "/1.25/1000)  <br>" + space(2) + " = " + bearing_capacity + " kN"
-        elif is_hsfg == True:
+        elif is_friction_grip_bolt == True:
             prov_field = 'N/A'
         rstr += design_check_row("Bolt bearing capacity (kN)", req_field, prov_field, "")
 

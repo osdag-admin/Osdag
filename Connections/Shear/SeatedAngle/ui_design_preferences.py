@@ -298,7 +298,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -431,7 +431,7 @@ class Ui_ShearDesignPreferences(object):
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">  0.1</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p></td></tr></table></body></html>"))
         self.label_note.setText(_translate("Dialog", "NOTE : If slip is permitted under the design load, design the bolt as a bearing\n"
-"bolt and select corresponding (higher) bolt grade."))
+"bolt and select corresponding bolt grade."))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("Dialog", "Bolt"))
         self.label_16.setText(_translate("Dialog", "Inputs"))
         self.label_17.setText(_translate("Dialog", "Description"))
@@ -440,7 +440,8 @@ class Ui_ShearDesignPreferences(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p></body></html>"))
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>"))
         self.label_6.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
         self.combo_weldType.setItemText(0, _translate("Dialog", "Shop weld"))
         self.combo_weldType.setItemText(1, _translate("Dialog", "Field weld"))
@@ -465,7 +466,7 @@ class Ui_ShearDesignPreferences(object):
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-size:8pt;\">and </span><span style=\" font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">This gap should include the tolerace value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p></body></html>"))

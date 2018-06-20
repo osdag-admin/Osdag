@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="newPrefix">
+<<<<<<< HEAD
+=======
+    <file>images/1.png</file>
+    <file>images/extended.png</file>
+    <file>images/coverplate.png</file>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
     <file>images/click_image.png</file>
     <file>images/image3487.png</file>
     <file>images/iitblogo.png</file>

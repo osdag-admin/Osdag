@@ -477,7 +477,13 @@ background-color: #abc250 ;
       <property name="font">
        <font>
         <pointsize>13</pointsize>
+<<<<<<< HEAD
         <italic>false</italic>
+=======
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
        </font>
       </property>
       <property name="frameShape">
@@ -487,7 +493,11 @@ background-color: #abc250 ;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
+<<<<<<< HEAD
        <number>1</number>
+=======
+       <number>0</number>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -638,8 +648,18 @@ background-color: #abc250 ;
            <string notr="true">QTabBar::tab {
     margin-right: 10;
  }
+<<<<<<< HEAD
 QTabBar::tab::hover
 {
+=======
+
+QTabBar::tab::selected{
+	background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QTabBar::tab::hover{
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
    background-color: #d97f7f;
    color:#000000 ;
 }
@@ -650,6 +670,10 @@ width: 200px;
 background-color: #925a5b;
 color:#ffffff;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
 QTabBar::tab{
 border-top-left-radius: 2px ;
 border-top-right-radius: 2px ;
@@ -1134,16 +1158,282 @@ color:#ffffff;
            <attribute name="whatsThis">
             <string>This connection is under development</string>
            </attribute>
+<<<<<<< HEAD
+=======
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="1" column="1">
+             <widget class="QRadioButton" name="rdbtn_beamcolumn">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Beam-Column</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <spacer name="verticalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>156</width>
+                <height>152</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="3">
+             <spacer name="verticalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>328</width>
+                <height>152</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>349</width>
+                <height>301</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="3" column="2">
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>349</width>
+                <height>25</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="3" column="1">
+             <widget class="QRadioButton" name="rdbtn_peb">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>PEB</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <spacer name="verticalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>156</width>
+                <height>163</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="3" column="3">
+             <widget class="QRadioButton" name="rdbtn_colcol">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Coulmn-Column</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="3">
+             <spacer name="verticalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>328</width>
+                <height>163</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="4">
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_14">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="3">
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                  <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Beam-Beam</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="rdbtn_beamtobeam">
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+                  <normaloff>:/newPrefix/images/1.png</normaloff>:/newPrefix/images/1.png</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>300</width>
+                  <height>300</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item row="0" column="3">
+             <spacer name="verticalSpacer_16">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
           </widget>
           <widget class="QWidget" name="tab3_trussconnection">
            <attribute name="title">
             <string>Truss Connection</string>
            </attribute>
+<<<<<<< HEAD
+=======
+           <layout class="QGridLayout" name="gridLayout_6">
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_19">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>218</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>This module is not available in the current version.</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_20">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>218</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
           </widget>
          </widget>
         </item>
        </layout>
       </widget>
+<<<<<<< HEAD
       <widget class="QWidget" name="tensionpage">
        <widget class="QLabel" name="label">
         <property name="geometry">
@@ -1166,6 +1456,260 @@ color:#ffffff;
          <string>Coming Soon ...</string>
         </property>
        </widget>
+=======
+      <widget class="QWidget" name="beamtobeampage">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_7">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>End Plate Connection</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>143</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="4" column="2">
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>358</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="4">
+         <spacer name="horizontalSpacer_16">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="1">
+         <spacer name="verticalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="3">
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="1">
+         <widget class="QRadioButton" name="rdbtn_coverplate">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+            <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>300</width>
+            <height>300</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <spacer name="horizontalSpacer_17">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>382</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="3">
+         <widget class="QRadioButton" name="rdbtn_endplate_ext">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+            <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>300</width>
+            <height>300</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="3" colspan="2">
+         <spacer name="horizontalSpacer_18">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>364</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="0">
+         <spacer name="horizontalSpacer_15">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="6" column="2">
+         <spacer name="verticalSpacer_14">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="5" column="2">
+         <widget class="QPushButton" name="btn_start_2">
+          <property name="minimumSize">
+           <size>
+            <width>190</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>190</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>11</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QPushButton
+{
+background-color: #925a5b;
+color:#ffffff;
+}</string>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+S</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Cover Plate Connection</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <spacer name="verticalSpacer_15">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+>>>>>>> a2b9ab456058efd9b060120514601539ab32e047
       </widget>
       <widget class="QWidget" name="page"/>
      </widget>

@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ShearDesignPreferences(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(808, 515)
+        Dialog.resize(856, 515)
         self.gridLayout_5 = QtWidgets.QGridLayout(Dialog)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -221,6 +221,23 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_18 = QtWidgets.QGridLayout(self.tab_Detailing)
         self.gridLayout_18.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_18.setObjectName("gridLayout_18")
+        self.gridLayout_10 = QtWidgets.QGridLayout()
+        self.gridLayout_10.setObjectName("gridLayout_10")
+        self.line_6 = QtWidgets.QFrame(self.tab_Detailing)
+        self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_6.setObjectName("line_6")
+        self.gridLayout_10.addWidget(self.line_6, 1, 0, 1, 1)
+        self.label_18 = QtWidgets.QLabel(self.tab_Detailing)
+        self.label_18.setObjectName("label_18")
+        self.gridLayout_10.addWidget(self.label_18, 0, 0, 1, 1)
+        self.textBrowser_detailingDescription = QtWidgets.QTextBrowser(self.tab_Detailing)
+        self.textBrowser_detailingDescription.setMinimumSize(QtCore.QSize(210, 0))
+        self.textBrowser_detailingDescription.setObjectName("textBrowser_detailingDescription")
+        self.gridLayout_10.addWidget(self.textBrowser_detailingDescription, 2, 0, 1, 1)
+        self.gridLayout_18.addLayout(self.gridLayout_10, 0, 1, 2, 1)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 255, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_18.addItem(spacerItem7, 1, 0, 1, 1)
         self.gridLayout_17 = QtWidgets.QGridLayout()
         self.gridLayout_17.setObjectName("gridLayout_17")
         self.gridLayout_6 = QtWidgets.QGridLayout()
@@ -261,25 +278,6 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_4.addWidget(self.combo_detailing_memebers, 2, 1, 1, 1)
         self.gridLayout_17.addLayout(self.gridLayout_4, 1, 0, 1, 1)
         self.gridLayout_18.addLayout(self.gridLayout_17, 0, 0, 1, 1)
-        spacerItem7 = QtWidgets.QSpacerItem(13, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_18.addItem(spacerItem7, 0, 1, 1, 1)
-        self.gridLayout_10 = QtWidgets.QGridLayout()
-        self.gridLayout_10.setObjectName("gridLayout_10")
-        self.line_6 = QtWidgets.QFrame(self.tab_Detailing)
-        self.line_6.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line_6.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line_6.setObjectName("line_6")
-        self.gridLayout_10.addWidget(self.line_6, 1, 0, 1, 1)
-        self.label_18 = QtWidgets.QLabel(self.tab_Detailing)
-        self.label_18.setObjectName("label_18")
-        self.gridLayout_10.addWidget(self.label_18, 0, 0, 1, 1)
-        self.textBrowser_detailingDescription = QtWidgets.QTextBrowser(self.tab_Detailing)
-        self.textBrowser_detailingDescription.setMinimumSize(QtCore.QSize(210, 0))
-        self.textBrowser_detailingDescription.setObjectName("textBrowser_detailingDescription")
-        self.gridLayout_10.addWidget(self.textBrowser_detailingDescription, 2, 0, 1, 1)
-        self.gridLayout_18.addLayout(self.gridLayout_10, 0, 2, 2, 1)
-        spacerItem8 = QtWidgets.QSpacerItem(20, 255, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_18.addItem(spacerItem8, 1, 0, 1, 1)
         self.tabWidget.addTab(self.tab_Detailing, "")
         self.tab_Design = QtWidgets.QWidget()
         self.tab_Design.setObjectName("tab_Design")
@@ -296,7 +294,7 @@ class Ui_ShearDesignPreferences(object):
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.retranslateUi(Dialog)
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(0)
         self.combo_slipfactor.setCurrentIndex(8)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -325,7 +323,7 @@ class Ui_ShearDesignPreferences(object):
         self.combo_slipfactor.setItemText(8, _translate("Dialog", "0.55"))
         self.label_5.setText(_translate("Dialog", "Inputs"))
         self.label_note.setText(_translate("Dialog", "NOTE : If slip is permitted under the design load, design the bolt as a bearing\n"
-"bolt and select corresponding (higher) bolt grade."))
+"bolt and select corresponding bolt grade."))
         self.label_3.setText(_translate("Dialog", "Description"))
         self.textBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -436,7 +434,8 @@ class Ui_ShearDesignPreferences(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p></body></html>"))
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Field weld takes a material safety factor of 1.5 </span></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>"))
         self.label_6.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
         self.combo_weldType.setItemText(0, _translate("Dialog", "Shop weld"))
         self.combo_weldType.setItemText(1, _translate("Dialog", "Field weld"))
@@ -444,6 +443,17 @@ class Ui_ShearDesignPreferences(object):
         self.txt_weldFu.setText(_translate("Dialog", "410"))
         self.label_10.setText(_translate("Dialog", "Fu"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("Dialog", "Weld"))
+        self.label_18.setText(_translate("Dialog", "Description"))
+        self.textBrowser_detailingDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-size:8pt;\">and </span><span style=\" font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">This gap should include the tolerace value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
+"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
+"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p></body></html>"))
         self.label_38.setText(_translate("Dialog", "Inputs"))
         self.label_39.setText(_translate("Dialog", "Type of edges"))
         self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut"))
@@ -454,17 +464,6 @@ class Ui_ShearDesignPreferences(object):
 "corrosive influences?"))
         self.combo_detailing_memebers.setItemText(0, _translate("Dialog", "No"))
         self.combo_detailing_memebers.setItemText(1, _translate("Dialog", "Yes"))
-        self.label_18.setText(_translate("Dialog", "Description"))
-        self.textBrowser_detailingDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">The minimum edge and end distances from the centre of any hole to the nearest edge of a plate shall not be less than </span><span style=\" font-size:8pt; font-weight:600;\">1.7</span><span style=\" font-size:8pt;\"> times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[a- sheared or hand flame cut edges] </span><span style=\" font-size:8pt;\">and </span><span style=\" font-size:8pt; font-weight:600;\">1.5 </span><span style=\" font-size:8pt;\">times the hole diameter in case of </span><span style=\" font-size:8pt; font-weight:600;\">[b - Rolled, machine-flame cut, sawn and planed edges]</span><span style=\" font-size:8pt;\"> (IS 800 - cl. 10. 2. 4. 2)</span></p>\n"
-"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt; vertical-align:middle;\"><br /></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">This gap should include the tolerance value of 5mm. So if the assumed clearance is 5mm, then the gap should be = 10mm (= 5mm {clearance} + 5 mm{tolerance})</span></p>\n"
-"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
-"<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
-"<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("Dialog", "Detailing"))
         self.label_19.setText(_translate("Dialog", "Design Method"))
         self.combo_design_method.setItemText(0, _translate("Dialog", "Limit State Design"))

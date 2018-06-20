@@ -9,7 +9,6 @@ from __builtin__ import str
 import time
 import math
 import os
-from os.path import exists
 import pickle
 
 from Connections.connection_calculations import ConnectionCalculations
@@ -77,7 +76,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     shear_load = str(uiObj['Load']['ShearForce (kN)'])
     column_sec = str(uiObj['Member']['ColumSection'])
     beam_sec = str(uiObj['Member']['BeamSection'])
-    beam_fy = float(uiObj['Member']['fy (MPa)'])
+
     plateThick = str(uiObj['Plate']['Thickness (mm)'])
     boltType = str(uiObj['Bolt']['Type'])
     boltGrade = str(uiObj['Bolt']['Grade'])
@@ -922,18 +921,8 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     rstr += t('tr')
-    ephislon = int(math.sqrt(250/beam_fy))
-    max_edgedist = str(float(12 * float(beam_tw) * ephislon))
-    min_width = str((2 * int(edge))+ float(gap))
-    if noOfCol == '1':
-        max_width = str(2*float( max_edgedist)+ float(gap))
-        row =[0,"Plate width (mm)","&#8805; (2*" + edge + ")+" +gap + "="+ min_width+ ", &#8804; (2*" + max_edgedist+ ")+"+gap +
-              "=" + max_width + "<br> [cl. 10.2.4]", plateWidth, ""]
-    else:
-        max_width = str(2*float( max_edgedist)+ int(gauge)+ float(gap))
-        row =[0,"Plate width (mm)","&#8805; (2*" + edge + ")+" +gap + "="+ min_width+ ", &#8804; (2*" + max_edgedist+ ")+" +
-              gauge+"+" +gap + "=" + max_width+ "<br> [cl. 10.2.4]", plateWidth, ""]
-
+    row = [0, "Plate width (mm)", "", "100", ""]
+    # row =[0,"Plate width (mm)","",plateWidth]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

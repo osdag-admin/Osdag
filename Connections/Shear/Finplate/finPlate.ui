@@ -301,7 +301,7 @@
         <string>Finplate only</string>
        </property>
        <property name="text">
-        <string>Finplate</string>
+        <string>Fin Plate</string>
        </property>
       </widget>
      </widget>
@@ -387,11 +387,6 @@
          <width>16777215</width>
          <height>16777215</height>
         </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
        </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -3144,7 +3139,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="toolTip">
-      <string>Reset inputs</string>
+      <string>Alt+R</string>
      </property>
      <property name="text">
       <string>Reset</string>
@@ -3173,7 +3168,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="toolTip">
-      <string>Design connection</string>
+      <string>Alt+D</string>
      </property>
      <property name="text">
       <string>Design</string>

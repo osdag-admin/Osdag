@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>images/bitmap.png</file>
+    <file>images/colFlange.svg</file>
+    <file>images/iit_logo.svg</file>
+    <file>images/coverplatewindow.png</file>
+    <file>images/image3487.png</file>
+    <file>images/input.png</file>
+    <file>images/Osdag Icon.ico</file>
+    <file>images/Osdag.png</file>
+    <file>images/Osdag_header.png</file>
+    <file>images/Osdag_header1</file>
+    <file>images/output.png</file>
+    <file>images/X-Y.eps</file>
+    <file>images/X-Y.png</file>
+    <file>images/Z-X.eps</file>
+    <file>images/Z-X.png</file>
+    <file>images/Z-Y.eps</file>
+    <file>images/Z-Y.png</file>
+  </qresource>
+</RCC>

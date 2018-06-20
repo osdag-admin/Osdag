@@ -226,7 +226,7 @@
         <string>Endplate only</string>
        </property>
        <property name="text">
-        <string>Endplate</string>
+        <string>End Plate</string>
        </property>
       </widget>
       <widget class="QToolButton" name="btn_front">
@@ -3168,7 +3168,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="toolTip">
-      <string>Reset inputs</string>
+      <string>Alt+R</string>
      </property>
      <property name="text">
       <string>Reset</string>
@@ -3197,7 +3197,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="toolTip">
-      <string>Design connection</string>
+      <string>Alt+D</string>
      </property>
      <property name="text">
       <string>Design</string>

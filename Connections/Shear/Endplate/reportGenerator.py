@@ -559,7 +559,8 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    if bolt_type == "HSFG":
+
+    if bolt_type == "Friction Grip Bolt":
         row = [1, "Slip factor", slip_factor]
     else:
         row = [1, "Slip factor", "N/A"]

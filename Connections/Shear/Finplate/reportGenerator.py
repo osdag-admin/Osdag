@@ -9,7 +9,6 @@ from __builtin__ import str
 import time
 import math
 import os
-from os.path import exists
 import pickle
 
 from Connections.connection_calculations import ConnectionCalculations
@@ -77,6 +76,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     shear_load = str(uiObj['Load']['ShearForce (kN)'])
     column_sec = str(uiObj['Member']['ColumSection'])
     beam_sec = str(uiObj['Member']['BeamSection'])
+
     plateThick = str(uiObj['Plate']['Thickness (mm)'])
     boltType = str(uiObj['Bolt']['Type'])
     boltGrade = str(uiObj['Bolt']['Grade'])

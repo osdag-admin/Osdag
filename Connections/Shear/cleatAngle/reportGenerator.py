@@ -711,7 +711,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         row = [1, "Slip factor", slip_factor]
     else:
         row = [1, "Slip factor", "N/A"]
@@ -853,7 +853,8 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     const = str(round(math.pi / 4 * 0.78, 4))
     n_e = str(2)
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
-    if bolt_type == "HSFG":
+
+    if bolt_type == "Friction Grip Bolt":
         row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
                ")/(1.25)) = " + shear_capacity_b + "<br> [cl. 10.4.3]", ""]
     else:
@@ -867,7 +868,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         row = [0, "Bolt bearing capaciy (kN)", "", "N/A", " "]
     else:
         row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_b + "*" + bolt_fu +
@@ -881,7 +882,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity of beam web (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type ==  "HSFG":
+    if bolt_type ==  "Friction Grip Bolt":
         row = [0, "Bearing capacity of beam web (kN)", "", "N/A", ""]
     else:
         row = [0, "Bearing capacity of beam web (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + beam_tw + "*" + beam_fu +
@@ -893,8 +894,9 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('/tr')
 
     rstr += t('tr')
-    # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == "HSFG":
+    # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"
+
+    if bolt_type == "Friction Grip Bolt":
         row = [0, "Bearing capacity of cleat (kN)", "", "N/A", " "]
     else:
         row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
@@ -907,7 +909,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bearing capacity (kN)", "", "N/A", " "]
     else:
         bearcapacity = str(min(float(boltbearingcapacity_b), float(bearingcapacitybeam_b), float(bearingcapacitycleat_b)))
@@ -921,7 +923,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt capacity (kN)", "", shear_capacity_b ,""]
     else:
         row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity_b + ", " + bearcapacity + ") = " + bolt_capacity_b, ""]
@@ -1196,7 +1198,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     const = str(round(math.pi / 4 * 0.78, 4))
     n_e = str(1)
     # row =[0,"Bolt shear capacity (kN)"," ","<i>V</i><sub>dsb</sub> = ((800*0.6123*20*20)/(&#8730;3*1.25*1000) = 90.53 <br> [cl. 10.3.3]"]
-    if bolt_type == "HSFG":
+    if bolt_type == "Friction Grip Bolt":
         row = [0, "Bolt shear capacity (kN)", " ", "<i>V</i><sub>dsf</sub> = ((" + slip_factor + "*" + n_e + "*" + k_h + "*" +
            F_0 + ")/(1.25)) = " + shear_capacity_c + "<br> [cl. 10.4.3]", ""]
     else:
@@ -1212,7 +1214,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bolt bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt bearing capaciy (kN)", "", "N/A", " "]
     else:
         row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thinner_c + "*" +
@@ -1237,7 +1239,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity of beam web (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt bearing capaciy (kN)", "", "N/A", " "]
     else:
         row = [0, str_con, "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + thk + "*" + beam_fu + ")/(1.25*1000)  = " + bearingcapacitycolumn_c +
@@ -1250,7 +1252,8 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('tr')
 
     # row =[0,"Bearing capacity of cleat (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == 'HSFG':
+
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt bearing capaciy (kN)", "", "N/A", " "]
     else:
         row = [0, "Bearing capacity of cleat (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + cleat_thk + "*" + beam_fu +
@@ -1263,7 +1266,7 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bearing capacity (kN)",""," <i>V</i><sub>dsb</sub> = (2.5*0.5*20*8.9*410)  = 72.98<br> [cl. 10.3.4]"]
-    if bolt_type == 'HSFG':
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt bearing capaciy (kN)", "", "N/A", " "]
     else:
         bearingcapacitycleat_c = str(min(float(boltbearingcapacity_c), float(bearingcapacitycolumn_c), float(bearingcapacitycleat_c)))
@@ -1277,7 +1280,8 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
 
     rstr += t('tr')
     # row =[0,"Bolt capacity (kN)","","Min (90.53,72.98) = 72.98","<p align=right style=color:green><b>Pass</b></p>"]
-    if bolt_type == 'HSFG':
+
+    if bolt_type == 'Friction Grip Bolt':
         row = [0, "Bolt capacity (kN)", "",shear_capacity_c , ""]
     else:
         row = [0, "Bolt capacity (kN)", "", "Min (" + shear_capacity_c + ", " + bearingcapacitycleat_c + ") = " + bolt_capacity_c, ""]

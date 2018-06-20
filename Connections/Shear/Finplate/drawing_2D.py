@@ -859,7 +859,8 @@ class Fin2DCreatorFront(object):
         theta = 70
         offset = (self.dataObj.beam_B)
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -882,8 +883,8 @@ class Fin2DCreatorFront(object):
         ptx = self.FG + 70 * np.array([-1,0]) + (self.dataObj.col_L - self.dataObj.beam_L)/2  * np.array([0, 1]) + np.array([-1, 0])
         dwg.add(dwg.text('Front view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FG + 70 * np.array([-1,0]) + ((self.dataObj.col_L - self.dataObj.beam_L)/2 + 40)* np.array([0, 1]) + np.array([-1, 0])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def callCWBWfront(self, fileName):
@@ -1069,7 +1070,8 @@ class Fin2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.col_L - self.dataObj.D_beam)/3
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -1099,8 +1101,8 @@ class Fin2DCreatorFront(object):
         ptx = self.H + (self.dataObj.col_L / 3.5) * np.array([0, 1]) + 30 * np.array([-1, 0])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.H + (self.dataObj.col_L / 3.5 + 40) * np.array([0, 1]) + 30 * np.array([-1, 0])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def callBWBWfront(self, fileName):
@@ -1277,7 +1279,8 @@ class Fin2DCreatorFront(object):
         theta = 45
         offset = self.dataObj.end_dist + self.dataObj.notch_ht + 50
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -1308,8 +1311,8 @@ class Fin2DCreatorFront(object):
         ptx = self.BH + (self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 100) * np.array([0, 1]) + 100 * np.array([1, 0])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BH + (self.dataObj.end_dist + self.dataObj.beam_T + self.dataObj.beam_R1 + 140) * np.array([0, 1]) + 100 * np.array([1, 0])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
 
@@ -1560,7 +1563,8 @@ class Fin2DCreatorTop(object):
         theta = 60
         offset = (self.dataObj.beam_B) + 130
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -1595,8 +1599,8 @@ class Fin2DCreatorTop(object):
         ptx = self.FG + (self.dataObj.col_B *1.3  ) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FG + (self.dataObj.col_B *1.3 + 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def callCWBWTop(self, fileName):
@@ -1713,7 +1717,8 @@ class Fin2DCreatorTop(object):
         theta = 60
         offset = (self.dataObj.beam_B) + 160
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -1748,8 +1753,8 @@ class Fin2DCreatorTop(object):
         ptx = self.G + (30) * np.array([1, 0]) + (self.dataObj.beam_L + 60) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32)) 
         ptx = self.G + (30) * np.array([1, 0]) + (self.dataObj.beam_L + 100) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
         dwg.save()
 
     def callBWBWTop(self, fileName):
@@ -1871,7 +1876,8 @@ class Fin2DCreatorTop(object):
         theta = 60
         offset = (self.dataObj.beam_B) + 160
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -1906,8 +1912,8 @@ class Fin2DCreatorTop(object):
         ptx = self.BC + (80) * np.array([1, 0]) + (220) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32)) 
         ptx = self.BC + (80) * np.array([1, 0]) + (260) * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
         dwg.save()
 
 
@@ -2096,7 +2102,8 @@ class Fin2DCreatorSide(object):
         theta = 45
         offset = self.dataObj.col_L / 4
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -2117,8 +2124,8 @@ class Fin2DCreatorSide(object):
         ptx = self.G + 150 * np.array([0, 1]) + (self.dataObj.D_col/1.5) * np.array([1, 0])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30)) 
         ptx = self.G + 190 * np.array([0, 1]) + (self.dataObj.D_col/1.5) * np.array([1, 0])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def callCFBWSide(self, fileName):
@@ -2208,7 +2215,8 @@ class Fin2DCreatorSide(object):
         theta = 45
         offset = self.dataObj.col_L / 4
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -2229,7 +2237,8 @@ class Fin2DCreatorSide(object):
         ptx = self.FC + 90 * np.array([-1, 0]) + 140 * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FC  + 90 * np.array([-1, 0]) + 180 * np.array([0, 1])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.fit()
         dwg.save()
 
@@ -2321,7 +2330,8 @@ class Fin2DCreatorSide(object):
         offset = self.dataObj.col_L / 3.0
 
         textUp = str(self.dataObj.no_of_rows) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
-        if str(self.dataObj.bolt_type) == "HSFG":
+
+        if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             textDown = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(
                 self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.grade) + ")"
         else:
@@ -2342,7 +2352,8 @@ class Fin2DCreatorSide(object):
         ptx = self.BA6 + (self.dataObj.D_beam/1.2) * np.array([0, 1]) + (self.dataObj.col_L/2) * np.array([1, 0])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BA6 + (self.dataObj.D_beam/1.2 + 40) * np.array([0, 1]) + (self.dataObj.col_L / 2) * np.array([1, 0])
-        dwg.add(dwg.text('(All distances are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
+
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.fit()
         dwg.save()
                 

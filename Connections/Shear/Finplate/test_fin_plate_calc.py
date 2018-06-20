@@ -15,7 +15,7 @@ def create_sample_ui_input_fp(fp_connection_id):
         input_dict['Load']['ShearForce (kN)'] = 120
         input_dict['Bolt'] = {
             'Diameter (mm)': 16,
-            'Type': "HSFG",
+            'Type': "Friction Grip Bolt",
             'Grade': "8.8"}
         input_dict['Plate'] = {
             'Thickness (mm)': 10,
@@ -46,7 +46,7 @@ def create_sample_ui_input_fp(fp_connection_id):
         input_dict['Load']['ShearForce (kN)'] = 120
         input_dict['Bolt'] = {
             'Diameter (mm)': 16,
-            'Type': "HSFG",
+            'Type': "Friction Grip Bolt",
             'Grade': "8.8"}
         input_dict['Plate'] = {
             'Thickness (mm)': 10,
@@ -76,7 +76,7 @@ def create_sample_ui_input_fp(fp_connection_id):
         input_dict['Load']['ShearForce (kN)'] = 120
         input_dict['Bolt'] = {
             'Diameter (mm)': 16,
-            'Type': "HSFG",
+            'Type': "Friction Grip Bolt",
             'Grade': "8.8"}
         input_dict['Plate'] = {
             'Thickness (mm)': 10,
@@ -106,7 +106,7 @@ def create_sample_ui_input_fp(fp_connection_id):
         input_dict['Load']['ShearForce (kN)'] = 120
         input_dict['Bolt'] = {
             'Diameter (mm)': 16,
-            'Type': "HSFG",
+            'Type': "Friction Grip Bolt",
             'Grade': "8.8"}
         input_dict['Plate'] = {
             'Thickness (mm)': 10,
@@ -136,7 +136,7 @@ def create_sample_ui_input_fp(fp_connection_id):
         input_dict['Load']['ShearForce (kN)'] = 120
         input_dict['Bolt'] = {
             'Diameter (mm)': 16,
-            'Type': "HSFG",
+            'Type': "Friction Grip Bolt",
             'Grade': "8.8"}
         input_dict['Plate'] = {
             'Thickness (mm)': 10,

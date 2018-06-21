@@ -76,6 +76,7 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     shear_load = str(uiObj['Load']['ShearForce (kN)'])
     column_sec = str(uiObj['Member']['ColumSection'])
     beam_sec = str(uiObj['Member']['BeamSection'])
+
     plateThick = str(uiObj['Plate']['Thickness (mm)'])
     boltType = str(uiObj['Bolt']['Type'])
     boltGrade = str(uiObj['Bolt']['Grade'])

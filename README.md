@@ -13,6 +13,7 @@
 * <a href="#license">Copyright and license</a>
 
 ## <a id="user-content-quick-start" class="anchor" href="#quick-start" aria-hidden="true"></a> Quick start
+
 <a href= "http://osdag.fossee.in/resources/downloads">Download the latest release version 2017.08.a.e2dd</a>
 ### 1. Windows Installation
 
@@ -47,7 +48,7 @@
             i) Add Anaconda to my PATH environment variable
             ii) Register Anaconda as my default Python 2.7            
     2) Run Osdag_setup_x86.exe    and follow on-screen instructions
-        # The default directory to install Osdag is the User’s Desktop.  
+        # The default directory to install Osdag is the User’s Desktop.
         You may choose any other location. However, DO NOT choose any of the following locations:
             a) Program Files  
             b) Program Files (x86)
@@ -114,10 +115,10 @@
     Installation steps:
     ===================
       Extract the downloaded installer using the Archive Manager/File-Roller, or using the following command on the bash prompt: tar -xvf Osdag_ubuntu_installer.tar.gz
-      
+
       # If you have already installed the  previous version of Osdag in your system then skip Step/Command 1) and just run the new 2-install-osdag.sh.
 
-      In bash, navigate to the extracted installation folder containing the shell scripts (the folder that contains this README file) 
+      In bash, navigate to the extracted installation folder containing the shell scripts (the folder that contains this README file)
       and a folder named Osdag, and enter Command 1 and Command 2 given below.  
 
       Note: After entering Command 1, while installing Miniconda2, you will be asked whether you wish to set the system default python
@@ -156,6 +157,10 @@ Anyone and everyone is welcome to contribute. It's through your contributions th
 Have a bug or a feature request? Please first read the <a href= "https://github.com/osdag-admin/Osdag/blob/master/CONTRIBUTING.md#using-the-issue-tracker">issue guidelines</a> and search for existing and closed issues. If your problem or idea is not addressed yet, please <a href= "https://github.com/osdag-admin/Osdag/issues/new">open a new issue</a> or at <a href= "http://osdag.fossee.in/forums"> Osdag forum</a>.
 
 ## <a id="user-content-version" class="anchor" href="#version" aria-hidden="true"></a> Versioning
+<<<<<<< HEAD
+=======
+
+>>>>>>> 410d1c0b96cf3ffa654ab6b14394593096d755a8
 This beta version of Osdag contains only the shear connection modules. Starting with version of Osdag 2017.06.a.874e. The latest version of Osdag 2017.08.a.e2dd is available with bugs fixed.
 
 ## <a id="user-content-license" class="anchor" href="#license" aria-hidden="true"></a> Copyright and license

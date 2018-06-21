@@ -1,0 +1,52 @@
+(dp0
+S'Member'
+p1
+(dp2
+S'ColumSection'
+p3
+S'ISMB 500'
+p4
+sS'fu (MPa)'
+p5
+I410
+sS'BeamSection'
+p6
+S'ISMB 300'
+p7
+sS'fy (MPa)'
+p8
+I250
+sS'Connectivity'
+p9
+S'Beam-Beam'
+p10
+ssS'Load'
+p11
+(dp12
+S'ShearForce (kN)'
+p13
+F120.0
+ssS'cleat'
+p14
+(dp15
+S'section'
+p16
+S'ISA 120X80X10'
+p17
+sS'Height (mm)'
+p18
+F0.0
+ssS'Bolt'
+p19
+(dp20
+S'Grade'
+p21
+F4.8
+sS'Diameter (mm)'
+p22
+I16
+sS'Type'
+p23
+S'Black Bolt'
+p24
+ss.

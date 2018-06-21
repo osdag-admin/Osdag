@@ -155,7 +155,6 @@ class ConnectionCalculations(object):
     @staticmethod
     def bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, mu_f, n_e, bolt_hole_type):
         """ Calculate design shear capacity of a single Friction Grip Bolt bolt(s) based on Cl 10.4.3
-
         Args:
              bolt_diameter (int)
              bolt_fu (int) - ultimate stress of bolt Fu
@@ -164,6 +163,7 @@ class ConnectionCalculations(object):
              bolt_hole_type (string) - "Standard" or "Over-sized"
 
         Returns:
+
             v_db - Factored shear capacity of Friction Grip Bolt bolt as float
 
         Note:

@@ -162,6 +162,7 @@ class Ui_MainWindow(object):
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
         self.textEdit.setMinimumSize(QtCore.QSize(0, 125))
         self.textEdit.setMaximumSize(QtCore.QSize(16777215, 16777215))
+
         self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.textEdit.setReadOnly(True)
         self.textEdit.setOverwriteMode(True)
@@ -1879,6 +1880,7 @@ class Ui_MainWindow(object):
         self.lbl_angle.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600; font-style:italic;\">Angle sections</span></p></body></html>"))
         self.lbl_comboAngleSec.setText(_translate("MainWindow", "Seated angle *"))
         self.lbl_topanglesection.setText(_translate("MainWindow", " Top angle *"))
+
         self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
         self.btn_Reset.setText(_translate("MainWindow", "Reset"))
         self.btn_Reset.setShortcut(_translate("MainWindow", "Alt+R"))

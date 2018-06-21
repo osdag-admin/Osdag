@@ -5,7 +5,7 @@ Created on 24-Aug-2017
 """
 
 from ui_extendedendplate import Ui_MainWindow
-from ui_design_preferences import Ui_DesignPreference
+from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
@@ -79,7 +79,7 @@ class MyAboutOsdag(QDialog):
 class DesignPreference(QDialog):
 	def __init__(self, parent=None):
 		QDialog.__init__(self, parent)
-		self.ui = Ui_DesignPreference()
+		self.ui = Ui_DesignPreferences()
 		self.ui.setupUi(self)
 		self.maincontroller = parent
 
@@ -371,7 +371,7 @@ class DesignReportDialog(QDialog):
 
 	def desired_location(self, filename, base_type):
 		if base_type == ".svg":
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoCleat.png"))
+			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.svg"))
 		else:
 			shutil.copyfile(filename, os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
 

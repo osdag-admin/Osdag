@@ -127,9 +127,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["design"] = {}
         self.saved_designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
         self.saved = True
-
         # QMessageBox.about(self, 'Information', "Preferences saved")
-
 
         return self.saved_designPref
 
@@ -345,6 +343,7 @@ class MainController(QMainWindow):
 
         self.get_columndata()
         self.get_beamdata()
+
         self.designPrefDialog = DesignPreferences(self)
         self.ui.inputDock.setFixedSize(310, 710)
 
@@ -469,7 +468,6 @@ class MainController(QMainWindow):
         self.disableViewButtons()
         self.resultObj = None
         self.uiObj = None
-
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
@@ -799,7 +797,6 @@ class MainController(QMainWindow):
         range of plate height
 
         '''
-
         def clear_widget():
             ''' Clear the widget and change the label colour in to red '''
             widget.clear()
@@ -877,6 +874,7 @@ class MainController(QMainWindow):
                 clear_depth = col_D - 2 * (col_T + col_R1 + 5)
 
             if clear_depth < plate_width:
+
                 QMessageBox.about(self, 'Information', "Height of the fin plate should be less than %s mm" % (int(clear_depth)))
             else:
                 self.ui.btn_Design.setDisabled(False)
@@ -889,6 +887,7 @@ class MainController(QMainWindow):
         Returns:
 
         """
+
         if self.ui.comboPlateThick_2.currentText() == "Select plate thickness":
             self.ui.comboPlateThick_2.setCurrentIndex(0)
             self.ui.comboWldSize.setCurrentIndex(0)
@@ -943,7 +942,6 @@ class MainController(QMainWindow):
             for element in newlist[:]:
                 self.ui.comboWldSize.addItem(str(element))
 
-
     def retrieve_prevstate(self):
         """Maintain previous session's data.
         Returns:
@@ -952,7 +950,6 @@ class MainController(QMainWindow):
 
         uiObj = self.get_prevstate()
         self.setDictToUserInputs(uiObj)
-
 
     def setDictToUserInputs(self,uiObj):
 
@@ -1603,7 +1600,6 @@ class MainController(QMainWindow):
         if flag:
             flag = self.checkBeam_B()
 
-
         return flag
 
 
@@ -1678,6 +1674,7 @@ class MainController(QMainWindow):
 
     def call_3DModel(self, bgcolor):
         '''
+
         This routine responsible for displaying 3D Cad model
         :param flag: boolean
         :return:
@@ -1744,6 +1741,7 @@ class MainController(QMainWindow):
         This routine returns the neccessary design parameters.
         '''
         self.uiObj = self.getuser_inputs()
+
         # if self.designPrefDialog.saved is not True:
         #     design_pref = self.designPrefDialog.set_default_para()
         #     print "default_design_pref=",design_pref
@@ -1918,6 +1916,7 @@ class MainController(QMainWindow):
                 self.commLogicObj.call2D_Drawing(view, fname, self.folder)
 
         else:
+
             QMessageBox.about(self,'Information', 'Design Unsafe: %s view cannot be viewed' %(view))
 
 
@@ -1925,6 +1924,7 @@ class MainController(QMainWindow):
         '''
         Closing finPlate window.
         '''
+
         # uiInput = self.getuser_inputs()
         uiInput = self.designParameters()[0]
         self.save_inputs(uiInput)

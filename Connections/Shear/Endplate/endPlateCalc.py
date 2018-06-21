@@ -254,9 +254,6 @@ def blockshear(numrow, numcol, dia_hole, fy, fu, edge_dist, end_dist, pitch, gau
     return Tdb
 
 
-
-
-
 def end_connection(ui_obj):
     
     global logger
@@ -527,6 +524,7 @@ def end_connection(ui_obj):
                         pass
 
         min_end_plate_l = 2 * min_end_dist + (no_row - 1) * min_pitch
+
         max_end_plate_l = beam_depth - (2 * (beam_f_t + beam_R1 + 5))  # 5mm is the gap
 
         if connectivity == "Column web-Beam web":
@@ -817,7 +815,6 @@ def end_connection(ui_obj):
         logger.info(": Decrease the weld thickness")
 
     # End of calculation
-    
     output_obj = {}
     output_obj['Bolt'] = {}
     output_obj['Bolt']['status'] = design_check

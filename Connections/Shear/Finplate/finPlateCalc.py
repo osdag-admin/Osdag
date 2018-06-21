@@ -854,6 +854,7 @@ def finConn(uiObj):
             design_status = False
             logger.error(": Plate thickness provided is less than the minimum required [Ref. Owens and Cheal, 1989]")
             logger.warning(": Minimum plate thickness required is %2.2f mm " % (min_plate_thk))
+
     if web_plate_t > max_plate_thk:
         design_status = False
         logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
@@ -861,8 +862,8 @@ def finConn(uiObj):
         logger.info(": Increase the bolt diameter or decrease the plate thickness")
         # logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
         # logger.info(": Select a deeper secondary beam section")
-    
-    # Calculation of plate height required (for optional input) 
+
+    # Calculation of plate height required (for optional input)
     web_plate_l_req1 = math.sqrt((boltParameters['moment'] * 1000000 * 6 * 1.1) / (1.2 * beam_fy * web_plate_t));
     web_plate_l_req1 = round(web_plate_l_req1, 3)
     # Single line of bolts
@@ -890,7 +891,7 @@ def finConn(uiObj):
             logger.error(": Plate height provided is less than the minimum required [cl. 10.2.2/10.2.4]")
             logger.warning(": Minimum plate width required is %2.2f mm " % (web_plate_l_req))
             logger.info(": Increase the plate width")
-            
+
     if web_plate_w != 0:
         if web_plate_w < web_plate_w_req:
             design_status = False
@@ -1011,7 +1012,6 @@ def finConn(uiObj):
         logger.info(": Decrease the weld thickness")
 
     # End of calculation
-
     # Output for user given fin plate height
     if web_plate_l != 0 and web_plate_w != 0:
         outputObj = {}

@@ -900,6 +900,7 @@ class MainController(QMainWindow):
                 QMessageBox.about(self, 'Information', "File saved")
         else:
             self.ui.actionSave_CAD_image.setEnabled(False)
+
             QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be viewed')
 
 
@@ -1266,7 +1267,6 @@ class MainController(QMainWindow):
         self.ui.textEdit.clear()
 
         self.display.EraseAll()
-
         self.designPrefDialog.set_default_para()
 
     def dockbtn_clicked(self, widget):
@@ -1300,6 +1300,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         text_str = widget.text()
+
         val = float(text_str)
         if(val < min_val or val > max_val):
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_val, max_val))
@@ -1530,9 +1531,7 @@ class MainController(QMainWindow):
         if flag:
             flag = self.checkbeam_b()
 
-
         return flag
-
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''

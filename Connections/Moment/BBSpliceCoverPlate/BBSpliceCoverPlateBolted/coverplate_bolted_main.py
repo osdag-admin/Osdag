@@ -10,7 +10,7 @@ from ui_webspliceplate import Ui_Webspliceplate
 from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
 from drawing_2D import CoverEndPlate
-from ui_design_preferences import Ui_DesignPreference
+from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_ask_question import Ui_AskQuestion
 from ui_aboutosdag import Ui_AboutOsdag
@@ -72,7 +72,7 @@ class MyAboutOsdag(QDialog):
 class DesignPreferences(QDialog):
 	def __init__(self, parent=None):
 		QDialog.__init__(self, parent)
-		self.ui = Ui_DesignPreference()
+		self.ui = Ui_DesignPreferences()
 		self.ui.setupUi(self)
 		self.maincontroller = parent
 
@@ -291,7 +291,7 @@ class DesignReportDialog(QDialog):
 	def desired_location(self, filename, base_type):
 		if base_type == ".svg":
 			cairosvg.svg2png(file_obj=filename,
-							 write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoCleat.png"))
+							 write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.svg"))
 		else:
 			shutil.copyfile(filename,
 							os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))

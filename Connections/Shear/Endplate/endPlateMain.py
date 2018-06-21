@@ -421,6 +421,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen,self.ui.lbl_len_2))
+
         self.ui.txtPlateWidth.editingFinished.connect(lambda: self.check_plate_width(self.ui.txtPlateWidth, self.ui.lbl_width_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -436,7 +437,6 @@ class MainController(QMainWindow):
         self.ui.actionAbout_Osdag_2.triggered.connect(self.open_osdag)
         self.ui.actionVideo_Tutorials.triggered.connect(self.tutorials)
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
-
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_question)
 
         self.ui.actionDesign_Preferences.triggered.connect(self.design_preferences)
@@ -618,12 +618,12 @@ class MainController(QMainWindow):
             dict_col_data = get_columndata(column_sec)
         return dict_col_data
 
+
     def convert_col_combo_to_beam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
             self.ui.lbl_beam.setText(" Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
-
             self.ui.chkBxBeam.setText("SBeam")
             self.ui.actionShow_beam.setText("Show SBeam")
             self.ui.chkBxBeam.setToolTip("Secondary  beam")
@@ -634,7 +634,6 @@ class MainController(QMainWindow):
             self.ui.comboColSec.clear()
             self.get_beamdata()
             self.ui.comboColSec.addItems(get_beamcombolist())
-
             self.ui.combo_Beam.setCurrentIndex((0))
             self.ui.comboColSec.setCurrentIndex((0))
             self.ui.comboDiameter.setCurrentIndex(0)
@@ -720,7 +719,6 @@ class MainController(QMainWindow):
         loc = self.ui.comboConnLoc.currentText()
         check = True
         if loc == "Column web-Beam web":
-
             if self.ui.combo_Beam.currentText() == "Select section" or self.ui.comboColSec.currentIndex() == -1 or self.ui.comboColSec.currentText() == 'Select section':
                 return
             dict_beam_data = self.fetch_beam_param()
@@ -734,6 +732,7 @@ class MainController(QMainWindow):
 
             if column_web_depth <= beam_B:
                 self.ui.btn_Design.setDisabled(True)
+
                 QMessageBox.about(self, 'Information',
                                   "Beam flange is wider than clear depth of column web (No provision in Osdag till now)")
                 check = False
@@ -1282,7 +1281,7 @@ class MainController(QMainWindow):
         self.ui.comboDiameter.setCurrentIndex(0)
         self.ui.comboType.setCurrentIndex((0))
         self.ui.comboGrade.setCurrentIndex((0))
-        
+
         self.ui.comboPlateThick_2.setItemText(0, "Select plate thickness")
         self.ui.comboPlateThick_2.setCurrentIndex((0))
         self.ui.txtPlateLen.clear()
@@ -1350,6 +1349,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yeild Strength) textfields
         '''
         text_str = widget.text()
+
         val = float(text_str)
         if(val < min_val or val > max_val):
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_val, max_val))
@@ -1523,11 +1523,8 @@ class MainController(QMainWindow):
 
         if flag:
             flag = self.checkbeam_b()
-        
 
         return flag
-
-
 
     # QtViewer
     def init_display(self, backend_str=None, size=(1024, 768)):
@@ -1547,6 +1544,7 @@ class MainController(QMainWindow):
         self.ui.modelTab = qtViewer3d(self)
 
         # self.setWindowTitle("Osdag-%s 3d viewer ('%s' backend)" % (VERSION, backend_name()))
+
         self.setWindowTitle("Osdag End Plate")
         self.ui.mytabWidget.resize(size[0], size[1])
         self.ui.mytabWidget.addTab(self.ui.modelTab, "")
@@ -1758,6 +1756,7 @@ class MainController(QMainWindow):
         '''
         #self.designPrefDialog.saved = False
         self.uiobj = self.getuser_inputs()
+
         # if self.designPrefDialog.saved is not True:
         #     design_pref = self.designPrefDialog.set_default_para()
         # else:
@@ -1990,12 +1989,12 @@ class MainController(QMainWindow):
         '''
         Closing endPlate window.
         '''
+
         # ui_input = self.getuser_inputs()
         ui_input = self.designParameters()[0]
         self.save_inputs(ui_input)
         reply = QMessageBox.question(self, 'Message',
                                            "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
-
         if reply == QMessageBox.Yes:
             self.closed.emit()
             event.accept()

@@ -861,6 +861,7 @@ class Cleat2DCreatorFront(object):
         theta = 70
         offset = (self.dataObj.D_col - self.dataObj.D_beam)  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -881,8 +882,8 @@ class Cleat2DCreatorFront(object):
         ptx = self.BH + 100 * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BH + 140 * np.array([0, 1])
-        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CFBW_front(self, filename):
@@ -1109,6 +1110,7 @@ class Cleat2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.D_beam * 3) / 8
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1123,6 +1125,7 @@ class Cleat2DCreatorFront(object):
         theta = 60
         offset = (self.dataObj.D_col + 10)
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1146,8 +1149,8 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx = self.FG + (self.dataObj.col_B/2 + 40) * np.array([0, 1])   # + 2000 * np.array([0, 1])  # 1150
-        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CWBW_front(self, filename):
@@ -1258,6 +1261,7 @@ class Cleat2DCreatorFront(object):
         theta = 45
         offset = (self.dataObj.col_L - self.dataObj.D_beam) /2
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1269,6 +1273,7 @@ class Cleat2DCreatorFront(object):
         theta = 65
         offset = (self.dataObj.col_B * 3) / 4
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1373,6 +1378,7 @@ class Cleat2DCreatorFront(object):
         dwg.add(dwg.text('Front view (Sec C-C)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.D + (self.dataObj.beam_B + 40) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -1696,6 +1702,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = (self.dataObj.beam_B) + 100
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1708,6 +1715,7 @@ class Cleat2DCreatorTop(object):
         theta = 30
         offset = (self.beam_beam_length - 2 * self.dataObj.cleat_legsize) / 2 + 25
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1732,8 +1740,8 @@ class Cleat2DCreatorTop(object):
         ptx = self.BD + 100 * np.array([1, 0]) + 300 * np.array([0, 1])  # 640
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.BD + 100 * np.array([1, 0]) + 340 * np.array([0, 1])
-        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CFBW_top(self, filename):
@@ -1904,6 +1912,7 @@ class Cleat2DCreatorTop(object):
         theta = 70
         offset = (self.dataObj.beam_B) + 80
         text_up = str(self.dataObj.no_of_rows * self.dataObj.no_of_col) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1917,6 +1926,7 @@ class Cleat2DCreatorTop(object):
         theta = 70
         offset = (self.dataObj.D_col - self.dataObj.beam_B) / 2 + 80
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -1943,8 +1953,8 @@ class Cleat2DCreatorTop(object):
         ptx = self.FG + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 740
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         ptx = self.FG + (self.dataObj.beam_B * 2 + 40) * np.array([0, 1])
-        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
 
+        dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
     def call_CWBW_top(self, filename):
@@ -2114,6 +2124,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = (self.dataObj.beam_B)
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2126,6 +2137,7 @@ class Cleat2DCreatorTop(object):
         theta = 45
         offset = self.dataObj.beam_B + 50
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2151,6 +2163,7 @@ class Cleat2DCreatorTop(object):
         ptx = self.G + (self.dataObj.beam_B * 2) * np.array([0, 1])  # 1090
         dwg.add(dwg.text('Top view (Sec A-A)', insert=(ptx), fill='black', font_family="sans-serif", font_size=32))
         ptx = self.G + (self.dataObj.beam_B * 2+ 40) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2473,6 +2486,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.D_beam * 3) / 8 + 75  # #NEED TO CHANGED AFTER IMPORTING SUPPORTED BEAM INFORMATION
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2488,6 +2502,7 @@ class Cleat2DCreatorSide(object):
         theta = 75
         offset = (self.beam_beam_length / 2 + 50)  # #
         text_up = str(no_of_bolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2509,6 +2524,7 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side View (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx = self.BG + (self.dataObj.beam_B * 3+ 40) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2720,6 +2736,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.D_col) / 2 + 10
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2733,6 +2750,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset =  (self.dataObj.D_col) / 2 + 10
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2744,6 +2762,7 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.G + (self.dataObj.beam_B + 140) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2951,6 +2970,7 @@ class Cleat2DCreatorSide(object):
         theta = 60
         offset = (self.dataObj.col_B) / 2 + 130
         text_up = str(no_of_bbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2964,6 +2984,7 @@ class Cleat2DCreatorSide(object):
         theta = 55
         offset =  (self.dataObj.col_B) / 2.2 + 30
         text_up = str(no_of_cbolts) + " nos " + str(self.dataObj.dia_hole) + u'\u00d8' + " holes"
+
         if str(self.dataObj.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(int(self.dataObj.bolt_dia)) + " " + str(self.dataObj.bolt_type) + " bolts (grade" + " " + str(self.dataObj.bolt_grade) + ")"
         else:
@@ -2976,5 +2997,6 @@ class Cleat2DCreatorSide(object):
         dwg.add(dwg.text('Side view (Sec B-B)', insert=(ptx), fill='black', font_family="sans-serif", font_size=30))
         # # All dimensions in "mm"
         ptx2 = self.G + (self.dataObj.beam_B + 90) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=(ptx2), fill='black', font_family="sans-serif", font_size=30))
         dwg.save()

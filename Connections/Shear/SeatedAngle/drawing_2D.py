@@ -863,6 +863,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth /1.5
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -876,6 +877,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -888,6 +890,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth - 30
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -900,6 +903,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth +20
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1038,6 +1042,7 @@ class Seat2DCreatorFront(object):
         ptx = self.SA + self.data_object.col_depth * np.array([1, 0]) + (self.data_object.col_length + 160) * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 =self.SA + self.data_object.col_depth * np.array([1, 0]) + (self.data_object.col_length + 200) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -1232,6 +1237,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth / 1.6
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1244,6 +1250,7 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1256,6 +1263,8 @@ class Seat2DCreatorFront(object):
         theta = 60
         offset = self.data_object.beam_depth/1.8
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
+
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1268,6 +1277,7 @@ class Seat2DCreatorFront(object):
         theta = 55
         offset = self.data_object.beam_depth/2 + 20
         text_up = str(no_of_bolts) + "nos " + str(int(self.data_object.bolt_hole_diameter)) + u'\u00d8' + "holes "
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1335,6 +1345,7 @@ class Seat2DCreatorFront(object):
         ptx = self.SWA + np.array([1, 0]) + (self.data_object.col_length +130) * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWA + np.array([1, 0]) + (self.data_object.col_length + 170) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -1647,6 +1658,7 @@ class Seat2DCreatorTop(object):
         theta = 60
         offset = self.data_object.beam_depth/1.5 + 60
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1659,6 +1671,7 @@ class Seat2DCreatorTop(object):
         theta = 70
         offset = self.data_object.beam_depth/2 + 50
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1749,6 +1762,7 @@ class Seat2DCreatorTop(object):
         ptx = self.SG + 50 * np.array([-1, 0]) + (self.data_object.beam_length/1.5 + 50) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SG + 50 * np.array([-1, 0]) + (self.data_object.beam_length/1.5 +90) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -1843,6 +1857,7 @@ class Seat2DCreatorTop(object):
         theta = 60
         offset = self.data_object.beam_width + 50
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1855,6 +1870,7 @@ class Seat2DCreatorTop(object):
         theta = 90
         offset = (self.data_object.col_depth - self.data_object.beam_width)/ 2 + 50
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -1946,6 +1962,7 @@ class Seat2DCreatorTop(object):
         ptx = self.SWC + (self.data_object.beam_length + 40) * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWC + (self.data_object.beam_length + 80) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
         dwg.save()
 
@@ -2384,6 +2401,7 @@ class Seat2DCreatorSide(object):
         theta = 55
         offset =  self.data_object.beam_depth/3
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -2396,6 +2414,7 @@ class Seat2DCreatorSide(object):
         theta = 65
         offset =  self.data_object.beam_depth/1.5
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -2409,6 +2428,7 @@ class Seat2DCreatorSide(object):
         theta = 65
         offset =  self.data_object.beam_depth/1.5
         text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -2421,6 +2441,7 @@ class Seat2DCreatorSide(object):
         theta = 55
         offset =  self.data_object.beam_depth/3
         text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
         if str(self.data_object.bolt_type) == "Friction Grip Bolt":
             text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
         else:
@@ -2479,6 +2500,7 @@ class Seat2DCreatorSide(object):
         ptx = self.SWA +  np.array([1, 0]) + (self.data_object.col_length + 50) * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SWA +  np.array([1, 0]) + (self.data_object.col_length + 90) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black',
                          font_family="sans-serif", font_size=30))
         dwg.save()
@@ -2608,6 +2630,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/4
             text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
             if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
@@ -2622,6 +2645,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/2
             text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
             if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
@@ -2636,6 +2660,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/2
             text_up = str(no_of_bolts_beam) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
             if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
@@ -2650,6 +2675,7 @@ class Seat2DCreatorSide(object):
             theta = 70
             offset = self.data_object.beam_depth/3
             text_up = str(no_of_bolts_column) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+
             if str(self.data_object.bolt_type) == "Friction Grip Bolt":
                 text_down = "for M" + str(self.data_object.bolt_dia) + " " + str(
                     self.data_object.bolt_type) + " bolts (grade " + str(self.data_object.grade) + ")"
@@ -2727,6 +2753,7 @@ class Seat2DCreatorSide(object):
         ptx = self.SA + np.array([1, 0]) + (self.data_object.col_length + 50) * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B)', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = self.SA + np.array([1, 0]) + (self.data_object.col_length + 90) * np.array([0, 1])
+
         dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black',
                          font_family="sans-serif", font_size=30))
         dwg.fit()

@@ -59,9 +59,15 @@ class SeatAngleCalculation(ConnectionCalculations):
         type_of_edge (string)
         is_environ_corrosive (string): "Yes" if members are under corrosive influences (used for max edge distance)
         design_method (string)
+<<<<<<< HEAD
+        is_hsfg (boolean): True if the bolt is to be designed as HSFG with slip not permitted at ultimate load
+        n_e (int): Number of effective surfaces offering frictional resistance to HSFG bolts
+        mu_f (float): slip-factor/ coefficient of friction of HSFG bolts
+=======
         is_friction_grip_bolt (boolean): True if the bolt is to be designed as Friction Grip Bolt with slip not permitted at ultimate load
         n_e (int): Number of effective surfaces offering frictional resistance to Friction Grip Bolt bolts
         mu_f (float): slip-factor/ coefficient of friction of Friction Grip Bolt bolts
+>>>>>>> 410d1c0b96cf3ffa654ab6b14394593096d755a8
         bolt_fu_overwrite (int)
         
 
@@ -318,6 +324,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.gamma_m1 = 1.25  # partial safety factor for material - resistance governed by ultimate stress
 
         self.bolt_hole_type = input_dict['bolt']['bolt_hole_type']  # "Standard" or "Over-sized"
+
         self.is_friction_grip_bolt = False
         if input_dict['Bolt']['Type'] == "Friction Grip Bolt":
             self.is_friction_grip_bolt = True  # set to True, if bolt is Friction Grip Bolt with no slip at ultimate load
@@ -452,6 +459,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.calculate_kb()
 
         # Bolt capacity
+
         if self.is_friction_grip_bolt is False:
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear(bolt_diameter=self.bolt_diameter,
                                                                          number_of_bolts=1, bolt_fu=self.bolt_fu)
@@ -459,6 +467,7 @@ class SeatAngleCalculation(ConnectionCalculations):
                                         number_of_bolts=1, thickness_plate=self.thickness_governing_min,
                                         k_b=self.k_b, plate_fu=self.beam_fu)
             self.bolt_value = min(self.bolt_shear_capacity, self.bolt_bearing_capacity)
+
         elif self.is_friction_grip_bolt:
             self.bolt_shear_capacity = ConnectionCalculations.bolt_shear_friction_grip_bolt(self.bolt_diameter, self.bolt_fu,
                                                                               self.mu_f,

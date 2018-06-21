@@ -535,7 +535,7 @@ def bbExtendedEndPlateSplice(uiObj):
     l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
 
     if bolt_type == "Friction Grip Bolt":
-        Vdsf = ConnectionCalculations.bolt_shear_hsfg(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
+        Vdsf = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
 
         if l_j > 15 * bolt_dia:
             V_dsf = Vdsf * long_joint(bolt_dia, l_j)

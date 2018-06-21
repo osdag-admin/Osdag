@@ -32,7 +32,6 @@ class Ui_AskQuestion(object):
         self.label_2.setOpenExternalLinks(True)
         self.label_2.setObjectName("label_2")
         self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
-
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 

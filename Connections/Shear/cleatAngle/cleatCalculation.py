@@ -58,7 +58,6 @@ def black_bolt_shear(dia, n, fu):
     Vs = round(Vs, 3)
     return Vs
 
-
 # BOLT: Determination of factored design force of Friction Grip Bolt bolts Vsf = Vnsf / Ymf = uf * ne * Kh * Fo where Vnsf: The nominal shear capacity of bolt
 
 
@@ -72,6 +71,7 @@ def friction_grip_bolt_shear(uf, dia, n, fu):
         fu (float) ultimate tensile strength of a bolt
 
     Returns:
+
         Shear capacity of Friction Grip Bolt bolt
 
     '''
@@ -304,6 +304,7 @@ def cleat_connection(ui_obj):
     bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
+
     bolt_friction_grip_bolt_slip_factor = ui_obj["bolt"]["slip_factor"]
     gap = float(ui_obj["detailing"]["gap"])
 
@@ -320,9 +321,6 @@ def cleat_connection(ui_obj):
     cleat_fu = float(ui_obj['Member']['fu (MPa)'])
     cleat_fy = float(ui_obj['Member']['fy (MPa)'])
     cleat_sec = ui_obj['cleat']['section']
-
-
-
               
     dictbeamdata = get_beamdata(beam_sec)
     beam_w_t = float(dictbeamdata["tw"])
@@ -458,6 +456,7 @@ def cleat_connection(ui_obj):
         bolt_bearing_capacity_c = bearing_capacity(bolt_dia, thinner, bolt_fu, beam_fu)
         bearing_capacity_column = bearing_capacity(bolt_dia, column_w_t, beam_fu, beam_fu)
         bearing_capacity_cleat_c = bearing_capacity(bolt_dia, cleat_thk, beam_fu, beam_fu)
+
         if bolt_type == 'Friction Grip Bolt':
             bearing_capacity_c = 'N/A'
         else:
@@ -468,6 +467,7 @@ def cleat_connection(ui_obj):
         bolt_bearing_capacity_c = bearing_capacity(bolt_dia, thinner, bolt_fu, beam_fu)
         bearing_capacity_column = bearing_capacity(bolt_dia, column_f_t, beam_fu, beam_fu)
         bearing_capacity_cleat_c = bearing_capacity(bolt_dia, cleat_thk, beam_fu, beam_fu)
+
         if bolt_type == 'Friction Grip Bolt':
             bearing_capacity_c = 'N/A'
         else:

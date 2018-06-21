@@ -498,8 +498,8 @@ class MainController(QMainWindow):
                 QMessageBox.about(self, 'Information', "File saved")
         else:
             self.ui.action_save_CAD_image.setEnabled(False)
-            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be viewed')
 
+            QMessageBox.about(self,'Information', 'Design Unsafe: CAD image cannot be viewed')
 
     def disableViewButtons(self):
         """
@@ -938,6 +938,7 @@ class MainController(QMainWindow):
         Validating F_u(ultimate Strength) and F_y (Yield Strength) textfields
         """
         textStr = widget.text()
+
         val = float(textStr)
         if val < min_value or val > max_value:
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_value, max_value))
@@ -1288,6 +1289,7 @@ class MainController(QMainWindow):
         This routine returns the necessary design parameters.
         """
         self.uiObj = self.getuser_inputs()
+
         # if self.designPrefDialog.saved is not True:
         #     design_pref = self.designPrefDialog.set_default_para()
         # else:
@@ -1470,6 +1472,7 @@ class MainController(QMainWindow):
         :param event:
         :return:
         """
+
         # uiInput = self.getuser_inputs()
         uiInput = self.designParameters()[0]
         self.save_inputs(uiInput)

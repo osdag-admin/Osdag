@@ -129,17 +129,22 @@ class OsdagMainWindow(QMainWindow):
 		desktop_path = config.get("desktop_path", "path1")
 		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
 
-		while ' ' in folder:
-			"""
-			The workspace folder shouldn't have any spaces
 
-			As long as the user enters spaces in the name of the workspace folder, 
-			this while loops prompts the user not to use spaces and prompts the user again 
-			to select the workspace folder
+		# temporarily disabling the below section, as Osdag will still crash while
+		# generating design report even if there are spaces in the entire path and not
+		# just spaces in workspace folder name
 
-			"""
-			QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
-			folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
+		# while ' ' in folder:
+		# 	"""
+		# 	The workspace folder shouldn't have any spaces
+        #
+		# 	As long as the user enters spaces in the name of the workspace folder,
+		# 	this while loops prompts the user not to use spaces and prompts the user again
+		# 	to select the workspace folder
+        #
+		# 	"""
+		# 	QMessageBox.information(self, "Information", "Please do not use spaces in the name of the workspace folder.")
+		# 	folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
 
 		# Return the folder name (without any spaces)
 		return folder

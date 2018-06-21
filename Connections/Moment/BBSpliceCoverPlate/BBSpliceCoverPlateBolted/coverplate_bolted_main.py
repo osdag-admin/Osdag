@@ -783,7 +783,7 @@ class MainController(QMainWindow):
 
 		"""
 		# uiInput = self.get_user_inputs()
-		uiInput = self.designParameters()
+		uiInput = self.designParameters()[0]
 		self.save_inputs_totext(uiInput)
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:

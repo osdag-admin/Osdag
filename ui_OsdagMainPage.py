@@ -953,7 +953,7 @@ class Ui_MainWindow(object):
         self.mytabWidget.setTabText(self.mytabWidget.indexOf(self.tab3_trussconnection), _translate("MainWindow", "Truss Connection"))
         self.label_7.setText(_translate("MainWindow", "End Plate Connection"))
         self.btn_start_2.setText(_translate("MainWindow", "Start"))
-        self.btn_start_2.setShortcut(_translate("MainWindow", "Ctrl+S"))
+        self.btn_start_2.setShortcut(_translate("MainWindow", "Return"))
         self.label.setText(_translate("MainWindow", "Cover Plate Connection"))
         self.btn_connection.setToolTip(_translate("MainWindow", "Ctrl+Shift+C"))
         self.btn_connection.setText(_translate("MainWindow", "Connection"))

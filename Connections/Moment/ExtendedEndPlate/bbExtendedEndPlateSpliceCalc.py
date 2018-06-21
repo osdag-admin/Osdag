@@ -1712,6 +1712,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
             outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
             outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+            outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['PryingForce'] = Q
 
         outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
         outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)

@@ -127,7 +127,7 @@ class OsdagMainWindow(QMainWindow):
 		config = ConfigParser.ConfigParser()
 		config.readfp(open(r'Osdag.config'))
 		desktop_path = config.get("desktop_path", "path1")
-		folder = QFileDialog.getExistingDirectory(self, 'Select Folder for Workspace', desktop_path)
+		folder = QFileDialog.getExistingDirectory(self, "Select Workspace Folder (Don't use spaces in the folder name)", desktop_path)
 
 
 		# temporarily disabling the below section, as Osdag will still crash while

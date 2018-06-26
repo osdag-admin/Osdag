@@ -4,7 +4,6 @@ Revised on 5-March-2018
 Revised on 13-April-2018
 Revised on 15-June-2018 (experts suggestions)
 Revised on 18-June-2018 (experts suggestions)
-Revised on 25-June-2018 (After launch)
 @author: Swathi M.
 '''
 
@@ -361,7 +360,7 @@ def coverplateboltedconnection(uiObj):
     type_edge = str(uiObj["detailing"]["typeof_edge"])
 
     flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"])
-    flange_plate_w = float(uiObj["FlangePlate"]["Width (mm)"])
+    flange_plate_w = str(uiObj["FlangePlate"]["Width (mm)"])
     if flange_plate_w == '':
         flange_plate_w = 0
     else:
@@ -379,11 +378,11 @@ def coverplateboltedconnection(uiObj):
     flange_plate_fy = beam_fy
 
     web_plate_t = float(uiObj["WebPlate"]["Thickness (mm)"])
-    web_plate_w = float(uiObj["WebPlate"]["Width (mm)"])
+    web_plate_w = str(uiObj["WebPlate"]["Width (mm)"])
     if web_plate_w == '':
         web_plate_w = 0
     else:
-        web_plate_w = web_plate_w
+        web_plate_w = int(web_plate_w)
 
     web_plate_l = str(uiObj["WebPlate"]["Height (mm)"])
     if web_plate_l == '':
@@ -749,7 +748,7 @@ def coverplateboltedconnection(uiObj):
                                               vv
         '''
         if flange_plate_w == 0:
-            flange_plate_w = beam_b - 20 # Revised on 25-June-2018 (After launch): Width of flange splice plate (by default) = beam_b - half inch on both sides of beam
+            flange_plate_w = beam_b
         elif flange_plate_w != 0:
             flange_plate_w = flange_plate_w
         else:
@@ -910,7 +909,7 @@ def coverplateboltedconnection(uiObj):
     ## Implies;;;;; Thickness of flange > (1.05 (breath of flange * thickness of flange)) /  Breath of flange plate
     if flange_plate_w >= 0:
         flange_plate_w = new_bolt_param["FlangePlateWidth"]
-        thkflangeplate2 = (1.05 * (beam_b * beam_f_t)) / new_bolt_param["FlangePlateWidth"]
+        thkflangeplate2 = (1.05 * (beam_b * beam_f_t)) / flange_plate_w
 
         thkflangeplate = thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load, beam_b, beam_fy, dia_hole)
         flangeplatethick = max(thkflangeplate2, (beam_f_t / 2), 10, thkflangeplate)
@@ -956,7 +955,7 @@ def coverplateboltedconnection(uiObj):
         max_gauge = boltparameters["WebGaugeMax"]
         # calculation of total width of web splice plate
         ## Case 1: width is sufficient
-        web_plate_w_req = gauge_web + 2 * boltparameters["Edge"]
+        web_plate_w_req = gauge_web + 2 * boltparameters["Edge"] + gap
         ## Case 2: when gauge is less than the minimum gauge
         min_web_w_gauge = min_gauge + 2 * boltparameters["Edge"] + gap
         ## Case 3: when gauge distance is less than 2 times the end distance

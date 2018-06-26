@@ -1110,7 +1110,7 @@ class MainController(QMainWindow):
 		self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
 	def display_log_to_textedit(self):
-		file = QFile('Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log')
+		file = QFile(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted','coverplate.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
 			QMessageBox.information(None, 'info', file.errorString())
 		stream = QtCore.QTextStream(file)
@@ -1507,7 +1507,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="a")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1528,12 +1528,13 @@ def launch_coverplate_controller(osdagMainWindow, folder):
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	# fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
 	rawLogger.info(
-		'''<link rel="stylesheet" type="text/css" href="Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\log.css"/>''')
+		'''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'log.css') +'''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = MainController(folder)
@@ -1546,10 +1547,10 @@ if __name__ == '__main__':
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
 	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
 	# ----------------------------------------------------------------------------
 	folder_path = "D:\Osdag_Workspace\coverplate"

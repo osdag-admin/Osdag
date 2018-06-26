@@ -995,7 +995,7 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
 	def display_log_to_textedit(self):
-		file = QFile('Connections\Moment\ExtendedEndPlate\extnd.log')
+		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
 			QMessageBox.information(None, 'info', file.errorString())
 		stream = QtCore.QTextStream(file)
@@ -1787,7 +1787,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="a")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1808,11 +1808,11 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\ExtendedEndPlate\log.css"/>''')
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','ExtendedEndPlate', 'log.css') +'''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -1825,7 +1825,7 @@ if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="w")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)

@@ -696,6 +696,7 @@ class MainController(QMainWindow):
 		uiObj["Bolt"]["Type"] = self.ui.combo_type.currentText()
 
 		uiObj["FlangePlate"] = {}
+		uiObj['FlangePlate']['Preferences'] = self.ui.combo_flange_preference.currentText()
 		uiObj["FlangePlate"]["Thickness (mm)"] = self.ui.combo_flangeplateThick.currentText()
 		uiObj["FlangePlate"]["Height (mm)"] = self.ui.txt_flangeplateHeight.text()
 		uiObj["FlangePlate"]["Width (mm)"] = self.ui.txt_flangeplateWidth.text()
@@ -766,6 +767,7 @@ class MainController(QMainWindow):
 		self.ui.combo_diameter.setCurrentIndex(0)
 		self.ui.combo_type.setCurrentIndex(0)
 		self.ui.combo_grade.setCurrentIndex(0)
+		self.ui.combo_flange_preference.setCurrentIndex(0)
 		self.ui.combo_flangeplateThick.setCurrentIndex(0)
 		self.ui.txt_flangeplateHeight.clear()
 		self.ui.txt_flangeplateWidth.clear()
@@ -885,6 +887,7 @@ class MainController(QMainWindow):
 				self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
 				self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
 				self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+				self.ui.combo_flange_preference.setCurrentIndex(self.ui.combo_flange_preference.findText(uiObj["FlangePlate"]['Preferences']))
 				self.ui.combo_flangeplateThick.setCurrentIndex(
 					self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
 				self.ui.combo_webplateThick.setCurrentIndex(

@@ -30,6 +30,7 @@ import pdfkit
 import shutil
 import sys
 import subprocess
+from collections import OrderedDict
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -357,6 +358,17 @@ class MainController(QMainWindow):
 		self.ui.combo_type.addItems(self.gradeType.keys())
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
 		self.ui.combo_type.setCurrentIndex(0)
+
+		self.preference_type = OrderedDict()
+		self.preference_type['Cover plate location'] = ''
+		self.preference_type['Outside'] = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
+		self.preference_type['Outside + Inside'] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+		print "Preferences", self.preference_type
+		self.ui.combo_flange_preference.addItems(self.preference_type.keys())
+		self.ui.combo_flange_preference.currentIndexChanged[str].connect(self.combopreference_current_index_changed)
+		self.ui.combo_flange_preference.setCurrentIndex(0)
+
 		self.retrieve_prevstate()
 		self.ui.combo_connLoc.currentIndexChanged[str].connect(self.setimage_connection)
 
@@ -524,6 +536,26 @@ class MainController(QMainWindow):
 				stritems.append(str(val))
 
 			self.ui.combo_grade.addItems(stritems)
+		else:
+			pass
+
+	def combopreference_current_index_changed(self, index):
+		"""
+
+		Args:
+		    index: Number
+
+		Returns: Types of Preferences
+
+		"""
+		items = self.preference_type[str(index)]
+		if items != 0:
+			self.ui.combo_flangeplateThick.clear()
+			stritems = []
+			for val in items:
+				stritems.append(str(val))
+
+			self.ui.combo_flangeplateThick.addItems(stritems)
 		else:
 			pass
 

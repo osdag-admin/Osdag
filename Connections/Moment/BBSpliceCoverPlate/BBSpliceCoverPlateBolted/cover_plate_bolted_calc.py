@@ -361,17 +361,17 @@ def coverplateboltedconnection(uiObj):
     type_edge = str(uiObj["detailing"]["typeof_edge"])
 
     flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"])
-    flange_plate_w = float(uiObj["FlangePlate"]["Width (mm)"])
+    flange_plate_w = str(uiObj["FlangePlate"]["Width (mm)"])
     if flange_plate_w == '':
         flange_plate_w = 0
     else:
-        flange_plate_w = flange_plate_w
+        flange_plate_w = float(flange_plate_w)
 
     flange_plate_l = str(uiObj["FlangePlate"]["Height (mm)"])
     if flange_plate_l == '':
         flange_plate_l = 0
     else:
-        flange_plate_l = flange_plate_l
+        flange_plate_l = float(flange_plate_l)
 
     # flange_plate_fu = float(uiObj["Member"]["fu (Mpa)"])
     # flange_plate_fy = float(uiObj["Member"]["fy (MPa)"])
@@ -379,11 +379,11 @@ def coverplateboltedconnection(uiObj):
     flange_plate_fy = beam_fy
 
     web_plate_t = float(uiObj["WebPlate"]["Thickness (mm)"])
-    web_plate_w = float(uiObj["WebPlate"]["Width (mm)"])
+    web_plate_w = str(uiObj["WebPlate"]["Width (mm)"])
     if web_plate_w == '':
         web_plate_w = 0
     else:
-        web_plate_w = web_plate_w
+        web_plate_w = float(web_plate_w)
 
     web_plate_l = str(uiObj["WebPlate"]["Height (mm)"])
     if web_plate_l == '':

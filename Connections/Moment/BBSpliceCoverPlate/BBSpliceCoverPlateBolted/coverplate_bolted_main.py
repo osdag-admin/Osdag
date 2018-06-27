@@ -1427,8 +1427,10 @@ class MainController(QMainWindow):
 
 		if component == "Beam":
 			# Displays both beams
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLAModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLBModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRAModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRBModel(), update=True)
 
 		elif component == "Connector":
 			# Displays the Flange Plates
@@ -1456,8 +1458,10 @@ class MainController(QMainWindow):
 
 		elif component == "Model":
 			# Displays both beams
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLAModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLBModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRAModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRBModel(), update=True)
 
 			# Displays the Flange Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')

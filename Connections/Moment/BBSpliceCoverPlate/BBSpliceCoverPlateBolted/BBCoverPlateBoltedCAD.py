@@ -8,6 +8,7 @@ This file is for creating CAD model for cover plate bolted moment connection for
 """""
 
 import numpy
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class BBCoverPlateBoltedCAD(object):
@@ -35,6 +36,9 @@ class BBCoverPlateBoltedCAD(object):
         self.nut_bolt_array_AF = nut_bolt_array_AF
         self.nut_bolt_array_BF = nut_bolt_array_BF
         self.nut_bolt_array_Web = nut_bolt_array_Web
+        self.beamLModel = None
+        self.beamRModel = None
+        # self.WebPlateLeftModel = None
 
     def create_3DModel(self):
         '''
@@ -128,11 +132,8 @@ class BBCoverPlateBoltedCAD(object):
         boltDirW = numpy.array([-1.0, 0, 0])
         self.nut_bolt_array_Web.placeW(nutBoltOriginW, gaugeDirW, pitchDirW, boltDirW)
 
-    def get_beamLModel(self):
-        return self.beamLModel
-
-    def get_beamRModel(self):
-        return self.beamRModel
+    # def get_beamRModel(self):
+    #     return self.beamRModel
 
     def get_plateAbvFlangeModel(self):
         return self.plateAbvFlangeModel
@@ -154,3 +155,39 @@ class BBCoverPlateBoltedCAD(object):
 
     def get_nutboltmodelsWeb(self):
         return self.nut_bolt_array_Web.get_modelsWeb()
+
+    def get_beamLAModel(self):
+        final_beamLA = self.beamLModel
+        bolt_listLA = self.nut_bolt_array_AF.get_boltAF_list()
+        for boltLA in bolt_listLA[:]:
+            final_beamLA = BRepAlgoAPI_Cut(final_beamLA, boltLA).Shape()
+        return final_beamLA
+
+    def get_beamLBModel(self):
+        final_beamLB = self.beamLModel
+        bolt_listLB = self.nut_bolt_array_BF.get_boltBF_list()
+        for boltLB in bolt_listLB[:]:
+            final_beamLB = BRepAlgoAPI_Cut(final_beamLB, boltLB).Shape()
+        return final_beamLB
+
+    def get_beamRAModel(self):
+        final_beamRA = self.beamRModel
+        bolt_listRA = self.nut_bolt_array_AF.get_boltAF_list()
+        for boltRA in bolt_listRA[:]:
+            final_beamRA = BRepAlgoAPI_Cut(final_beamRA, boltRA).Shape()
+        return final_beamRA
+
+    def get_beamRBModel(self):
+        final_beamRB = self.beamRModel
+        bolt_listRB = self.nut_bolt_array_BF.get_boltBF_list()
+        for boltRB in bolt_listRB[:]:
+            final_beamRB = BRepAlgoAPI_Cut(final_beamRB, boltRB).Shape()
+        return final_beamRB
+
+    # def get_beam_webModel(self):
+    #     final_web =  self.WebPlateLeftModel
+    #     bolt_list = self.nut_bolt_array_Web.get_bolt_web_list()
+    #     for boltweb in bolt_list[:]:
+    #         final_web = BRepAlgoAPI_Cut(final_web, boltweb).Shape()
+    #     return final_web
+

@@ -121,3 +121,12 @@ class NutBoltArray_BF():
 
     def get_modelsBF(self):
         return self.models_BF
+
+    def get_boltBF_list(self):
+        boltlist = []
+        for bolt in self.bolts_BF:
+            boltlist.append(bolt.create_model())
+            dbg = self.dbgSphere(self.originBF)
+            self.models_BF.append(dbg)
+        return boltlist
+

@@ -436,6 +436,10 @@ class MainController(QMainWindow):
 		max_fy = 450
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
+		min_gap = 2
+		max_gap = 10
+		self.designPrefDialog.ui.txt_detailingGap.editingFinished.connect(lambda: self.check_range(self.designPrefDialog.ui.txt_detailingGap, min_gap, max_gap))
+
 		from osdagMainSettings import backend_name
 		self.display, _ = self.init_display(backend_str=backend_name())
 		self.uiObj = None

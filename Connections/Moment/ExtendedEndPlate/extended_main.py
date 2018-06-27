@@ -499,10 +499,10 @@ class Maincontroller(QMainWindow):
 		self.ui.chkBx_connector.clicked.connect(lambda :self.call_3DConnector("gradient_bg"))
 
 		validator = QIntValidator()
-		self.ui.txt_Fu.setValidator(validator)
-		self.ui.txt_Fy.setValidator(validator)
 
 		doubl_validator = QDoubleValidator()
+		self.ui.txt_Fu.setValidator(doubl_validator)
+		self.ui.txt_Fy.setValidator(doubl_validator)
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)

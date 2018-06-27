@@ -416,17 +416,17 @@ class MainController(QMainWindow):
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
 		validator = QIntValidator()
-		self.ui.txt_Fu.setValidator(validator)
-		self.ui.txt_Fy.setValidator(validator)
+		self.ui.txt_flangeplateHeight.setValidator(validator)
+		self.ui.txt_flangeplateWidth.setValidator(validator)
+		self.ui.txt_webplateHeight.setValidator(validator)
+		self.ui.txt_webplateWidth.setValidator(validator)
 
 		doubl_validator = QDoubleValidator()
+		self.ui.txt_Fu.setValidator(doubl_validator)
+		self.ui.txt_Fy.setValidator(doubl_validator)
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)
-		self.ui.txt_flangeplateHeight.setValidator(doubl_validator)
-		self.ui.txt_flangeplateWidth.setValidator(doubl_validator)
-		self.ui.txt_webplateHeight.setValidator(doubl_validator)
-		self.ui.txt_webplateWidth.setValidator(doubl_validator)
 
 		min_fu = 290
 		max_fu = 590

@@ -425,7 +425,7 @@ class Maincontroller(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-
+		self.connection = "Extended"
 		self.get_beamdata()
 		self.result_obj = None
 
@@ -683,6 +683,7 @@ class Maincontroller(QMainWindow):
 		uiObj["Weld"] = {}
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
+		uiObj["Connection"] = self.connection
 		return uiObj
 
 	def osdag_header(self):
@@ -725,7 +726,7 @@ class Maincontroller(QMainWindow):
 		Returns: Save the user input to txt format
 
 		"""
-		input_file = QFile(os.path.join("Connections\Moment\ExtendedEndPlate\saveINPUT.txt"))
+		input_file = QFile(os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt"))
 		if not input_file.open(QFile.WriteOnly | QFile.Text):
 			QMessageBox.warning(self, "Application",
 								"Cannot write file %s: \n%s"
@@ -738,7 +739,7 @@ class Maincontroller(QMainWindow):
 		Returns: Read for the previous user inputs design
 
 		"""
-		filename = os.path.join("Connections\Moment\ExtendedEndPlate\saveINPUT.txt")
+		filename = os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt")
 		if os.path.isfile(filename):
 			file_object = open(filename, 'r')
 			uiObj = pickle.load(file_object)
@@ -766,6 +767,10 @@ class Maincontroller(QMainWindow):
 		"""
 
 		if uiObj is not None:
+			if uiObj["Connection"] != "Extended":
+				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+				return
+
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
 			if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))

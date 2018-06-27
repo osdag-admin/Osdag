@@ -347,7 +347,7 @@ class MainController(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-
+		self.connection = "Coverplate"
 		self.get_beamdata()
 		self.designPrefDialog = DesignPreferences(self)
 		self.ui.combo_connLoc.model().item(2).setEnabled(False)
@@ -705,6 +705,7 @@ class MainController(QMainWindow):
 		uiObj["WebPlate"]["Thickness (mm)"] = self.ui.combo_webplateThick.currentText()
 		uiObj["WebPlate"]["Height (mm)"] = self.ui.txt_webplateHeight.text()
 		uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
+		uiObj["Connection"] = self.connection
 		return uiObj
 
 	def osdag_header(self):
@@ -875,6 +876,10 @@ class MainController(QMainWindow):
 
 		"""
 		if uiObj is not None:
+			if uiObj["Connection"] != "Coverplate":
+				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+				return
+
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
 			if uiObj["Member"]["Connectivity"] == "Select Connectivity" or "Bolted" :
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))

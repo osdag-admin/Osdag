@@ -285,7 +285,7 @@ def end_connection(ui_obj):
     if end_plate_l == '':
         end_plate_l = 0
     else:
-        end_plate_l = int(end_plate_l)
+        end_plate_l = float(end_plate_l)
         
     web_plate_fu = float(ui_obj['Member']['fu (MPa)'])
     web_plate_fy = float(ui_obj['Member']['fy (MPa)'])
@@ -357,7 +357,7 @@ def end_connection(ui_obj):
 #    0 def boltDesign(end_plate_l):
 # I: Check for number of bolts -------------------
 
-    bolt_fu = int(bolt_grade) * 100
+    bolt_fu = float(bolt_grade) * 100
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
 
     if connectivity == "Column web-Beam web":

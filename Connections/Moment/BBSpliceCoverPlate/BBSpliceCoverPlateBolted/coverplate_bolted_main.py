@@ -30,6 +30,7 @@ import pdfkit
 import shutil
 import sys
 import subprocess
+from collections import OrderedDict
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -346,7 +347,7 @@ class MainController(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-
+		self.connection = "Coverplate"
 		self.get_beamdata()
 		self.designPrefDialog = DesignPreferences(self)
 		self.ui.combo_connLoc.model().item(2).setEnabled(False)
@@ -357,6 +358,17 @@ class MainController(QMainWindow):
 		self.ui.combo_type.addItems(self.gradeType.keys())
 		self.ui.combo_type.currentIndexChanged[str].connect(self.combotype_current_index_changed)
 		self.ui.combo_type.setCurrentIndex(0)
+
+		self.preference_type = OrderedDict()
+		self.preference_type['Cover plate location'] = ''
+		self.preference_type['Outside'] = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28]
+		self.preference_type['Outside + Inside'] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+		print "Preferences", self.preference_type
+		self.ui.combo_flange_preference.addItems(self.preference_type.keys())
+		self.ui.combo_flange_preference.currentIndexChanged[str].connect(self.combopreference_current_index_changed)
+		self.ui.combo_flange_preference.setCurrentIndex(0)
+
 		self.retrieve_prevstate()
 		self.ui.combo_connLoc.currentIndexChanged[str].connect(self.setimage_connection)
 
@@ -404,17 +416,17 @@ class MainController(QMainWindow):
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
 		validator = QIntValidator()
-		self.ui.txt_Fu.setValidator(validator)
-		self.ui.txt_Fy.setValidator(validator)
+		self.ui.txt_flangeplateHeight.setValidator(validator)
+		self.ui.txt_flangeplateWidth.setValidator(validator)
+		self.ui.txt_webplateHeight.setValidator(validator)
+		self.ui.txt_webplateWidth.setValidator(validator)
 
 		doubl_validator = QDoubleValidator()
+		self.ui.txt_Fu.setValidator(doubl_validator)
+		self.ui.txt_Fy.setValidator(doubl_validator)
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)
-		self.ui.txt_flangeplateHeight.setValidator(doubl_validator)
-		self.ui.txt_flangeplateWidth.setValidator(doubl_validator)
-		self.ui.txt_webplateHeight.setValidator(doubl_validator)
-		self.ui.txt_webplateWidth.setValidator(doubl_validator)
 
 		min_fu = 290
 		max_fu = 590
@@ -423,6 +435,10 @@ class MainController(QMainWindow):
 		min_fy = 165
 		max_fy = 450
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+
+		min_gap = 2
+		max_gap = 10
+		self.designPrefDialog.ui.txt_detailingGap.editingFinished.connect(lambda: self.check_range(self.designPrefDialog.ui.txt_detailingGap, min_gap, max_gap))
 
 		from osdagMainSettings import backend_name
 		self.display, _ = self.init_display(backend_str=backend_name())
@@ -524,6 +540,26 @@ class MainController(QMainWindow):
 				stritems.append(str(val))
 
 			self.ui.combo_grade.addItems(stritems)
+		else:
+			pass
+
+	def combopreference_current_index_changed(self, index):
+		"""
+
+		Args:
+		    index: Number
+
+		Returns: Types of Preferences
+
+		"""
+		items = self.preference_type[str(index)]
+		if items != 0:
+			self.ui.combo_flangeplateThick.clear()
+			stritems = []
+			for val in items:
+				stritems.append(str(val))
+
+			self.ui.combo_flangeplateThick.addItems(stritems)
 		else:
 			pass
 
@@ -664,6 +700,7 @@ class MainController(QMainWindow):
 		uiObj["Bolt"]["Type"] = self.ui.combo_type.currentText()
 
 		uiObj["FlangePlate"] = {}
+		uiObj['FlangePlate']['Preferences'] = self.ui.combo_flange_preference.currentText()
 		uiObj["FlangePlate"]["Thickness (mm)"] = self.ui.combo_flangeplateThick.currentText()
 		uiObj["FlangePlate"]["Height (mm)"] = self.ui.txt_flangeplateHeight.text()
 		uiObj["FlangePlate"]["Width (mm)"] = self.ui.txt_flangeplateWidth.text()
@@ -672,6 +709,7 @@ class MainController(QMainWindow):
 		uiObj["WebPlate"]["Thickness (mm)"] = self.ui.combo_webplateThick.currentText()
 		uiObj["WebPlate"]["Height (mm)"] = self.ui.txt_webplateHeight.text()
 		uiObj["WebPlate"]["Width (mm)"] = self.ui.txt_webplateWidth.text()
+		uiObj["Connection"] = self.connection
 		return uiObj
 
 	def osdag_header(self):
@@ -734,6 +772,7 @@ class MainController(QMainWindow):
 		self.ui.combo_diameter.setCurrentIndex(0)
 		self.ui.combo_type.setCurrentIndex(0)
 		self.ui.combo_grade.setCurrentIndex(0)
+		self.ui.combo_flange_preference.setCurrentIndex(0)
 		self.ui.combo_flangeplateThick.setCurrentIndex(0)
 		self.ui.txt_flangeplateHeight.clear()
 		self.ui.txt_flangeplateWidth.clear()
@@ -841,6 +880,10 @@ class MainController(QMainWindow):
 
 		"""
 		if uiObj is not None:
+			if uiObj["Connection"] != "Coverplate":
+				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+				return
+
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
 			if uiObj["Member"]["Connectivity"] == "Select Connectivity" or "Bolted" :
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
@@ -853,6 +896,7 @@ class MainController(QMainWindow):
 				self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
 				self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
 				self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
+				self.ui.combo_flange_preference.setCurrentIndex(self.ui.combo_flange_preference.findText(uiObj["FlangePlate"]['Preferences']))
 				self.ui.combo_flangeplateThick.setCurrentIndex(
 					self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
 				self.ui.combo_webplateThick.setCurrentIndex(
@@ -1078,7 +1122,7 @@ class MainController(QMainWindow):
 		self.ui.txt_edgeDist_2.setText(str(web_edgedist))
 
 	def display_log_to_textedit(self):
-		file = QFile('Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log')
+		file = QFile(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted','coverplate.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
 			QMessageBox.information(None, 'info', file.errorString())
 		stream = QtCore.QTextStream(file)
@@ -1475,7 +1519,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="a")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1496,12 +1540,13 @@ def launch_coverplate_controller(osdagMainWindow, folder):
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	# fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
 	rawLogger.info(
-		'''<link rel="stylesheet" type="text/css" href="Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\log.css"/>''')
+		'''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'log.css') +'''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = MainController(folder)
@@ -1514,10 +1559,10 @@ if __name__ == '__main__':
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\BBSpliceCoverPlate\BBSpliceCoverPlateBolted\coverplate.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
 	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
 	# ----------------------------------------------------------------------------
 	folder_path = "D:\Osdag_Workspace\coverplate"

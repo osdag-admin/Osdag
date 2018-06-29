@@ -124,3 +124,13 @@ class NutBoltArray_Web():
     def get_modelsW(self):
         return self.models_W
 
+    def get_bolt_web_list(self):
+        boltlist = []
+        for bolt in self.bolts_W:
+            boltlist.append(bolt.create_model())
+            dbg = self.dbgSphere(self.originW)
+            self.models_W.append(dbg)
+        return boltlist
+
+
+

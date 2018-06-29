@@ -1268,6 +1268,8 @@ class MainController(QMainWindow):
 
         self.display.EraseAll()
         self.designPrefDialog.set_default_para()
+        self.disable_view_buttons()
+
 
     def dockbtn_clicked(self, widget):
 

@@ -1317,7 +1317,7 @@ class MainController(QMainWindow):
 
         # ------------------------------------ Erase Display -----------------------------------------------------------------
         self.display.EraseAll()
-
+        self.disable_view_buttons()
         self.designPrefDialog.set_default_para()
 
     def dockbtn_clicked(self, widget):

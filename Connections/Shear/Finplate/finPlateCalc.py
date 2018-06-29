@@ -256,13 +256,13 @@ def finConn(uiObj):
     if web_plate_w == '':
         web_plate_w  = 0
     else:
-        web_plate_w =  int(web_plate_w)
+        web_plate_w =  float(web_plate_w)
 
     web_plate_l = str(uiObj['Plate']['Height (mm)'])
     if web_plate_l == '':
         web_plate_l = 0
     else:
-        web_plate_l = int(web_plate_l)
+        web_plate_l = float(web_plate_l)
 
     web_plate_fu = float(uiObj['Member']['fu (MPa)'])
     web_plate_fy = float(uiObj['Member']['fy (MPa)'])

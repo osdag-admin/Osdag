@@ -444,8 +444,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
-    g_1 = max(90, (l_v + edge_dist_mini))
-
+    # g_1 = max(90, (l_v + edge_dist_mini))
+    g_1 = 90
     #######################################################################
     # Validation of Input Dock
 
@@ -765,7 +765,7 @@ def bbExtendedEndPlateSplice(uiObj):
         elif number_of_bolts == 20:
             pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
             pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-            pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
+            pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
 
 
             if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:

@@ -425,7 +425,7 @@ class Maincontroller(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-
+		self.connection = "Extended"
 		self.get_beamdata()
 		self.result_obj = None
 
@@ -499,10 +499,10 @@ class Maincontroller(QMainWindow):
 		self.ui.chkBx_connector.clicked.connect(lambda :self.call_3DConnector("gradient_bg"))
 
 		validator = QIntValidator()
-		self.ui.txt_Fu.setValidator(validator)
-		self.ui.txt_Fy.setValidator(validator)
 
 		doubl_validator = QDoubleValidator()
+		self.ui.txt_Fu.setValidator(doubl_validator)
+		self.ui.txt_Fy.setValidator(doubl_validator)
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)
@@ -683,6 +683,7 @@ class Maincontroller(QMainWindow):
 		uiObj["Weld"] = {}
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
+		uiObj["Connection"] = self.connection
 		return uiObj
 
 	def osdag_header(self):
@@ -725,7 +726,7 @@ class Maincontroller(QMainWindow):
 		Returns: Save the user input to txt format
 
 		"""
-		input_file = QFile(os.path.join("Connections\Moment\ExtendedEndPlate\saveINPUT.txt"))
+		input_file = QFile(os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt"))
 		if not input_file.open(QFile.WriteOnly | QFile.Text):
 			QMessageBox.warning(self, "Application",
 								"Cannot write file %s: \n%s"
@@ -738,7 +739,7 @@ class Maincontroller(QMainWindow):
 		Returns: Read for the previous user inputs design
 
 		"""
-		filename = os.path.join("Connections\Moment\ExtendedEndPlate\saveINPUT.txt")
+		filename = os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt")
 		if os.path.isfile(filename):
 			file_object = open(filename, 'r')
 			uiObj = pickle.load(file_object)
@@ -766,6 +767,10 @@ class Maincontroller(QMainWindow):
 		"""
 
 		if uiObj is not None:
+			if uiObj["Connection"] != "Extended":
+				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+				return
+
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
 			if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
@@ -995,7 +1000,7 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
 	def display_log_to_textedit(self):
-		file = QFile('Connections\Moment\ExtendedEndPlate\extnd.log')
+		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
 			QMessageBox.information(None, 'info', file.errorString())
 		stream = QtCore.QTextStream(file)
@@ -1787,7 +1792,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="a")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1808,11 +1813,11 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="w")
+	file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
-	fh.setFormatter(formatter)
-	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\ExtendedEndPlate\log.css"/>''')
+	file_handler.setFormatter(formatter)
+	rawLogger.addHandler(file_handler)
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','ExtendedEndPlate', 'log.css') +'''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -1825,7 +1830,7 @@ if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler("Connections\Moment\ExtendedEndPlate\extnd.log", mode="w")
+	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)

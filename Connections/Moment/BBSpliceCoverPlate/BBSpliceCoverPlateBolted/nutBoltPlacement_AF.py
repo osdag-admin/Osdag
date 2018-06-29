@@ -138,5 +138,3 @@ class NutBoltArray_AF():
             dbg = self.dbgSphere(self.originAF)
             self.models_AF.append(dbg)
         return boltlist
-
-

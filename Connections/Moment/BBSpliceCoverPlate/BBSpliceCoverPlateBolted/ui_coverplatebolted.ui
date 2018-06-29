@@ -386,7 +386,7 @@
      <x>0</x>
      <y>0</y>
      <width>1310</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -1139,7 +1139,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>500</y>
+       <y>520</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -1159,7 +1159,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>420</y>
+       <y>405</y>
        <width>181</width>
        <height>25</height>
       </rect>
@@ -1179,7 +1179,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>440</y>
+       <y>460</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -1199,7 +1199,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>470</y>
+       <y>490</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1222,7 +1222,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>470</y>
+       <y>490</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -1242,7 +1242,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>440</y>
+       <y>460</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1256,85 +1256,20 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">QComboBox { combobox-popup: 0; }</string>
+      <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>-1</number>
      </property>
      <property name="maxVisibleItems">
       <number>5</number>
      </property>
-     <item>
-      <property name="text">
-       <string>Select plate thickness</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>6</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>8</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>10</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>12</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>14</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>16</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>18</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>20</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>22</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>24</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>26</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>28</string>
-      </property>
-     </item>
     </widget>
     <widget class="QLabel" name="label_42">
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>540</y>
+       <y>545</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -1352,7 +1287,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>560</y>
+       <y>565</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -3103,7 +3038,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>500</y>
+       <y>520</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3123,7 +3058,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>650</y>
+       <y>655</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3152,7 +3087,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>650</y>
+       <y>655</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3181,7 +3116,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>560</y>
+       <y>565</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3381,7 +3316,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>590</y>
+       <y>595</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3401,7 +3336,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>620</y>
+       <y>625</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3421,7 +3356,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>590</y>
+       <y>595</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3441,7 +3376,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>620</y>
+       <y>625</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3455,6 +3390,53 @@ QMenu::item:selected {
      </property>
      <property name="placeholderText">
       <string>0</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="combo_flange_preference">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>430</y>
+       <width>160</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <property name="maxVisibleItems">
+      <number>10</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_94">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>430</y>
+       <width>141</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Preferences&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>

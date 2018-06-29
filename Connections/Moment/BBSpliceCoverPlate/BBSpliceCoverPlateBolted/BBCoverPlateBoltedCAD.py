@@ -13,7 +13,7 @@ from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 class BBCoverPlateBoltedCAD(object):
     def __init__(self, beamLeft, beamRight, plateAbvFlange, plateBelwFlange, WebPlateLeft, WebPlateRight, nut_bolt_array_AF,
-                 nut_bolt_array_BF, nut_bolt_array_Web):
+                 nut_bolt_array_BF, nut_bolt_array_Web, alist):
 
         """
         :param beamLeft: Left beam 
@@ -28,7 +28,8 @@ class BBCoverPlateBoltedCAD(object):
         """
         self.beamLeft = beamLeft
         self.beamRight = beamRight
-        self.gap = 5.0      # TODO: For time being gap between two beams is kept as 5.0, later on it could change in Design Preferences
+        self.alist = alist
+        self.gap = alist["detailing"]["gap"]
         self.plateAbvFlange = plateAbvFlange
         self.plateBelwFlange = plateBelwFlange
         self.WebPlateLeft = WebPlateLeft

@@ -41,7 +41,7 @@ class NutBoltArray_BF():
         self.numOfboltsF = numOfboltsF
         self.nutSpaceF = nutSpaceF
 
-        self.initBoltPlaceParams_BF(outputobj)
+        self.initBoltPlaceParams_BF(outputobj, alist)
         self.bolts_BF = []
         self.nuts_BF = []
         self.initialiseNutBolts_BF()
@@ -64,7 +64,7 @@ class NutBoltArray_BF():
             self.bolts_BF.append(Bolt(b_BF.R, b_BF.T, b_BF.H, b_BF.r))
             self.nuts_BF.append(Nut(n_BF.R, n_BF.T, n_BF.H, n_BF.r1))
 
-    def initBoltPlaceParams_BF(self, outputobj):
+    def initBoltPlaceParams_BF(self, outputobj, alist):
         '''
         :param outputobj: This is output dictionary for bolt placement parameters 
         :return: Edge, end, gauge and pitch distances for placement
@@ -75,6 +75,7 @@ class NutBoltArray_BF():
         self.gauge_BF = outputobj["FlangeBolt"]["FlangeGauge"]
         self.row_BF = outputobj["FlangeBolt"]["BoltsRequiredF"]
         self.col_BF = 2
+        self.gap = alist["detailing"]["gap"]
 
     def calculatePositions_BF(self):
         """
@@ -86,7 +87,7 @@ class NutBoltArray_BF():
             for cl_BF in range(self.col_BF):
                 pos_BF = self.boltOrigin_BF
                 if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
-                    self.pitch_new_BF = 2 * self.end_BF + 5.0      #TODO 5.0 = self.gap
+                    self.pitch_new_BF = 2 * self.end_BF + self.gap
                     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
                     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)

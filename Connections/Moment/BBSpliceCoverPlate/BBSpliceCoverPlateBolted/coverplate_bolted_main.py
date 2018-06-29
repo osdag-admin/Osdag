@@ -1302,7 +1302,7 @@ class MainController(QMainWindow):
 
 		# bbCoverPlateBolted is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
 		bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
-												   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web)
+												   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web, alist)
 
 		# bbCoverPlateBolted.create_3DModel() will create the CAD model of each component, debugging this line will give moe clarity
 		bbCoverPlateBolted.create_3DModel()

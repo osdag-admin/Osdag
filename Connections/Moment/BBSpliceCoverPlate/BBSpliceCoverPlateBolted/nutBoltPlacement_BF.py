@@ -121,3 +121,21 @@ class NutBoltArray_BF():
 
     def get_modelsBF(self):
         return self.models_BF
+
+    # Below methods are for creating holes in flange and web
+    def get_bolt_listLB(self):
+        boltlist = []
+        for bolt in self.bolts_BF:
+            boltlist.append(bolt.create_model())
+            dbg = self.dbgSphere(self.originBF)
+            self.models_BF.append(dbg)
+        return boltlist
+
+    def get_bolt_listRB(self):
+        boltlist = []
+        for bolt in self.bolts_BF:
+            boltlist.append(bolt.create_model())
+            dbg = self.dbgSphere(self.originBF)
+            self.models_BF.append(dbg)
+        return boltlist
+

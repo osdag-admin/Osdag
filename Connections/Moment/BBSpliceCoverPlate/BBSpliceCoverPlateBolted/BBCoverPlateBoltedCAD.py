@@ -8,6 +8,7 @@ This file is for creating CAD model for cover plate bolted moment connection for
 """""
 
 import numpy
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 
 class BBCoverPlateBoltedCAD(object):
@@ -35,6 +36,8 @@ class BBCoverPlateBoltedCAD(object):
         self.nut_bolt_array_AF = nut_bolt_array_AF
         self.nut_bolt_array_BF = nut_bolt_array_BF
         self.nut_bolt_array_Web = nut_bolt_array_Web
+        self.beamLModel = None
+        self.beamRModel = None
 
     def create_3DModel(self):
         '''
@@ -128,12 +131,6 @@ class BBCoverPlateBoltedCAD(object):
         boltDirW = numpy.array([-1.0, 0, 0])
         self.nut_bolt_array_Web.placeW(nutBoltOriginW, gaugeDirW, pitchDirW, boltDirW)
 
-    def get_beamLModel(self):
-        return self.beamLModel
-
-    def get_beamRModel(self):
-        return self.beamRModel
-
     def get_plateAbvFlangeModel(self):
         return self.plateAbvFlangeModel
 
@@ -154,3 +151,24 @@ class BBCoverPlateBoltedCAD(object):
 
     def get_nutboltmodelsWeb(self):
         return self.nut_bolt_array_Web.get_modelsWeb()
+
+    # Below methods are for creating holes in flange and web
+    def get_beamLModel(self):
+        final_beam = self.beamLModel
+        bolt_listLA = self.nut_bolt_array_AF.get_bolt_listLA()
+        bolt_listLB = self.nut_bolt_array_BF.get_bolt_listLB()
+        for boltLB in bolt_listLB[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, boltLB).Shape()
+        for boltLA in bolt_listLA[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, boltLA).Shape()
+        return final_beam
+
+    def get_beamRModel(self):
+        final_beam = self.beamRModel
+        bolt_listRA = self.nut_bolt_array_AF.get_bolt_listRA()
+        bolt_listRB = self.nut_bolt_array_BF.get_bolt_listRB()
+        for boltRB in bolt_listRB[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, boltRB).Shape()
+        for boltRA in bolt_listRA[:]:
+            final_beam = BRepAlgoAPI_Cut(final_beam, boltRA).Shape()
+        return final_beam

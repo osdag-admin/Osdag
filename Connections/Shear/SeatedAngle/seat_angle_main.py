@@ -904,6 +904,8 @@ class MainController(QMainWindow):
         self.ui.txt_bolt_gauge.clear()
         self.ui.txt_end_distance.clear()
         self.ui.txt_edge_distance.clear()
+        self.ui.textEdit.clear()
+
 
         # ------ Erase Display
         self.display.EraseAll()

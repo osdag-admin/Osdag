@@ -342,17 +342,17 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.connectivity = input_dict['Member']['Connectivity']
         self.beam_section = input_dict['Member']['BeamSection']
         self.column_section = input_dict['Member']['ColumnSection']
-        self.beam_fu = int(input_dict['Member']['fu (MPa)'])
-        self.beam_fy = int(input_dict['Member']['fy (MPa)'])
-        self.column_fy = int(self.beam_fy)
-        self.column_fu = int(self.beam_fu)
-        self.angle_fy = int(str(self.beam_fy))
-        self.angle_fu = int(self.beam_fu)
+        self.beam_fu = float(input_dict['Member']['fu (MPa)'])
+        self.beam_fy = float(input_dict['Member']['fy (MPa)'])
+        self.column_fy = float(self.beam_fy)
+        self.column_fu = float(self.beam_fu)
+        self.angle_fy = float(str(self.beam_fy))
+        self.angle_fu = float(self.beam_fu)
         self.shear_force = float(input_dict['Load']['ShearForce (kN)'])
         self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
-        self.bolt_fu = int(float(self.bolt_grade)) * 100
+        self.bolt_fu = float(float(self.bolt_grade)) * 100
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
         # TODO for test_calc and test_report, uncomment the below line
@@ -566,9 +566,9 @@ class SeatAngleCalculation(ConnectionCalculations):
         if self.connectivity == "Column web-Beam flange":
             limiting_angle_length = self.column_d - 2 * self.column_f_t - 2 * self.column_R1 - self.root_clearance_col
 
-            self.angle_l = int(math.ceil(min(self.beam_b, limiting_angle_length)))
+            self.angle_l = float(math.ceil(min(self.beam_b, limiting_angle_length)))
         elif self.connectivity == "Column flange-Beam flange":
-            self.angle_l = int(math.ceil(min(self.beam_b, self.column_b)))
+            self.angle_l = float(math.ceil(min(self.beam_b, self.column_b)))
 
         if self.angle_t < 6:
             logger.warning(": Minimum thickness of 6 mm is recommended for the seat angle")

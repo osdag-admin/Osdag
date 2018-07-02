@@ -316,7 +316,7 @@ def cleat_connection(ui_obj):
     if cleat_length == '':
         cleat_length = 0
     else:
-        cleat_length = int(cleat_length)
+        cleat_length = float(cleat_length)
 
     cleat_fu = float(ui_obj['Member']['fu (MPa)'])
     cleat_fy = float(ui_obj['Member']['fy (MPa)'])

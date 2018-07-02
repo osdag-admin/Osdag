@@ -98,7 +98,7 @@ class DesignPreferences(QDialog):
         self.saved_designPref["bolt"] = {}
         self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
-        self.saved_designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        self.saved_designPref["bolt"]["bolt_fu"] = float(self.ui.txt_boltFu.text())
         self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
         self.saved_designPref["weld"] = {}
@@ -151,7 +151,7 @@ class DesignPreferences(QDialog):
         designPref["bolt"] = {}
         designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
         designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
-        designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+        designPref["bolt"]["bolt_fu"] = float(self.ui.txt_boltFu.text())
         self.ui.combo_slipfactor.setCurrentIndex(4)
         designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -1317,7 +1317,7 @@ class MainController(QMainWindow):
 
         # ------------------------------------ Erase Display -----------------------------------------------------------------
         self.display.EraseAll()
-
+        self.disable_view_buttons()
         self.designPrefDialog.set_default_para()
 
     def dockbtn_clicked(self, widget):

@@ -114,18 +114,21 @@ class BBCoverPlateBoltedCAD(object):
         self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
 
     def create_nut_bolt_array_AF(self):
+
         nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 1.0, 0])
         boltDirAF = numpy.array([0, 0, -1.0])
-        self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF)
+        width = self.plateAbvFlange.L
+        self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF, width)
 
     def create_nut_bolt_array_BF(self):
         nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])
         gaugeDirBF = numpy.array([1.0, 0, 0])
         pitchDirBF = numpy.array([0, 1.0, 0])
         boltDirBF = numpy.array([0, 0, 1.0])
-        self.nut_bolt_array_BF.placeBF(nutBoltOriginBF, gaugeDirBF, pitchDirBF, boltDirBF)
+        width = self.plateBelwFlange.L
+        self.nut_bolt_array_BF.placeBF(nutBoltOriginBF, gaugeDirBF, pitchDirBF, boltDirBF, width)
 
     def create_nut_bolt_array_Web(self):
         boltWeb_X = self.WebPlateRight.T / 2

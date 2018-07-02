@@ -40,6 +40,9 @@ class BBCoverPlateBoltedCAD(object):
         self.beamLModel = None
         self.beamRModel = None
         self.WebPlateLeftModel = None
+        self.WebPlateRightModel = None
+        self.plateAbvFlangeModel = None
+        self.plateBelwFlangeModel = None
 
     def create_3DModel(self):
         '''
@@ -133,18 +136,6 @@ class BBCoverPlateBoltedCAD(object):
         boltDirW = numpy.array([-1.0, 0, 0])
         self.nut_bolt_array_Web.placeW(nutBoltOriginW, gaugeDirW, pitchDirW, boltDirW)
 
-    def get_plateAbvFlangeModel(self):
-        return self.plateAbvFlangeModel
-
-    def get_plateBelwFlangeModel(self):
-        return self.plateBelwFlangeModel
-
-    def get_WebPlateLeftModel(self):
-        return self.WebPlateLeftModel
-
-    def get_WebPlateRightModel(self):
-        return self.WebPlateRightModel
-
     def get_nutboltmodelsAF(self):
         return self.nut_bolt_array_AF.get_modelsAF()
 
@@ -181,3 +172,30 @@ class BBCoverPlateBoltedCAD(object):
             final_beam = BRepAlgoAPI_Cut(final_beam, boltWR).Shape()
         return final_beam
 
+    def get_WebPlateLeftModel(self):
+        final_plateLP = self.WebPlateLeftModel
+        bolt_listLP = self.nut_bolt_array_Web.get_bolt_web_list()
+        for boltLP in bolt_listLP[:]:
+            final_plateLP = BRepAlgoAPI_Cut(final_plateLP, boltLP).Shape()
+        return final_plateLP
+
+    def get_WebPlateRightModel(self):
+        final_plateRP = self.WebPlateRightModel
+        bolt_listRP = self.nut_bolt_array_Web.get_bolt_web_list()
+        for boltRP in bolt_listRP[:]:
+            final_plateRP = BRepAlgoAPI_Cut(final_plateRP, boltRP).Shape()
+        return final_plateRP
+
+    def get_plateAbvFlangeModel(self):
+        final_plateAP = self.plateAbvFlangeModel
+        bolt_listAP = self.nut_bolt_array_AF.get_bolt_listLA()
+        for boltAP in bolt_listAP[:]:
+            final_plateAP = BRepAlgoAPI_Cut(final_plateAP, boltAP).Shape()
+        return final_plateAP
+
+    def get_plateBelwFlangeModel(self):
+        final_plateBP = self.plateBelwFlangeModel
+        bolt_listBP = self.nut_bolt_array_BF.get_bolt_listRB()
+        for boltBP in bolt_listBP[:]:
+            final_plateBP = BRepAlgoAPI_Cut(final_plateBP, boltBP).Shape()
+        return final_plateBP

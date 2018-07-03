@@ -154,7 +154,8 @@ def web_max_t(bolt_diameter):
     return max_web_t
 
 ########################################################################################################################
-# Calculation of block shear capacity of web splice plate
+# Calculation of block shear capacity of web splice plate [Reference: Bolted field splices for steel bridge flexural\
+#  members AISC - overview and design example: Design example 3.1] [link: https://www.aisc.org/globalassets/nsba/design-resources/bolted-field-splices-for-steel-bridge-flexural-members_march2017.pdf]
 def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
     """
     Args:
@@ -181,8 +182,9 @@ def web_block_shear(web_plate_l, edge_dist, thk, n_bolts, dia_hole, fy, fu):
     return round((Tdb / 1000), 2)
 
 ########################################################################################################################
-# Calculation of block shear capacity of outer flange splice plate
-def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, flange_gauge, fy, fu):
+# Calculation of block shear capacity of outer flange splice plate [Reference: Bolted field splices for steel bridge flexural\
+#  members AISC - overview and design example: Design example 3.1] [link: https://www.aisc.org/globalassets/nsba/design-resources/bolted-field-splices-for-steel-bridge-flexural-members_march2017.pdf]
+def flange_splice_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, flange_gauge, fy, fu):
     """
     Args:
         Ltp: ((Length of flange splice plate - gap) / 2) in mm (float)
@@ -211,14 +213,69 @@ def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, fla
     return round((Tdb_flange / 1000), 2)
 
 ########################################################################################################################
-# Todo
-#  Calculation of block shear capacity of outer flange splice plate
+#  Calculation of block shear capacity of inner flange splice plate [Reference: Bolted field splices for steel bridge flexural\
+#  members AISC - overview and design example: Design example 3.1] [link: https://www.aisc.org/globalassets/nsba/design-resources/bolted-field-splices-for-steel-bridge-flexural-members_march2017.pdf]
 
+# %%%%%Important Note:%%%%%%%
+# As per the reference mentioned above, the block shear capacity of inner flange splice plates is the combined capacity\
+# ... of 2 inner plates on one side of the connection
+def inner_flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, flange_gauge, fy, fu):
+    """
+    Args:
+        Ltp: ((Length of flange splice plate - gap) / 2) in mm (float)
+        edge_dist: Edge/end distance in mm (Assumption: edge distance = end distance) (float)
+        thk: Thickness of flange splice plate in mm (float)
+        n_bolts: Number of bolts in half part of flange splice plate (int)
+        dia_hole: Diameter of bolt hole in mm
+        flange_width: Width of flange in mm (float)
+        flange_gauge: Gauge distance between bolts in flange in mm (float)
+        fy: Characteristic yield stress in N/mm^2 (float)
+        fu: Ultimate tensile stress of the material in N/mm^2 (float)
+    Returns: Block shear capacity of inner flange splice plate in mm
+    """
+######## NOTE: flange block shear for outer flange splice plate = Flange block shear for inner flange splice plate
+    gamma_m0 = 1.10
+    gamma_m1 = 1.25
+    Avg = (Ltp - edge_dist) * thk
+    Avn = (Ltp - edge_dist - (n_bolts - 1 + 0.5) * dia_hole) * thk
+    Atg = ((flange_width - flange_gauge) / 2)  * thk
+    Atn = (((flange_width - flange_gauge) / 2) - 0.5 * dia_hole) * thk
+
+    Tdb1 = 2 * (((Avg * fy)/(math.sqrt(3) * gamma_m0)) + ((0.9 * Atn * fu) / (gamma_m1)))
+    Tdb2 = 2 * (((0.9 * Avn * fu) / (math.sqrt(3))) + ((Atg * fy) / gamma_m0))
+    Tdb_flange = min(Tdb1, Tdb2)
+
+    return round((Tdb_flange / 1000), 2)
 ########################################################################################################################
 
-# Todo
 # Calculation of flange block shear
+def flange_block_shear(Ltp, edge_dist, thk, n_bolts, dia_hole, flange_width, flange_gauge, fy, fu):
+    """
+    Args:
+        Ltp: ((Length of flange splice plate - gap) / 2) in mm (float)
+        edge_dist: Edge/end distance in mm (Assumption: edge distance = end distance) (float)
+        thk: Thickness of flange in mm (float)
+        n_bolts: Number of bolts in half part of flange splice plate (int)
+        dia_hole: Diameter of bolt hole in mm
+        flange_width: Width of flange in mm (float)
+        flange_gauge: Gauge distance between bolts in flange in mm (float)
+        fy: Characteristic yield stress in N/mm^2 (float)
+        fu: Ultimate tensile stress of the material in N/mm^2 (float)
+    Returns: Block shear capacity of flange in mm
+    """
 
+    gamma_m0 = 1.10
+    gamma_m1 = 1.25
+    Avg = (Ltp - edge_dist) * thk
+    Avn = (Ltp - edge_dist - (n_bolts - 1 + 0.5) * dia_hole) * thk
+    Atg = ((flange_width - flange_gauge) / 2)  * thk
+    Atn = (((flange_width - flange_gauge) / 2) - 0.5 * dia_hole) * thk
+
+    Tdb1 = 2 * (((Avg * fy)/(math.sqrt(3) * gamma_m0)) + ((0.9 * Atn * fu) / (gamma_m1)))
+    Tdb2 = 2 * (((0.9 * Avn * fu) / (math.sqrt(3))) + ((Atg * fy) / gamma_m0))
+    Tdb_flange = min(Tdb1, Tdb2)
+
+    return round((Tdb_flange / 1000), 2)
 ########################################################################################################################
 # Check for shear yielding of web splice plate (Clause 8.4.1, IS 800 : 2007)
 def shear_yielding(A_v, beam_fy):
@@ -336,8 +393,8 @@ def coverplateboltedconnection(uiObj):
     else:
         web_plate_l = round(int(web_plate_l), 2)
 
-    web_plate_fu = int(beam_fu)
-    web_plate_fy = int(beam_fy)
+    web_plate_fu = float(beam_fu)
+    web_plate_fy = float(beam_fy)
 
     old_beam_section = get_oldbeamcombolist()
 
@@ -502,7 +559,7 @@ def coverplateboltedconnection(uiObj):
         number_of_bolts = 1
         if bolt_type == "Bearing Bolt":
             web_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear(bolt_diameter, web_bolt_planes, bolt_fu), 2)
-            web_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter,number_of_bolts, web_t_thinner,\
+            web_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, web_t_thinner,\
                                                                             kb, web_plate_fu), 2)
             web_bolt_capacity = min(web_bolt_shear_capacity,web_bolt_bearing_capacity)
 
@@ -526,7 +583,8 @@ def coverplateboltedconnection(uiObj):
         if bolt_type == "Bearing Bolt":
             flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear(bolt_diameter, number_of_bolts, bolt_fu), 2)
             flange_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
-                                                                            kb, int(flange_plate_fu)), 2)
+                                                                                kb, int(flange_plate_fu)), 2)
+
             flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
 
         elif bolt_type == "Friction Grip Bolt":
@@ -534,7 +592,8 @@ def coverplateboltedconnection(uiObj):
             bolt_hole_type = dp_bolt_hole_type  # 1 for standard, 0 for oversize hole
             n_e = 1  # number of effective surfaces offering frictional resistance
             flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e,
-                                                                             bolt_hole_type), 2)
+                                                                                 bolt_hole_type), 2)
+
             flange_bolt_bearing_capacity = 'N/A'
             flange_bolt_capacity = flange_bolt_shear_capacity
 
@@ -602,7 +661,9 @@ def coverplateboltedconnection(uiObj):
                                    In the above diagram total number of bolts along one side of beam is 8
                                      number of rows = 8/2 = 4
             '''
+
         number_of_rows_flange = flange_bolts_required / 2
+
         total_web_plate_bolts = web_bolts_required * 2
         total_flange_plate_bolts = flange_bolts_required * 4
 
@@ -702,12 +763,30 @@ def coverplateboltedconnection(uiObj):
             else:
                 pass
 
-            flange_plate_l = flange_plate_l
-            flange_pitch = (Ltp_input - (2 * min_end_dist)) /(number_of_rows_flange - 1)
+            if number_of_rows_flange > 1:
+                flange_plate_l = flange_plate_l
+                flange_pitch = (Ltp_input - (2 * min_end_dist)) /(number_of_rows_flange - 1)
 
-        elif flange_plate_l == 0:
+            else:
+                design_status = False
+                logger.error(": Chosen length of flange splice plate is not sufficient")
+                logger.warning(": Minimum required length of flange splice plate is %2.2f" % (flange_plate_l_opt))
+                logger.info(": Increase the length of flange splice plate")
+
+
+        if flange_plate_l == 0:
             flange_plate_l = flange_plate_l_opt
-            flange_pitch = int(Ltp - (2 * min_end_dist)) / int(number_of_rows_flange - 1)
+            if number_of_rows_flange > 1:
+                flange_pitch = int(Ltp - (2 * min_end_dist)) / int(number_of_rows_flange - 1)
+                if flange_pitch % 10 != 0:
+                    flange_pitch = int(flange_pitch / 10) * 10 + 10
+                else:
+                    flange_pitch = flange_pitch + 10
+
+                Ltp11 = (2 * min_end_dist) + (flange_pitch * (number_of_rows_flange - 1))
+                flange_plate_l = (2 * Ltp11) + gap
+            else:
+                flange_pitch = 0
 
         else:
             pass
@@ -931,18 +1010,18 @@ def coverplateboltedconnection(uiObj):
         pass
 
 
-    # # Revised on 15-June-2018
-    # # Check for the capacity of fasteners (as per experts review) [Strength of fasteners >  50% (Area of flange * Fy)] [Reference: Annex F, Clause 10.6.1, F-2.2, Page 130]
-    # Area_flange = beam_b * beam_f_t
-    # flange_capacity1 = (Area_flange * beam_fy) / 1000 # kN
-    # bolt_strength = new_bolt_param["BoltsRequiredF"] * new_bolt_param["CapacityBoltF"]
-    #
-    # if bolt_strength < (0.5 * (flange_capacity1)):
-    #     capacity_bolts = int(math.ceil((0.5 * (flange_capacity1)) / new_bolt_param["BoltsRequiredF"]))
-    #     design_status = False
-    #     logger.error(": Strength of fasteners is less than 50% the capacity of flange as per clause 10.6.1, Annex F")
-    #     logger.warning(": Bolt capacity required is %d kN" % (capacity_bolts))
-    #     logger.info(": Increase diameter and slip factor of the bolt")
+    # Revised on 15-June-2018
+    # Check for the capacity of fasteners (as per experts review) [Strength of fasteners >  50% (Effective Area of flange * Fy)] [Reference: Annex F, Clause 10.6.1, F-2.2, Page 130]
+    Area_flange = (beam_b - (2 * dia_hole)) * beam_f_t
+    flange_capacity1 = (Area_flange * beam_fy) / (1000 * 1.10) # kN
+    bolt_strength = new_bolt_param["BoltsRequiredF"] * new_bolt_param["CapacityBoltF"]
+
+    if bolt_strength < (0.5 * (flange_capacity1)):
+        capacity_bolts = int(math.ceil((0.5 * (flange_capacity1)) / new_bolt_param["BoltsRequiredF"]))
+        design_status = False
+        logger.error(": Strength of fasteners is less than 50% the capacity of flange as per clause 10.6.1, Annex F, IS 800")
+        logger.warning(": Bolt capacity required is %d kN" % (capacity_bolts))
+        logger.info(": Increase diameter and slip factor of the bolt")
 
 
     ## Web plate width input (optional) and validation
@@ -1087,7 +1166,7 @@ def coverplateboltedconnection(uiObj):
     min_thk = min(flange_plate_t, beam_f_t)
     n_bolts = boltparameters["BoltsRequiredF"] / 2
     Ltp = (boltparameters["FlangePlateHeight"] - gap) / 2
-    Tdb_flange = flange_block_shear(Ltp, boltparameters["EdgeF"], min_thk, n_bolts, dia_hole,
+    Tdb_flange = flange_splice_block_shear(Ltp, boltparameters["EdgeF"], min_thk, n_bolts, dia_hole,
                                     boltparameters["FlangePlateWidth"], int(flange_g),
                                     flange_plate_fy, flange_plate_fu)
 
@@ -1101,6 +1180,22 @@ def coverplateboltedconnection(uiObj):
 
     # Capacity of flange splice plate
     flange_splice_capacity = min(Tdg_flange_plate, Tdn_flange_plate, Tdb_flange)
+
+    #####################################################################################################################
+    # Check for block shear capacity of flange ## [As suggested by experts]
+    n_bolts = boltparameters["BoltsRequiredF"] / 2
+    Ltp = (boltparameters["FlangePlateHeight"] - gap) / 2
+    Tdb_beamflange = flange_splice_block_shear(Ltp, boltparameters["EdgeF"], beam_f_t, n_bolts, dia_hole,
+                                    boltparameters["FlangePlateWidth"], int(flange_g),
+                                    beam_fy, beam_fu)
+
+    if Tdb_beamflange < ff:
+        design_status = False
+        logger.error(": Block shear capacity of flange is less than force in flange [cl. 6.4.1]")
+        logger.warning(": Minimum block shear capacity required is %2.2f kN" % (ff))
+        logger.info(": Choose the higher beam section")
+    else:
+        pass
 
     #####################################################################################################################
     # End of calculation for design of web splice plate
@@ -1143,6 +1238,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["FlangeGauge"] = int(flange_g)
         outputObj["FlangeBolt"]["FlangePlateDemand"] = new_bolt_param["FlangePlateDemand"]
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
+        outputObj["FlangeBolt"]["edge_dist_gauge"] = edge_dist # For 3D model
 
         ####### For reference and validation
         outputObj["WebBolt"]["WebBlockShear"] = Tdb
@@ -1206,6 +1302,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["FlangeCapacity"] = flange_splice_capacity
         outputObj['FlangeBolt']['MaxPitchF'] = new_bolt_param["MaxPitchF"]
         outputObj["FlangeBolt"]["FlangeTThinner"] = new_bolt_param["FlangeTThinner"]
+        outputObj["FlangeBolt"]["edge_dist_gauge"] = edge_dist  # For 3D model
 
         # Dimension of inner flange plate
         outputObj["FlangeBolt"]["InnerFlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]

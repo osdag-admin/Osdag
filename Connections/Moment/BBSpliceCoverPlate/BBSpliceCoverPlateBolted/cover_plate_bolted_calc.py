@@ -584,6 +584,7 @@ def coverplateboltedconnection(uiObj):
             flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear(bolt_diameter, number_of_bolts, bolt_fu), 2)
             flange_bolt_bearing_capacity = round(ConnectionCalculations.bolt_bearing(bolt_diameter, number_of_bolts, flange_t_thinner, \
                                                                                 kb, int(flange_plate_fu)), 2)
+
             flange_bolt_capacity = min(flange_bolt_shear_capacity, flange_bolt_bearing_capacity)
 
         elif bolt_type == "Friction Grip Bolt":
@@ -592,6 +593,7 @@ def coverplateboltedconnection(uiObj):
             n_e = 1  # number of effective surfaces offering frictional resistance
             flange_bolt_shear_capacity = round(ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_diameter, bolt_fu, muf, n_e,
                                                                                  bolt_hole_type), 2)
+
             flange_bolt_bearing_capacity = 'N/A'
             flange_bolt_capacity = flange_bolt_shear_capacity
 

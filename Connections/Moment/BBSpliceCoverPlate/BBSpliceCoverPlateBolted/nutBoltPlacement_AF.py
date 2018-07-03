@@ -82,7 +82,9 @@ class NutBoltArray_AF():
         :return: The positions/coordinates to place the bolts in the form of list, positions_AF = [list of bolting coordinates] 
         """
         self.positions_AF = []
-        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
+        # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.plateAbvFlangeL - self.gauge_AF)/2 * self.gaugeDirAF
+
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):
                 pos_AF = self.boltOrigin_AF
@@ -96,11 +98,12 @@ class NutBoltArray_AF():
                     pos_AF = pos_AF + cl_AF * self.gauge_AF * self.gaugeDirAF
                     self.positions_AF.append(pos_AF)
 
-    def placeAF(self, originAF, gaugeDirAF, pitchDirAF, boltDirAF):
+    def placeAF(self, originAF, gaugeDirAF, pitchDirAF, boltDirAF, plateAbvFlangeL):
         self.originAF = originAF
         self.gaugeDirAF = gaugeDirAF
         self.pitchDirAF = pitchDirAF
         self.boltDirAF = boltDirAF
+        self.plateAbvFlangeL = plateAbvFlangeL
 
         self.calculatePositions_AF()
 

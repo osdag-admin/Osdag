@@ -1712,6 +1712,10 @@ class MainController(QMainWindow):
             self.commLogicObj.call_3DModel(status)
             if status is True:
                 self.callCleat2D_drawing("All")
+                self.ui.actionShow_all.setEnabled(True)
+                self.ui.actionShow_beam.setEnabled(True)
+                self.ui.actionShow_column.setEnabled(True)
+                self.ui.actionShow_cleat_angle.setEnabled(True)
             else:
                 self.ui.btn3D.setEnabled(False)
                 self.ui.chkBxBeam.setEnabled(False)

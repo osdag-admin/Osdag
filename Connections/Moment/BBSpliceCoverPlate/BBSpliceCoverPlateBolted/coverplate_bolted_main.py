@@ -362,7 +362,7 @@ class MainController(QMainWindow):
 		self.preference_type = OrderedDict()
 		self.preference_type['Cover plate location'] = ''
 		self.preference_type['Outside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
-		self.preference_type['Outside + Inside'] = [5, 6, 8, 10, 12, 14, 15, 16]
+		self.preference_type['Outside + Inside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
 
 		print "Preferences", self.preference_type
 		self.ui.combo_flange_preference.addItems(self.preference_type.keys())

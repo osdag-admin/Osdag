@@ -622,11 +622,11 @@ class MainController(QMainWindow):
     def convert_col_combo_to_beam(self):
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
-            self.ui.lbl_beam.setText(" Secondary beam *")
+            self.ui.lbl_beam.setText("Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
             self.ui.chkBxBeam.setText("SBeam")
             self.ui.actionShow_beam.setText("Show SBeam")
-            self.ui.chkBxBeam.setToolTip("Secondary  beam")
+            self.ui.chkBxBeam.setToolTip("Secondary beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.actionShow_column.setText("Show PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
@@ -1810,6 +1810,10 @@ class MainController(QMainWindow):
             self.commLogicObj.call_3DModel(status)
             if status is True:
                 self.callend2D_Drawing("All")
+                self.ui.actionShow_all.setEnabled(True)
+                self.ui.actionShow_beam.setEnabled(True)
+                self.ui.actionShow_column.setEnabled(True)
+                self.ui.actionShow_end_plate.setEnabled(True)
             else:
                 self.ui.btn3D.setEnabled(False)
                 self.ui.chkBxBeam.setEnabled(False)

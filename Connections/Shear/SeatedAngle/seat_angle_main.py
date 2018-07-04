@@ -904,6 +904,8 @@ class MainController(QMainWindow):
         self.ui.txt_bolt_gauge.clear()
         self.ui.txt_end_distance.clear()
         self.ui.txt_edge_distance.clear()
+        self.ui.textEdit.clear()
+
 
         # ------ Erase Display
         self.display.EraseAll()
@@ -1340,6 +1342,11 @@ class MainController(QMainWindow):
             self.commLogicObj.call_3DModel(status)
             if status is True:
                 self.call_seatangle2D_Drawing("All")
+                self.ui.actionShow_All.setEnabled(True)
+                self.ui.actionShow_beam.setEnabled(True)
+                self.ui.actionShow_column.setEnabled(True)
+                self.ui.actionShow_seatAngle.setEnabled(True)
+
             else:
                 self.ui.btn3D.setEnabled(False)
                 self.ui.chkBxBeam.setEnabled(False)

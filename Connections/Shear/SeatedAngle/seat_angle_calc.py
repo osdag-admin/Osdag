@@ -59,18 +59,10 @@ class SeatAngleCalculation(ConnectionCalculations):
         type_of_edge (string)
         is_environ_corrosive (string): "Yes" if members are under corrosive influences (used for max edge distance)
         design_method (string)
-<<<<<<< HEAD
-        is_hsfg (boolean): True if the bolt is to be designed as HSFG with slip not permitted at ultimate load
-        n_e (int): Number of effective surfaces offering frictional resistance to HSFG bolts
-        mu_f (float): slip-factor/ coefficient of friction of HSFG bolts
-=======
         is_friction_grip_bolt (boolean): True if the bolt is to be designed as Friction Grip Bolt with slip not permitted at ultimate load
         n_e (int): Number of effective surfaces offering frictional resistance to Friction Grip Bolt bolts
         mu_f (float): slip-factor/ coefficient of friction of Friction Grip Bolt bolts
->>>>>>> 410d1c0b96cf3ffa654ab6b14394593096d755a8
         bolt_fu_overwrite (int)
-        
-
         top_angle (string)
         dict_top_angle_data (dict): top angle section - geometric properties
         top_angle_recommended (string): Calculated top angle size based on thumb rules

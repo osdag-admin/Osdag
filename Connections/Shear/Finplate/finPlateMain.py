@@ -555,11 +555,11 @@ class MainController(QMainWindow):
         self.designPrefDialog.set_default_para()
         loc = self.ui.comboConnLoc.currentText()
         if loc == "Beam-Beam":
-            self.ui.lbl_beam.setText(" Secondary beam *")
+            self.ui.lbl_beam.setText("Secondary beam *")
             self.ui.lbl_column.setText("Primary beam *")
 
             self.ui.chkBxBeam.setText("SBeam")
-            self.ui.chkBxBeam.setToolTip("Secondary  beam")
+            self.ui.chkBxBeam.setToolTip("Secondary beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.actionShow_beam.setText("Show SBeam")
@@ -1787,11 +1787,15 @@ class MainController(QMainWindow):
         self.displaylog_totextedit(self.commLogicObj)
         isempty = [True if val != '' else False for ele in alist for val in ele.values()]
 
-        if isempty[0] == True:
+        if isempty[0] is True:
             status = self.resultObj['Bolt']['status']
             self.commLogicObj.call_3DModel(status)
             if status is True:
                 self.callFin2D_Drawing("All")
+                self.ui.actionShow_all.setEnabled(True)
+                self.ui.actionShow_beam.setEnabled(True)
+                self.ui.actionShow_column.setEnabled(True)
+                self.ui.actionShow_finplate.setEnabled(True)
             else:
                 self.ui.btn3D.setEnabled(False)
                 self.ui.chkBxBeam.setEnabled(False)

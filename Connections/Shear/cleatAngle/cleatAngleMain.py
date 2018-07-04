@@ -564,13 +564,13 @@ class MainController(QMainWindow):
         self.display.EraseAll()
         loc = str(self.ui.comboConnLoc.currentText())
         if loc == "Beam-Beam":
-            self.ui.beamSection_lbl.setText(" Secondary beam *")
+            self.ui.beamSection_lbl.setText("Secondary beam *")
             self.ui.actionShow_beam.setText("Show SBeam")
             self.ui.columnSection_lbl.setText("Primary beam *")
             self.ui.actionShow_column.setText("Show PBeam")
 
             self.ui.chkBxBeam.setText("SBeam")
-            self.ui.chkBxBeam.setToolTip("Secondary  beam")
+            self.ui.chkBxBeam.setToolTip("Secondary beam")
             self.ui.chkBxCol.setText("PBeam")
             self.ui.chkBxCol.setToolTip("Primary beam")
             self.ui.comboColSec.blockSignals(True)

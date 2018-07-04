@@ -1021,7 +1021,12 @@ def coverplateboltedconnection(uiObj):
         design_status = False
         logger.error(": Strength of fasteners is less than 50% the capacity of flange as per clause 10.6.1, Annex F, IS 800")
         logger.warning(": Bolt capacity required is %d kN" % (capacity_bolts))
-        logger.info(": Increase diameter and slip factor of the bolt")
+        logger.info(": Reduce the size of beam section")
+
+        # design_status = False
+        # logger.error(": Strength of fasteners is less than 50% the capacity of flange as per clause 10.6.1, Annex F, IS 800")
+        # logger.warning(": Bolt capacity required is %d kN" % (capacity_bolts))
+        # logger.info(": Increase diameter and slip factor of the bolt")
 
 
     ## Web plate width input (optional) and validation

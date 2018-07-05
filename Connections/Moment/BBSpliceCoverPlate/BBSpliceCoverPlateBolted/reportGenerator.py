@@ -73,7 +73,11 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     shear_load = str(float(uiObj["Load"]["ShearForce (kN)"]))
     moment_load = str(float(uiObj["Load"]["Moment (kNm)"]))
-    axial_force = str(float(uiObj["Load"]["AxialForce"]))
+    axial_force = str((uiObj["Load"]["AxialForce"]))
+    if axial_force == '':
+        axial_force = str(float(0))
+    else:
+        axial_force = str(float(uiObj["Load"]["AxialForce"]))
 
     bolt_diameter = str(int(uiObj["Bolt"]["Diameter (mm)"]))
     bolt_grade = str(float(uiObj["Bolt"]["Grade"]))
@@ -135,6 +139,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     FlangeForce = str(float(outputObj['FlangeBolt']['FlangeForce']))
     FlangeForce1 = (float(outputObj['FlangeBolt']['FlangeForce']))
     InnerFlangePlateWidth = str(float(outputObj["FlangeBolt"]["InnerFlangePlateWidth"]))
+    flangeplatethick = str(float(outputObj["FlangeBolt"]["flangeplatethick"]))
 
     WebBlockShear = str(float(outputObj["WebBolt"]["WebBlockShear"]))
     ShearYielding = str(float(outputObj["WebBolt"]["ShearYielding"]))
@@ -997,14 +1002,13 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     if flange_plate_preference == "Outside":
-        minPlateThick1 = round(FlangeForce1 / ((beam_b1 - 2 * dia_hole1) * (beam_fy1/ (1.10 * 1000))), 1)
-        minPlateThick = str(minPlateThick1)
-        if float(flange_plate_t) < float(minPlateThick):
+        flangeplatethick2 = str(float(round(flangeplatethick), 2))
+        if float(flange_plate_t) < float(flangeplatethick2):
             row = [0, "Flange splice plate thickness (mm)",
-                   minPlateThick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+                   flangeplatethick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
         else:
-            row = [0, "Flange splice plate thickness (mm)", minPlateThick +
+            row = [0, "Flange splice plate thickness (mm)", flangeplatethick +
                    "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1048,16 +1052,14 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/h1')
 
     elif flange_plate_preference == "Outside + Inside":
-        thkflangeplate2 = (1.05 * (float(beam_b) * float(beam_f_t))) / float(FlangePlateWidth)
-        minPlateThick2 = round(FlangeForce1 / ((beam_b1 - 2 * dia_hole1) * (beam_fy1 / (1.10 * 1000))), 1)
-        minPlateThick1 = max(thkflangeplate2, (float(beam_f_t) / 2), 10, minPlateThick2)
-        minPlateThick = str(minPlateThick1)
-        if float(flange_plate_t) < float(minPlateThick):
+        flangeplatethick2 = round(float(flangeplatethick), 2)
+        flangeplatethick1 = str(float(flangeplatethick2 / 2))
+        if float(flange_plate_t) < float(flangeplatethick1):
             row = [0, "Outer flange splice plate thickness (mm)",
-                   minPlateThick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+                   flangeplatethick1 + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
         else:
-            row = [0, "Outer flange splice plate thickness (mm)", minPlateThick +
+            row = [0, "Outer flange splice plate thickness (mm)", flangeplatethick1 +
                    "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1102,16 +1104,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
         rstr += t('/tr')
 
-        rstr += t('/table')
-        rstr += t('h1 style="page-break-before:always"')  # page break
-        rstr += t('/h1')
-
-        if float(flange_plate_t) < float(minPlateThick):
+        if float(flange_plate_t) < float(flangeplatethick1):
             row = [0, "Inner flange splice plate thickness (mm)",
-                   minPlateThick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+                   flangeplatethick1 + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
         else:
-            row = [0, "Inner flange splice plate thickness (mm)", minPlateThick +
+            row = [0, "Inner flange splice plate thickness (mm)", flangeplatethick1 +
                    "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
         rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1143,7 +1141,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('tr')
 
         # Width of flange splice plate
-        minPlateWidthI = str(2 * EdgeF)
+        minPlateWidthI = str(int(2 * int(EdgeF)))
         if float(InnerFlangePlateWidth) < float(minPlateWidthI):
             row = [0, "Inner flange splice plate width (mm)", " &#8805; " + minPlateWidthI, InnerFlangePlateWidth,
                    "<p align=left style=color:red><b>Fail</b></p>"]
@@ -1159,6 +1157,11 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/table')
         rstr += t('h1 style="page-break-before:always"')  # page break
         rstr += t('/h1')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
+
     # *************************************************************************************************************************
     # *************************************************************************************************************************
     # Header of the pdf fetched from dialogbox
@@ -1443,11 +1446,11 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     if float(ShearYielding) < float(shear_load):
         row = [0, "Shear yielding (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
         row = [0, "Shear yielding (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1458,12 +1461,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     if float(ShearRupture) < float(shear_load):
         row = [0, "Shear rupture (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 6.4.1]" + "<br>",
+               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 8.4.1]" + "<br>",
                "<p align=left style=color:red><b>Fail</b></p>"]
 
     else:
         row = [0, "Shear rupture (kN)", " &#8805; " + shear_load,
-               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 6.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

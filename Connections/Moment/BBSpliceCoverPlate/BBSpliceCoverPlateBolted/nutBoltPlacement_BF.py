@@ -71,6 +71,7 @@ class NutBoltArray_BF():
         '''
         self.edge_BF = outputobj["FlangeBolt"]["EdgeF"]
         self.end_BF = outputobj["FlangeBolt"]["EndF"]
+        self.edge_gauge_BF = outputobj["FlangeBolt"]["edge_dist_gauge"]
         self.pitch_BF = outputobj["FlangeBolt"]["PitchF"]
         self.gauge_BF = outputobj["FlangeBolt"]["FlangeGauge"]
         self.row_BF = outputobj["FlangeBolt"]["BoltsRequiredF"]
@@ -82,12 +83,12 @@ class NutBoltArray_BF():
         :return: The positions/coordinates to place the bolts in the form of list, positions_BF = [list of bolting coordinates] 
         """
         self.positions_BF = []
-        self.boltOrigin_BF = self.originBF + self.end_BF * self.pitchDirBF + (self.gauge_BF / 2) * self.gaugeDirBF
+        self.boltOrigin_BF = self.originBF + self.edge_gauge_BF * self.pitchDirBF + (self.plateBelwFlangeL - self.gauge_BF) / 2 * self.gaugeDirBF
         for rw_BF in range(self.row_BF):
             for cl_BF in range(self.col_BF):
                 pos_BF = self.boltOrigin_BF
                 if self.row_BF / 2 < rw_BF or self.row_BF / 2 == rw_BF:
-                    self.pitch_new_BF = 2 * self.end_BF + self.gap
+                    self.pitch_new_BF = 2 * self.edge_gauge_BF + self.gap
                     pos_BF = pos_BF + ((rw_BF - 1) * self.pitch_BF + self.pitch_new_BF) * self.pitchDirBF
                     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
@@ -96,11 +97,12 @@ class NutBoltArray_BF():
                     pos_BF = pos_BF + cl_BF * self.gauge_BF * self.gaugeDirBF
                     self.positions_BF.append(pos_BF)
 
-    def placeBF(self, originBF, gaugeDirBF, pitchDirBF, boltDirBF):
+    def placeBF(self, originBF, gaugeDirBF, pitchDirBF, boltDirBF, plateBelwFlangeL):
         self.originBF = originBF
         self.gaugeDirBF = gaugeDirBF
         self.pitchDirBF = pitchDirBF
         self.boltDirBF = boltDirBF
+        self.plateBelwFlangeL = plateBelwFlangeL
 
         self.calculatePositions_BF()
 

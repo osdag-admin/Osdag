@@ -101,7 +101,7 @@ class DesignPreferences(QDialog):
 		self.saved_designPref["bolt"] = {}
 		self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
 		self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
-		self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+		self.saved_designPref["bolt"]["bolt_fu"] = float(str(self.ui.txt_boltFu.text()))
 		self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
 		self.saved_designPref["weld"] = {}
@@ -148,7 +148,7 @@ class DesignPreferences(QDialog):
 		designPref["bolt"] = {}
 		designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
 		designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
-		designPref["bolt"]["bolt_fu"] = int(self.ui.txt_boltFu.text())
+		designPref["bolt"]["bolt_fu"] = float(self.ui.txt_boltFu.text())
 		self.ui.combo_slipfactor.setCurrentIndex(4)
 		designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
@@ -362,7 +362,7 @@ class MainController(QMainWindow):
 		self.preference_type = OrderedDict()
 		self.preference_type['Cover plate location'] = ''
 		self.preference_type['Outside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
-		self.preference_type['Outside + Inside'] = [5, 6, 8, 10, 12, 14, 15, 16]
+		self.preference_type['Outside + Inside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
 
 		print "Preferences", self.preference_type
 		self.ui.combo_flange_preference.addItems(self.preference_type.keys())
@@ -799,7 +799,7 @@ class MainController(QMainWindow):
 
 		self.ui.btn_flangePlate.setDisabled(True)
 		self.ui.btn_webPlate.setDisabled(True)
-
+		self.disable_buttons()
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
 

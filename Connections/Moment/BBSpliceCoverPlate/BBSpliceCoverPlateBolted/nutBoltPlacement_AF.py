@@ -71,6 +71,7 @@ class NutBoltArray_AF():
         '''
         self.edge_AF = outputobj["FlangeBolt"]["EdgeF"]
         self.end_AF = outputobj["FlangeBolt"]["EndF"]
+        self.edge_gauge_AF = outputobj["FlangeBolt"]["edge_dist_gauge"]
         self.pitch_AF = outputobj["FlangeBolt"]["PitchF"]
         self.gauge_AF = outputobj["FlangeBolt"]["FlangeGauge"]  # Revised gauge distance
         self.row_AF = outputobj["FlangeBolt"]["BoltsRequiredF"]
@@ -82,12 +83,14 @@ class NutBoltArray_AF():
         :return: The positions/coordinates to place the bolts in the form of list, positions_AF = [list of bolting coordinates] 
         """
         self.positions_AF = []
-        self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
+        # self.boltOrigin_AF = self.originAF + self.end_AF * self.pitchDirAF + (self.gauge_AF / 2) * self.gaugeDirAF
+        self.boltOrigin_AF = self.originAF + self.edge_gauge_AF * self.pitchDirAF + (self.plateAbvFlangeL - self.gauge_AF)/2 * self.gaugeDirAF
+
         for rw_AF in range(self.row_AF):
             for cl_AF in range(self.col_AF):
                 pos_AF = self.boltOrigin_AF
                 if self.row_AF / 2 < rw_AF or self.row_AF / 2 == rw_AF:
-                    self.pitch_new_AF = 2 * self.end_AF + self.gap
+                    self.pitch_new_AF = 2 * self.edge_gauge_AF + self.gap
                     pos_AF = pos_AF + ((rw_AF-1) * self.pitch_AF + self.pitch_new_AF) * self.pitchDirAF
                     pos_AF = pos_AF + cl_AF * self.gauge_AF * self.gaugeDirAF
                     self.positions_AF.append(pos_AF)
@@ -96,11 +99,12 @@ class NutBoltArray_AF():
                     pos_AF = pos_AF + cl_AF * self.gauge_AF * self.gaugeDirAF
                     self.positions_AF.append(pos_AF)
 
-    def placeAF(self, originAF, gaugeDirAF, pitchDirAF, boltDirAF):
+    def placeAF(self, originAF, gaugeDirAF, pitchDirAF, boltDirAF, plateAbvFlangeL):
         self.originAF = originAF
         self.gaugeDirAF = gaugeDirAF
         self.pitchDirAF = pitchDirAF
         self.boltDirAF = boltDirAF
+        self.plateAbvFlangeL = plateAbvFlangeL
 
         self.calculatePositions_AF()
 

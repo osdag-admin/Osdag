@@ -620,6 +620,8 @@ class MainController(QMainWindow):
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
             self.ui.outputCleatHeight.clear()
+            self.display.EraseAll()
+            self.disable_view_buttons()
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
@@ -679,6 +681,8 @@ class MainController(QMainWindow):
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
             self.ui.outputCleatHeight.clear()
+            self.display.EraseAll()
+            self.disable_view_buttons()
 
     def fill_cleatsection_combo(self):
         '''Populates the cleat section on the basis  beam section and column section

@@ -602,6 +602,8 @@ class MainController(QMainWindow):
             self.ui.txtMomntCapacity.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
+            self.display.EraseAll()
+            self.disableViewButtons()
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
@@ -649,6 +651,8 @@ class MainController(QMainWindow):
             self.ui.txtMomntCapacity.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
+            self.display.EraseAll()
+            self.disableViewButtons()
 
     def showFontDialogue(self):
 

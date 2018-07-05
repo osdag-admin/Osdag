@@ -1168,7 +1168,7 @@ def coverplateboltedconnection(uiObj):
     flangeplatewidth = boltparameters["FlangePlateWidth"]
     flangeplatethickness = flange_plate_t
     gamma_m0 = 1.10
-    Tdg_flange_plate = ((flangeplatewidth * flangeplatethickness * beam_fy) / gamma_m0)
+    Tdg_flange_plate = round(((flangeplatewidth * flangeplatethickness * beam_fy) / (gamma_m0 * 1000)), 2)
     if Tdg_flange_plate < ff:
         design_status = False
         logger.error(": Flange splice plate fails due to yielding of gross section")
@@ -1179,7 +1179,7 @@ def coverplateboltedconnection(uiObj):
     # Strength against rupture (flange splice plate)
     net_area = (flangeplatewidth - 2 * dia_hole) * flangeplatethickness
     gamma_m1 = 1.25
-    Tdn_flange_plate = (0.9 * net_area * flange_plate_fu) / (gamma_m1 * 1000)
+    Tdn_flange_plate = round(((0.9 * net_area * flange_plate_fu) / (gamma_m1 * 1000)), 2)
     if Tdn_flange_plate < ff:
         design_status = False
         logger.error(": Flange splice plate fails due to rupture")

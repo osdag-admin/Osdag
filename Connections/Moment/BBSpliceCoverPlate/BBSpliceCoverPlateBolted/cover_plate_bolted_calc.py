@@ -1287,6 +1287,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["InnerFlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["InnerFlangePlateWidth"] = inner_flange_plate_w # There will be 4 inner plates, this width is width of each plate
         outputObj["FlangeBolt"]["InnerFlangePlateThickness"] = flange_plate_t
+        outputObj["FlangeBolt"]["flangeplatethick"] = flangeplatethick
 
     else:
         outputObj = {}
@@ -1333,6 +1334,7 @@ def coverplateboltedconnection(uiObj):
         outputObj["FlangeBolt"]["InnerFlangePlateHeight"] = new_bolt_param["FlangePlateHeight"]
         outputObj["FlangeBolt"]["InnerFlangePlateWidth"] = inner_flange_plate_w # There will be 4 inner plates, this width is width of each plate
         outputObj["FlangeBolt"]["InnerFlangePlateThickness"] = flange_plate_t
+        outputObj["FlangeBolt"]["flangeplatethick"] = flangeplatethick
 
         ####### For reference and validation
         outputObj["WebBolt"]["WebBlockShear"] = Tdb

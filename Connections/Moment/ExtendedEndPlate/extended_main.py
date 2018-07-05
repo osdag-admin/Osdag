@@ -158,9 +158,9 @@ class DesignPreference(QDialog):
 		weldType = str(self.ui.combo_weldType.currentText())
 		designPref["weld"]["typeof_weld"] = weldType
 		designPref["weld"]["safety_factor"] = float(1.25)
-		self.ui.txt_weldFu.setText(str(410))
+		Fu = str(uiObj["Member"]["fu (MPa)"])
+		self.ui.txt_weldFu.setText(Fu)
 		designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
-
 		self.ui.combo_detailingEdgeType.setCurrentIndex(0)
 		designPref["detailing"] = {}
 		typeOfEdge = str(self.ui.combo_detailingEdgeType.currentText())
@@ -173,6 +173,16 @@ class DesignPreference(QDialog):
 		designPref["design"]["design_method"] = str(self.ui.combo_design_method.currentText())
 		self.saved = False
 		return designPref
+
+	def set_weldFu(self):
+		"""
+
+		Returns: Set weld Fu based on member fu
+
+		"""
+		uiObj = self.maincontroller.get_user_inputs()
+		Fu = str(uiObj["Member"]["fu (MPa)"])
+		self.ui.txt_weldFu.setText(Fu)
 
 	def set_boltFu(self):
 		uiObj = self.maincontroller.get_user_inputs()
@@ -458,6 +468,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
 		self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
 		self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
+		self.ui.txt_Fu.textChanged.connect(self.call_weld_fu)
 
 		self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 		self.ui.btn_Design.clicked.connect(self.osdag_header)
@@ -698,6 +709,9 @@ class Maincontroller(QMainWindow):
 
 	def call_bolt_fu(self):
 		self.designPrefDialog.set_boltFu()
+
+	def call_weld_fu(self):
+		self.designPrefDialog.set_weldFu()
 
 	def closeEvent(self, event):
 		"""

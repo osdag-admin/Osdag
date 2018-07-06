@@ -764,12 +764,14 @@ def end_connection(ui_obj):
         logger.warning(": Minimum block shear capacity required is % 2.2f KN" % (shear_load))
         logger.info(": Increase the plate thickness")
 
-# ################ CHECK 4: FILLET WELD ####################
+# ################ CHECK 4: FILLET WELD ###################
 
+    # Assumption: Weld electrode is stronger than parent metal
+    weld_fu_govern = min(weld_fu, beam_fu)    # cl. 10.5.7.1
     weld_l = end_plate_l - 2 * weld_t
     Vy1 = (shear_load) / float(2 * weld_l)
     Vy1 = round(Vy1, 3)
-    weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * 1000 * gamma_mw)
+    weld_strength = 0.7 * weld_t * weld_fu_govern / (math.sqrt(3) * 1000 * gamma_mw)
     weld_strength = round(weld_strength, 3);
     if Vy1 > weld_strength:
         design_check = False

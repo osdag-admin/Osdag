@@ -394,11 +394,11 @@ class MainController(QMainWindow):
         self.ui.txtShear.setMaxLength(7)
 
         min_fu = 290
-        max_fu = 590
+        max_fu = 780
         self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
 
         min_fy = 165
-        max_fy = 450
+        max_fy = 650
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
 
         ##### MenuBar #####

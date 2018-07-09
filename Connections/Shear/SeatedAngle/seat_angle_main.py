@@ -321,12 +321,12 @@ class MainController(QMainWindow):
         self.ui.txt_shear_force.setMaxLength(7)
 
         min_fu_value = 290
-        max_fu_value = 590
+        max_fu_value = 780
         self.ui.txt_fu.editingFinished.connect(
             lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu_value, max_fu_value))
 
         min_fy_value = 165
-        max_fy_value = 450
+        max_fy_value = 650
         self.ui.txt_fy.editingFinished.connect(
             lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
 

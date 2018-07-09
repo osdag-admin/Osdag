@@ -262,6 +262,8 @@ def end_connection(ui_obj):
     connectivity = ui_obj['Member']['Connectivity']
     beam_fu = float(ui_obj['Member']['fu (MPa)'])
     beam_fy = float(ui_obj['Member']['fy (MPa)'])
+    column_fu = float(ui_obj['Member']['fu (MPa)'])
+    column_fy = float(ui_obj['Member']['fy (MPa)'])
               
     shear_load = float(str(ui_obj['Load']['ShearForce (kN)']))
 
@@ -307,10 +309,12 @@ def end_connection(ui_obj):
     old_beam_section = get_oldbeamcombolist()
     old_col_section = get_oldcolumncombolist()
 
-    if beam_sec in old_beam_section:
+    if beam_sec in old_beam_section or column_sec in old_col_section:
         logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-    if column_sec in old_col_section:
-        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+
+    if beam_fu < 410 or beam_fy < 230 or column_fu < 410 or column_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
+
 
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web":
         dictcolumndata = get_columndata(column_sec)

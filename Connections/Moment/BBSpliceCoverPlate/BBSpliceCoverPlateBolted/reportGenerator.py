@@ -73,7 +73,11 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     shear_load = str(float(uiObj["Load"]["ShearForce (kN)"]))
     moment_load = str(float(uiObj["Load"]["Moment (kNm)"]))
-    axial_force = str(float(uiObj["Load"]["AxialForce"]))
+    axial_force = str((uiObj["Load"]["AxialForce"]))
+    if axial_force == '':
+        axial_force = str(float(0))
+    else:
+        axial_force = str(float(uiObj["Load"]["AxialForce"]))
 
     bolt_diameter = str(int(uiObj["Bolt"]["Diameter (mm)"]))
     bolt_grade = str(float(uiObj["Bolt"]["Grade"]))
@@ -89,23 +93,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     type_edge = str(uiObj["detailing"]["typeof_edge"])
 
     flange_plate_t = str(int(uiObj["FlangePlate"]["Thickness (mm)"]))
-    # flange_plate_w = str(uiObj["FlangePlate"]["Width (mm)"])
-    # flange_plate_l = str(uiObj["FlangePlate"]["Height (mm)"])
-
-    # flange_plate_fu = float(uiObj["Member"]["fu (Mpa)"])
-    # flange_plate_fy = float(uiObj["Member"]["fy (MPa)"])
+    flange_plate_preference = str(uiObj['FlangePlate']['Preferences'])
 
     web_plate_t = str(int(uiObj["WebPlate"]["Thickness (mm)"]))
     web_plate_w = str(uiObj["WebPlate"]["Width (mm)"])
-
-
-    # ## To call k_h value from hsfg calculations
-    # bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=dp_bolt_hole_type)
-    # k_h = str(float(bolt_param_k_h))
-    #
-    # ## To call F_0 value from hsfg calculations
-    # bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=bolt_diameter, bolt_fu=bolt_grade)
-    # F_0 = str(float(bolt_param_F_0))
 
     k_h = str(float(ConnectionCalculations.calculate_k_h(dp_bolt_hole_type)))
     bolt_fu = str(float(int(float(bolt_grade)) * 100))
@@ -147,6 +138,8 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     FlangeCapacity = str(float(outputObj["FlangeBolt"]["FlangeCapacity"]))
     FlangeForce = str(float(outputObj['FlangeBolt']['FlangeForce']))
     FlangeForce1 = (float(outputObj['FlangeBolt']['FlangeForce']))
+    InnerFlangePlateWidth = str(float(outputObj["FlangeBolt"]["InnerFlangePlateWidth"]))
+    flangeplatethick = str(float(outputObj["FlangeBolt"]["flangeplatethick"]))
 
     WebBlockShear = str(float(outputObj["WebBolt"]["WebBlockShear"]))
     ShearYielding = str(float(outputObj["WebBolt"]["ShearYielding"]))
@@ -156,6 +149,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     Rupture = str(float(outputObj["FlangeBolt"]["Rupture"]))
     FlangeBlockShear = str(float(outputObj["FlangeBolt"]["FlangeBlockShear"]))
     FlangeBlockShear1 = (float(outputObj["FlangeBolt"]["FlangeBlockShear"]))
+    Yielding = str(float(outputObj["FlangeBolt"]["Yielding"]))
+    Rupture = str(float(outputObj["FlangeBolt"]["Rupture"]))
+    ShearYielding = str(float(outputObj["WebBolt"]["ShearYielding"]))
+    ShearRupture = str(float(outputObj["WebBolt"]["ShearRupture"]))
 
     status = str(outputObj['Bolt']['status'])
     FlangePlateDimension = FlangePlateHeight + ' X ' + FlangePlateWidth + ' X ' + flange_plate_t
@@ -977,52 +974,189 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
+
+    if float(Yielding) < FlangeForce1:
+        row = [0, "Strength due to yielding of gross section (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + Yielding + "<br> [cl. 6.2]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+
+    else:
+        row = [0, "Strength due to yielding of gross section (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + Yielding + "<br> [cl. 6.2]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    if float(Rupture) < FlangeForce1:
+        row = [0, "Strength due to rupture of critical section (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + Rupture + "<br> [cl. 6.3.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+
+    else:
+        row = [0, "Strength due to rupture of critical section (kN)", " &#8805; " + FlangeForce, "<i>V</i><sub>db</sub> = " + Rupture + "<br> [cl. 6.3.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-    minPlateThick1 = round(FlangeForce1 / ((beam_b1 - 2 * dia_hole1) * (beam_fy1/ (1.10 * 1000))), 1)
-    minPlateThick = str(minPlateThick1)
-    if float(flange_plate_t) < float(minPlateThick):
-        row = [0, "Flange plate thickness (mm)",
-               minPlateThick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+    if flange_plate_preference == "Outside":
+        flangeplatethick2 = str(float(round(flangeplatethick), 2))
+        if float(flange_plate_t) < float(flangeplatethick2):
+            row = [0, "Flange splice plate thickness (mm)",
+                   flangeplatethick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
 
-    else:
-        row = [0, "Flange plate thickness (mm)", minPlateThick +
-               "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+        else:
+            row = [0, "Flange splice plate thickness (mm)", flangeplatethick +
+                   "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
 
-    rstr += t('tr')
+        rstr += t('tr')
 
-    # Height of flange splice plate
-    minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
-    minPlateHeight = str(minPlateHeight1)
-    if float(FlangePlateHeight) < float(minPlateHeight):
-        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
-               "<br> [SCI - 6th edition, page 754]", FlangePlateHeight, "<p align=left style=color:red><b>Fail</b></p>"]
-    else:
-        row = [0, "Flange plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
-               "<br> [SCI - 6th edition, page-754]", FlangePlateHeight, "<p align=left style=color:green><b>Pass</b></p>"]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+        # Height of flange splice plate
+        minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
+        minPlateHeight = str(minPlateHeight1)
+        if float(FlangePlateHeight) < float(minPlateHeight):
+            row = [0, "Flange splice plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page 754]", FlangePlateHeight, "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Flange splice plate height (mm)", " &#8805; " + "2 * min("+ beam_b +", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page-754]", FlangePlateHeight, "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
 
-    rstr += t('tr')
+        rstr += t('tr')
 
-    # Width of flange splice plate
-    minPlateWidth = str(beam_b1 - 20) # Beam width - 20 mm (half inch on each side of the flange)
-    if float(FlangePlateWidth) < float(minPlateWidth):
-        row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:red><b>Fail</b></p>"]
-    else:
-        row = [0, "Flange plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:green><b>Pass</b></p>"]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+        # Width of flange splice plate
+        minPlateWidth = str(beam_b1 - 20) # Beam width - 20 mm (half inch on each side of the flange)
+        if float(FlangePlateWidth) < float(minPlateWidth):
+            row = [0, "Flange splice plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Flange splice plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth, "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
+
+    elif flange_plate_preference == "Outside + Inside":
+        flangeplatethick2 = round(float(flangeplatethick), 2)
+        flangeplatethick1 = str(float(flangeplatethick2 / 2))
+        if float(flange_plate_t) < float(flangeplatethick1):
+            row = [0, "Outer flange splice plate thickness (mm)",
+                   flangeplatethick1 + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+
+        else:
+            row = [0, "Outer flange splice plate thickness (mm)", flangeplatethick1 +
+                   "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+
+        # Height of flange splice plate
+        minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
+        minPlateHeight = str(minPlateHeight1)
+        if float(FlangePlateHeight) < float(minPlateHeight):
+            row = [0, "Outer flange splice plate height (mm)",
+                   " &#8805; " + "2 * min(" + beam_b + ", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page 754]", FlangePlateHeight,
+                   "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Outer flange splice plate height (mm)",
+                   " &#8805; " + "2 * min(" + beam_b + ", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page-754]", FlangePlateHeight,
+                   "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+
+        # Width of flange splice plate
+        minPlateWidth = str(beam_b1 - 20)  # Beam width - 20 mm (half inch on each side of the flange)
+        if float(FlangePlateWidth) < float(minPlateWidth):
+            row = [0, "Outer flange splice plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth,
+                   "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Outer flange splice plate width (mm)", " &#8805; " + minPlateWidth + ", &#8804;" + beam_b, FlangePlateWidth,
+                   "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        if float(flange_plate_t) < float(flangeplatethick1):
+            row = [0, "Inner flange splice plate thickness (mm)",
+                   flangeplatethick1 + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]
+
+        else:
+            row = [0, "Inner flange splice plate thickness (mm)", flangeplatethick1 +
+                   "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+
+        # Height of flange splice plate
+        minPlateHeight1 = (2 * (min(beam_b1, 225)) + gap1)
+        minPlateHeight = str(minPlateHeight1)
+        if float(FlangePlateHeight) < float(minPlateHeight):
+            row = [0, "Inner flange splice plate height (mm)",
+                   " &#8805; " + "2 * min(" + beam_b + ", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page 754]", FlangePlateHeight,
+                   "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Inner flange splice plate height (mm)",
+                   " &#8805; " + "2 * min(" + beam_b + ", 225)" + " + " + gap + " = " + minPlateHeight +
+                   "<br> [SCI - 6th edition, page-754]", FlangePlateHeight,
+                   "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+
+        # Width of flange splice plate
+        minPlateWidthI = str(int(2 * int(EdgeF)))
+        if float(InnerFlangePlateWidth) < float(minPlateWidthI):
+            row = [0, "Inner flange splice plate width (mm)", " &#8805; " + minPlateWidthI, InnerFlangePlateWidth,
+                   "<p align=left style=color:red><b>Fail</b></p>"]
+        else:
+            row = [0, "Inner flange splice plate width (mm)", " &#8805; " + minPlateWidthI, InnerFlangePlateWidth,
+                   "<p align=left style=color:green><b>Pass</b></p>"]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
 
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
@@ -1302,6 +1436,37 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         row = [0, "Block shear capacity (kN)", " &#8805; " + shear_load,
                "<i>V</i><sub>db</sub> = " + WebBlockShear + "<br> [cl. 6.4.1]" + "<br>",
                "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    if float(ShearYielding) < float(shear_load):
+        row = [0, "Shear yielding (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:red><b>Fail</b></p>"]
+
+    else:
+        row = [0, "Shear yielding (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + ShearYielding + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
+
+    if float(ShearRupture) < float(shear_load):
+        row = [0, "Shear rupture (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 8.4.1]" + "<br>",
+               "<p align=left style=color:red><b>Fail</b></p>"]
+
+    else:
+        row = [0, "Shear rupture (kN)", " &#8805; " + shear_load,
+               "<i>V</i><sub>db</sub> = " + ShearRupture + "<br> [cl. 8.4.1]" + "<br>", "<p align=left style=color:green><b>Pass</b></p>"]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

@@ -575,7 +575,7 @@ class MainController(QMainWindow):
 
 		"""
 		text_str = widget.text()
-		text_str = int(text_str)
+		text_str = float(text_str)
 		if (text_str < min_val or text_str > max_val or text_str == ' '):
 			QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
 			widget.clear()
@@ -908,6 +908,7 @@ class MainController(QMainWindow):
 
 				self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
 				self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
+				self.designPrefDialog.ui.txt_detailingGap.setText(str(uiObj["detailing"]["gap"]))
 				self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
 				self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
 				self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))

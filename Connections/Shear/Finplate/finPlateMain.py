@@ -159,7 +159,8 @@ class DesignPreferences(QDialog):
         weldType = str(self.ui.combo_weldType.currentText())
         designPref["weld"]["typeof_weld"] = weldType
         designPref["weld"]["safety_factor"] = float(1.25)
-        self.ui.txt_weldFu.setText(str(410))
+        Fu = str(uiObj["Member"]["fu (MPa)"])
+        self.ui.txt_weldFu.setText(Fu)
         designPref["weld"]["fu_overwrite"] = self.ui.txt_weldFu.text()
 
         self.ui.combo_detailingEdgeType.setCurrentIndex(0)
@@ -177,6 +178,15 @@ class DesignPreferences(QDialog):
         self.saved = False
         return designPref
 
+    def set_weldFu(self):
+        """
+
+        Returns: Set weld Fu based on member fu
+
+        """
+        uiObj = self.main_controller.getuser_inputs()
+        Fu = str(uiObj["Member"]["fu (MPa)"])
+        self.ui.txt_weldFu.setText(Fu)
 
     def set_boltFu(self):
         uiObj = self.main_controller.getuser_inputs()
@@ -432,6 +442,7 @@ class MainController(QMainWindow):
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populateWeldThickCombo)
         self.ui.comboDiameter.currentIndexChanged[str].connect(self.bolt_hole_clearace)
         self.ui.comboGrade.currentIndexChanged[str].connect(self.call_boltFu)
+        self.ui.txtFu.textChanged.connect(self.call_weld_fu)
 
         self.ui.txtPlateLen.editingFinished.connect(lambda: self.check_plate_height(self.ui.txtPlateLen, self.ui.lbl_len_2))
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
@@ -1987,6 +1998,9 @@ class MainController(QMainWindow):
 
     def call_boltFu(self):
         self.designPrefDialog.set_boltFu()
+
+    def call_weld_fu(self):
+        self.designPrefDialog.set_weldFu()
 
 
 def set_osdaglogger():

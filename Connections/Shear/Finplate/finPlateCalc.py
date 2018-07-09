@@ -234,6 +234,8 @@ def finConn(uiObj):
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumSection']
     connectivity = uiObj['Member']['Connectivity']
+    column_fu = float(uiObj['Member']['fu (MPa)'])
+    column_fy = float(uiObj['Member']['fy (MPa)'])
     beam_fu = float(uiObj['Member']['fu (MPa)'])
     beam_fy = float(uiObj['Member']['fy (MPa)'])
 
@@ -250,6 +252,7 @@ def finConn(uiObj):
     dp_bolt_hole_type = str(uiObj['bolt']['bolt_hole_type'])
     dia_hole = int(uiObj['bolt']['bolt_hole_clrnce'])+ bolt_dia
     weld_type = uiObj['weld']['typeof_weld']
+    weld_fu = float(uiObj["weld"]["fu_overwrite"])
 
     web_plate_t = float(uiObj['Plate']['Thickness (mm)'])
     web_plate_w = str(uiObj['Plate']['Width (mm)'])
@@ -272,10 +275,11 @@ def finConn(uiObj):
     old_beam_section = get_oldbeamcombolist()
     old_col_section = get_oldcolumncombolist()
 
-    if beam_sec in old_beam_section:
+    if beam_sec in old_beam_section or column_sec in old_col_section:
         logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-    if column_sec in old_col_section:
-        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+
+    if beam_fu < 410 or beam_fy < 230 or column_fu < 410 or column_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
 
 
     #####################################################################################
@@ -941,10 +945,8 @@ def finConn(uiObj):
 
 
     # # Weld design
-    # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode) [source: Subramanian's book]
-    weld_fu = 410; #TODO weld_fu should fetch from DP of Finplate
-    weld_fy = 250;
-    
+    # Assumption: Weld electrode is stronger than parent metal
+    weld_fu_govern = min(weld_fu, column_fu)    # cl. 10.5.7.1
 #     Effective length of the weld required (Note: Weld is assumed to be provided for full length of the plate)
 #     Weld length for user given plate height
     if web_plate_l != 0:
@@ -970,10 +972,10 @@ def finConn(uiObj):
     Vr = math.sqrt(Vx ** 2 + (Vy1 + Vy2) ** 2);
     Vr = round(Vr, 3);
     
-    weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * gamma_mw);
+    weld_strength = 0.7 * weld_t * weld_fu_govern / (math.sqrt(3) * gamma_mw);
     weld_strength = round(weld_strength, 3);
     
-    weld_t_req_chk1 = (Vr * (math.sqrt(3) * gamma_mw)) / (0.7 * weld_fu);
+    weld_t_req_chk1 = (Vr * (math.sqrt(3) * gamma_mw)) / (0.7 * weld_fu_govern);
     weld_t_req_chk2 = 0.8 * web_plate_t;
     weld_t_req = max(weld_t_req_chk1, weld_t_req_chk2);
     

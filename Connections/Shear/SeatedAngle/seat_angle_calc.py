@@ -36,7 +36,7 @@ ASCII diagram
 
 import math
 import logging
-import model
+from model import *
 from model import get_angledata, get_beamdata, get_columndata
 from Connections.connection_calculations import ConnectionCalculations
 
@@ -497,6 +497,16 @@ class SeatAngleCalculation(ConnectionCalculations):
             logger.warning(": Beam width (%s mm) is greater than the clear space available" + \
                            " between column flanges (%s mm)" % self.clear_col_space, self.beam_b)
             logger.info(": Select compatible beam and column sizes")
+
+        old_beam_section = get_oldbeamcombolist()
+        old_col_section = get_oldcolumncombolist()
+
+
+        if self.column_section in old_col_section or self.beam_section in old_beam_section:
+            logger.warning(
+                " : You are using a section (in red color) that is not available in latest version of IS 808")
+        if self.beam_fu < 410 or self.beam_fy < 230 or self.column_fu < 410 or self.column_fy < 230:
+            logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
 
         self.bolt_design()
 

@@ -294,8 +294,7 @@ def end_connection(ui_obj):
     user_width = end_plate_w
     
     weld_t = float(ui_obj["Weld"]['Size (mm)'])
-    weld_fu = 410
-    # weld_fu = float(ui_obj["Weld"]["weld_fu"])
+    weld_fu = float(ui_obj["weld"]["weld_fu"])
 
     bolt_planes = 1
     # check input database required or not?

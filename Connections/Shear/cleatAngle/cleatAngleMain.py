@@ -408,11 +408,17 @@ class MainController(QMainWindow):
 
         min_fu = 290
         max_fu = 780
-        self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFu, self.ui.lbl_fu))
 
         min_fy = 165
         max_fy = 650
-        self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFy, self.ui.lbl_fy))
 
         self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
         self.ui.actionSave_log_message.triggered.connect(self.save_log)
@@ -1318,6 +1324,34 @@ class MainController(QMainWindow):
         else:
             palette = QPalette()
             lblwidget.setPalette(palette)
+
+
+    def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+
+        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+        try:
+            fu_value = float(fu_widget.text())
+        except ValueError:
+            fu_value = 0.0
+
+        try:
+            fy_value = float(fy_widget.text())
+        except ValueError:
+            fy_value = 0.0
+
+        if fy_value > fu_value:
+            QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
+            current_widget.clear()
+            current_widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+        else:
+            palette = QPalette()
+            lblwidget.setPalette(palette)
+
 
     def display_output(self, output_obj):
         '''(dictionary) --> NoneType

@@ -320,15 +320,19 @@ class MainController(QMainWindow):
         self.ui.txt_shear_force.setValidator(dbl_validator)
         self.ui.txt_shear_force.setMaxLength(7)
 
-        min_fu_value = 290
-        max_fu_value = 780
+        min_fu = 290
+        max_fu = 780
         self.ui.txt_fu.editingFinished.connect(
-            lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu_value, max_fu_value))
+            lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txt_fu.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txt_fu, self.ui.txt_fy, self.ui.txt_fu, self.ui.lbl_fu))
 
-        min_fy_value = 165
-        max_fy_value = 650
+        min_fy = 165
+        max_fy = 650
         self.ui.txt_fy.editingFinished.connect(
-            lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
+            lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txt_fy.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txt_fu, self.ui.txt_fy, self.ui.txt_fy, self.ui.lbl_fy))
 
         # Menu Bar and File Menu
         self.ui.action_save_front_view.triggered.connect(lambda: self.call_seatangle2D_Drawing("Front"))
@@ -929,6 +933,34 @@ class MainController(QMainWindow):
         else:
             palette = QPalette()
             lblwidget.setPalette(palette)
+
+
+    def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+
+        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+        try:
+            fu_value = float(fu_widget.text())
+        except ValueError:
+            fu_value = 0.0
+
+        try:
+            fy_value = float(fy_widget.text())
+        except ValueError:
+            fy_value = 0.0
+
+        if fy_value > fu_value:
+            QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
+            current_widget.clear()
+            current_widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+        else:
+            palette = QPalette()
+            lblwidget.setPalette(palette)
+
 
     def display_output(self, outputObj):
         """(dictionary) --> NoneType

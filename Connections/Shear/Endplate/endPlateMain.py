@@ -395,14 +395,17 @@ class MainController(QMainWindow):
 
         min_fu = 290
         max_fu = 780
-        self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
-        self.ui.txtFu.editingFinished.connect(lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFu, self.ui.lbl_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFu, self.ui.lbl_fu))
 
         min_fy = 165
         max_fy = 650
-        self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
-        self.ui.txtFy.editingFinished.connect(lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFy, self.ui.lbl_fy))
-
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFy, self.ui.lbl_fy))
 
         ##### MenuBar #####
         self.ui.actionQuit_end_plate_design.setShortcut('Ctrl+Q')
@@ -1347,6 +1350,7 @@ class MainController(QMainWindow):
             palette = QPalette()
             lblwidget.setPalette(palette)
 
+
     def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
 
         '''(QlineEdit,QLable,Number,Number)---> NoneType
@@ -1363,7 +1367,7 @@ class MainController(QMainWindow):
             fy_value = 0.0
 
         if fy_value > fu_value:
-            QMessageBox.about(self, 'Error', 'Yield strength (fy) can not be greater than ultimate strength (fu)')
+            QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
             current_widget.clear()
             current_widget.setFocus()
             palette = QPalette()
@@ -1372,6 +1376,7 @@ class MainController(QMainWindow):
         else:
             palette = QPalette()
             lblwidget.setPalette(palette)
+
 
     def display_output(self, output_obj):
         '''(dictionary) --> NoneType

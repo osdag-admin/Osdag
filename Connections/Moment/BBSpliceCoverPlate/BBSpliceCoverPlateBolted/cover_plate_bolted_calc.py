@@ -364,6 +364,7 @@ def coverplateboltedconnection(uiObj):
     mu_f = float(uiObj["bolt"]["slip_factor"])
     dp_bolt_hole_type = str(uiObj["bolt"]["bolt_hole_type"])
     dia_hole = int(uiObj["bolt"]["bolt_hole_clrnce"]) + bolt_diameter
+    bolt_fu = float(uiObj["bolt"]["bolt_fu"])
     type_edge = str(uiObj["detailing"]["typeof_edge"])
 
     flange_plate_t = float(uiObj["FlangePlate"]["Thickness (mm)"])
@@ -425,7 +426,7 @@ def coverplateboltedconnection(uiObj):
     if web_plate_t < (beam_w_t / 2): # Revised on 18-June-2018) ## Web plate thickness = web plate 1 thickness = (thickness of web / 2)
         web_min_t = (5 * shear_load * 1000) / (beam_fy * 0.5 * beam_d)
         web_opt_thk = max(web_min_t, (beam_w_t / 2))
-        web_plate_t = web_opt_thk
+        # web_plate_t = web_opt_thk
         design_status = False
         logger.error(": Chosen web splice plate thickness is not sufficient")
         logger.warning(": Minimum required thickness of web splice plate is %2.2f mm" % (web_opt_thk))
@@ -433,7 +434,7 @@ def coverplateboltedconnection(uiObj):
 
     elif web_plate_t > web_max_t:
         design_status = False
-        web_plate_t = web_max_t
+        # web_plate_t = web_max_t
         logger.error(": Thickness of web splice plate is greater than the maximum thickness")
         logger.warning(": Maximum allowed thickness of web splice plate is %2.2f mm" % (web_max_t))
         logger.info(": Decrease the thickness of web splice plate")
@@ -534,7 +535,7 @@ def coverplateboltedconnection(uiObj):
     ########################################################################################################################
     def boltdesignweb (web_plate_l, flange_plate_w, flange_plate_l, flange_plate_t):
         # Bolt fu and fy calculation
-        bolt_fu = int(bolt_grade) * 100
+        # bolt_fu = int(bolt_grade) * 100
         bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
         print bolt_fu
         # Minimum pitch and gauge
@@ -768,7 +769,7 @@ def coverplateboltedconnection(uiObj):
 
             if number_of_rows_flange > 1:
                 flange_plate_l = flange_plate_l
-                flange_pitch = (Ltp_input - (2 * min_end_dist)) /(number_of_rows_flange - 1)
+                flange_pitch = round((Ltp_input - (2 * min_end_dist)) /(number_of_rows_flange - 1), 2)
 
             else:
                 design_status = False
@@ -989,12 +990,13 @@ def coverplateboltedconnection(uiObj):
         thkflangeplate2 = (1.05 * (beam_b * beam_f_t)) / new_bolt_param["FlangePlateWidth"]
 
     thkflangeplate = thk_flange_plate(beam_d, beam_f_t, axial_force, moment_load, beam_b, beam_fy, dia_hole)
-    flangeplatethick = max(thkflangeplate2, (beam_f_t / 2), 10, thkflangeplate)
+    flangeplatethick111 = max(thkflangeplate2, (beam_f_t / 2), 10, thkflangeplate)
+    flangeplatethick = round(flangeplatethick111)
 
     # thkflangeplate1 = max(thkflangeplate, thkflangeplate)
     if flange_plate_preference == "Outside":
         if flange_plate_t < flangeplatethick:
-            flange_plate_t = flangeplatethick
+            # flange_plate_t = flangeplatethick
             design_status = False
             logger.error(": Chosen flange splice plate thickness is not sufficient")
             logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm" % (flangeplatethick))
@@ -1003,7 +1005,7 @@ def coverplateboltedconnection(uiObj):
     elif flange_plate_preference == "Outside + Inside":
         flangepthk = (flangeplatethick / 2)
         if flange_plate_t < flangepthk:
-            flange_plate_t = flangepthk
+            # flange_plate_t = flangepthk
             design_status = False
             logger.error(": Chosen flange splice plate thickness is not sufficient")
             logger.warning(": Minimum required thickness of flange splice plate is %2.2f mm" % (flangepthk))
@@ -1068,21 +1070,21 @@ def coverplateboltedconnection(uiObj):
 
         ## Case 2
         if gauge_web < min_gauge:
-            web_plate_w_req = min_web_w_gauge
+            # web_plate_w_req = web_plate_w
             design_status = False
             logger.error(": Chosen width for web splice plate is not sufficient")
             logger.warning(": Minimum width of web splice plate required is %2.2f mm" % (min_web_w_gauge))
             logger.info(": Increase the width of web splice plate")
         ## Case 3
         elif gauge_web < ((2 * edge_distance) + gap):
-            web_plate_w_req = web_plate_w_3
+            # web_plate_w_req = web_plate_w
             design_status = False
             logger.error(": Chosen width of web splice plate is not sufficient")
             logger.warning(": Minimum width of web splice plate required is %2.2f mm" % (web_plate_w_3))
             logger.info(": Increase the width of web splice plate")
         ## Case 6
         elif gauge_web > (max_gauge + gap):
-            web_plate_w_req = web_plate_w_6
+            # web_plate_w_req = web_plate_w
             design_status = False
             logger.error(": Width is greater than the maximum allowed width of web splice plate")
             logger.warning(": Maximum width of web splice plate allowed is %2.2f mm" % (web_plate_w_6))

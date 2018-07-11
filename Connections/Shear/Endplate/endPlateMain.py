@@ -242,11 +242,12 @@ class DesignPreferences(QDialog):
         """
         if boltGrade == '':
             return
-
-        boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040, 12.9: 1220}
+        # Nominal tensile strength (Table 3, IS 1367(part 3):2002) should be taken for calculations
+        # boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900,
+        #           10.9: 1040, 12.9: 1220}
         boltGrd = float(boltGrade)
-
-        return boltFu[boltGrd]
+        boltFu = int(boltGrd) * 100
+        return boltFu
 
     def close_designPref(self):
         self.close()

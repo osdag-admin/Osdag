@@ -1232,7 +1232,7 @@ class ExtendedEnd2DSide(object):
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 1400'))
 		dwg.add(dwg.polyline(
 			points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],
-			stroke='blue', fill='none', stroke_width=2.5))
+			stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 
 		pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 1 1)"))

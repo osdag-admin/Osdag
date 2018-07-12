@@ -44,6 +44,8 @@ class CoverEndPlate(object):
 		self.inner_plate_thickness_p1 = int(output_dict["FlangeBolt"]["InnerFlangePlateThickness"])
 		self.inner_plate_thickness_p2 = self.inner_plate_thickness_p1
 
+		self.inner_plates_width = int(output_dict["FlangeBolt"]["InnerFlangePlateWidth"])
+
 		self.plate_width_B1 = output_dict["FlangeBolt"]["FlangePlateWidth"]
 		self.plate_width_B2 = self.plate_width_B1 #150
 		self.plate_width_B3 = output_dict["WebBolt"]["WebPlateWidth"]
@@ -1286,7 +1288,10 @@ class CoverEnd2DSide(object):
 		self.A10 = np.array([ptA10x, ptA10y])
 
 		# =========================  Cover Plate Top  =========================
-		ptP1x = ptA1x
+		left_space = (self.data_object.beam_width_B1 - self.data_object.plate_width_B1) / 2
+		right_space = left_space
+
+		ptP1x = ptA1x + left_space
 		ptP1y = ptA1y
 		self.P1 = np.array([ptP1x, ptP1y])
 
@@ -1302,8 +1307,42 @@ class CoverEnd2DSide(object):
 		ptP4y = ptP1y
 		self.P4 = np.array([ptP4x, ptP4y])
 
+		# =========================  Cover Plate Inside left  =========================
+		ptIP1x = ptA12x + left_space
+		ptIP1y = ptA12y
+		self.IP1 = np.array([ptIP1x, ptIP1y])
+
+		ptIP2x = ptIP1x
+		ptIP2y = ptIP1y + self.data_object.inner_plate_thickness_p1
+		self.IP2 = np.array([ptIP2x, ptIP2y])
+
+		ptIP3x = ptIP2x + self.data_object.inner_plates_width
+		ptIP3y = ptIP2y
+		self.IP3 = np.array([ptIP3x, ptIP3y])
+
+		ptIP4x = ptIP3x
+		ptIP4y = ptIP1y
+		self.IP4 = np.array([ptIP4x, ptIP4y])
+
+		# =========================  Cover Plate Inside right  =========================
+		ptIP5x = ptA3x - right_space
+		ptIP5y = ptA3y
+		self.IP5 = np.array([ptIP5x, ptIP5y])
+
+		ptIP6x = ptIP5x
+		ptIP6y = ptIP5y + self.data_object.inner_plate_thickness_p1
+		self.IP6 = np.array([ptIP6x, ptIP6y])
+
+		ptIP7x = ptIP6x - self.data_object.inner_plates_width
+		ptIP7y = ptIP6y
+		self.IP7 = np.array([ptIP7x, ptIP7y])
+
+		ptIP8x = ptIP7x
+		ptIP8y = ptIP5y
+		self.IP8 = np.array([ptIP8x, ptIP8y])
+
 		# =========================  Cover Plate Bottom  =========================
-		ptPP1x = ptA8x
+		ptPP1x = ptA8x + left_space
 		ptPP1y = ptA8y
 		self.PP1 = np.array([ptPP1x, ptPP1y])
 
@@ -1319,9 +1358,49 @@ class CoverEnd2DSide(object):
 		ptPP4y = ptPP1y
 		self.PP4 = np.array([ptPP4x, ptPP4y])
 
-		# =========================  Cover Plate Middle left  =========================
-		ptW1x = ptA1x + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2)/2
-		ptW1y = (self.data_object.beam_depth_D2 - self.data_object.plate_length_L3)/2
+		# =========================  Cover Plate Inside left  =========================
+		ptIPP1x = ptA9x + left_space
+		ptIPP1y = ptA9y
+		self.IPP1 = np.array([ptIPP1x, ptIPP1y])
+
+		ptIPP2x = ptIPP1x
+		ptIPP2y = ptIPP1y - self.data_object.inner_plate_thickness_p1
+		self.IPP2 = np.array([ptIPP2x, ptIPP2y])
+
+		ptIPP3x = ptIPP2x + self.data_object.inner_plates_width
+		ptIPP3y = ptIPP2y
+		self.IPP3 = np.array([ptIPP3x, ptIPP3y])
+
+		ptIPP4x = ptIPP3x
+		ptIPP4y = ptIPP1y
+		self.IPP4 = np.array([ptIPP4x, ptIPP4y])
+
+		# =========================  Cover Plate Inside right  =========================
+		ptIPP5x = ptA6x - right_space
+		ptIPP5y = ptA6y
+		self.IPP5 = np.array([ptIPP5x, ptIPP5y])
+
+		ptIPP6x = ptIPP5x
+		ptIPP6y = ptIPP5y - self.data_object.inner_plate_thickness_p1
+		self.IPP6 = np.array([ptIPP6x, ptIPP6y])
+
+		ptIPP7x = ptIPP6x - self.data_object.inner_plates_width
+		ptIPP7y = ptIPP6y
+		self.IPP7 = np.array([ptIPP7x, ptIPP7y])
+
+		ptIPP8x = ptIPP7x
+		ptIPP8y = ptIPP5y
+		self.IPP8 = np.array([ptIPP8x, ptIPP8y])
+
+        # =========================  Cover Plate Middle left  =========================
+		ptQx = (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2)/2
+		ptQy = 0
+		self.Q = np.array([ptQx, ptQy])
+
+		# ptW1x = ptA1x + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2)/2
+		ptW1x = ptQx
+		# ptW1y = (self.data_object.beam_depth_D2 - self.data_object.plate_length_L3)/2
+		ptW1y = ptQy + (self.data_object.beam_depth_D1 - self.data_object.plate_length_L3)/2
 		self.W1 = np.array([ptW1x, ptW1y])
 
 		ptW2x = (ptW1x - self.data_object.plate_thickness_p3)
@@ -1353,9 +1432,6 @@ class CoverEnd2DSide(object):
 		ptWW4y = ptWW3y
 		self.WW4 = np.array([ptWW4x, ptWW4y])
 
-		ptQx = (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2)/2
-		ptQy = 0
-		self.Q = np.array([ptQx, ptQy])
 
 	def call_CoverEnd_side(self, filename):
 		"""
@@ -1368,12 +1444,27 @@ class CoverEnd2DSide(object):
 
 		"""
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-700 -400 1500 1400'))
-		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
-					self.A12, self.A1], stroke='blue', fill='none', stroke_width=2.5))
-		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width=2.5))
-		dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
-		dwg.add(dwg.polyline(points=[self.W1, self.W2, self.W3, self.W4], stroke='blue', fill='none', stroke_width=2.5))
-		dwg.add(dwg.polyline(points=[self.WW1, self.WW2, self.WW3, self.WW4], stroke='blue', fill='none', stroke_width=2.5))
+		if self.data_object.flange_preferences == "Outside":
+			dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
+						self.A12, self.A1], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.W1, self.W2, self.W3, self.W4], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.WW1, self.WW2, self.WW3, self.WW4], stroke='blue', fill='none', stroke_width=2.5))
+
+		else:
+			dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
+						self.A12, self.A1], stroke='blue', fill='#E0E0E0', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.W1, self.W2, self.W3, self.W4], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.WW1, self.WW2, self.WW3, self.WW4], stroke='blue', fill='none', stroke_width=2.5))
+
+
+			dwg.add(dwg.polyline(points=[self.IP1, self.IP2, self.IP3, self.IP4, self.IP1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.IP5, self.IP6, self.IP7, self.IP8, self.IP5], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.IPP1, self.IPP2, self.IPP3, self.IPP4, self.IPP1], stroke='blue', fill='none', stroke_width=2.5))
+			dwg.add(dwg.polyline(points=[self.IPP5, self.IPP6, self.IPP7, self.IPP8, self.IPP5], stroke='blue', fill='none', stroke_width=2.5))
 
 		btofc1 = self.data_object.bolts_top_of_flange1_row
 		bolt_r = self.data_object.bolt_diameter / 2
@@ -1386,11 +1477,14 @@ class CoverEnd2DSide(object):
 					  i * self.data_object.gauge * np.array([1, 0])
 				ptx1 = ptx - bolt_r * np.array([1, 0])
 				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+				if self.data_object.flange_preferences == "Outside":
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+				else:
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1 + self.data_object.inner_plate_thickness_p1
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
 
 				pt_Cx = ptx +  np.array([0, -1])
-				pt_Dx = ptx + (rect_length - 20) * np.array([0, -1])
+				pt_Dx = ptx + (rect_length - 30) * np.array([0, -1])
 				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
 				pt_top_flange_list.append(ptx)
 
@@ -1399,44 +1493,47 @@ class CoverEnd2DSide(object):
 				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
 				pt_top_flange_list.append(ptx)
 
+
 		# ------------------------------------------  Bolts Inside Web  -------------------------------------------
 			biwr = self.data_object.bolts_inside_web_row
 			pt_inside_column_list = []
 			for i in range(1, (biwr + 1)):
+				# ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) +\
+				# 	  (self.data_object.plate_thickness_p3) * np.array([-1, 0]) + (i * self.data_object.pitch2) * np.array([0, 1])# + self.data_object.end_dist * np.array([0, -1])
 				ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) -\
 					  (self.data_object.plate_thickness_p3) * np.array([1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])
-				# ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) +\
-				# 	  (self.data_object.plate_thickness_p3) * np.array([-1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])# + self.data_object.end_dist * np.array([0, -1])
 
+				pt_Cx = ptx + 20 * np.array([-1, 0])
+				pt_Dx = ptx + 10 * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('red', width=2.0, linecap='square').dasharray(dasharray=([10, 5, 1, 5])))
+				pt_inside_column_list.append(ptx)
 
 				ptx1 = ptx - bolt_r * np.array([0, 1])
 				rect_width = self.data_object.bolt_diameter
 				rect_length = (2 * self.data_object.plate_thickness_p3) + self.data_object.web_thickness_tw2
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-				pt_Cx = ptx + np.array([1, 0])
-				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-				pt_inside_column_list.append(ptx)
-
-				pt_Cx1 = ptx + np.array([-1, 0])
-				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-				pt_inside_column_list.append(ptx)
-
 		# ------------------------------------------  Bolts Bottom Flange -------------------------------------------
 		pt_bottom_flange_list = []
 		if btofc1 >= 1:
 			for i in range(btofc1):
-				ptx = self.PP1 + ((self.data_object.beam_width_B2 -self.data_object.gauge)/2 * np.array([1, 0])) - (self.data_object.flange_thickness_T1) * np.array([0, 1]) +\
-					  i * self.data_object.gauge * np.array([1, 0]) #+ 20
+				if self.data_object.flange_preferences == "Outside":
+					ptx = self.PP1 + ((self.data_object.beam_width_B2 -self.data_object.gauge)/2 * np.array([1, 0])) - (self.data_object.flange_thickness_T1) * np.array([0, 1]) +\
+						  i * self.data_object.gauge * np.array([1, 0]) #+ 20
+				else:
+					ptx = self.IPP1 + ((self.data_object.beam_width_B2 - self.data_object.gauge) / 2 * np.array([1, 0])) -\
+						  (self.data_object.flange_thickness_T1) * np.array([0, 1]) +i * self.data_object.gauge * np.array([1, 0])  # + 20
+
 				ptx1 = ptx - bolt_r * np.array([1, 0])
 				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p2 + self.data_object.flange_thickness_T2
+				if self.data_object.flange_preferences == "Outside":
+					rect_length = self.data_object.plate_thickness_p2 + self.data_object.flange_thickness_T2
+				else:
+					rect_length = self.data_object.plate_thickness_p2 + self.data_object.flange_thickness_T2 + self.data_object.inner_plate_thickness_p2
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_width, rect_length), fill='black', stroke='black', stroke_width=2.5))
 
 				pt_Cx = ptx +  np.array([0, -1])
-				pt_Dx = ptx + (rect_length - 20) * np.array([0, -1])
+				pt_Dx = ptx + (rect_length - 30) * np.array([0, -1])
 				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
 				pt_bottom_flange_list.append(ptx)
 

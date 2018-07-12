@@ -99,7 +99,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     web_plate_w = str(uiObj["WebPlate"]["Width (mm)"])
 
     k_h = str(float(ConnectionCalculations.calculate_k_h(dp_bolt_hole_type)))
-    bolt_fu = str(float(int(float(bolt_grade)) * 100))
+    bolt_fu = str(float(uiObj["bolt"]["bolt_fu"]))
     F_0 = str(float(ConnectionCalculations.proof_load_F_0(bolt_diameter, bolt_fu)))
 
     beamdepth = str(int(outputObj['FlangeBolt']['beamdepth']))
@@ -1002,7 +1002,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
     if flange_plate_preference == "Outside":
-        flangeplatethick2 = str(float(round(flangeplatethick), 2))
+        flangeplatethick2 = str(float(flangeplatethick))
         if float(flange_plate_t) < float(flangeplatethick2):
             row = [0, "Flange splice plate thickness (mm)",
                    flangeplatethick + "<br> [Cl. 6.2]", flange_plate_t, "<p align=left style=color:red><b>Fail</b></p>"]

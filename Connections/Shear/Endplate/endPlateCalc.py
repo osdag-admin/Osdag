@@ -262,6 +262,8 @@ def end_connection(ui_obj):
     connectivity = ui_obj['Member']['Connectivity']
     beam_fu = float(ui_obj['Member']['fu (MPa)'])
     beam_fy = float(ui_obj['Member']['fy (MPa)'])
+    column_fu = float(ui_obj['Member']['fu (MPa)'])
+    column_fy = float(ui_obj['Member']['fy (MPa)'])
               
     shear_load = float(str(ui_obj['Load']['ShearForce (kN)']))
 
@@ -294,8 +296,7 @@ def end_connection(ui_obj):
     user_width = end_plate_w
     
     weld_t = float(ui_obj["Weld"]['Size (mm)'])
-    weld_fu = 410
-    # weld_fu = float(ui_obj["Weld"]["weld_fu"])
+    weld_fu = float(ui_obj["weld"]["weld_fu"])
 
     bolt_planes = 1
     # check input database required or not?
@@ -308,10 +309,12 @@ def end_connection(ui_obj):
     old_beam_section = get_oldbeamcombolist()
     old_col_section = get_oldcolumncombolist()
 
-    if beam_sec in old_beam_section:
+    if beam_sec in old_beam_section or column_sec in old_col_section:
         logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
-    if column_sec in old_col_section:
-        logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+
+    if beam_fu < 410 or beam_fy < 230 or column_fu < 410 or column_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
+
 
     if connectivity == "Column web-Beam web" or connectivity == "Column flange-Beam web":
         dictcolumndata = get_columndata(column_sec)
@@ -764,12 +767,14 @@ def end_connection(ui_obj):
         logger.warning(": Minimum block shear capacity required is % 2.2f KN" % (shear_load))
         logger.info(": Increase the plate thickness")
 
-# ################ CHECK 4: FILLET WELD ####################
+# ################ CHECK 4: FILLET WELD ###################
 
+    # Assumption: Weld electrode is stronger than parent metal
+    weld_fu_govern = min(weld_fu, beam_fu)    # cl. 10.5.7.1
     weld_l = end_plate_l - 2 * weld_t
     Vy1 = (shear_load) / float(2 * weld_l)
     Vy1 = round(Vy1, 3)
-    weld_strength = 0.7 * weld_t * weld_fu / (math.sqrt(3) * 1000 * gamma_mw)
+    weld_strength = 0.7 * weld_t * weld_fu_govern / (math.sqrt(3) * 1000 * gamma_mw)
     weld_strength = round(weld_strength, 3);
     if Vy1 > weld_strength:
         design_check = False

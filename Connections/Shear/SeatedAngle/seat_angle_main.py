@@ -321,12 +321,12 @@ class MainController(QMainWindow):
         self.ui.txt_shear_force.setMaxLength(7)
 
         min_fu_value = 290
-        max_fu_value = 590
+        max_fu_value = 780
         self.ui.txt_fu.editingFinished.connect(
             lambda: self.check_range(self.ui.txt_fu, self.ui.lbl_fu, min_fu_value, max_fu_value))
 
         min_fy_value = 165
-        max_fy_value = 450
+        max_fy_value = 650
         self.ui.txt_fy.editingFinished.connect(
             lambda: self.check_range(self.ui.txt_fy, self.ui.lbl_fy, min_fy_value, max_fy_value))
 
@@ -554,71 +554,48 @@ class MainController(QMainWindow):
         self.ui.menuEdit.setEnabled(True)
 
     def convert_col_combo_to_beam(self):
+        """
+        Clear all input and output data
+        """
         loc = self.ui.combo_connectivity.currentText()
-        if loc == "Column flange-Beam flange":
-            self.ui.combo_beam_section.setCurrentIndex(0)
-            self.ui.combo_column_section.setCurrentIndex(0)
-            self.ui.combo_bolt_diameter.setCurrentIndex(0)
-            self.ui.combo_angle_section.setCurrentIndex(0)
-            self.ui.combo_bolt_type.setCurrentIndex(0)
-            self.ui.combo_bolt_grade.setCurrentIndex(0)
-            self.ui.txt_fu.clear()
-            self.ui.txt_fy.clear()
-            self.ui.txt_shear_force.clear()
 
-            self.ui.combo_topangle_section.setCurrentIndex(0)
+        # Clear Input
+        self.ui.combo_beam_section.setCurrentIndex(0)
+        self.ui.combo_column_section.setCurrentIndex(0)
+        self.ui.combo_bolt_diameter.setCurrentIndex(0)
+        self.ui.combo_angle_section.setCurrentIndex(0)
+        self.ui.combo_bolt_type.setCurrentIndex(0)
+        self.ui.combo_bolt_grade.setCurrentIndex(0)
+        self.ui.txt_fu.clear()
+        self.ui.txt_fy.clear()
+        self.ui.txt_shear_force.clear()
 
-            self.ui.txt_bolt_shear_capacity.clear()
-            self.ui.txt_bolt_bearing_capacity.clear()
-            self.ui.txt_bolt_capacity.clear()
-            self.ui.txt_no_bolts.clear()
-            self.ui.txt_bolt_group_capacity.clear()
-            self.ui.txt_bolt_rows.clear()
-            self.ui.txt_bolt_cols.clear()
-            self.ui.txt_bolt_pitch.clear()
-            self.ui.txt_bolt_gauge.clear()
-            self.ui.txt_end_distance.clear()
-            self.ui.txt_edge_distance.clear()
-            self.ui.txt_seat_length.clear()
-            self.ui.txt_moment_capacity.clear()
-            self.ui.txt_moment_demand.clear()
-            self.ui.txt_seat_shear_capacity.clear()
-            self.ui.txt_seat_shear_demand.clear()
-            self.ui.txt_beam_shear_strength.clear()
-            self.ui.txt_top_angle.clear()
-            self.ui.txt_seat_angle.clear()
-        else:
-            self.ui.combo_beam_section.setCurrentIndex(0)
-            self.ui.combo_column_section.setCurrentIndex(0)
-            self.ui.combo_bolt_diameter.setCurrentIndex(0)
-            self.ui.combo_angle_section.setCurrentIndex(0)
-            self.ui.combo_bolt_type.setCurrentIndex(0)
-            self.ui.combo_bolt_grade.setCurrentIndex(0)
-            self.ui.txt_fu.clear()
-            self.ui.txt_fy.clear()
-            self.ui.txt_shear_force.clear()
+        self.ui.combo_topangle_section.setCurrentIndex(0)
 
-            self.ui.combo_topangle_section.setCurrentIndex(0)
+        # Clear Output
+        self.ui.txt_bolt_shear_capacity.clear()
+        self.ui.txt_bolt_bearing_capacity.clear()
+        self.ui.txt_bolt_capacity.clear()
+        self.ui.txt_no_bolts.clear()
+        self.ui.txt_bolt_group_capacity.clear()
+        self.ui.txt_bolt_rows.clear()
+        self.ui.txt_bolt_cols.clear()
+        self.ui.txt_bolt_pitch.clear()
+        self.ui.txt_bolt_gauge.clear()
+        self.ui.txt_end_distance.clear()
+        self.ui.txt_edge_distance.clear()
+        self.ui.txt_seat_length.clear()
+        self.ui.txt_moment_capacity.clear()
+        self.ui.txt_moment_demand.clear()
+        self.ui.txt_seat_shear_capacity.clear()
+        self.ui.txt_seat_shear_demand.clear()
+        self.ui.txt_beam_shear_strength.clear()
+        self.ui.txt_top_angle.clear()
+        self.ui.txt_seat_angle.clear()
 
-            self.ui.txt_bolt_shear_capacity.clear()
-            self.ui.txt_bolt_bearing_capacity.clear()
-            self.ui.txt_bolt_capacity.clear()
-            self.ui.txt_no_bolts.clear()
-            self.ui.txt_bolt_group_capacity.clear()
-            self.ui.txt_bolt_rows.clear()
-            self.ui.txt_bolt_cols.clear()
-            self.ui.txt_bolt_pitch.clear()
-            self.ui.txt_bolt_gauge.clear()
-            self.ui.txt_end_distance.clear()
-            self.ui.txt_edge_distance.clear()
-            self.ui.txt_seat_length.clear()
-            self.ui.txt_moment_capacity.clear()
-            self.ui.txt_moment_demand.clear()
-            self.ui.txt_seat_shear_capacity.clear()
-            self.ui.txt_seat_shear_demand.clear()
-            self.ui.txt_beam_shear_strength.clear()
-            self.ui.txt_top_angle.clear()
-            self.ui.txt_seat_angle.clear()
+        # ------ Erase Display
+        self.display.EraseAll()
+        self.disableViewButtons()
 
     def retrieve_prevstate(self):
         uiObj = self.get_prevstate()

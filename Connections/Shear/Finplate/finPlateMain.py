@@ -397,12 +397,12 @@ class MainController(QMainWindow):
         self.ui.txtShear.setMaxLength(7)
 
         minfuVal = 290
-        maxfuVal = 590
+        maxfuVal = 780
         self.ui.txtFu.editingFinished.connect(
             lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, minfuVal, maxfuVal))
 
         minfyVal = 165
-        maxfyVal = 450
+        maxfyVal = 650
         self.ui.txtFy.editingFinished.connect(
             lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, minfyVal, maxfyVal))
 
@@ -613,6 +613,8 @@ class MainController(QMainWindow):
             self.ui.txtMomntCapacity.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
+            self.display.EraseAll()
+            self.disableViewButtons()
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
@@ -660,6 +662,8 @@ class MainController(QMainWindow):
             self.ui.txtMomntCapacity.clear()
             self.ui.txtResltShr.clear()
             self.ui.txtWeldStrng.clear()
+            self.display.EraseAll()
+            self.disableViewButtons()
 
     def showFontDialogue(self):
 

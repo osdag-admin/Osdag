@@ -407,11 +407,11 @@ class MainController(QMainWindow):
         self.ui.txtShear.setMaxLength(7)
 
         min_fu = 290
-        max_fu = 590
+        max_fu = 780
         self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
 
         min_fy = 165
-        max_fy = 450
+        max_fy = 650
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
 
         self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
@@ -620,6 +620,8 @@ class MainController(QMainWindow):
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
             self.ui.outputCleatHeight.clear()
+            self.display.EraseAll()
+            self.disable_view_buttons()
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
@@ -679,6 +681,8 @@ class MainController(QMainWindow):
             self.ui.txtEndDist.clear()
             self.ui.txtEdgeDist.clear()
             self.ui.outputCleatHeight.clear()
+            self.display.EraseAll()
+            self.disable_view_buttons()
 
     def fill_cleatsection_combo(self):
         '''Populates the cleat section on the basis  beam section and column section

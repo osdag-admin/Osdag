@@ -394,12 +394,15 @@ class MainController(QMainWindow):
         self.ui.txtShear.setMaxLength(7)
 
         min_fu = 290
-        max_fu = 590
+        max_fu = 780
         self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFu, self.ui.lbl_fu))
 
         min_fy = 165
-        max_fy = 450
+        max_fy = 650
         self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFy, self.ui.lbl_fy))
+
 
         ##### MenuBar #####
         self.ui.actionQuit_end_plate_design.setShortcut('Ctrl+Q')
@@ -647,36 +650,6 @@ class MainController(QMainWindow):
             self.ui.comboColSec.clear()
             self.get_beamdata()
             self.ui.comboColSec.addItems(get_beamcombolist())
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-            self.ui.comboDiameter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
-
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
-
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
-
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
 
         elif loc == "Column web-Beam web" or loc == "Column flange-Beam web":
 
@@ -689,44 +662,43 @@ class MainController(QMainWindow):
             self.ui.chkBxCol.setText("Column")
             self.ui.actionShow_column.setText("Show column")
             self.ui.chkBxCol.setToolTip("Column only")
-
             self.ui.comboColSec.clear()
             self.get_columndata()
-            # self.ui.comboColSec.addItems(get_columncombolist())
 
-            self.ui.combo_Beam.setCurrentIndex(0)
-            self.ui.comboColSec.setCurrentIndex(0)
-            self.ui.combo_Beam.setCurrentIndex((0))
-            self.ui.comboColSec.setCurrentIndex((0))
-            self.ui.comboDiameter.setCurrentIndex(0)
-            self.ui.comboType.setCurrentIndex((0))
-            self.ui.comboGrade.setCurrentIndex((0))
-            self.ui.comboPlateThick_2.setCurrentIndex((0))
-            self.ui.comboWldSize.setCurrentIndex((0))
+        self.ui.combo_Beam.setCurrentIndex(0)
+        self.ui.comboColSec.setCurrentIndex(0)
+        self.ui.comboDiameter.setCurrentIndex(0)
+        self.ui.comboType.setCurrentIndex(0)
+        self.ui.comboGrade.setCurrentIndex(0)
+        self.ui.comboPlateThick_2.setCurrentIndex(0)
+        self.ui.comboWldSize.setCurrentIndex(0)
 
-            self.ui.txtFu.clear()
-            self.ui.txtFy.clear()
-            self.ui.txtShear.clear()
-            self.ui.txtPlateLen.clear()
-            self.ui.txtPlateWidth.clear()
+        self.ui.txtFu.clear()
+        self.ui.txtFy.clear()
+        self.ui.txtShear.clear()
+        self.ui.txtPlateLen.clear()
+        self.ui.txtPlateWidth.clear()
 
-            self.ui.txtShrCapacity.clear()
-            self.ui.txtbearCapacity.clear()
-            self.ui.txtBoltCapacity.clear()
-            self.ui.txtNoBolts.clear()
-            self.ui.txtboltgrpcapacity.clear()
-            self.ui.txt_row.clear()
-            self.ui.txt_col.clear()
-            self.ui.txtPitch.clear()
-            self.ui.txtGuage.clear()
-            self.ui.txtEndDist.clear()
-            self.ui.txtEdgeDist.clear()
+        self.ui.txtShrCapacity.clear()
+        self.ui.txtbearCapacity.clear()
+        self.ui.txtBoltCapacity.clear()
+        self.ui.txtNoBolts.clear()
+        self.ui.txtboltgrpcapacity.clear()
+        self.ui.txt_row.clear()
+        self.ui.txt_col.clear()
+        self.ui.txtPitch.clear()
+        self.ui.txtGuage.clear()
+        self.ui.txtEndDist.clear()
+        self.ui.txtEdgeDist.clear()
 
-            self.ui.txtplate_ht.clear()
-            self.ui.txtplate_width.clear()
-            self.ui.txtResltShr.clear()
-            self.ui.txtWeldStrng.clear()
-            self.ui.txtWeld_length.clear()
+        self.ui.txtplate_ht.clear()
+        self.ui.txtplate_width.clear()
+        self.ui.txtResltShr.clear()
+        self.ui.txtWeldStrng.clear()
+        self.ui.txtWeld_length.clear()
+
+        self.display.EraseAll()
+        self.disable_view_buttons()
 
     def checkbeam_b(self):
         loc = self.ui.comboConnLoc.currentText()
@@ -1368,6 +1340,32 @@ class MainController(QMainWindow):
             QMessageBox.about(self, 'Error', 'Please Enter a value between %s-%s' % (min_val, max_val))
             widget.clear()
             widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+        else:
+            palette = QPalette()
+            lblwidget.setPalette(palette)
+
+    def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+
+        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+        try:
+            fu_value = float(fu_widget.text())
+        except ValueError:
+            fu_value = 0.0
+
+        try:
+            fy_value = float(fy_widget.text())
+        except ValueError:
+            fy_value = 0.0
+
+        if fy_value > fu_value:
+            QMessageBox.about(self, 'Error', 'Yield strength (fy) can not be greater than ultimate strength (fu)')
+            current_widget.clear()
+            current_widget.setFocus()
             palette = QPalette()
             palette.setColor(QPalette.Foreground, Qt.red)
             lblwidget.setPalette(palette)

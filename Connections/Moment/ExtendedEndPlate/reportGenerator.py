@@ -72,7 +72,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     factored_moment = str(float(uiObj['Load']['Moment (kNm)']))
     factored_shear_load = str(float(uiObj['Load']['ShearForce (kN)']))
 
-    factored_axial_load = str(float(uiObj['Load']['AxialForce (kN)']))
+    factored_axial_load = str(uiObj['Load']['AxialForce (kN)'])
 
     bolt_dia = str(int(uiObj['Bolt']['Diameter (mm)']))
     bolt_type = uiObj["Bolt"]["Type"]
@@ -138,6 +138,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     pitch_mini = str(int(float(outObj['Bolt']['PitchMini'])))
     pitch_max = str(outObj['Bolt']['PitchMax'])
 
+    cross_centre_gauge = str(outObj['Bolt']['CrossCentreGauge'])
     gauge_mini = str(float(pitch_mini))
     gauge_max = str(float(pitch_max))
     end_mini = str(outObj['Bolt']['EndMini'])
@@ -504,6 +505,11 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+    row = [2, "Cross-centre gauge (mm)", cross_centre_gauge]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
 
     # row = [2, "Pitch Distance (mm)", ]
     # rstr += t('tr')

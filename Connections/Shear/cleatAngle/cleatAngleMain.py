@@ -449,8 +449,9 @@ class MainController(QMainWindow):
         self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
-        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
-
+        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(
+            self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
+        self.ui.comboBoltGrade.currentIndexChanged[str].connect(self.call_boltFu)
         ######################################################################################
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())

@@ -388,6 +388,7 @@ class MainController(QMainWindow):
 
         self.display, _ = self.init_display(backend_str=backend_name())
         self.ui.action_design_preferences.triggered.connect(self.design_preferences)
+        self.ui.combo_bolt_grade.currentIndexChanged[str].connect(self.call_boltFu)
 
         # self.ui.btnSvgSave.clicked.connect(self.save3DcadImages)
 

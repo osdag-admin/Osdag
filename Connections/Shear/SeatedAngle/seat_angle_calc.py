@@ -344,7 +344,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
-        self.bolt_fu = float(float(self.bolt_grade)) * 100
+        self.bolt_fu = float(input_dict["bolt"]["bolt_fu"])
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
         # TODO for test_calc and test_report, uncomment the below line

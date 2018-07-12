@@ -270,7 +270,7 @@ def end_connection(ui_obj):
     bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
-
+    bolt_fu = float(ui_obj["bolt"]["bolt_fu"])
     mu_f = float(ui_obj["bolt"]["slip_factor"])
     dp_bolt_hole_type = str(ui_obj['bolt']['bolt_hole_type'])
     gamma_mw = float(ui_obj["weld"]["safety_factor"])
@@ -360,7 +360,6 @@ def end_connection(ui_obj):
 #    0 def boltDesign(end_plate_l):
 # I: Check for number of bolts -------------------
 
-    bolt_fu = float(bolt_grade) * 100
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
 
     if connectivity == "Column web-Beam web":

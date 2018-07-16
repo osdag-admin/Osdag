@@ -119,7 +119,7 @@ class BBCoverPlateBoltedCAD(object):
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 1.0, 0])
         boltDirAF = numpy.array([0, 0, -1.0])
-        width = self.plateAbvFlange.L
+        width = self.beamLeft.B
         self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF, width)
 
     def create_nut_bolt_array_BF(self):
@@ -127,7 +127,7 @@ class BBCoverPlateBoltedCAD(object):
         gaugeDirBF = numpy.array([1.0, 0, 0])
         pitchDirBF = numpy.array([0, 1.0, 0])
         boltDirBF = numpy.array([0, 0, 1.0])
-        width = self.plateBelwFlange.L
+        width = self.beamLeft.B
         self.nut_bolt_array_BF.placeBF(nutBoltOriginBF, gaugeDirBF, pitchDirBF, boltDirBF, width)
 
     def create_nut_bolt_array_Web(self):

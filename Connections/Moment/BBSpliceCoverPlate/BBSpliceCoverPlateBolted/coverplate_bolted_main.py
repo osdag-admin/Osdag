@@ -1009,7 +1009,7 @@ class MainController(QMainWindow):
 		if self.ui.combo_type.currentIndex() == 0:
 			incomplete_list.append("Type of bolt")
 
-		if self.ui.combo_flangeplateThick.currentIndex() == 0:
+		if self.ui.combo_flange_preference.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
 		if self.ui.combo_webplateThick.currentIndex() == 0:

@@ -108,7 +108,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=bolt_diameter, bolt_fu=bolt_grade_fu)
     F_0 = str(float(bolt_param_F_0))
 
-    minplatethk = str(int(round(outobj['Plate']['MinThick'], 1)))
+    maxplatethk = str(int(round(outobj['Plate']['MaxThick'], 1)))
     blockshear = str(int(round(outobj['Plate']['blockshear'], 1)))
 
     plate_width = str(int(round(outobj['Plate']['width'], 1)))
@@ -880,11 +880,11 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     rstr += t('tr')
     # row =[0,"Plate thickness (mm)","(5*140*1000)/(300*250)= 9.33","10"]
-    if int(minplatethk) > int(plate_thickness):
-        row = [0, "Plate thickness (mm)", "&#8805;  " + minplatethk, plate_thickness,
+    if int(maxplatethk) < int(plate_thickness):
+        row = [0, "Plate thickness (mm)", "&#8804;  " + maxplatethk, plate_thickness,
                " <p align=left style=color:red><b>Fail</b></p> "]
     else:
-        row = [0, "Plate thickness (mm)", "&#8805;  " + minplatethk, plate_thickness, " <p align=left style=color:green><b>Pass</b></p> "]
+        row = [0, "Plate thickness (mm)", "&#8804;  " + maxplatethk, plate_thickness, " <p align=left style=color:green><b>Pass</b></p> "]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

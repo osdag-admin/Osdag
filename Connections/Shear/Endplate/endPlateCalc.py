@@ -135,7 +135,7 @@ def bolt_bearing(dia, t, fu, kb):
     return Vb
 
 
-def end_plate_t_min(beam_depth, grade_bolt, dia):
+def end_plate_t_max(beam_depth, grade_bolt, dia):
     '''
 
     Args:
@@ -348,13 +348,12 @@ def end_connection(ui_obj):
     bolt_shear_capacity = 0.0
     
 # Plate thickness check
-    min_end_plate_t = end_plate_t_min(beam_depth, bolt_grade, bolt_dia)
-    if end_plate_t < min_end_plate_t:
-        end_plate_t = min_end_plate_t
-        design_check = False  
-        logger.error(": Chosen end plate thickness is less than the minimum plate thickness [Design of Steel Structures by N. Subramanian, OUP, 2014, page 372]")
-        logger.warning(" : Minimum required thickness %2.2f mm" % (min_end_plate_t))
-        logger.info(" : Increase plate thickness")
+    max_end_plate_t = end_plate_t_max(beam_depth, bolt_grade, bolt_dia)
+    if end_plate_t > max_end_plate_t:
+        design_check = False
+        logger.error(": Chosen end plate thickness is more than the maximum allowed [DoSS, N. Subramanian, page 372]")
+        logger.warning(" : Maximum allowed plate thickness is %2.2f mm" % max_end_plate_t)
+        logger.info(" : Decrease the end plate thickness")
 
 # ############# BOLT CAPACITY ###############
 #    0 def boltDesign(end_plate_l):
@@ -850,7 +849,7 @@ def end_connection(ui_obj):
     output_obj['Plate'] = {}
     output_obj['Plate']['height'] = float(end_plate_l)
     output_obj['Plate']['width'] = float(end_plate_w)
-    output_obj['Plate']['MinThick'] = float(min_end_plate_t)
+    output_obj['Plate']['MaxThick'] = float(max_end_plate_t)
     output_obj['Plate']['MinWidth'] = float(min_end_plate_w)
     output_obj['Plate']['blockshear'] = float(Tdb)
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)

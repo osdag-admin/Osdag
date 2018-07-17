@@ -38,8 +38,8 @@ class ExtendedEndPlate(object):
 		self.beam_width_B1 = int(beam_data["B"])
 		self.beam_width_B2 = self.beam_width_B1
 
-		self.plate_thickness_p1 = 20
-		self.plate_thickness_p2 = 20
+		self.plate_thickness_p1 = int(output_dict['Plate']['Thickness'])
+		self.plate_thickness_p2 = self.plate_thickness_p1
 
 		self.plate_width_B1 = int(output_dict['Plate']['Width'])
 		self.plate_width_B2 = self.plate_width_B1

@@ -50,7 +50,7 @@ class ExtendedEndPlate(object):
 		self.flange_thickness_T1 = (beam_data["T"])
 		self.flange_thickness_T2 = self.flange_thickness_T1
 
-		self.web_thickness_tw1 = (beam_data["tw"])
+		self.web_thickness_tw1 = int(beam_data["tw"])
 		self.web_thickness_tw2 = self.web_thickness_tw1
 
 		self.flange_weld_thickness = int(input_dict['Weld']['Flange (mm)'])  # 12
@@ -1606,11 +1606,11 @@ class ExtendedEnd2DSide(object):
 		# ---------------------------------------------  Web Welding ----------------------------------------------
 		point = self.A4 + self.data_object.beam_depth_D1 / 2 * np.array([0, 1])
 		theta = 60
-		offset = 1
+		offset = 50
 		textup = "     z         " + str(self.data_object.web_thickness_tw1)
 		textdown = " "
 		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Flange Welding -------------------------------------------
 		point = self.A2

@@ -823,11 +823,11 @@ def end_connection(ui_obj):
     output_obj = {}
     output_obj['Bolt'] = {}
     output_obj['Bolt']['status'] = design_check
-    output_obj['Bolt']['shearcapacity'] = bolt_shear_capacity
+    output_obj['Bolt']['shearcapacity'] = round(bolt_shear_capacity, 3)
     output_obj['Bolt']['bearingcapacity'] = bolt_bearing_capacity
-    output_obj['Bolt']['boltcapacity'] = bolt_capacity
+    output_obj['Bolt']['boltcapacity'] = round(bolt_capacity, 3)
     output_obj['Bolt']['numofbolts'] = int(2 * no_col * no_row)
-    output_obj['Bolt']['boltgrpcapacity'] = float(bolt_capacity * 2 * no_col * no_row)
+    output_obj['Bolt']['boltgrpcapacity'] = float(round((bolt_capacity * 2 * no_col * no_row), 3))
     output_obj['Bolt']['numofrow'] = int(no_row)
     output_obj['Bolt']['numofcol'] = int(2 * no_col)
     output_obj['Bolt']['pitch'] = float(pitch)

@@ -860,7 +860,7 @@ def finConn(uiObj):
 
     if web_plate_t > max_plate_thk:
         design_status = False
-        logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
+        logger.error(": Plate thickness provided is more than the maximum allowed [Ref. INSDAG detailing manual, 2002]")
         logger.warning(": Maximum plate thickness allowed is half the diameter of bolt")
         logger.info(": Increase the bolt diameter or decrease the plate thickness")
         # logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))

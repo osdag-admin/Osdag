@@ -511,7 +511,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_design()
 
         if self.top_angle_recommended != self.top_angle:
-            logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
+            logger.warning(": Based on thumb rules, a top angle of size %s may sufficient to provide stability to %s ",
                            self.top_angle_recommended, self.beam_section)
 
         self.top_angle_end_dist_column = (float(self.top_angle_A) - self.top_angle_t - self.top_angle_R1

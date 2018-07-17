@@ -950,6 +950,8 @@ class CoverEnd2DTop(object):
 		#                                           TOP VIEW
 		# -------------------------------------------------------------------------------------------------
 		# ====================== Primary Beam 1  =====================
+		top_space = (self.data_object.beam_width_B1 - self.data_object.plate_width_B1) /2
+		down_space = top_space
 
 		ptA1x = 0
 		ptA1y = 0
@@ -982,6 +984,14 @@ class CoverEnd2DTop(object):
 		ptA6x = 0
 		ptA6y = ptA5y - self.data_object.web_thickness_tw1
 		self.A6 = np.array([ptA6x, ptA6y])
+
+		ptA9x = ptA2x
+		ptA9y = ptA2y + top_space
+		self.A9 = np.array([ptA9x, ptA9y])
+
+		ptA10x = ptA2x
+		ptA10y = ptA3y - down_space
+		self.A10 = np.array([ptA10x, ptA10y])
 
 		# ====================== Primary Beam 2  =====================
 		ptAA1x = ptA2x + self.data_object.gap_btwn_2beam
@@ -1016,13 +1026,24 @@ class CoverEnd2DTop(object):
 		ptAA6y = ptAA5y - self.data_object.web_thickness_tw2
 		self.AA6 = np.array([ptAA6x, ptAA6y])
 
+		ptAA9x = ptAA1x
+		ptAA9y = ptAA1y + top_space
+		self.AA9 = np.array([ptAA9x, ptAA9y])
+
+		ptAA10x = ptAA1x
+		ptAA10y = ptAA4y - down_space
+		self.AA10 = np.array([ptAA10x, ptAA10y])
+
+
 		# =========================  Cover Plate UP  =========================
+
 		ptP1x = ptA1x + ((self.data_object.beam_length_L1 + self.data_object.beam_length_L2 + self.data_object.gap_btwn_2beam) - self.data_object.plate_length_L1)/2
-		ptP1y = 0
+		ptP1y = ptA1y + top_space
+		# ptP1y = 0
 		self.P1 = np.array([ptP1x, ptP1y])
 
 		ptP2x = ptP1x + self.data_object.plate_length_L1
-		ptP2y = 0
+		ptP2y = ptP1y
 		self.P2 = np.array([ptP2x, ptP2y])
 
 		ptP3x = ptP2x
@@ -1048,12 +1069,12 @@ class CoverEnd2DTop(object):
 		dwg.add(dwg.line(self.A5, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A6, self.A7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.A2, self.A3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.polyline(points=[self.A3, self.A4, self.A1, self.A2, ], stroke='blue', fill='none', stroke_width=2.5))
+		dwg.add(dwg.polyline(points=[self.A10, self.A3, self.A4, self.A1, self.A2, self.A9], stroke='blue', fill='none', stroke_width=2.5))
 
 		dwg.add(dwg.line(self.AA5, self.AA8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.AA6, self.AA7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.AA1, self.AA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4], stroke='blue', fill='none', stroke_width=2.5))
+		dwg.add(dwg.polyline(points=[self.AA9, self.AA1, self.AA2, self.AA3, self.AA4, self.AA10], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width=2.5))
 
 		# ------------------------------------------  Bolts Top Flange 1 -------------------------------------------

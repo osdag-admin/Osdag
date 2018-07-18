@@ -1494,6 +1494,19 @@ def bbExtendedEndPlateSplice(uiObj):
             tw_minimum = 8
         # TODO: If tw_minimum is required in calc file?
 
+        if weld_thickness_flange < tw_minimum:
+            design_status = False
+            logger.error(": Selected weld thickness at flange is less than the minimum required value")
+            logger.warning(": Minimum weld thickness required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+            logger.info(": Increase the weld thickness at flange")
+
+        if weld_thickness_web < tw_minimum:
+            design_status = False
+            logger.error(": Selected weld thickness at web is less than the minimum required value")
+            logger.warning(": Minimum weld thickness required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+            logger.info(": Increase the weld thickness at web")
+
+
         # Design of weld at flange
         # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
         k = 0.7  # constant (Table 22, IS 800:2007)
@@ -1525,17 +1538,17 @@ def bbExtendedEndPlateSplice(uiObj):
         R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
 
         # Actual required size of weld
-        t_weld_flange = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
+        t_weld_flange_actual = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
 
-        if t_weld_flange % 2 == 0:
-            t_weld_flange = t_weld_flange
+        if t_weld_flange_actual % 2 == 0:
+            t_weld_flange = t_weld_flange_actual
         else:
-            t_weld_flange += 1
+            t_weld_flange = t_weld_flange_actual + 1
 
         if weld_thickness_flange < t_weld_flange:
             design_status = False
             logger.error(": Weld thickness at the flange is not sufficient")
-            logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_flange)
+            logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_flange_actual)
             logger.info(": Increase the weld thickness at flange")
         if weld_thickness_flange > min(beam_tf, tp_provided):
             design_status = False
@@ -1553,7 +1566,7 @@ def bbExtendedEndPlateSplice(uiObj):
         if t_weld_web % 2 == 0:
             t_weld_web = t_weld_web
         else:
-            t_weld_web -= 1
+            t_weld_web += 1
 
         if weld_thickness_web < t_weld_web:
             design_status = False

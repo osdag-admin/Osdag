@@ -1557,16 +1557,18 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Decrease the weld thickness at flange")
 
         # Design of weld at web
+
         t_weld_web = int(min(beam_tw, tp_required))
-        if t_weld_web > t_weld_flange:
-            t_weld_web = t_weld_flange
-        else:
-            t_weld_web = t_weld_web
 
         if t_weld_web % 2 == 0:
             t_weld_web = t_weld_web
         else:
             t_weld_web += 1
+
+        if t_weld_web > t_weld_flange:
+            t_weld_web = t_weld_flange
+        else:
+            t_weld_web = t_weld_web
 
         if weld_thickness_web < t_weld_web:
             design_status = False

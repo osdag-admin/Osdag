@@ -100,11 +100,11 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
 
     design_method = str(uiobj["design"]["design_method"])
 
-    # To call k_h value from hsfg calculations
+    # To call k_h value from Friction Grip Bolt calculations
     bolt_param_k_h = ConnectionCalculations.calculate_k_h(bolt_hole_type=bolt_hole_type)
     k_h = str(float(bolt_param_k_h))
 
-    # To call F_0 value from hsfg calculations
+    # To call F_0 value from Friction Grip Bolt calculations
     bolt_param_F_0 = ConnectionCalculations.proof_load_F_0(bolt_diameter=bolt_diameter, bolt_fu=bolt_grade_fu)
     F_0 = str(float(bolt_param_F_0))
 
@@ -262,13 +262,19 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Beam Connection", "Welded"]
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary Beam", "Welded"]
+    else:
+        row = [1, "Beam Connection", "Welded"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Column Connection", "Bolted"]
+    if connectivity == "Beam-Beam":
+        row = [1, "Secondary Beam", "Bolted"]
+    else:
+        row = [1, "Column Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -318,7 +324,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Hole", "STD"]
+    row = [2, "Hole", bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -352,7 +358,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Hole", "STD"]
+    row = [2, "Hole", bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -381,7 +387,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    # row = [2, "Type", "HSFG"]
+    # row = [2, "Type", "Friction Grip Bolt"]
     row = [2, "Type", bolt_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')

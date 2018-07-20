@@ -1268,6 +1268,14 @@ class MainController(QMainWindow):
 							   T=float(alist["FlangePlate"]["Thickness (mm)"]))  # Call to Plate in Component repository
 		plateBelwFlange = copy.copy(plateAbvFlange)  # Since both the flange plates are identical
 
+		innerplateAbvFlangeFront = Plate(L=outputobj["FlangeBolt"]["InnerFlangePlateWidth"],
+										 W=outputobj["FlangeBolt"]["InnerFlangePlateHeight"],
+										 T=(outputobj["FlangeBolt"]["InnerFlangePlateThickness"]))
+		innerplateAbvFlangeBack = copy.copy(innerplateAbvFlangeFront)
+		innerplateBelwFlangeFront = copy.copy(innerplateAbvFlangeBack)
+		innerplateBelwFlangeBack = copy.copy(innerplateBelwFlangeFront)
+
+
 		WebPlateLeft = Plate(L=outputobj["WebBolt"]["WebPlateHeight"],
 							 W=outputobj["WebBolt"]["WebPlateWidth"],
 							 T=float(alist["WebPlate"]["Thickness (mm)"]))  # Call to Plate in Component repository
@@ -1302,7 +1310,8 @@ class MainController(QMainWindow):
 		bolting_Web = NutBoltArray_Web(alist, beam_data, outputobj, nut, bolt, numOfBoltsW, nutSpaceW)
 
 		# bbCoverPlateBolted is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
-		bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange,
+		bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange, innerplateAbvFlangeFront,
+												   innerplateAbvFlangeBack, innerplateBelwFlangeFront, innerplateBelwFlangeBack,
 												   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web, alist)
 
 		# bbCoverPlateBolted.create_3DModel() will create the CAD model of each component, debugging this line will give moe clarity
@@ -1435,6 +1444,10 @@ class MainController(QMainWindow):
 			# Displays the Flange Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
 
 			# Displays the Web Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
@@ -1455,6 +1468,7 @@ class MainController(QMainWindow):
 			for nutboltW in nutboltlistW:
 				osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
+
 		elif component == "Model":
 			# Displays both beams
 			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
@@ -1463,6 +1477,10 @@ class MainController(QMainWindow):
 			# Displays the Flange Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
 
 			# Displays the Web Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')

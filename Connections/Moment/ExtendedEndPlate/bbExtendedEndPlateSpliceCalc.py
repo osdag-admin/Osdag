@@ -462,12 +462,12 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # Minimum and Maximum Plate Height
     # TODO: Validate end_plate_height_mini after excomm review (currently used value of l_v is 50mm)
-    end_plate_height_mini = beam_d + 50 + (2 * end_dist_mini)
+    end_plate_height_mini = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_mini)
 
     # TODO: Validate end_plate_height_max after excomm review
     # Note: The distance between the toe of weld or the flange edge to the centre of the nearer bolt is 62.5mm (assumed to be maximum)
 
-    end_plate_height_max = beam_d + 50 + (2 * end_dist_max)
+    end_plate_height_max = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_max)
 
     # End Plate Width
 

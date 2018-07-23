@@ -233,7 +233,6 @@ class Flangespliceplate(QDialog):
 
 		uiObj = self.maincontroller.designParameters()
 		resultObj_flangeplate = coverplateboltedconnection(uiObj)
-		print "flange ", resultObj_flangeplate
 
 		self.ui.txt_plateHeight.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateHeight"]))
 		self.ui.txt_plateWidth.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateWidth"]))
@@ -364,7 +363,6 @@ class MainController(QMainWindow):
 		self.preference_type['Outside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
 		self.preference_type['Outside + Inside'] = [5, 6, 8, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 28, 30, 32]
 
-		print "Preferences", self.preference_type
 		self.ui.combo_flange_preference.addItems(self.preference_type.keys())
 		self.ui.combo_flange_preference.currentIndexChanged[str].connect(self.combopreference_current_index_changed)
 		self.ui.combo_flange_preference.setCurrentIndex(0)
@@ -672,7 +670,6 @@ class MainController(QMainWindow):
 	def call_designreport(self, fileName, report_summary):
 		self.alist = self.designParameters()
 		self.result = coverplateboltedconnection(self.alist)
-		print "resultobj", self.result
 		self.beam_data = self.fetchBeamPara()
 		save_html(self.result, self.alist, self.beam_data, fileName, report_summary, self.folder)
 
@@ -1030,7 +1027,6 @@ class MainController(QMainWindow):
 		if self.validate_inputs_on_design_btn() is not True:
 			return
 		self.alist = self.designParameters()
-		print "alist printing", self.alist
 
 		self.ui.outputDock.setFixedSize(310, 710)
 		self.enable_buttons()
@@ -1444,10 +1440,11 @@ class MainController(QMainWindow):
 			# Displays the Flange Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
+			if self.ui.combo_flange_preference.currentText() != 'Outside':
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
 
 			# Displays the Web Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
@@ -1477,10 +1474,11 @@ class MainController(QMainWindow):
 			# Displays the Flange Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
+			if self.ui.combo_flange_preference.currentText() != 'Outside':
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
 
 			# Displays the Web Plates
 			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
@@ -1488,7 +1486,6 @@ class MainController(QMainWindow):
 
 			# Displays the bolts which are above the Flange Plate, debugging will give more clarity
 			nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-			print "nutboltlist", nutboltlistAF
 			for nutboltAF in nutboltlistAF:
 				osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
 
@@ -1502,7 +1499,7 @@ class MainController(QMainWindow):
 			for nutboltW in nutboltlistW:
 				osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
-# 	        ============================================================================================
+			# ============================================================================================
 	def open_about_osdag(self):
 		dialog = MyAboutOsdag(self)
 		dialog.show()

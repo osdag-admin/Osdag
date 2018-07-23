@@ -860,7 +860,7 @@ def finConn(uiObj):
 
     if web_plate_t > max_plate_thk:
         design_status = False
-        logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
+        logger.error(": Plate thickness provided is more than the maximum allowed [Ref. INSDAG detailing manual, 2002]")
         logger.warning(": Maximum plate thickness allowed is half the diameter of bolt")
         logger.info(": Increase the bolt diameter or decrease the plate thickness")
         # logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))
@@ -1018,11 +1018,12 @@ def finConn(uiObj):
         outputObj = {}
         outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = design_status
-        outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
+        outputObj['Bolt']['shearcapacity'] = round(new_bolt_param['shearcapacity'], 3)
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
-        outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
-        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
-        outputObj['Bolt']['boltgrpcapacity'] = new_bolt_param['boltgrpcapacity']
+        outputObj['Bolt']['boltcapacity'] = round(new_bolt_param['boltcapacity'], 3)
+        # outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
+        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofrow'] * new_bolt_param['numofcol']
+        outputObj['Bolt']['boltgrpcapacity'] = round(new_bolt_param['boltgrpcapacity'], 3)
         outputObj['Bolt']['numofrow'] = new_bolt_param['numofrow']
         outputObj['Bolt']['numofcol'] = new_bolt_param['numofcol']
         outputObj['Bolt']['pitch'] = new_bolt_param['pitch']
@@ -1051,11 +1052,12 @@ def finConn(uiObj):
         outputObj = {}
         outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = design_status
-        outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
+        outputObj['Bolt']['shearcapacity'] = round(new_bolt_param['shearcapacity'], 3)
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
-        outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
-        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
-        outputObj['Bolt']['boltgrpcapacity'] = new_bolt_param['boltgrpcapacity']
+        outputObj['Bolt']['boltcapacity'] = round(new_bolt_param['boltcapacity'], 3)
+        # outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
+        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofrow'] * new_bolt_param['numofcol']
+        outputObj['Bolt']['boltgrpcapacity'] = round(new_bolt_param['boltgrpcapacity'], 3)
         outputObj['Bolt']['numofrow'] = new_bolt_param['numofrow']
         outputObj['Bolt']['numofcol'] = new_bolt_param['numofcol']
         outputObj['Bolt']['pitch'] = new_bolt_param['pitch']
@@ -1084,11 +1086,12 @@ def finConn(uiObj):
         outputObj = {}
         outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = design_status
-        outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
+        outputObj['Bolt']['shearcapacity'] = round(new_bolt_param['shearcapacity'], 3)
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
-        outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
-        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
-        outputObj['Bolt']['boltgrpcapacity'] = new_bolt_param['boltgrpcapacity']
+        outputObj['Bolt']['boltcapacity'] = round(new_bolt_param['boltcapacity'], 3)
+        # outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
+        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofrow'] * new_bolt_param['numofcol']
+        outputObj['Bolt']['boltgrpcapacity'] = round(new_bolt_param['boltgrpcapacity'], 3)
         outputObj['Bolt']['numofrow'] = new_bolt_param['numofrow']
         outputObj['Bolt']['numofcol'] = new_bolt_param['numofcol']
         outputObj['Bolt']['pitch'] = new_bolt_param['pitch']
@@ -1117,11 +1120,12 @@ def finConn(uiObj):
         outputObj = {}
         outputObj['Bolt'] = {}
         outputObj['Bolt']['status'] = design_status
-        outputObj['Bolt']['shearcapacity'] = new_bolt_param['shearcapacity']
+        outputObj['Bolt']['shearcapacity'] = round(new_bolt_param['shearcapacity'], 3)
         outputObj['Bolt']['bearingcapacity'] = new_bolt_param['bearingcapacity']
-        outputObj['Bolt']['boltcapacity'] = new_bolt_param['boltcapacity']
-        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
-        outputObj['Bolt']['boltgrpcapacity'] = new_bolt_param['boltgrpcapacity']
+        outputObj['Bolt']['boltcapacity'] = round(new_bolt_param['boltcapacity'], 3)
+        # outputObj['Bolt']['numofbolts'] = new_bolt_param['numofbolts']
+        outputObj['Bolt']['numofbolts'] = new_bolt_param['numofrow'] * new_bolt_param['numofcol']
+        outputObj['Bolt']['boltgrpcapacity'] = round(new_bolt_param['boltgrpcapacity'], 3)
         outputObj['Bolt']['numofrow'] = new_bolt_param['numofrow']
         outputObj['Bolt']['numofcol'] = new_bolt_param['numofcol']
         outputObj['Bolt']['pitch'] = new_bolt_param['pitch']

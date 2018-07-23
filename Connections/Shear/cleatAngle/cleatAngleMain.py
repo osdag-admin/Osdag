@@ -1391,11 +1391,11 @@ class MainController(QMainWindow):
         gauge_dist = result_obj['Bolt']['gauge']
         self.ui.txtBeamGuage.setText(str(gauge_dist))
 
-        end_dist = result_obj['Bolt']['edge']
-        self.ui.txtEndDist.setText(str(end_dist))
-
-        edge_dist = result_obj['Bolt']['enddist']
+        edge_dist = result_obj['Bolt']['edge']
         self.ui.txtEdgeDist.setText(str(edge_dist))
+
+        end_dist = result_obj['Bolt']['enddist']
+        self.ui.txtEndDist.setText(str(end_dist))
 
         c_noOfBolts = result_obj['cleat']['numofbolts']
         self.ui.txtNoBolts_c.setText(str(c_noOfBolts))
@@ -1411,11 +1411,11 @@ class MainController(QMainWindow):
         gauge_dist = result_obj['cleat']['guage']
         self.ui.txtBeamGuage_c.setText(str(gauge_dist))
 
-        end_dist = result_obj['cleat']['edge']
-        self.ui.txtEndDist_c.setText(str(end_dist))
-
-        edge_dist = result_obj['cleat']['end']
+        edge_dist = result_obj['cleat']['edge']
         self.ui.txtEdgeDist_c.setText(str(edge_dist))
+
+        end_dist = result_obj['cleat']['end']
+        self.ui.txtEndDist_c.setText(str(end_dist))
 
         cleat_ht = result_obj['cleat']['height']
         self.ui.outputCleatHeight.setText(str(cleat_ht))

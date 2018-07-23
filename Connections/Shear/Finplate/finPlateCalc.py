@@ -245,7 +245,7 @@ def finConn(uiObj):
     bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
-
+    bolt_fu = float(uiObj["bolt"]["bolt_fu"])
     gap = float(uiObj["detailing"]["gap"])
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
@@ -397,7 +397,6 @@ def finConn(uiObj):
     # Bolt design function
     def boltDesign(web_plate_l):
         # I: Check for number of bolts -------------------
-        bolt_fu = int(bolt_grade) * 100
         bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
          
         # Spacing of bolts for web plate -------------------
@@ -861,7 +860,7 @@ def finConn(uiObj):
 
     if web_plate_t > max_plate_thk:
         design_status = False
-        logger.error(": Plate thickness provided is less than the minimum required [Ref. INSDAG detailing manual, 2002]")
+        logger.error(": Plate thickness provided is more than the maximum allowed [Ref. INSDAG detailing manual, 2002]")
         logger.warning(": Maximum plate thickness allowed is half the diameter of bolt")
         logger.info(": Increase the bolt diameter or decrease the plate thickness")
         # logger.warning(": Maximum plate thickness allowed is %2.2f mm " % (max_plate_thk))

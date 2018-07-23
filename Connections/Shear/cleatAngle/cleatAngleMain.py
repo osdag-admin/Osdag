@@ -191,10 +191,12 @@ class DesignPreferences(QDialog):
         This routine returns ultimate strength of bolt depending upon grade of bolt chosen
         '''
         if boltGrade != '':
-            boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
-                      12.9: 1220}
+            # Nominal tensile strength (Table 3, IS 1367(part 3):2002) should be taken for calculations
+            # boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+            #           12.9: 1220}
             boltGrd = float(boltGrade)
-            return boltFu[boltGrd]
+            boltFu = int(boltGrd) * 100
+            return boltFu
         else:
             pass
 
@@ -408,11 +410,17 @@ class MainController(QMainWindow):
 
         min_fu = 290
         max_fu = 780
-        self.ui.txtFu.editingFinished.connect(lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFu, self.ui.lbl_fu, min_fu, max_fu))
+        self.ui.txtFu.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFu, self.ui.lbl_fu))
 
         min_fy = 165
         max_fy = 650
-        self.ui.txtFy.editingFinished.connect(lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.check_range(self.ui.txtFy, self.ui.lbl_fy, min_fy, max_fy))
+        self.ui.txtFy.editingFinished.connect(
+            lambda: self.validate_fu_fy(self.ui.txtFu, self.ui.txtFy, self.ui.txtFy, self.ui.lbl_fy))
 
         self.ui.actionCreate_design_report.triggered.connect(self.create_design_report)
         self.ui.actionSave_log_message.triggered.connect(self.save_log)
@@ -441,8 +449,9 @@ class MainController(QMainWindow):
         self.ui.comboColSec.currentIndexChanged[int].connect(self.fill_cleatsection_combo)
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
-        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
-
+        self.ui.txtInputCleatHeight.editingFinished.connect(lambda: self.check_cleat_height(
+            self.ui.txtInputCleatHeight, self.ui.cleatLength_lbl))
+        self.ui.comboBoltGrade.currentIndexChanged[str].connect(self.call_boltFu)
         ######################################################################################
         self.ui.menuView.addAction(self.ui.inputDock.toggleViewAction())
         self.ui.menuView.addAction(self.ui.outputDock.toggleViewAction())
@@ -1318,6 +1327,34 @@ class MainController(QMainWindow):
         else:
             palette = QPalette()
             lblwidget.setPalette(palette)
+
+
+    def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+
+        '''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+        try:
+            fu_value = float(fu_widget.text())
+        except ValueError:
+            fu_value = 0.0
+
+        try:
+            fy_value = float(fy_widget.text())
+        except ValueError:
+            fy_value = 0.0
+
+        if fy_value > fu_value:
+            QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
+            current_widget.clear()
+            current_widget.setFocus()
+            palette = QPalette()
+            palette.setColor(QPalette.Foreground, Qt.red)
+            lblwidget.setPalette(palette)
+        else:
+            palette = QPalette()
+            lblwidget.setPalette(palette)
+
 
     def display_output(self, output_obj):
         '''(dictionary) --> NoneType

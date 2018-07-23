@@ -306,8 +306,7 @@ def cleat_connection(ui_obj):
     bolt_dia = int(ui_obj['Bolt']['Diameter (mm)'])
     bolt_type = ui_obj["Bolt"]["Type"]
     bolt_grade = float(ui_obj['Bolt']['Grade'])
-
-    bolt_friction_grip_bolt_slip_factor = ui_obj["bolt"]["slip_factor"]
+    bolt_fu = ui_obj["bolt"]["bolt_fu"]
     gap = float(ui_obj["detailing"]["gap"])
 
     mu_f = float(ui_obj["bolt"]["slip_factor"])
@@ -407,14 +406,12 @@ def cleat_connection(ui_obj):
 # Bolt design:
 #     design_status = True
 # I: Check for number of bolts -------------------
-    bolt_fu = int(bolt_grade) * 100
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
     
     t_thinner_b = min(beam_w_t.real, cleat_thk.real)
     bolt_shear_capacity = 0
 
     if bolt_type == 'Friction Grip Bolt':
-        # bolt_shear_capacity = friction_grip_bolt_shear(bolt_friction_grip_bolt_slip_factor, bolt_dia, 2, bolt_fu)
         mu_f = mu_f
         n_e = 2
         bolt_hole_type = dp_bolt_hole_type

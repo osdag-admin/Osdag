@@ -344,7 +344,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_diameter = int(input_dict['Bolt']['Diameter (mm)'])
         self.bolt_type = input_dict['Bolt']['Type']
         self.bolt_grade = input_dict['Bolt']['Grade']
-        self.bolt_fu = float(float(self.bolt_grade)) * 100
+        self.bolt_fu = float(input_dict["bolt"]["bolt_fu"])
         self.angle_sec = input_dict['Angle']["AngleSection"]
 
         # TODO for test_calc and test_report, uncomment the below line
@@ -511,7 +511,7 @@ class SeatAngleCalculation(ConnectionCalculations):
         self.bolt_design()
 
         if self.top_angle_recommended != self.top_angle:
-            logger.warning(": Based on thumb rules, a top angle of size %s is sufficient to provide stability to %s ",
+            logger.warning(": Based on thumb rules, a top angle of size %s may sufficient to provide stability to %s ",
                            self.top_angle_recommended, self.beam_section)
 
         self.top_angle_end_dist_column = (float(self.top_angle_A) - self.top_angle_t - self.top_angle_R1

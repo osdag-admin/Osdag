@@ -429,16 +429,17 @@ class MainController(QMainWindow):
 		self.ui.txt_Axial.setValidator(doubl_validator)
 
 		min_fu = 290
-		max_fu = 590
+		max_fu = 780
 		self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
 
 		min_fy = 165
-		max_fy = 450
+		max_fy = 650
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 
 		min_gap = 2
 		max_gap = 10
-		self.designPrefDialog.ui.txt_detailingGap.editingFinished.connect(lambda: self.check_range(self.designPrefDialog.ui.txt_detailingGap, min_gap, max_gap))
+		self.designPrefDialog.ui.txt_detailingGap.editingFinished.connect(
+			lambda: self.check_range(self.designPrefDialog.ui.txt_detailingGap, min_gap, max_gap))
 
 		from osdagMainSettings import backend_name
 		self.display, _ = self.init_display(backend_str=backend_name())

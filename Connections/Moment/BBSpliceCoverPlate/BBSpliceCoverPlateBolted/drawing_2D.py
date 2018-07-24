@@ -891,14 +891,7 @@ class CoverEnd2DFront(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, pta1, point4, str(self.data_object.end_dist), params)
 
 		# ------------------------------------------  Beam 1& 2 -------------------------------------------
-		point = self.A1 + (self.data_object.beam_length_L1 /4) * np.array([1, 0])
-		theta = 60
-		offset = 50
-		textup = "Beam " + str(self.data_object.beam_designation)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
-
-		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
+		point = self.AA2 + (self.data_object.beam_length_L2 / 3) * np.array([-1, 0])
 		theta = 60
 		offset = 50
 		textup = "Beam " + str(self.data_object.beam_designation)
@@ -906,24 +899,34 @@ class CoverEnd2DFront(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  Plate 1, 2 & 3-------------------------------------------
-		point = self.P2
-		theta = 60
-		offset = 100
-		textup = "Flange splice " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.IP2
+			theta = 60
+			offset = 100
+			textup = "Inner flange splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(self.data_object.inner_plates_width) + " x " + str(self.data_object.inner_plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
-		point = self.PP2
-		theta = 60
-		offset = 100
-		textdown = "Flange splice " + str(self.data_object.plate_length_L2) + " x " + str(self.data_object.plate_width_B2) + " x " + str(self.data_object.plate_thickness_p2)
-		textup = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+			point = self.PP2
+			theta = 60
+			offset = 100
+			textdown = "Outer flange splice " + str(int(self.data_object.plate_length_L2)) + " x " + \
+					   str(int(self.data_object.plate_width_B2)) + " x " + str(self.data_object.plate_thickness_p2)
+			textup = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+		else:
+			point = self.PP2
+			theta = 60
+			offset = 100
+			textdown = "Flange splice " + str(int(self.data_object.plate_length_L2)) + " x " + \
+					   str(int(self.data_object.plate_width_B2)) + " x " + str(self.data_object.plate_thickness_p2)
+			textup = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
 
 		point = self.W2
 		theta = 60
-		offset = 200
-		textup = "Web splice " + str(self.data_object.plate_length_L3) + " x " + str(self.data_object.plate_width_B3) + " x " + str(self.data_object.plate_thickness_p3)
+		offset = 150
+		textup = "Web splice " + str(int(self.data_object.plate_length_L3)) + " x " + str(int(self.data_object.plate_width_B3)) + " x " + str(self.data_object.plate_thickness_p3)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
@@ -1200,13 +1203,6 @@ class CoverEnd2DTop(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, pta2, point31, str(self.data_object.edge_dist1), params)
 
 		# ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
-		point = self.A1 + (self.data_object.beam_length_L1 / 4 )* np.array([1, 0])
-		theta = 60
-		offset = 50
-		textup = "Beam " + str(self.data_object.beam_designation)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
-
 		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
 		theta = 60
 		offset = 50
@@ -1215,12 +1211,22 @@ class CoverEnd2DTop(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
-		point = self.P1 + (40 * np.array([0, 1]))
-		theta = 60
-		offset = 160
-		textup = "Flange cover plate " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.P1 + (40 * np.array([0, 1]))
+			theta = 60
+			offset = 160
+			textup = "Outer flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " + \
+					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		else:
+			point = self.P1 + (40 * np.array([0, 1]))
+			theta = 60
+			offset = 160
+			textup = "Flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " +\
+					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
 		# ------------------------------------------  Bolts details -------------------------------------------
 		no_of_bolts_flange = self.data_object.bolts_top_flange1_col * self.data_object.bolts_top_of_flange1_row
@@ -1624,19 +1630,36 @@ class CoverEnd2DSide(object):
 		# ------------------------------------------  Web Splice -------------------------------------------
 		point = self.WW2
 		theta = 50
-		offset = 40
-		textup = "Web Splice " + str(self.data_object.plate_length_L3) + " x "+ str(self.data_object.plate_width_B3) + " x " + str(self.data_object.plate_thickness_p3)
+		offset = 30
+		textup = "Web Splice " + str(int(self.data_object.plate_length_L3)) + " x "+ str(int(self.data_object.plate_width_B3)) + " x " + str(self.data_object.plate_thickness_p3)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  Flange Splice -------------------------------------------
-		point = self.P3
-		theta = 70
-		offset = 40
-		textup = "Flange Splice " + str(self.data_object.plate_length_L1) + " x " + str(
-			self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.P3
+			theta = 60
+			offset = 40
+			textup = "Outer flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+
+			point = self.IPP2
+			theta = 60
+			offset = 40
+			textup = " "
+			textdown = "Inner flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.inner_plates_width)) + " x " + str(self.data_object.inner_plate_thickness_p1)
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+		else:
+			point = self.P3
+			theta = 60
+			offset = 40
+			textup = "Flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  View details-------------------------------------------
 		ptx = self.PP2 * np.array([0, 1]) + 200 * np.array([0, 1]) + 60 * np.array([-1, 0])

@@ -347,6 +347,8 @@ def bbExtendedEndPlateSplice(uiObj):
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
+
+    #TODO: Check these (not used) @Danish Ansari
     weld_type = uiObj["weld"]["typeof_weld"]
     dp_bolt_type = uiObj["Bolt"]["Grade"]
     edge_factor = uiObj["detailing"]["typeof_edge"]
@@ -403,7 +405,7 @@ def bbExtendedEndPlateSplice(uiObj):
     # =======================================================
     #######################################################################
     # Calculation of Bolt strength in MPa
-    bolt_fu = int(bolt_grade) * 100
+    bolt_fu = uiObj["bolt"]["bolt_fu"]
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
 
     #######################################################################

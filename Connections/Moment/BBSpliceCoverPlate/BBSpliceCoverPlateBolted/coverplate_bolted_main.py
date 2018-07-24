@@ -18,7 +18,7 @@ from ui_tutorial import Ui_Tutorial
 from svg_window import SvgWindow
 from reportGenerator import save_html
 from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFileDialog, QColorDialog
-from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal, QPixmap
+from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal, QPixmap, QPalette
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
 import cairosvg
@@ -432,10 +432,14 @@ class MainController(QMainWindow):
 		min_fu = 290
 		max_fu = 780
 		self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+		self.ui.txt_Fu.editingFinished.connect(
+			lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fu, self.ui.lbl_fu))
 
 		min_fy = 165
 		max_fy = 650
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+		self.ui.txt_Fy.editingFinished.connect(
+			lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fy, self.ui.lbl_fy))
 
 		min_gap = 2
 		max_gap = 10
@@ -582,6 +586,31 @@ class MainController(QMainWindow):
 			QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
 			widget.clear()
 			widget.setFocus()
+
+	def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+		'''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+		try:
+			fu_value = float(fu_widget.text())
+		except ValueError:
+			fu_value = 0.0
+
+		try:
+			fy_value = float(fy_widget.text())
+		except ValueError:
+			fy_value = 0.0
+
+		if fy_value > fu_value:
+			QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
+			current_widget.clear()
+			current_widget.setFocus()
+			palette = QPalette()
+			palette.setColor(QPalette.Foreground, Qt.red)
+			lblwidget.setPalette(palette)
+		else:
+			palette = QPalette()
+			lblwidget.setPalette(palette)
 
 	def save_design_inputs(self):
 		filename, _ = QFileDialog.getSaveFileName(self, "Save Design", os.path.join(str(self.folder), "untitled.osi"),

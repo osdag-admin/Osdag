@@ -211,10 +211,11 @@ class DesignPreferences(QDialog):
 		Returns: ultimate strength of bolt depending upon grade of bolt chosen
 
 		"""
-		boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
-				  12.9: 1220}
+		# boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+		# 		  12.9: 1220}
 		boltGrd = float(boltGrade)
-		return boltFu[boltGrd]
+		boltFu = int(boltGrd) * 100 # Nominal strength of bolt
+		return boltFu
 
 	def close_designPref(self):
 		self.close()

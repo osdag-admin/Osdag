@@ -347,6 +347,8 @@ def bbExtendedEndPlateSplice(uiObj):
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
+
+    #TODO: Check these (not used) @Danish Ansari
     weld_type = uiObj["weld"]["typeof_weld"]
     dp_bolt_type = uiObj["Bolt"]["Grade"]
     edge_factor = uiObj["detailing"]["typeof_edge"]
@@ -377,6 +379,9 @@ def bbExtendedEndPlateSplice(uiObj):
     if beam_sec in old_beam_section:
         logger.warning(": You are using a section (in red colour) that is not available in the latest version of IS 808")
 
+    if beam_fu < 410 or beam_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
+
     #######################################################################
     # Read input values from Beam database
     # Here,
@@ -400,7 +405,7 @@ def bbExtendedEndPlateSplice(uiObj):
     # =======================================================
     #######################################################################
     # Calculation of Bolt strength in MPa
-    bolt_fu = int(bolt_grade) * 100
+    bolt_fu = uiObj["bolt"]["bolt_fu"]
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
 
     #######################################################################

@@ -18,7 +18,7 @@ from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
-from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
 import sys
@@ -105,7 +105,7 @@ class DesignPreference(QDialog):
 		self.saved_designPref["bolt"]["bolt_type"] = str(self.ui.combo_boltType.currentText())
 		self.saved_designPref["bolt"]["bolt_hole_type"] = str(self.ui.combo_boltHoleType.currentText())
 		self.saved_designPref["bolt"]["bolt_hole_clrnce"] = self.get_clearance()
-		self.saved_designPref["bolt"]["bolt_fu"] = int(str(self.ui.txt_boltFu.text()))
+		self.saved_designPref["bolt"]["bolt_fu"] = float(str(self.ui.txt_boltFu.text()))
 		self.saved_designPref["bolt"]["slip_factor"] = float(str(self.ui.combo_slipfactor.currentText()))
 
 		self.saved_designPref["weld"] = {}
@@ -220,10 +220,11 @@ class DesignPreference(QDialog):
 		Returns: ultimate strength of bolt depending upon grade of bolt chosen
 
 		"""
-		boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
-				  12.9: 1220}
+		# boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
+		# 		  12.9: 1220}
 		boltGrd = float(boltGrade)
-		return boltFu[boltGrd]
+		boltFu = int(boltGrd) * 100 # Nominal strength of bolt
+		return boltFu
 
 	def close_designPref(self):
 		self.close()
@@ -521,12 +522,16 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_plateWidth.setValidator(doubl_validator)
 
 		min_fu = 290
-		max_fu = 590
+		max_fu = 780
 		self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
+		self.ui.txt_Fu.editingFinished.connect(
+			lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fu, self.ui.lbl_fu))
 
 		min_fy = 165
-		max_fy = 450
+		max_fy = 650
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
+		self.ui.txt_Fy.editingFinished.connect(
+			lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fy, self.ui.lbl_fy))
 
 		from osdagMainSettings import backend_name
 		self.display, _ = self.init_display(backend_str=backend_name())
@@ -1237,6 +1242,31 @@ class Maincontroller(QMainWindow):
 			QMessageBox.about(self, "Error", "Please enter a value between %s-%s" % (min_val, max_val))
 			widget.clear()
 			widget.setFocus()
+
+	def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
+		'''(QlineEdit,QLable,Number,Number)---> NoneType
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
+		try:
+			fu_value = float(fu_widget.text())
+		except ValueError:
+			fu_value = 0.0
+
+		try:
+			fy_value = float(fy_widget.text())
+		except ValueError:
+			fy_value = 0.0
+
+		if fy_value > fu_value:
+			QMessageBox.about(self, 'Error', 'Yield strength (fy) cannot be greater than ultimate strength (fu)')
+			current_widget.clear()
+			current_widget.setFocus()
+			palette = QPalette()
+			palette.setColor(QPalette.Foreground, Qt.red)
+			lblwidget.setPalette(palette)
+		else:
+			palette = QPalette()
+			lblwidget.setPalette(palette)
 
 	def call_2D_drawing(self, view):
 		"""

@@ -24,26 +24,26 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     myfile.write(t('style'))
     myfile.write('table{width= 100%; border-collapse:collapse; border:1px solid black collapse}')
     myfile.write('th,td {padding:3px}')
-#     Provides light green background color(#D5DF93), font-weight bold, font-size 20 and font-family
+    #     Provides light green background color(#D5DF93), font-weight bold, font-size 20 and font-family
     myfile.write('td.detail{background-color:#D5DF93; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-#     Provides font-weight bold, font-size 20 and font-family
+    #     Provides font-weight bold, font-size 20 and font-family
     myfile.write('td.detail1{font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-#     Provides font-size 20 and font-family
+    #     Provides font-size 20 and font-family
     myfile.write('td.detail2{font-size:20; font-family:Helvetica, Arial, Sans Serif}')
-#     Provides dark green background color(#8FAC3A), font-weight bold, font-size 20 and font-family
+    #     Provides dark green background color(#8FAC3A), font-weight bold, font-size 20 and font-family
     myfile.write('td.header0{background-color:#8fac3a; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-#     Provides grey background color(#E6E6E6), font-weight bold, font-size 20 and font-family
+    #     Provides grey background color(#E6E6E6), font-weight bold, font-size 20 and font-family
     myfile.write('td.header1{background-color:#E6E6E6; font-size:20; font-family:Helvetica, Arial, Sans Serif; font-weight:bold}')
-#     Provides only font-size 20 and width of the images box
+    #     Provides only font-size 20 and width of the images box
     myfile.write('td.header2{font-size:20; width:50%}')
     myfile.write(t('/style'))
 
     myfile.write(t('/head'))
     myfile.write(t('body'))
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# DATA PARAMS
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Project summary data
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # DATA PARAMS
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Project summary data
     companyname = str(reportsummary["ProfileSummary"]['CompanyName'])
     companylogo = str(reportsummary["ProfileSummary"]['CompanyLogo'])
     groupteamname = str(reportsummary["ProfileSummary"]['Group/TeamName'])
@@ -54,8 +54,8 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     client = str(reportsummary['Client'])
     addtionalcomments = str(reportsummary['AdditionalComments'])
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# BB Splice Cover Plate Bolted Main Data
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # BB Splice Cover Plate Bolted Main Data
     beam_w_t = str(float(dictbeamdata["tw"]))
     beam_f_t = str(float(dictbeamdata["T"]))
     beam_d = str(float(dictbeamdata["D"]))
@@ -165,8 +165,10 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     dia_hole = str(int(outputObj['FlangeBolt']['DiaHole']))
     dia_hole1 = (int(outputObj['FlangeBolt']['DiaHole']))
 
+    flange_plate_preference
+
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Header of the pdf fetched from dialogbox
+    # Header of the pdf fetched from dialogbox
     rstr = t('table border-collapse= "collapse" border="1px solid black" width=100%')
     rstr += t('tr')
     row = [0, '<object type= "image/PNG" data= "cmpylogoExtendEndplate.png" height=60 ></object>', '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
@@ -177,7 +179,7 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('tr')
     row = [0, 'Company Name']
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
-#     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+    #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
     row = [0, companyname]
     rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
 
@@ -222,12 +224,12 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/table')
 
     rstr += t('hr')
-#     rstr += t('p> &nbsp</p')
+    #     rstr += t('p> &nbsp</p')
     rstr += t('/hr')
 
-# &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-# Design Conclusion
-#     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+    # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+    # Design Conclusion
+    #     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
     rstr += t('table border-collapse= "collapse" border="1px solid black" width= 100% ')
 
     row = [0, 'Design Conclusion', "IS800:2007/Limit state design"]
@@ -1635,6 +1637,91 @@ def save_html(outputObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break
     rstr += t('/h1')
+
+    # *************************************************************************************************************************
+    # Header of the pdf fetched from dialogbox
+    if flange_plate_preference == "Outside + Inside":
+        rstr += t('table width= 100% border-collapse= "collapse" border="1px solid black collapse"')
+        rstr += t('tr')
+        row = [0, '<object type= "image/PNG" data= "cmpylogoExtendEndplate.png" height=60 ></object>',
+               '<font face="Helvetica, Arial, Sans Serif" size="3">Created with</font>' "&nbsp" "&nbsp" "&nbsp" "&nbsp" "&nbsp" '<object type= "image/PNG" data= "Osdag_header.png" height=60 ''&nbsp" "&nbsp" "&nbsp" "&nbsp"></object>']
+        rstr += t('td colspan="2" align= "center"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td colspan="2" align= "center"') + row[2] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+        row = [0, 'Company Name']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        #     rstr += t('td style= "font:bold 20px Helvetica, Arial, Sans Serif;background-color:#D5DF93"') + space(row[0]) + row[1] + t('/td')
+        row = [0, companyname]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+
+        row = [0, 'Project Title']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, projecttitle]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+        row = [0, 'Group/Team Name']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, groupteamname]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, 'Subtitle']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, subtitle]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+        row = [0, 'Designer']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, designer]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, 'Job Number']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, jobnumber]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+
+        rstr += t('tr')
+        row = [0, 'Date']
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, time.strftime("%d /%m /%Y")]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, "Client"]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        row = [0, client]
+        rstr += t('td class="detail" ') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+        rstr += t('/table')
+
+        rstr += t('hr')
+        rstr += t('/hr')
+
+        # *************************************************************************************************************************
+        # Diagram
+
+        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+
+        row = [0, "Views", " "]
+        rstr += t('tr')
+        rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+        png = folder + "/images_html/3D_Model.png"
+        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+
+        plan = folder + "/images_html/coverboltedPlan.png"
+        dataplan = '<object type="image/PNG" data= %s width ="400"></object>' % plan
+
+        row = [0, dataplan]
+        rstr += t('tr')
+        rstr += t('td align="center" class="header2"') + space(row[0]) + row[1] + t('/d')
+        rstr += t('/tr')
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
 
     # *************************************************************************************************************************
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&

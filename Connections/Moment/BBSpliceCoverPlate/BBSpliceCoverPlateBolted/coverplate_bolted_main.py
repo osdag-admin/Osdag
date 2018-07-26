@@ -47,27 +47,27 @@ import copy
 
 
 class MyTutorials(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_Tutorial()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_Tutorial()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class MyAskQuestion(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_AskQuestion()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_AskQuestion()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class MyAboutOsdag(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_AboutOsdag()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_AboutOsdag()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class DesignPreferences(QDialog):
@@ -408,6 +408,7 @@ class MainController(QMainWindow):
 		self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
 		self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
+		self.ui.btnPlan.clicked.connect(lambda: self.call_2D_drawing("Plan"))
 		self.ui.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
 		self.ui.chkBx_beamSec1.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.chkBx_extndPlate.clicked.connect(lambda: self.call_3DConnector("gradient_bg"))
@@ -545,7 +546,7 @@ class MainController(QMainWindow):
 		"""
 
 		Args:
-		    index: Number
+			index: Number
 
 		Returns: Types of Preferences
 
@@ -719,6 +720,7 @@ class MainController(QMainWindow):
 		self.ui.btnFront.setEnabled(False)
 		self.ui.btnTop.setEnabled(False)
 		self.ui.btnSide.setEnabled(False)
+		self.ui.btnPlan.setEnabled(False)
 		self.ui.btn3D.setEnabled(False)
 		self.ui.chkBx_extndPlate.setEnabled(False)
 		self.ui.chkBx_beamSec1.setEnabled(False)
@@ -740,6 +742,7 @@ class MainController(QMainWindow):
 		self.ui.btn_SaveMessages.setEnabled(True)
 		self.ui.btnFront.setEnabled(True)
 		self.ui.btnTop.setEnabled(True)
+		self.ui.btnPlan.setEnabled(True)
 		self.ui.btnSide.setEnabled(True)
 		self.ui.btn3D.setEnabled(True)
 		self.ui.chkBx_beamSec1.setEnabled(True)
@@ -1039,6 +1042,8 @@ class MainController(QMainWindow):
 		self.display_output(self.outputs)
 		self.display_log_to_textedit()
 		isempty = [True if val != '' else False for ele in alist for val in ele.values()]
+		if self.ui.combo_flange_preference.currentText() == 'Outside':
+			self.ui.btnPlan.setEnabled(False)
 
 		if isempty[0] is True:
 			status = self.resultObj['Bolt']['status']

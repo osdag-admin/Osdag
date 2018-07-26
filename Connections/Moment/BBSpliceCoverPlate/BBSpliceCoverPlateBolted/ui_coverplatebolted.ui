@@ -196,7 +196,7 @@
       <widget class="QCheckBox" name="btn3D">
        <property name="geometry">
         <rect>
-         <x>220</x>
+         <x>290</x>
          <y>0</y>
          <width>90</width>
          <height>28</height>
@@ -226,7 +226,7 @@
       <widget class="QCheckBox" name="chkBx_beamSec1">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>400</x>
          <y>0</y>
          <width>90</width>
          <height>29</height>
@@ -253,7 +253,7 @@
       <widget class="QCheckBox" name="chkBx_extndPlate">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>510</x>
          <y>0</y>
          <width>151</width>
          <height>29</height>
@@ -275,6 +275,35 @@
        </property>
        <property name="text">
         <string>Connector</string>
+       </property>
+      </widget>
+      <widget class="QToolButton" name="btnPlan">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>0</y>
+         <width>28</width>
+         <height>28</height>
+        </rect>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Plan View</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="ResourceFiles/icons.qrc">
+         <normaloff>:/newPrefix/images/X-Y.png</normaloff>:/newPrefix/images/X-Y.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>22</width>
+         <height>22</height>
+        </size>
        </property>
       </widget>
      </widget>

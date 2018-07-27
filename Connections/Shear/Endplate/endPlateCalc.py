@@ -755,14 +755,17 @@ def end_connection(ui_obj):
         logger.info(": Increase the end plate height if possible, else select a deeper beam section")
 
 # ################ CHECK 3: BLOCK SHEAR ####################
-    min_thk = min(end_plate_t,beam_w_t)
-    Tdb = blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, min_thk)
+#     min_thk = min(end_plate_t,beam_w_t)
+    min_thk = end_plate_t
+    Tdb = 2 * blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, min_thk)
 
     if Tdb < shear_load:
         design_check = False
         logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
-        logger.warning(": Minimum block shear capacity required is % 2.2f KN" % (shear_load))
-        logger.info(": Increase the plate thickness")
+        # logger.warning(": Minimum block shear capacity required is % 2.2f KN" % shear_load)
+        logger.warning(
+            ": Available block shear capacity is %2.2f KN which is less than required %2.2f KN" % (Tdb, shear_load))
+        logger.info(": Increase the plate thickness or the plate height")
 
 # ################ CHECK 4: FILLET WELD ###################
 

@@ -863,6 +863,11 @@ def end_connection(ui_obj):
         if weld_t < 8:
             logger.warning(" : Minimum recommended weld thickness for field weld is 8 mm")
 
+    if end_plate_t < 8:
+        logger.warning(
+            " : Minimum recommended wend plate thickness is 8 mm to avoid weld distortion during fabrication and"
+            " damage during transportation [Reference: SCI Steel Designers' Manual - 7th Edition (2012)")
+
     if output_obj['Bolt']['status'] is True:
 
         logger.info(": Overall end plate connection design is safe \n")

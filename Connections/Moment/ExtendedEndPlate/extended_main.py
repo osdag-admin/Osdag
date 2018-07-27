@@ -948,7 +948,7 @@ class Maincontroller(QMainWindow):
 
 		if isempty[0] == True:
 			status = self.resultObj['Bolt']['status']
-			self.call_3DModel("gradient_bg")
+			# self.call_3DModel("gradient_bg")
 			if status is True:
 				self.call_2D_drawing("All")
 			else:

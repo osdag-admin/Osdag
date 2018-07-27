@@ -433,7 +433,8 @@ class MainController(QMainWindow):
         self.ui.actionShow_all.triggered.connect(lambda: self.call_3d_model("gradient_bg"))
         self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 
-        self.ui.combo_Beam.currentIndexChanged[int].connect(self.fill_plate_thick_combo)
+        # self.ui.combo_Beam.currentIndexChanged[int].connect(self.fill_plate_thick_combo)
+        # End plate thickness is not to be checked against beam web thickness
         self.ui.combo_Beam.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboColSec.currentIndexChanged[str].connect(self.checkbeam_b)
         self.ui.comboPlateThick_2.currentIndexChanged[int].connect(self.populate_weld_thick_combo)

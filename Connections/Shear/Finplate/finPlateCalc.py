@@ -338,10 +338,10 @@ def finConn(uiObj):
 
     # Plate thickness check
     if web_plate_t < beam_w_t:
-        web_plate_t = beam_w_t
         design_status = False
-        logger.error(": Chosen web plate thickness is not sufficient")
-        logger.warning(" : Minimum required thickness of web is %2.2f mm" % (beam_w_t))
+        logger.error(": Chosen fin plate thickness is not sufficient")
+        logger.warning(" : Minimum required thickness of fin plate is %2.2f mm" % beam_w_t)
+        logger.info(": Increase the thickness of fin plate")
 
     # # Plate height check
 
@@ -500,7 +500,8 @@ def finConn(uiObj):
                 if web_plate_l_opt > max_plate_height :
                     design_status = False
                     logger.error(": Bolt strength is insufficient to carry the shear force")
-                    logger.warning (": Increase bolt diameter and/or bolt grade")
+                    logger.warning(": Maximum plate height allowed is %2.2f mm " % max_plate_height)
+                    logger.info(": Increase bolt diameter and/or bolt grade")
                   
             elif min_plate_height > max_plate_height:
                 design_status = False

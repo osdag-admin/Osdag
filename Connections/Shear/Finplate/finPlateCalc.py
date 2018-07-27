@@ -574,7 +574,7 @@ def finConn(uiObj):
                 else:
                     design_status = False
                     logger.error(": Bolt strength is insufficient to carry the shear force")
-                    logger.warning (": Increase bolt diameter and/or bolt grade")
+                    logger.info(": Increase bolt diameter and/or bolt grade")
                     moment_demand = 0.0
         
         # Moment demand calculation for user defined plate height and optional width input (2nd case)

@@ -751,7 +751,7 @@ def end_connection(ui_obj):
     if shear_load > shear_capacity_beam:
         design_check = False
         logger.error(": Shear capacity of the beam web at the end plate is less than the external load")
-        logger.warning(": Shear capacity of the beam web is %2.2f KN" % (shear_capacity_beam))
+        logger.warning(": Shear capacity of the beam web is %2.2f kN" % (shear_capacity_beam))
         logger.info(": Increase the end plate height if possible, else select a deeper beam section")
 
 # ################ CHECK 3: BLOCK SHEAR ####################
@@ -762,9 +762,9 @@ def end_connection(ui_obj):
     if Tdb < shear_load:
         design_check = False
         logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
-        # logger.warning(": Minimum block shear capacity required is % 2.2f KN" % shear_load)
+        # logger.warning(": Minimum block shear capacity required is % 2.2f kN" % shear_load)
         logger.warning(
-            ": Available block shear capacity is %2.2f KN which is less than required %2.2f KN" % (Tdb, shear_load))
+            ": Available block shear capacity is %2.2f kN which is less than required %2.2f kN" % (Tdb, shear_load))
         logger.info(": Increase the plate thickness or the plate height")
 
 # ################ CHECK 4: FILLET WELD ###################

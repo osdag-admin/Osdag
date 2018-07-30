@@ -897,8 +897,7 @@ class MainController(QMainWindow):
 				self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
 				self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
 				self.ui.combo_flange_preference.setCurrentIndex(self.ui.combo_flange_preference.findText(uiObj["FlangePlate"]['Preferences']))
-				self.ui.combo_flangeplateThick.setCurrentIndex(
-					self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
+				self.ui.combo_flangeplateThick.setCurrentIndex(self.ui.combo_flangeplateThick.findText(uiObj["FlangePlate"]["Thickness (mm)"]))
 				self.ui.combo_webplateThick.setCurrentIndex(
 					self.ui.combo_webplateThick.findText(uiObj["WebPlate"]["Thickness (mm)"]))
 				self.ui.txt_flangeplateHeight.setText(str(uiObj["FlangePlate"]["Height (mm)"]))
@@ -1350,29 +1349,29 @@ class MainController(QMainWindow):
 		bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
 		return bolt_head_dia[bolt_diameter]
 
-	def bolt_length_calculation(self, bolt_diameter):
-		'''
-		This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
-
-	   bolt Head Dia
-		<-------->
-		__________  ______
-		|        |    |
-		|________|    |
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |  |       |  l= length
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |__|    ___|__
-
-		'''
-		bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
-
-		return bolt_head_dia[bolt_diameter]
+	# def bolt_length_calculation(self, bolt_diameter):
+	# 	'''
+	# 	This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+    #
+	#    bolt Head Dia
+	# 	<-------->
+	# 	__________  ______
+	# 	|        |    |
+	# 	|________|    |
+	# 	   |  |       |
+	# 	   |  |       |
+	# 	   |  |       |
+	# 	   |  |       |
+	# 	   |  |       |  l= length
+	# 	   |  |       |
+	# 	   |  |       |
+	# 	   |  |       |
+	# 	   |__|    ___|__
+    #
+	# 	'''
+	# 	bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+    #
+	# 	return bolt_head_dia[bolt_diameter]
 
 	def nut_thick_calculation(self, bolt_diameter):
 		'''
@@ -1381,6 +1380,38 @@ class MainController(QMainWindow):
 		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23,
 				   30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
+
+	def bolt_length_calculation(self, bolt_diameter):
+		'''
+
+		:param self:
+		:param bolt_diameter:
+		:return:
+		'''
+
+		alist = self.designParameters()
+		beam_data = self.fetchBeamPara()  # Fetches the beam dimensions
+		flangeplatethickness = alist["FlangePlate"]["Thickness (mm)"]
+		beam_T = float(beam_data["T"])
+		length_required = self.bolt_head_thick_calculation(bolt_diameter) + self.nut_thick_calculation(bolt_diameter) + \
+						  2.0 * float(flangeplatethickness) + float(beam_T) + float(self.nut_thick_calculation(bolt_diameter)) + 10.0
+
+		if length_required < 40:
+			length_required = 40
+
+		elif length_required > 40 and length_required < 100:
+			if length_required % 5 != 0:
+				length_required = int(length_required / 5) * 5 + 5
+			else:
+				length_required = length_required
+
+		elif length_required > 100 and length_required < 300:
+			if length_required % 10 != 0:
+				length_required = int(length_required / 10) * 10 + 10
+			else:
+				length_required = length_required
+
+		return length_required
 
 	def call_3DModel(self, bgcolor):
 		# Call to calculate/create the BB Cover Plate Bolted CAD model

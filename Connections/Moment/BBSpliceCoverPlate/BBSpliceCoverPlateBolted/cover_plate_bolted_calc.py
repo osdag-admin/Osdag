@@ -405,6 +405,8 @@ def coverplateboltedconnection(uiObj):
 
     if beam_section in old_beam_section:
         logger.warning(" : You are using a section (in red color) that is not available in latest version of IS 808")
+    if beam_fu < 410 or beam_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
 
     ########################################################################################################################
     # Read input values from Beam  database

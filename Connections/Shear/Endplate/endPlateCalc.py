@@ -594,14 +594,15 @@ def end_connection(ui_obj):
 
         no_row = bolts_required / 2
         no_col = 1
-
-        end_plate_l = 0.6 * beam_depth
+        min_end_plate_l = 0.6 * beam_depth
+        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+        req_end_plate_l = ((no_row-1) * min_pitch + 2 * min_end_dist)
+        end_plate_l = max(0.6 * beam_depth, req_end_plate_l)
         avbl_length = (end_plate_l - 2 * min_end_dist)
         pitch = avbl_length / (no_row - 1)
         end_dist = min_end_dist
         edge_dist = min_edge_dist
-        min_end_plate_l = 0.6 * beam_depth
-        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+
         test = True
         if end_plate_l > max_end_plate_l:
             test = False

@@ -705,7 +705,7 @@ def coverplateboltedconnection(uiObj):
         elif web_plate_l == 0:
             # Consider web splice plate equal to minimum required height of web splice plate & calc pitch
             web_plate_l_opt = web_min_h(beam_d)
-            web_pitch =  int(round((((web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)) / 5)) * 5 + 5)
+            web_pitch = int(round((((web_plate_l_opt - (2 * min_end_dist)) / (web_bolts_required - 1)) / 5)) * 5 + 5)
             web_plate_l = round(int(web_pitch * (web_bolts_required - 1) + (2 * min_end_dist)), 2)
             ## In the above case if "pitch < required min pitch" then recalculate height of web splice plate
             if web_pitch <= min_pitch:
@@ -916,7 +916,6 @@ def coverplateboltedconnection(uiObj):
         new_bolt_param = boltparameters
     #####################################################################################################################
 
-# Todo: This check of egde distance satisfaction for flange splice plate is to be finalized based on expert reviews
 ## Note: As per discussion with Prof. Siddhartha Ghosh below flange_gauge calculation is implemented on 27-July-2018
     # Minimum and maximum end and edge distance
     if uiObj["detailing"]["typeof_edge"] == str("a - Sheared or hand flame cut"):

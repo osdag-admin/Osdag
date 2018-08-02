@@ -873,7 +873,7 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     rstr += t('tr')
-    if int(blockshear) < int(shear_load):
+    if float(blockshear) < float(shear_load):
         row = [0, "Block shear capacity (kN)", "&#8805;  " + shear_load,
                "<i>V</i><sub>db</sub> = " + blockshear + "<br> [cl. 6.4.1]", "<p align=left style=color:red><b>Fail</b></p>"]
     else:

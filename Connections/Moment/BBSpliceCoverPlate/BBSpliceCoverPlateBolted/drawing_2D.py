@@ -24,8 +24,8 @@ class CoverEndPlate(object):
 
 		"""
 		self.folder = folder
-		self.beam_length_L1 = 750
-		self.beam_length_L2 = 750
+		self.beam_length_L1 = 650
+		self.beam_length_L2 = 650
 
 		self.beam_depth_D1 = float(beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
@@ -34,6 +34,8 @@ class CoverEndPlate(object):
 
 		self.beam_width_B1 = float(beam_data["B"])
 		self.beam_width_B2 = self.beam_width_B1
+
+		self.beam_R1 = beam_data["R1"]
 
 		self.flange_preferences = input_dict["FlangePlate"]['Preferences']
 
@@ -264,8 +266,8 @@ class CoverEndPlate(object):
 				params["offset"] (float): offset of the dimension line
 				params["textoffset"] (float): offset of text from dimension line
 				params["lineori"] (float): orientation of line [right/left]
-                params["endlinedim"] (float): dimension line at the end of the outer arrow
-                params["arrowlen"] (float): size of the arrow
+				params["endlinedim"] (float): dimension line at the end of the outer arrow
+				params["arrowlen"] (float): size of the arrow
 
 		Returns:
 			None
@@ -395,12 +397,15 @@ class CoverEndPlate(object):
 		cover_end_2d_front = CoverEnd2DFront(self)
 		cover_end_2d_top = CoverEnd2DTop(self)
 		cover_end_2d_side = CoverEnd2DSide(self)
+		cover_end_2d_plan = CoverEnd2DPlan(self)
 		if view == "Front":
 			cover_end_2d_front.call_CoverEnd_front(filename)
 		elif view == "Top":
 			cover_end_2d_top.call_CoverEnd_top(filename)
 		elif view == "Side":
 			cover_end_2d_side.call_CoverEnd_side(filename)
+		elif view == "Plan":
+			cover_end_2d_plan.call_CoverEnd_plan(filename)
 		else:
 			filename = os.path.join(str(self.folder), 'images_html', 'coverboltedFront.svg')
 			cover_end_2d_front.call_CoverEnd_front(filename)
@@ -413,6 +418,11 @@ class CoverEndPlate(object):
 			filename = os.path.join(str(self.folder), 'images_html', 'coverboltedSide.svg')
 			cover_end_2d_side.call_CoverEnd_side(filename)
 			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "coverboltedSide.png"))
+
+			if self.flange_preferences != 'Outside':
+				filename = os.path.join(str(self.folder), 'images_html', 'coverboltedPlan.svg')
+				cover_end_2d_plan.call_CoverEnd_plan(filename)
+				cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "coverboltedPlan.png"))
 
 
 class CoverEnd2DFront(object):
@@ -891,14 +901,7 @@ class CoverEnd2DFront(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, pta1, point4, str(self.data_object.end_dist), params)
 
 		# ------------------------------------------  Beam 1& 2 -------------------------------------------
-		point = self.A1 + (self.data_object.beam_length_L1 /4) * np.array([1, 0])
-		theta = 60
-		offset = 50
-		textup = "Beam " + str(self.data_object.beam_designation)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
-
-		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
+		point = self.AA2 + (self.data_object.beam_length_L2 / 3) * np.array([-1, 0])
 		theta = 60
 		offset = 50
 		textup = "Beam " + str(self.data_object.beam_designation)
@@ -906,27 +909,62 @@ class CoverEnd2DFront(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  Plate 1, 2 & 3-------------------------------------------
-		point = self.P2
-		theta = 60
-		offset = 100
-		textup = "Flange splice " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.IP2
+			theta = 60
+			offset = 100
+			textup = "Inner flange splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(self.data_object.inner_plates_width) + " x " + str(self.data_object.inner_plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
-		point = self.PP2
-		theta = 60
-		offset = 100
-		textdown = "Flange splice " + str(self.data_object.plate_length_L2) + " x " + str(self.data_object.plate_width_B2) + " x " + str(self.data_object.plate_thickness_p2)
-		textup = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+			point = self.PP2
+			theta = 60
+			offset = 100
+			textdown = "Outer flange splice " + str(int(self.data_object.plate_length_L2)) + " x " + \
+					   str(int(self.data_object.plate_width_B2)) + " x " + str(self.data_object.plate_thickness_p2)
+			textup = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+		else:
+			point = self.PP2
+			theta = 60
+			offset = 100
+			textdown = "Flange splice " + str(int(self.data_object.plate_length_L2)) + " x " + \
+					   str(int(self.data_object.plate_width_B2)) + " x " + str(self.data_object.plate_thickness_p2)
+			textup = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
 
 		point = self.W2
 		theta = 60
-		offset = 200
-		textup = "Web splice " + str(self.data_object.plate_length_L3) + " x " + str(self.data_object.plate_width_B3) + " x " + str(self.data_object.plate_thickness_p3)
+		offset = 150
+		textup = "Web splice " + str(int(self.data_object.plate_length_L3)) + " x " + str(int(self.data_object.plate_width_B3)) + " x " + str(self.data_object.plate_thickness_p3)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
+		# ------------------------------------------  Sectional arrow -------------------------------------------
+		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 100) * np.array([0, -1])
+		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
+		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		text = "A"
+		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
+
+		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + self.data_object.gap_btwn_2beam) * np.array([1, 0])
+		pt_b2 = pt_a2 + (50 * np.array([0, 1]))
+		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
+
+		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
+
+		pt_a3 = self.A1 + (200 * np.array([-1, 0]))
+		pt_b3 = pt_a3 + (50 * np.array([0, 1]))
+		txt_3 = pt_b3 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		text = "A1"
+		self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
+
+		pt_a4 = pt_a3 + (2 * self.data_object.beam_length_L1 + self.data_object.gap_btwn_2beam + 400) * np.array([1, 0])
+		pt_b4 = pt_a4 + (50 * np.array([0, 1]))
+		txt_3 = pt_b4 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_3, text)
+		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 
 		# ------------------------------------------  View details-------------------------------------------
 		ptx = self.PP2 + 100 * np.array([1, 0]) + 200 * np.array([0, 1])
@@ -1161,20 +1199,6 @@ class CoverEnd2DTop(object):
 				  "endlinedim": 10, "arrowlen": 20}
 		self.data_object.draw_dimension_outer_arrow(dwg, pta1, point21, str(self.data_object.edge_dist1), params)
 
-		# ------------------------------------------  Faint line for top bolts right   -------------------------------------------
-		ptx1 = np.array(pt_outside_topflange2_list[0][0])
-		pty1 = ptx1 + (self.data_object.beam_length_L1- 50) * np.array([1, 0])
-		self.data_object.draw_faint_line(ptx1, pty1, dwg)
-
-		ptx2 = np.array(pt_outside_topflange2_list[0][1])
-		pty2 = ptx2 +(self.data_object.beam_length_L1- 50) * np.array([1, 0])
-		self.data_object.draw_faint_line(ptx2, pty2, dwg)
-
-		point3 = ptx2 + (self.data_object.gauge) * np.array([0, -1])
-		params = {"offset": (self.data_object.beam_length_L1- 50), "textoffset": 10, "lineori": "right",
-				  "endlinedim": 10, "arrowlen": 20}
-		self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point3, str(self.data_object.gauge), params)
-
 		# ------------------------------------------  End, pitch -------------------------------------------
 		ptxx1 = np.array(pt_outside_topflange2_list[0][0])
 		ptyy1 = ptxx1 + (self.data_object.plate_length_L1/2) * np.array([0, -1])
@@ -1200,13 +1224,6 @@ class CoverEnd2DTop(object):
 		self.data_object.draw_dimension_outer_arrow(dwg, pta2, point31, str(self.data_object.edge_dist1), params)
 
 		# ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
-		point = self.A1 + (self.data_object.beam_length_L1 / 4 )* np.array([1, 0])
-		theta = 60
-		offset = 50
-		textup = "Beam " + str(self.data_object.beam_designation)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
-
 		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
 		theta = 60
 		offset = 50
@@ -1215,22 +1232,24 @@ class CoverEnd2DTop(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
-		point = self.P1 + (40 * np.array([0, 1]))
-		theta = 60
-		offset = 160
-		textup = "Flange cover plate " + str(self.data_object.plate_length_L1) + " x " + str(self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.P1 + (40 * np.array([0, 1]))
+			theta = 60
+			offset = 160
+			textup = "Outer flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " + \
+					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+		else:
+			point = self.P1 + (40 * np.array([0, 1]))
+			theta = 60
+			offset = 160
+			textup = "Flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " +\
+					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 
 		# ------------------------------------------  Bolts details -------------------------------------------
-		no_of_bolts_flange = self.data_object.bolts_top_flange1_col * self.data_object.bolts_top_of_flange1_row
-		point =  np.array(pt_outside_topflange1_list[1][1])
-		theta = 60
-		offset = 120
-		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " (grade " + str(self.data_object.grade) + ")"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
-
 		no_of_bolts_flange = self.data_object.bolts_top_flange2_col * self.data_object.bolts_top_of_flange2_row
 		point =  np.array(pt_outside_topflange2_list[1][1])
 		theta = 60
@@ -1239,8 +1258,35 @@ class CoverEnd2DTop(object):
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " (grade " + str(self.data_object.grade) + ")"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown)
 
-		# ------------------------------------------  View details -------------------------------------------
-		ptx = self.P4 + 100 * np.array([1, 0]) + 300 * np.array([0, 1])
+	# ------------------------------------------  Sectional arrow -------------------------------------------
+
+		pt_a1 = self.A4 - (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
+		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		text = "C"
+		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
+
+		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + self.data_object.gap_btwn_2beam) * np.array([1, 0])
+		pt_b2 = pt_a2 + (50 * np.array([0, -1]))
+		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
+
+		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
+
+		pt_a3 = self.AA2 + (self.data_object.plate_length_L1 / 2) * np.array([1, 0])
+		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
+		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		text = "B"
+		self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
+
+		pt_a4 = pt_a3 + (self.data_object.beam_width_B1 * np.array([0, 1]))
+		pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
+		txt_4 = pt_b4 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
+
+		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
+# ------------------------------------------  View details -------------------------------------------
+		ptx = self.P4 + 100 * np.array([1, 0]) + (self.data_object.beam_length_L1 - 200) * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
@@ -1413,7 +1459,7 @@ class CoverEnd2DSide(object):
 		ptIPP8y = ptIPP5y
 		self.IPP8 = np.array([ptIPP8x, ptIPP8y])
 
-        # =========================  Cover Plate Middle left  =========================
+		# =========================  Cover Plate Middle left  =========================
 		ptQx = (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2)/2
 		ptQy = 0
 		self.Q = np.array([ptQx, ptQy])
@@ -1624,19 +1670,36 @@ class CoverEnd2DSide(object):
 		# ------------------------------------------  Web Splice -------------------------------------------
 		point = self.WW2
 		theta = 50
-		offset = 40
-		textup = "Web Splice " + str(self.data_object.plate_length_L3) + " x "+ str(self.data_object.plate_width_B3) + " x " + str(self.data_object.plate_thickness_p3)
+		offset = 30
+		textup = "Web Splice " + str(int(self.data_object.plate_length_L3)) + " x "+ str(int(self.data_object.plate_width_B3)) + " x " + str(self.data_object.plate_thickness_p3)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  Flange Splice -------------------------------------------
-		point = self.P3
-		theta = 70
-		offset = 40
-		textup = "Flange Splice " + str(self.data_object.plate_length_L1) + " x " + str(
-			self.data_object.plate_width_B1) + " x " + str(self.data_object.plate_thickness_p1)
-		textdown = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+		if self.data_object.flange_preferences != 'Outside':
+			point = self.P3
+			theta = 60
+			offset = 40
+			textup = "Outer flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+
+			point = self.IPP2
+			theta = 60
+			offset = 40
+			textup = " "
+			textdown = "Inner flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.inner_plates_width)) + " x " + str(self.data_object.inner_plate_thickness_p1)
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown)
+		else:
+			point = self.P3
+			theta = 60
+			offset = 40
+			textup = "Flange Splice " + str(int(self.data_object.plate_length_L1)) + " x " + str(
+				int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+			textdown = " "
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  View details-------------------------------------------
 		ptx = self.PP2 * np.array([0, 1]) + 200 * np.array([0, 1]) + 60 * np.array([-1, 0])
@@ -1645,3 +1708,307 @@ class CoverEnd2DSide(object):
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 		dwg.save()
 
+
+class CoverEnd2DPlan(object):
+	"""
+	Contains functions for generating the plan view of the cover plate connection.
+	"""
+	def __init__(self, coverplate_common_object):
+		self.data_object = coverplate_common_object
+		# -------------------------------------------------------------------------------------------------
+		#                                           Plan VIEW
+		# -------------------------------------------------------------------------------------------------
+		# ====================== Primary Beam 1  =====================
+		top_space = (self.data_object.beam_width_B1 - 2*self.data_object.inner_plates_width - self.data_object.web_thickness_tw1
+					 ) / 2
+		down_space = top_space
+
+
+		ptA1x = 0
+		ptA1y = 0
+		self.A1 = np.array([ptA1x, ptA1y])
+
+		ptA2x = ptA1x + self.data_object.beam_length_L1
+		ptA2y = 0
+		self.A2 = np.array([ptA2x, ptA2y])
+
+		ptA6x = ptA2x
+		ptA6y = ptA2y + (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
+		self.A6 = np.array([ptA6x, ptA6y])
+
+		ptA7x = ptA2x
+		ptA7y = ptA6y + self.data_object.web_thickness_tw1
+		self.A7 = np.array([ptA7x, ptA7y])
+
+		ptA3x = ptA2x
+		ptA3y = ptA2y + self.data_object.beam_width_B1
+		self.A3 = np.array([ptA3x, ptA3y])
+
+		ptA4x = 0
+		ptA4y = ptA1y + self.data_object.beam_width_B1
+		self.A4 = np.array([ptA4x, ptA4y])
+
+		ptA5x = 0
+		ptA5y = ptA1y + (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
+		self.A5 = np.array([ptA5x, ptA5y])
+
+		ptA8x = 0
+		ptA8y = ptA5y + self.data_object.web_thickness_tw1
+		self.A8 = np.array([ptA8x, ptA8y])
+
+		# ====================== Primary Beam 2  =====================
+		ptAA1x = ptA2x + self.data_object.gap_btwn_2beam
+		ptAA1y = 0
+		self.AA1 = np.array([ptAA1x, ptAA1y])
+
+		ptAA2x = ptAA1x + self.data_object.beam_length_L1
+		ptAA2y = 0
+		self.AA2 = np.array([ptAA2x, ptAA2y])
+
+		ptAA6x = ptAA2x
+		ptAA6y = ptAA2y + (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
+		self.AA6 = np.array([ptAA6x, ptAA6y])
+
+		ptAA7x = ptAA2x
+		ptAA7y = ptAA6y + self.data_object.web_thickness_tw1
+		self.AA7 = np.array([ptAA7x, ptAA7y])
+
+		ptAA3x = ptAA2x
+		ptAA3y = ptAA2y + self.data_object.beam_width_B1
+		self.AA3 = np.array([ptAA3x, ptAA3y])
+
+		ptAA4x = ptAA1x
+		ptAA4y = ptAA1y + self.data_object.beam_width_B1
+		self.AA4 = np.array([ptAA4x, ptAA4y])
+
+		ptAA5x = ptAA1x
+		ptAA5y = ptAA1y + (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
+		self.AA5 = np.array([ptAA5x, ptAA5y])
+
+		ptAA8x = ptAA1x
+		ptAA8y = ptAA5y + self.data_object.web_thickness_tw1
+		self.AA8 = np.array([ptAA8x, ptAA8y])
+
+		# =========================  Inner Cover Plate UP  =========================
+		beam_mid = (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
+		innerplate_point = (beam_mid - self.data_object.inner_plates_width - self.data_object.beam_R1) / 2
+
+		ptP1x = ptA1x + ((self.data_object.beam_length_L1 + self.data_object.beam_length_L2 + self.data_object.gap_btwn_2beam)
+						 - self.data_object.plate_length_L1)/2
+		ptP1y = ptA1y + top_space
+		self.P1 = np.array([ptP1x, ptP1y])
+
+		ptP2x = ptP1x + self.data_object.plate_length_L1
+		ptP2y = ptP1y
+		self.P2 = np.array([ptP2x, ptP2y])
+
+		ptP3x = ptP2x
+		ptP3y = ptP2y + self.data_object.inner_plates_width - self.data_object.beam_R1
+		self.P3 = np.array([ptP3x, ptP3y])
+
+		ptP4x = ptP1x
+		ptP4y = ptP3y
+		self.P4 = np.array([ptP4x, ptP4y])
+
+		# =========================  Inner Cover Plate UP  =========================
+
+		ptPP1x = ptA4x + ((self.data_object.beam_length_L1 + self.data_object.beam_length_L2 + self.data_object.gap_btwn_2beam) - self.data_object.plate_length_L1)/2
+		ptPP1y = ptA4y - down_space
+		self.PP1 = np.array([ptPP1x, ptPP1y])
+
+		ptPP2x = ptPP1x + self.data_object.plate_length_L1
+		ptPP2y = ptPP1y
+		self.PP2 = np.array([ptPP2x, ptPP2y])
+
+		ptPP3x = ptPP2x
+		ptPP3y = ptPP2y - self.data_object.inner_plates_width
+		self.PP3 = np.array([ptPP3x, ptPP3y])
+
+		ptPP4x = ptPP1x
+		ptPP4y = ptPP3y
+		self.PP4 = np.array([ptPP4x, ptPP4y])
+
+	def call_CoverEnd_plan(self, filename):
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-250 -700 1900 1500' ))
+		dwg.add(dwg.line(self.A5, self.A6).stroke('pink', width=1, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.A8, self.A7).stroke('pink', width=1, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
+
+		dwg.add(dwg.line(self.AA5, self.AA6).stroke('pink', width=1, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AA8, self.AA7).stroke('pink', width=1, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='blue', fill='none',
+							 stroke_width=2.5))
+		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='red', fill='none',
+							 stroke_width=2.5).dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='red', fill='none',
+							 stroke_width=2.5).dasharray(dasharray=[5, 5]))
+
+		# ------------------------------------------  Bolts Top Flange 1 -------------------------------------------
+		btfc1 = self.data_object.bolts_top_flange1_col
+		btofr1 = self.data_object.bolts_top_of_flange1_row
+		bolt_r = self.data_object.bolt_diameter/2
+
+		pt_outside_topflange1_list = []
+		for i in range(1, (btfc1 +1)):
+			col_outside_toflange1_list = []
+			for j in range(1, (btofr1 + 1)):
+				pt = self.P1 + ( self.data_object.edge_dist1) * np.array([1, 0]) + (self.data_object.plate_width_B1 - self.data_object.gauge)/2 * np.array([0, 1]) + \
+					 (i - 1) * self.data_object.pitch1 * np.array([1, 0]) + (j - 1) * self.data_object.gauge * np.array([0, 1])
+				dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+				pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+				pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+				dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+				pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+				pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+				dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+				col_outside_toflange1_list.append(pt)
+			pt_outside_topflange1_list.append(col_outside_toflange1_list)
+
+		# ------------------------------------------  Bolts Top Flange 2 -------------------------------------------
+		btfc2 = self.data_object.bolts_top_flange2_col
+		btofr2 = self.data_object.bolts_top_of_flange2_row
+		bolt_r = self.data_object.bolt_diameter/2
+
+		pt_outside_topflange2_list = []
+		for i in range(1, (btfc2 +1)):
+			col_outside_toflange2_list = []
+			for j in range(1, (btofr2 + 1)):
+				pt = self.P2 + ( self.data_object.edge_dist1) * np.array([-1, 0]) + (self.data_object.plate_width_B2 - self.data_object.gauge)/2 * np.array([0, 1]) - \
+					 (i - 1) * self.data_object.pitch1 * np.array([1, 0]) + (j - 1) * self.data_object.gauge * np.array([0, 1])
+				dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='blue', fill='none', stroke_width=1.5))
+				pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+				pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+				dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+
+				pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+				pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+				dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+
+				col_outside_toflange2_list.append(pt)
+			pt_outside_topflange2_list.append(col_outside_toflange2_list)
+
+		# ------------------------------------------  End, pitch -------------------------------------------
+		ptxx1 = np.array(pt_outside_topflange1_list[0][0])
+		ptyy1 = ptxx1 + (self.data_object.plate_length_L1/2) * np.array([0, -1])
+		self.data_object.draw_faint_line(ptxx1, ptyy1, dwg)
+
+		ptxx2 = np.array(pt_outside_topflange1_list[1][0])
+		ptyy2 = ptxx2 + (self.data_object.plate_length_L1/2) * np.array([0, -1])
+		self.data_object.draw_faint_line(ptxx2, ptyy2, dwg)
+
+		point2 = ptxx1 + (self.data_object.pitch1) * np.array([1, 0])
+		params = {"offset": (self.data_object.plate_length_L1/2), "textoffset": 40, "lineori": "left",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, ptxx1, point2, str(self.data_object.pitch1), params)
+
+		# ---------------------------------------------------------------------------------------------------------------------------
+		pta1 = self.P1
+		ptb1 = pta1 + (self.data_object.plate_length_L1 / 2) * np.array([0, -1])
+		self.data_object.draw_faint_line(pta1, ptb1, dwg)
+
+		point21 = pta1 + (self.data_object.edge_dist1) * np.array([1, 0])
+		params = {"offset": (self.data_object.plate_length_L1 / 2), "textoffset": 40, "lineori": "left",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, pta1, point21, str(self.data_object.edge_dist1), params)
+
+	# ------------------------------------------  Faint line for top bolts left   -------------------------------------------
+		ptx1 = np.array(pt_outside_topflange1_list[0][0])
+		pty1 = ptx1 + (self.data_object.beam_length_L1 - 50) * np.array([-1, 0])
+		self.data_object.draw_faint_line(ptx1, pty1, dwg)
+
+		ptx2 = np.array(pt_outside_topflange1_list[0][1])
+		pty2 = ptx2 + (self.data_object.beam_length_L1 - 50) * np.array([-1, 0])
+		self.data_object.draw_faint_line(ptx2, pty2, dwg)
+
+		point1 = ptx2 + (self.data_object.gauge) * np.array([0, -1])
+		params = {"offset": (self.data_object.beam_length_L1 - 50), "textoffset": 40, "lineori": "left",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.gauge),
+											params)
+
+	# ------------------------------------------  End, pitch -------------------------------------------
+		ptxx1 = np.array(pt_outside_topflange2_list[0][0])
+		ptyy1 = ptxx1 + (self.data_object.plate_length_L1/2) * np.array([0, -1])
+		self.data_object.draw_faint_line(ptxx1, ptyy1, dwg)
+
+		ptxx2 = np.array(pt_outside_topflange2_list[1][0])
+		ptyy2 = ptxx2 + (self.data_object.plate_length_L1/2) * np.array([0, -1])
+		self.data_object.draw_faint_line(ptxx2, ptyy2, dwg)
+
+		point4 = ptxx1 + (self.data_object.pitch1) * np.array([-1, 0])
+		params = {"offset": (self.data_object.plate_length_L1/2), "textoffset": 40, "lineori": "right",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, ptxx1, point4, str(self.data_object.pitch1), params)
+
+		# ---------------------------------------------------------------------------------------------------------------------------
+		pta2 = self.P2
+		ptb2 = pta2 + (self.data_object.plate_length_L1 / 2) * np.array([0, -1])
+		self.data_object.draw_faint_line(pta2, ptb2, dwg)
+
+		point31 = pta2 + (self.data_object.edge_dist1) * np.array([-1, 0])
+		params = {"offset": (self.data_object.plate_length_L1 / 2), "textoffset": 40, "lineori": "right",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, pta2, point31, str(self.data_object.edge_dist1), params)
+
+		# ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
+		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
+		theta = 60
+		offset = 50
+		textup = "Beam " + str(self.data_object.beam_designation)
+		textdown = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
+
+		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
+		point = self.P4 + (100 * np.array([1, 0]))
+		theta = 60
+		offset = 150
+		textup = "Inner flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " +\
+				 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
+		textdown = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
+
+		# ------------------------------------------  Bolts details -------------------------------------------
+		no_of_bolts_flange = self.data_object.bolts_top_flange2_col * self.data_object.bolts_top_of_flange2_row
+		point =  np.array(pt_outside_topflange2_list[2][1])
+		theta = 60
+		offset = 120
+		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " (grade " + str(self.data_object.grade) + ")"
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown)
+
+		# ------------------------------------------  Sectional arrow -------------------------------------------
+		pt_a1 = self.A4 - (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
+		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		text = "C"
+		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
+
+		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + self.data_object.gap_btwn_2beam) * np.array([1, 0])
+		pt_b2 = pt_a2 + (50 * np.array([0, -1]))
+		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
+
+		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
+
+		pt_a3 = self.AA2 + (self.data_object.plate_length_L1/2) * np.array([1, 0])
+		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
+		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		text = "B"
+		self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
+
+		pt_a4 = pt_a3 + (self.data_object.beam_width_B1 * np.array([0, 1]))
+		pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
+		txt_4 = pt_b4 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
+
+		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
+
+		# ------------------------------------------  View details -------------------------------------------
+		ptx = self.P4 + 100 * np.array([1, 0]) + (self.data_object.plate_length_L1) * np.array([0, 1])
+		dwg.add(dwg.text('Plan view (Sec A1-A1) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
+		ptx1 = ptx + 40 * np.array([0, 1])
+		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
+
+		dwg.save()

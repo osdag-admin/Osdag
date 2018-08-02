@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_coverplatebolted.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -68,7 +68,7 @@ class Ui_MainWindow(object):
         self.btnSide.setIconSize(QtCore.QSize(22, 22))
         self.btnSide.setObjectName("btnSide")
         self.btn3D = QtWidgets.QCheckBox(self.frame)
-        self.btn3D.setGeometry(QtCore.QRect(220, 0, 90, 28))
+        self.btn3D.setGeometry(QtCore.QRect(290, 0, 90, 28))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(11)
@@ -81,7 +81,7 @@ class Ui_MainWindow(object):
         self.btn3D.setFocusPolicy(QtCore.Qt.TabFocus)
         self.btn3D.setObjectName("btn3D")
         self.chkBx_beamSec1 = QtWidgets.QCheckBox(self.frame)
-        self.chkBx_beamSec1.setGeometry(QtCore.QRect(330, 0, 90, 29))
+        self.chkBx_beamSec1.setGeometry(QtCore.QRect(400, 0, 90, 29))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(11)
@@ -91,7 +91,7 @@ class Ui_MainWindow(object):
         self.chkBx_beamSec1.setFocusPolicy(QtCore.Qt.TabFocus)
         self.chkBx_beamSec1.setObjectName("chkBx_beamSec1")
         self.chkBx_extndPlate = QtWidgets.QCheckBox(self.frame)
-        self.chkBx_extndPlate.setGeometry(QtCore.QRect(440, 0, 151, 29))
+        self.chkBx_extndPlate.setGeometry(QtCore.QRect(510, 0, 151, 29))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(11)
@@ -100,6 +100,12 @@ class Ui_MainWindow(object):
         self.chkBx_extndPlate.setFont(font)
         self.chkBx_extndPlate.setFocusPolicy(QtCore.Qt.TabFocus)
         self.chkBx_extndPlate.setObjectName("chkBx_extndPlate")
+        self.btnPlan = QtWidgets.QToolButton(self.frame)
+        self.btnPlan.setGeometry(QtCore.QRect(190, 0, 28, 28))
+        self.btnPlan.setFocusPolicy(QtCore.Qt.TabFocus)
+        self.btnPlan.setIcon(icon3)
+        self.btnPlan.setIconSize(QtCore.QSize(22, 22))
+        self.btnPlan.setObjectName("btnPlan")
         self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
         self.splitter = QtWidgets.QSplitter(self.centralwidget)
         self.splitter.setOrientation(QtCore.Qt.Vertical)
@@ -1918,6 +1924,8 @@ class Ui_MainWindow(object):
         self.chkBx_beamSec1.setText(_translate("MainWindow", "Beam"))
         self.chkBx_extndPlate.setToolTip(_translate("MainWindow", "Extendedplate only"))
         self.chkBx_extndPlate.setText(_translate("MainWindow", "Connector"))
+        self.btnPlan.setToolTip(_translate("MainWindow", "Plan View"))
+        self.btnPlan.setText(_translate("MainWindow", "..."))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuView.setTitle(_translate("MainWindow", "View"))

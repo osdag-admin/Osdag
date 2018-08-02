@@ -31,6 +31,7 @@ class BBCoverPlateBoltedCAD(object):
         self.beamRight = beamRight
         self.alist = alist
         self.gap = alist["detailing"]["gap"]
+        self.flange_splice_preference = alist['FlangePlate']['Preferences']
         self.plateAbvFlange = plateAbvFlange
         self.plateBelwFlange = plateBelwFlange
 
@@ -64,10 +65,6 @@ class BBCoverPlateBoltedCAD(object):
         self.createPlateAbvFlangeGeometry()
         self.createPlateBelwFlangeGeometry()
 
-        self.createInnerPlateAbvFlangeGeometryFront()
-        self.createInnerPlateAbvFlangeGeometryBack()
-        self.createInnerPlateBelwFlangeGeometryFront()
-        self.createInnerPlateBelwFlangeGeometryBack()
 
         self.createWebPlateLeftGeometry()
         self.createWebPlateRightGeometry()
@@ -80,10 +77,15 @@ class BBCoverPlateBoltedCAD(object):
         self.plateAbvFlangeModel = self.plateAbvFlange.create_model()   # Call to plate.py in Component directory
         self.plateBelwFlangeModel = self.plateBelwFlange.create_model()
 
-        self.innerplateAbvFlangeFrontModel = self.innerplateAbvFlangeFront.create_model()
-        self.innerplateAbvFlangeBackModel = self.innerplateAbvFlangeBack.create_model()
-        self.innerplateBelwFlangeFrontModel = self.innerplateBelwFlangeFront.create_model()
-        self.innerplateBelwFlangeBackModel = self.innerplateBelwFlangeBack.create_model()
+        if self.flange_splice_preference != 'Outside':
+            self.createInnerPlateAbvFlangeGeometryFront()
+            self.createInnerPlateAbvFlangeGeometryBack()
+            self.createInnerPlateBelwFlangeGeometryFront()
+            self.createInnerPlateBelwFlangeGeometryBack()
+            self.innerplateAbvFlangeFrontModel = self.innerplateAbvFlangeFront.create_model()
+            self.innerplateAbvFlangeBackModel = self.innerplateAbvFlangeBack.create_model()
+            self.innerplateBelwFlangeFrontModel = self.innerplateBelwFlangeFront.create_model()
+            self.innerplateBelwFlangeBackModel = self.innerplateBelwFlangeBack.create_model()
 
         self.WebPlateLeftModel = self.WebPlateLeft.create_model()
         self.WebPlateRightModel = self.WebPlateRight.create_model()
@@ -123,7 +125,7 @@ class BBCoverPlateBoltedCAD(object):
     def createInnerPlateAbvFlangeGeometryFront(self):
         shiftY = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
         shiftZ = (self.beamLeft.D -(2 * self.beamLeft.t))/ 2 - self.innerplateAbvFlangeFront.T
-        shiftX = (self.beamLeft.B - self.innerplateAbvFlangeFront.L)/2
+        shiftX = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + 2*self.beamLeft.R1+self.beamLeft.t))/2
         innerplateAbvFlangeOrigin = numpy.array([shiftX, shiftY, shiftZ])
         innerplateAF_uDir = numpy.array([0.0, 0.0, 1.0])
         innerplateAF_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -132,7 +134,7 @@ class BBCoverPlateBoltedCAD(object):
     def createInnerPlateAbvFlangeGeometryBack(self):
         shiftY1 = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
         shiftZ1 = (self.beamLeft.D -(2*self.beamLeft.t))/ 2 - self.innerplateAbvFlangeFront.T
-        shiftX1 = (self.beamLeft.B - self.innerplateAbvFlangeFront.L)/2 - self.beamLeft.R1
+        shiftX1 = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + 2*self.beamLeft.R1+self.beamLeft.t))/2
         innerplateAbvFlangeOrigin1 = numpy.array([-shiftX1, shiftY1, shiftZ1])
         innerplateAF_uDir1 = numpy.array([0.0, 0.0, 1.0])
         innerplateAF_wDir1 = numpy.array([0.0, 1.0, 0.0])
@@ -141,7 +143,7 @@ class BBCoverPlateBoltedCAD(object):
     def createInnerPlateBelwFlangeGeometryFront(self):
         shiftY = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
         shiftZ = (self.beamLeft.D -(2 * self.beamLeft.t))/ 2 - self.innerplateAbvFlangeFront.T
-        shiftX = (self.beamLeft.B - self.innerplateAbvFlangeFront.L)/2
+        shiftX = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + 2*self.beamLeft.R1+self.beamLeft.t))/2
         innerplateAbvFlangeOrigin = numpy.array([shiftX, shiftY, -shiftZ])
         innerplateAF_uDir = numpy.array([0.0, 0.0, 1.0])
         innerplateAF_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -150,7 +152,7 @@ class BBCoverPlateBoltedCAD(object):
     def createInnerPlateBelwFlangeGeometryBack(self):
         shiftY1 = self.beamLeft.length + self.gap /2 - self.innerplateAbvFlangeFront.W / 2
         shiftZ1 = (self.beamLeft.D -(2*self.beamLeft.t))/ 2 - self.innerplateAbvFlangeFront.T
-        shiftX1 = (self.beamLeft.B - self.innerplateAbvFlangeFront.L)/2 - self.beamLeft.R1
+        shiftX1 = (self.beamLeft.B - (self.innerplateAbvFlangeFront.L + 2*self.beamLeft.R1+self.beamLeft.t))/2
         innerplateAbvFlangeOrigin1 = numpy.array([-shiftX1, shiftY1, -shiftZ1])
         innerplateAF_uDir1 = numpy.array([0.0, 0.0, 1.0])
         innerplateAF_wDir1 = numpy.array([0.0, 1.0, 0.0])
@@ -173,8 +175,11 @@ class BBCoverPlateBoltedCAD(object):
         self.WebPlateRight.place(WebPlateRightOrigin, WPR_uDir, WPR_wDir)
 
     def create_nut_bolt_array_AF(self):
-
-        nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, (self.plateAbvFlange.T / 2-self.innerplateAbvFlangeFront.T/2)])
+        if self.flange_splice_preference != 'Outside':
+            nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array(
+                [-self.beamLeft.B / 2, 0.0, (self.plateAbvFlange.T + self.innerplateAbvFlangeFront.T) / 2])
+        else:
+            nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         gaugeDirAF = numpy.array([1.0, 0, 0])
         pitchDirAF = numpy.array([0, 1.0, 0])
         boltDirAF = numpy.array([0, 0, -1.0])
@@ -182,7 +187,12 @@ class BBCoverPlateBoltedCAD(object):
         self.nut_bolt_array_AF.placeAF(nutBoltOriginAF, gaugeDirAF, pitchDirAF, boltDirAF, width)
 
     def create_nut_bolt_array_BF(self):
-        nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])
+        if self.flange_splice_preference != 'Outside':
+            nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
+                [-self.beamLeft.B / 2, 0.0, -(self.plateAbvFlange.T + self.innerplateAbvFlangeFront.T) / 2])
+        else:
+            nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
+                [-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])
         gaugeDirBF = numpy.array([1.0, 0, 0])
         pitchDirBF = numpy.array([0, 1.0, 0])
         boltDirBF = numpy.array([0, 0, 1.0])

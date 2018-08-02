@@ -330,6 +330,9 @@ def bbExtendedEndPlateSplice(uiObj):
     beam_sec = uiObj['Member']['BeamSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])
     beam_fy = float(uiObj['Member']['fy (MPa)'])
+    weld_fu = float(uiObj['weld']['fu_overwrite'])
+    weld_fu_govern = min(beam_fu, weld_fu)  # Mpa  (weld_fu_govern is the governing value of weld strength)
+    weld_fy = beam_fy  # Mpa
 
     factored_moment = float(uiObj['Load']['Moment (kNm)'])
     factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
@@ -438,6 +441,7 @@ def bbExtendedEndPlateSplice(uiObj):
     edge_dist_mini = end_dist_mini
     edge_dist_max = end_dist_max
 
+    #######################################################################
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
     l_v = float(50)
@@ -557,6 +561,34 @@ def bbExtendedEndPlateSplice(uiObj):
         bolt_capacity = V_db
         bearing_capacity = Vdpb
 
+    if bolt_type == "Friction Grip Bolt":
+        bolt_shear_capacity = V_dsf
+    else:
+        bolt_shear_capacity = V_dsb
+
+    #######################################################################
+    # Check for tension capacities of bolt
+
+    Tdf_1 = (bolt_fy * netarea_shank(bolt_dia) * (1.25 / 1.10)) / 1000  # Here, Tdf_1 is the maximum allowed tension capacity of bolt (Cl 10.4.5, IS 800:2007 )
+
+    if bolt_type == "Friction Grip Bolt":
+        Tdf = bolt_tension_friction_grip_bolt(bolt_fu, netArea_thread(bolt_dia))
+        bolt_tension_capacity = Tdf
+        if Tdf > Tdf_1:
+            design_status = False
+            logger.error(": Tension capacity of Friction Grip Bolt bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
+            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
+            logger.info(": Re-design the connection using bolt of smaller diameter")
+    else:
+        Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
+        bolt_tension_capacity = Tdb
+
+        if Tdb > Tdf_1:
+            design_status = False
+            logger.error(": Tension capacity of Bearing bolt exceeds the specified limit (Clause 10.3.5, IS 800:2007)")
+            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
+            logger.info(": Re-design the connection using bolt of smaller diameter")
+
     #######################################################################
     # Calculation for number of bolts in each column
 
@@ -564,14 +596,8 @@ def bbExtendedEndPlateSplice(uiObj):
     M_u = factored_moment + ((factored_axial_load * (beam_d/2 - beam_tf/2)) / 1000)  # kN-m
 
     # Number of bolts
-
-    if bolt_type == "Friction Grip Bolt":
-        bolt_shear_capacity = V_dsf
-    else:
-        bolt_shear_capacity = V_dsb
-
     # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
-    n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_shear_capacity))
+    n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
     n = math.ceil(n)
 
     # number_of_bolts = Total number of bolts in the configuration
@@ -602,19 +628,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # Number of bolts per column
 
         n_c = int(number_of_bolts / 2)
-        #######################################################################
-        minimum_pitch_distance = pitch_dist_min
-        maximum_pitch_distance = pitch_dist_max
-
-        minimum_gauge_distance = gauge_dist_min
-        maximum_gauge_distance = gauge_dist_max
-
-        minimum_end_distance = end_dist_mini
-        maximum_end_distance = end_dist_max
-
-        minimum_edge_distance = edge_dist_mini
-        maximum_edge_distance = edge_dist_max
-
+        # #######################################################################
         # Calculating pitch, gauge, end and edge distances for different cases
 
         # Case 1: When the height and the width of end plate is not specified by user
@@ -654,7 +668,6 @@ def bbExtendedEndPlateSplice(uiObj):
                 pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
                 pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
 
-
                 if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
                     design_status = False
                     logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
@@ -672,7 +685,6 @@ def bbExtendedEndPlateSplice(uiObj):
                 pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
                 pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
 
-
                 if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
                     design_status = False
                     logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
@@ -689,20 +701,20 @@ def bbExtendedEndPlateSplice(uiObj):
                 design_status = False
 
             if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_end_distance))
+                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
             else:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_pitch_distance) + (2 * minimum_end_distance))
+                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
-            end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
+            end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
 
-            cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
             height_available = end_plate_height  # available height of end plate
 
             if number_of_bolts == 8:
-                pitch_distance = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+                pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
 
                 if pitch_distance < pitch_dist_min:
                     design_status = False
@@ -717,8 +729,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
             elif number_of_bolts == 12:
                 pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
-                pitch_distance_3_4 = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
-
+                pitch_distance_3_4 = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
                 if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
                     design_status = False
@@ -734,8 +745,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
             elif number_of_bolts == 16:
                 pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
-
+                pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
 
                 if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
                     design_status = False
@@ -752,8 +762,7 @@ def bbExtendedEndPlateSplice(uiObj):
             elif number_of_bolts == 20:
                 pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
                 pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
-
+                pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
 
                 if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
                     design_status = False
@@ -771,9 +780,9 @@ def bbExtendedEndPlateSplice(uiObj):
                 design_status = False
 
             end_plate_height_provided = height_available
-            end_plate_width_provided = max(beam_B + 25, g_1 + (2 * minimum_edge_distance))
+            end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
 
-            cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -812,7 +821,6 @@ def bbExtendedEndPlateSplice(uiObj):
                 pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
                 pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
 
-
                 if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
                     design_status = False
                     logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
@@ -830,7 +838,6 @@ def bbExtendedEndPlateSplice(uiObj):
                 pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
                 pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
 
-
                 if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
                     design_status = False
                     logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
@@ -847,14 +854,14 @@ def bbExtendedEndPlateSplice(uiObj):
                 design_status = False
 
             if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_end_distance))
+                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
             else:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * minimum_pitch_distance) + (2 * minimum_end_distance))
+                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             width_available = end_plate_width
             end_plate_width_provided = width_available
 
-            cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -862,7 +869,7 @@ def bbExtendedEndPlateSplice(uiObj):
             height_available = end_plate_height
 
             if number_of_bolts == 8:
-                pitch_distance = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+                pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
 
                 if pitch_distance < pitch_dist_min:
                     design_status = False
@@ -877,8 +884,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
             elif number_of_bolts == 12:
                 pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
-                pitch_distance_3_4 = height_available - ((2 * minimum_end_distance) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
-
+                pitch_distance_3_4 = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
 
                 if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
                     design_status = False
@@ -894,8 +900,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
             elif number_of_bolts == 16:
                 pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
-
+                pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
 
                 if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
                     design_status = False
@@ -912,8 +917,7 @@ def bbExtendedEndPlateSplice(uiObj):
             elif number_of_bolts == 20:
                 pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
                 pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = height_available - ((2 * minimum_end_distance) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
-
+                pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
 
                 if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
                     design_status = False
@@ -935,7 +939,7 @@ def bbExtendedEndPlateSplice(uiObj):
             width_available = end_plate_width
             end_plate_width_provided = width_available
 
-            cross_centre_gauge = end_plate_width_provided - (2 * minimum_edge_distance)
+            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         #######################################################################
         # Validation of calculated Height and Width of End Plate
@@ -1348,29 +1352,6 @@ def bbExtendedEndPlateSplice(uiObj):
         Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
         Q = round(Q.real, 3)
 
-        #######################################################################
-        # Check for tension capacities of bolt
-
-        Tdf_1 = (bolt_fy * netarea_shank(bolt_dia) * (1.25/1.10)) / 1000 # Here, Tdf_1 is the maximum allowed tension capacity of bolt (Cl 10.4.5, IS 800:2007 )
-
-        if bolt_type == "Friction Grip Bolt":
-            Tdf = bolt_tension_friction_grip_bolt(bolt_fu, netArea_thread(bolt_dia))
-            bolt_tension_capacity = Tdf
-            if Tdf > Tdf_1:
-                design_status = False
-                logger.error(": Tension capacity of Friction Grip Bolt bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
-                logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-                logger.info(": Re-design the connection using bolt of smaller diameter")
-        else:
-            Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
-            bolt_tension_capacity = Tdb
-
-            if Tdb > Tdf_1:
-                design_status = False
-                logger.error(": Tension capacity of Bearing bolt exceeds the specified limit (Clause 10.3.5, IS 800:2007)")
-                logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-                logger.info(": Re-design the connection using bolt of smaller diameter")
-
         # Finding tension in critical bolt (T_b)
         # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
         T_b = T1 + Q
@@ -1474,13 +1455,10 @@ def bbExtendedEndPlateSplice(uiObj):
 
         # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
         # (Reference: Design of Steel structures by Dr. N. Subramanian)
-        # TODO add condition to retrieve weld fu and fy from design preference
-        weld_fu = 410  # Mpa
-        weld_fy = 250  # Mpa
 
-        # Minimum weld thickness (mm)
-        # Minimum weld thickness at flange (for drop-down list)
-        # Minimum weld thickness (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
+        # Minimum weld size (mm)
+        # Minimum weld size at flange (for drop-down list)
+        # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
 
         t_thicker = max(beam_tf, beam_tw, tp_required)
 
@@ -1496,15 +1474,15 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if weld_thickness_flange < tw_minimum:
             design_status = False
-            logger.error(": Selected weld thickness at flange is less than the minimum required value")
-            logger.warning(": Minimum weld thickness required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld thickness at flange")
+            logger.error(": Selected weld size at flange is less than the minimum required value")
+            logger.warning(": Minimum weld size required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+            logger.info(": Increase the weld size at flange")
 
         if weld_thickness_web < tw_minimum:
             design_status = False
-            logger.error(": Selected weld thickness at web is less than the minimum required value")
-            logger.warning(": Minimum weld thickness required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld thickness at web")
+            logger.error(": Selected weld size at web is less than the minimum required value")
+            logger.warning(": Minimum weld size required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+            logger.info(": Increase the weld size at web")
 
 
         # Design of weld at flange
@@ -1512,7 +1490,7 @@ def bbExtendedEndPlateSplice(uiObj):
         k = 0.7  # constant (Table 22, IS 800:2007)
 
         # capacity_unit_flange is the capacity of weld of unit throat thickness
-        capacity_unit_flange = (k * weld_fu) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+        capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
 
         # Calculating th effective length of weld at the flange
         L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) + (4 * beam_tf)) + (2 * weld_thickness_flange)  # mm
@@ -1547,14 +1525,14 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if weld_thickness_flange < t_weld_flange:
             design_status = False
-            logger.error(": Weld thickness at the flange is not sufficient")
-            logger.warning(": Minimum weld thickness required is %2.2f mm " % t_weld_flange_actual)
-            logger.info(": Increase the weld thickness at flange")
+            logger.error(": Weld size at the flange is not sufficient")
+            logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
+            logger.info(": Increase the weld size at flange")
         if weld_thickness_flange > min(beam_tf, tp_provided):
             design_status = False
-            logger.error(": Weld thickness at the flange exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld thickness at the flange is %2.2f mm" % min(beam_tf, tp_provided))
-            logger.info(": Decrease the weld thickness at flange")
+            logger.error(": Weld size at the flange exceeds the maximum allowed value")
+            logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
+            logger.info(": Decrease the weld size at flange")
 
         # Design of weld at web
 
@@ -1563,7 +1541,7 @@ def bbExtendedEndPlateSplice(uiObj):
         if t_weld_web % 2 == 0:
             t_weld_web = t_weld_web
         else:
-            t_weld_web += 1
+            t_weld_web -= 1
 
         if t_weld_web > t_weld_flange:
             t_weld_web = t_weld_flange
@@ -1572,14 +1550,14 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if weld_thickness_web < t_weld_web:
             design_status = False
-            logger.error(": Weld thickness at the web is not sufficient")
-            logger.warning(": Minimum weld thickness required is %2.2f mm" % t_weld_web)
-            logger.info(": Increase the weld thickness at web")
+            logger.error(": Weld size at the web is not sufficient")
+            logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
+            logger.info(": Increase the weld size at web")
         if weld_thickness_web > int(min(beam_tw, tp_required)):
             design_status = False
-            logger.error(": Weld thickness at the web exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld thickness at the web is %2.2f mm" % t_weld_web)
-            logger.info(": Decrease the weld thickness at web")
+            logger.error(": Weld size at the web exceeds the maximum allowed value")
+            logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
+            logger.info(": Decrease the weld size at web")
 
         #######################################################################
         # Weld Checks
@@ -1591,7 +1569,7 @@ def bbExtendedEndPlateSplice(uiObj):
         f_a_flange = force_flange * 10 ** 3 / (3 * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
 
         # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
-        f_wd = weld_fu / (math.sqrt(3) * 1.25)
+        f_wd = weld_fu_govern / (math.sqrt(3) * 1.25)
         # TODO: call appropriate factor of safety for weld from main file
 
         if f_a_flange > f_wd:
@@ -1691,10 +1669,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Tb'] = float(round(Tb, 3))
                 outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
-            outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
-            outputobj['Bolt']['EndMax'] = maximum_end_distance
-            outputobj['Bolt']['EndMini'] = minimum_end_distance
+            outputobj['Bolt']['PitchMini'] = pitch_dist_min
+            outputobj['Bolt']['PitchMax'] = pitch_dist_max
+            outputobj['Bolt']['EndMax'] = end_dist_max
+            outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
             if number_of_bolts == 8:
@@ -1726,10 +1704,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
 
-            outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(minimum_end_distance)
-            outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+            outputobj['Bolt']['End'] = float(end_dist_mini)
+            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
             outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
@@ -1758,6 +1736,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['Qweb'] = float(round(q_web, 3))
             outputobj['Weld']['Resultant'] = float(round(R, 3))
             outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
             outputobj['Stiffener']['Height'] = round(h_st, 3)
@@ -1793,10 +1772,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Tb'] = float(round(Tb, 3))
                 outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
-            outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
-            outputobj['Bolt']['EndMax'] = maximum_end_distance
-            outputobj['Bolt']['EndMini'] = minimum_end_distance
+            outputobj['Bolt']['PitchMini'] = pitch_dist_min
+            outputobj['Bolt']['PitchMax'] = pitch_dist_max
+            outputobj['Bolt']['EndMax'] = end_dist_max
+            outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
             if number_of_bolts == 8:
@@ -1826,10 +1805,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
                 outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
-            outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(minimum_end_distance)
-            outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+            outputobj['Bolt']['End'] = float(end_dist_mini)
+            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
             outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
@@ -1856,6 +1835,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['Qweb'] = float(q_web)
             outputobj['Weld']['Resultant'] = float(R)
             outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
             outputobj['Stiffener']['Height'] = round(h_st, 3)
@@ -1891,10 +1871,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Tb'] = float(round(Tb, 3))
                 outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
-            outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
-            outputobj['Bolt']['EndMax'] = maximum_end_distance
-            outputobj['Bolt']['EndMini'] = minimum_end_distance
+            outputobj['Bolt']['PitchMini'] = pitch_dist_min
+            outputobj['Bolt']['PitchMax'] = pitch_dist_max
+            outputobj['Bolt']['EndMax'] = end_dist_max
+            outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
             if number_of_bolts == 8:
@@ -1924,10 +1904,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
                 outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
-            outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(minimum_end_distance)
-            outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+            outputobj['Bolt']['End'] = float(end_dist_mini)
+            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
             outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
@@ -1954,6 +1934,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['Qweb'] = float(q_web)
             outputobj['Weld']['Resultant'] = float(R)
             outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
             outputobj['Stiffener']['Height'] = round(h_st, 3)
@@ -1989,10 +1970,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Tb'] = float(round(Tb, 3))
                 outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = minimum_pitch_distance
-            outputobj['Bolt']['PitchMax'] = maximum_pitch_distance
-            outputobj['Bolt']['EndMax'] = maximum_end_distance
-            outputobj['Bolt']['EndMini'] = minimum_end_distance
+            outputobj['Bolt']['PitchMini'] = pitch_dist_min
+            outputobj['Bolt']['PitchMax'] = pitch_dist_max
+            outputobj['Bolt']['EndMax'] = end_dist_max
+            outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
             if number_of_bolts == 8:
@@ -2022,10 +2003,10 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
                 outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
 
-            outputobj['Bolt']['Gauge'] = float(minimum_gauge_distance)
+            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(minimum_end_distance)
-            outputobj['Bolt']['Edge'] = float(minimum_edge_distance)
+            outputobj['Bolt']['End'] = float(end_dist_mini)
+            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
             outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
@@ -2053,6 +2034,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['Qweb'] = float(q_web)
             outputobj['Weld']['Resultant'] = float(R)
             outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
             outputobj['Stiffener']['Height'] = round(h_st, 3)
@@ -2063,17 +2045,17 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status
         outputobj['Bolt']['CriticalTension'] = 0
-        outputobj['Bolt']['TensionCapacity'] = 0
-        outputobj['Bolt']['ShearCapacity'] = 0
-        outputobj['Bolt']['BearingCapacity'] = 0
-        outputobj['Bolt']['BoltCapacity'] = 0
+        outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
+        outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
         outputobj['Bolt']['CombinedCapacity'] = 0
-        outputobj['Bolt']['NumberOfBolts'] = 0
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
         outputobj['Bolt']['NumberOfRows'] = 0
         outputobj['Bolt']['BoltsPerColumn'] = 0
-        outputobj['Bolt']['kb'] = 0
-        outputobj['Bolt']['SumPlateThick'] = 0
-        outputobj['Bolt']['BoltFy'] = 0
+        outputobj['Bolt']['kb'] = float(round(k_b, 3))
+        outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
         if bolt_type == "Friction Grip Bolt":
             outputobj['Bolt']['Vsf'] = 0
@@ -2086,52 +2068,29 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['Tb'] = 0
             outputobj['Bolt']['Tdb'] = 0
 
-        outputobj['Bolt']['PitchMini'] = 0
-        outputobj['Bolt']['PitchMax'] = 0
-        outputobj['Bolt']['EndMax'] = 0
-        outputobj['Bolt']['EndMini'] = 0
-        outputobj['Bolt']['DiaHole'] = 0
+        outputobj['Bolt']['PitchMini'] = pitch_dist_min
+        outputobj['Bolt']['PitchMax'] = pitch_dist_max
+        outputobj['Bolt']['EndMax'] = end_dist_max
+        outputobj['Bolt']['EndMini'] = end_dist_mini
+        outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-        if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = 0
-            outputobj['Bolt']['TensionCritical'] = 0  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = 0
-        elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch23'] = 0
-            outputobj['Bolt']['Pitch34'] = 0
-            outputobj['Bolt']['Pitch45'] = 0
-            outputobj['Bolt']['TensionCritical'] = 0  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = 0
-        elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = 0
-            outputobj['Bolt']['Pitch34'] = 0
-            outputobj['Bolt']['Pitch45'] = 0
-            outputobj['Bolt']['Pitch56'] = 0
-            outputobj['Bolt']['Pitch67'] = 0
-            outputobj['Bolt']['TensionCritical'] = 0  # Tension in critical bolt required for report generator
-            outputobj['Bolt']['PryingForce'] = 0
-        elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = 0
-            outputobj['Bolt']['Pitch34'] = 0
-            outputobj['Bolt']['Pitch45'] = 0
-            outputobj['Bolt']['Pitch56'] = 0
-            outputobj['Bolt']['Pitch67'] = 0
-            outputobj['Bolt']['Pitch78'] = 0
-            outputobj['Bolt']['Pitch910'] = 0
+        outputobj['Bolt']['Pitch'] = pitch_dist_min
+        outputobj['Bolt']['TensionCritical'] = 0  # Tension in critical bolt required for report generator
+        outputobj['Bolt']['PryingForce'] = 0
 
-        outputobj['Bolt']['Gauge'] = 0
+        outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
         outputobj['Bolt']['CrossCentreGauge'] = 0
-        outputobj['Bolt']['End'] = 0
-        outputobj['Bolt']['Edge'] = 0
+        outputobj['Bolt']['End'] = float(end_dist_mini)
+        outputobj['Bolt']['Edge'] = float(edge_dist_mini)
         # ===================  CAD ===================
-        outputobj['Bolt']['Lv'] = 0
+        outputobj['Bolt']['Lv'] = float(l_v)
         # ===================  CAD ===================
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = 0
         outputobj['Plate']['Width'] = 0
         # ===================  CAD ===================
-        outputobj['Plate']['Thickness'] = 0
+        outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
         # ===================  CAD ===================
 
         outputobj['Plate']['MomentDemand'] = 0
@@ -2150,6 +2109,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Weld']['Qweb'] = 0
         outputobj['Weld']['Resultant'] = 0
         outputobj['Weld']['UnitCapacity'] = 0
+        outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
         outputobj['Stiffener'] = {}
         outputobj['Stiffener']['Height'] = 0

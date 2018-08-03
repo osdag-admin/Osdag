@@ -1562,23 +1562,21 @@ class CoverEnd2DSide(object):
 
 
 		# ------------------------------------------  Bolts Inside Web  -------------------------------------------
-			biwr = self.data_object.bolts_inside_web_row
-			pt_inside_column_list = []
-			for i in range(1, (biwr + 1)):
-				# ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) +\
-				# 	  (self.data_object.plate_thickness_p3) * np.array([-1, 0]) + (i * self.data_object.pitch2) * np.array([0, 1])# + self.data_object.end_dist * np.array([0, -1])
-				ptx = self.W1  + self.data_object.end_dist * np.array([0, -1]) -\
-					  (self.data_object.plate_thickness_p3) * np.array([1, 0]) - (i * self.data_object.pitch2) * np.array([0, -1])
+		biwr = self.data_object.bolts_inside_web_row
+		pt_inside_column_list = []
+		for i in range(1, (biwr + 1)):
+			ptx = self.W1  + (self.data_object.end_dist * np.array([0, 1])) -\
+                  (self.data_object.plate_thickness_p3) * np.array([1, 0]) + (i-1) * self.data_object.pitch2 * np.array([0, 1])
 
-				pt_Cx = ptx + 20 * np.array([-1, 0])
-				pt_Dx = ptx + 10 * np.array([1, 0])
-				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('red', width=2.0, linecap='square').dasharray(dasharray=([10, 5, 1, 5])))
-				pt_inside_column_list.append(ptx)
+			pt_Cx = ptx + 20 * np.array([-1, 0])
+			pt_Dx = ptx + 10 * np.array([1, 0])
+			dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('red', width=2.0, linecap='square').dasharray(dasharray=([10, 5, 1, 5])))
+			pt_inside_column_list.append(ptx)
 
-				ptx1 = ptx - bolt_r * np.array([0, 1])
-				rect_width = self.data_object.bolt_diameter
-				rect_length = (2 * self.data_object.plate_thickness_p3) + self.data_object.web_thickness_tw2
-				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+			ptx1 = ptx - bolt_r * np.array([0, 1])
+			rect_width = self.data_object.bolt_diameter
+			rect_length = (2 * self.data_object.plate_thickness_p3) + self.data_object.web_thickness_tw2
+			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 		# ------------------------------------------  Bolts Bottom Flange -------------------------------------------
 		pt_bottom_flange_list = []

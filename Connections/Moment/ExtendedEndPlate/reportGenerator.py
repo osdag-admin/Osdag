@@ -113,9 +113,8 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     # Bolt
     # print "out", outObj
     number_of_bolts = str(int(outObj['Bolt']['NumberOfBolts']))
-    # number_of_bolts = str(int(24))
 
-    if number_of_bolts <= 20:
+    if float(number_of_bolts) <= 20:
         number_of_rows = str(int(round(outObj['Bolt']['NumberOfRows'])))
         bolts_per_column = str(outObj['Bolt']['BoltsPerColumn'])
         cross_centre_gauge = str(outObj['Bolt']['CrossCentreGauge'])
@@ -172,7 +171,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     dia_hole = str(int(outObj['Bolt']['DiaHole']))
 
     # Plate
-    if number_of_bolts <= 20:
+    if float(number_of_bolts) <= 20:
         tp_required = str(float(outObj['Plate']['ThickRequired']))
         M_p = str(float(outObj['Plate']['Mp']))
         plate_height = str(float(outObj['Plate']['Height']))
@@ -191,7 +190,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     b_e = str(be)
 
     # Weld
-    if number_of_bolts <= 20:
+    if float(number_of_bolts) <= 20:
         critical_stress_flange = str(float(outObj['Weld']['CriticalStressflange']))
         critical_stress_web = str(float(outObj['Weld']['CriticalStressWeb']))
         weld_strength = str(float(outObj['Weld']['WeldStrength']))
@@ -225,17 +224,17 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         stiffener_thickness = str(float(outObj['Stiffener']['Thickness']))
 
     # Calling pitch distance values from Output dict of calc file
-    if str(int(float(number_of_bolts))) == str(8):
+    if float(number_of_bolts) == float(8):
         pitch_distance = str(float(outObj['Bolt']['Pitch']))
         tension_critical = str(float(outObj['Bolt']['TensionCritical']))
         prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif str(int(float(number_of_bolts))) == str(12):
+    elif float(number_of_bolts) == float(12):
         pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
         pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
         pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
         tension_critical = str(float(outObj['Bolt']['TensionCritical']))
         prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif str(int(float(number_of_bolts))) == str(16):
+    elif float(number_of_bolts) == float(16):
         pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
         pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
         pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
@@ -243,7 +242,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
         tension_critical = str(float(outObj['Bolt']['TensionCritical']))
         prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif str(int(float(number_of_bolts))) == str(20):
+    elif float(number_of_bolts) == float(20):
         pitch_distance_1_2 = str(float(outObj['Bolt']['Pitch12']))
         pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
         pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))

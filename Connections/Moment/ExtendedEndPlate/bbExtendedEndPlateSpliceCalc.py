@@ -326,13 +326,11 @@ def bbExtendedEndPlateSplice(uiObj):
     global design_status
     design_status = True
 
-    connectivity = str(uiObj['Member']['Connectivity'])
     beam_sec = uiObj['Member']['BeamSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])
     beam_fy = float(uiObj['Member']['fy (MPa)'])
     weld_fu = float(uiObj['weld']['fu_overwrite'])
     weld_fu_govern = min(beam_fu, weld_fu)  # Mpa  (weld_fu_govern is the governing value of weld strength)
-    weld_fy = beam_fy  # Mpa
 
     factored_moment = float(uiObj['Load']['Moment (kNm)'])
     factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
@@ -350,11 +348,6 @@ def bbExtendedEndPlateSplice(uiObj):
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
-
-    #TODO: Check these (not used) @Danish Ansari
-    weld_type = uiObj["weld"]["typeof_weld"]
-    dp_bolt_type = uiObj["Bolt"]["Grade"]
-    edge_factor = uiObj["detailing"]["typeof_edge"]
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
@@ -401,11 +394,7 @@ def bbExtendedEndPlateSplice(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
-    # ===================  CAD ===================
-    beam_R2 = float(dictbeamdata["R2"])
-    alpha = float(dictbeamdata["FlangeSlope"])
-    beam_length = 800.0
-    # =======================================================
+
     #######################################################################
     # Calculation of Bolt strength in MPa
     bolt_fu = uiObj["bolt"]["bolt_fu"]
@@ -466,6 +455,7 @@ def bbExtendedEndPlateSplice(uiObj):
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
+        logger.info(": Increase the thickness of end plate ")
 
     # End Plate Height [Ref: Based on reasoning]
 

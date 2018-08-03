@@ -6,6 +6,7 @@ Created on 7-November-2017
 
 from ui_coverplatebolted import Ui_MainWindow
 from ui_flangespliceplate import Ui_Flangespliceplate
+from ui_flangespliceplate_inner import Ui_FlangespliceplateInner
 from ui_webspliceplate import Ui_Webspliceplate
 from svg_window import SvgWindow
 from cover_plate_bolted_calc import coverplateboltedconnection
@@ -237,6 +238,24 @@ class Flangespliceplate(QDialog):
 
 		self.ui.txt_plateHeight.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateHeight"]))
 		self.ui.txt_plateWidth.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateWidth"]))
+		self.ui.txt_plateDemand.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateDemand"]))
+		self.ui.txt_plateCapacity.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangeCapacity"]))
+
+class FlangespliceplateInner(QDialog):
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_FlangespliceplateInner()
+
+		self.ui.setupUi(self)
+		self.maincontroller = parent
+
+		uiObj = self.maincontroller.designParameters()
+		resultObj_flangeplate = coverplateboltedconnection(uiObj)
+
+		self.ui.txt_outer_plateHeight.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateHeight"]))
+		self.ui.txt_outer_plateWidth.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateWidth"]))
+		self.ui.txt_inner_plateHeight.setText(str(resultObj_flangeplate["FlangeBolt"]["InnerFlangePlateHeight"]))
+		self.ui.txt_inner_plateWidth.setText(str(resultObj_flangeplate["FlangeBolt"]["InnerFlangePlateWidth"]))
 		self.ui.txt_plateDemand.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangePlateDemand"]))
 		self.ui.txt_plateCapacity.setText(str(resultObj_flangeplate["FlangeBolt"]["FlangeCapacity"]))
 
@@ -588,8 +607,8 @@ class MainController(QMainWindow):
 
 	def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
 		'''(QlineEdit,QLable,Number,Number)---> NoneType
-        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
-        '''
+		Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+		'''
 		try:
 			fu_value = float(fu_widget.text())
 		except ValueError:
@@ -1199,7 +1218,10 @@ class MainController(QMainWindow):
 			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 
 	def flangesplice_plate(self):
-		section = Flangespliceplate(self)
+		if self.ui.combo_flange_preference.currentText() == 'Outside':
+			section = Flangespliceplate(self)
+		else:
+			section = FlangespliceplateInner(self)
 		section.show()
 
 	def websplice_plate(self):

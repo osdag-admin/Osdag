@@ -136,6 +136,7 @@ def bolt_bearing(dia, t, fu, kb):
 
 
 def end_plate_t_max(beam_depth, grade_bolt, dia):
+    #TODO: Check on maximum endplate thickness with bolt diameter [Ref: INSDAG Teaching materials, pp 34-4]
     '''
 
     Args:
@@ -148,16 +149,18 @@ def end_plate_t_max(beam_depth, grade_bolt, dia):
 
     '''
     if beam_depth < 450:
-        if grade_bolt <= 4.6:
-            min_endplate = min(8, int(dia) / 3)
-        else:
-            min_endplate = min(8, int(dia) / 2)
+        max_endplate = 10
+        # if grade_bolt <= 4.6:
+        #     max_endplate = min(8, int(dia) / 3)
+        # else:
+        #     max_endplate = min(8, int(dia) / 2)
     else:
-        if grade_bolt <= 4.6:
-            min_endplate = min(10, int(dia) / 3)
-        else:
-            min_endplate = min(10, int(dia) / 2)
-    return min_endplate
+        max_endplate = 12
+        # if grade_bolt <= 4.6:
+        #     max_endplate = min(10, int(dia) / 3)
+        # else:
+        #     max_endplate = min(10, int(dia) / 2)
+    return max_endplate
 
 # ############ CRITICAL BOLT SHEAR CAPACITY ###################
 

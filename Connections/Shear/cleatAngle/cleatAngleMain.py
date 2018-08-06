@@ -1709,6 +1709,10 @@ class MainController(QMainWindow):
         # else:
         design_pref = self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
+        return self.uiObj
+
+    def parameters(self):
+        self.uiObj = self.getuser_inputs()
 
         dictbeamdata = self.fetch_beam_param()
         dictcoldata = self.fetch_column_param()
@@ -1722,7 +1726,7 @@ class MainController(QMainWindow):
         bolt_T = self.bolt_head_thick_calculation(bolt_dia)
         bolt_Ht = self.bolt_length_calculation(bolt_dia)
         nut_T = self.nut_thick_calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata,dictangledata, dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
+        return [dictbeamdata, dictcoldata,dictangledata, dict_topangledata, loc, component, bolt_R, bolt_T, bolt_Ht, nut_T]
 
     def design_btnclicked(self):
         '''
@@ -1732,15 +1736,16 @@ class MainController(QMainWindow):
 
         if self.validate_inputs_on_design_button() is not True:
             return
-        self.alist = self.designParameters()
+        self.alist = self.parameters()
+        designpreference = self.designParameters()
         print "uiobj=:",self.alist[0]
 
         self.ui.outputDock.setFixedSize(310, 710)
         self.enable_view_buttons()
         self.unchecked_all_checkbox()
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
+        self.commLogicObj = CommonDesignLogic(designpreference, self.alist[0], self.alist[1], self.alist[2], self.alist[3], self.alist[4],
                                               self.alist[5], self.alist[6],self.alist[7], self.alist[8], self.alist[9],
-                                              self.alist[10], self.display, self.folder, self.connection)
+                                              self.display, self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
         alist = self.resultObj.values()
@@ -1910,7 +1915,7 @@ class MainController(QMainWindow):
         Closing finPlate window.
         '''
         # ui_input = self.getuser_inputs()
-        ui_input = self.designParameters()[0]
+        ui_input = self.designParameters()
         self.save_inputs(ui_input)
         reply = QMessageBox.question(self, 'Message',
                                            "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

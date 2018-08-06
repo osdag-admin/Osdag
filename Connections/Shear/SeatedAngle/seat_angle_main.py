@@ -1309,7 +1309,10 @@ class MainController(QMainWindow):
         # else:
         design_pref = self.designPrefDialog.save_designPref_para() # self.designPrefDialog.save_designPref_para()
         self.uiObj.update(design_pref)
+        return self.uiObj
 
+    def parameters(self):
+        self.uiObj = self.getuser_inputs()
 
         dictbeamdata = self.fetchBeamPara()
         dictcoldata = self.fetchColumnPara()
@@ -1324,7 +1327,7 @@ class MainController(QMainWindow):
         bolt_T = self.boltHeadThick_Calculation(bolt_dia)
         bolt_Ht = self.boltLength_Calculation(bolt_dia)
         nut_T = self.nutThick_Calculation(bolt_dia)  # bolt_dia = nut_dia
-        return [self.uiObj, dictbeamdata, dictcoldata, dict_angledata,
+        return [dictbeamdata, dictcoldata, dict_angledata,
                 dict_topangledata, loc, component, bolt_R, bolt_T,
                 bolt_Ht, nut_T]
 
@@ -1334,13 +1337,14 @@ class MainController(QMainWindow):
         self.display.EraseAll()
         if self.validate_inputs_on_design_button() is not True:
             return
-        self.alist = self.designParameters()
+        self.alist = self.parameters()
+        designpreference = self.designParameters()
         self.ui.outputDock.setFixedSize(310, 710)
         self.enableViewButtons()
         self.unchecked_allChkBox()
-        self.commLogicObj = CommonDesignLogic(self.alist[0], self.alist[1], self.alist[2], self.alist[3],
+        self.commLogicObj = CommonDesignLogic(designpreference, self.alist[0], self.alist[1], self.alist[2], self.alist[3],
                                               self.alist[4], self.alist[5], self.alist[6], self.alist[7],
-                                              self.alist[8], self.alist[9], self.alist[10], self.display,
+                                              self.alist[8], self.alist[9], self.display,
                                               self.folder, self.connection)
 
         self.resultObj = self.commLogicObj.resultObj
@@ -1493,7 +1497,7 @@ class MainController(QMainWindow):
         """
 
         # uiInput = self.getuser_inputs()
-        uiInput = self.designParameters()[0]
+        uiInput = self.designParameters()
         self.save_inputs(uiInput)
         reply = QMessageBox.question(self, 'Message',
                                      "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)

@@ -135,7 +135,8 @@ def bolt_bearing(dia, t, fu, kb):
     return Vb
 
 
-def end_plate_t_min(beam_depth, grade_bolt, dia):
+def end_plate_t_max(beam_depth, grade_bolt, dia):
+    #TODO: Check on maximum endplate thickness with bolt diameter [Ref: INSDAG Teaching materials, pp 34-4]
     '''
 
     Args:
@@ -148,16 +149,18 @@ def end_plate_t_min(beam_depth, grade_bolt, dia):
 
     '''
     if beam_depth < 450:
-        if grade_bolt <= 4.6:
-            min_endplate = min(8, int(dia) / 3)
-        else:
-            min_endplate = min(8, int(dia) / 2)
+        max_endplate = 10
+        # if grade_bolt <= 4.6:
+        #     max_endplate = min(8, int(dia) / 3)
+        # else:
+        #     max_endplate = min(8, int(dia) / 2)
     else:
-        if grade_bolt <= 4.6:
-            min_endplate = min(10, int(dia) / 3)
-        else:
-            min_endplate = min(10, int(dia) / 2)
-    return min_endplate
+        max_endplate = 12
+        # if grade_bolt <= 4.6:
+        #     max_endplate = min(10, int(dia) / 3)
+        # else:
+        #     max_endplate = min(10, int(dia) / 2)
+    return max_endplate
 
 # ############ CRITICAL BOLT SHEAR CAPACITY ###################
 
@@ -348,13 +351,12 @@ def end_connection(ui_obj):
     bolt_shear_capacity = 0.0
     
 # Plate thickness check
-    min_end_plate_t = end_plate_t_min(beam_depth, bolt_grade, bolt_dia)
-    if end_plate_t < min_end_plate_t:
-        end_plate_t = min_end_plate_t
-        design_check = False  
-        logger.error(": Chosen end plate thickness is less than the minimum plate thickness [Design of Steel Structures by N. Subramanian, OUP, 2014, page 372]")
-        logger.warning(" : Minimum required thickness %2.2f mm" % (min_end_plate_t))
-        logger.info(" : Increase plate thickness")
+    max_end_plate_t = end_plate_t_max(beam_depth, bolt_grade, bolt_dia)
+    if end_plate_t > max_end_plate_t:
+        design_check = False
+        logger.error(": Chosen end plate thickness is more than the maximum allowed [DoSS, N. Subramanian, page 372]")
+        logger.warning(" : Maximum allowed plate thickness is %2.2f mm" % max_end_plate_t)
+        logger.info(" : Decrease the end plate thickness")
 
 # ############# BOLT CAPACITY ###############
 #    0 def boltDesign(end_plate_l):
@@ -595,14 +597,15 @@ def end_connection(ui_obj):
 
         no_row = bolts_required / 2
         no_col = 1
-
-        end_plate_l = 0.6 * beam_depth
+        min_end_plate_l = 0.6 * beam_depth
+        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+        req_end_plate_l = ((no_row-1) * min_pitch + 2 * min_end_dist)
+        end_plate_l = max(0.6 * beam_depth, req_end_plate_l)
         avbl_length = (end_plate_l - 2 * min_end_dist)
         pitch = avbl_length / (no_row - 1)
         end_dist = min_end_dist
         edge_dist = min_edge_dist
-        min_end_plate_l = 0.6 * beam_depth
-        max_end_plate_l = beam_depth - 2 * (beam_f_t + beam_R1)
+
         test = True
         if end_plate_l > max_end_plate_l:
             test = False
@@ -752,18 +755,21 @@ def end_connection(ui_obj):
     if shear_load > shear_capacity_beam:
         design_check = False
         logger.error(": Shear capacity of the beam web at the end plate is less than the external load")
-        logger.warning(": Shear capacity of the beam web is %2.2f KN" % (shear_capacity_beam))
+        logger.warning(": Shear capacity of the beam web is %2.2f kN" % (shear_capacity_beam))
         logger.info(": Increase the end plate height if possible, else select a deeper beam section")
 
 # ################ CHECK 3: BLOCK SHEAR ####################
-    min_thk = min(end_plate_t,beam_w_t)
-    Tdb = blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, min_thk)
+#     min_thk = min(end_plate_t,beam_w_t)
+    min_thk = end_plate_t
+    Tdb = 2 * blockshear(no_row, no_col, dia_hole, beam_fy, beam_fy, min_edge_dist, end_dist, pitch, gauge, min_thk)
 
     if Tdb < shear_load:
         design_check = False
         logger.error(": Block shear capacity of the plate is less than the applied shear force [cl. 6.4.1]")
-        logger.warning(": Minimum block shear capacity required is % 2.2f KN" % (shear_load))
-        logger.info(": Increase the plate thickness")
+        # logger.warning(": Minimum block shear capacity required is % 2.2f kN" % shear_load)
+        logger.warning(
+            ": Available block shear capacity is %2.2f kN which is less than required %2.2f kN" % (Tdb, shear_load))
+        logger.info(": Increase the plate thickness or the plate height")
 
 # ################ CHECK 4: FILLET WELD ###################
 
@@ -849,7 +855,7 @@ def end_connection(ui_obj):
     output_obj['Plate'] = {}
     output_obj['Plate']['height'] = float(end_plate_l)
     output_obj['Plate']['width'] = float(end_plate_w)
-    output_obj['Plate']['MinThick'] = float(min_end_plate_t)
+    output_obj['Plate']['MaxThick'] = float(max_end_plate_t)
     output_obj['Plate']['MinWidth'] = float(min_end_plate_w)
     output_obj['Plate']['blockshear'] = float(Tdb)
     output_obj['Plate']['Sectional Gauge'] = float(sectional_gauge)
@@ -860,6 +866,11 @@ def end_connection(ui_obj):
     else:
         if weld_t < 8:
             logger.warning(" : Minimum recommended weld thickness for field weld is 8 mm")
+
+    if end_plate_t < 8:
+        logger.warning(
+            " : Minimum recommended wend plate thickness is 8 mm to avoid weld distortion during fabrication and"
+            " damage during transportation [Reference: SCI Steel Designers' Manual - 7th Edition (2012)")
 
     if output_obj['Bolt']['status'] is True:
 

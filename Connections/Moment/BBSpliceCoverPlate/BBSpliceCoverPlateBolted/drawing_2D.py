@@ -629,7 +629,7 @@ class CoverEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-330 -600 2040 1740'))      #230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-430 -600 2040 1740'))      #230 = move towards left , 600= move towards down, 2840= width of view, 2340= height of view
 		if self.data_object.flange_preferences == "Outside":
 			dwg.add(dwg.polyline(points=[self.A10, self.A3, self.A4, self.A1, self.A2, self.A9], stroke='blue', fill='none', stroke_width=2.5))
 			dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
@@ -919,7 +919,7 @@ class CoverEnd2DFront(object):
 
 			point = self.PP2
 			theta = 60
-			offset = 100
+			offset = 50
 			textdown = "Outer flange splice " + str(int(self.data_object.plate_length_L2)) + " x " + \
 					   str(int(self.data_object.plate_width_B2)) + " x " + str(self.data_object.plate_thickness_p2)
 			textup = " "
@@ -935,13 +935,13 @@ class CoverEnd2DFront(object):
 
 		point = self.W2
 		theta = 60
-		offset = 150
+		offset = 250
 		textup = "Web splice " + str(int(self.data_object.plate_length_L3)) + " x " + str(int(self.data_object.plate_width_B3)) + " x " + str(self.data_object.plate_thickness_p3)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 100) * np.array([0, -1])
+		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 250) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
 		text = "A"
@@ -967,7 +967,7 @@ class CoverEnd2DFront(object):
 		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 
 		# ------------------------------------------  View details-------------------------------------------
-		ptx = self.PP2 + 100 * np.array([1, 0]) + 200 * np.array([0, 1])
+		ptx = self.PP2 + 150 * np.array([1, 0]) + 200 * np.array([0, 1])
 		dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
@@ -1234,7 +1234,7 @@ class CoverEnd2DTop(object):
 		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
 		if self.data_object.flange_preferences != 'Outside':
 			point = self.P1 + (40 * np.array([0, 1]))
-			theta = 60
+			theta = 80
 			offset = 160
 			textup = "Outer flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " + \
 					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
@@ -1242,7 +1242,7 @@ class CoverEnd2DTop(object):
 			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown)
 		else:
 			point = self.P1 + (40 * np.array([0, 1]))
-			theta = 60
+			theta = 80
 			offset = 160
 			textup = "Flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " +\
 					 str(int(self.data_object.plate_width_B1)) + " x " + str(self.data_object.plate_thickness_p1)
@@ -1260,7 +1260,7 @@ class CoverEnd2DTop(object):
 
 	# ------------------------------------------  Sectional arrow -------------------------------------------
 
-		pt_a1 = self.A4 - (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_a1 = self.A4 - 300 * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
 		text = "C"
@@ -1286,7 +1286,7 @@ class CoverEnd2DTop(object):
 
 		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 # ------------------------------------------  View details -------------------------------------------
-		ptx = self.P4 + 100 * np.array([1, 0]) + (self.data_object.beam_length_L1 - 200) * np.array([0, 1])
+		ptx = self.P4 + 100 * np.array([1, 0]) + 450 * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
@@ -1913,15 +1913,15 @@ class CoverEnd2DPlan(object):
 
 	# ------------------------------------------  Faint line for top bolts left   -------------------------------------------
 		ptx1 = np.array(pt_outside_topflange1_list[0][0])
-		pty1 = ptx1 + (self.data_object.beam_length_L1 - 50) * np.array([-1, 0])
+		pty1 = ptx1 + (self.data_object.beam_length_L1 - 250) * np.array([-1, 0])
 		self.data_object.draw_faint_line(ptx1, pty1, dwg)
 
 		ptx2 = np.array(pt_outside_topflange1_list[0][1])
-		pty2 = ptx2 + (self.data_object.beam_length_L1 - 50) * np.array([-1, 0])
+		pty2 = ptx2 + (self.data_object.beam_length_L1 - 250) * np.array([-1, 0])
 		self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
 		point1 = ptx2 + (self.data_object.gauge) * np.array([0, -1])
-		params = {"offset": (self.data_object.beam_length_L1 - 50), "textoffset": 40, "lineori": "left",
+		params = {"offset": (self.data_object.beam_length_L1 - 250), "textoffset": 40, "lineori": "left",
 				  "endlinedim": 10, "arrowlen": 20}
 		self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.gauge),
 											params)
@@ -1953,13 +1953,13 @@ class CoverEnd2DPlan(object):
 		# ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
 		point = self.AA2 + (self.data_object.beam_length_L2 / 4) * np.array([-1, 0])
 		theta = 60
-		offset = 50
+		offset = 150
 		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown)
 
 		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
-		point = self.P4 + (100 * np.array([1, 0]))
+		point = self.P4 + (200 * np.array([1, 0]))
 		theta = 60
 		offset = 150
 		textup = "Inner flange cover plate " + str(int(self.data_object.plate_length_L1)) + " x " +\
@@ -1977,7 +1977,7 @@ class CoverEnd2DPlan(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown)
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A4 - (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_a1 = self.A4 - 300 * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
 		text = "C"
@@ -1990,7 +1990,7 @@ class CoverEnd2DPlan(object):
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-		pt_a3 = self.AA2 + (self.data_object.plate_length_L1/2) * np.array([1, 0])
+		pt_a3 = self.AA2 + 300 * np.array([1, 0])
 		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
 		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
 		text = "B"
@@ -2004,7 +2004,7 @@ class CoverEnd2DPlan(object):
 		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 
 		# ------------------------------------------  View details -------------------------------------------
-		ptx = self.P4 + 100 * np.array([1, 0]) + (self.data_object.plate_length_L1) * np.array([0, 1])
+		ptx = self.P4 + 100 * np.array([1, 0]) + 450 * np.array([0, 1])
 		dwg.add(dwg.text('Plan view (Sec A1-A1) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))

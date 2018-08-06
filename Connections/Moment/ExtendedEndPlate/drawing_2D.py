@@ -1516,10 +1516,10 @@ class ExtendedEnd2DSide(object):
 			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
 			self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch), params)
 
-			point2 = ptx2 + self.data_object.Lv * np.array([0, -1])
+			point2 = ptx1 + self.data_object.Lv * np.array([0, -1])
 			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10,
 					  "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point2, str(self.data_object.Lv), params)
+			self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
 
 		elif self.data_object.no_of_bolts == 12:
 			ptx2 = np.array(pt_inside_top_column_list[1][1])

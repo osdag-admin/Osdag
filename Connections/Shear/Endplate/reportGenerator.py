@@ -263,18 +263,18 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     if connectivity == "Beam-Beam":
-        row = [1, "Primary Beam", "Welded"]
+        row = [1, "Primary Beam", "Bolted"]
     else:
-        row = [1, "Beam Connection", "Welded"]
+        row = [1, "Column Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
     if connectivity == "Beam-Beam":
-        row = [1, "Secondary Beam", "Bolted"]
+        row = [1, "Secondary Beam", "Welded"]
     else:
-        row = [1, "Column Connection", "Bolted"]
+        row = [1, "Beam Connection", "Welded"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -298,8 +298,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     # row = [1, "Column Section", "ISSC 200"]
-    row = [1, "Column Section", column_sec]
-
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary Beam", column_sec]
+    else:
+        row = [1, "Column Section", column_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -312,7 +314,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     # row = [1, "Beam Section", "ISMB 400"]
-    row = [1, "Beam Section", beam_sec]
+    if connectivity == "Beam-Beam":
+        row = [1, "Secondary Beam", beam_sec]
+    else:
+        row = [1, "Beam Section", beam_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -463,7 +468,10 @@ def save_html(outobj, uiobj, dictbeamdata, dictcolumndata, reportsummary, filena
     rstr += t('/tr')
 
     # row = [1, "Column-Beam Clearance (mm)", "20"]
-    row = [1, "Column-Beam Clearance (mm)", plate_thickness]
+    if connectivity == "Beam-Beam":
+        row = [1, "Beam-Beam Clearance (mm)", plate_thickness]
+    else:
+        row = [1, "Column-Beam Clearance (mm)", plate_thickness]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')

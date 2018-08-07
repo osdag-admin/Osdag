@@ -350,7 +350,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Beam Connection", "Bolted"]
+    if connectivity == "Beam-Beam":
+        row = [1, "Secondary Beam", "Bolted"]
+    else:
+        row = [1, "Beam Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -362,8 +365,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     #     rstr += t('td class="header2 "') + row[2] + t('/td')
     #     rstr += t('/tr')
 
-    #
-    row = [1, "Column Connection", "Bolted"]
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary Beam", "Bolted"]
+    else:
+        row = [1, "Column Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -387,8 +392,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('/tr')
 
     # row = [1, "Column Section", "ISSC 200"]
-    row = [1, "Column Section", column_sec]
-
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary Beam", column_sec]
+    else:
+        row = [1, "Column Section", column_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -401,7 +408,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('/tr')
 
     # row = [1, "Beam Section", "ISMB 400"]
-    row = [1, "Beam Section", beam_sec]
+    if connectivity == "Beam-Beam":
+        row = [1, "Secondary Beam", beam_sec]
+    else:
+        row = [1, "Beam Section", beam_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -453,7 +463,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Bolts on Beam", " "]
+    if connectivity == "Beam-Beam":
+        row = [1, "Bolts on Secondary Beam", " "]
+    else:
+        row = [1, "Bolts on Beam", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -528,7 +541,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Bolts on Column", " "]
+    if connectivity == "Beam-Beam":
+        row = [1, "Bolts on Primary Beam", " "]
+    else:
+        row = [1, "Bolts on Column", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -602,13 +618,17 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+
     row = [0, "Assembly ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
     # row = [1, "Column-Beam Clearance (mm)", "20"]
-    row = [1, "Column-Beam Clearance (mm)", gap]
+    if connectivity == "Beam-Beam":
+        row = [1, "Beam-Beam Clearance (mm)", gap]
+    else:
+        row = [1, "Column-Beam Clearance (mm)", gap]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -738,7 +758,10 @@ def save_html(output_obj, uiobj, dict_beam_data, dict_col_data, dict_cleat_data,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Gap between beam & support (mm)", gap]
+    if connectivity == "Beam-Beam":
+        row = [1, "Gap between primary & secondary beam (mm)", gap]
+    else:
+        row = [1, "Gap between beam & column (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

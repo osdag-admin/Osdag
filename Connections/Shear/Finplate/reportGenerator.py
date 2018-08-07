@@ -269,14 +269,19 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Beam Connection", "Bolted"]
+    if connectivity == 'Beam-Beam':
+        row = [1, "Secondary Beam", "Bolted"]
+    else:
+        row = [1, "Beam Connection", "Bolted"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-#
-    row = [1, "Column Connection", "Welded"]
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary Beam", "Welded"]
+    else:
+        row = [1, "Column Connection", "Welded"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -299,8 +304,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    # row = [1, "Column Section", "ISSC 200"]
-    row = [1, "Column Section", column_sec]
+    if connectivity == "Beam-Beam":
+        row = [1, "Primary beam", column_sec]
+    else:
+        row = [1, "Column Section", column_sec]
 
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -314,7 +321,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     # row = [1, "Beam Section", "ISMB 400"]
-    row = [1, "Beam Section", beam_sec]
+    if connectivity == "Beam-Beam":
+        row = [1, "Secondary beam", beam_sec]
+    else:
+        row = [1, "Beam Section", beam_sec]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -465,7 +475,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('/tr')
 
     # row = [1, "Column-Beam Clearance (mm)", "20"]
-    row = [1, "Column-Beam Clearance (mm)", gap]
+    if connectivity == "Beam-Beam":
+        row = [1, "Beam-Beam Clearance (mm)", gap]
+    else:
+        row = [1, "Column-Beam Clearance (mm)", gap]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -612,7 +625,10 @@ def save_html(outObj, uiObj, dictBeamData, dictColData, reportsummary, filename,
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Gap between Beam and Column (mm)", gap]
+    if connectivity == "Beam-Beam":
+        row = [1, "Gap between Primary and Secondary beam (mm)", gap]
+    else:
+        row = [1, "Gap between Beam and Column (mm)", gap]
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

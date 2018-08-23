@@ -177,7 +177,7 @@ class BBCoverPlateBoltedCAD(object):
     def create_nut_bolt_array_AF(self):
         if self.flange_splice_preference != 'Outside':
             nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array(
-                [-self.beamLeft.B / 2, 0.0, (self.innerplateAbvFlangeFront.T)/2])
+                [-self.beamLeft.B / 2, 0.0, (self.plateAbvFlange.T - self.beamLeft.t)/2])
         else:
             nutBoltOriginAF = self.plateAbvFlange.sec_origin + numpy.array([-self.beamLeft.B / 2, 0.0, self.plateAbvFlange.T / 2])
         gaugeDirAF = numpy.array([1.0, 0, 0])
@@ -189,7 +189,7 @@ class BBCoverPlateBoltedCAD(object):
     def create_nut_bolt_array_BF(self):
         if self.flange_splice_preference != 'Outside':
             nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
-                [-self.beamLeft.B / 2, 0.0, -(self.plateAbvFlange.T + self.innerplateAbvFlangeFront.T) / 2])
+                [-self.beamLeft.B / 2, 0.0, -(self.plateAbvFlange.T - self.beamLeft.t)/2])
         else:
             nutBoltOriginBF = self.plateBelwFlange.sec_origin + numpy.array(
                 [-self.beamLeft.B / 2, 0.0, -self.plateAbvFlange.T / 2])

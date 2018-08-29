@@ -216,10 +216,56 @@ class BBCoverPlateBoltedCAD(object):
         return self.nut_bolt_array_BF.get_modelsBF()
 
     def get_nutboltmodelsWeb(self):
-        return self.nut_bolt_array_Web.get_modelsWeb()
+        return self.nut_bolt_array_Web.get_modelsW()
 
     # Below methods are for creating holes in flange and web
+    def get_beam_models(self):
+        '''
+
+        Returns: Returns model of beam (left and right)
+
+        '''
+        return [self.beamLModel, self.beamRModel]
+
+    def get_connector_models(self):
+        '''
+
+        Returns: Returns model related to connector (plates and bolts)
+
+        '''
+
+        if self.flange_splice_preference != 'Outside':
+            return [self.WebPlateLeftModel, self.WebPlateRightModel, self.innerplateAbvFlangeBackModel,
+                self.innerplateAbvFlangeFrontModel, self.innerplateBelwFlangeBackModel,
+                self.innerplateBelwFlangeFrontModel, self.plateAbvFlangeModel,
+                    self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
+        else:
+            return [self.WebPlateLeftModel, self.WebPlateRightModel, self.plateAbvFlangeModel,
+                    self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
+
+    def get_models(self):
+        '''
+
+        Returns: Returns model related to complete model (beams, plates and bolts)
+
+        '''
+
+        if self.flange_splice_preference != 'Outside':
+            return [self.beamLModel, self.beamRModel, self.WebPlateLeftModel, self.WebPlateRightModel,
+                    self.innerplateAbvFlangeBackModel, self.innerplateAbvFlangeFrontModel,
+                    self.innerplateBelwFlangeBackModel, self.innerplateBelwFlangeFrontModel, self.plateAbvFlangeModel,
+                    self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
+        else:
+            return [self.beamLModel, self.beamRModel, self.WebPlateLeftModel, self.WebPlateRightModel,
+                    self.plateAbvFlangeModel, self.plateBelwFlangeModel] + self.nut_bolt_array_AF.get_modelsAF() + self.nut_bolt_array_BF.get_modelsBF() + self.nut_bolt_array_Web.get_modelsW()
+
+
     def get_beamLModel(self):
+        '''
+
+        Returns: Wholes in left beam
+
+        '''
         final_beam = self.beamLModel
         bolt_listLA = self.nut_bolt_array_AF.get_bolt_listLA()
         bolt_listLB = self.nut_bolt_array_BF.get_bolt_listLB()
@@ -233,6 +279,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_beam
 
     def get_beamRModel(self):
+        '''
+
+        Returns: Wholes in right beam
+
+        '''
         final_beam = self.beamRModel
         bolt_listRA = self.nut_bolt_array_AF.get_bolt_listRA()
         bolt_listRB = self.nut_bolt_array_BF.get_bolt_listRB()
@@ -246,6 +297,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_beam
 
     def get_WebPlateLeftModel(self):
+        '''
+
+        Returns: Wholes in left webplate
+
+        '''
         final_plateLP = self.WebPlateLeftModel
         bolt_listLP = self.nut_bolt_array_Web.get_bolt_web_list()
         for boltLP in bolt_listLP[:]:
@@ -253,6 +309,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_plateLP
 
     def get_WebPlateRightModel(self):
+        '''
+
+        Returns: Wholes in right webplate
+
+        '''
         final_plateRP = self.WebPlateRightModel
         bolt_listRP = self.nut_bolt_array_Web.get_bolt_web_list()
         for boltRP in bolt_listRP[:]:
@@ -260,6 +321,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_plateRP
 
     def get_plateAbvFlangeModel(self):
+        '''
+
+        Returns: Wholes in above plate of flange
+
+        '''
         final_plateAP = self.plateAbvFlangeModel
         bolt_listAP = self.nut_bolt_array_AF.get_bolt_listLA()
         for boltAP in bolt_listAP[:]:
@@ -267,6 +333,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_plateAP
 
     def get_plateBelwFlangeModel(self):
+        '''
+
+        Returns: Wholes in below plate of flange
+
+        '''
         final_plateBP = self.plateBelwFlangeModel
         bolt_listBP = self.nut_bolt_array_BF.get_bolt_listRB()
         for boltBP in bolt_listBP[:]:
@@ -274,6 +345,11 @@ class BBCoverPlateBoltedCAD(object):
         return final_plateBP
 
     def get_innerplateAbvFlangeFront(self):
+        '''
+
+        Returns: Wholes in inner front plate of above flange
+
+        '''
         final = self.innerplateAbvFlangeFrontModel
         boltt = self.nut_bolt_array_AF.get_bolt_listLA()
         for a in boltt[:]:
@@ -281,6 +357,11 @@ class BBCoverPlateBoltedCAD(object):
         return final
 
     def get_innerplateAbvFlangeBack(self):
+        '''
+
+        Returns: Wholes in inner back plate of above flange
+
+        '''
         final = self.innerplateAbvFlangeBackModel
         bolt = self.nut_bolt_array_AF.get_bolt_listLA()
         for a in bolt[:]:
@@ -288,6 +369,11 @@ class BBCoverPlateBoltedCAD(object):
         return final
 
     def get_innerplateBelwFlangeFront(self):
+        '''
+
+        Returns: Wholes in inner front plate of below flange
+
+        '''
         final = self.innerplateBelwFlangeFrontModel
         boltt = self.nut_bolt_array_BF.get_bolt_listRB()
         for a in boltt[:]:
@@ -295,6 +381,11 @@ class BBCoverPlateBoltedCAD(object):
         return final
 
     def get_innerplateBelwFlangeBack(self):
+        '''
+
+        Returns: Wholes in inner back plate of below flange
+
+        '''
         final = self.innerplateBelwFlangeBackModel
         bolt = self.nut_bolt_array_BF.get_bolt_listRB()
         for a in bolt[:]:

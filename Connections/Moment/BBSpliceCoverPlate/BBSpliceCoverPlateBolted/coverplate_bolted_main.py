@@ -22,6 +22,12 @@ from PyQt5.QtWidgets import QDialog, QMainWindow, QApplication, QFontDialog, QFi
 from PyQt5.Qt import QIntValidator, QDoubleValidator, QFile, Qt, QBrush, QColor, QTextStream, pyqtSignal, QPixmap, QPalette
 from PyQt5 import QtCore, QtGui, QtWidgets, QtOpenGL
 from model import *
+from OCC import IGESControl, BRepTools
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Interface import Interface_Static_SetCVal
+from OCC.IFSelect import IFSelect_RetDone
+from OCC.StlAPI import StlAPI_Writer
+from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 import cairosvg
 import ConfigParser
 import json
@@ -418,6 +424,7 @@ class MainController(QMainWindow):
 		self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
 		self.ui.actionAbout_Osdag_2.triggered.connect(self.open_about_osdag)
 		self.ui.actionDesign_examples.triggered.connect(self.design_examples)
+		self.ui.actionSave_3D_model.triggered.connect(self.save_3D_CAD_images)
 
 		self.ui.btn_flangePlate.clicked.connect(self.flangesplice_plate)
 		self.ui.btn_webPlate.clicked.connect(self.websplice_plate)
@@ -468,6 +475,7 @@ class MainController(QMainWindow):
 		self.display, _ = self.init_display(backend_str=backend_name())
 		self.uiObj = None
 		self.resultObj = None
+		self.fuse_model = None
 		self.disable_buttons()
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
@@ -762,7 +770,7 @@ class MainController(QMainWindow):
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+		# shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def disable_buttons(self):
 		self.ui.btn_CreateDesign.setEnabled(False)
@@ -890,7 +898,8 @@ class MainController(QMainWindow):
 		Returns: Save the user input to txt format
 
 		"""
-		input_file = QFile(os.path.join("Connections","Moment","BBSpliceCoverPlate","BBSpliceCoverPlateBolted","saveINPUT.txt"))
+		# input_file = QFile(os.path.join("Connections","Moment","BBSpliceCoverPlate","BBSpliceCoverPlateBolted","saveINPUT.txt"))
+		input_file = QFile(os.path.join("saveINPUT.txt"))
 		if not input_file.open(QFile.WriteOnly | QFile.Text):
 			QMessageBox.warning(self, "Application",
 								"Cannot write file %s: \n%s"
@@ -903,7 +912,8 @@ class MainController(QMainWindow):
 		Returns: Read for the previous user inputs design
 
 		"""
-		filename = os.path.join("Connections", "Moment", "BBSpliceCoverPlate", "BBSpliceCoverPlateBolted", "saveINPUT.txt")
+		# filename = os.path.join("Connections", "Moment", "BBSpliceCoverPlate", "BBSpliceCoverPlateBolted", "saveINPUT.txt")
+		filename = os.path.join("saveINPUT.txt")
 		if os.path.isfile(filename):
 			file_object = open(filename, 'r')
 			uiObj = pickle.load(file_object)
@@ -1096,7 +1106,7 @@ class MainController(QMainWindow):
 
 		if isempty[0] is True:
 			status = self.resultObj['Bolt']['status']
-			self.call_3DModel("gradient_bg")
+			# self.call_3DModel("gradient_bg")
 			if status is True:
 				self.call_2D_drawing("All")
 			else:
@@ -1278,6 +1288,92 @@ class MainController(QMainWindow):
 			self.ui.actionSave_current_image.setEnabled(False)
 			QMessageBox.about(self, 'Information', 'Design Unsafe: CAD image cannot be saved')
 
+	def create_2D_CAD(self):
+		"""
+
+		Returns: The 3D model of coverplate depending upon component selected
+
+		"""
+		self.CPBoltedObj = self.createBBCoverPlateBoltedCAD()
+		if self.component == "Beam":
+
+			# final_model = [self.CPBoltedObj.get_beamLModel(), self.CPBoltedObj.get_beamRModel()]
+			final_model = self.CPBoltedObj.get_beam_models()
+
+		elif self.component == "Connector":
+			cadlist = self.CPBoltedObj.get_connector_models()
+			print "CADLIST... ", cadlist
+
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+		else:
+			cadlist = self.CPBoltedObj.get_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+		return final_model
+
+	def save_3D_CAD_images(self):
+		'''
+
+		Returns: Save 3D CAD images in *igs, *step, *stl, *brep format
+
+		'''
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			if self.fuse_model is None:
+				self.fuse_model = self.create_2D_CAD()
+			shape = self.fuse_model
+
+			files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+
+			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+													  files_types)
+			fName = str(fileName)
+
+			flag = True
+			if fName == '':
+				flag = False
+				return flag
+			else:
+				file_extension = fName.split(".")[-1]
+
+				if file_extension == 'igs':
+					IGESControl.IGESControl_Controller().Init()
+					iges_writer = IGESControl.IGESControl_Writer()
+					iges_writer.AddShape(shape)
+					iges_writer.Write(fName)
+
+				elif file_extension == 'brep':
+
+					BRepTools.breptools.Write(shape, fName)
+
+				elif file_extension == 'stp':
+					# initialize the STEP exporter
+					step_writer = STEPControl_Writer()
+					Interface_Static_SetCVal("write.step.schema", "AP203")
+
+					# transfer shapes and write file
+					step_writer.Transfer(shape, STEPControl_AsIs)
+					status = step_writer.Write(fName)
+
+					assert (status == IFSelect_RetDone)
+
+				else:
+					stl_writer = StlAPI_Writer()
+					stl_writer.SetASCIIMode(True)
+					stl_writer.Write(shape, fName)
+
+				self.fuse_model = None
+
+				QMessageBox.about(self, 'Information', "File saved")
+		else:
+			self.ui.actionSave_3D_model.setEnabled(False)
+			QMessageBox.about(self, 'Information', 'Design Unsafe: 3D Model cannot be saved')
+
 	def call_zoomin(self):
 		self.display.ZoomFactor(2)
 
@@ -1405,7 +1501,7 @@ class MainController(QMainWindow):
 	# def bolt_length_calculation(self, bolt_diameter):
 	# 	'''
 	# 	This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
-    #
+	#
 	#    bolt Head Dia
 	# 	<-------->
 	# 	__________  ______
@@ -1420,10 +1516,10 @@ class MainController(QMainWindow):
 	# 	   |  |       |
 	# 	   |  |       |
 	# 	   |__|    ___|__
-    #
+	#
 	# 	'''
 	# 	bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
-    #
+	#
 	# 	return bolt_head_dia[bolt_diameter]
 
 	def nut_thick_calculation(self, bolt_diameter):
@@ -1664,15 +1760,22 @@ if __name__ == '__main__':
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
+	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','BBSpliceCoverPlate','BBSpliceCoverPlateBolted', 'coverplate.log'), mode='w')
+	file_handler = logging.FileHandler(os.path.join('..', 'coverplate.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
 	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+	app = QApplication(sys.argv)
+	module_setup()
 	# ----------------------------------------------------------------------------
-	folder_path = "D:\Osdag_Workspace\coverplate"
+	folder_path = "/home/reshma/Osdag_workspace/Coverplate"
+	if not os.path.exists(folder_path):
+		os.mkdir(folder_path, 0755)
+	image_folder_path = os.path.join(folder_path, 'images_html')
+	if not os.path.exists(image_folder_path):
+		os.mkdir(image_folder_path, 0755)
 	window = MainController(folder_path)
 	window.show()
-	app = QApplication(sys.argv)
 	sys.exit(app.exec_())
 # launch_coverplate_controller()

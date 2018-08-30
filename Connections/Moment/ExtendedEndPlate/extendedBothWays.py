@@ -27,6 +27,55 @@ class ExtendedBothWays(object):
         self.plateLeft = plateLeft
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
+        self.beamLModel = None
+        self.beamRModel = None
+        self.plateLModel = None
+        self.plateRModel = None
+        self.bbWeldAbvFlang_11Model = None
+        self.bbWeldAbvFlang_12Model = None
+        self.bbWeldAbvFlang_21Model = None
+        self.bbWeldAbvFlang_22Model = None
+
+        self.bbWeldBelwFlang_11Model = None
+        self.bbWeldBelwFlang_12Model = None
+        self.bbWeldBelwFlang_13Model = None
+        self.bbWeldBelwFlang_14Model = None
+        self.bbWeldBelwFlang_21Model = None
+        self.bbWeldBelwFlang_22Model = None
+        self.bbWeldBelwFlang_23Model = None
+        self.bbWeldBelwFlang_24Model = None
+
+        self.bbWeldSideFlange_11Model = None
+        self.bbWeldSideFlange_12Model = None
+        self.bbWeldSideFlange_13Model = None
+        self.bbWeldSideFlange_14Model = None
+        self.bbWeldSideFlange_21Model = None
+        self.bbWeldSideFlange_22Model = None
+        self.bbWeldSideFlange_23Model = None
+        self.bbWeldSideFlange_24Model = None
+
+        self.bbWeldSideWeb_11Model = None
+        self.bbWeldSideWeb_12Model = None
+        self.bbWeldSideWeb_21Model = None
+        self.bbWeldSideWeb_22Model = None
+
+        self.bbWeldQtrCone_11Model = None
+        self.bbWeldQtrCone_12Model = None
+        self.bbWeldQtrCone_13Model = None
+        self.bbWeldQtrCone_14Model = None
+        self.bbWeldQtrCone_15Model = None
+        self.bbWeldQtrCone_16Model = None
+        self.bbWeldQtrCone_17Model = None
+        self.bbWeldQtrCone_18Model = None
+
+        self.bbWeldQtrCone_21Model = None
+        self.bbWeldQtrCone_22Model = None
+        self.bbWeldQtrCone_23Model = None
+        self.bbWeldQtrCone_24Model = None
+        self.bbWeldQtrCone_25Model = None
+        self.bbWeldQtrCone_26Model = None
+        self.bbWeldQtrCone_27Model = None
+        self.bbWeldQtrCone_28Model = None
 
         # Weld above flange for left and right beam
         self.bbWeldAbvFlang_11 = bbWeldAbvFlang_11      # Left beam upper side
@@ -471,6 +520,49 @@ class ExtendedBothWays(object):
 #############################################################################################################
 #   Following functions returns the CAD model to the function display_3DModel of main file                  #
 #############################################################################################################
+    def get_beam_models(self):
+        '''
+
+        Returns: Returns model of beam (left and right)
+
+        '''
+        return [self.beamRModel, self.beamLModel]
+
+    def get_connector_models(self):
+        '''
+
+        Returns: Returns model related to connector (plates and weld)
+
+        '''
+        return [self.plateRModel, self.plateLModel, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+                self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
+                self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
+                self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideFlange_11Model, self.bbWeldSideFlange_12Model,
+                self.bbWeldSideFlange_13Model, self.bbWeldSideFlange_14Model, self.bbWeldSideFlange_21Model, self.bbWeldSideFlange_22Model,
+                self.bbWeldSideFlange_23Model, self.bbWeldSideFlange_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
+                self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, self.bbWeldQtrCone_11Model, self.bbWeldQtrCone_12Model, self.bbWeldQtrCone_13Model,
+                self.bbWeldQtrCone_14Model,self.bbWeldQtrCone_15Model, self.bbWeldQtrCone_16Model, self.bbWeldQtrCone_17Model, self.bbWeldQtrCone_18Model,
+                self.bbWeldQtrCone_21Model, self.bbWeldQtrCone_22Model, self.bbWeldQtrCone_22Model, self.bbWeldQtrCone_23Model, self.bbWeldQtrCone_24Model,
+                self.bbWeldQtrCone_25Model, self.bbWeldQtrCone_26Model, self.bbWeldQtrCone_27Model, self.bbWeldQtrCone_28Model] + self.nut_bolt_array.get_models()
+
+    def get_models(self):
+        '''
+
+        Returns: Returns model related to complete model (beams, plates and weld)
+
+        '''
+        return [self.beamRModel, self.beamLModel, self.plateRModel, self.plateLModel, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+                self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
+                self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
+                self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideFlange_11Model, self.bbWeldSideFlange_12Model,
+                self.bbWeldSideFlange_13Model, self.bbWeldSideFlange_14Model, self.bbWeldSideFlange_21Model, self.bbWeldSideFlange_22Model,
+                self.bbWeldSideFlange_23Model, self.bbWeldSideFlange_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
+                self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, self.bbWeldQtrCone_11Model, self.bbWeldQtrCone_12Model, self.bbWeldQtrCone_13Model,
+                self.bbWeldQtrCone_14Model,self.bbWeldQtrCone_15Model, self.bbWeldQtrCone_16Model, self.bbWeldQtrCone_17Model, self.bbWeldQtrCone_18Model,
+                self.bbWeldQtrCone_21Model, self.bbWeldQtrCone_22Model, self.bbWeldQtrCone_22Model, self.bbWeldQtrCone_23Model, self.bbWeldQtrCone_24Model,
+                self.bbWeldQtrCone_25Model, self.bbWeldQtrCone_26Model, self.bbWeldQtrCone_27Model, self.bbWeldQtrCone_28Model] + self.nut_bolt_array.get_models()
+
+
     def get_beamLModel(self):
         return self.beamLModel
 

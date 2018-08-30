@@ -481,7 +481,7 @@ class Maincontroller(QMainWindow):
 		self.ui.action_save_input.triggered.connect(self.save_design_inputs)
 		self.ui.action_load_input.triggered.connect(self.load_design_inputs)
 		self.ui.actionSave_log_messages.triggered.connect(self.save_log_messages)
-		# self.ui.actionSave_3D_model.triggered.connect(self.save_3D_cad_images)
+		self.ui.actionSave_3D_model.triggered.connect(self.save_3D_cad_images)
 		self.ui.actionCreate_design_report.triggered.connect(self.design_report)
 		self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
 		self.ui.actionSave_Front_View.triggered.connect(lambda : self.call_2D_drawing("Front"))
@@ -704,7 +704,7 @@ class Maincontroller(QMainWindow):
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+		# shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def design_prefer(self):
 		self.designPrefDialog.show()
@@ -1359,60 +1359,85 @@ class Maincontroller(QMainWindow):
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
 	def create_2D_CAD(self):
-		pass
+		'''
 
-	# def save_3D_cad_images(self):
-	# 	status = self.resultObj['Bolt']['status']
-	# 	if status is True:
-	# 		if self.fuse_model is None:
-	# 			self.fuse_model = self.create_2D_CAD()
-	# 		shape = self.fuse_model
-	#
-	# 		files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
-	#
-	# 		fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
-	# 		                                          files_types)
-	# 		fName = str(fileName)
-	#
-	# 		flag = True
-	# 		if fName == '':
-	# 			flag = False
-	# 			return flag
-	# 		else:
-	# 			file_extension = fName.split(".")[-1]
-	#
-	# 			if file_extension == 'igs':
-	# 				IGESControl.IGESControl_Controller().Init()
-	# 				iges_writer = IGESControl.IGESControl_Writer()
-	# 				iges_writer.AddShape(shape)
-	# 				iges_writer.Write(fName)
-	#
-	# 			elif file_extension == 'brep':
-	#
-	# 				BRepTools.breptools.Write(shape, fName)
-	#
-	# 			elif file_extension == 'stp':
-	# 				# initialize the STEP exporter
-	# 				step_writer = STEPControl_Writer()
-	# 				Interface_Static_SetCVal("write.step.schema", "AP203")
-	#
-	# 				# transfer shapes and write file
-	# 				step_writer.Transfer(shape, STEPControl_AsIs)
-	# 				status = step_writer.Write(fName)
-	#
-	# 				assert (status == IFSelect_RetDone)
-	#
-	# 			else:
-	# 				stl_writer = StlAPI_Writer()
-	# 				stl_writer.SetASCIIMode(True)
-	# 				stl_writer.Write(shape, fName)
-	#
-	# 			self.fuse_model = None
-	#
-	# 			QMessageBox.about(self, 'Information', "File saved")
-	# 	else:
-	# 		self.ui.actionSave_3D_model.setEnabled(False)
-	# 		QMessageBox.about(self, 'Information', 'Design Unsafe: 3D Model cannot be saved')
+		Returns: The 3D model of extendedplate depending upon component selected
+
+		'''
+		self.ExtObj = self.create_extended_both_ways()
+		if self.component == "Beam":
+			final_model = self.ExtObj.get_beam_models()
+
+		elif self.component == "Connector":
+			cadlist = self.ExtObj.get_connector_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+		else:
+			cadlist = self.ExtObj.get_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+		return final_model
+
+	def save_3D_cad_images(self):
+		'''
+
+		Returns: Save 3D CAD images in *igs, *step, *stl, *brep format
+
+		'''
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			if self.fuse_model is None:
+				self.fuse_model = self.create_2D_CAD()
+			shape = self.fuse_model
+
+			files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+
+			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
+			                                          files_types)
+			fName = str(fileName)
+
+			flag = True
+			if fName == '':
+				flag = False
+				return flag
+			else:
+				file_extension = fName.split(".")[-1]
+
+				if file_extension == 'igs':
+					IGESControl.IGESControl_Controller().Init()
+					iges_writer = IGESControl.IGESControl_Writer()
+					iges_writer.AddShape(shape)
+					iges_writer.Write(fName)
+
+				elif file_extension == 'brep':
+
+					BRepTools.breptools.Write(shape, fName)
+
+				elif file_extension == 'stp':
+					# initialize the STEP exporter
+					step_writer = STEPControl_Writer()
+					Interface_Static_SetCVal("write.step.schema", "AP203")
+
+					# transfer shapes and write file
+					step_writer.Transfer(shape, STEPControl_AsIs)
+					status = step_writer.Write(fName)
+
+					assert (status == IFSelect_RetDone)
+
+				else:
+					stl_writer = StlAPI_Writer()
+					stl_writer.SetASCIIMode(True)
+					stl_writer.Write(shape, fName)
+
+				self.fuse_model = None
+
+				QMessageBox.about(self, 'Information', "File saved")
+		else:
+			self.ui.actionSave_3D_model.setEnabled(False)
+			QMessageBox.about(self, 'Information', 'Design Unsafe: 3D Model cannot be saved')
 
 	def save_CAD_images(self):
 		status = self.resultObj['Bolt']['status']
@@ -1857,7 +1882,8 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
+	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
+	file_handler = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
@@ -1874,14 +1900,24 @@ if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
+	# fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
+	fh = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
 	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
 	# ----------------------------------------------------------------------------
-	folder_path = "D:\Osdag_Workspace\extendedendplate"
+	# folder_path = "D:\Osdag_Workspace\extendedendplate"
+	app = QApplication(sys.argv)
+	module_setup()
+	folder_path = "/home/reshma/Osdag_workspace/Extended"
+	if not os.path.exists(folder_path):
+		os.mkdir(folder_path, 0755)
+	image_folder_path = os.path.join(folder_path, 'images_html')
+	if not os.path.exists(image_folder_path):
+		os.mkdir(image_folder_path, 0755)
+
 	window = Maincontroller(folder_path)
 	window.show()
-	app = QApplication(sys.argv)
 	sys.exit(app.exec_())

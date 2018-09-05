@@ -770,7 +770,7 @@ class MainController(QMainWindow):
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-		# shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def disable_buttons(self):
 		self.ui.btn_CreateDesign.setEnabled(False)
@@ -1106,7 +1106,7 @@ class MainController(QMainWindow):
 
 		if isempty[0] is True:
 			status = self.resultObj['Bolt']['status']
-			# self.call_3DModel("gradient_bg")
+			self.call_3DModel("gradient_bg")
 			if status is True:
 				self.call_2D_drawing("All")
 			else:

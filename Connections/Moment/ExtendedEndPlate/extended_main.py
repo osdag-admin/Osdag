@@ -704,7 +704,7 @@ class Maincontroller(QMainWindow):
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
-		# shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def design_prefer(self):
 		self.designPrefDialog.show()

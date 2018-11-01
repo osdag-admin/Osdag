@@ -1,30 +1,49 @@
-from app.Utils.Common.Component import Section, Bolt, Weld, Plate
+from app.utils.common.component import Bolt, Weld, Plate, Angle
 
 
-class InputObject (object):
-    def __init__(self, val):
-        self.val = val
+class Input(object):
+    pass
 
 
-class ShearConnectionInputObject(InputObject):
+class ConnectionInput(Input):
+    pass
 
-    def __init__(self, a):
-        self.connectivity = "test"
-        # self.supporting_member = Section()
-        # self.supported_member = Section()
+
+class ShearConnectionInput(Input):
+
+    def __init__(self):
+        self.connectivity = ""
+        self.supporting_member = None
+        self.supported_member = None
         self.bolt = Bolt()
-        self.bolt_diameter_list = []  # Get from database
+        self.bolt_diameter_list = []
         self.weld = Weld()
         self.weld_size_list = []
-        super(ShearConnectionInputObject, self).__init__(a)
 
 
-class FinPlateInputObject(ShearConnectionInputObject):
+class FinPlateConnectionInput(ShearConnectionInput):
 
-    def __init__(self, a):
+    def __init__(self):
         self.plate = Plate()
-        super(FinPlateInputObject, self).__init__(a)
+        super(FinPlateConnectionInput, self).__init__()
 
 
-a = FinPlateInputObject(10)
-print(a.val)
+class EndPlateConnectionInput(ShearConnectionInput):
+
+    def __init__(self):
+        self.plate = Plate()
+        super(EndPlateConnectionInput, self).__init__()
+
+
+class CleatAngleConnectionInput(ShearConnectionInput):
+
+    def __init__(self):
+        self.angle = Angle()
+        super(CleatAngleConnectionInput, self).__init__()
+
+
+class SeatedAngleConnectionInput(ShearConnectionInput):
+
+    def __init__(self):
+        self.angle = Angle()
+        super(SeatedAngleConnectionInput, self).__init__()

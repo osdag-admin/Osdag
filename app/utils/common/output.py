@@ -1,0 +1,2 @@
+class OutputObject (object):
+    pass

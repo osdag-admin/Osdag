@@ -20,16 +20,14 @@ material = Material(fy=fy, fu=fu)
 fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
 
 bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material=material)
-fin_plate_input.bolt = bolt
-
 load = Load(shear_force=shear_force)
-fin_plate_input.load = load
-
 plate = Plate(thickness=plate_thickness, material=material)
-fin_plate_input.plate = plate
-
 weld = Weld(size=weld_size, material=material)
+
+fin_plate_input.bolt = bolt
+fin_plate_input.load = load
+fin_plate_input.plate = plate
 fin_plate_input.weld = weld
 
-print(fin_plate_input.plate.material.fu)
+print(fin_plate_input.load)
 

@@ -6,6 +6,7 @@ class Component(object):
 
     def __init__(self):
         self.material = Material()
+        self.path_to_database = "../../databases/Intg_osdag.sqlite"
 
 
 class Bolt(Component):
@@ -13,7 +14,7 @@ class Bolt(Component):
     def __init__(self):
         self.grade = 0.0
         self.diameter = 0.0
-        self.bolt_type = ""  # friction_grip or bearing
+        self.bolt_type = ""
         self.length = 0.0
         super(Bolt, self).__init__()
 
@@ -38,7 +39,7 @@ class Section(Component):
         super(Section, self).__init__()
 
     def connect_to_database_update_other_attributes(self, table, designation):
-        conn = sqlite3.connect("../../databases/Intg_osdag.sqlite")
+        conn = sqlite3.connect(self.path_to_database)
         db_query = "SELECT D, B, tw, T, R1, R2 FROM " + table + " WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))
@@ -100,7 +101,7 @@ class Angle(Component):
         super(Angle, self).__init__()
 
     def connect_to_database_update_other_attributes(self, designation):
-        conn = sqlite3.connect("../../databases/Intg_osdag.sqlite")
+        conn = sqlite3.connect(self.path_to_database)
         db_query = "SELECT AXB, t FROM Angles WHERE Designation = ?"
         cur = conn.cursor()
         cur.execute(db_query, (designation,))

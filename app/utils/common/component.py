@@ -12,7 +12,7 @@ class Bolt(Component):
     def __init__(self):
         self.grade = 0.0
         self.diameter = 0.0
-        self.bolt_type = "" # friction_grip or bearing for now
+        self.bolt_type = ""  # friction_grip or bearing
         self.length = 0.0
         super(Bolt, self).__init__()
 

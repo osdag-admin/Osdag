@@ -20,13 +20,13 @@ class ShearConnectionInput(Input):
 
 class FinPlateConnectionInput(ShearConnectionInput):
 
-    def __init__(self, connectivity, supporting_member_section, supported_member_section):
+    def __init__(self, connectivity, supporting_member_section, supported_member_section, material):
         self.connectivity = connectivity
         if connectivity == "column_flange_beam_web" or "column_web_beam_web":
-            self.supporting_member = Column(supporting_member_section)
+            self.supporting_member = Column(supporting_member_section, material)
         elif connectivity == "beam_beam":
-            self.supporting_member = Beam(supporting_member_section)
-        self.supported_member = Beam(supported_member_section)
+            self.supporting_member = Beam(supporting_member_section, material)
+        self.supported_member = Beam(supported_member_section, material)
         self.plate = Plate()
         super(FinPlateConnectionInput, self).__init__()
 

@@ -1,4 +1,4 @@
-from app.utils.common.component import Bolt, Weld, Plate, Angle
+from app.utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
 
 
 class Input(object):
@@ -12,9 +12,6 @@ class ConnectionInput(Input):
 class ShearConnectionInput(Input):
 
     def __init__(self):
-        self.connectivity = ""
-        self.supporting_member = None
-        self.supported_member = None
         self.bolt = Bolt()
         self.bolt_diameter_list = []
         self.weld = Weld()
@@ -23,7 +20,13 @@ class ShearConnectionInput(Input):
 
 class FinPlateConnectionInput(ShearConnectionInput):
 
-    def __init__(self):
+    def __init__(self, connectivity, supporting_member_section, supported_member_section):
+        self.connectivity = connectivity
+        if connectivity == "column_flange_beam_web" or "column_web_beam_web":
+            self.supporting_member = Column(supporting_member_section)
+        elif connectivity == "beam_beam":
+            self.supporting_member = Beam(supporting_member_section)
+        self.supported_member = Beam(supported_member_section)
         self.plate = Plate()
         super(FinPlateConnectionInput, self).__init__()
 

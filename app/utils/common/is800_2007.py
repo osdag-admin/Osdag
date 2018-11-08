@@ -19,7 +19,9 @@ class IS800_2007(object):
     #   5.4 Strength
     # -------------------------------------------------------------
 
-    # Table 5 Partial Safety Factores for Materials, gamma_m
+    """
+    Table 5 Partial Safety Factores for Materials, gamma_m (dict)
+    """
     cl_5_4_1_Table_5 = {"gamma_m0": {'Yielding': 1.10, 'Buckling': 1.10},
                         "gamma_m1": {'Ultimate_stress': 1.25},
                         "gamma_mf": {'Shop': 1.25, 'Field': 1.25},

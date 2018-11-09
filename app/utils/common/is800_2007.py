@@ -96,16 +96,16 @@ class IS800_2007(object):
         Vdsb = Vnsb/gamma_mb
         return Vdsb
 
+
     @staticmethod
-    def cl_10_3_3_1(Vdb, lj, d):
-        """ Reduce Nominal shear capacity for long joints.
+    def cl_10_3_3_1(lj, d):
+        """ Calculate reduction factor for long joints.
 
         Args:
-            Vdb = Nominal shear capacity of bolt in N as defined in cl. 8.3.2
-            lj = length of joint of a splice or end connection as defined in cl. 10.3.3.1
+            lj = Length of joint of a splice or end connection as defined in cl. 10.3.3.1
             d = Nominal diameter of the fastener
         Return:
-            beta_lj * Vdb = Reduced nominal shear capacity for long joint
+            beta_lj  = Reduction factor for long joints
 
         Note:
             Reference:
@@ -118,9 +118,10 @@ class IS800_2007(object):
         elif beta_lj >= 1.0:
             beta_lj = 1.0
         if lj >= 15 * d:
-            return beta_lj * Vdb
+            return beta_lj
         else:
-            return Vdb
+            return 1.0
+
 
     @staticmethod
     def cl_10_3_3_2(Vdb, lg, d):

@@ -117,7 +117,10 @@ class IS800_2007(object):
             beta_lj = 0.75
         elif beta_lj >= 1.0:
             beta_lj = 1.0
-        return beta_lj * Vdb
+        if lj >= 15 * d:
+            return beta_lj * Vdb
+        else:
+            return Vdb
 
 
     # -------------------------------------------------------------

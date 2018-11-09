@@ -122,6 +122,27 @@ class IS800_2007(object):
         else:
             return Vdb
 
+    @staticmethod
+    def cl_10_3_3_2(Vdb, lg, d):
+        """ Reduce Nominal shear capacity for large grip lengths.
+
+        Args:
+            Vdb = Nominal shear capacity of bolt in N as defined in cl. 8.3.2
+            lg = grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2
+            d = Nominal diameter of the fastener
+        Return:
+            beta_lg * Vdb = Reduced nominal shear capacity for large grip lengths
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.3.2
+
+        """
+        beta_lg = 8 / (3 + lg / d)
+        if lg >= 5 * d:
+            return beta_lg * Vdb
+        else:
+            return Vdb
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting

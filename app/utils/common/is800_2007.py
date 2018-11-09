@@ -52,12 +52,12 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_2(Vsb, Vdsb, Vdpb):
+    def cl_10_3_2(V_sb, V_dsb, V_dpb):
         """Determine condition for bolt subjected to shear force
 
         Args:
-            Vsb - Factored shear force in bearing bolt in N (float)
-            Vdb - Design strength of bearing bolt in N (float)
+            V_sb - Factored shear force in bearing bolt in N (float)
+            V_db - Design strength of bearing bolt in N (float)
 
         Returns:
             Boolean - True or False
@@ -68,41 +68,41 @@ class IS800_2007(object):
             AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
 
         """
-        Vdb = min(Vdsb, Vdpb)
-        return Vsb <= Vdb
+        V_db = min(V_dsb, V_dpb)
+        return V_sb <= V_db
 
 
     @staticmethod
-    def cl_10_3_3(fu, Anb, Asb, nn, ns=0, safety_factor_parameter='Field'):
+    def cl_10_3_3(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='Field'):
         """Calculate design shear strength of bearing bolt
 
         Args:
-            fu - Uitimate tensile strength of a bolt in N (float)
-            Anb - Net shear area of the bolt at threads in sq. mm  (float)
-            Asb - Nominal plain shank area of the bolt in sq. mm  (float)
-            nn - Number of shear planes with threads intercepting the shear plane (int)
-            ns -  Number of shear planes without threads intercepting the shear plane (int)
+            f_u - Uitimate tensile strength of a bolt in N (float)
+            A_nb - Net shear area of the bolt at threads in sq. mm  (float)
+            A_sb - Nominal plain shank area of the bolt in sq. mm  (float)
+            n_n - Number of shear planes with threads intercepting the shear plane (int)
+            n_s -  Number of shear planes without threads intercepting the shear plane (int)
 
         return:
-            Vdsb - Design shear strength of bearing bolt in N (float)
+            V_dsb - Design shear strength of bearing bolt in N (float)
 
         Note:
             Reference:
             IS 800:2007,  cl 10.3.3
 
         """
-        Vnsb = fu / math.sqrt(3) * (nn * Anb + ns * Asb)
+        V_nsb = f_u / math.sqrt(3) * (n_n * A_nb + n_s * A_sb)
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
-        Vdsb = Vnsb/gamma_mb
-        return Vdsb
+        V_dsb = V_nsb/gamma_mb
+        return V_dsb
 
 
     @staticmethod
-    def cl_10_3_3_1(d, lj):
+    def cl_10_3_3_1(d, l_j):
         """ Calculate reduction factor for long joints.
 
         Args:
-            lj = Length of joint of a splice or end connection as defined in cl. 10.3.3.1 (float)
+            l_j = Length of joint of a splice or end connection as defined in cl. 10.3.3.1 (float)
             d = Nominal diameter of the fastener (float)
         Return:
             beta_lj  = Reduction factor for long joints (float)
@@ -112,23 +112,23 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3.1
 
         """
-        beta_lj = 1.075 - 0.005 * lj / d
+        beta_lj = 1.075 - 0.005 * l_j / d
         if beta_lj <= 0.75:
             beta_lj = 0.75
         elif beta_lj >= 1.0:
             beta_lj = 1.0
-        if lj >= 15.0 * d:
+        if l_j >= 15.0 * d:
             return beta_lj
         else:
             return 1.0
 
 
     @staticmethod
-    def cl_10_3_3_2(d, lg, lj=0):
+    def cl_10_3_3_2(d, l_g, l_j=0):
         """ Calculate reduction factor for large grip lengths.
 
         Args:
-            lg = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
+            l_g = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
             d = Nominal diameter of the fastener (float)
         Return:
             beta_lg = Reduction factor for large grip lengths (float) if applicable
@@ -138,12 +138,12 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.3.2
 
         """
-        beta_lg = 8.0 / (3.0 + lg / d)
-        if beta_lg >= IS800_2007.cl_10_3_3_1(d, lj):
-            beta_lg = IS800_2007.cl_10_3_3_1(d, lj)
-        if lg <= 5.0 * d:
+        beta_lg = 8.0 / (3.0 + l_g / d)
+        if beta_lg >= IS800_2007.cl_10_3_3_1(d, l_j):
+            beta_lg = IS800_2007.cl_10_3_3_1(d, l_j)
+        if l_g <= 5.0 * d:
             beta_lg = 1
-        elif lg > 8.0 * d:
+        elif l_g > 8.0 * d:
             return "GRIP LENGTH TOO LARGE"
         return beta_lg
 

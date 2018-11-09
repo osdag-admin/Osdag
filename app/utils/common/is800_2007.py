@@ -74,7 +74,6 @@ class IS800_2007(object):
 
     @staticmethod
     def cl_10_3_3(fu, Anb, Asb, nn, ns=0, safety_factor_parameter='Field'):
-        #TODO : Add Table 5 and take gamma_mb from there
         """Calculate design shear strength of bearing bolt
 
         Args:
@@ -84,7 +83,7 @@ class IS800_2007(object):
             nn - Number of shear planes with threads intercepting the shear plane (int)
             ns -  Number of shear planes without threads intercepting the shear plane (int)
 
-        Returns:
+        return:
             Vdsb - Design shear strength of bearing bolt in N
 
         Note:
@@ -96,6 +95,26 @@ class IS800_2007(object):
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         Vdsb = Vnsb/gamma_mb
         return Vdsb
+
+    @staticmethod
+    def cl_10_3_3_1(Vdb, lj, d):
+        """ Reduce Nominal shear capacity for long joints.
+
+        Args:
+            Vdb = Nominal shear capacity of bolt in N as defined in cl. 8.3.2
+            lj = length of joint of a splice or end connection as defined in cl. 10.3.3.1
+            d = Nominal diameter of the fastener
+        Return:
+            beta_lj * Vdb = Reduced nominal shear capacity for long joint
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.3.1
+
+        """
+        beta_lj = 1.075 - 0.005 * lj / d
+        return beta_lj * Vdb
+
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting

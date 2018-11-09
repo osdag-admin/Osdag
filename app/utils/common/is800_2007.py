@@ -19,15 +19,14 @@ class IS800_2007(object):
     #   5.4 Strength
     # -------------------------------------------------------------
 
-    """
-    Table 5 Partial Safety Factors for Materials, gamma_m (dict)
-    """
-    cl_5_4_1_Table_5 = {"gamma_m0": {'Yielding': 1.10, 'Buckling': 1.10},
-                        "gamma_m1": {'Ultimate_stress': 1.25},
-                        "gamma_mf": {'Shop': 1.25, 'Field': 1.25},
-                        "gamma_mb": {'Shop': 1.25, 'Field': 1.25},
-                        "gamma_mr": {'Shop': 1.25, 'Field': 1.25},
-                        "gamma_mw": {'Shop': 1.25, 'Field': 1.50}
+
+    #Table 5 Partial Safety Factors for Materials, gamma_m (dict)
+    cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
+                        "gamma_m1": {'ultimate_stress': 1.25},
+                        "gamma_mf": {'shop': 1.25, 'field': 1.25},
+                        "gamma_mb": {'shop': 1.25, 'field': 1.25},
+                        "gamma_mr": {'shop': 1.25, 'field': 1.25},
+                        "gamma_mw": {'shop': 1.25, 'field': 1.50}
                         }
 
     # ==========================================================================
@@ -46,6 +45,46 @@ class IS800_2007(object):
     # -------------------------------------------------------------
     #   10.2 Location Details of Fasteners
     # -------------------------------------------------------------
+
+    @staticmethod
+    def cl_10_2_1(d, bolt_hole_type='standard'):
+        """Calculate bolt hole diameter as per Table 19 of IS 800:2007
+
+        Args:
+             d - Nominal diameter of fastener in mm (float)
+             bolt_hole_type - Either 'standard' or 'over_size' or short_slot' or 'long_slot' (str)
+
+        Returns:
+            bolt_hole_size -  Diameter of the bolt hole in mm (float)
+
+        Note:
+            Reference:
+            IS 800, Table 19 (Cl 10.2.1)
+
+        """
+        table_19 = {
+            "12-14": {'standard': 1.0, 'over_size': 3.0, 'short_slot': 4.0, 'long_slot': 2.5},
+            "16-22": {'standard': 2.0, 'over_size': 4.0, 'short_slot': 6.0, 'long_slot': 2.5},
+            "24"   : {'standard': 2.0, 'over_size': 6.0, 'short_slot': 8.0, 'long_slot': 2.5},
+            "24+"  : {'standard': 3.0, 'over_size': 8.0, 'short_slot': 10.0, 'long_slot': 2.5}
+        }
+
+        if d < 12:
+            clearance = 0
+        elif d <= 14:
+            clearance = table_19["12-14"][bolt_hole_type]
+        elif d <= 22:
+            clearance = table_19["16-22"][bolt_hole_type]
+        elif d <= 24:
+            clearance = table_19["24"][bolt_hole_type]
+        else:
+            clearance = table_19["24+"][bolt_hole_type]
+        if bolt_hole_type == 'long_slot':
+            bolt_hole_size = clearance * d
+        else:
+            bolt_hole_size = clearance + d
+        return bolt_hole_size
+
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts
     # -------------------------------------------------------------
@@ -73,7 +112,7 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_3(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='Field'):
+    def cl_10_3_3(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
         """Calculate design shear strength of bearing bolt
 
         Args:
@@ -82,6 +121,7 @@ class IS800_2007(object):
             A_sb - Nominal plain shank area of the bolt in sq. mm  (float)
             n_n - Number of shear planes with threads intercepting the shear plane (int)
             n_s -  Number of shear planes without threads intercepting the shear plane (int)
+            safety_factor_parameter - Either 'field' or 'shop' (str)
 
         return:
             V_dsb - Design shear strength of bearing bolt in N (float)
@@ -146,6 +186,34 @@ class IS800_2007(object):
         elif l_g > 8.0 * d:
             return "GRIP LENGTH TOO LARGE"
         return beta_lg
+
+
+    @staticmethod
+    def cl_10_3_4(f_u, f_ub, t, d, e, p, bolt_hole_type='standard', safety_factor_parameter='field'):
+
+        """Calculate design shear strength of bearing bolt
+
+        Args:
+            f_ub - Uitimate tensile strength of a bolt in N (float)
+            #TODO : Add Args
+
+        return:
+            V_dsb - Design shear strength of bearing bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.3
+
+        """
+        d_0 = IS800_2007.cl_10_2_1(d, bolt_hole_type)
+
+        k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
+        V_npb = 2.5 * k_b * d * t * f_u
+        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
+        V_dpb = V_npb/gamma_mb
+        return V_dpb
+
+
 
 
     # -------------------------------------------------------------

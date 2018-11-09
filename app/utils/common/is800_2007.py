@@ -20,7 +20,7 @@ class IS800_2007(object):
     # -------------------------------------------------------------
 
     """
-    Table 5 Partial Safety Factores for Materials, gamma_m (dict)
+    Table 5 Partial Safety Factors for Materials, gamma_m (dict)
     """
     cl_5_4_1_Table_5 = {"gamma_m0": {'Yielding': 1.10, 'Buckling': 1.10},
                         "gamma_m1": {'Ultimate_stress': 1.25},
@@ -73,7 +73,7 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_3(fu, Anb, Asb, nn, ns=0, fabrication='Field'):
+    def cl_10_3_3(fu, Anb, Asb, nn, ns=0, safety_factor_parameter='Field'):
         #TODO : Add Table 5 and take gamma_mb from there
         """Calculate design shear strength of bearing bolt
 
@@ -93,7 +93,7 @@ class IS800_2007(object):
 
         """
         Vnsb = fu / math.sqrt(3) * (nn * Anb + ns * Asb)
-        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][fabrication]
+        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         Vdsb = Vnsb/gamma_mb
         return Vdsb
 

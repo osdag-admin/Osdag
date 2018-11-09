@@ -84,7 +84,7 @@ class IS800_2007(object):
             ns -  Number of shear planes without threads intercepting the shear plane (int)
 
         return:
-            Vdsb - Design shear strength of bearing bolt in N
+            Vdsb - Design shear strength of bearing bolt in N (float)
 
         Note:
             Reference:
@@ -102,10 +102,10 @@ class IS800_2007(object):
         """ Calculate reduction factor for long joints.
 
         Args:
-            lj = Length of joint of a splice or end connection as defined in cl. 10.3.3.1
-            d = Nominal diameter of the fastener
+            lj = Length of joint of a splice or end connection as defined in cl. 10.3.3.1 (float)
+            d = Nominal diameter of the fastener (float)
         Return:
-            beta_lj  = Reduction factor for long joints
+            beta_lj  = Reduction factor for long joints (float)
 
         Note:
             Reference:
@@ -117,37 +117,43 @@ class IS800_2007(object):
             beta_lj = 0.75
         elif beta_lj >= 1.0:
             beta_lj = 1.0
-        if lj >= 15 * d:
+        if lj >= 15.0 * d:
             return beta_lj
         else:
             return 1.0
 
 
     @staticmethod
-    def cl_10_3_3_2(Vdb, lg, d):
-        """ Reduce Nominal shear capacity for large grip lengths.
+    def cl_10_3_3_2(lg, lj, d):
+        """ Calculate reduction factor for large grip lengths.
 
         Args:
-            Vdb = Nominal shear capacity of bolt in N as defined in cl. 8.3.2
-            lg = grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2
-            d = Nominal diameter of the fastener
+            lg = Grip length equal to the total thickness of the connected plates as defined in cl. 10.3.3.2 (float)
+            d = Nominal diameter of the fastener (float)
         Return:
-            beta_lg * Vdb = Reduced nominal shear capacity for large grip lengths
+            beta_lg = Reduction factor for large grip lengths (float) if applicable
 
         Note:
             Reference:
             IS 800:2007,  cl 10.3.3.2
 
         """
-        beta_lg = 8 / (3 + lg / d)
-        if lg >= 5 * d:
-            return beta_lg * Vdb
-        else:
-            return Vdb
+        beta_lg = 8.0 / (3.0 + lg / d)
+        if beta_lg >= IS800_2007.cl_10_3_3_1(lj, d):
+            beta_lg = IS800_2007.cl_10_3_3_1(lj, d)
+        if lg <= 5.0 * d:
+            beta_lg = 1
+        elif lg > 8.0 * d:
+            return "GRIP LENGTH TOO LARGE"
+        return beta_lg
+
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
     # -------------------------------------------------------------
+
+
+
     # -------------------------------------------------------------
     #   10.5 Welds and Welding
     # -------------------------------------------------------------
@@ -171,13 +177,13 @@ class IS800_2007(object):
         thicker_part_thickness = max(part1_thickness, part2_thickness)
         thinner_part_thickness = min(part1_thickness, part2_thickness)
 
-        if thicker_part_thickness <= 10:
+        if thicker_part_thickness <= 10.0:
             min_weld_size = 3
-        elif thicker_part_thickness <= 20:
+        elif thicker_part_thickness <= 20.0:
             min_weld_size = 5
-        elif thicker_part_thickness <= 32:
+        elif thicker_part_thickness <= 32.0:
             min_weld_size = 6
-        elif thicker_part_thickness <= 50:
+        elif thicker_part_thickness <= 50.0:
             min_weld_size = 10
         #TODO else:
         if min_weld_size > thinner_part_thickness:

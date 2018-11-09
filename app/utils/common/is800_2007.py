@@ -98,7 +98,7 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_3_1(lj, d):
+    def cl_10_3_3_1(d, lj):
         """ Calculate reduction factor for long joints.
 
         Args:
@@ -124,7 +124,7 @@ class IS800_2007(object):
 
 
     @staticmethod
-    def cl_10_3_3_2(lg, lj, d):
+    def cl_10_3_3_2(d, lg, lj=0):
         """ Calculate reduction factor for large grip lengths.
 
         Args:
@@ -139,8 +139,8 @@ class IS800_2007(object):
 
         """
         beta_lg = 8.0 / (3.0 + lg / d)
-        if beta_lg >= IS800_2007.cl_10_3_3_1(lj, d):
-            beta_lg = IS800_2007.cl_10_3_3_1(lj, d)
+        if beta_lg >= IS800_2007.cl_10_3_3_1(d, lj):
+            beta_lg = IS800_2007.cl_10_3_3_1(d, lj)
         if lg <= 5.0 * d:
             beta_lg = 1
         elif lg > 8.0 * d:

@@ -80,7 +80,7 @@ class IS800_2007(object):
         else:
             clearance = table_19["24+"][bolt_hole_type]
         if bolt_hole_type == 'long_slot':
-            bolt_hole_size = clearance * d
+            bolt_hole_size = (clearance + 1) * d
         else:
             bolt_hole_size = clearance + d
         return bolt_hole_size

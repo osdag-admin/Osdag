@@ -52,7 +52,7 @@ class IS800_2007(object):
 
         Args:
              d - Nominal diameter of fastener in mm (float)
-             bolt_hole_type - Either 'standard' or 'over_size' or short_slot' or 'long_slot' (str)
+             bolt_hole_type - Either 'standard' or 'over_size' or 'short_slot' or 'long_slot' (str)
 
         Returns:
             bolt_hole_size -  Diameter of the bolt hole in mm (float)
@@ -116,7 +116,7 @@ class IS800_2007(object):
         """Calculate design shear strength of bearing bolt
 
         Args:
-            f_u - Uitimate tensile strength of a bolt in N (float)
+            f_u - Ultimate tensile strength of the bolt in MPa (float)
             A_nb - Net shear area of the bolt at threads in sq. mm  (float)
             A_sb - Nominal plain shank area of the bolt in sq. mm  (float)
             n_n - Number of shear planes with threads intercepting the shear plane (int)
@@ -191,29 +191,36 @@ class IS800_2007(object):
     @staticmethod
     def cl_10_3_4(f_u, f_ub, t, d, e, p, bolt_hole_type='standard', safety_factor_parameter='field'):
 
-        """Calculate design shear strength of bearing bolt
+        """Calculate design bearing strength of a bolt on any plate.
 
         Args:
-            f_ub - Uitimate tensile strength of a bolt in N (float)
-            #TODO : Add Args
+            f_u     - Ultimate tensile strength of the plate in MPa (float)
+            f_ub    - Ultimate tensile strength of the bolt in MPa (float)
+            t       - Summation of thicknesses of the connected plates in mm as defined in cl. 10.3.4 (float)
+            d       - Diameter of the bolt in mm (float)
+            e       - End distance of the fastener along bearing direction in mm (float)
+            p       - Pitch distance of the fastener along bearing direction in mm (float)
+            bolt_hole_type - Either 'standard' or 'over_size' or 'short_slot' or 'long_slot' (str)
+            safety_factor_parameter - Either 'field' or 'shop' (str)
 
         return:
-            V_dsb - Design shear strength of bearing bolt in N (float)
+            V_dpb - Design bearing strength of bearing bolt in N (float)
 
         Note:
             Reference:
-            IS 800:2007,  cl 10.3.3
+            IS 800:2007,  cl 10.3.4
 
         """
         d_0 = IS800_2007.cl_10_2_1(d, bolt_hole_type)
-
         k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
         V_dpb = V_npb/gamma_mb
+        if bolt_hole_type == 'over_size' or 'short_slot':
+            V_dpb *= 0.7
+        elif bolt_hole_type == 'long_slot':
+            V_dpb *= 0.5
         return V_dpb
-
-
 
 
     # -------------------------------------------------------------

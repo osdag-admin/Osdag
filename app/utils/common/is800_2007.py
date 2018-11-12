@@ -171,8 +171,34 @@ class IS800_2007(object):
         if edge_type == 'hand_flame_cut':
             return 1.7 * d_0
         else:
-             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
+            # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
             return 1.5 * d_0
+
+    # cl. 10.2.4.3  Maximum Edge Distance
+    @staticmethod
+    def cl_10_2_4_3(plate_thicknesses, f_y, corrosive_influences=False):
+        """Calculate maximum end and edge distance
+
+        Args:
+             plate_thicknesses - List of thicknesses in mm of outer plates (list or tuple)
+             f_y - Yield strength of plate material in MPa (float)
+             corrosive_influences - Whether the members are exposed to corrosive influences or not (Boolean)
+
+        Returns:
+            Maximum edge distance to the nearest line of fasteners from an edge of any un-stiffened part in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 10.2.4.3
+
+        """
+        # TODO : Differentiate outer plates and connected plates.
+        t = min(plate_thicknesses)
+        epsilon = math.sqrt(250 / f_y)
+        if corrosive_influences is True:
+            return 40.0 + 4 * t
+        else:
+            return 12 * t * epsilon
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts

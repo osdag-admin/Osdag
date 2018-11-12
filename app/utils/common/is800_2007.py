@@ -146,36 +146,33 @@ class IS800_2007(object):
         elif member_type == 'compression':
             return min(12*t, 200.0)
         else:
-            # compression members wherein forces are transferred through butting faces is given in else
-            return 4.5 * d
-
-    # cl. 10.2.3.2 Maximum pitch in tension and compression members
-    @staticmethod
-    def cl_10_2_4(d, plate_thicknesses, member_type):
-        """Calculate maximum pitch between centre of fasteners lying in the direction of stress
-
-        Args:
-             d - Nominal diameter of fastener in mm (float)
-             plate_thicknesses - List of thicknesses in mm of connected plates (list or tuple)
-             member_type - Either 'tension' or 'compression' or 'compression_butting' (str)
-
-        Returns:
-            Maximum distance between centres of adjacent fasteners in mm (float)
-
-        Note:
-            Reference:
-            IS 800:2007, cl. 10.2.3.2
-
-        """
-        t = min(plate_thicknesses)
-        if member_type == 'tension':
-            return min(16*t, 200.0)
-        elif member_type == 'compression':
-            return min(12*t, 200.0)
-        else:
             # TODO compression members wherein forces are transferred through butting faces is given in else
             return 4.5 * d
 
+    # cl. 10.2.4.2  Minimum Edge and End Distances
+    @staticmethod
+    def cl_10_2_4_2(d, bolt_hole_type='standard', edge_type='hand_flame_cut'):
+        """Calculate minimum end and edge distance
+
+        Args:
+             d - Nominal diameter of fastener in mm (float)
+             edge_type - Either 'hand_flame_cut' or 'machine_flame_cut' (str)
+
+        Returns:
+                Minimum edge and end distances from the centre of any hole to the nearest edge of a plate in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 10.2.4.2
+
+        """
+
+        d_0 = IS800_2007.cl_10_2_1(d, bolt_hole_type)
+        if edge_type == 'hand_flame_cut':
+            return 1.7 * d_0
+        else:
+             # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
+            return 1.5 * d_0
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts

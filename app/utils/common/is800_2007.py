@@ -122,6 +122,32 @@ class IS800_2007(object):
         t = min(plate_thicknesses)
         return min(32*t, 300.0)
 
+    # cl. 10.2.3.2 Maximum pitch in tension and compression members
+    @staticmethod
+    def cl_10_2_3_2(d, plate_thicknesses, member_type):
+        """Calculate maximum pitch between centre of fasteners lying in the direction of stress
+
+        Args:
+             d - Nominal diameter of fastener in mm (float)
+             plate_thicknesses - List of thicknesses in mm of connected plates (list)
+             member_type - Either 'tension' or 'compression' or 'compression_butting' (str)
+
+        Returns:
+            Maximum distance between centres of adjacent fasteners in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 10.2.3.2
+
+        """
+        t = min(plate_thicknesses)
+        if member_type == 'tension':
+            return min(16*t, 200.0)
+        elif member_type == 'compression':
+            return min(12*t, 200.0)
+        else:
+            # compression members wherein forces are transferred through butting faces is given in else
+            return 4.5 * d
 
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts

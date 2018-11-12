@@ -45,6 +45,7 @@ class IS800_2007(object):
     #   10.2 Location Details of Fasteners
     # -------------------------------------------------------------
 
+    # cl. 10.2.1 Clearances for Holes for Fasteners
     @staticmethod
     def cl_10_2_1(d, bolt_hole_type='standard'):
         """Calculate bolt hole diameter as per Table 19 of IS 800:2007
@@ -88,7 +89,7 @@ class IS800_2007(object):
     #   10.3 Bearing Type Bolts
     # -------------------------------------------------------------
 
-
+    # cl. 10.3.2 Design strength of bearing type bolt
     @staticmethod
     def cl_10_3_2(V_sb, V_dsb, V_dpb):
         """Determine condition for bolt subjected to shear force
@@ -109,7 +110,7 @@ class IS800_2007(object):
         V_db = min(V_dsb, V_dpb)
         return V_sb <= V_db
 
-
+    # cl. 10.3.3 Shear Capacity of Bearing Bolt
     @staticmethod
     def cl_10_3_3(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
         """Calculate design shear strength of bearing bolt
@@ -135,7 +136,7 @@ class IS800_2007(object):
         V_dsb = V_nsb/gamma_mb
         return V_dsb
 
-
+    # cl. 10.3.3.1 Long joints
     @staticmethod
     def cl_10_3_3_1(d, l_j):
         """ Calculate reduction factor for long joints.
@@ -161,7 +162,7 @@ class IS800_2007(object):
         else:
             return 1.0
 
-
+    # 10.3.3.2 Large grip lengths
     @staticmethod
     def cl_10_3_3_2(d, l_g, l_j=0):
         """ Calculate reduction factor for large grip lengths.
@@ -186,7 +187,7 @@ class IS800_2007(object):
             return "GRIP LENGTH TOO LARGE"
         return beta_lg
 
-
+    # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
     def cl_10_3_4(f_u, f_ub, t, d, e, p, bolt_hole_type='standard', safety_factor_parameter='field'):
 
@@ -221,12 +222,11 @@ class IS800_2007(object):
             V_dpb *= 0.5
         return V_dpb
 
-
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
     # -------------------------------------------------------------
 
-
+    # cl. 10.4.3 Slip Resistance
     @staticmethod
     def cl_10_4_3(f_ub, A_nb, n_e, mu_f, bolt_hole_type='standard', slip_resistance='service_load'):
         #TODO : Ensure default slip_resistance = 'service_load' or ultimate_load'
@@ -276,6 +276,7 @@ class IS800_2007(object):
     #   10.5 Welds and Welding
     # -------------------------------------------------------------
 
+    # cl. 10.5.2.3 Minimum Size of First Run or of a Single Run Fillet Weld
     @staticmethod
     def cl_10_5_2_3(part1_thickness, part2_thickness):
         """Calculate minimum size of fillet weld as per Table 21 of IS 800:2007

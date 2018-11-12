@@ -249,22 +249,24 @@ class IS800_2007(object):
             AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
 
         """
+        f_0 = 0.70 * f_ub
+        F_0 = A_nb * f_0
+        if slip_resistance == 'service_load':
+            gamma_mf = 1.10
+        else:
+            # TODO : slip _resistance for 'ultimate_load' is given in else
+            gamma_mf = 1.25
         if bolt_hole_type == 'standard':
             K_h = 1.0
         elif bolt_hole_type == 'over_size' or 'short_slot' or 'long_slot':
             K_h = 0.85
         else:
+            # TODO : long_slot bolt loaded parallel to slot is given in else
             K_h = 0.7
         if mu_f >= 0.55:
             mu_f = 0.55
-        if slip_resistance == 'service_load':
-            gamma_mf = 1.10
-        elif slip_resistance == 'ultimate_load':
-            gamma_mf = 1.25
-        f_0 = 0.70 * f_ub
-        F_0 = A_nb * f_0
         V_nsf = mu_f * n_e * K_h * F_0
-        V_dsf = V_nsf/gamma_mf
+        V_dsf = V_nsf / gamma_mf
         return V_dsf
 
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)

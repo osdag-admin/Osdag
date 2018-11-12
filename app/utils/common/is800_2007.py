@@ -91,24 +91,23 @@ class IS800_2007(object):
 
     # cl. 10.3.2 Design strength of bearing type bolt
     @staticmethod
-    def cl_10_3_2(V_sb, V_dsb, V_dpb):
-        """Determine condition for bolt subjected to shear force
+    def cl_10_3_2(V_dsb, V_dpb):
+        """Calculate design strength of bearing type bolt
 
         Args:
-            V_sb - Factored shear force in bearing bolt in N (float)
-            V_db - Design strength of bearing bolt in N (float)
+            V_dsb - Design shear strength of bearing bolt in N (float)
+            V_dpb - Design bearing strength of bolt on the plate in N (float)
 
         Returns:
-            Boolean - True or False
+            V_db - Design strength of bearing bolt in N (float)
 
         Note:
             Reference:
             IS 800:2007,  cl 10.3.2
-            AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
 
         """
         V_db = min(V_dsb, V_dpb)
-        return V_sb <= V_db
+        return V_db
 
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
     @staticmethod

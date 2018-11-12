@@ -85,6 +85,44 @@ class IS800_2007(object):
             bolt_hole_size = clearance + d
         return bolt_hole_size
 
+    # cl. 10.2.2 Minimum Spacing
+    @staticmethod
+    def cl_10_2_2(d):
+        """Calculate minimum distance between centre of fasteners
+
+        Args:
+             d - Nominal diameter of fastener in mm (float)
+
+        Returns:
+            Minimum distance between centre of fasteners in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 10.2.2
+
+        """
+        return 2.5 * d
+
+    # cl. 10.2.3.1 Maximum Spacing
+    @staticmethod
+    def cl_10_2_3_1(plate_thicknesses):
+        """Calculate maximum distance between centre of fasteners
+
+        Args:
+             plate_thicknesses- List of thicknesses in mm of connected plates (list)
+
+        Returns:
+            Maximum distance between centres of adjacent fasteners in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 10.2.3.1
+
+        """
+        t = min(plate_thicknesses)
+        return min(32*t, 300.0)
+
+
     # -------------------------------------------------------------
     #   10.3 Bearing Type Bolts
     # -------------------------------------------------------------

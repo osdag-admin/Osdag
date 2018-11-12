@@ -19,8 +19,7 @@ class IS800_2007(object):
     #   5.4 Strength
     # -------------------------------------------------------------
 
-
-    #Table 5 Partial Safety Factors for Materials, gamma_m (dict)
+    # Table 5 Partial Safety Factors for Materials, gamma_m (dict)
     cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
                         "gamma_m1": {'ultimate_stress': 1.25},
                         "gamma_mf": {'shop': 1.25, 'field': 1.25},
@@ -268,6 +267,9 @@ class IS800_2007(object):
         V_nsf = mu_f * n_e * K_h * F_0
         V_dsf = V_nsf/gamma_mf
         return V_dsf
+
+    # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
+    cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
 
 
     # -------------------------------------------------------------

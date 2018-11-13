@@ -479,6 +479,10 @@ class IS800_2007(object):
             K = table_22['114-120']
         else:
             K = "NOT DEFINED"
+        try:
+            K = int(K)
+        except ValueError:
+            return
         return K * fillet_size
 
     @staticmethod

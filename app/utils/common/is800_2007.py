@@ -506,6 +506,30 @@ class IS800_2007(object):
         effective_length = available_length - 2 * fillet_size
         return effective_length
 
+    # cl. 10.5.7.1.1 Design stresses in fillet welds
+    @staticmethod
+    def cl_10_5_7_1_1_fillet_weld_design_stress(ultimate_stresses, fabrication='shop'):
+
+        """Calculate the design strength of fillet weld
+
+        Args:
+            ultimate_stresses - Ultimate stresses of weld and parent metal in MPa (list or tuple)
+            fabrication - Either 'shop' or 'field' (str)
+
+        Returns:
+            Design strength of fillet weld in MPa (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.1.1
+
+        """
+        f_u = min(ultimate_stresses)
+        f_wn = f_u / math.sqrt(3)
+        gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
+        f_wd = f_wn / gamma_mw
+        return f_wd
+
     # -------------------------------------------------------------
     #   10.6 Design of Connections
     # -------------------------------------------------------------

@@ -449,6 +449,38 @@ class IS800_2007(object):
         else:
             return 0.7 * min(part1_thickness, part2_thickness)
 
+    @staticmethod
+    def cl_10_5_3_2_fillet_weld_effective_throat_thickness(fillet_size, fusion_face_angle=90):
+
+        """Calculate effective throat thickness of fillet weld for stress calculation
+
+        Args:
+            fillet_size - Size of fillet weld in mm (float)
+            fusion_face_angle - Angle between fusion faces in degrees (int)
+
+        Returns:
+            Effective throat thickness of fillet weld for stress calculation in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.2
+
+        """
+        table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        if 60 <= fusion_face_angle <= 90:
+            K = table_22['60-90']
+        elif 91 <= fusion_face_angle <= 100:
+            K = table_22['91-100']
+        elif 101 <= fusion_face_angle <= 106:
+            K = table_22['101-106']
+        elif 107 <= fusion_face_angle <= 113:
+            K = table_22['107-113']
+        elif 114 <= fusion_face_angle <= 120:
+            K = table_22['114-120']
+        else:
+            K = "NOT DEFINED"
+        return K * fillet_size
+
     # -------------------------------------------------------------
     #   10.6 Design of Connections
     # -------------------------------------------------------------

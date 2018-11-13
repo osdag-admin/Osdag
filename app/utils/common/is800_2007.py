@@ -480,7 +480,7 @@ class IS800_2007(object):
         else:
             K = "NOT DEFINED"
         try:
-            K = int(K)
+            K = float(K)
         except ValueError:
             return
         return K * fillet_size

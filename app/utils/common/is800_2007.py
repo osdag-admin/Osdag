@@ -426,8 +426,29 @@ class IS800_2007(object):
         return min_weld_size
 
     @staticmethod
-    def compute_max_weld_thickness(part1_thickness, part2_thickness):
-        return min(part1_thickness, part2_thickness)
+    def cl_10_5_3_1_max_weld_throat_thickness(part1_thickness, part2_thickness, special_circumstance=False):
+
+        """Calculate maximum effective throat thickness of fillet weld
+
+        Args:
+            part1_thickness - Thickness of either plate element being welded in mm (float)
+            part2_thickness - Thickness of other plate element being welded in mm (float)
+            special_circumstance - (Boolean)
+
+        Returns:
+            maximum effective throat thickness of fillet weld in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.1
+
+        """
+
+        if special_circumstance is True:
+            return min(part1_thickness, part2_thickness)
+        else:
+            return 0.7 * min(part1_thickness, part2_thickness)
+
     # -------------------------------------------------------------
     #   10.6 Design of Connections
     # -------------------------------------------------------------

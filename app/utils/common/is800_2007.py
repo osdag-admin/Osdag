@@ -30,6 +30,39 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
+    # -------------------------------------------------------------
+    #   6.4 Design Strength Due to Block Shear
+    # -------------------------------------------------------------
+
+    # cl. 6.4.1 Block shear strength of bolted connections
+    @staticmethod
+    def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """Calculate the block shear strength of bolted connections as per cl. 6.4.1
+
+        Args:
+            A_vg: Minimum gross area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_vn: Minimum net area in shear along bolt line parallel to external force [in sq. mm] (float)
+            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+                           end bolt line, perpendicular to the line of force, respectively [in sq. mm] (float)
+            f_u: Ultimate stress of the plate material in MPa (float)
+            f_y: Yield stress of the plate material in MPa (float)
+
+        Return:
+            block shear strength of bolted connection in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007, cl. 6.4.1
+
+        """
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        return min(T_db1, T_db2)
+
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
     # ==========================================================================

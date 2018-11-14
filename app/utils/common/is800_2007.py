@@ -90,7 +90,7 @@ class IS800_2007(object):
 
     # cl. 10.2.1 Clearances for Holes for Fasteners
     @staticmethod
-    def cl_10_2_1(d, bolt_hole_type='standard'):
+    def cl_10_2_1_bolt_hole_size(d, bolt_hole_type='standard'):
         """Calculate bolt hole diameter as per Table 19 of IS 800:2007
 
         Args:
@@ -130,7 +130,7 @@ class IS800_2007(object):
 
     # cl. 10.2.2 Minimum Spacing
     @staticmethod
-    def cl_10_2_2(d):
+    def cl_10_2_2_min_spacing(d):
         """Calculate minimum distance between centre of fasteners
 
         Args:
@@ -148,7 +148,7 @@ class IS800_2007(object):
 
     # cl. 10.2.3.1 Maximum Spacing
     @staticmethod
-    def cl_10_2_3_1(plate_thicknesses):
+    def cl_10_2_3_1_max_spacing(plate_thicknesses):
         """Calculate maximum distance between centre of fasteners
 
         Args:
@@ -167,7 +167,7 @@ class IS800_2007(object):
 
     # cl. 10.2.3.2 Maximum pitch in tension and compression members
     @staticmethod
-    def cl_10_2_3_2(d, plate_thicknesses, member_type):
+    def cl_10_2_3_2_max_pitch_tension_compression(d, plate_thicknesses, member_type):
         """Calculate maximum pitch between centre of fasteners lying in the direction of stress
 
         Args:
@@ -194,7 +194,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.2  Minimum Edge and End Distances
     @staticmethod
-    def cl_10_2_4_2(d, bolt_hole_type='standard', edge_type='hand_flame_cut'):
+    def cl_10_2_4_2_min_edge_end_dist(d, bolt_hole_type='standard', edge_type='hand_flame_cut'):
         """Calculate minimum end and edge distance
 
         Args:
@@ -219,7 +219,7 @@ class IS800_2007(object):
 
     # cl. 10.2.4.3  Maximum Edge Distance
     @staticmethod
-    def cl_10_2_4_3(plate_thicknesses, f_y, corrosive_influences=False):
+    def cl_10_2_4_3_max_edge_dist(plate_thicknesses, f_y, corrosive_influences=False):
         """Calculate maximum end and edge distance
 
         Args:
@@ -249,7 +249,7 @@ class IS800_2007(object):
 
     # cl. 10.3.2 Design strength of bearing type bolt
     @staticmethod
-    def cl_10_3_2(V_dsb, V_dpb):
+    def cl_10_3_2_bolt_design_strength(V_dsb, V_dpb):
         """Calculate design strength of bearing type bolt
 
         Args:
@@ -269,7 +269,7 @@ class IS800_2007(object):
 
     # cl. 10.3.3 Shear Capacity of Bearing Bolt
     @staticmethod
-    def cl_10_3_3(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
+    def cl_10_3_3_bolt_shear_capacity(f_u, A_nb, A_sb, n_n, n_s=0, safety_factor_parameter='field'):
         """Calculate design shear strength of bearing bolt
 
         Args:
@@ -295,7 +295,7 @@ class IS800_2007(object):
 
     # cl. 10.3.3.1 Long joints
     @staticmethod
-    def cl_10_3_3_1(d, l_j):
+    def cl_10_3_3_1_bolt_long_joint(d, l_j):
         """ Calculate reduction factor for long joints.
 
         Args:
@@ -321,7 +321,7 @@ class IS800_2007(object):
 
     # 10.3.3.2 Large grip lengths
     @staticmethod
-    def cl_10_3_3_2(d, l_g, l_j=0):
+    def cl_10_3_3_2_bolt_large_grip(d, l_g, l_j=0):
         """ Calculate reduction factor for large grip lengths.
 
         Args:
@@ -346,7 +346,7 @@ class IS800_2007(object):
 
     # cl. 10.3.4 Bearing Capacity of the Bolt
     @staticmethod
-    def cl_10_3_4(f_u, f_ub, t, d, e, p, bolt_hole_type='standard', safety_factor_parameter='field'):
+    def cl_10_3_4_bolt_bearing_capacity(f_u, f_ub, t, d, e, p, bolt_hole_type='standard', safety_factor_parameter='field'):
 
         """Calculate design bearing strength of a bolt on any plate.
 
@@ -385,7 +385,7 @@ class IS800_2007(object):
 
     # cl. 10.4.3 Slip Resistance
     @staticmethod
-    def cl_10_4_3(f_ub, A_nb, n_e, mu_f, bolt_hole_type='standard', slip_resistance='service_load'):
+    def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='standard', slip_resistance='service_load'):
         #TODO : Ensure default slip_resistance = 'service_load' or ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
 
@@ -437,7 +437,7 @@ class IS800_2007(object):
 
     # cl. 10.5.2.3 Minimum Size of First Run or of a Single Run Fillet Weld
     @staticmethod
-    def cl_10_5_2_3(part1_thickness, part2_thickness):
+    def cl_10_5_2_3_min_weld_size(part1_thickness, part2_thickness):
         """Calculate minimum size of fillet weld as per Table 21 of IS 800:2007
 
         Args:

@@ -67,6 +67,16 @@ class IS800_2007(object):
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
     # ==========================================================================
     """    SECTION  8     DESIGN OF MEMBERS SUBJECTED TO BENDING   """
+    # -------------------------------------------------------------
+    #   8.4 Shear
+    # -------------------------------------------------------------
+
+    # cl. 8.4.1 shear strength of bolted connections
+    @staticmethod
+    def cl_8_4_design_shear_strength():
+        # TODO
+        pass
+
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
     # ==========================================================================

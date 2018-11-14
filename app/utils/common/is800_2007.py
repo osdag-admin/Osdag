@@ -210,7 +210,7 @@ class IS800_2007(object):
 
         """
 
-        d_0 = IS800_2007.cl_10_2_1(d, bolt_hole_type)
+        d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
         if edge_type == 'hand_flame_cut':
             return 1.7 * d_0
         else:
@@ -336,8 +336,8 @@ class IS800_2007(object):
 
         """
         beta_lg = 8.0 / (3.0 + l_g / d)
-        if beta_lg >= IS800_2007.cl_10_3_3_1(d, l_j):
-            beta_lg = IS800_2007.cl_10_3_3_1(d, l_j)
+        if beta_lg >= IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j):
+            beta_lg = IS800_2007.cl_10_3_3_1_bolt_long_joint(d, l_j)
         if l_g <= 5.0 * d:
             beta_lg = 1
         elif l_g > 8.0 * d:
@@ -368,7 +368,7 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.3.4
 
         """
-        d_0 = IS800_2007.cl_10_2_1(d, bolt_hole_type)
+        d_0 = IS800_2007.cl_10_2_1_bolt_hole_size(d, bolt_hole_type)
         k_b = min(e/(3.0*d_0), p/(3.0*d_0)-0.25, f_ub/f_u, 1.0)
         V_npb = 2.5 * k_b * d * t * f_u
         gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb'][safety_factor_parameter]
@@ -386,7 +386,7 @@ class IS800_2007(object):
     # cl. 10.4.3 Slip Resistance
     @staticmethod
     def cl_10_4_3_bolt_slip_resistance(f_ub, A_nb, n_e, mu_f, bolt_hole_type='standard', slip_resistance='service_load'):
-        #TODO : Ensure default slip_resistance = 'service_load' or ultimate_load'
+        # TODO : Ensure default slip_resistance = 'service_load' or ultimate_load'
         """Calculate design shear strength of friction grip bolt as governed by slip
 
         Args:
@@ -461,7 +461,7 @@ class IS800_2007(object):
             min_weld_size = 5
         elif thicker_part_thickness <= 32.0:
             min_weld_size = 6
-        elif thicker_part_thickness <= 50.0:
+        else:  # thicker_part_thickness <= 50.0:
             min_weld_size = 10
         #TODO else:
         if min_weld_size > thinner_part_thickness:

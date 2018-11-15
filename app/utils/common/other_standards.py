@@ -17,6 +17,8 @@ class IS1367_Part3_2002(object):
                 STEEL AND ALLOY STEEL — BOLTS, SCREWS AND STUDS
 
     """
+    # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
+    bolt_grades = [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]
 
     # Calculate bolt nominal tensile strength depending upon grade of bolt
     @staticmethod

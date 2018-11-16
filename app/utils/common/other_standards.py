@@ -35,6 +35,14 @@ class IS1363_part_1_2002(object):
         "60": {'pitch': 5.50, 'head_thick': 38.0, 'head_diag': 99.210, 'head_dia': 90.0, 'thread': "non_preferred"}
         }
 
+    # Available lengths of bolts as per Table 1 and 2 of IS 1363(Part-1) :2002 (list)
+    # Preferred threads
+    bolt_length_preferred = [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 80, 90, 100,110, 120, 130, 140, 150, 160, 180,
+                             200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500]
+    # Non preferred threads
+    bolt_length_non_preferred = [60, 65, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 180, 200, 220, 240,
+                                 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500]
+
 
 # IS 1363 - Part 3 : 2002
 class IS1363_part_3_2002(object):

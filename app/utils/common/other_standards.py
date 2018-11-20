@@ -201,8 +201,7 @@ class IS3757_1985(object):
         bolt_lengths = [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150,
                         160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
         length_index = {16: 0, 20: 1, 22: 2, 24: 3, 27: 4, 30: 5, 36: 7}
-        # TODO : Make sub lists by lambda expressions
-
+        return bolt_lengths[length_index[bolt_diameter]:]
 
 # IS 6623 : 2004
 class IS6623_2004(object):

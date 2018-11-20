@@ -163,3 +163,27 @@ class IS1367_Part3_2002(object):
             return [shank_area, table_6[bolt_diameter]]
         except KeyError:
             return
+
+
+# IS 3757 : 1985
+class IS3757_1985(object):
+    """Perform calculations on steel design as per Indian Standard, IS 3757 : 1985 [ISO/DIS 7412]
+        Specification for High Strength Structural Bolts’
+    """
+
+    # Dimensions of High Strength Structural Bolts as per Table 1 (dict) [key: Diameter of bolt]
+    bolt_dimensions = {
+        "16": {'pitch': 2.00, 'head_thick': 10.0, 'head_diag': 29.56, 'head_dia': 27.0, 'thread': "preferred"},
+        "20": {'pitch': 2.50, 'head_thick': 12.5, 'head_diag': 37.29, 'head_dia': 34.0, 'thread': "preferred"},
+        "22": {'pitch': 2.50, 'head_thick': 14.0, 'head_diag': 39.55, 'head_dia': 36.0, 'thread': "non_preferred"},
+        "24": {'pitch': 3.00, 'head_thick': 15.0, 'head_diag': 45.20, 'head_dia': 41.0, 'thread': "preferred"},
+        "27": {'pitch': 3.00, 'head_thick': 17.0, 'head_diag': 50.85, 'head_dia': 46.0, 'thread': "non_preferred"},
+        "30": {'pitch': 3.50, 'head_thick': 18.7, 'head_diag': 55.37, 'head_dia': 50.0, 'thread': "preferred"},
+        "36": {'pitch': 4.00, 'head_thick': 22.5, 'head_diag': 66.44, 'head_dia': 60.0, 'thread': "preferred"}
+    }
+
+    bolt_lengths = [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 130, 140, 150,
+                    160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
+    length_index = {"16": 0, "20": 1, "22": 2, "24": 3, "27": 4, "30": 5, "36": 7}
+    # TODO : Make sub lists by lambda expressions
+

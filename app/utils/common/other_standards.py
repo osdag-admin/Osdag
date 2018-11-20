@@ -1,3 +1,16 @@
+"""Module for Indian Standards other than IS 800 : 2007
+
+Included standards,
+    IS 1363 - Part 1 : 2002
+    IS 1363 - Part 3 : 2002
+    IS 1367 - Part 3 : 2002
+    IS 3757 : 1985
+    IS 6623 : 2004
+
+Started on 15 - Nov - 2018
+
+@author: ajmalbabums
+"""
 import math
 
 

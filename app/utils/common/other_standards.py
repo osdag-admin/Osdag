@@ -187,3 +187,28 @@ class IS3757_1985(object):
     length_index = {"16": 0, "20": 1, "22": 2, "24": 3, "27": 4, "30": 5, "36": 7}
     # TODO : Make sub lists by lambda expressions
 
+# IS 6623 : 2004
+class IS6623_2004(object):
+    """Perform calculations on steel design as per Indian Standard, IS 6623 :2004
+        High Strength Structural Nuts - Specification
+    """
+
+    # Dimensions of High Strength Nuts as per Table 1 (dict) [key: Nut thread size in mm]
+    nut_dimensions = {
+        "12": {'pitch': 1.75, 'nut_dia': 21.0, 'nut_diag': 22.780, 'nut_thick_max': 12.3, 'nut_thick_min': 11.9,
+               'thread': "preferred"},
+        "16": {'pitch': 2.00, 'nut_dia': 27.0, 'nut_diag': 29.56, 'nut_thick_max': 17.1, 'nut_thick_min': 16.4,
+               'thread': "preferred"},
+        "20": {'pitch': 2.50, 'nut_dia': 34.0, 'nut_diag': 37.29, 'nut_thick_max': 20.7, 'nut_thick_min': 19.4,
+               'thread': "preferred"},
+        "22": {'pitch': 2.50, 'nut_dia': 35.0, 'nut_diag': 39.55, 'nut_thick_max': 23.6, 'nut_thick_min': 22.3,
+               'thread': "non_preferred"},
+        "24": {'pitch': 3.00, 'nut_dia': 41.0, 'nut_diag': 45.20, 'nut_thick_max': 24.2, 'nut_thick_min': 22.9,
+               'thread': "preferred"},
+        "27": {'pitch': 3.00, 'nut_dia': 46.0, 'nut_diag': 50.85, 'nut_thick_max': 27.6, 'nut_thick_min': 26.3,
+               'thread': "non_preferred"},
+        "30": {'pitch': 3.50, 'nut_dia': 50.0, 'nut_diag': 55.37, 'nut_thick_max': 30.7, 'nut_thick_min': 29.1,
+               'thread': "preferred"},
+        "36": {'pitch': 4.00, 'nut_dia': 60.0, 'nut_diag': 66.44, 'nut_thick_max': 36.6, 'nut_thick_min': 35.0,
+               'thread': "preferred"}
+    }

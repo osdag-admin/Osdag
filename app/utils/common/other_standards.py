@@ -1,4 +1,3 @@
-# TODO : Change "diameter" to diameter
 import math
 
 

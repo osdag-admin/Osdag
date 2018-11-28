@@ -198,13 +198,13 @@ class IS3757_1985(object):
     # Returns a list of available bolt lengths in mm depending upon diameter of bolt
     @staticmethod
     def bolt_length(bolt_diameter):
-        """Make a list of available bolt lengths in mm
+        """Make a list of available bolt lengths in mm for the given diameter of bolt
 
         Args:
             bolt_diameter: Nominal diameter of bolt in mm (float)
 
         Return:
-             List of available bolt lengths in mm as per IS: 3757 : 1985 (list)
+             List of available bolt lengths in mm as per IS: 3757 : 1985 for the given diameter (list)
 
         Note:
             Reference:

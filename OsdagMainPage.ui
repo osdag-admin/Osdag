@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +14,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Osdag</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+    <normaloff>:/newPrefix/images/Osdag.png</normaloff>:/newPrefix/images/Osdag.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget::showMaximised()</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -863,7 +873,7 @@ color:#ffffff;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">

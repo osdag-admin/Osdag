@@ -26,6 +26,7 @@ class Bolt(Component):
         repr += "Length: {}".format(self.length)
         return repr
 
+
 class Nut(Component):
 
     def __init__(self, diameter=0.0, material=Material()):
@@ -36,6 +37,7 @@ class Nut(Component):
         repr = "Nut\n"
         repr += "Diameter: {}".format(self.diameter)
         return repr
+
 
 class Section(Component):
 
@@ -53,7 +55,6 @@ class Section(Component):
         repr = "Section\n"
         repr += "Designation: {}".format(self.designation)
         return repr
-
 
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(self.path_to_database)
@@ -98,6 +99,7 @@ class Weld(Component):
         repr += "Size: {}\n".format(self.size)
         repr += "Length: {}".format(self.length)
         return repr
+
 
 class Plate(Component):
 

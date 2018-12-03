@@ -1,4 +1,4 @@
-class Design(object):
+class DesignType(object):
 
     def __init__(self, input_object, design_preferences):
         self.input_object = input_object

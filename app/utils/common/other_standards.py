@@ -16,9 +16,9 @@ import math
 
 # IS 1363 - Part 1 : 2002
 class IS1363_part_1_2002(object):
-    """Perform calculations on steel design as per Indian Standard, IS 1363( Part 1 ) :2002 [ISO 4016:1999]
-        Hexagon Head Bolts, Screws and nuts of Product Grade ‘C’
-        Part 1 Hexagon Head Bolts (size Range M 5 to M 64)
+    """Perform calculations as per IS 1363 (Part 1) : 2002 [ISO 4016: 1999]
+    Hexagon head bolts, screws, and nuts of product grade C
+    Part 1 : Hexagon head bolts (size M5 to M64)
     """
 
     # Dimensions of Metric bolts as per Table 1 and 2 of IS 1363(Part-1) :2002 (dict)
@@ -59,9 +59,9 @@ class IS1363_part_1_2002(object):
 
 # IS 1363 - Part 3 : 2002
 class IS1363_part_3_2002(object):
-    """Perform calculations on steel design as per Indian Standard, IS 1363( Part 3 ) :2002 [ISO 4034:1999]
-        Hexagon Head Bolts, Screws and nuts of Product Grade ‘C’
-        Part 3 Hexagon  Nuts ( Size Range M 5 to M 64) (Fourth Revision)
+    """Perform calculations as per IS 1363 (Part 3) : 2002 [ISO 4034: 1999]
+    Hexagon head bolts, screws, and nuts of product grade C
+    Part 3 : Hexagon nuts (size M5 to M64)
     """
 
     # Dimensions of Metric nuts as per Table 1 and 2 of IS 1363(Part-3) :2002 (dict)
@@ -117,11 +117,12 @@ class IS1363_part_3_2002(object):
 
 # IS 1367 - Part 3 : 2002
 class IS1367_Part3_2002(object):
-    """Perform calculations on steel design as per Indian Standard, IS 1367( Part 3 ) :2002 [ISO 898-1:1999]
-        Technical Supply Conditions for Threaded Steel Fasteners,
-        Part 3 - Mechanical Properties of Fasteners Made of Carbon
-                Steel and Alloy Steel — Bolts, Screws and Studs
+    """Perform calculations as per IS 1367 (Part 3) : 2002 [ISO 898-1:1999]
+    Technical supply conditions for threaded steel fasteners
+    Part 3 : Mechanical properties of fasteners made of carbon steel and alloy steel-
+    Bolts, screws and studs
     """
+
     # Bolt grades available as per Table 1 of IS 1367(Part-3) :2002 (list)
     bolt_grades = [3.6, 4.6, 4.8, 5.6, 5.8, 6.8, 8.8, 9.8, 10.9, 12.9]
 
@@ -180,8 +181,8 @@ class IS1367_Part3_2002(object):
 
 # IS 3757 : 1985
 class IS3757_1985(object):
-    """Perform calculations on steel design as per Indian Standard, IS 3757 : 1985 [ISO/DIS 7412]
-        Specification for High Strength Structural Bolts’
+    """Perform calculations as per IS 3757 : 1985 [ISO/DIS 7412]
+    Specifications for high strength structural bolts
     """
 
     # Dimensions of High Strength Structural Bolts as per Table 1 (dict) [key: Diameter of bolt]
@@ -214,6 +215,7 @@ class IS3757_1985(object):
                         160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300]
         length_index = {16: 0, 20: 1, 22: 2, 24: 3, 27: 4, 30: 5, 36: 7}
         return bolt_lengths[length_index[bolt_diameter]:]
+
 
 # IS 6623 : 2004
 class IS6623_2004(object):

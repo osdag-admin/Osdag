@@ -517,6 +517,7 @@ class IS800_2007(object):
 
         """
         table_22 = {'60-90': 0.70, '91-100': 0.65, '101-106': 0.60, '107-113': 0.55, '114-120': 0.50}
+        fusion_face_angle = int(round(fusion_face_angle))
         if 60 <= fusion_face_angle <= 90:
             K = table_22['60-90']
         elif 91 <= fusion_face_angle <= 100:

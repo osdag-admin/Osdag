@@ -1,8 +1,9 @@
-from app.Utils.Common.IS800_2007 import IS800_2007
+from app.utils.common.is800_2007 import IS800_2007
 
 
 class Validator (object):
 
+    # TODO : Check these functions static
     def validate_fu (self, fu):
         return 290 <= fu <= 780
 
@@ -27,9 +28,9 @@ class ConnectionValidator(Validator):
 
     def filter_weld_list(self, weld_size_list, part1_thickness, part2_thickness):
 
-        min_weld_size = IS800_2007.compute_min_weld_thickness(part1_thickness, part2_thickness)
-        max_weld_size = IS800_2007.compute_max_weld_thickness(part1_thickness, part2_thickness)
-
+        min_weld_size = IS800_2007.cl_10_5_2_3_min_weld_size(part1_thickness, part2_thickness)
+        # TODO : max weld size - throat thickness ambiguity
+        max_weld_size = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(part1_thickness, part2_thickness)
         filtered_weld_size_list = list(filter(lambda x: min_weld_size <= x <= max_weld_size,
                                               weld_size_list))
 

@@ -18,6 +18,13 @@ class Bolt(Component):
         self.length = length
         super(Bolt, self).__init__(material)
 
+    def __repr__(self):
+        repr = "Bolt\n"
+        repr += "Diameter: {}\n".format(self.diameter)
+        repr += "Type: {}\n".format(self.bolt_type)
+        repr += "Grade: {}\n".format(self.grade)
+        repr += "Length: {}".format(self.length)
+        return repr
 
 class Nut(Component):
 
@@ -25,6 +32,10 @@ class Nut(Component):
         self.diameter = diameter
         super(Nut, self).__init__(material)
 
+    def __repr__(self):
+        repr = "Nut\n"
+        repr += "Diameter: {}".format(self.diameter)
+        return repr
 
 class Section(Component):
 
@@ -37,6 +48,12 @@ class Section(Component):
         self.root_radius = 0.0
         self.toe_radius = 0.0
         super(Section, self).__init__(material)
+
+    def __repr__(self):
+        repr = "Section\n"
+        repr += "Designation: {}".format(self.designation)
+        return repr
+
 
     def connect_to_database_update_other_attributes(self, table, designation):
         conn = sqlite3.connect(self.path_to_database)
@@ -76,6 +93,11 @@ class Weld(Component):
         self.length = length
         super(Weld, self).__init__(material)
 
+    def __repr__(self):
+        repr = "Weld\n"
+        repr += "Size: {}\n".format(self.size)
+        repr += "Length: {}".format(self.length)
+        return repr
 
 class Plate(Component):
 
@@ -84,6 +106,11 @@ class Plate(Component):
         self.height = height
         self.width = width
         super(Plate, self).__init__(material)
+
+    def __repr__(self):
+        repr = "Plate\n"
+        repr += "Thickness: {}".format(self.thickness)
+        return repr
 
 
 class Angle(Component):
@@ -99,6 +126,11 @@ class Angle(Component):
 
         self.length = 0.0
         super(Angle, self).__init__(material)
+
+    def __repr__(self):
+        repr = "Angle\n"
+        repr += "Designation: {}".format(self.designation)
+        return repr
 
     def connect_to_database_update_other_attributes(self, designation):
         conn = sqlite3.connect(self.path_to_database)

@@ -9,7 +9,7 @@ class ConnectionInput(Input):
     pass
 
 
-class ShearConnectionInput(Input):
+class ShearConnectionInput(ConnectionInput):
 
     def __init__(self):
         self.bolt = Bolt()

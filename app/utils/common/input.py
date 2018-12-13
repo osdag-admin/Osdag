@@ -25,15 +25,15 @@ class ShearConnectionInput(ConnectionInput):
         self.shear_load = Load(shear_force=shear_load)
         self.bolt = Bolt(diameter=bolt_diameter, grade=bolt_grade, bolt_type=bolt_type)
         self.bolt_diameter_list = []
-        self.weld = Weld()
-        self.weld_size_list = []
 
 
 class FinPlateConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade, plate_thickness, plate_height=0, plate_width=0):
+                 bolt_diameter, bolt_type, bolt_grade, weld_size, plate_thickness, plate_height=0.0, plate_width=0.0):
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
+        self.weld = Weld(weld_size)
+        self.weld_size_list = []
         super(FinPlateConnectionInput, self).__init__(connectivity, supporting_member_section, supported_member_section,
                                                       fu, fy, shear_load, bolt_diameter, bolt_type, bolt_grade)
 
@@ -41,8 +41,10 @@ class FinPlateConnectionInput(ShearConnectionInput):
 class EndPlateConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade, plate_thickness, plate_height=0, plate_width=0):
+                 bolt_diameter, bolt_type, bolt_grade, weld_size, plate_thickness, plate_height=0.0, plate_width=0.0):
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
+        self.weld = Weld(weld_size)
+        self.weld_size_list = []
         super(EndPlateConnectionInput, self).__init__(connectivity, supporting_member_section, supported_member_section,
                                                       fu, fy, shear_load, bolt_diameter, bolt_type, bolt_grade)
 

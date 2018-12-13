@@ -32,8 +32,8 @@ class ShearConnectionInput(ConnectionInput):
 class FinPlateConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade):
-        self.plate = Plate()
+                 bolt_diameter, bolt_type, bolt_grade, plate_thickness, plate_height=0, plate_width=0):
+        self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
         super(FinPlateConnectionInput, self).__init__(connectivity, supporting_member_section, supported_member_section,
                                                       fu, fy, shear_load, bolt_diameter, bolt_type, bolt_grade)
 
@@ -41,8 +41,8 @@ class FinPlateConnectionInput(ShearConnectionInput):
 class EndPlateConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade):
-        self.plate = Plate()
+                 bolt_diameter, bolt_type, bolt_grade, plate_thickness, plate_height=0, plate_width=0):
+        self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
         super(EndPlateConnectionInput, self).__init__(connectivity, supporting_member_section, supported_member_section,
                                                       fu, fy, shear_load, bolt_diameter, bolt_type, bolt_grade)
 
@@ -50,8 +50,8 @@ class EndPlateConnectionInput(ShearConnectionInput):
 class CleatAngleConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade):
-        self.cleat_angle = Angle()
+                 bolt_diameter, bolt_type, bolt_grade, cleat_angle_section):
+        self.cleat_angle = Angle(designation=cleat_angle_section, material=self.material)
         super(CleatAngleConnectionInput, self).__init__(connectivity, supporting_member_section,
                                                         supported_member_section, fu, fy, shear_load, bolt_diameter,
                                                         bolt_type, bolt_grade)
@@ -60,9 +60,9 @@ class CleatAngleConnectionInput(ShearConnectionInput):
 class SeatedAngleConnectionInput(ShearConnectionInput):
 
     def __init__(self, connectivity, supporting_member_section, supported_member_section, fu, fy, shear_load,
-                 bolt_diameter, bolt_type, bolt_grade):
-        self.seated_angle = Angle()
-        self.top_angle = Angle()
+                 bolt_diameter, bolt_type, bolt_grade, seated_angle_section, top_angle_section):
+        self.seated_angle = Angle(designation=seated_angle_section, material=self.material)
+        self.top_angle = Angle(designation=top_angle_section, material=self.material)
         super(SeatedAngleConnectionInput, self).__init__(connectivity, supporting_member_section,
                                                          supported_member_section, fu, fy, shear_load,
                                                          bolt_diameter, bolt_type, bolt_grade)

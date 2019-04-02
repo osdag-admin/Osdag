@@ -1,4 +1,5 @@
 from app.utils.common.material import Material
+from app.utils.common.is800_2007 import IS800_2007
 import sqlite3
 
 
@@ -16,6 +17,11 @@ class Bolt(Component):
         self.diameter = diameter
         self.bolt_type = bolt_type
         self.length = length
+        self.shear_capacity = 0.0
+        self.bearing_capacity = 0.0
+        self.bolt_capacity = 0.0
+        self.no_of_bolts = 0
+        self.bolt_group_capacity = 0.0
         super(Bolt, self).__init__(material)
 
     def __repr__(self):
@@ -25,6 +31,11 @@ class Bolt(Component):
         repr += "Grade: {}\n".format(self.grade)
         repr += "Length: {}".format(self.length)
         return repr
+
+    def calculate_bolt_shear_capacity(self, bolt_diameter):
+        # self.shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity()
+        # TODO : Bolt shear capacity functions
+        pass
 
 
 class Nut(Component):

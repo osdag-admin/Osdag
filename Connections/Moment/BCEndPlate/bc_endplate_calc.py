@@ -1,10 +1,10 @@
 """
-Created on 16th October, 2017.
+Started on 22nd April, 2019.
 
-@author: Danish Ansari
+@author: ajmalbabums
 
 
-Module: Beam to beam extended end plate splice connection (Moment connection)
+Module: Beam to column end plate moment connection
 
 Reference:
             1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
@@ -14,31 +14,6 @@ Reference:
 
 
 ASCII diagram
-                                      End plate
-                                     +---+
-                                 +----------+ Bolt
-                                     | | |
-+------------------------------------+ | +-------------------------------+
-+------------------------------------| | |-------------------------------+
-|                                   || | ||                              |
-|                                +----------+                            |
-|                                   || | ||   Bolt                       |
-|                                +----------+                            |
-|                                   || | ||                              |
-|           Beam Section            || | ||            Beam Section      |
-|                                   || | ||                              |
-|                                +-----------+                           |
-|                                   || | ||     Bolt                     |
-|                                +-----------+                           |
-|                                   || | ||                              |
-+------------------------------------| | |-------------------------------+
-+------------------------------------+ | +-------------------------------+
-                                     | | |
-                                 +----------+  Bolt
-                                     +---+
-
-                                      End plate
-Note: The above ASCII diagram does not show details of weld
 
 
 """
@@ -53,7 +28,7 @@ logger = None
 
 def module_setup():
     global logger
-    logger = logging.getLogger("osdag.bbExtendedEndPlateSpliceCalc")
+    logger = logging.getLogger("osdag.bc_endplate_calc")
 
 
 module_setup()
@@ -321,7 +296,7 @@ def fetchBeamPara(self):
 #######################################################################
 # Start of Main Program
 
-def bbExtendedEndPlateSplice(uiObj):
+def bc_endplate_design(uiObj):
     global logger
     global design_status
     design_status = True

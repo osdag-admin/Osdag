@@ -14,7 +14,7 @@ from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
-from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
+from bc_endplate_calc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog

@@ -7,12 +7,15 @@ Started on 22nd April, 2019.
 Module: Beam to column end plate moment connection
 """
 
+# UI files
 from ui_extendedendplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
+
+
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
@@ -20,6 +23,7 @@ from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
+
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
@@ -34,14 +38,16 @@ import cairosvg
 import shutil
 import subprocess
 
+
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
 from Connections.Component.plate import Plate
-from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
-from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
-from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
+
+from Connections.Moment.BCEndPlate.extendedBothWays import ExtendedBothWays
+from Connections.Moment.BCEndPlate.nutBoltPlacement import NutBoltArray
+
 from Connections.Component.quarterCone import QuarterCone
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
 from OCC import IGESControl, BRepTools
@@ -245,7 +251,7 @@ class PlateDetails(QDialog):
 		self.maincontroller = parent
 
 		uiObj = self.maincontroller.designParameters()
-		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+		resultObj_plate = bc_endplate_design(uiObj)
 		self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
 		self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
 		self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
@@ -260,7 +266,7 @@ class Stiffener(QDialog):
 		self.maincontroller = parent
 
 		uiObj = self.maincontroller.designParameters()
-		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+		resultObj_plate = bc_endplate_design(uiObj)
 		self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
 		self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
 		self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
@@ -274,7 +280,7 @@ class Pitch(QDialog):
 		self.maincontroller = parent
 
 		uiObj = self.maincontroller.designParameters()
-		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+		resultObj_plate = bc_endplate_design(uiObj)
 		print "result plate", resultObj_plate
 		no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
 		if no_of_bolts == 8:
@@ -439,7 +445,7 @@ class Maincontroller(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-		self.connection = "Extended"
+		self.connection = "BC_EndPlate"
 		self.get_beamdata()
 		self.result_obj = None
 
@@ -671,7 +677,7 @@ class Maincontroller(QMainWindow):
 
 	def call_designreport(self, fileName, report_summary):
 		self.alist = self.designParameters()
-		self.result = bbExtendedEndPlateSplice(self.alist)
+		self.result = bc_endplate_design(self.alist)
 		print "resultobj", self.result
 		self.beam_data = self.fetchBeamPara()
 		save_html(self.result, self.alist, self.beam_data, fileName, report_summary, self.folder)
@@ -748,7 +754,7 @@ class Maincontroller(QMainWindow):
 		Returns: Save the user input to txt format
 
 		"""
-		input_file = QFile(os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt"))
+		input_file = QFile(os.path.join("Connections", "Moment", "BCEndPlate", "saveINPUT.txt"))
 		if not input_file.open(QFile.WriteOnly | QFile.Text):
 			QMessageBox.warning(self, "Application",
 								"Cannot write file %s: \n%s"
@@ -761,7 +767,7 @@ class Maincontroller(QMainWindow):
 		Returns: Read for the previous user inputs design
 
 		"""
-		filename = os.path.join("Connections","Moment","ExtendedEndPlate","saveINPUT.txt")
+		filename = os.path.join("Connections", "Moment", "BCEndPlate", "saveINPUT.txt")
 		if os.path.isfile(filename):
 			file_object = open(filename, 'r')
 			uiObj = pickle.load(file_object)
@@ -940,7 +946,7 @@ class Maincontroller(QMainWindow):
 		if self.validate_inputs_on_design_btn() is not True:
 			return
 		self.alist = self.designParameters()
-		self.outputs = bbExtendedEndPlateSplice(self.alist)
+		self.outputs = bc_endplate_design(self.alist)
 		print "output list ", self.outputs
 
 		self.ui.outputDock.setFixedSize(310, 710)
@@ -1022,7 +1028,7 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
 	def display_log_to_textedit(self):
-		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
+		file = QFile(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
 			QMessageBox.information(None, 'info', file.errorString())
 		stream = QtCore.QTextStream(file)
@@ -1282,7 +1288,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		self.alist = self.designParameters()
-		self.result_obj = bbExtendedEndPlateSplice(self.alist)
+		self.result_obj = bc_endplate_design(self.alist)
 		self.beam_data = self.fetchBeamPara()
 		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
 		status = self.resultObj['Bolt']['status']
@@ -1343,10 +1349,10 @@ class Maincontroller(QMainWindow):
 		design_report_dialog = DesignReportDialog(self)
 		design_report_dialog.show()
 
-		# fileName = ("Connections\Moment\ExtendedEndPlate\Html_Report.html")
+		# fileName = ("Connections\Moment\BCEndPlate\Html_Report.html")
 		# fileName = str(fileName)
 		# self.alist = self.designParameters()
-		# self.result = bbExtendedEndPlateSplice(self.alist)
+		# self.result = bc_endplate_design(self.alist)
 		# print "result_obj", self.result
 		# self.beam_data = self.fetchBeamPara()
 		# save_html(self.result, self.alist, self.beam_data, fileName)
@@ -1864,7 +1870,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='a')
+	fh = logging.FileHandler(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'), mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -1880,17 +1886,17 @@ def set_osdaglogger():
 	logger.addHandler(fh)
 
 
-def launch_extendedendplate_controller(osdagMainWindow, folder):
+def launch_bc_endplate_controller(osdagMainWindow, folder):
 	set_osdaglogger()
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
+	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','BCEndPlate','extnd.log'), mode='w')
 	file_handler = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','ExtendedEndPlate', 'log.css') +'''/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment', 'BCEndPlate', 'log.css') +'''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -1903,7 +1909,7 @@ if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
-	# fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
+	# fh = logging.FileHandler(os.path.join('Connections','Moment','BCEndPlate','extnd.log'), mode="w")
 	fh = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
 
 	formatter = logging.Formatter('''%(message)s''')
@@ -1914,7 +1920,7 @@ if __name__ == "__main__":
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/reshma/Osdag_workspace/Extended"
+	folder_path = "/home/shihab/Osdag_workspace"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

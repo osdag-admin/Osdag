@@ -348,12 +348,13 @@ def bc_endplate_design(uiObj):
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
     old_beam_section = get_oldbeamcombolist()
+    old_column_section = get_oldcolumncombolist()
 
-    if beam_sec in old_beam_section:
+    if beam_sec in old_beam_section or column_sec in old_column_section:
         logger.warning(": You are using a section (in red colour) that is not available in the latest version of IS 808")
 
-    if beam_fu < 410 or beam_fy < 230:
-        logger.warning(" : You are using a section of grade that is not available in latest version of IS 2062")
+    if beam_fu < 410 or beam_fy < 230 or column_fu < 410 or column_fy < 230:
+        logger.warning(" : You are using a section of grade that is not available in the latest version of IS 2062")
 
     #######################################################################
     # Read input values from Beam database
@@ -371,6 +372,23 @@ def bc_endplate_design(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
+
+    #######################################################################
+    # Read input values from column database
+    # Here,
+    #    column_tw - Thickness of column web
+    #    column_tf - Thickness of column Flange
+    #    column_d  - Depth of column
+    #    column_B  - Width of column Flange
+    #    column_R1 - Radius of column at root
+
+    dictcolumndata = get_columndata(column_sec)
+
+    column_tw = float(dictcolumndata["tw"])
+    column_tf = float(dictcolumndata["T"])
+    column_d = float(dictcolumndata["D"])
+    column_B = float(dictcolumndata["B"])
+    column_R1 = float(dictcolumndata["R1"])
 
     #######################################################################
     # Calculation of Bolt strength in MPa
@@ -395,7 +413,8 @@ def bc_endplate_design(uiObj):
     gauge_dist_min = pitch_dist_min
     gauge_dist_max = pitch_dist_max
 
-    # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
+    # min_end_distance & max_end_distance = Minimum and Maximum end distance
+    #       [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         min_end_distance = int(math.ceil(1.7 * dia_hole))
     else:

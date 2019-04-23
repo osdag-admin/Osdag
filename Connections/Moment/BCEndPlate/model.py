@@ -94,4 +94,53 @@ def get_oldbeamcombolist():
     return old_columnList
 
 
+def get_oldcolumncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    old_columnList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Columns where Source = 'IS808_Old' order by id ASC")
+    a = columnQuery.size()
+
+    #comboList.append("Select section")
+    while(columnQuery.next()):
+        old_columnList.append(columnQuery.value(0))
+
+    return old_columnList
+
+
+def get_columncombolist():
+    '''(None) -> (List)
+    This function returns the list of Indian Standard Column Designation.
+    '''
+    comboList = []
+    columnQuery = QSqlQuery("SELECT Designation FROM Columns order by id ASC")
+    a = columnQuery.size()
+
+    comboList.append("Select section")
+    while(columnQuery.next()):
+        comboList.append(columnQuery.value(0))
+    return comboList
+
+
+def get_columndata(sect):
+
+    '''(None) --> (Dictionary)
+    This Function returns the Indian Standard column section properties.
+    '''
+    section = sect
+    # section = Ui_MainWindow.comboColSec.currentText()
+    queryStr = "Select * from Columns where Designation = '%s'" % section
+
+    designQuery = QSqlQuery(queryStr)
+
+    retDict = {}
+    record = designQuery.record()
+
+    while(designQuery.next()):
+        for i in range(0, record.count()):
+            colName = record.fieldName(i)
+            retDict[colName] = designQuery.value(i)
+
+    return retDict
 

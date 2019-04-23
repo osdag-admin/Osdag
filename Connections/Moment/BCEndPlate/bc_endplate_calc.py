@@ -300,6 +300,7 @@ def bc_endplate_design(uiObj):
     global design_status
     design_status = True
 
+    connectivity = uiObj['Member']['Connectivity']
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumnSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])
@@ -453,6 +454,7 @@ def bc_endplate_design(uiObj):
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
         logger.info(": Increase the thickness of end plate ")
 
+    '''
     # End Plate Height [Ref: Based on reasoning]
 
     # Minimum and Maximum Plate Height
@@ -504,6 +506,7 @@ def bc_endplate_design(uiObj):
             logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
             logger.info(": Decrease the Height of End Plate")
 
+'''
     #######################################################################
     # Check for shear capacity of Friction Grip Bolt bolt (Cl. 10.4.3, IS 800:2007)
     # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
@@ -699,6 +702,8 @@ def bc_endplate_design(uiObj):
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
 
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+
+        '''
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
@@ -994,6 +999,7 @@ def bc_endplate_design(uiObj):
         # T1, T2, ..., Tn are the Tension in the bolts starting from top of the end plate and y1, y2, ..., yn are its corresponding distances from N.A
         # TODO : check the working of the below loop
 
+        '''
         # Case 1: When the height and the width of end plate is not specified by user
         if end_plate_height == 0 and end_plate_width == 0:
             if number_of_bolts == 8:
@@ -1069,6 +1075,8 @@ def bc_endplate_design(uiObj):
 
             else:
                 design_status = False
+
+        '''
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
@@ -1295,6 +1303,7 @@ def bc_endplate_design(uiObj):
             else:
                 design_status = False
 
+        '''
         #######################################################################
         # Calculating actual required thickness of End Plate (tp_required) as per bending criteria
         b_e = beam_B / 2
@@ -1734,6 +1743,7 @@ def bc_endplate_design(uiObj):
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
 
+        '''
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
             outputobj = {}
@@ -2107,6 +2117,7 @@ def bc_endplate_design(uiObj):
         outputobj['Stiffener']['Length'] = 0
         outputobj['Stiffener']['Thickness'] = 0
 
+    '''
     ###########################################################################
     # End of Output dictionary
     

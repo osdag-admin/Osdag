@@ -293,7 +293,6 @@ def fetchBeamPara(self):
 
 
 #######################################################################
-#######################################################################
 # Start of Main Program
 
 def bc_endplate_design(uiObj):
@@ -302,8 +301,11 @@ def bc_endplate_design(uiObj):
     design_status = True
 
     beam_sec = uiObj['Member']['BeamSection']
+    column_sec = uiObj['Member']['ColumnSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])
     beam_fy = float(uiObj['Member']['fy (MPa)'])
+    column_fu = float(uiObj['Member']['fu (MPa)'])
+    column_fy = float(uiObj['Member']['fy (MPa)'])
     weld_fu = float(uiObj['weld']['fu_overwrite'])
     weld_fu_govern = min(beam_fu, weld_fu)  # Mpa  (weld_fu_govern is the governing value of weld strength)
 
@@ -326,17 +328,17 @@ def bc_endplate_design(uiObj):
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
-    end_plate_width = str(uiObj['Plate']['Width (mm)'])
-    if end_plate_width == '':
-        end_plate_width = 0
-    else:
-        end_plate_width = float(end_plate_width)
-
-    end_plate_height = str(uiObj['Plate']['Height (mm)'])
-    if end_plate_height == '':
-        end_plate_height = 0
-    else:
-        end_plate_height = float(end_plate_height)
+    # end_plate_width = str(uiObj['Plate']['Width (mm)'])
+    # if end_plate_width == '':
+    #     end_plate_width = 0
+    # else:
+    #     end_plate_width = float(end_plate_width)
+    #
+    # end_plate_height = str(uiObj['Plate']['Height (mm)'])
+    # if end_plate_height == '':
+    #     end_plate_height = 0
+    # else:
+    #     end_plate_height = float(end_plate_height)
 
     # TODO implement after excomm review for different grades of plate
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])

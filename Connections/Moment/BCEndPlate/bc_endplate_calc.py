@@ -20,6 +20,9 @@ ASCII diagram
 
 from model import *
 from Connections.connection_calculations import ConnectionCalculations
+from utilities.is800_2007 import IS800_2007
+from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002
+from utilities.common_calculation import *
 import math
 import logging
 flag = 1
@@ -321,7 +324,8 @@ def bc_endplate_design(uiObj):
     bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
     bolt_type = uiObj["Bolt"]["Type"]
     bolt_grade = float(uiObj['Bolt']['Grade'])
-
+    bolt_fu = uiObj["bolt"]["bolt_fu"]
+    bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
@@ -347,6 +351,15 @@ def bc_endplate_design(uiObj):
 
     weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+
+    if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+        edge_type = 'hand_flame_cut'
+    else:
+        edge_type = 'machine_flame_cut'
+    corrosive_influences = False
+    if uiObj['detailing']['is_env_corrosive'] == "Yes":
+        corrosive_influences = True
+
 
     old_beam_section = get_oldbeamcombolist()
     old_column_section = get_oldcolumncombolist()
@@ -391,42 +404,31 @@ def bc_endplate_design(uiObj):
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
 
-    #######################################################################
-    # Calculation of Bolt strength in MPa
-    bolt_fu = uiObj["bolt"]["bolt_fu"]
-    bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
+    bolt_plates_tk = [column_tf, end_plate_thickness]
 
     #######################################################################
     # Calculation of Spacing
 
-    # t_thinner is the thickness of the thinner plate(s) being connected
-    t_thinner = end_plate_thickness
+    # t_thinner is the thickness of the thinner plate(s) being bolted
+    t_thinner = min(bolt_plates_tk)
 
-    # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm) [Cl. 10.2.2, IS 800:2007]
-    min_pitch = int(math.ceil(2.5 * bolt_dia))
-    pitch_dist_min = min_pitch + (5 - min_pitch) % 5  # round off to nearest greater multiple of five
-
-    max_pitch = int(min(math.ceil(32 * t_thinner), 300))
-    pitch_dist_max = max_pitch + (5 - max_pitch) % 5  # round off to nearest greater multiple of five
+    # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm)
+    # rounded to nearest greater multiple of five
+    pitch_dist_min = round_up(IS800_2007.cl_10_2_2_min_spacing(bolt_dia), multiplier=5)
+    pitch_dist_max = IS800_2007.cl_10_2_3_1_max_spacing(bolt_plates_tk)
 
     # min_gauge & max_gauge = Minimum and Maximum gauge distance (mm) [Cl. 10.2.3.1, IS 800:2007]
-
     gauge_dist_min = pitch_dist_min
     gauge_dist_max = pitch_dist_max
 
     # min_end_distance & max_end_distance = Minimum and Maximum end distance
     #       [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
-    if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
-        min_end_distance = int(math.ceil(1.7 * dia_hole))
-    else:
-        min_end_distance = int(float(1.5 * dia_hole))
 
-    end_dist_mini = min_end_distance + (5 - min_end_distance) % 5  # round off to nearest greater multiple of five
+    end_dist_mini = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=bolt_dia, bolt_hole_type=dp_bolt_hole_type,
+                                                                      edge_type=edge_type), multiplier=5)
 
-    e = math.sqrt(250 / end_plate_fy)
-    max_end_distance = math.ceil(12 * end_plate_thickness * e)
-
-    end_dist_max = max_end_distance + (5 - max_end_distance) % 5  # round off to nearest greater multiple of five
+    end_dist_max = IS800_2007.cl_10_2_4_3_max_edge_dist(plate_thicknesses=bolt_plates_tk, f_y=end_plate_fy,
+                                                        corrosive_influences=corrosive_influences)
 
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     edge_dist_mini = end_dist_mini
@@ -435,20 +437,20 @@ def bc_endplate_design(uiObj):
     #######################################################################
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
-    l_v = float(50)
+    l_v = float(50.0)
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
     # g_1 = max(90, (l_v + edge_dist_mini))
-    g_1 = 90
+    g_1 = 100.0
     #######################################################################
     # Validation of Input Dock
 
     # End Plate Thickness
 
     # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
-    if end_plate_thickness < max(beam_tf, beam_tw):
-        end_plate_thickness = math.ceil(max(beam_tf, beam_tw))
+    if end_plate_thickness < max(beam_tf, beam_tw, column_tf):
+        end_plate_thickness = math.ceil(max(beam_tf, beam_tw, column_tf))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
@@ -518,7 +520,7 @@ def bc_endplate_design(uiObj):
 
     n_e = 1  # number of effective interfaces offering resistance to shear
     factor = 1
-    sum_plate_thickness = 2 * end_plate_thickness
+    sum_plate_thickness = column_tf + end_plate_thickness
 
     # Calculation of k_b
     kb_1 = float(end_dist_mini) / (3 * dia_hole)
@@ -626,7 +628,7 @@ def bc_endplate_design(uiObj):
         # Calculating pitch, gauge, end and edge distances for different cases
 
         # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
+        if connectivity == "both_way":
 
             if number_of_bolts == 8:
                 pitch_distance = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v))
@@ -1001,7 +1003,7 @@ def bc_endplate_design(uiObj):
 
         '''
         # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
+        if connectivity == "both_way":
             if number_of_bolts == 8:
                 y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
                 y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
@@ -1410,10 +1412,7 @@ def bc_endplate_design(uiObj):
         # Check for Shear yielding and shear rupture of end plate
 
         # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
-        if end_plate_width != 0:
-            A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
-        else:
-            A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
+        A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
         V_d = shear_yielding(A_v, end_plate_fy)
 
         if V_d < factored_shear_load:
@@ -1641,7 +1640,7 @@ def bc_endplate_design(uiObj):
     if number_of_bolts <= 20:
 
         # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
+        if connectivity == "both_way":
             outputobj = {}
             outputobj['Bolt'] = {}
             outputobj['Bolt']['status'] = design_status

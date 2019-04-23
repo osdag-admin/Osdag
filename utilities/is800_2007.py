@@ -221,7 +221,7 @@ class IS800_2007(object):
         if edge_type == 'hand_flame_cut':
             return 1.7 * d_0
         else:
-            # TODO : bolt_hole_type == 'machine_flame_cut' is given in else
+            # TODO : edge_type == 'machine_flame_cut' is given in else
             return 1.5 * d_0
 
     # cl. 10.2.4.3  Maximum Edge Distance

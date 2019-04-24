@@ -335,21 +335,14 @@ def bc_endplate_design(uiObj):
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
+    if dp_bolt_hole_type == "Over-sized":
+        bolt_hole_type = 'over_size'
+    else:
+        bolt_hole_type = 'standard'
+
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
 
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
-
-    # end_plate_width = str(uiObj['Plate']['Width (mm)'])
-    # if end_plate_width == '':
-    #     end_plate_width = 0
-    # else:
-    #     end_plate_width = float(end_plate_width)
-    #
-    # end_plate_height = str(uiObj['Plate']['Height (mm)'])
-    # if end_plate_height == '':
-    #     end_plate_height = 0
-    # else:
-    #     end_plate_height = float(end_plate_height)
 
     # TODO implement after excomm review for different grades of plate
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])

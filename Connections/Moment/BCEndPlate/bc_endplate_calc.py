@@ -303,7 +303,13 @@ def bc_endplate_design(uiObj):
     global design_status
     design_status = True
 
-    connectivity = uiObj['Member']['Connectivity']
+    conn_type = uiObj['Member']['Connectivity']
+    if conn_type == "Extended both ways":
+        connectivity = "both_way"
+    else:   #TODO : elif for one way and flush
+        connectivity = "one_way"
+        connectivity = "flush"
+
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumnSection']
     beam_fu = float(uiObj['Member']['fu (MPa)'])

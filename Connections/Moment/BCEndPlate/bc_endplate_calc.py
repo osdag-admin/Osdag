@@ -21,7 +21,7 @@ ASCII diagram
 from model import *
 from Connections.connection_calculations import ConnectionCalculations
 from utilities.is800_2007 import IS800_2007
-from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002
+from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002, IS1367_Part3_2002
 from utilities.common_calculation import *
 import math
 import logging
@@ -210,48 +210,9 @@ def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
 
 #######################################################################
 
-# Function for calculating Tension capacity of Friction Grip Bolt bolt
-# Reference: Cl 10.4.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-
-def bolt_tension_friction_grip_bolt(bolt_fu, netArea):
-    """
-
-    Args:
-        bolt_fu: (float)- Ultimate tensile strength of a bolt
-        netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
-
-    Returns: (float)- Tension capacity of Friction Grip Bolt bolt in kN
-
-    """
-    T_df = 0.9 * bolt_fu * netArea * (1.25 * 1000) ** -1
-    return T_df
-
-
-#######################################################################
-
-# Function for calculating Tension capacity of bearing bolt (also known as black bolt)
-# Reference: Cl 10.3.5 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def bolt_tension_bearing(bolt_fu, netArea):
-    """
-
-    Args:
-        bolt_fu: (float)- Ultimate tensile strength of a bolt
-        netArea: (float)- Net tensile stress area as specified in IS 1367 (area at threads)
-
-    Returns: (float)- Tension capacity of Bearing bolt in kN
-
-    """
-
-    T_db = (0.9 * bolt_fu * netArea) / (1.25 * 1000)
-    return T_db
-
-
-#######################################################################
-
 # Function for calculating Shear yielding capacity of End Plate
 # Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+
 
 def shear_yielding(A_v, plate_fy):
     """
@@ -359,6 +320,7 @@ def bc_endplate_design(uiObj):
     if uiObj['detailing']['is_env_corrosive'] == "Yes":
         corrosive_influences = True
 
+    [bolt_shank_area, bolt_net_area] = IS1367_Part3_2002.bolt_area(bolt_dia)
 
     old_beam_section = get_oldbeamcombolist()
     old_column_section = get_oldcolumncombolist()
@@ -423,7 +385,7 @@ def bc_endplate_design(uiObj):
     # min_end_distance & max_end_distance = Minimum and Maximum end distance
     #       [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
 
-    end_dist_mini = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=bolt_dia, bolt_hole_type=dp_bolt_hole_type,
+    end_dist_mini = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=bolt_dia, bolt_hole_type=bolt_hole_type,
                                                                       edge_type=edge_type), multiplier=5)
 
     end_dist_max = IS800_2007.cl_10_2_4_3_max_edge_dist(plate_thicknesses=bolt_plates_tk, f_y=end_plate_fy,
@@ -558,33 +520,15 @@ def bc_endplate_design(uiObj):
 
     if bolt_type == "Friction Grip Bolt":
         bolt_shear_capacity = V_dsf
+        bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(f_ub=bolt_fu,
+                                                                                      f_yb=bolt_fy,
+                                                                                      A_sb=bolt_shank_area,
+                                                                                      A_n=bolt_net_area)
     else:
         bolt_shear_capacity = V_dsb
 
     #######################################################################
-    # Check for tension capacities of bolt
 
-    Tdf_1 = (bolt_fy * netarea_shank(bolt_dia) * (1.25 / 1.10)) / 1000  # Here, Tdf_1 is the maximum allowed tension capacity of bolt (Cl 10.4.5, IS 800:2007 )
-
-    if bolt_type == "Friction Grip Bolt":
-        Tdf = bolt_tension_friction_grip_bolt(bolt_fu, netArea_thread(bolt_dia))
-        bolt_tension_capacity = Tdf
-        if Tdf > Tdf_1:
-            design_status = False
-            logger.error(": Tension capacity of Friction Grip Bolt bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-            logger.info(": Re-design the connection using bolt of smaller diameter")
-    else:
-        Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
-        bolt_tension_capacity = Tdb
-
-        if Tdb > Tdf_1:
-            design_status = False
-            logger.error(": Tension capacity of Bearing bolt exceeds the specified limit (Clause 10.3.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-            logger.info(": Re-design the connection using bolt of smaller diameter")
-
-    #######################################################################
     # Calculation for number of bolts in each column
 
     # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )

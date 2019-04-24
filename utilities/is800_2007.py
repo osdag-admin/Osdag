@@ -437,6 +437,33 @@ class IS800_2007(object):
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
 
+    # cl. 10.4.5 Tension Resistance
+    @staticmethod
+    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n):
+        """Calculate design tensile strength of friction grip bolt
+
+        Args:
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb - Yield strength of the bolt in MPa (float)
+            A_sb - Shank area of bolt in sq. mm  (float)
+            A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+
+        return:
+            T_df - Design tensile strength of friction grip bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.4.5
+            AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
+
+        """
+        gamma_mf = IS800_2007.cl_5_4_1_Table_5['gamma_mf']['shop']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5['gamma_m1']['ultimate_stress']
+
+        T_nf = min(0.9 * f_ub * A_n, f_yb * A_sb * gamma_m1/gamma_m0)
+        return T_nf / gamma_mf
+
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding

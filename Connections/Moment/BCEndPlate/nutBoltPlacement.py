@@ -1,6 +1,6 @@
-"""created on 19-01-2018
+"""created on 24-04-2019
 
-@author: Siddhesh C.
+@author: Anand Swaroop.
 """
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
@@ -49,7 +49,7 @@ class NutBoltArray(object):
         b = self.bolt
         n = self.nut
         for i in range(self.numOfBolts):
-            bolt_length_required = float(b.T + self.gap)
+            bolt_length_required = float(b.T + self.gap )  #
             b.H = bolt_length_required + (bolt_length_required - 5) % 5
             self.bolts.append(Bolt(b.R, b.T, b.H, b.r))
             self.nuts.append(Nut(n.R, n.T, n.H, n.r1))

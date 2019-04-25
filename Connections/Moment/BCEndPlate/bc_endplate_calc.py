@@ -368,13 +368,12 @@ def bc_endplate_design(uiObj):
     bolt_plates_tk = [column_tf, end_plate_thickness]
 
     #######################################################################
-    # Calculation of Spacing
+    # Calculation of Spacing (Min values rounded to next multiple of 5)
 
     # t_thinner is the thickness of the thinner plate(s) being bolted
     t_thinner = min(bolt_plates_tk)
 
     # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm)
-    # rounded to nearest greater multiple of five
     pitch_dist_min = round_up(IS800_2007.cl_10_2_2_min_spacing(bolt_dia), multiplier=5)
     pitch_dist_max = IS800_2007.cl_10_2_3_1_max_spacing(bolt_plates_tk)
 
@@ -387,10 +386,8 @@ def bc_endplate_design(uiObj):
 
     end_dist_mini = round_up(IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=bolt_dia, bolt_hole_type=bolt_hole_type,
                                                                       edge_type=edge_type), multiplier=5)
-
     end_dist_max = IS800_2007.cl_10_2_4_3_max_edge_dist(plate_thicknesses=bolt_plates_tk, f_y=end_plate_fy,
                                                         corrosive_influences=corrosive_influences)
-
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     edge_dist_mini = end_dist_mini
     edge_dist_max = end_dist_max
@@ -417,115 +414,32 @@ def bc_endplate_design(uiObj):
         logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
         logger.info(": Increase the thickness of end plate ")
 
-    '''
-    # End Plate Height [Ref: Based on reasoning]
 
-    # Minimum and Maximum Plate Height
-    # TODO: Validate end_plate_height_mini after excomm review (currently used value of l_v is 50mm)
-    end_plate_height_mini = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_mini)
-
-    # TODO: Validate end_plate_height_max after excomm review
-    # Note: The distance between the toe of weld or the flange edge to the centre of the nearer bolt is 62.5mm (assumed to be maximum)
-
-    end_plate_height_max = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_max)
-
-    # End Plate Width
-
-    # Minimum and Maximum width of End Plate [Ref: Based on reasoning and AISC Design guide 16]
-    # TODO check for mini width as per AISC after excomm review
-
-    end_plate_width_mini = max(g_1 + (2 * edge_dist_mini), beam_B)
-    end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
-
-    if end_plate_width != 0:
-        if end_plate_width < end_plate_width_mini:
-            design_status = False
-            logger.error(": Width of the End Plate is less than the minimum required value ")
-            logger.warning(": Minimum End Plate width required is %2.2f mm" % end_plate_width_mini)
-            logger.info(": Increase the width of End Plate")
-        if end_plate_width > end_plate_width_max:
-            design_status = False
-            logger.error(": Width of the End Plate exceeds the maximum allowed width ")
-            logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
-            logger.info(": Decrease the width of End Plate")
-
-    # Check for Minimum and Maximum values of End Plate Height from user input
-
-    if end_plate_height != 0:
-        if end_plate_height <= beam_d:
-            design_status = False
-            logger.error(": Height of End Plate is less than/or equal to the depth of the Beam ")
-            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-            logger.info(": Increase the Height of End Plate")
-        elif end_plate_height <= end_plate_height_mini:
-            design_status = False
-            logger.error(": Height of End Plate is less than the minimum required height")
-            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-            logger.info(": Increase the Height of End Plate")
-
-        if end_plate_height > end_plate_height_max:
-            design_status = False
-            logger.error(": Height of End Plate exceeds the maximum allowed height")
-            logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
-            logger.info(": Decrease the Height of End Plate")
-
-'''
     #######################################################################
-    # Check for shear capacity of Friction Grip Bolt bolt (Cl. 10.4.3, IS 800:2007)
-    # Check for shear and bearing capacities of Bearing bolt (Cl. 10.3.3 and Cl. 10.3.4, IS 800:2007)
-    # Here,
-    # Vdsf = nominal shear capacity of Friction Grip Bolt bolt
-    # V_dsf = nominal shear capacity of Friction Grip Bolt bolt after multiplying the correction factor(s)
-    # Vdsb = nominal shear capacity of Bearing bolt
-    # V_dsb = nominal shear capacity of Bearing bolt after multiplying the correction factor(s)
-
-    n_e = 1  # number of effective interfaces offering resistance to shear
-    factor = 1
-    sum_plate_thickness = column_tf + end_plate_thickness
-
-    # Calculation of k_b
-    kb_1 = float(end_dist_mini) / (3 * dia_hole)
-    kb_2 = (float(pitch_dist_min) / (3 * dia_hole)) - 0.25
-    kb_3 = bolt_fu / end_plate_fu
-    kb_4 = 1.0
-    k_b = min(kb_1, kb_2, kb_3, kb_4)
-
-    plate_fu = int(end_plate_fu)
-
-    # Check for long joints (Cl. 10.3.3.1, IS 800:2007)
-    l_j = beam_d - (2 * beam_tf) - (2 * weld_thickness_flange) - (2 * l_v)
+    # Calculate bolt capacities
 
     if bolt_type == "Friction Grip Bolt":
-        Vdsf = ConnectionCalculations.bolt_shear_friction_grip_bolt(bolt_dia, bolt_fu, mu_f, n_e, dp_bolt_hole_type)
-
-        if l_j > 15 * bolt_dia:
-            V_dsf = Vdsf * long_joint(bolt_dia, l_j)
-        else:
-            V_dsf = Vdsf
-        bolt_capacity = V_dsf  # Capacity of Friction Grip Bolt bolt
-        bearing_capacity = "N/A"
-    else:
-        Vdsb = ConnectionCalculations.bolt_shear(bolt_dia, n_e, bolt_fu)      # 1. Check for Shear capacity of bearing bolt
-
-        if l_j > 15 * bolt_dia:
-            V_dsb = Vdsb * long_joint(bolt_dia, l_j)
-        else:
-            V_dsb = Vdsb
-
-        Vdpb = ConnectionCalculations.bolt_bearing(bolt_dia, factor, sum_plate_thickness, k_b, plate_fu)  # 2. Check for Bearing capacity of bearing bolt
-
-        V_db = min(V_dsb, Vdpb)   # Capacity of bearing bolt (V_db) is minimum of V_dsb and Vdpb
-        bolt_capacity = V_db
-        bearing_capacity = Vdpb
-
-    if bolt_type == "Friction Grip Bolt":
-        bolt_shear_capacity = V_dsf
+        bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(f_ub=bolt_fu, A_nb=bolt_net_area, n_e=1,
+                                                                        mu_f=mu_f, bolt_hole_type=bolt_hole_type)
         bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(f_ub=bolt_fu,
                                                                                       f_yb=bolt_fy,
                                                                                       A_sb=bolt_shank_area,
                                                                                       A_n=bolt_net_area)
+        bearing_capacity = "N/A"
+        bolt_capacity = bolt_shear_capacity
+
     else:
-        bolt_shear_capacity = V_dsb
+        bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(f_u=bolt_fu, A_nb=bolt_net_area,
+                                                                       A_sb=bolt_shank_area, n_n=1, n_s=0)
+        bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=min(column_fu, end_plate_fu),
+                                                                      f_ub=bolt_fu, t=sum(bolt_plates_tk),
+                                                                      d=bolt_dia, e=edge_dist_mini, p=pitch_dist_min,
+                                                                      bolt_hole_type=bolt_hole_type)
+        bolt_capacity = min(bolt_shear_capacity, bearing_capacity)
+        bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(f_ub=bolt_fu,
+                                                                                     f_yb=bolt_fy,
+                                                                                     A_sb=bolt_shank_area,
+                                                                                     A_n=bolt_net_area)
 
     #######################################################################
 

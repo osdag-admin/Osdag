@@ -443,19 +443,16 @@ def bc_endplate_design(uiObj):
 
     #######################################################################
 
-    # Calculation for number of bolts in each column
-
-    # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )
-    M_u = factored_moment + ((factored_axial_load * (beam_d/2 - beam_tf/2)) / 1000)  # kN-m
-
-    # Number of bolts
-    # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
-    n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
-    n = math.ceil(n)
-
+    # Calculation for number of bolts around tension flange
+    flange_tension = factored_moment / (beam_d - beam_tf) + factored_axial_load / 2
+    n_tension_side = flange_tension / (0.80 * bolt_tension_capacity)
     # number_of_bolts = Total number of bolts in the configuration
-    # TODO: Update number of bolts after review
-    number_of_bolts = n
+    number_of_bolts = round_up(n_tension_side, multiplier=2, minimum_value=4)
+
+
+
+
+
 
     if number_of_bolts <= 20:
 

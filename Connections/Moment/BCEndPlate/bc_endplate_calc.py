@@ -373,6 +373,7 @@ def bc_endplate_design(uiObj):
     flange_tension = factored_moment / (beam_d - beam_tf) + factored_axial_load / 2
     no_tension_side_rqd = flange_tension / (0.80 * bolt_tension_capacity)
     no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=4)
+    number_of_bolts = 2 * no_tension_side
 
     # Prying force
     b_e = beam_B
@@ -404,7 +405,6 @@ def bc_endplate_design(uiObj):
             if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist_min:
                 no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
                            'out_compression_flange': 2, 'in_compression_flange': 1}
-            number_of_bolts = 2 * sum(no_rows.values())
 
         elif no_tension_side == 8:
             no_rows = {'out_tension_flange': 2, 'in_tension_flange': 2,
@@ -412,7 +412,6 @@ def bc_endplate_design(uiObj):
             if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist_min:
                 no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                            'out_compression_flange': 3, 'in_compression_flange': 1}
-            number_of_bolts = 2 * sum(no_rows.values())
 
         else:
             design_status = False
@@ -420,8 +419,11 @@ def bc_endplate_design(uiObj):
             #     ": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
             # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
             logger.info(": Re-design the connection using bolt of higher grade or diameter")
+            no_rows = {'out_tension_flange': (no_tension_side-4)/2, 'in_tension_flange': 2,
+                       'out_compression_flange': (no_tension_side-4)/2, 'in_compression_flange': 2}
 
         # #######################################################################
+
     # Plate height and width
     if no_rows['out_tension_flange'] == 0:
         tens_plate_no_pitch = flange_projection
@@ -440,55 +442,38 @@ def bc_endplate_design(uiObj):
         plate_width = g_1 + 2 * edge_dist_mini
 
     # Tension in bolts
-    # Check for combined tension and shear
-
-
-    if bolt_type == "Friction Grip Bolt":
-        if T_b >= Tdf:
-            design_status = False
-            logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.4.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension on Friction Grip Bolt bolt of selected diameter is %2.2f kN" % Tdf)
-            logger.info(": Re-design the connection using bolt of higher diameter or grade")
+    axial_tension = factored_axial_load / number_of_bolts
+    if no_rows['out_tension_flange'] == 0:
+        extreme_bolt_dist = beam_d - beam_tf * 3/2 - l_v
     else:
-        if T_b >= Tdb:
-            design_status = False
-            logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.3.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension on Bearing bolt of selected diameter is %2.2f kN" % Tdb)
-            logger.info(": Re-design the connection using bolt of higher diameter or grade")
+        extreme_bolt_dist = beam_d - beam_tf/2 + l_v + (no_rows['out_tension_flange']-1) * pitch_dist_min
+    sigma_yi_sq = 0
+    for bolt_row in range(no_rows['out_tension_flange']):
+        sigma_yi_sq += (beam_d - beam_tf/2 + l_v + bolt_row * pitch_dist_min) ** 2
+    for bolt_row in range(no_rows['out_compression_flange']):
+        sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist_min) ** 2
 
-        #######################################################################
-        # Check for Combined shear and tension capacity of bolt
+    moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
+    tension_in_bolt = axial_tension + moment_tension + prying_force
+    shear_in_bolt = factored_shear_load / number_of_bolts
+    # Check for combined tension and shear
+    if bolt_type == "Friction Grip Bolt":
+        bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf=shear_in_bolt,
+                                                                                        V_df=bolt_capacity,
+                                                                                        T_f=tension_in_bolt,
+                                                                                        T_df=bolt_tension_capacity)
+    else:
+        bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb=shear_in_bolt,
+                                                                                        V_db=bolt_capacity,
+                                                                                        T_b=tension_in_bolt,
+                                                                                        T_db=bolt_tension_capacity)
 
-        # 1. Friction Grip Bolt bolt (Cl. 10.4.6, IS 800:2007)
-        # Here, Vsf = Factored shear load acting on single bolt, Vdf = shear capacity of single Friction Grip Bolt bolt
-        # Tf = External factored tension acting on a single Friction Grip Bolt bolt, Tdf = Tension capacity of single Friction Grip Bolt bolt
-
-        # 2. Bearing bolt (Cl. 10.3.6, IS 800:2007)
-        # Here, Vsb = Factored shear load acting on single bolt, Vdb = shear capacity of single bearing bolt
-        # Tb = External factored tension acting on single bearing bolt, Tdb = Tension capacity of single bearing bolt
-
-        if bolt_type == "Friction Grip Bolt":
-            combined_capacity = (Vsf / Vdf) ** 2 + (Tf / Tdf) ** 2
-
-            if combined_capacity > 1.0:
-                design_status = False
-                logger.error(": Load due to combined shear and tension on selected Friction Grip Bolt bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
-                logger.warning(": The maximum allowable value is 1.0")
-                logger.info(": Re-design the connection using bolt of higher diameter or grade")
-        else:
-            combined_capacity = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
-
-            if combined_capacity > 1.0:
-                design_status = False
-                logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
-                logger.warning(": The maximum allowable value is 1.0")
-                logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
         #######################################################################
         # Check for Shear yielding and shear rupture of end plate
 
         # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
-        A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
+        A_v = plate_width * end_plate_thickness  # gross shear area of end plate
         V_d = shear_yielding(A_v, end_plate_fy)
 
         if V_d < factored_shear_load:
@@ -603,15 +588,15 @@ def bc_endplate_design(uiObj):
             logger.error(": Weld size at the flange is not sufficient")
             logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
             logger.info(": Increase the weld size at flange")
-        if weld_thickness_flange > min(beam_tf, tp_provided):
+        if weld_thickness_flange > min(beam_tf, end_plate_thickness):
             design_status = False
             logger.error(": Weld size at the flange exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
+            logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, end_plate_thickness))
             logger.info(": Decrease the weld size at flange")
 
         # Design of weld at web
 
-        t_weld_web = int(min(beam_tw, tp_required))
+        t_weld_web = int(min(beam_tw, end_plate_thickness))
 
         if t_weld_web % 2 == 0:
             t_weld_web = t_weld_web
@@ -628,10 +613,10 @@ def bc_endplate_design(uiObj):
             logger.error(": Weld size at the web is not sufficient")
             logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
             logger.info(": Increase the weld size at web")
-        if weld_thickness_web > int(min(beam_tw, tp_required)):
+        if weld_thickness_web > int(min(beam_tw, end_plate_thickness)):
             design_status = False
             logger.error(": Weld size at the web exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
+            logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, end_plate_thickness)))
             logger.info(": Decrease the weld size at web")
 
         #######################################################################
@@ -681,7 +666,7 @@ def bc_endplate_design(uiObj):
 
         # Height of stiffener (mm) (AISC Design guide 4, page 16)
         # TODO: Do calculation for actual height of end plate above
-        h_st = math.ceil((end_plate_height_provided - beam_d) / 2)
+        h_st = math.ceil((plate_height - beam_d) / 2)
 
         # Length of stiffener
         cf = math.pi/180  # conversion factor to convert degree into radian
@@ -713,8 +698,6 @@ def bc_endplate_design(uiObj):
 ########################################################################################################################
     # End of Calculation
     # Output dictionary for different cases
-    if number_of_bolts <= 20:
-
         # Case 1: When the height and the width of end plate is not specified by user
         if connectivity == "both_way":
             outputobj = {}

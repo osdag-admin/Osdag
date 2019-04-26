@@ -102,45 +102,6 @@ def long_joint(dia, l_j):
 # Reference: Cl 10.3.3 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 # Assumption: The shear planes are assumed to be passing through the threads of the bolt
 
-def bolt_shear(dia, n, bolt_fu):
-    """
-
-    Args:
-        dia: (int)- diameter of bolt
-        n: (str)- number of shear plane(s) through which bolt is passing
-        bolt_fu: (float)- Ultimate tensile strength of a bolt
-
-    Returns: (float)- Shear capacity of bearing type bolt in kN
-
-    """
-    A = netArea_thread(dia)
-    V_dsb = bolt_fu * n * A / (math.sqrt(3) * 1.25 * 1000)
-    V_dsb = round(V_dsb.real, 3)
-    return V_dsb
-
-
-#######################################################################
-
-# Function for Bearing Capacity of bearing bolt (also known as black bolt)
-# Reference: Cl 10.3.4 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def bolt_bearing(dia, t, k_b, bolt_fu):
-    """
-
-    Args:
-        dia: (int)- diameter of bolt
-        t: (float)- summation of thickneses of the connected plates experencing bearing stress in same direction, or if the bolts are countersunk, the thickness of plate minus 1/2 of the depth of countersunk
-        k_b: (float)- multiplying factor (Ref: Cl 10.3.4 IS 800:2007)
-        bolt_fu: (float)- Ultimate tensile strength of a bolt
-
-    Returns: (float)- Bearing capacity of bearing type bolt in kN
-
-    """
-    V_dpb = 2.5 * k_b * dia * t * bolt_fu / (1.25 * 1000)
-    V_dpb  = round(V_dpb.real, 3)
-    return V_dpb
-
-
 #######################################################################
 
 # Function for minimum height of end plate
@@ -183,30 +144,6 @@ def min_plate_width(g_1, n, min_gauge, e_2):
     min_end_plate_width = g_1 + (n - 2) * min_gauge + (2 * e_2)
     return min_end_plate_width
 
-
-#######################################################################
-
-# Function for calculation of Prying Force in bolts
-# Reference: Cl 10.4.7 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p):
-    """
-
-    Args:
-        T_e: (float): Tension acting on beam flange
-        l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
-        l_e: (float)- Distance between prying force and bolt centreline
-        beta: (int)- multiplying factor
-        eta: (float)- multiplying factor
-        f_0: (float)- proof stress in consistent units
-        b_e: (float)- effective width of flange per pair of bolts
-        t_p: (float)- thickness of end plate
-
-    Returns: (float)- Prying force in bolt (in kN)
-
-    """
-    prying_force_bolt = (l_v * (2 * l_e) ** -1) * (T_e - ((beta * eta * f_0 * b_e * t_p ** 4) * (27 * l_e * l_v ** 2) ** -1))
-    return prying_force_bolt
 
 #######################################################################
 
@@ -396,23 +333,12 @@ def bc_endplate_design(uiObj):
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
     l_v = float(50.0)
+    flange_projection = 5
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
     # g_1 = max(90, (l_v + edge_dist_mini))
     g_1 = 100.0
-    #######################################################################
-    # Validation of Input Dock
-
-    # End Plate Thickness
-
-    # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
-    if end_plate_thickness < max(beam_tf, beam_tw, column_tf):
-        end_plate_thickness = math.ceil(max(beam_tf, beam_tw, column_tf))
-        design_status = False
-        logger.error(": Chosen end plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
-        logger.info(": Increase the thickness of end plate ")
 
 
     #######################################################################
@@ -448,6 +374,23 @@ def bc_endplate_design(uiObj):
     no_tension_side_rqd = flange_tension / (0.80 * bolt_tension_capacity)
     no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=4)
 
+    # Prying force
+    b_e = beam_B
+    prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu,
+                                                          b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
+                                                          end_dist=end_dist_mini, pre_tensioned=False)
+    toe_of_weld_moment = flange_tension/2 * l_v - prying_force * end_dist_mini
+    plate_tk_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
+
+    # End Plate Thickness
+    # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
+    if end_plate_thickness < max(column_tf, plate_tk_min):
+        end_plate_thickness = math.ceil(max(column_tf, plate_tk_min))
+        design_status = False
+        logger.error(": Chosen end plate thickness is not sufficient")
+        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
+        logger.info(": Increase the thickness of end plate ")
+
     # Detailing
     if connectivity == "both_way":
 
@@ -479,10 +422,24 @@ def bc_endplate_design(uiObj):
             logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
         # #######################################################################
+    # Plate height and width
+    if no_rows['out_tension_flange'] == 0:
+        tens_plate_no_pitch = flange_projection
+    else:
+        tens_plate_no_pitch = end_dist_mini + l_v
+    if no_rows['out_compression_flange'] == 0:
+        comp_plate_no_pitch = flange_projection
+    else:
+        comp_plate_no_pitch = end_dist_mini + l_v
 
+    plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist_min + \
+                   comp_plate_no_pitch + tens_plate_no_pitch
+    plate_width = g_1 + 2 * edge_dist_mini
+    while plate_width < beam_B:
+        edge_dist_mini += 5
+        plate_width = g_1 + 2 * edge_dist_mini
 
     # Tension in bolts
-    # Prying force
     # Check for combined tension and shear
 
 

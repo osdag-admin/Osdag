@@ -411,7 +411,7 @@ class IS800_2007(object):
 
     # cl. 10.3.6 Bolt subjected to combined shear and tension of bearing bolts
     @staticmethod
-    def cl_10_3_6_bearing_bolt_combined_forces(V_sb, V_db, T_b, T_db):
+    def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db):
 
         """Check for bolt subjected to combined shear and tension
 
@@ -535,12 +535,13 @@ class IS800_2007(object):
 
     # cl. 10.4.7 Prying force bolts
     @staticmethod
-    def cl_10_4_7_bolt_prying_force(T_e, l_v, beta, eta, f_o, b_e, t, f_y, e):
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
         """Calculate prying force of friction grip bolt
 
                        Args:
                           2 * T_e - Force in
-                          l_v - distance from the bolt centre line to the toe of the fillet weld or to half the root radius for a rolled section,
+                          l_v - distance from the bolt centre line to the toe of the fillet weld or to half
+                                the root radius for a rolled section,
                           beta - 2 for non pre-tensioned bolt and 1 for pre-tensioned bolt
                           eta - 1.5
                           b_e - effective width of flange per pair of bolts
@@ -553,8 +554,12 @@ class IS800_2007(object):
                        Note:
                            Reference:
                            IS 800:2007,  cl 10.4.7
-               """
-        l_e = min(e, 1.1 * t * math.sqrt(beta * f_o / f_y))
+
+        """
+        beta = 2
+        if pre_tensioned is True:
+            beta = 1
+        l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
         Q = (l_v/2*l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
 

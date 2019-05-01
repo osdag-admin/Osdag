@@ -217,13 +217,13 @@ def bc_endplate_design(uiObj):
     weld_fu = float(uiObj['weld']['fu_overwrite'])
     weld_fu_govern = min(beam_fu, weld_fu)  # Mpa  (weld_fu_govern is the governing value of weld strength)
 
-    factored_moment = float(uiObj['Load']['Moment (kNm)'])
-    factored_shear_load = float(uiObj['Load']['ShearForce (kN)'])
+    factored_moment = float(uiObj['Load']['Moment (kNm)']) * 1e6
+    factored_shear_load = float(uiObj['Load']['ShearForce (kN)']) * 1e3
     factored_axial_load = uiObj['Load']['AxialForce (kN)']
     if factored_axial_load == '':
         factored_axial_load = 0
     else:
-        factored_axial_load = float(factored_axial_load)
+        factored_axial_load = float(factored_axial_load) * 1e3
 
     bolt_dia = int(uiObj['Bolt']['Diameter (mm)'])
     bolt_type = uiObj["Bolt"]["Type"]
@@ -384,7 +384,7 @@ def bc_endplate_design(uiObj):
     prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu,
                                                           b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
                                                           end_dist=end_dist, pre_tensioned=False)
-    toe_of_weld_moment = flange_tension/2 * l_v - prying_force * end_dist
+    toe_of_weld_moment = abs(flange_tension/2 * l_v - prying_force * end_dist)
     plate_tk_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
     # End Plate Thickness
@@ -469,9 +469,9 @@ def bc_endplate_design(uiObj):
         else:
             extreme_bolt_dist = beam_d - beam_tf/2 + l_v + (no_rows['out_tension_flange']-1) * pitch_dist
         sigma_yi_sq = 0
-        for bolt_row in range(no_rows['out_tension_flange']):
+        for bolt_row in range(int(no_rows['out_tension_flange'])):
             sigma_yi_sq += (beam_d - beam_tf/2 + l_v + bolt_row * pitch_dist) ** 2
-        for bolt_row in range(no_rows['out_compression_flange']):
+        for bolt_row in range(int(no_rows['out_compression_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
         moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq

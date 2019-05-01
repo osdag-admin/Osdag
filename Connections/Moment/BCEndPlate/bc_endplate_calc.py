@@ -409,20 +409,30 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
                            'out_compression_flange': 1, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
-                               'out_compression_flange': 2, 'in_compression_flange': 1}
+                    design_status = False
+                    # logger.error(
+                    #     ": Detailing Error - Pitch distance is less than the minimum required (Clause 10.2.2, IS 800:2007)")
+                    # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
+                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+
+                    # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
+                    #            'out_compression_flange': 2, 'in_compression_flange': 1}
 
             elif no_tension_side == 8:
-                no_rows = {'out_tension_flange': 2, 'in_tension_flange': 2,
-                           'out_compression_flange': 2, 'in_compression_flange': 2}
-                if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
-                               'out_compression_flange': 3, 'in_compression_flange': 1}
+                no_rows = {'out_tension_flange': 1, 'in_tension_flange': 3,
+                           'out_compression_flange': 1, 'in_compression_flange': 3}
+                if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
+                    design_status = False
+                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+
+                    # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
+                    #            'out_compression_flange': 3, 'in_compression_flange': 1}
             elif no_tension_side == 10:
                 no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
                            'out_compression_flange': 3, 'in_compression_flange': 2}
-                if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
                     design_status = False
+                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
             else:
                 design_status = False

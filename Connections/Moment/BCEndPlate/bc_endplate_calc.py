@@ -732,25 +732,25 @@ def bc_endplate_design(uiObj):
 
 
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = round(pitch_dist, 3)
+            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
         elif number_of_bolts == 12:
             outputobj['Bolt']['Pitch23'] = pitch_dist
             outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
             outputobj['Bolt']['Pitch45'] = pitch_dist
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-            outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-            outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-            outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-            outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch56'] = pitch_dist
+            outputobj['Bolt']['Pitch67'] = pitch_dist
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = 0.0
-            outputobj['Bolt']['Pitch34'] = 0.0
-            outputobj['Bolt']['Pitch45'] = 0.0
-            outputobj['Bolt']['Pitch56'] = 0.0
-            outputobj['Bolt']['Pitch67'] = 0.0
-            outputobj['Bolt']['Pitch78'] = 0.0
-            outputobj['Bolt']['Pitch910'] = 0.0
+            outputobj['Bolt']['Pitch12'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+            outputobj['Bolt']['Pitch78'] = pitch_dist
+            outputobj['Bolt']['Pitch910'] = pitch_dist
 
         outputobj['Plate'] = {}
         outputobj['Plate']['Height'] = float(round(plate_height, 3))

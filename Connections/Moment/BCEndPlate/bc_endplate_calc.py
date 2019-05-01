@@ -331,7 +331,7 @@ def bc_endplate_design(uiObj):
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
     edge_dist_min = end_dist_min
     edge_dist_max = end_dist_max
-    edge_dist = edge_dist_min
+    edge_dist = round_up(edge_dist_min, multiplier=5)
 
     #######################################################################
     # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]

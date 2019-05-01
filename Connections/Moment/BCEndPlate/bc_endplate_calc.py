@@ -430,8 +430,8 @@ def bc_endplate_design(uiObj):
                 #     ": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
                 # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
                 logger.info(": Re-design the connection using bolt of higher grade or diameter")
-                no_rows = {'out_tension_flange': (no_tension_side-4)/2, 'in_tension_flange': 2,
-                           'out_compression_flange': (no_tension_side-4)/2, 'in_compression_flange': 2}
+                no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
+                           'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
             # #######################################################################
 

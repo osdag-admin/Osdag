@@ -397,80 +397,93 @@ def bc_endplate_design(uiObj):
         logger.info(": Increase the thickness of end plate ")
 
     # Detailing
-    if connectivity == "both_way":
+    bolt_combined_status = False
+    while bolt_combined_status is False:
+        if connectivity == "both_way":
 
-        if no_tension_side == 4:
-            no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
-                       'out_compression_flange': 1, 'in_compression_flange': 1}
+            if no_tension_side == 4:
+                no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
+                           'out_compression_flange': 1, 'in_compression_flange': 1}
 
-        elif no_tension_side == 6:
-            no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
-                       'out_compression_flange': 1, 'in_compression_flange': 2}
-            if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist_min:
-                no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
-                           'out_compression_flange': 2, 'in_compression_flange': 1}
+            elif no_tension_side == 6:
+                no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
+                           'out_compression_flange': 1, 'in_compression_flange': 2}
+                if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
+                               'out_compression_flange': 2, 'in_compression_flange': 1}
 
-        elif no_tension_side == 8:
-            no_rows = {'out_tension_flange': 2, 'in_tension_flange': 2,
-                       'out_compression_flange': 2, 'in_compression_flange': 2}
-            if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist_min:
-                no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
-                           'out_compression_flange': 3, 'in_compression_flange': 1}
+            elif no_tension_side == 8:
+                no_rows = {'out_tension_flange': 2, 'in_tension_flange': 2,
+                           'out_compression_flange': 2, 'in_compression_flange': 2}
+                if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
+                               'out_compression_flange': 3, 'in_compression_flange': 1}
+            elif no_tension_side == 10:
+                no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
+                           'out_compression_flange': 3, 'in_compression_flange': 2}
+                if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
+                    design_status = False
 
+            else:
+                design_status = False
+                # logger.error(
+                #     ": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
+                # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
+                logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                no_rows = {'out_tension_flange': (no_tension_side-4)/2, 'in_tension_flange': 2,
+                           'out_compression_flange': (no_tension_side-4)/2, 'in_compression_flange': 2}
+
+            # #######################################################################
+
+        # Plate height and width
+        if no_rows['out_tension_flange'] == 0:
+            tens_plate_no_pitch = flange_projection
         else:
-            design_status = False
-            # logger.error(
-            #     ": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-            # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-            logger.info(": Re-design the connection using bolt of higher grade or diameter")
-            no_rows = {'out_tension_flange': (no_tension_side-4)/2, 'in_tension_flange': 2,
-                       'out_compression_flange': (no_tension_side-4)/2, 'in_compression_flange': 2}
+            tens_plate_no_pitch = end_dist + l_v
+        if no_rows['out_compression_flange'] == 0:
+            comp_plate_no_pitch = flange_projection
+        else:
+            comp_plate_no_pitch = end_dist + l_v
 
-        # #######################################################################
-
-    # Plate height and width
-    if no_rows['out_tension_flange'] == 0:
-        tens_plate_no_pitch = flange_projection
-    else:
-        tens_plate_no_pitch = end_dist + l_v
-    if no_rows['out_compression_flange'] == 0:
-        comp_plate_no_pitch = flange_projection
-    else:
-        comp_plate_no_pitch = end_dist + l_v
-
-    plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
-                   comp_plate_no_pitch + tens_plate_no_pitch
-    plate_width = g_1 + 2 * edge_dist
-    while plate_width < beam_B:
-        edge_dist += 5
+        plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
+                       comp_plate_no_pitch + tens_plate_no_pitch
         plate_width = g_1 + 2 * edge_dist
+        while plate_width < beam_B:
+            edge_dist += 5
+            plate_width = g_1 + 2 * edge_dist
 
-    # Tension in bolts
-    axial_tension = factored_axial_load / number_of_bolts
-    if no_rows['out_tension_flange'] == 0:
-        extreme_bolt_dist = beam_d - beam_tf * 3/2 - l_v
-    else:
-        extreme_bolt_dist = beam_d - beam_tf/2 + l_v + (no_rows['out_tension_flange']-1) * pitch_dist
-    sigma_yi_sq = 0
-    for bolt_row in range(no_rows['out_tension_flange']):
-        sigma_yi_sq += (beam_d - beam_tf/2 + l_v + bolt_row * pitch_dist) ** 2
-    for bolt_row in range(no_rows['out_compression_flange']):
-        sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
+        # Tension in bolts
+        axial_tension = factored_axial_load / number_of_bolts
+        if no_rows['out_tension_flange'] == 0:
+            extreme_bolt_dist = beam_d - beam_tf * 3/2 - l_v
+        else:
+            extreme_bolt_dist = beam_d - beam_tf/2 + l_v + (no_rows['out_tension_flange']-1) * pitch_dist
+        sigma_yi_sq = 0
+        for bolt_row in range(no_rows['out_tension_flange']):
+            sigma_yi_sq += (beam_d - beam_tf/2 + l_v + bolt_row * pitch_dist) ** 2
+        for bolt_row in range(no_rows['out_compression_flange']):
+            sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
-    moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
-    tension_in_bolt = axial_tension + moment_tension + prying_force
-    shear_in_bolt = factored_shear_load / number_of_bolts
-    # Check for combined tension and shear
-    if bolt_type == "Friction Grip Bolt":
-        bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf=shear_in_bolt,
-                                                                                        V_df=bolt_capacity,
-                                                                                        T_f=tension_in_bolt,
-                                                                                        T_df=bolt_tension_capacity)
-    else:
-        bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb=shear_in_bolt,
-                                                                                        V_db=bolt_capacity,
-                                                                                        T_b=tension_in_bolt,
-                                                                                        T_db=bolt_tension_capacity)
+        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
+        tension_in_bolt = axial_tension + moment_tension + prying_force
+        shear_in_bolt = factored_shear_load / number_of_bolts
+        # Check for combined tension and shear
+        if bolt_type == "Friction Grip Bolt":
+            bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf=shear_in_bolt,
+                                                                                            V_df=bolt_capacity,
+                                                                                            T_f=tension_in_bolt,
+                                                                                            T_df=bolt_tension_capacity)
+        else:
+            bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb=shear_in_bolt,
+                                                                                            V_db=bolt_capacity,
+                                                                                            T_b=tension_in_bolt,
+                                                                                            T_db=bolt_tension_capacity)
+
+        if bolt_combined_status is False:
+            no_tension_side += 2
+            number_of_bolts = 2 * no_tension_side
+
+
 
 
     #######################################################################

@@ -560,7 +560,7 @@ class IS800_2007(object):
         if pre_tensioned is True:
             beta = 1
         l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
-        Q = (l_v/2*l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+        Q = (l_v/2/l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
         return Q
 
     # -------------------------------------------------------------

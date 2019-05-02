@@ -3,6 +3,7 @@ Created on 30-April-2019
 
 @author: Anand Swaroop
 '''
+
 from numpy import math
 from Connections.connection_calculations import ConnectionCalculations
 import svgwrite
@@ -44,6 +45,14 @@ class ExtendedEndPlate(object):
 		self.plate_width_B1 = int(output_dict['Plate']['Width'])
 
 		self.plate_length_L1 = int(output_dict['Plate']['Height'])
+
+		#TODO ADD 	dictionary for stiffiners
+
+		self.stiffener_thickness_t1 = 16
+
+		self.stiffener_width_B1 = 65.55
+
+		self.stiffener_length_L1 = 368
 
 		self.flange_thickness_T1 = (beam_data["T"])
 		self.flange_thickness_T2 = self.flange_thickness_T1
@@ -512,6 +521,48 @@ class ExtendedEnd2DFront(object):
 		ptP4y = ptP3y
 		self.P4 = np.array([ptP4x, ptP4y])
 
+
+
+		# =========================  stiffener 1  =========================
+
+		ptS1x = self.data_object.flange_thickness_T1
+		ptS1y = self.data_object.column_length_L1/2 - self.data_object.beam_depth_D2/2 +\
+				self.data_object.flange_thickness_T2/2 + self.data_object.stiffener_thickness_t1/2
+		self.S1 = np.array([ptS1x, ptS1y])
+
+		ptS2x = ptS1x + self.data_object.stiffener_length_L1
+		ptS2y = ptS1y
+		self.S2 = np.array([ptS2x, ptS2y])
+
+		ptS3x = ptS2x
+		ptS3y = ptS2y + self.data_object.stiffener_thickness_t1
+		self.S3 = np.array([ptS3x, ptS3y])
+
+		ptS4x = ptS1x
+		ptS4y = ptS3y
+		self.S4 = np.array([ptS4x, ptS4y])
+
+
+
+		# =========================  stiffener 2  =========================
+
+		ptSS1x = self.data_object.flange_thickness_T1
+		ptSS1y = self.data_object.column_length_L1/2 + self.data_object.beam_depth_D2/2 -\
+				self.data_object.flange_thickness_T2/2 - self.data_object.stiffener_thickness_t1/2
+		self.SS1 = np.array([ptSS1x, ptSS1y])
+
+		ptSS2x = ptSS1x + self.data_object.stiffener_length_L1
+		ptSS2y = ptSS1y
+		self.SS2 = np.array([ptSS2x, ptSS2y])
+
+		ptSS3x = ptSS2x
+		ptSS3y = ptSS2y + self.data_object.stiffener_thickness_t1
+		self.SS3 = np.array([ptSS3x, ptSS3y])
+
+		ptSS4x = ptSS1x
+		ptSS4y = ptSS3y
+		self.SS4 = np.array([ptSS4x, ptSS4y])
+
 		# ------------------------------------------  Weld triangle  UP-------------------------------------------
 		# self.B3 = self.A2
 		# self.B2 = self.B3 + self.data_object.flange_weld_thickness * np.array([-1, 0])
@@ -629,6 +680,12 @@ class ExtendedEnd2DFront(object):
 
 
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
+
+		dwg.add(dwg.polyline(points=[self.S1, self.S2, self.S3, self.S4, self.S1], stroke='blue', fill='none',
+							 stroke_width='2.5'))
+
+		dwg.add(dwg.polyline(points=[self.SS1, self.SS2, self.SS3, self.SS4, self.SS1], stroke='blue', fill='none',
+							 stroke_width='2.5'))
 
 		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.AA5, self.AA6).stroke('blue', width=2.5, linecap='square'))
@@ -1074,6 +1131,42 @@ class ExtendedEnd2DTop(object):
 		ptP4y = ptP3y
 		self.P4 = np.array([ptP4x, ptP4y])
 
+		# =========================  stiffener 1  =========================
+
+		ptS1x = self.data_object.flange_thickness_T1
+		ptS1y = ptA1y
+		self.S1 = np.array([ptS1x, ptS1y])
+
+		ptS2x = ptS1x + self.data_object.stiffener_length_L1
+		ptS2y = ptS1y
+		self.S2 = np.array([ptS2x, ptS2y])
+
+		ptS3x = ptS2x
+		ptS3y = ptS2y + self.data_object.stiffener_width_B1
+		self.S3 = np.array([ptS3x, ptS3y])
+
+		ptS4x = ptS1x
+		ptS4y = ptS3y
+		self.S4 = np.array([ptS4x, ptS4y])
+
+		# =========================  stiffener 2  =========================
+
+		ptSS1x = self.data_object.flange_thickness_T1
+		ptSS1y = self.data_object.column_width_B1  - self.data_object.stiffener_width_B1
+		self.SS1 = np.array([ptSS1x, ptSS1y])
+
+		ptSS2x = ptSS1x + self.data_object.stiffener_length_L1
+		ptSS2y = ptSS1y
+		self.SS2 = np.array([ptSS2x, ptSS2y])
+
+		ptSS3x = ptSS2x
+		ptSS3y = ptSS2y + self.data_object.stiffener_width_B1
+		self.SS3 = np.array([ptSS3x, ptSS3y])
+
+		ptSS4x = ptSS1x
+		ptSS4y = ptSS3y
+		self.SS4 = np.array([ptSS4x, ptSS4y])
+
 		# ====================== End Plate 2  =====================
 		# ptP1x = ptP2x
 		# ptP1y = -(self.data_object.plate_width_B2 - self.data_object.beam_width_B2) / 2
@@ -1153,6 +1246,12 @@ class ExtendedEnd2DTop(object):
 
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 		# dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width=2.5))
+
+		dwg.add(dwg.polyline(points=[self.S1, self.S2, self.S3, self.S4, self.S1], stroke='blue', fill='none',
+							 stroke_width='2.5'))
+
+		dwg.add(dwg.polyline(points=[self.SS1, self.SS2, self.SS3, self.SS4, self.SS1], stroke='blue', fill='none',
+							 stroke_width='2.5'))
 
 		dwg.add(dwg.line(self.AA5, self.AA8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.AA6, self.AA7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1288,6 +1387,78 @@ class ExtendedEnd2DSide(object):
 		ptP4x = ptP1x
 		ptP4y = ptP3y
 		self.P4 = np.array([ptP4x, ptP4y])
+
+		# =========================  stiffener 1  =========================
+
+		ptS1x = self.data_object.plate_width_B1/2 - self.data_object.beam_width_B2/2
+		ptS1y = self.data_object.plate_length_L1/2 - self.data_object.beam_depth_D2/2
+		self.S1 = np.array([ptS1x, ptS1y])
+
+		ptS2x = ptS1x + self.data_object.stiffener_width_B1
+		ptS2y = ptS1y
+		self.S2 = np.array([ptS2x, ptS2y])
+
+		ptS3x = ptS2x
+		ptS3y = ptS2y + self.data_object.stiffener_thickness_t1
+		self.S3 = np.array([ptS3x, ptS3y])
+
+		ptS4x = ptS1x
+		ptS4y = ptS3y
+		self.S4 = np.array([ptS4x, ptS4y])
+
+		# =========================  stiffener 2  =========================
+
+		ptSS1x = ptS1x + self.data_object.beam_width_B2/2 + self.data_object.web_thickness_tw2/2
+		ptSS1y = self.data_object.plate_length_L1/2 - self.data_object.beam_depth_D2/2
+		self.SS1 = np.array([ptSS1x, ptSS1y])
+
+		ptSS2x = ptSS1x + self.data_object.stiffener_width_B1
+		ptSS2y = ptSS1y
+		self.SS2 = np.array([ptSS2x, ptSS2y])
+
+		ptSS3x = ptSS2x
+		ptSS3y = ptSS2y + self.data_object.stiffener_thickness_t1
+		self.SS3 = np.array([ptSS3x, ptSS3y])
+
+		ptSS4x = ptSS1x
+		ptSS4y = ptSS3y
+		self.SS4 = np.array([ptSS4x, ptSS4y])
+
+		# =========================  stiffener 3  =========================
+
+		ptS31x = self.data_object.plate_width_B1/2 - self.data_object.beam_width_B2/2
+		ptS31y = self.data_object.plate_length_L1/2 + self.data_object.beam_depth_D2/2 -self.data_object.stiffener_thickness_t1
+		self.S31 = np.array([ptS31x, ptS31y])
+
+		ptS32x = ptS1x + self.data_object.stiffener_width_B1
+		ptS32y = ptS31y
+		self.S32 = np.array([ptS32x, ptS32y])
+
+		ptS33x = ptS2x
+		ptS33y = ptS2y + self.data_object.stiffener_thickness_t1
+		self.S33 = np.array([ptS33x, ptS33y])
+
+		ptS34x = ptS1x
+		ptS34y = ptS3y
+		self.S34 = np.array([ptS34x, ptS34y])
+
+		# =========================  stiffener 4  =========================
+
+		ptS41x = ptS1x + self.data_object.beam_width_B2/2 + self.data_object.web_thickness_tw2/2
+		ptS41y = self.data_object.plate_length_L1/2 + self.data_object.beam_depth_D2/2 -self.data_object.stiffener_thickness_t1
+		self.S41 = np.array([ptS41x, ptS41y])
+
+		ptS42x = ptS41x + self.data_object.stiffener_width_B1
+		ptS42y = ptS41y
+		self.S42 = np.array([ptS42x, ptS42y])
+
+		ptS43x = ptS42x
+		ptS43y = ptS42y + self.data_object.stiffener_thickness_t1
+		self.S43 = np.array([ptS43x, ptS43y])
+
+		ptS44x = ptS41x
+		ptS44y = ptS43y
+		self.S44 = np.array([ptS44x, ptS44y])
 
 		# =========================  Primary Beam 1  =========================
 		ptA1x = (self.data_object.plate_width_B1 - self.data_object.beam_width_B2) / 2
@@ -1427,6 +1598,20 @@ class ExtendedEnd2DSide(object):
 			stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 
+		# dwg.add(dwg.polyline(points=[self.S1, self.S2, self.S3, self.S4, self.S1], stroke='red', fill='none',
+		# 					 stroke_width='2.5',dasharray=[5, 5]))
+		# dwg.add(dwg.polyline(points=[self.SS1, self.SS2, self.SS3, self.SS4, self.SS1], stroke='red', fill='none',
+		# 					 stroke_width='2.5',dasharray=[5, 5]))
+		# dwg.add(dwg.polyline(points=[self.S31, self.S32, self.S33, self.S34, self.S31], stroke='red', fill='none',
+		# 					 stroke_width='2.5',dasharray=[5, 5]))
+		# dwg.add(dwg.polyline(points=[self.S41, self.S42, self.S43, self.S44, self.S41], stroke='red', fill='none',
+		# 					 stroke_width='2.5',dasharray=[5, 5]))
+
+		# dwg.add(dwg.polyline(self.S1, self.S2, self.S3, self.S4, self.S1).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.polyline(self.SS1, self.SS2, self.SS3, self.SS4, self.SS1).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		#
+		# dwg.add(dwg.polyline(self.S31, self.S32, self.S33, self.S34, self.S31).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.polyline(self.S41, self.S42, self.S43, self.S44, self.S41).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		# dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA5, self.AA6, self.AA7, self.AA8, self.AA1], stroke='blue', fill='none',
 		# 					 stroke_width='2.5'))
 

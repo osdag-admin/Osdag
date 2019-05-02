@@ -1479,87 +1479,96 @@ class Maincontroller(QMainWindow):
 	def clear_log_messages(self):
 		self.ui.textEdit.clear()
 
-		def create_extended_both_ways(self):
-			beam_data = self.fetchBeamPara()
+	def create_extended_both_ways(self):
 
-			beam_tw = float(beam_data["tw"])
-			beam_T = float(beam_data["T"])
-			beam_d = float(beam_data["D"])
-			beam_B = float(beam_data["B"])
-			beam_R1 = float(beam_data["R1"])
-			beam_R2 = float(beam_data["R2"])
-			beam_alpha = float(beam_data["FlangeSlope"])
-			beam_length = 1600.0
+		beam_data = self.fetchBeamPara()
 
-			beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
-								 R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-								 length=beam_length, notchObj=None)
-			beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+		beam_tw = float(beam_data["tw"])
+		beam_T = float(beam_data["T"])
+		beam_d = float(beam_data["D"])
+		beam_B = float(beam_data["B"])
+		beam_R1 = float(beam_data["R1"])
+		beam_R2 = float(beam_data["R2"])
+		beam_alpha = float(beam_data["FlangeSlope"])
+		beam_length = 1600.0
 
-			outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
+		beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+							 R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+							 length=beam_length, notchObj=None)
+		beam_Right = copy.copy(beam_Left)  # Since both the beams are same
 
-			plate_Right = Plate(W=outputobj["Plate"]["Width"],
-								L=outputobj["Plate"]["Height"],
-								T=outputobj["Plate"]["Thickness"])
+		outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
-			alist = self.designParameters()  # An object to save all input values entered by user
+		plate_Right = Plate(W=outputobj["Plate"]["Width"],
+							L=outputobj["Plate"]["Height"],
+							T=outputobj["Plate"]["Thickness"])
 
-			bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
-			bolt_r = bolt_d / 2
-			bolt_T = self.bolt_head_thick_calculation(bolt_d)
-			bolt_R = self.bolt_head_dia_calculation(bolt_d) / 2
-			bolt_Ht = self.bolt_length_calculation(bolt_d)
+		# TODO make dictionary for the stiffeners
 
-			bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component repo
-			nut_T = self.nut_thick_calculation(bolt_d)
-			nut_Ht = nut_T
-			nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
+		stiffener_L1 = Plate(W=65.55, L=368, T=16)
+		stiffener_L2 = Plate(W=65.55, L=368, T=16)
+		stiffener_R1 = Plate(W=65.55, L=368, T=16)
+		stiffener_R2 = Plate(W=65.55, L=368, T=16)
 
-			numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
+		alist = self.designParameters()  # An object to save all input values entered by user
 
-			# nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
-			nutSpace = float(beam_data["T"]) + float(
-				outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+		bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
+		bolt_r = bolt_d / 2
+		bolt_T = self.bolt_head_thick_calculation(bolt_d)
+		bolt_R = self.bolt_head_dia_calculation(bolt_d) / 2
+		bolt_Ht = self.bolt_length_calculation(bolt_d)
 
-			bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+		bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component repo
+		nut_T = self.nut_thick_calculation(bolt_d)
+		nut_Ht = nut_T
+		nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-			###########################
-			#       WELD SECTIONS     #
-			###########################
-			'''
-			Following sections are for creating Fillet Welds. 
-			Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
-			'''
+		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
-			# Followings welds are welds above beam flange, Qty = 4
-			bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
-										   L=beam_B)
-			bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
+		# nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
+		nutSpace = float(beam_data["T"]) + float(
+			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
-			# Followings welds are welds below beam flange, Qty = 8
-			bbWeldBelwFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
-											h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
-			bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_21)
-			bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_21)
-			bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_21)
+		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
 
-			# Followings welds are welds placed aside of beam web, Qty = 4
-			bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										  L=beam_d - 2 * beam_T - 40)
-			bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
+		###########################
+		#       WELD SECTIONS     #
+		###########################
+		'''
+		Following sections are for creating Fillet Welds. 
+		Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+		'''
 
-			#######################################
-			#       WELD SECTIONS QUARTER CONE    #
-			#######################################
+		# Followings welds are welds above beam flange, Qty = 4
+		bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
+									   L=beam_B)
+		bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
 
-			# # Following weld cones are placed for Left beam
+		# Followings welds are welds below beam flange, Qty = 8
+		bbWeldBelwFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
+										h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+		bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_21)
+		bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_21)
+		bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_21)
 
-			extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-										   bbWeldAbvFlang_22,
-										   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-										   bbWeldBelwFlang_24,
-										   bbWeldSideWeb_21, bbWeldSideWeb_22, )
-			extbothWays.create_3DModel()
+		# Followings welds are welds placed aside of beam web, Qty = 4
+		bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+									  L=beam_d - 2 * beam_T - 40)
+		bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
+
+		#######################################
+		#       WELD SECTIONS QUARTER CONE    #
+		#######################################
+
+		# # Following weld cones are placed for Left beam
+
+		extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+									   bbWeldAbvFlang_22,
+									   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+									   bbWeldBelwFlang_24,
+									   bbWeldSideWeb_21, bbWeldSideWeb_22, stiffener_L1, stiffener_L2, stiffener_R1,
+									   stiffener_R2)
+		extbothWays.create_3DModel()
 
 		return extbothWays
 
@@ -1575,7 +1584,8 @@ class Maincontroller(QMainWindow):
 		   |  |
 		   |  |
 		'''
-		bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7, 36: 22.5}
+		bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7,
+						   36: 22.5}
 		return bolt_head_thick[bolt_diameter]
 
 	def bolt_head_dia_calculation(self, bolt_diameter):
@@ -1611,7 +1621,8 @@ class Maincontroller(QMainWindow):
 		   |  |       |
 		   |__|    ___|__
 		'''
-		bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65, 36: 75}
+		bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65,
+						 36: 75}
 
 		return bolt_head_dia[bolt_diameter]
 
@@ -1619,7 +1630,8 @@ class Maincontroller(QMainWindow):
 		'''
 		Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
 		'''
-		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23, 30: 25.35, 36: 30.65}
+		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23,
+				   30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
 
 	def call_3DModel(self, bgcolor):
@@ -1633,7 +1645,7 @@ class Maincontroller(QMainWindow):
 				self.ui.chkBx_connector.setChecked(Qt.Unchecked)
 				self.ui.mytabWidget.setCurrentIndex(0)
 
-		# Call to display the Extended Both Way CAD model
+			# Call to display the Extended Both Way CAD model
 			self.display_3DModel("Model", bgcolor)
 		else:
 			self.display.EraseAll()
@@ -1658,7 +1670,7 @@ class Maincontroller(QMainWindow):
 				self.ui.mytabWidget.setCurrentIndex(0)
 			self.display_3DModel("Connector", bgcolor)
 
-	def display_3DModel(self,component, bgcolor):
+	def display_3DModel(self, component, bgcolor):
 		self.component = component
 
 		self.display.EraseAll()
@@ -1678,12 +1690,17 @@ class Maincontroller(QMainWindow):
 		# Displays the beams
 		if component == "Beam":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Connector":
 			# Displays the end plates
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1705,8 +1722,13 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
 			# Displays the end plates
-			#osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
+			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

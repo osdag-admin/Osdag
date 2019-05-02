@@ -1505,10 +1505,14 @@ class Maincontroller(QMainWindow):
 
 		# TODO make dictionary for the stiffeners
 
-		stiffener_L1 = Plate(W=65.55, L=368, T=16)
-		stiffener_L2 = Plate(W=65.55, L=368, T=16)
-		stiffener_R1 = Plate(W=65.55, L=368, T=16)
-		stiffener_R2 = Plate(W=65.55, L=368, T=16)
+		stiffener_L1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
+							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
+		stiffener_L2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
+							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
+		stiffener_R1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
+							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
+		stiffener_R2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
+							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
 
 		alist = self.designParameters()  # An object to save all input values entered by user
 

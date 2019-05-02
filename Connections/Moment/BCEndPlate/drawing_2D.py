@@ -46,19 +46,18 @@ class ExtendedEndPlate(object):
 
 		self.plate_length_L1 = int(output_dict['Plate']['Height'])
 
-		#TODO ADD 	dictionary for stiffiners
-
-		self.stiffener_thickness_t1 = 16
-
-		self.stiffener_width_B1 = 65.55
-
-		self.stiffener_length_L1 = 368
 
 		self.flange_thickness_T1 = (beam_data["T"])
 		self.flange_thickness_T2 = self.flange_thickness_T1
 
 		self.web_thickness_tw1 = (beam_data["tw"])
 		self.web_thickness_tw2 = self.web_thickness_tw1
+
+		# TODO ADD 	dictionary for stiffiners
+
+		self.stiffener_thickness_t1 = self.flange_thickness_T2
+		self.stiffener_width_B1 = (self.column_width_B1 - self.web_thickness_tw1) / 2
+		self.stiffener_length_L1 = self.column_depth_D1 - 2 * self.flange_thickness_T1
 
 		self.flange_weld_thickness = int(input_dict['Weld']['Flange (mm)'])  # 12
 		self.web_weld_thickness = int(input_dict["Weld"]['Web (mm)'])  # 8

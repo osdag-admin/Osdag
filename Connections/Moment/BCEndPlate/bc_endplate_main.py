@@ -527,8 +527,7 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)
-		self.ui.txt_plateHeight.setValidator(doubl_validator)
-		self.ui.txt_plateWidth.setValidator(doubl_validator)
+
 
 		min_fu = 290
 		max_fu = 780
@@ -702,8 +701,7 @@ class Maincontroller(QMainWindow):
 
 		uiObj["Plate"] = {}
 		uiObj["Plate"]["Thickness (mm)"] = str(self.ui.combo_plateThick.currentText())
-		uiObj["Plate"]["Height (mm)"] = str(self.ui.txt_plateHeight.text())
-		uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
+
 
 		uiObj["Weld"] = {}
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
@@ -1811,7 +1809,7 @@ if __name__ == "__main__":
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/shihab/Osdag_workspace"
+	folder_path = "/home/ajmalbabums/Osdag_workspace"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

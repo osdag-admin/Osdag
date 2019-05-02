@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1328</width>
-    <height>769</height>
+    <height>768</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -226,9 +226,9 @@
       <widget class="QCheckBox" name="chkBx_beamSec">
        <property name="geometry">
         <rect>
-         <x>330</x>
+         <x>410</x>
          <y>0</y>
-         <width>90</width>
+         <width>71</width>
          <height>29</height>
         </rect>
        </property>
@@ -253,7 +253,7 @@
       <widget class="QCheckBox" name="chkBx_connector">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>490</x>
          <y>0</y>
          <width>151</width>
          <height>29</height>
@@ -275,6 +275,33 @@
        </property>
        <property name="text">
         <string>Connector</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="chkBx_columnSec">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>0</y>
+         <width>91</width>
+         <height>29</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::TabFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Column only</string>
+       </property>
+       <property name="text">
+        <string>Column</string>
        </property>
       </widget>
      </widget>
@@ -585,6 +612,7 @@ QMenu::item:selected {
     <addaction name="actionPan"/>
     <addaction name="actionRotate_3D_model"/>
     <addaction name="separator"/>
+    <addaction name="actionShow_column_2"/>
     <addaction name="actionShow_beam"/>
     <addaction name="actionShow_connector"/>
     <addaction name="actionShow_all"/>
@@ -648,7 +676,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>243</y>
+       <y>233</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -668,7 +696,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>180</y>
+       <y>170</y>
        <width>151</width>
        <height>22</height>
       </rect>
@@ -688,7 +716,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>60</y>
+       <y>50</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -702,12 +730,12 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Select Connectivity</string>
+       <string>Select Type</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Flush</string>
+       <string>Flush end plate</string>
       </property>
      </item>
      <item>
@@ -725,7 +753,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>213</y>
+       <y>203</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -803,7 +831,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>60</y>
+       <y>50</y>
        <width>120</width>
        <height>25</height>
       </rect>
@@ -816,14 +844,14 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Connectivity *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;End plate type *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_fu">
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>213</y>
+       <y>203</y>
        <width>120</width>
        <height>25</height>
       </rect>
@@ -843,7 +871,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>180</y>
+       <y>170</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -868,7 +896,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>238</y>
+       <y>228</y>
        <width>120</width>
        <height>25</height>
       </rect>
@@ -888,7 +916,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>273</y>
+       <y>263</y>
        <width>201</width>
        <height>25</height>
       </rect>
@@ -909,7 +937,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>324</y>
+       <y>314</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -929,7 +957,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>324</y>
+       <y>314</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -946,7 +974,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>380</y>
+       <y>370</y>
        <width>150</width>
        <height>25</height>
       </rect>
@@ -969,7 +997,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>430</y>
+       <y>420</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -989,7 +1017,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>460</y>
+       <y>450</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -1009,7 +1037,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>460</y>
+       <y>450</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1031,7 +1059,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>400</y>
+       <y>390</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -1051,7 +1079,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>430</y>
+       <y>420</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -1071,7 +1099,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>400</y>
+       <y>390</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1130,7 +1158,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>500</y>
+       <y>480</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -1150,7 +1178,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>520</y>
+       <y>500</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -1170,7 +1198,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>520</y>
+       <y>500</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1262,7 +1290,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>550</y>
+       <y>530</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -1273,14 +1301,14 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Weld size&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Weld type and size&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_43">
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>570</y>
+       <y>580</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3031,7 +3059,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>640</y>
+       <y>650</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3060,7 +3088,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>640</y>
+       <y>650</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3089,7 +3117,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>570</y>
+       <y>580</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3172,7 +3200,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>190</x>
-       <y>90</y>
+       <y>80</y>
        <width>81</width>
        <height>51</height>
       </rect>
@@ -3185,7 +3213,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>294</y>
+       <y>284</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -3205,7 +3233,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>294</y>
+       <y>284</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3222,7 +3250,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>354</y>
+       <y>344</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -3242,7 +3270,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>354</y>
+       <y>344</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3259,7 +3287,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>600</y>
+       <y>610</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3342,7 +3370,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>600</y>
+       <y>610</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3358,11 +3386,11 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Web (mm) *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLabel" name="lbl_beam1_2">
+    <widget class="QLabel" name="lbl_column">
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>150</y>
+       <y>140</y>
        <width>151</width>
        <height>22</height>
       </rect>
@@ -3375,14 +3403,14 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Beam section *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Column section *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="combo_beamSec_2">
+    <widget class="QComboBox" name="combo_columnSec">
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>150</y>
+       <y>140</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3406,8 +3434,8 @@ QMenu::item:selected {
     <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>30</y>
+       <x>6</x>
+       <y>20</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -3423,12 +3451,56 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Connectivity *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="combo_connLoc_2">
+    <widget class="QComboBox" name="combo_connect">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>150</x>
        <y>20</y>
-       <width>151</width>
+       <width>160</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <item>
+      <property name="text">
+       <string>Select Connectivity</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Column flange-Beam web</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Column web-Beam web</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QComboBox" name="combo_weld_method">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>550</y>
+       <width>160</width>
        <height>27</height>
       </rect>
      </property>
@@ -3439,26 +3511,39 @@ QMenu::item:selected {
        <bold>false</bold>
       </font>
      </property>
+     <property name="maxVisibleItems">
+      <number>10</number>
+     </property>
      <item>
       <property name="text">
-       <string>Select Connectivity</string>
+       <string>Groove Weld (CJP)</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Flush</string>
+       <string>Fillet Weld</string>
       </property>
      </item>
-     <item>
-      <property name="text">
-       <string>Extended one way</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Extended both ways</string>
-      </property>
-     </item>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>550</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Type *</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -4790,6 +4875,20 @@ QMenu::item:selected {
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionShow_column_2">
+   <property name="text">
+    <string>Show column</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>DejaVu Sans</family>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+C</string>
    </property>
   </action>
  </widget>

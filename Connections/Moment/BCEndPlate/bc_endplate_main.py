@@ -8,7 +8,7 @@ Module: Beam to column end plate moment connection
 """
 
 # UI files
-from ui_extendedendplate import Ui_MainWindow
+from ui_bc_endplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate

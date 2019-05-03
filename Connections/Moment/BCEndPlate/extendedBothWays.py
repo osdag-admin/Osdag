@@ -10,14 +10,19 @@ import numpy
 class ExtendedBothWays(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
-                 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21, bbWeldSideWeb_22):
+                 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21, bbWeldSideWeb_22,
+                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2):
 
         # Initializing the arguments
-        self.beamLeft = beamLeft                            # beamLeft frepresents the column
+        self.beamLeft = beamLeft                            # beamLeft represents the column
         self.beamRight = beamRight
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
         self.beamRight.length = 1000.0
+        self.stiffener_L1 = stiffener_L1
+        self.stiffener_L2 = stiffener_L2
+        self.stiffener_R1 = stiffener_R1
+        self.stiffener_R2 = stiffener_R2
 
 
         # Weld above flange for left and right beam
@@ -44,6 +49,10 @@ class ExtendedBothWays(object):
         self.createBeamRGeometry()
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
+        self.create_stiffener_L1Geometry()
+        self.create_stiffener_L2Geometry()
+        self.create_stiffener_R1Geometry()
+        self.create_stiffener_R2Geometry()
 
         self.create_bbWeldAbvFlang_21()          #left beam above flange weld
         self.create_bbWeldAbvFlang_22()          #left beam above 2nd (lower) flange
@@ -62,6 +71,10 @@ class ExtendedBothWays(object):
         self.beamRModel = self.beamRight.create_model()
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
+        self.stiffener_L1Model = self.stiffener_L1.create_model()
+        self.stiffener_L2Model = self.stiffener_L2.create_model()
+        self.stiffener_R1Model = self.stiffener_R1.create_model()
+        self.stiffener_R2Model = self.stiffener_R2.create_model()
 
         self.bbWeldAbvFlang_21Model = self.bbWeldAbvFlang_21.create_model()
         self.bbWeldAbvFlang_22Model = self.bbWeldAbvFlang_22.create_model()
@@ -105,6 +118,34 @@ class ExtendedBothWays(object):
         pitchDir = numpy.array([0, 0, -1.0])
         boltDir = numpy.array([0, -1.0, 0])
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+    ##############################################  Adding stiffeners ########################################
+
+    def create_stiffener_L1Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.t/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    def create_stiffener_L2Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.t/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    def create_stiffener_R1Geometry(self):
+        beamOriginL = numpy.array([-self.beamRight.B/2 , 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    def create_stiffener_R2Geometry(self):
+        beamOriginL = numpy.array([-self.beamRight.B/2 , 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    ##############################################  creating weld sections ########################################
 
     def create_bbWeldAbvFlang_21(self):
         weldAbvFlangOrigin_21 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.D/2 +  self.plateRight.T, self.beamLeft.length / 2 +self.beamRight.D/2])
@@ -174,6 +215,18 @@ class ExtendedBothWays(object):
 
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
+
+    def get_stiffener_L1Model(self):
+        return self.stiffener_L1Model
+
+    def get_stiffener_L2Model(self):
+        return self.stiffener_L2Model
+
+    def get_stiffener_R1Model(self):
+        return self.stiffener_R1Model
+
+    def get_stiffener_R2Model(self):
+        return self.stiffener_R2Model
 
     def get_bbWeldAbvFlang_21Model(self):
         return self.bbWeldAbvFlang_21Model

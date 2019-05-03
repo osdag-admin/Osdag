@@ -203,10 +203,10 @@ def bc_endplate_design(uiObj):
 
     conn_type = uiObj['Member']['Connectivity']
     if conn_type == "Extended both ways":
-        connectivity = "both_way"
+        endplate_type = "both_way"
     else:   #TODO : elif for one way and flush
-        connectivity = "one_way"
-        connectivity = "flush"
+        endplate_type = "one_way"
+        endplate_type = "flush"
 
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumnSection']
@@ -399,7 +399,7 @@ def bc_endplate_design(uiObj):
     # Detailing
     bolt_combined_status = False
     while bolt_combined_status is False:
-        if connectivity == "both_way":
+        if endplate_type == "both_way":
 
             if no_tension_side == 4:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
@@ -699,7 +699,7 @@ def bc_endplate_design(uiObj):
     # End of Calculation
     # Output dictionary for different cases
         # Case 1: When the height and the width of end plate is not specified by user
-    if connectivity == "both_way":
+    if endplate_type == "both_way":
         outputobj = {}
         outputobj['Bolt'] = {}
         outputobj['Bolt']['status'] = design_status

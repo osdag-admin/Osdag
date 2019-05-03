@@ -246,6 +246,10 @@ def bc_endplate_design(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
+    if uiObj["Weld"]["Method"] == "Fillet Weld":
+        weld_method = 'fillet'
+    else:
+        weld_method = 'groove'
     weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 

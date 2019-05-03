@@ -684,7 +684,9 @@ class Maincontroller(QMainWindow):
 	def get_user_inputs(self):
 		uiObj = {}
 		uiObj["Member"] = {}
-		uiObj["Member"]["Connectivity"] = str(self.ui.combo_connLoc.currentText())
+		uiObj["Member"]["EndPlate_type"] = str(self.ui.combo_connLoc.currentText())
+		uiObj["Member"]["Connectivity"] = str(self.ui.combo_connect.currentText())
+		uiObj["Member"]["ColumnSection"] = str(self.ui.combo_columnSec.currentText())
 		uiObj["Member"]["BeamSection"] = str(self.ui.combo_beamSec.currentText())
 		uiObj["Member"]["fu (MPa)"] = self.ui.txt_Fu.text()
 		uiObj["Member"]["fy (MPa)"] = self.ui.txt_Fy.text()
@@ -793,13 +795,15 @@ class Maincontroller(QMainWindow):
 		"""
 
 		if uiObj is not None:
-			if uiObj["Connection"] != "Extended":
+			if uiObj["Connection"] != "BCEndPlate":
 				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
 				return
 
-			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["Connectivity"])))
-			if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way" or "Extended both ways":
-				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["Connectivity"]))
+			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["EndPlate_type"])))
+			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
+				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
+				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["EndPlate_type"]))
+				self.ui.combo_columnSec.setCurrentIndex(self.ui.combo_columnSec.findText(uiObj["Member"]["ColumnSection"]))
 				self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
 				self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
 				self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
@@ -891,10 +895,16 @@ class Maincontroller(QMainWindow):
 		incomplete_list = []
 		state = self.setimage_connection()
 		if state is True:
-			if self.ui.combo_connLoc.currentIndex() == 0:
+			if self.ui.combo_connect.currentIndex() == 0:
 				incomplete_list.append("Connectivity")
 		else:
 			pass
+
+		if self.ui.combo_connLoc.currentIndex() == 0:
+			incomplete_list.append("EndPlate_type")
+
+		if self.ui.combo_columnSec.currentIndex() == 0:
+			incomplete_list.append("Column section")
 
 		if self.ui.combo_beamSec.currentIndex() == 0:
 			incomplete_list.append("Beam section")
@@ -968,6 +978,7 @@ class Maincontroller(QMainWindow):
 				self.ui.btn_plateDetail.setDisabled(False)
 				self.ui.btn_stiffnrDetail.setDisabled(False)
 				self.ui.chkBx_connector.setDisabled(True)
+				self.ui.chkBx_columnSec.setDisabled(True)
 				self.ui.chkBx_beamSec.setDisabled(True)
 				self.ui.btn3D.setDisabled(True)
 
@@ -1043,6 +1054,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btnTop.setEnabled(False)
 		self.ui.btnSide.setEnabled(False)
 		self.ui.btn3D.setEnabled(False)
+		self.ui.chkBx_columnSec.setEnabled(False)
 		self.ui.chkBx_beamSec.setEnabled(False)
 		self.ui.chkBx_connector.setEnabled(False)
 		self.ui.btn_pitchDetail.setEnabled(False)
@@ -1066,6 +1078,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btnTop.setEnabled(True)
 		self.ui.btnSide.setEnabled(True)
 		self.ui.btn3D.setEnabled(True)
+		self.ui.chkBx_columnSec.setEnabled(True)
 		self.ui.chkBx_beamSec.setEnabled(True)
 		self.ui.chkBx_connector.setEnabled(True)
 		self.ui.btn_pitchDetail.setEnabled(True)
@@ -1088,8 +1101,10 @@ class Maincontroller(QMainWindow):
 		Returns:
 
 		"""
-		self.ui.combo_beamSec.setCurrentIndex(0)
+		self.ui.combo_connect.setCurrentIndex(0)
 		self.ui.combo_connLoc.setCurrentIndex(0)
+		self.ui.combo_columnSec.setCurrentIndex(0)
+		self.ui.combo_beamSec.setCurrentIndex(0)
 		self.ui.lbl_connectivity.clear()
 		self.ui.txt_Fu.clear()
 		self.ui.txt_Fy.clear()
@@ -1643,6 +1658,7 @@ class Maincontroller(QMainWindow):
 			self.create_extended_both_ways()
 			self.ui.btn3D.setChecked(Qt.Checked)
 			if self.ui.btn3D.isChecked():
+				self.ui.chkBx_columnSec.setChecked(Qt.Unchecked)
 				self.ui.chkBx_beamSec.setChecked(Qt.Unchecked)
 				self.ui.chkBx_connector.setChecked(Qt.Unchecked)
 				self.ui.mytabWidget.setCurrentIndex(0)

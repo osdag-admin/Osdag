@@ -446,6 +446,7 @@ class Maincontroller(QMainWindow):
 		self.ui.setupUi(self)
 		self.folder = folder
 		self.connection = "BC_EndPlate"
+		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None
 
@@ -497,6 +498,7 @@ class Maincontroller(QMainWindow):
 		self.ui.actionSave_Side_View.triggered.connect(lambda : self.call_2D_drawing("Side"))
 		self.ui.actionSave_Top_View.triggered.connect(lambda : self.call_2D_drawing("Top"))
 		self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
+		self.ui.actionShow_column.triggered.connect(lambda: self.call_3DColumn("gradient_bg"))
 		self.ui.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
 		self.ui.actionShow_connector.triggered.connect(lambda: self.call_3DConnector("gradient_bg"))
 		self.ui.actionSave_current_image.triggered.connect(self.save_CAD_images)
@@ -516,6 +518,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
 		self.ui.btn3D.clicked.connect(lambda : self.call_3DModel("gradient_bg"))
+		self.ui.chkBx_columnSec.clicked.connect(lambda : self.call_3DColumn("gradient_bg"))
 		self.ui.chkBx_beamSec.clicked.connect(lambda : self.call_3DBeam("gradient_bg"))
 		self.ui.chkBx_connector.clicked.connect(lambda :self.call_3DConnector("gradient_bg"))
 
@@ -678,8 +681,9 @@ class Maincontroller(QMainWindow):
 		self.alist = self.designParameters()
 		self.result = bc_endplate_design(self.alist)
 		print "resultobj", self.result
+		self.column_data = self.fetchColumnPara()
 		self.beam_data = self.fetchBeamPara()
-		save_html(self.result, self.alist, self.beam_data, fileName, report_summary, self.folder)
+		save_html(self.result, self.alist, self.column_data, self.beam_data, fileName, report_summary, self.folder)
 
 	def get_user_inputs(self):
 		uiObj = {}
@@ -1115,8 +1119,6 @@ class Maincontroller(QMainWindow):
 		self.ui.combo_type.setCurrentIndex(0)
 		self.ui.combo_grade.setCurrentIndex(0)
 		self.ui.combo_plateThick.setCurrentIndex(0)
-		self.ui.txt_plateHeight.clear()
-		self.ui.txt_plateWidth.clear()
 		self.ui.combo_flangeSize.setCurrentIndex(0)
 		self.ui.combo_webSize.setCurrentIndex(0)
 
@@ -1141,6 +1143,17 @@ class Maincontroller(QMainWindow):
 
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
+
+	def get_columndata(self):
+		"""Fetch  old and new column sections from "Intg_osdag" database.
+		Returns:
+        	"""
+		columndata = get_columncombolist()
+		old_colList = get_oldcolumncombolist()
+
+		self.ui.combo_columnSec.addItems(columndata)
+		combo_section = self.ui.combo_columnSec
+		self.color_oldDatabase_section(old_colList, columndata, combo_section)
 
 	def get_beamdata(self):
 		loc = self.ui.combo_connLoc.currentText()
@@ -1170,6 +1183,11 @@ class Maincontroller(QMainWindow):
 		duplicate = [i for i, x in enumerate(intg_section) if intg_section.count(x) > 1]
 		for i in duplicate:
 			combo_section.setItemData(i, QBrush(QColor("red")), Qt.TextColorRole)
+
+	def fetchColumnPara(self):
+		columndata_sec = self.ui.combo_columnSec.currentText()
+		dictcolumndata = get_columndata(columndata_sec)
+		return dictcolumndata
 
 	def fetchBeamPara(self):
 		beamdata_sec = self.ui.combo_beamSec.currentText()
@@ -1302,8 +1320,9 @@ class Maincontroller(QMainWindow):
 		"""
 		self.alist = self.designParameters()
 		self.result_obj = bc_endplate_design(self.alist)
+		self.column_data = self.fetchColumnPara()
 		self.beam_data = self.fetchBeamPara()
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":
@@ -1387,7 +1406,10 @@ class Maincontroller(QMainWindow):
 
 		'''
 		self.ExtObj = self.create_extended_both_ways()
-		if self.component == "Beam":
+		if self.component == "Column":
+			final_model = self.ExtObj.get_column_models()
+
+		elif self.component == "Beam":
 			final_model = self.ExtObj.get_beam_models()
 
 		elif self.component == "Connector":
@@ -1494,6 +1516,7 @@ class Maincontroller(QMainWindow):
 
 	def create_extended_both_ways(self):
 
+		column_data = self.fetchColumnPara()
 		beam_data = self.fetchBeamPara()
 
 		beam_tw = float(beam_data["tw"])
@@ -1668,6 +1691,16 @@ class Maincontroller(QMainWindow):
 		else:
 			self.display.EraseAll()
 
+	def call_3DColumn(self, bgcolor):
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			self.ui.chkBx_columnSec.setChecked(Qt.Checked)
+			if self.ui.chkBx_columnSec.isChecked():
+				self.ui.btn3D.setChecked(Qt.Unchecked)
+				self.ui.chkBx_connector.setChecked(Qt.Unchecked)
+				self.ui.mytabWidget.setCurrentIndex(0)
+			self.display_3DModel("Column", bgcolor)
+
 	def call_3DBeam(self, bgcolor):
 		status = self.resultObj['Bolt']['status']
 		if status is True:
@@ -1684,6 +1717,7 @@ class Maincontroller(QMainWindow):
 			self.ui.chkBx_connector.setChecked(Qt.Checked)
 			if self.ui.chkBx_connector.isChecked():
 				self.ui.btn3D.setChecked(Qt.Unchecked)
+				self.ui.chkBx_columnSec.setChecked(Qt.Unchecked)
 				self.ui.chkBx_beamSec.setChecked(Qt.Unchecked)
 				self.ui.mytabWidget.setCurrentIndex(0)
 			self.display_3DModel("Connector", bgcolor)
@@ -1705,8 +1739,12 @@ class Maincontroller(QMainWindow):
 		# ExtObj is an object which gets all the calculated values of CAD models
 		self.ExtObj = self.create_extended_both_ways()
 
-		# Displays the beams
-		if component == "Beam":
+		# Displays the beams #TODO ANAND
+		if component == "Column":
+			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
+
+		elif component == "Beam":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 

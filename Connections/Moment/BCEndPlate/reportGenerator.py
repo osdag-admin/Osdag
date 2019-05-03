@@ -13,7 +13,7 @@ from Connections.connection_calculations import ConnectionCalculations
 
 ######################################################################
 # Start of Report
-def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
+def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsummary, folder):
     filename = filename
     myfile = open(filename, "w")
     myfile.write(t('! DOCTYPE html'))

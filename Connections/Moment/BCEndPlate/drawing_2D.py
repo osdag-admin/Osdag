@@ -13,7 +13,7 @@ import os
 
 
 class ExtendedEndPlate(object):
-	def __init__(self, input_dict, output_dict, beam_data, folder):
+	def __init__(self, input_dict, output_dict, column_data, beam_data, folder):
 		"""
 
 		Args:

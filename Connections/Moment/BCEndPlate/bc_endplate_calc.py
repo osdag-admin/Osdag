@@ -36,117 +36,6 @@ def module_setup():
 
 module_setup()
 
-#######################################################################
-# Defining functions
-#######################################################################
-
-
-# Function for net area of bolts at threaded portion of bolts
-# Reference: Design of steel structures by N. Subramanian, page 348 or 358
-
-
-def netArea_thread(dia):
-    """
-
-    Args:
-        dia: (int)- diameter of bolt (Friction Grip Bolt/Bearing bolt)
-
-    Returns: (float)- Net area of bolts at threaded portion (Ref. Table 5.11 Subramanian's book, page: 358 )
-
-    """
-    netArea = {12: 84.3, 16: 157, 20: 245, 22: 303, 24: 353, 27: 459, 30: 561, 36: 817}
-    return netArea[dia]
-
-#######################################################################
-
-# Function for net area of bolts at threaded portion of bolts
-# Reference: Design of steel structures by N. Subramanian, page 348 or 358
-
-
-def netarea_shank(dia):
-    """
-
-    Args:
-        dia: (int) -  diameter of bolt (Friction Grip Bolt/Bearing bolt)
-
-    Returns: (int)- Net area of bolts at shank portion (Ref. Table 5.11 Subramanian's book, page: 358 )
-
-    """
-    net_area = {12: 113, 16: 201, 20: 314, 22: 380, 24: 452, 27: 572, 30: 706, 36: 1017}
-    return net_area[dia]
-
-#######################################################################
-
-#Function for long joints (beta_lj)
-#Source: Cl 10.3.3.1
-#Reference: Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-
-def long_joint(dia, l_j):
-    """
-
-    Args:
-        dia: (int)- diameter of bolt
-        l_j: (float)- length of joint i.e. distance between first and last bolt in the joint measured in the direction of load transfer
-
-    Returns: (float)- reduction factor beta_lj
-
-    """
-    beta_lj = 1.075 - (0.005 * (l_j/dia))
-    return beta_lj
-
-
-#######################################################################
-
-# Function for Shear Capacity of bearing bolt (also known as black bolt)
-# Reference: Cl 10.3.3 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-# Assumption: The shear planes are assumed to be passing through the threads of the bolt
-
-#######################################################################
-
-# Function for minimum height of end plate
-# Reference: Based on reasoning
-
-def min_plate_height(beam_D, l_v, n_r, min_pitch, e_1):
-    """
-
-    Args:
-        beam_D: (float) - Depth of beam
-        l_v: (float)- Distance between the toe of weld or flange to the centre of the nearer bolt
-        n_r: (int)- number of row(s) above or below the beam flange
-        min_pitch: (float)- minimum pitch distance i.e. 2.5*bolt_diameter
-        e_1: (float)- minimum end distance i.e. 1.7*bolt_hole_diameter
-
-    Returns: (float)- Minimum required height of extended end plate as per detailing requirements in mm
-
-    """
-    min_end_plate_height = beam_D + (2 * l_v) + (2 * (n_r-1) * min_pitch) + (2 * e_1)
-    return min_end_plate_height
-
-
-#######################################################################
-
-# Function for minimum width of end plate
-# Reference: Based on reasoning
-
-def min_plate_width(g_1, n, min_gauge, e_2):
-    """
-
-    Args:
-        g_1: (float)- Cross-centre gauge distance
-        n: (int)- Number of columns of bolt (assumed to be 2)
-        min_gauge: (float)- minimum gauge distance i.e. 2.5*bolt_diameter
-        e_2: (float)- minimum edge distance i.e. 1.7*bolt_hole_diameter
-
-    Returns: (float)- Minimum required width of extended end plate as per detailing requirements in mm
-
-    """
-    min_end_plate_width = g_1 + (n - 2) * min_gauge + (2 * e_2)
-    return min_end_plate_width
-
-
-#######################################################################
-
 # Function for calculating Shear yielding capacity of End Plate
 # Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
@@ -184,14 +73,19 @@ def shear_rupture(A_vn, plate_fu):
     return R_n
 
 
-#######################################################################
-# Function for fetching beam parameters from the database
-
-def fetchBeamPara(self):
-    beam_sec = self.ui.combo_Beam.currentText()
-    dictbeamdata = get_beamdata(beam_sec)
-    return dictbeamdata
-
+# #######################################################################
+# # Function for fetching column and beam parameters from the database
+#
+# def fetchColumnPara(self):
+#     column_sec = self.ui.combo_Column.currentText()
+#     dictcolumndata = get_beamdata(column_sec)
+#     return dictcolumndata
+#
+# def fetchBeamPara(self):
+#     beam_sec = self.ui.combo_Beam.currentText()
+#     dictbeamdata = get_beamdata(beam_sec)
+#     return dictbeamdata
+#
 
 #######################################################################
 # Start of Main Program
@@ -201,12 +95,17 @@ def bc_endplate_design(uiObj):
     global design_status
     design_status = True
 
-    conn_type = uiObj['Member']['Connectivity']
-    if conn_type == "Extended both ways":
-        endplate_type = "both_way"
-    else:   #TODO : elif for one way and flush
+    if uiObj['Member']['Connectivity'] == "Column web-Beam web":
+        conn_type = 'col_web_connectivity'
+    else:   # "Column flange-Beam web"
+        conn_type = 'col_flange_connectivity'
+
+    if uiObj['Member']['EndPlate_type'] == "Extended one way":
         endplate_type = "one_way"
+    elif uiObj['Member']['EndPlate_type'] == "Flush end plate":
         endplate_type = "flush"
+    else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+        endplate_type = "both_way"
 
     beam_sec = uiObj['Member']['BeamSection']
     column_sec = uiObj['Member']['ColumnSection']
@@ -235,11 +134,10 @@ def bc_endplate_design(uiObj):
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
     if dp_bolt_hole_type == "Over-sized":
         bolt_hole_type = 'over_size'
-    else:
+    else:   # "Standard"
         bolt_hole_type = 'standard'
 
     dia_hole = bolt_dia + int(uiObj["bolt"]["bolt_hole_clrnce"])
-
     end_plate_thickness = float(uiObj['Plate']['Thickness (mm)'])
 
     # TODO implement after excomm review for different grades of plate
@@ -248,15 +146,17 @@ def bc_endplate_design(uiObj):
 
     if uiObj["Weld"]["Method"] == "Fillet Weld":
         weld_method = 'fillet'
-    else:
+    else:   # "Groove Weld (CJP)"
         weld_method = 'groove'
+
     weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         edge_type = 'hand_flame_cut'
-    else:
+    else:   # "b - Rolled, machine-flame cut, sawn and planed"
         edge_type = 'machine_flame_cut'
+
     corrosive_influences = False
     if uiObj['detailing']['is_env_corrosive'] == "Yes":
         corrosive_influences = True
@@ -306,22 +206,22 @@ def bc_endplate_design(uiObj):
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
 
-    bolt_plates_tk = [column_tf, end_plate_thickness]
+    if conn_type == 'col_web_connectivity':
+        bolt_plates_tk = [column_tw, end_plate_thickness]
+    else:
+        bolt_plates_tk = [column_tf, end_plate_thickness]
+
+    web_weld_plates = [end_plate_thickness, beam_tw]
+    flange_weld_plates = [end_plate_thickness, beam_tf]
+
 
     #######################################################################
     # Calculation of Spacing (Min values rounded to next multiple of 5)
-
-    # t_thinner is the thickness of the thinner plate(s) being bolted
-    t_thinner = min(bolt_plates_tk)
 
     # min_pitch & max_pitch = Minimum and Maximum pitch distance (mm)
     pitch_dist_min = IS800_2007.cl_10_2_2_min_spacing(bolt_dia)
     pitch_dist_max = IS800_2007.cl_10_2_3_1_max_spacing(bolt_plates_tk)
     pitch_dist = round_up(pitch_dist_min, multiplier=5)
-
-    # min_gauge & max_gauge = Minimum and Maximum gauge distance (mm) [Cl. 10.2.3.1, IS 800:2007]
-    gauge_dist_min = pitch_dist_min
-    gauge_dist_max = pitch_dist_max
 
     # min_end_distance & max_end_distance = Minimum and Maximum end distance
     #       [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
@@ -338,16 +238,12 @@ def bc_endplate_design(uiObj):
     edge_dist = round_up(edge_dist_min, multiplier=5)
 
     #######################################################################
-    # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
-    # TODO: Implement l_v depending on excomm review
+    # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     l_v = float(50.0)
     flange_projection = 5
 
-    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
-    # TODO validate g_1 with correct value
-    # g_1 = max(90, (l_v + edge_dist_mini))
+    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
     g_1 = 100.0
-
 
     #######################################################################
     # Calculate bolt capacities
@@ -359,7 +255,7 @@ def bc_endplate_design(uiObj):
                                                                                       f_yb=bolt_fy,
                                                                                       A_sb=bolt_shank_area,
                                                                                       A_n=bolt_net_area)
-        bearing_capacity = "N/A"
+        bearing_capacity = 0.0
         bolt_capacity = bolt_shear_capacity
 
     else:
@@ -381,7 +277,6 @@ def bc_endplate_design(uiObj):
     flange_tension = factored_moment / (beam_d - beam_tf) + factored_axial_load / 2
     no_tension_side_rqd = flange_tension / (0.80 * bolt_tension_capacity)
     no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=4)
-    number_of_bolts = 2 * no_tension_side
 
     # Prying force
     b_e = beam_B
@@ -403,8 +298,9 @@ def bc_endplate_design(uiObj):
     # Detailing
     bolt_combined_status = False
     while bolt_combined_status is False:
-        if endplate_type == "both_way":
 
+        if endplate_type == "both_way":
+            number_of_bolts = 2 * no_tension_side
             if no_tension_side == 4:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 1, 'in_compression_flange': 1}
@@ -414,11 +310,11 @@ def bc_endplate_design(uiObj):
                            'out_compression_flange': 1, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
                     design_status = False
-                    # logger.error(
-                    #     ": Detailing Error - Pitch distance is less than the minimum required (Clause 10.2.2, IS 800:2007)")
-                    # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
+                    logger.error("Large number of bolts are required for the connection")
+                    # logger.warning()
                     logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
+                    # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
                     #            'out_compression_flange': 2, 'in_compression_flange': 1}
 
@@ -427,8 +323,10 @@ def bc_endplate_design(uiObj):
                            'out_compression_flange': 1, 'in_compression_flange': 3}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
                     design_status = False
+                    logger.error("Large number of bolts are required for the connection")
                     logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
+                    # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
             elif no_tension_side == 10:
@@ -436,13 +334,12 @@ def bc_endplate_design(uiObj):
                            'out_compression_flange': 3, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
                     design_status = False
+                    logger.error("Large number of bolts are required for the connection")
                     logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
             else:
                 design_status = False
-                # logger.error(
-                #     ": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                # logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
+                logger.error("Large number of bolts are required for the connection")
                 logger.info(": Re-design the connection using bolt of higher grade or diameter")
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
@@ -454,6 +351,8 @@ def bc_endplate_design(uiObj):
                        'out_compression_flange': 3, 'in_compression_flange': 2}
 
         # Plate height and width
+            ''' tens_plate_no_pitch : projection of end plate beyond the beam flange excluding the 
+                                        distances b/w bolts on tension side '''
         if no_rows['out_tension_flange'] == 0:
             tens_plate_no_pitch = flange_projection
         else:
@@ -469,6 +368,11 @@ def bc_endplate_design(uiObj):
         while plate_width < beam_B:
             edge_dist += 5
             plate_width = g_1 + 2 * edge_dist
+            if edge_dist > edge_dist_max:
+                edge_dist -= 5
+                g_1 += 5
+                plate_width = g_1 + 2 * edge_dist
+                # TODO: Apply max limit for g_1, design fails
 
         # Tension in bolts
         axial_tension = factored_axial_load / number_of_bolts
@@ -499,10 +403,6 @@ def bc_endplate_design(uiObj):
 
         if bolt_combined_status is False:
             no_tension_side += 2
-            number_of_bolts = 2 * no_tension_side
-
-
-
 
     #######################################################################
     # TODO Check for Shear yielding and shear rupture of end plate
@@ -800,19 +700,38 @@ def bc_endplate_design(uiObj):
 '''
     ######################################
     # End of Calculation, SAMPLE Output dictionary
-    outputobj = {}
+    outputobj = dict()
+
+    # FOR OUTPUT DOCK
     outputobj['Bolt'] = {}
+    outputobj["Weld"] = {}
+
+    outputobj["Bolt"]["CriticalTension"] = 0
+    outputobj["Bolt"]["TensionCapacity"] = 0
+    outputobj["Bolt"]["ShearCapacity"] = 0
+    outputobj["Bolt"]["BearingCapacity"] = 0
+    outputobj["Bolt"]["CombinedCapacity"] = 0
+    outputobj["Bolt"]["BoltCapacity"] = 0
+    outputobj["Bolt"]["NumberOfBolts"] = 0
+    outputobj["Bolt"]["NumberOfRows"] = 0
+    outputobj["Bolt"]["Gauge"] = 0
+    outputobj["Bolt"]["CrossCentreGauge"] = 0
+    outputobj["Bolt"]["End"] = 0
+    outputobj["Bolt"]["Edge"] = 0
+    outputobj["Weld"]["CriticalStressflange"] = 0
+    outputobj["Weld"]["CriticalStressWeb"] = 0
+
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = 8
     outputobj['Bolt']['Gauge'] = 50.0
     outputobj['Bolt']['CrossCentreGauge'] = 100.0
-    outputobj['Bolt']['End'] = 40.0
-    outputobj['Bolt']['Edge'] = 40.0
+    outputobj['Bolt']['End'] = 50.0
+    outputobj['Bolt']['Edge'] = 50.0
     outputobj['Bolt']['Lv'] = 50.0
     outputobj['Bolt']['PitchMini'] = 50.0
     outputobj['Bolt']['PitchMax'] = 300.0
     outputobj['Bolt']['EndMax'] = 300.0
-    outputobj['Bolt']['EndMini'] = 35.0
+    outputobj['Bolt']['EndMini'] = 50.0
     outputobj['Bolt']['DiaHole'] = 22
 
     outputobj['Plate'] = {}
@@ -821,7 +740,79 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
 
     # Detailing
-    if endplate_type == "both_way":
+    if endplate_type == 'flush':
+        if number_of_bolts == 8:
+            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+        elif number_of_bolts == 12:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        elif number_of_bolts == 16:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch56'] = pitch_dist
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        elif number_of_bolts == 20:
+            outputobj['Bolt']['Pitch12'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+            outputobj['Bolt']['Pitch78'] = pitch_dist
+            outputobj['Bolt']['Pitch910'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        else:
+            pass
+
+    elif endplate_type == 'one_way':
+        if number_of_bolts == 8:
+            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+        elif number_of_bolts == 12:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        elif number_of_bolts == 16:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch56'] = pitch_dist
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        elif number_of_bolts == 20:
+            outputobj['Bolt']['Pitch12'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+            outputobj['Bolt']['Pitch78'] = pitch_dist
+            outputobj['Bolt']['Pitch910'] = pitch_dist
+
+            outputobj['Plate']['Height'] = 1000.0
+            outputobj['Plate']['Width'] = 500.0
+
+        else:
+            pass
+
+    else:   # endplate_type == 'both_way':
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
         elif number_of_bolts == 12:
@@ -842,15 +833,13 @@ def bc_endplate_design(uiObj):
             outputobj['Bolt']['Pitch67'] = pitch_dist
             outputobj['Bolt']['Pitch78'] = pitch_dist
             outputobj['Bolt']['Pitch910'] = pitch_dist
-
-    elif endplate_type == "one_way":
-
-
+        else:
+            pass
 
 
     # End of SAMPLE Output dictionary
     
-    if design_status == True:
+    if design_status is True:
         logger.info(": Overall extended end plate connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:

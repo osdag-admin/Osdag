@@ -697,58 +697,84 @@ def bc_endplate_design(uiObj):
 
     #######################################################################
     # Design of Stiffener
-
+    '''
     # TODO: add material strengths for below condition (design preference?)
     stiffener_fy = end_plate_fy
     stiffener_fu = end_plate_fu
 
+    ###################################################################################################
 
-########################################################################################################################
-    # End of Calculation
-    # Output dictionary for different cases
-        # Case 1: When the height and the width of end plate is not specified by user
+    # End of Calculation, Output dictionary
+    outputobj = {}
+    outputobj['Bolt'] = {}
+    outputobj['Bolt']['status'] = design_status
+    # outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
+    # outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
+    # outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
+    # outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+    # outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
+    # outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+    # outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
+    # outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+    # outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
+    # outputobj['Bolt']['kb'] = float(round(k_b, 3))
+    # outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+    # outputobj['Bolt']['BoltFy'] = bolt_fy
+    # outputobj['Bolt']['PryingForce'] = round(prying_force, 3)
+    # outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+    outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
+    outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
+    outputobj['Bolt']['End'] = float(end_dist)
+    outputobj['Bolt']['Edge'] = float(edge_dist)
+    outputobj['Bolt']['Lv'] = float(l_v)
+    outputobj['Bolt']['PitchMini'] = pitch_dist_min
+    outputobj['Bolt']['PitchMax'] = pitch_dist_max
+    outputobj['Bolt']['EndMax'] = end_dist_max
+    outputobj['Bolt']['EndMini'] = end_dist
+    outputobj['Bolt']['DiaHole'] = int(dia_hole)
+    #
+    # if bolt_type == "Friction Grip Bolt":
+    #     outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+    #     outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+    #     outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+    #     outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+    # else:
+    #     outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+    #     outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+    #     outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+    #     outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+    
+    outputobj['Plate'] = {}
+    outputobj['Plate']['Height'] = float(round(plate_height, 3))
+    outputobj['Plate']['Width'] = float(round(plate_width, 3))
+    outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
+    # outputobj['Plate']['MomentDemand'] = round(M_d, 3)
+    # outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
+    #
+    # outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
+    # outputobj['Plate']['Mp'] = float(round(M_p, 3))
+
+    # outputobj['Weld'] = {}
+    # outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+    # outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+    # outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+    # outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+    # outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+    # outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+    #
+    # outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+    # outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+    # outputobj['Weld']['Resultant'] = float(round(R, 3))
+    # outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+    # outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+    # outputobj['Stiffener'] = {}
+    # outputobj['Stiffener']['Height'] = round(h_st, 3)
+    # outputobj['Stiffener']['Length'] = round(l_st, 3)
+    # outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+    
+    # Detailing
     if endplate_type == "both_way":
-        outputobj = {}
-        outputobj['Bolt'] = {}
-        outputobj['Bolt']['status'] = design_status
-        # outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-        # outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-        # outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-        # outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-        # outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-        # outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-        # outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-        # outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-        # outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-        # outputobj['Bolt']['kb'] = float(round(k_b, 3))
-        # outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-        # outputobj['Bolt']['BoltFy'] = bolt_fy
-        # outputobj['Bolt']['PryingForce'] = round(prying_force, 3)
-        # outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-        outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-        outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
-        outputobj['Bolt']['End'] = float(end_dist)
-        outputobj['Bolt']['Edge'] = float(edge_dist)
-        outputobj['Bolt']['Lv'] = float(l_v)
-        outputobj['Bolt']['PitchMini'] = pitch_dist_min
-        outputobj['Bolt']['PitchMax'] = pitch_dist_max
-        outputobj['Bolt']['EndMax'] = end_dist_max
-        outputobj['Bolt']['EndMini'] = end_dist
-        outputobj['Bolt']['DiaHole'] = int(dia_hole)
-        #
-        # if bolt_type == "Friction Grip Bolt":
-        #     outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-        #     outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-        #     outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-        #     outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-        # else:
-        #     outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-        #     outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-        #     outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-        #     outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-
-
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
         elif number_of_bolts == 12:
@@ -770,38 +796,59 @@ def bc_endplate_design(uiObj):
             outputobj['Bolt']['Pitch78'] = pitch_dist
             outputobj['Bolt']['Pitch910'] = pitch_dist
 
-        outputobj['Plate'] = {}
-        outputobj['Plate']['Height'] = float(round(plate_height, 3))
-        outputobj['Plate']['Width'] = float(round(plate_width, 3))
-        outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-        # # ===================  CAD ===================
-        # outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-        # outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-        #
-        # outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
-        # outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-        # outputobj['Weld'] = {}
-        # outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-        # outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-        # outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-        # outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-        # outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-        # outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-        #
-        # outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-        # outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-        # outputobj['Weld']['Resultant'] = float(round(R, 3))
-        # outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-        # outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-        # outputobj['Stiffener'] = {}
-        # outputobj['Stiffener']['Height'] = round(h_st, 3)
-        # outputobj['Stiffener']['Length'] = round(l_st, 3)
-        # outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-
-    ###########################################################################
     # End of Output dictionary
+'''
+    ######################################
+    # End of Calculation, SAMPLE Output dictionary
+    outputobj = {}
+    outputobj['Bolt'] = {}
+    outputobj['Bolt']['status'] = design_status
+    outputobj['Bolt']['NumberOfBolts'] = 8
+    outputobj['Bolt']['Gauge'] = 50.0
+    outputobj['Bolt']['CrossCentreGauge'] = 100.0
+    outputobj['Bolt']['End'] = 40.0
+    outputobj['Bolt']['Edge'] = 40.0
+    outputobj['Bolt']['Lv'] = 50.0
+    outputobj['Bolt']['PitchMini'] = 50.0
+    outputobj['Bolt']['PitchMax'] = 300.0
+    outputobj['Bolt']['EndMax'] = 300.0
+    outputobj['Bolt']['EndMini'] = 35.0
+    outputobj['Bolt']['DiaHole'] = 22
+
+    outputobj['Plate'] = {}
+    outputobj['Plate']['Height'] = 1000.0
+    outputobj['Plate']['Width'] = 500.0
+    outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
+
+    # Detailing
+    if endplate_type == "both_way":
+        if number_of_bolts == 8:
+            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+        elif number_of_bolts == 12:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+        elif number_of_bolts == 16:
+            outputobj['Bolt']['Pitch23'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch56'] = pitch_dist
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+        elif number_of_bolts == 20:
+            outputobj['Bolt']['Pitch12'] = pitch_dist
+            outputobj['Bolt']['Pitch34'] = pitch_dist
+            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
+            outputobj['Bolt']['Pitch67'] = pitch_dist
+            outputobj['Bolt']['Pitch78'] = pitch_dist
+            outputobj['Bolt']['Pitch910'] = pitch_dist
+
+    elif endplate_type == "one_way":
+
+
+
+
+    # End of SAMPLE Output dictionary
     
     if design_status == True:
         logger.info(": Overall extended end plate connection design is safe \n")

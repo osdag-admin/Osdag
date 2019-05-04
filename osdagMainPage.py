@@ -22,6 +22,7 @@ from Connections.Shear.cleatAngle.cleatAngleMain import launch_cleatangle_contro
 from Connections.Shear.Endplate.endPlateMain import launch_endplate_controller
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.coverplate_bolted_main import launch_coverplate_controller
 from Connections.Moment.ExtendedEndPlate.extended_main import launch_extendedendplate_controller
+from Connections.Moment.BCEndPlate.bc_endplate_main import launch_bc_endplate_controller
 import os.path
 import subprocess
 import shutil
@@ -217,7 +218,8 @@ class OsdagMainWindow(QMainWindow):
 					os.mkdir(os.path.join(root_path, create_folder))
 
 		if self.ui.rdbtn_coverplate.isChecked():
-			launch_coverplate_controller(self, folder)
+			# launch_coverplate_controller(self, folder)
+			launch_bc_endplate_controller(self, folder)
 			self.ui.myStackedWidget.setCurrentIndex(0)
 
 		elif self.ui.rdbtn_endplate_ext.isChecked():

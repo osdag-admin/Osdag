@@ -451,8 +451,8 @@ class Maincontroller(QMainWindow):
 		self.result_obj = None
 
 		self.designPrefDialog = DesignPreference(self)
-		self.ui.combo_connLoc.model().item(1).setEnabled(False)
-		self.ui.combo_connLoc.model().item(2).setEnabled(False)
+		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
+		# self.ui.combo_connLoc.model().item(2).setEnabled(False)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
 
@@ -688,8 +688,8 @@ class Maincontroller(QMainWindow):
 	def get_user_inputs(self):
 		uiObj = {}
 		uiObj["Member"] = {}
-		uiObj["Member"]["EndPlate_type"] = str(self.ui.combo_connLoc.currentText())
 		uiObj["Member"]["Connectivity"] = str(self.ui.combo_connect.currentText())
+		uiObj["Member"]["EndPlate_type"] = str(self.ui.combo_connLoc.currentText())
 		uiObj["Member"]["ColumnSection"] = str(self.ui.combo_columnSec.currentText())
 		uiObj["Member"]["BeamSection"] = str(self.ui.combo_beamSec.currentText())
 		uiObj["Member"]["fu (MPa)"] = self.ui.txt_Fu.text()
@@ -804,9 +804,10 @@ class Maincontroller(QMainWindow):
 				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
 				return
 
+			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["EndPlate_type"])))
 			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
-				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
+				# self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["EndPlate_type"]))
 				self.ui.combo_columnSec.setCurrentIndex(self.ui.combo_columnSec.findText(uiObj["Member"]["ColumnSection"]))
 				self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))

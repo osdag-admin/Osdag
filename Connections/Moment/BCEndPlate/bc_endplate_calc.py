@@ -449,6 +449,10 @@ def bc_endplate_design(uiObj):
 
             # #######################################################################
 
+        else: #TODO: for flush and oneway
+            no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
+                       'out_compression_flange': 3, 'in_compression_flange': 2}
+
         # Plate height and width
         if no_rows['out_tension_flange'] == 0:
             tens_plate_no_pitch = flange_projection

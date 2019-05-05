@@ -605,7 +605,7 @@ def bc_endplate_design(uiObj):
     '''
 
     #######################################################################
-    # Design of Stiffener
+    # Design of Stiffener,  output dictionary
     '''
     # TODO: add material strengths for below condition (design preference?)
     stiffener_fy = end_plate_fy
@@ -750,6 +750,7 @@ def bc_endplate_design(uiObj):
 
     # Detailing
     if endplate_type == 'flush':
+        outputobj['Bolt']['projection'] = 10
         if number_of_bolts == 4:
             outputobj['Bolt']['Pitch12'] = 250
 
@@ -775,6 +776,8 @@ def bc_endplate_design(uiObj):
             pass
 
     elif endplate_type == 'one_way':
+        outputobj['Bolt']['projection'] = 10
+
         if number_of_bolts == 6:
             outputobj['Bolt']['Pitch12'] = 100.0
             outputobj['Bolt']['Pitch23'] = 250.0
@@ -831,7 +834,6 @@ def bc_endplate_design(uiObj):
             outputobj['Bolt']['Pitch910'] = pitch_dist
         else:
             pass
-
 
     # End of SAMPLE Output dictionary
     

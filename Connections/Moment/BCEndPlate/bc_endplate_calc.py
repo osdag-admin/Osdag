@@ -299,8 +299,21 @@ def bc_endplate_design(uiObj):
     bolt_combined_status = False
     while bolt_combined_status is False:
 
-        if endplate_type == "both_way":
+        if endplate_type == 'flush':
             number_of_bolts = 2 * no_tension_side
+            #TODO: DETAILING
+            no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
+                       'out_compression_flange': 3, 'in_compression_flange': 2}
+
+        elif endplate_type == 'one_way':
+            number_of_bolts = no_tension_side + 2
+            #TODO: DETAILING
+            no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
+                       'out_compression_flange': 3, 'in_compression_flange': 2}
+
+        else:   # endplate_type == "both_way":
+            number_of_bolts = 2 * no_tension_side
+
             if no_tension_side == 4:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 1, 'in_compression_flange': 1}
@@ -345,10 +358,6 @@ def bc_endplate_design(uiObj):
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
             # #######################################################################
-
-        else: #TODO: for flush and oneway
-            no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
-                       'out_compression_flange': 3, 'in_compression_flange': 2}
 
         # Plate height and width
             ''' tens_plate_no_pitch : projection of end plate beyond the beam flange excluding the 
@@ -735,79 +744,66 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['DiaHole'] = 22
 
     outputobj['Plate'] = {}
-    outputobj['Plate']['Height'] = 1000.0
-    outputobj['Plate']['Width'] = 500.0
+    outputobj['Plate']['Height'] = 530
+    outputobj['Plate']['Width'] = 180
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
 
     # Detailing
     if endplate_type == 'flush':
-        if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+        if number_of_bolts == 4:
+            outputobj['Bolt']['Pitch12'] = 250
+
+            outputobj['Plate']['Height'] = 370
+
+        elif number_of_bolts == 8:
+            outputobj['Bolt']['Pitch12'] = 50.0
+            outputobj['Bolt']['Pitch23'] = 150.0
+            outputobj['Bolt']['Pitch34'] = 50.0
+
+            outputobj['Plate']['Height'] = 370
+
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
-            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch12'] = 50.0
+            outputobj['Bolt']['Pitch23'] = 50.0
+            outputobj['Bolt']['Pitch34'] = 50.0
+            outputobj['Bolt']['Pitch45'] = 50.0
+            outputobj['Bolt']['Pitch56'] = 50.0
 
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
-
-        elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch56'] = pitch_dist
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
-
-        elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = pitch_dist
-            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-            outputobj['Bolt']['Pitch78'] = pitch_dist
-            outputobj['Bolt']['Pitch910'] = pitch_dist
-
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
+            outputobj['Plate']['Height'] = 370
 
         else:
             pass
 
     elif endplate_type == 'one_way':
-        if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+        if number_of_bolts == 6:
+            outputobj['Bolt']['Pitch12'] = 100.0
+            outputobj['Bolt']['Pitch23'] = 250.0
+
+            outputobj['Plate']['Height'] = 450.0
+
+        elif number_of_bolts == 8:
+            outputobj['Bolt']['Pitch12'] = 100.0
+            outputobj['Bolt']['Pitch23'] = 50.0
+            outputobj['Bolt']['Pitch34'] = 200.0
+
+            outputobj['Plate']['Height'] = 450.0
+
+        elif number_of_bolts == 10:
+            outputobj['Bolt']['Pitch12'] = 100.0
+            outputobj['Bolt']['Pitch23'] = 50.0
+            outputobj['Bolt']['Pitch34'] = 50.0
+            outputobj['Bolt']['Pitch45'] = 150.0
+
+            outputobj['Plate']['Height'] = 450.0
+
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
-            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch12'] = 50.0
+            outputobj['Bolt']['Pitch23'] = 100.0
+            outputobj['Bolt']['Pitch34'] = 50.0
+            outputobj['Bolt']['Pitch45'] = 50.0
+            outputobj['Bolt']['Pitch56'] = 150.0
 
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
-
-        elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch56'] = pitch_dist
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
-
-        elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = pitch_dist
-            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-            outputobj['Bolt']['Pitch78'] = pitch_dist
-            outputobj['Bolt']['Pitch910'] = pitch_dist
-
-            outputobj['Plate']['Height'] = 1000.0
-            outputobj['Plate']['Width'] = 500.0
+            outputobj['Plate']['Height'] = 500.0
 
         else:
             pass

@@ -68,7 +68,7 @@ class NutBoltArray(object):
         self.row = numberOfBolts / 2
         self.col = 2
 
-        if self.endplate_type == "Extended both ways":
+        if self.endplate_type == "both_way":
             if numberOfBolts == 8:
                 self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
                 # self.endDist = boltPlaceObj["Bolt"]["End"]
@@ -109,41 +109,30 @@ class NutBoltArray(object):
                 # self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
                 # self.row = numberOfBolts / 2
                 # self.col = 2
-        elif self.endplate_type == "Extended one way":
-            pass
+        elif self.endplate_type == "one_way":
+            # pass
 
-            # if numberOfBolts == 6:
-            #     self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
-            #     self.endDist = boltPlaceObj["Bolt"]["End"]
-            #     self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            #     self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
-            #     self.row = numberOfBolts / 2
-            #     self.col = 2
-            #
-            # # TODO give dictionary to this values
-            # elif numberOfBolts == 8:
-            #     self.pitch23 = boltPlaceObj['Bolt']['Pitch23']
-            #     self.pitch34 = boltPlaceObj['Bolt']['Pitch34'] # TODO may be different in Ajmal code
-            #     # self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-            #     self.endDist = 40
-            #     # flange_projection = 10
-            #     self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            #     self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
-            #     self.row = numberOfBolts / 2
-            #     self.col = 2
-            # elif numberOfBolts == 10:
-            #     self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-            #     self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-            #     self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"] + boltPlaceObj["Bolt"][
-            #         "Pitch56"]  # TODO may change for Ajmals code (self.pitch56)
-            #     self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
-            #     self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
-            #     self.endDist = boltPlaceObj["Bolt"]["End"]
-            #     self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            #     self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
-            #     self.row = numberOfBolts / 2
-            #     self.col = 2
-        elif self.endplate_type == "Flush end plate":
+            if numberOfBolts == 6:
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
+                self.endDist = boltPlaceObj["Bolt"]["End"]
+                self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+                self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
+                self.row = numberOfBolts / 2
+                self.col = 2
+
+            # TODO give dictionary to this values
+            elif numberOfBolts == 8:
+                self.pitch23 = boltPlaceObj['Bolt']['Pitch23']
+                self.pitch34 = boltPlaceObj['Bolt']['Pitch34']     # TODO may be different in Ajmal code
+
+            elif numberOfBolts == 10:
+                self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
+                # self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+
+
+        elif self.endplate_type == "flush":
             pass
 
     def calculatePositions(self, numberOfBolts):
@@ -154,7 +143,7 @@ class NutBoltArray(object):
         '''
         self.positions = []
 
-        if self.endplate_type == "Extended both ways":
+        if self.endplate_type == "both_way":
             if numberOfBolts == 8:
                 self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
                 self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
@@ -375,10 +364,107 @@ class NutBoltArray(object):
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
 
-        elif self.endplate_type == "Extended one way":
-            pass
+        elif self.endplate_type == "one_way":
+            # pass
+            if numberOfBolts == 6:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["T"]     #space is the distance between 1st row and 2nd row
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["T"] + self.pitch23  #Distance between 1st row and 3rd row #TODO make better variable for space13
+                            pos = pos + self.boltOrigin + space23 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
 
-        elif self.endplate_type == "Flush end plate":
+            elif numberOfBolts == 8:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim["T"]
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim[
+                                "T"] + self.pitch23
+                            pos = pos + self.boltOrigin + space23 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 4:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space34 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim[
+                                "T"] + self.pitch23 + self.pitch34                                      #TODO may be different for Ajmal code (may not need to add pitch45)
+                            pos = pos + self.boltOrigin + space34 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+
+            elif numberOfBolts == 10:
+                self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir  # self.origin here is vertex of endplate, translate by Edge distance in X
+                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir  # Translate by endDistance in Z direction
+                for rw in range(1, self.row + 1):
+                    if rw == 1:
+                        for col in range(self.col):
+                            pos = self.boltOrigin
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 2:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space12 = self.pitch12
+                            pos = pos + self.boltOrigin + space12 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 3:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space23 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim[
+                                "T"] + self.pitch12
+                            pos = pos + self.boltOrigin + space23 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 4:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space34 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim[
+                                "T"] + self.pitch12 + self.pitch34
+                            pos = pos + self.boltOrigin + space34 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+                    if rw == 5:
+                        for col in range(self.col):
+                            pos = np.array([0.0, 0.0, 0.0])
+                            space45 = 2 * (self.Lv + float(self.uiObjW["Weld"]["Flange (mm)"])) + self.beamDim[
+                                "T"] + self.pitch12 + self.pitch34 +  self.pitch45
+                            pos = pos + self.boltOrigin + space45 * self.pitchDir
+                            pos = pos + col * self.crossCgauge * self.gaugeDir
+                            self.positions.append(pos)
+
+        elif self.endplate_type == "flush":
             pass
 
     def place(self, origin, gaugeDir, pitchDir, boltDir):

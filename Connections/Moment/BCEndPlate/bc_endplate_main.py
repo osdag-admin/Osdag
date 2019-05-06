@@ -1545,7 +1545,13 @@ class Maincontroller(QMainWindow):
 		# TODO make dictionary for the stiffeners
 		#TODO adding enpplate type and check if code is working
 
-		endplate_type = alist['Member']['EndPlate_type']
+		# endplate_type = alist['Member']['EndPlate_type']
+		if alist['Member']['EndPlate_type'] == "Extended one way":
+			endplate_type = "one_way"
+		elif alist['Member']['EndPlate_type'] == "Flush end plate":
+			endplate_type = "flush"
+		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+			endplate_type = "both_way"
 
 		stiffener_L1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
 							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))

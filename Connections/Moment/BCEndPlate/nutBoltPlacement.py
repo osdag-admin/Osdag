@@ -62,46 +62,52 @@ class NutBoltArray(object):
         :return: Bolt placement coordinates
         '''
         self.Lv = boltPlaceObj["Bolt"]["Lv"]
-        if numberOfBolts == 8:
-            self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
-            self.endDist = boltPlaceObj["Bolt"]["End"]
-            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
-            self.row = numberOfBolts / 2
-            self.col = 2
-        elif numberOfBolts == 12:
-            self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-            self.endDist = boltPlaceObj["Bolt"]["End"]
-            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
-            self.row = numberOfBolts / 2
-            self.col = 2
-        elif numberOfBolts == 16:
-            self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-            self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
-            self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
-            self.endDist = boltPlaceObj["Bolt"]["End"]
-            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
-            self.row = numberOfBolts / 2
-            self.col = 2
-        elif numberOfBolts == 20:
-            self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
-            self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
-            self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
-            self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
-            self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
-            self.pitch78 = boltPlaceObj["Bolt"]["Pitch78"]
-            self.pitch910 = boltPlaceObj["Bolt"]["Pitch910"]
-            self.endDist = boltPlaceObj["Bolt"]["End"]
-            self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
-            self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
-            self.row = numberOfBolts / 2
-            self.col = 2
+
+        if self.endplate_type == "Extended both ways":
+            if numberOfBolts == 8:
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
+                self.endDist = boltPlaceObj["Bolt"]["End"]
+                self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+                self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
+                self.row = numberOfBolts / 2
+                self.col = 2
+            elif numberOfBolts == 12:
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+                self.endDist = boltPlaceObj["Bolt"]["End"]
+                self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+                self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
+                self.row = numberOfBolts / 2
+                self.col = 2
+            elif numberOfBolts == 16:
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+                self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
+                self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
+                self.endDist = boltPlaceObj["Bolt"]["End"]
+                self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+                self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
+                self.row = numberOfBolts / 2
+                self.col = 2
+            elif numberOfBolts == 20:
+                self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+                self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
+                self.pitch67 = boltPlaceObj["Bolt"]["Pitch67"]
+                self.pitch78 = boltPlaceObj["Bolt"]["Pitch78"]
+                self.pitch910 = boltPlaceObj["Bolt"]["Pitch910"]
+                self.endDist = boltPlaceObj["Bolt"]["End"]
+                self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
+                self.crossCgauge = boltPlaceObj["Plate"]["Width"] - 2 * self.edgeDist
+                self.row = numberOfBolts / 2
+                self.col = 2
+        elif self.endplate_type == "Extended one way":
+            pass
+        elif self.endplate_type == "Flush end plate":
+            pass
 
     def calculatePositions(self, numberOfBolts):
         '''

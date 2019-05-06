@@ -10,7 +10,7 @@ import numpy as np
 
 
 class NutBoltArray(object):
-    def __init__(self, uiObjWeld, beamDim, boltPlaceObj, nut, bolt, numberOfBolts, nut_space):
+    def __init__(self, uiObjWeld, beamDim, boltPlaceObj, nut, bolt, numberOfBolts, nut_space, endplate_type):
         """
         :param uiObjWeld: User inputs 
         :param beamDim: Beam dimensions
@@ -31,6 +31,7 @@ class NutBoltArray(object):
         self.nut = nut
         self.numOfBolts = numberOfBolts
         self.gap = nut_space
+        self.endplate_type = endplate_type
 
         self.initBoltPlaceParams(boltPlaceObj, numberOfBolts)
 

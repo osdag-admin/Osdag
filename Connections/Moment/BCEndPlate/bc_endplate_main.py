@@ -445,7 +445,7 @@ class Maincontroller(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-		self.connection = "BC_EndPlate"
+		self.connection = "BCEndPlate"
 		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None
@@ -1540,7 +1540,12 @@ class Maincontroller(QMainWindow):
 							L=outputobj["Plate"]["Height"],
 							T=outputobj["Plate"]["Thickness"])
 
+		alist = self.designParameters()  # An object to save all input values entered by user
+
 		# TODO make dictionary for the stiffeners
+		#TODO adding enpplate type and check if code is working
+
+		endplate_type = alist['Member']['EndPlate_type']
 
 		stiffener_L1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
 							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
@@ -1551,7 +1556,7 @@ class Maincontroller(QMainWindow):
 		stiffener_R2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
 							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
 
-		alist = self.designParameters()  # An object to save all input values entered by user
+
 
 		bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
 		bolt_r = bolt_d / 2
@@ -1570,7 +1575,7 @@ class Maincontroller(QMainWindow):
 		nutSpace = float(beam_data["T"]) + float(
 			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
-		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
 		###########################
 		#       WELD SECTIONS     #

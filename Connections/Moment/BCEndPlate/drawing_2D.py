@@ -13,7 +13,7 @@ import os
 
 
 class ExtendedEndPlate(object):
-	def __init__(self, input_dict, output_dict, column_data, beam_data, folder):
+	def __init__(self, input_dict, output_dict, column_data, beam_data, folder, endplate_type):
 		"""
 
 		Args:
@@ -28,6 +28,8 @@ class ExtendedEndPlate(object):
 		"""
 		print "calculation", input_dict
 		self.folder = folder
+		self.endplate_type = endplate_type
+
 		self.column_length_L1 = 1200										# column length is represented as beam length L1
 		self.beam_length_L2 = 700
 

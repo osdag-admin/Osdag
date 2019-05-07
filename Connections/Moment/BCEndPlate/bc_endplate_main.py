@@ -1323,7 +1323,16 @@ class Maincontroller(QMainWindow):
 		self.result_obj = bc_endplate_design(self.alist)
 		self.column_data = self.fetchColumnPara()
 		self.beam_data = self.fetchBeamPara()
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+
+		#TODO added endplate_type here, find new way to redue this lines
+		if self.alist['Member']['EndPlate_type'] == "Extended one way":
+			endplate_type = "one_way"
+		elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
+			endplate_type = "flush"
+		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+			endplate_type = "both_way"
+
+		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder, endplate_type)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":

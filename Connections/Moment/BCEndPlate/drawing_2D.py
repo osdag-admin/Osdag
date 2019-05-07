@@ -119,10 +119,75 @@ class ExtendedEndPlate(object):
 				self.bolts_outside_bottom_flange_row = 2
 
 		elif self.endplate_type == "one_way":
-			pass
+			if self.no_of_bolts == 6:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.bolts_outside_top_flange_row = 1
+				self.bolts_inside_top_flange_row = 1
+				self.bolts_inside_bottom_flange_row = 1
+				self.bolts_outside_bottom_flange_row = 0
+			elif self.no_of_bolts == 8:
+				self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+				self.pitch34 = 200			#float(output_dict['Bolt']['Pitch34'])
+				# self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				self.bolts_outside_top_flange_row = 1
+				self.bolts_inside_top_flange_row = 2
+				self.bolts_inside_bottom_flange_row = 1
+				self.bolts_outside_bottom_flange_row = 0
+			# elif self.no_of_bolts == 10:
+			# 	self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+			# 	self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+			# 	self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+			# 	self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+			# 	self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+			# 	self.bolts_outside_top_flange_row = 1
+			# 	self.bolts_inside_top_flange_row = 3
+			# 	self.bolts_inside_bottom_flange_row = 3
+			# 	# self.bolts_outside_bottom_flange_row = 1
+			elif self.no_of_bolts == 10:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				# self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+				# self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+				# self.pitch78 = float(output_dict['Bolt']['Pitch78'])
+				# self.pitch910 = float(output_dict['Bolt']['Pitch910'])
+				self.bolts_outside_top_flange_row = 2
+				self.bolts_inside_top_flange_row = 2
+				self.bolts_inside_bottom_flange_row = 1
+				self.bolts_outside_bottom_flange_row = 0
+
+			else:
+				pass
 
 		elif self.endplate_type == "flush":
-			pass
+			if self.no_of_bolts == 4:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.bolts_outside_top_flange_row = 0
+				self.bolts_inside_top_flange_row = 1
+				self.bolts_inside_bottom_flange_row = 1
+				self.bolts_outside_bottom_flange_row = 0
+			elif self.no_of_bolts == 8:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.bolts_outside_top_flange_row = 0
+				self.bolts_inside_top_flange_row = 2
+				self.bolts_inside_bottom_flange_row = 2
+				self.bolts_outside_bottom_flange_row = 0
+			elif self.no_of_bolts == 12:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+				# self.pitch78 = float(output_dict['Bolt']['Pitch78'])
+				# self.pitch910 = float(output_dict['Bolt']['Pitch910'])
+				self.bolts_outside_top_flange_row = 0
+				self.bolts_inside_top_flange_row = 3
+				self.bolts_inside_bottom_flange_row = 3
+				self.bolts_outside_bottom_flange_row = 0
+			else:
+				pass
 
 	def add_s_marker(self, dwg):
 		"""
@@ -536,7 +601,7 @@ class ExtendedEnd2DFront(object):
 
 		ptS1x = self.data_object.flange_thickness_T1
 		ptS1y = self.data_object.column_length_L1/2 - self.data_object.beam_depth_D2/2 +\
-				self.data_object.flange_thickness_T2/2 + self.data_object.stiffener_thickness_t1/2
+				self.data_object.flange_thickness_T2/2 + self.data_object.stiffener_thickness_t1/2			#This formula will be right once the aspect ratio of the column is adjusted
 		self.S1 = np.array([ptS1x, ptS1y])
 
 		ptS2x = ptS1x + self.data_object.stiffener_length_L1
@@ -719,20 +784,19 @@ class ExtendedEnd2DFront(object):
 		dwg.add(dwg.polyline(points=[self.BB8, self.BB7, self.BB9, self.BB8], stroke='black', fill='black', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.BB12, self.BB11, self.BB13, self.BB12], stroke='black', fill='black', stroke_width=2.5))
 
-		botfr = self.data_object.bolts_outside_top_flange_row
-		bitfr = self.data_object.bolts_inside_top_flange_row
-		bolt_r = int(self.data_object.bolt_diameter) / 2
 
-		# ------------------------------------------  Bolts Outside Top Flange -------------------------------------------
-		pt_outside_top_column_list = []
+		if self.data_object.endplate_type == "both_way":
 
-		if self.data_object.endplate_type == "flush":
-			pass
+			botfr = self.data_object.bolts_outside_top_flange_row
+			bitfr = self.data_object.bolts_inside_top_flange_row
+			bolt_r = int(self.data_object.bolt_diameter) / 2
 
-		else:
+			# ------------------------------------------  Bolts Outside Top Flange -------------------------------------------
+			pt_outside_top_column_list = []
+
 			for i in range(1, (botfr + 1)):
 				if self.data_object.no_of_bolts == 20:
-					ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1 )\
+					ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1 )\
 						  * np.array([1, 0]) + (i - 1) *self.data_object.pitch12 * np.array([0, 1])
 					ptx1 = ptx - bolt_r * np.array([0, 1])
 					rect_width = self.data_object.bolt_diameter
@@ -747,88 +811,56 @@ class ExtendedEnd2DFront(object):
 					rect_length = self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1
 					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-			pt_Cx = ptx + np.array([1, 0])
-			pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-			dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-			pt_outside_top_column_list.append(ptx)
+				pt_Cx = ptx + np.array([1, 0])
+				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+				pt_outside_top_column_list.append(ptx)
 
-			pt_Cx1 = ptx + np.array([-1, 0])
-			pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-			dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-			pt_outside_top_column_list.append(ptx)
+				pt_Cx1 = ptx + np.array([-1, 0])
+				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+				pt_outside_top_column_list.append(ptx)
 
-		# ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
+			# ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
+			pt_inside_top_column_list = []
+			for i in range(1, (bitfr + 1)):
+				if self.data_object.no_of_bolts == 8:
+					ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) * np.array(
+						[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch * np.array([0, 1])   	#this formula gives two rows of bolts inside the flanges
+				elif self.data_object.no_of_bolts == 12:
+					ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) * np.array(
+						[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
+				elif self.data_object.no_of_bolts == 16:
+					ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) * np.array(
+						[0, 1]) -(self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
+				else:
+					ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) * np.array(
+						[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
 
-		# pt_inside_top_column_list = []
-		# for i in range(1, (bitfr + 1)):
-		# 	if self.data_object.no_of_bolts == 8:
-		# 		ptx = self.P2 + ((
-		# 									 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv) * np.array(
-		# 			[0, 1]) - (self.data_object.plate_thickness_p1+ self.data_object.plate_thickness_p1) * np.array(
-		# 			[1, 0]) + i * self.data_object.pitch * np.array([0, 1])
-		# 	elif self.data_object.no_of_bolts == 12:
-		# 		ptx = self.P2 + ((
-		# 									 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv) * np.array(
-		# 			[0, 1]) - (self.data_object.plate_thickness_p1+ self.data_object.plate_thickness_p1) * np.array(
-		# 			[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
-		# 	elif self.data_object.no_of_bolts == 16:
-		# 		ptx = self.P2 + ((
-		# 									 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv) * np.array(
-		# 			[0, 1]) - (self.data_object.plate_thickness_p1+ self.data_object.plate_thickness_p1) * np.array(
-		# 			[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
-		# 	else:
-		# 		ptx = self.P2 + ((
-		# 									 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv) * np.array(
-		# 			[0, 1]) - (self.data_object.plate_thickness_p1+ self.data_object.plate_thickness_p1) * np.array(
-		# 			[1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
-		#
+				ptx1 = ptx - bolt_r * np.array([0, 1])
+				rect_width = self.data_object.bolt_diameter
+				# rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1
+				rect_length = self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1
+				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
+				pt_Cx = ptx + np.array([1, 0])							#pt Cx and Dx are the points for black square rectangular boxes representing bolts
+				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+				pt_inside_top_column_list.append(ptx)
 
-		pt_inside_top_column_list = []
-		for i in range(1, (bitfr + 1)):
-			if self.data_object.no_of_bolts == 8:
-				ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
-					[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch * np.array([0, 1])
-			elif self.data_object.no_of_bolts == 12:
-				ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
-					[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
-			elif self.data_object.no_of_bolts == 16:
-				ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
-					[0, 1]) -(self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
-			else:
-				ptx = self.P2 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
-					[0, 1]) - (self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
+				pt_Cx1 = ptx + np.array([-1, 0])						#pt Cx1 and Dx1 are the st lind representing the center of the bolt
+				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+				pt_inside_top_column_list.append(ptx)
 
-			ptx1 = ptx - bolt_r * np.array([0, 1])
-			rect_width = self.data_object.bolt_diameter
-			# rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1
-			rect_length = self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1
-			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+				bobfr = self.data_object.bolts_outside_bottom_flange_row
+				bibfr = self.data_object.bolts_inside_bottom_flange_row
 
-			pt_Cx = ptx + np.array([1, 0])
-			pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-			dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-			pt_inside_top_column_list.append(ptx)
-
-			pt_Cx1 = ptx + np.array([-1, 0])
-			pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-			dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-			pt_inside_top_column_list.append(ptx)
-
-			bobfr = self.data_object.bolts_outside_bottom_flange_row
-			bibfr = self.data_object.bolts_inside_bottom_flange_row
-
-		# ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
+			# ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
 
 
-		pt_outside_bottom_column_list = []
-		if self.data_object.endplate_type == "flush":
-			pass
+			pt_outside_bottom_column_list = []
 
-		elif self.data_object.endplate_type == "one_way":
-			pass
-
-		else:
 			for i in range(1, (bobfr + 1)):
 				if self.data_object.no_of_bolts == 20:
 					ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - (
@@ -859,64 +891,214 @@ class ExtendedEnd2DFront(object):
 				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
 				pt_outside_bottom_column_list.append(ptx)
 
-		# ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
-		# pt_inside_bottom_column_list = []
-		# for i in range(1, (bibfr + 1)):
-		# 	if self.data_object.no_of_bolts == 8:
-		# 		ptx = self.P3 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv)\
-		# 		      * np.array([0, -1]) -(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + i * self.data_object.pitch * np.array([0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-		# 	elif self.data_object.no_of_bolts == 12:
-		# 		ptx = self.P3 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv)\
-		# 		      * np.array([0, -1]) -(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-		# 	elif self.data_object.no_of_bolts == 16:
-		# 		ptx = self.P3 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv)\
-		# 		      * np.array([0, -1]) -(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-		# 	else:
-		# 		ptx = self.P3 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 - self.Lv)\
-		# 		      * np.array([0, -1]) -(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array([0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+				# ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
 
-		pt_inside_bottom_column_list = []
-		for i in range(1, (bibfr + 1)):
-			if self.data_object.no_of_bolts == 8:
-				ptx = self.P3 + ((
-											 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
-					  * np.array([0, -1]) - (
-								  self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1 ) * np.array([1, 0]) + i * self.data_object.pitch * np.array(
-					[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-			elif self.data_object.no_of_bolts == 12:
-				ptx = self.P3 + ((
-											 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
-					  * np.array([0, -1]) - (
-								  self.data_object.plate_thickness_p1  + self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array(
-					[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-			elif self.data_object.no_of_bolts == 16:
-				ptx = self.P3 + ((
-											 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
-					  * np.array([0, -1]) - (
-								  self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array(
-					[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-			else:
-				ptx = self.P3 + ((
-											 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
-					  * np.array([0, -1]) - (
-								  self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array(
-					[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+				pt_inside_bottom_column_list = []
+				for i in range(1, (bibfr + 1)):
+					if self.data_object.no_of_bolts == 8:
+						ptx = self.P3 + ((
+													 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+							  * np.array([0, -1]) - (
+										  self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1 ) * np.array([1, 0]) + i * self.data_object.pitch * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					elif self.data_object.no_of_bolts == 12:
+						ptx = self.P3 + ((
+													 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+							  * np.array([0, -1]) - (
+										  self.data_object.plate_thickness_p1  + self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					elif self.data_object.no_of_bolts == 16:
+						ptx = self.P3 + ((
+													 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+							  * np.array([0, -1]) - (
+										  self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					else:
+						ptx = self.P3 + ((
+													 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+							  * np.array([0, -1]) - (
+										  self.data_object.plate_thickness_p1  +self.data_object.flange_thickness_T1) * np.array([1, 0]) + i * self.data_object.pitch34 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
 
-			ptx1 = ptx - bolt_r * np.array([0, 1])
-			rect_width = self.data_object.bolt_diameter
-			rect_length = self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1
-			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					rect_length = self.data_object.plate_thickness_p1 +self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-			pt_Cx = ptx + np.array([1, 0])
-			pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-			dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-			pt_inside_bottom_column_list.append(ptx)
+					pt_Cx = ptx + np.array([1, 0])
+					pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+					dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+					pt_inside_bottom_column_list.append(ptx)
 
-			pt_Cx1 = ptx + np.array([-1, 0])
-			pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-			dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-			pt_inside_bottom_column_list.append(ptx)
+					pt_Cx1 = ptx + np.array([-1, 0])
+					pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+					dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+					pt_inside_bottom_column_list.append(ptx)
 
+		elif self.data_object.endplate_type == "one_way":
+
+			botfr = self.data_object.bolts_outside_top_flange_row
+			bitfr = self.data_object.bolts_inside_top_flange_row
+			bolt_r = int(self.data_object.bolt_diameter) / 2
+
+			# ------------------------------------------  Bolts Outside Top Flange -------------------------------------------
+			pt_outside_top_column_list = []
+
+			for i in range(1, (botfr + 1)):
+				if self.data_object.no_of_bolts >= 10:
+					ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (
+								self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) \
+						  * np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1])
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+									 stroke_width=2.5))
+				else:
+					ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - \
+						  (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array([1, 0])
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					# rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1  #removing thickness p2
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+									 stroke_width=2.5))
+
+				pt_Cx = ptx + np.array([1, 0])
+				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+				pt_outside_top_column_list.append(ptx)
+
+				pt_Cx1 = ptx + np.array([-1, 0])
+				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+				pt_outside_top_column_list.append(ptx)
+
+			# ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
+			pt_inside_top_column_list = []
+			for i in range(1, (bitfr + 1)):
+				if self.data_object.no_of_bolts == 6:
+					ptx = self.P2 + (( self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
+						[0, 1]) - ( self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+						[1, 0]) + i * self.data_object.pitch * np.array([0, 1])
+				elif self.data_object.no_of_bolts == 8:
+					ptx = self.P2 + (( self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
+						[0, 1]) - ( self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+						[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
+				elif self.data_object.no_of_bolts == 10:
+					ptx = self.P2 + (( self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
+						[0, 1]) - ( self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+						[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
+				# else:
+					# ptx = self.P2 + (( self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
+					# 	[0, 1]) - ( self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+					# 	[1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
+
+				ptx1 = ptx - bolt_r * np.array([0, 1])
+				rect_width = self.data_object.bolt_diameter
+				# rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1
+				rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+								 stroke_width=2.5))
+
+				pt_Cx = ptx + np.array([1, 0])
+				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+				pt_inside_top_column_list.append(ptx)
+
+				pt_Cx1 = ptx + np.array([-1, 0])
+				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+				pt_inside_top_column_list.append(ptx)
+
+				bobfr = self.data_object.bolts_outside_bottom_flange_row
+				bibfr = self.data_object.bolts_inside_bottom_flange_row
+
+			# ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
+
+			pt_outside_bottom_column_list = []
+
+			for i in range(1, (bobfr + 1)):
+				if self.data_object.no_of_bolts == 20:
+					ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - (
+							self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * \
+						  np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, -1])
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+									 stroke_width=2.5))
+				else:
+					ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - \
+						  (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+						[1, 0])  # + column * self.data_object.gauge * np.array([0, 1])
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+									 stroke_width=2.5))
+
+				pt_Cx = ptx + np.array([1, 0])
+				pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+				dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+				pt_outside_bottom_column_list.append(ptx)
+
+				pt_Cx1 = ptx + np.array([-1, 0])
+				pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+				dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+				pt_outside_bottom_column_list.append(ptx)
+
+				# ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
+
+				pt_inside_bottom_column_list = []
+				for i in range(1, (bibfr + 1)):
+					if self.data_object.no_of_bolts == 8:
+						ptx = self.P3 + ((
+												 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
+							  * np.array([0, -1]) - (
+									  self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+							[1, 0]) + i * self.data_object.pitch * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					elif self.data_object.no_of_bolts == 12:
+						ptx = self.P3 + ((
+												 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
+							  * np.array([0, -1]) - (
+									  self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+							[1, 0]) + i * self.data_object.pitch23 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					elif self.data_object.no_of_bolts == 16:
+						ptx = self.P3 + ((
+												 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
+							  * np.array([0, -1]) - (
+									  self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+							[1, 0]) + i * self.data_object.pitch23 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+					else:
+						ptx = self.P3 + ((
+												 self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) \
+							  * np.array([0, -1]) - (
+									  self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+							[1, 0]) + i * self.data_object.pitch34 * np.array(
+							[0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+
+					ptx1 = ptx - bolt_r * np.array([0, 1])
+					rect_width = self.data_object.bolt_diameter
+					rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+					dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+									 stroke_width=2.5))
+
+					pt_Cx = ptx + np.array([1, 0])
+					pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+					dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+					pt_inside_bottom_column_list.append(ptx)
+
+					pt_Cx1 = ptx + np.array([-1, 0])
+					pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+					dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+					pt_inside_bottom_column_list.append(ptx)
+
+		elif self.data_object.endplate_type == "flush":
+			pass
 		# ------------------------------------------  Labeling Outside top bolt of flange -------------------------------------------
 		no_of_bolts_flange = self.data_object.bolts_outside_top_flange_row * self.data_object.no_of_columns
 		point = np.array(pt_outside_top_column_list[0])

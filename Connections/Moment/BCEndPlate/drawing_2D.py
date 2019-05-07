@@ -79,42 +79,50 @@ class ExtendedEndPlate(object):
 
 		self.no_of_columns = 2
 		self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
-		if self.no_of_bolts == 8:
-			self.pitch = float(output_dict['Bolt']['Pitch'])
-			self.bolts_outside_top_flange_row = 1
-			self.bolts_inside_top_flange_row = 1
-			self.bolts_inside_bottom_flange_row = 1
-			self.bolts_outside_bottom_flange_row = 1
-		elif self.no_of_bolts == 12:
-			self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-			self.bolts_outside_top_flange_row = 1
-			self.bolts_inside_top_flange_row = 2
-			self.bolts_inside_bottom_flange_row = 2
-			self.bolts_outside_bottom_flange_row = 1
-		elif self.no_of_bolts == 16:
-			self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-			self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-			self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-			self.bolts_outside_top_flange_row = 1
-			self.bolts_inside_top_flange_row = 3
-			self.bolts_inside_bottom_flange_row = 3
-			self.bolts_outside_bottom_flange_row = 1
-		elif self.no_of_bolts == 20:
-			self.pitch12 = float(output_dict['Bolt']['Pitch12'])
-			self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-			self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-			self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-			self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-			self.pitch78 = float(output_dict['Bolt']['Pitch78'])
-			self.pitch910 = float(output_dict['Bolt']['Pitch910'])
-			self.bolts_outside_top_flange_row = 2
-			self.bolts_inside_top_flange_row = 3
-			self.bolts_inside_bottom_flange_row = 3
-			self.bolts_outside_bottom_flange_row = 2
+
+		if self.endplate_type == "both_way":
+			if self.no_of_bolts == 8:
+				self.pitch = float(output_dict['Bolt']['Pitch'])
+				self.bolts_outside_top_flange_row = 1
+				self.bolts_inside_top_flange_row = 1
+				self.bolts_inside_bottom_flange_row = 1
+				self.bolts_outside_bottom_flange_row = 1
+			elif self.no_of_bolts == 12:
+				self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				self.bolts_outside_top_flange_row = 1
+				self.bolts_inside_top_flange_row = 2
+				self.bolts_inside_bottom_flange_row = 2
+				self.bolts_outside_bottom_flange_row = 1
+			elif self.no_of_bolts == 16:
+				self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+				self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+				self.bolts_outside_top_flange_row = 1
+				self.bolts_inside_top_flange_row = 3
+				self.bolts_inside_bottom_flange_row = 3
+				self.bolts_outside_bottom_flange_row = 1
+			elif self.no_of_bolts == 20:
+				self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+				self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+				self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+				self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+				self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+				self.pitch78 = float(output_dict['Bolt']['Pitch78'])
+				self.pitch910 = float(output_dict['Bolt']['Pitch910'])
+				self.bolts_outside_top_flange_row = 2
+				self.bolts_inside_top_flange_row = 3
+				self.bolts_inside_bottom_flange_row = 3
+				self.bolts_outside_bottom_flange_row = 2
+
+		elif self.endplate_type == "one_way":
+			pass
+
+		elif self.endplate_type == "flush":
+			pass
 
 	def add_s_marker(self, dwg):
 		"""

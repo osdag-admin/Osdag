@@ -445,7 +445,7 @@ class Maincontroller(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.folder = folder
-		self.connection = "BC_EndPlate"
+		self.connection = "BCEndPlate"
 		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None

@@ -113,7 +113,7 @@ class NutBoltArray(object):
             # pass
 
             if numberOfBolts == 6:
-                self.pitch23 = boltPlaceObj["Bolt"]["Pitch"]
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
                 self.endDist = boltPlaceObj["Bolt"]["End"]
                 # self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
                 # self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
@@ -122,12 +122,12 @@ class NutBoltArray(object):
 
             # TODO give dictionary to this values
             elif numberOfBolts == 8:
-                self.pitch23 = 50.0             # boltPlaceObj['Bolt']['Pitch23']
-                self.pitch34 = 200.0          #boltPlaceObj['Bolt']['Pitch34']     # TODO may be different in Ajmal code
+                self.pitch23 = 50.0             # boltPlaceObj['Bolt']['Pitch23'] & 50.0
+                self.pitch34 = 145.0          #boltPlaceObj['Bolt']['Pitch34'] & 200.0     # TODO may be different in Ajmal code
 
             elif numberOfBolts == 10:
                 self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
-                # self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
                 self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
                 self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
         elif self.endplate_type == "flush":

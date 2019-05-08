@@ -11,7 +11,7 @@ class ExtendedBothWays(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21, bbWeldSideWeb_22,
-                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2):
+                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2, endplate_type):
 
         # Initializing the arguments
         self.beamLeft = beamLeft                            # beamLeft represents the column
@@ -23,6 +23,7 @@ class ExtendedBothWays(object):
         self.stiffener_L2 = stiffener_L2
         self.stiffener_R1 = stiffener_R1
         self.stiffener_R2 = stiffener_R2
+        self.endplate_type = endplate_type
 
 
         # Weld above flange for left and right beam

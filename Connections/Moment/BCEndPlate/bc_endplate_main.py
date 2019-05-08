@@ -1628,7 +1628,7 @@ class Maincontroller(QMainWindow):
 									   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 									   bbWeldBelwFlang_24,
 									   bbWeldSideWeb_21, bbWeldSideWeb_22, stiffener_L1, stiffener_L2, stiffener_R1,
-									   stiffener_R2)
+									   stiffener_R2, endplate_type)
 		extbothWays.create_3DModel()
 
 		return extbothWays

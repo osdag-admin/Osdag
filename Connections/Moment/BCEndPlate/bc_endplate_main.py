@@ -1529,6 +1529,17 @@ class Maincontroller(QMainWindow):
 		column_data = self.fetchColumnPara()
 		beam_data = self.fetchBeamPara()
 
+		#TODO check if column data is working
+
+		column_tw = float(column_data["tw"])
+		column_T = float(column_data["T"])
+		column_d = float(column_data["D"])
+		column_B = float(column_data["B"])
+		column_R1 = float(column_data["R1"])
+		column_R2 = float(column_data["R2"])
+		column_alpha = float(column_data["FlangeSlope"])
+		column_length = 1600.0
+
 		beam_tw = float(beam_data["tw"])
 		beam_T = float(beam_data["T"])
 		beam_d = float(beam_data["D"])
@@ -1538,10 +1549,15 @@ class Maincontroller(QMainWindow):
 		beam_alpha = float(beam_data["FlangeSlope"])
 		beam_length = 1600.0
 
-		beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+
+
+		beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
+							 R1=column_R1, R2=column_R2, alpha=column_alpha,
+							 length=column_length, notchObj=None)
+
+		beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
 							 R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-							 length=beam_length, notchObj=None)
-		beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+							 length=beam_length, notchObj=None)  # Since both the beams are same
 
 		outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
@@ -1562,14 +1578,14 @@ class Maincontroller(QMainWindow):
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 			endplate_type = "both_way"
 
-		stiffener_L1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_L2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_R1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_R2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
+		stiffener_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 
 
 

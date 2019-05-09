@@ -135,15 +135,19 @@ class ExtendedBothWays(object):
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
-        else: #self.endplate_type == "both_way" and flushed
+        elif self.endplate_type == "both_way":
             nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, self.plateRight.L /2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
-        # elif self.endplate_type == "flush":
-        #     pass
+        elif self.endplate_type == "flush":
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2,  self.plateRight.L/2 + 50])       #TODO Add self.Lv instead of 50
+            gaugeDir = numpy.array([1.0, 0, 0])
+            pitchDir = numpy.array([0, 0, -1.0])
+            boltDir = numpy.array([0, -1.0, 0])
+            self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
     ##############################################  Adding stiffeners ########################################
 

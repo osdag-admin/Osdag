@@ -500,7 +500,7 @@ class NutBoltArray(object):
 
             if numberOfBolts == 4:
                 self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
-                self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
+                self.boltOrigin = self.boltOrigin #+ self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                 for rw in range(1, self.row + 1):
 
                        #TODO remove this lines
@@ -526,7 +526,7 @@ class NutBoltArray(object):
 
             elif numberOfBolts == 8:
                     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
-                    self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
+                    self.boltOrigin = self.boltOrigin #+ self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                     for rw in range(1, self.row + 1):
 
                         #TODO remove some rowsn from here
@@ -579,7 +579,7 @@ class NutBoltArray(object):
 
             elif numberOfBolts == 12:
                     self.boltOrigin = self.origin + self.edgeDist * self.gaugeDir   # self.origin here is vertex of endplate, translate by Edge distance in X
-                    self.boltOrigin = self.boltOrigin + self.endDist * self.pitchDir    # Translate by endDistance in Z direction
+                    self.boltOrigin = self.boltOrigin #+ self.endDist * self.pitchDir    # Translate by endDistance in Z direction
                     for rw in range(1, self.row + 1):
                         # if rw == 1:
                         #     for col in range(self.col):

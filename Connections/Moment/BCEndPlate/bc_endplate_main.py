@@ -1763,10 +1763,10 @@ class Maincontroller(QMainWindow):
 		# Displays the beams #TODO ANAND
 		if component == "Column":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
+			# osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Beam":
-			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+			# osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Connector":

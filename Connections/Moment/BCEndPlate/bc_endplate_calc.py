@@ -414,6 +414,27 @@ def bc_endplate_design(uiObj):
             no_tension_side += 2
 
     #######################################################################
+    # WELD DESIGN
+
+    if weld_method == 'fillet':
+        # Flange weld
+        flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(beam_tf, end_plate_thickness)
+        flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=weld_thickness_flange, fusion_face_angle=90)
+        flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tf, end_plate_thickness)
+
+        # check min and max weld size
+
+        # weld lengths, long joint, min length
+
+        # strength of welds
+
+        # forces in welds
+
+        # check for weld strength
+
+
+
     # TODO Check for Shear yielding and shear rupture of end plate
     '''
 

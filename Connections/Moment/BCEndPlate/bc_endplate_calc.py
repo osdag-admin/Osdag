@@ -188,6 +188,8 @@ def bc_endplate_design(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
+    beam_R2 = float(dictbeamdata["R2"])
+
 
     #######################################################################
     # Read input values from column database
@@ -425,7 +427,31 @@ def bc_endplate_design(uiObj):
 
         # check min and max weld size
 
+        if weld_thickness_flange <= flange_weld_size_min:
+            design_status = False
+            logger.error(": The weld size at beam flange is less than required")
+            logger.warning(": The minimum required weld size at beam flange is %s mm" % flange_weld_size_min)
+            logger.info(": Increase the size of weld at beam flanges")
+
+        if flange_weld_throat_size >= flange_weld_throat_max:
+            design_status = False
+            logger.error(": The weld size at beam flange is more than allowed")
+            logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_throat_max)
+            logger.info(": Decrease the size of weld at beam flanges")
+
         # weld lengths, long joint, min length
+
+        flange_weld_available_length_top = beam_B
+        flange_weld_available_length_bottom = (beam_B - beam_tw - 2*beam_R1 - 2*beam_R2) / 2
+
+        flange_weld_effective_length_top = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=weld_thickness_flange, available_length=flange_weld_available_length_top)
+        flange_weld_effective_length_bottom = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=weld_thickness_flange, available_length=flange_weld_available_length_bottom)
+
+
+
+
 
         # strength of welds
 

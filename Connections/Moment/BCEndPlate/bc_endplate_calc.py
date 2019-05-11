@@ -458,6 +458,7 @@ def bc_endplate_design(uiObj):
         flange_weld_long_joint_bottom = IS800_2007.cl_10_5_7_3_weld_long_joint(
             l_j=flange_weld_effective_length_bottom, t_t=flange_weld_throat_size)
 
+
         # Weld strength
 
         flange_weld_strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
@@ -465,9 +466,25 @@ def bc_endplate_design(uiObj):
 
         #  Design forces at welds due to loads
 
+        flange_weld_force_axial = factored_axial_load / \
+                                  (2 *(flange_weld_effective_length_top * flange_weld_long_joint_top +
+                                  2 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
+                                                             0.0)) # ADD WEB WELD LENGTH instead of 0.0
+
+        flange_tension_moment = factored_moment / (beam_d - beam_tf)
+        flange_weld_force_moment = flange_tension_moment / (flange_weld_effective_length_top +
+                                                             2 * flange_weld_effective_length_bottom)
 
         # check for weld strength
 
+        flange_weld_stress = (flange_weld_force_moment + flange_weld_force_axial) / flange_weld_throat_size
+        flange_weld_throat_reqd = round((flange_weld_force_moment + flange_weld_force_axial) / flange_weld_strength, 3)
+
+        if flange_weld_stress >= flange_weld_strength:
+            design_status = False
+            logger.error(": The weld size at beam flange is less than required")
+            logger.warning(": The minimum required throat size of weld flanges is %s mm" % flange_weld_throat_reqd)
+            logger.info(": Increase the size of weld at beam flanges")
 
 
     # TODO Check for Shear yielding and shear rupture of end plate

@@ -524,6 +524,9 @@ def bc_endplate_design(uiObj):
             logger.warning(": The minimum required throat size of weld web is %s mm" % web_weld_throat_reqd)
             logger.info(": Increase the size of weld at beam web")
 
+    else:   # weld_method == 'groove'
+        groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            beam_tf, beam_tw, end_plate_thickness)
 
     # TODO Check for Shear yielding and shear rupture of end plate
     '''

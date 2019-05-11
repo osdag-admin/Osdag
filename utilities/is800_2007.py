@@ -708,6 +708,31 @@ class IS800_2007(object):
         f_wd = f_wn / gamma_mw
         return f_wd
 
+    # cl. 10.5.7.3 Long joints
+    @staticmethod
+    def cl_10_5_7_3_weld_long_joint(l_j, t_t):
+
+        """Calculate the reduction factor for long joints in welds
+
+        Args:
+            l_j - length of joints in the direction of force transfer in mm (float)
+            t_t - throat size of the weld in mm (float)
+
+        Returns:
+             Reduction factor, beta_lw for long joints in welds (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.3
+
+        """
+        if l_j <= 150 * t_t:
+            return 1.0
+        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        if beta_lw >= 1.0:
+            beta_lw = 1.0
+        return beta_lw
+
     # -------------------------------------------------------------
     #   10.6 Design of Connections
     # -------------------------------------------------------------

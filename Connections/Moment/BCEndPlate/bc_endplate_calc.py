@@ -114,7 +114,6 @@ def bc_endplate_design(uiObj):
     column_fu = float(uiObj['Member']['fu (MPa)'])
     column_fy = float(uiObj['Member']['fy (MPa)'])
     weld_fu = float(uiObj['weld']['fu_overwrite'])
-    weld_fu_govern = min(beam_fu, weld_fu)  # Mpa  (weld_fu_govern is the governing value of weld strength)
 
     factored_moment = float(uiObj['Load']['Moment (kNm)']) * 1e6
     factored_shear_load = float(uiObj['Load']['ShearForce (kN)']) * 1e3
@@ -131,6 +130,11 @@ def bc_endplate_design(uiObj):
     bolt_fy = (bolt_grade - int(bolt_grade)) * bolt_fu
     mu_f = float(uiObj["bolt"]["slip_factor"])
     gamma_mw = float(uiObj["weld"]["safety_factor"])
+    if gamma_mw == 1.50:
+        weld_fabrication = 'field'
+    else:
+        weld_fabrication = 'shop'
+
     dp_bolt_hole_type = uiObj["bolt"]["bolt_hole_type"]
     if dp_bolt_hole_type == "Over-sized":
         bolt_hole_type = 'over_size'
@@ -449,13 +453,18 @@ def bc_endplate_design(uiObj):
         flange_weld_effective_length_bottom = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
             fillet_size=weld_thickness_flange, available_length=flange_weld_available_length_bottom)
 
+        flange_weld_long_joint_top = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=flange_weld_effective_length_top, t_t=flange_weld_throat_size)
+        flange_weld_long_joint_bottom = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=flange_weld_effective_length_bottom, t_t=flange_weld_throat_size)
 
+        # Weld strength
 
+        flange_weld_strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
 
+        #  Design forces at welds due to loads
 
-        # strength of welds
-
-        # forces in welds
 
         # check for weld strength
 

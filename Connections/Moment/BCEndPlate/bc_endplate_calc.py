@@ -429,6 +429,13 @@ def bc_endplate_design(uiObj):
             fillet_size=weld_thickness_flange, fusion_face_angle=90)
         flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tf, end_plate_thickness)
 
+        # Web welds
+
+        web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(beam_tw, end_plate_thickness)
+        web_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=weld_thickness_web, fusion_face_angle=90)
+        web_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tw, end_plate_thickness)
+
         # check min and max weld size
 
         if weld_thickness_flange <= flange_weld_size_min:
@@ -443,7 +450,19 @@ def bc_endplate_design(uiObj):
             logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_throat_max)
             logger.info(": Decrease the size of weld at beam flanges")
 
-        # weld lengths, long joint, min length
+        if weld_thickness_web <= web_weld_size_min:
+            design_status = False
+            logger.error(": The weld size at beam web is less than required")
+            logger.warning(": The minimum required weld size at beam web is %s mm" % web_weld_size_min)
+            logger.info(": Increase the size of weld at beam web")
+
+        if web_weld_throat_size >= web_weld_throat_max:
+            design_status = False
+            logger.error(": The weld size at beam web is more than allowed")
+            logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_throat_max)
+            logger.info(": Decrease the size of weld at beam web")
+
+        # Weld lengths - available and effective, long joint reduction factors
 
         flange_weld_available_length_top = beam_B
         flange_weld_available_length_bottom = (beam_B - beam_tw - 2*beam_R1 - 2*beam_R2) / 2
@@ -458,33 +477,52 @@ def bc_endplate_design(uiObj):
         flange_weld_long_joint_bottom = IS800_2007.cl_10_5_7_3_weld_long_joint(
             l_j=flange_weld_effective_length_bottom, t_t=flange_weld_throat_size)
 
+        web_weld_available_length = beam_d - 2 * (beam_tf + beam_R1)
+        web_weld_effective_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=weld_thickness_web, available_length=web_weld_available_length)
+        web_weld_long_joint = IS800_2007.cl_10_5_7_3_weld_long_joint(
+            l_j=web_weld_effective_length, t_t=web_weld_throat_size)
 
         # Weld strength
 
         flange_weld_strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
             ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
 
+        web_weld_strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
+
         #  Design forces at welds due to loads
 
-        flange_weld_force_axial = factored_axial_load / \
-                                  (2 *(flange_weld_effective_length_top * flange_weld_long_joint_top +
-                                  2 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
-                                                             0.0)) # ADD WEB WELD LENGTH instead of 0.0
+        weld_force_axial = factored_axial_load / (
+                2 * (flange_weld_effective_length_top * flange_weld_long_joint_top +
+                    2 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
+                    web_weld_effective_length * web_weld_long_joint))
 
         flange_tension_moment = factored_moment / (beam_d - beam_tf)
-        flange_weld_force_moment = flange_tension_moment / (flange_weld_effective_length_top +
+        weld_force_moment = flange_tension_moment / (flange_weld_effective_length_top +
                                                              2 * flange_weld_effective_length_bottom)
+        weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
 
         # check for weld strength
 
-        flange_weld_stress = (flange_weld_force_moment + flange_weld_force_axial) / flange_weld_throat_size
-        flange_weld_throat_reqd = round((flange_weld_force_moment + flange_weld_force_axial) / flange_weld_strength, 3)
+        flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
+        flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+
+        web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_throat_size
+
+        web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_strength, 3)
 
         if flange_weld_stress >= flange_weld_strength:
             design_status = False
             logger.error(": The weld size at beam flange is less than required")
             logger.warning(": The minimum required throat size of weld flanges is %s mm" % flange_weld_throat_reqd)
             logger.info(": Increase the size of weld at beam flanges")
+
+        if web_weld_stress >= web_weld_strength:
+            design_status = False
+            logger.error(": The weld size at beam web is less than required")
+            logger.warning(": The minimum required throat size of weld web is %s mm" % web_weld_throat_reqd)
+            logger.info(": Increase the size of weld at beam web")
 
 
     # TODO Check for Shear yielding and shear rupture of end plate

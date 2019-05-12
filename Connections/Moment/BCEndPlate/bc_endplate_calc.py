@@ -756,6 +756,9 @@ def bc_endplate_design(uiObj):
     # FOR OUTPUT DOCK
     outputobj['Bolt'] = {}
     outputobj["Weld"] = {}
+    outputobj['Plate'] = {}
+
+    outputobj['Bolt']['status'] = design_status
 
     outputobj["Bolt"]["CriticalTension"] = 0
     outputobj["Bolt"]["TensionCapacity"] = 0
@@ -763,29 +766,21 @@ def bc_endplate_design(uiObj):
     outputobj["Bolt"]["BearingCapacity"] = 0
     outputobj["Bolt"]["CombinedCapacity"] = 0
     outputobj["Bolt"]["BoltCapacity"] = 0
-    outputobj["Bolt"]["NumberOfBolts"] = 0
-    outputobj["Bolt"]["NumberOfRows"] = 0
-    outputobj["Bolt"]["Gauge"] = 0
-    outputobj["Bolt"]["CrossCentreGauge"] = 0
-    outputobj["Bolt"]["End"] = 0
-    outputobj["Bolt"]["Edge"] = 0
+
     outputobj["Weld"]["CriticalStressflange"] = 0
     outputobj["Weld"]["CriticalStressWeb"] = 0
 
-    outputobj['Bolt']['status'] = design_status
-    outputobj['Bolt']['NumberOfBolts'] = 8
-    outputobj['Bolt']['Gauge'] = 50.0
-    outputobj['Bolt']['CrossCentreGauge'] = 100.0
-    outputobj['Bolt']['End'] = 50.0
-    outputobj['Bolt']['Edge'] = 50.0
-    outputobj['Bolt']['Lv'] = 50.0
-    outputobj['Bolt']['PitchMini'] = 50.0
-    outputobj['Bolt']['PitchMax'] = 300.0
-    outputobj['Bolt']['EndMax'] = 300.0
-    outputobj['Bolt']['EndMini'] = 50.0
-    outputobj['Bolt']['DiaHole'] = 22
+    outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
+    outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
+    outputobj['Bolt']['End'] = float(round(end_dist, 3))
+    outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
+    outputobj['Bolt']['Lv'] = float(round(l_v, 3))
+    outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
+    outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
+    outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
+    outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
+    outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-    outputobj['Plate'] = {}
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))

@@ -840,25 +840,25 @@ def bc_endplate_design(uiObj):
 
     else:   # endplate_type == 'both_way':
         if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
+            outputobj['Bolt']['Pitch'] = float(round(beam_d - 2 * (beam_tf + l_v), 3))
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
-            outputobj['Bolt']['Pitch45'] = pitch_dist
+            outputobj['Bolt']['Pitch23'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch34'] = float(round(beam_d - 2 * (beam_tf + l_v + pitch_dist), 3))
+            outputobj['Bolt']['Pitch45'] = float(round(pitch_dist, 3))
         elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch56'] = pitch_dist
-            outputobj['Bolt']['Pitch67'] = pitch_dist
+            outputobj['Bolt']['Pitch23'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch34'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch45'] = float(round(beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist), 3))
+            outputobj['Bolt']['Pitch56'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch67'] = float(round(pitch_dist, 3))
         elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = pitch_dist
-            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-            outputobj['Bolt']['Pitch78'] = pitch_dist
-            outputobj['Bolt']['Pitch910'] = pitch_dist
+            outputobj['Bolt']['Pitch12'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch34'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch45'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch56'] = float(round(beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist), 3))
+            outputobj['Bolt']['Pitch67'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch78'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch910'] = float(round(pitch_dist, 3))
         else:
             pass
 

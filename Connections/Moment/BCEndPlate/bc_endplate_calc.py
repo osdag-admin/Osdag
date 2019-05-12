@@ -673,17 +673,6 @@ def bc_endplate_design(uiObj):
     # outputobj['Bolt']['BoltFy'] = bolt_fy
     # outputobj['Bolt']['PryingForce'] = round(prying_force, 3)
     # outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-    outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-    outputobj['Bolt']['CrossCentreGauge'] = float(g_1)
-    outputobj['Bolt']['End'] = float(end_dist)
-    outputobj['Bolt']['Edge'] = float(edge_dist)
-    outputobj['Bolt']['Lv'] = float(l_v)
-    outputobj['Bolt']['PitchMini'] = pitch_dist_min
-    outputobj['Bolt']['PitchMax'] = pitch_dist_max
-    outputobj['Bolt']['EndMax'] = end_dist_max
-    outputobj['Bolt']['EndMini'] = end_dist
-    outputobj['Bolt']['DiaHole'] = int(dia_hole)
-    #
     # if bolt_type == "Friction Grip Bolt":
     #     outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
     #     outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
@@ -719,33 +708,6 @@ def bc_endplate_design(uiObj):
     # outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
     # outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
-    # outputobj['Stiffener'] = {}
-    # outputobj['Stiffener']['Height'] = round(h_st, 3)
-    # outputobj['Stiffener']['Length'] = round(l_st, 3)
-    # outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-    
-    # Detailing
-    if endplate_type == "both_way":
-        if number_of_bolts == 8:
-            outputobj['Bolt']['Pitch'] = beam_d - 2 * (beam_tf + l_v)
-        elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = beam_d - 2 * (beam_tf + l_v + pitch_dist)
-            outputobj['Bolt']['Pitch45'] = pitch_dist
-        elif number_of_bolts == 16:
-            outputobj['Bolt']['Pitch23'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch56'] = pitch_dist
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-        elif number_of_bolts == 20:
-            outputobj['Bolt']['Pitch12'] = pitch_dist
-            outputobj['Bolt']['Pitch34'] = pitch_dist
-            outputobj['Bolt']['Pitch45'] = pitch_dist
-            outputobj['Bolt']['Pitch56'] = beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist)
-            outputobj['Bolt']['Pitch67'] = pitch_dist
-            outputobj['Bolt']['Pitch78'] = pitch_dist
-            outputobj['Bolt']['Pitch910'] = pitch_dist
 
     # End of Output dictionary
 '''

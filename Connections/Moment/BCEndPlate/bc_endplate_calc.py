@@ -232,10 +232,10 @@ def bc_endplate_design(uiObj):
     # min_end_distance & max_end_distance = Minimum and Maximum end distance
     #       [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
 
-    end_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(d=bolt_dia, bolt_hole_type=bolt_hole_type,
-                                                                      edge_type=edge_type)
-    end_dist_max = IS800_2007.cl_10_2_4_3_max_edge_dist(plate_thicknesses=bolt_plates_tk, f_y=end_plate_fy,
-                                                        corrosive_influences=corrosive_influences)
+    end_dist_min = IS800_2007.cl_10_2_4_2_min_edge_end_dist(
+        d=bolt_dia, bolt_hole_type=bolt_hole_type,edge_type=edge_type)
+    end_dist_max = IS800_2007.cl_10_2_4_3_max_edge_dist(
+        plate_thicknesses=bolt_plates_tk, f_y=end_plate_fy, corrosive_influences=corrosive_influences)
     end_dist = round_up(end_dist_min, multiplier=5)
 
     # min_edge_distance = Minimum edge distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
@@ -255,27 +255,22 @@ def bc_endplate_design(uiObj):
     # Calculate bolt capacities
 
     if bolt_type == "Friction Grip Bolt":
-        bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(f_ub=bolt_fu, A_nb=bolt_net_area, n_e=1,
-                                                                        mu_f=mu_f, bolt_hole_type=bolt_hole_type)
-        bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(f_ub=bolt_fu,
-                                                                                      f_yb=bolt_fy,
-                                                                                      A_sb=bolt_shank_area,
-                                                                                      A_n=bolt_net_area)
+        bolt_shear_capacity = IS800_2007.cl_10_4_3_bolt_slip_resistance(
+            f_ub=bolt_fu, A_nb=bolt_net_area, n_e=1, mu_f=mu_f, bolt_hole_type=bolt_hole_type)
+        bolt_tension_capacity = IS800_2007.cl_10_4_5_friction_bolt_tension_resistance(
+            f_ub=bolt_fu, f_yb=bolt_fy, A_sb=bolt_shank_area, A_n=bolt_net_area)
         bearing_capacity = 0.0
         bolt_capacity = bolt_shear_capacity
 
     else:
-        bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(f_u=bolt_fu, A_nb=bolt_net_area,
-                                                                       A_sb=bolt_shank_area, n_n=1, n_s=0)
-        bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(f_u=min(column_fu, end_plate_fu),
-                                                                      f_ub=bolt_fu, t=sum(bolt_plates_tk),
-                                                                      d=bolt_dia, e=edge_dist, p=pitch_dist,
-                                                                      bolt_hole_type=bolt_hole_type)
+        bolt_shear_capacity = IS800_2007.cl_10_3_3_bolt_shear_capacity(
+            f_u=bolt_fu, A_nb=bolt_net_area, A_sb=bolt_shank_area, n_n=1, n_s=0)
+        bearing_capacity = IS800_2007.cl_10_3_4_bolt_bearing_capacity(
+            f_u=min(column_fu, end_plate_fu), f_ub=bolt_fu, t=sum(bolt_plates_tk), d=bolt_dia, e=edge_dist,
+            p=pitch_dist, bolt_hole_type=bolt_hole_type)
         bolt_capacity = min(bolt_shear_capacity, bearing_capacity)
-        bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(f_ub=bolt_fu,
-                                                                                     f_yb=bolt_fy,
-                                                                                     A_sb=bolt_shank_area,
-                                                                                     A_n=bolt_net_area)
+        bolt_tension_capacity = IS800_2007.cl_10_3_5_bearing_bolt_tension_resistance(
+            f_ub=bolt_fu, f_yb=bolt_fy, A_sb=bolt_shank_area, A_n=bolt_net_area)
 
     #######################################################################
 
@@ -286,9 +281,9 @@ def bc_endplate_design(uiObj):
 
     # Prying force
     b_e = beam_B
-    prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu,
-                                                          b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
-                                                          end_dist=end_dist, pre_tensioned=False)
+    prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(
+        T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
+        end_dist=end_dist, pre_tensioned=False)
     toe_of_weld_moment = abs(flange_tension/2 * l_v - prying_force * end_dist)
     plate_tk_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
@@ -482,15 +477,11 @@ def bc_endplate_design(uiObj):
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear
         if bolt_type == "Friction Grip Bolt":
-            bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf=shear_in_bolt,
-                                                                                            V_df=bolt_capacity,
-                                                                                            T_f=tension_in_bolt,
-                                                                                            T_df=bolt_tension_capacity)
+            bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(
+                V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity)
         else:
-            bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb=shear_in_bolt,
-                                                                                            V_db=bolt_capacity,
-                                                                                            T_b=tension_in_bolt,
-                                                                                            T_db=bolt_tension_capacity)
+            bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(
+                V_sb=shear_in_bolt, V_db=bolt_capacity, T_b=tension_in_bolt, T_db=bolt_tension_capacity)
 
         if bolt_combined_status is False:
             no_tension_side += 2

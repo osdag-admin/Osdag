@@ -786,33 +786,27 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['DiaHole'] = 22
 
     outputobj['Plate'] = {}
-    outputobj['Plate']['Height'] = 530
-    outputobj['Plate']['Width'] = 180
+    outputobj['Plate']['Height'] = float(round(plate_height, 3))
+    outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
+    outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
     # Detailing
     if endplate_type == 'flush':
-        outputobj['Bolt']['projection'] = 10
         if number_of_bolts == 4:
-            outputobj['Bolt']['Pitch12'] = 250
-
-            outputobj['Plate']['Height'] = 370
+            outputobj['Bolt']['Pitch12'] = round(beam_d - 2 * (beam_tf + l_v), 3)
 
         elif number_of_bolts == 8:
-            outputobj['Bolt']['Pitch12'] = 50.0
-            outputobj['Bolt']['Pitch23'] = 150.0
-            outputobj['Bolt']['Pitch34'] = 50.0
-
-            outputobj['Plate']['Height'] = 370
+            outputobj['Bolt']['Pitch12'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch23'] = round(beam_d - 2 * (beam_tf + l_v + pitch_dist), 3)
+            outputobj['Bolt']['Pitch34'] = float(round(pitch_dist, 3))
 
         elif number_of_bolts == 12:
-            outputobj['Bolt']['Pitch12'] = 50.0
-            outputobj['Bolt']['Pitch23'] = 50.0
-            outputobj['Bolt']['Pitch34'] = 50.0
-            outputobj['Bolt']['Pitch45'] = 50.0
-            outputobj['Bolt']['Pitch56'] = 50.0
-
-            outputobj['Plate']['Height'] = 370
+            outputobj['Bolt']['Pitch12'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch23'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch34'] = round(beam_d - 2 * (beam_tf + l_v + 2 * pitch_dist), 3)
+            outputobj['Bolt']['Pitch45'] = float(round(pitch_dist, 3))
+            outputobj['Bolt']['Pitch56'] = float(round(pitch_dist, 3))
 
         else:
             pass

@@ -427,12 +427,7 @@ class IS800_2007(object):
             Reference:
             IS 800:2007,  cl 10.3.6
         """
-        combined_bearing = (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
-
-        return combined_bearing
-        # if (V_sb / V_db) ** 2 + (T_b / T_db) ** 2 <= 1:
-        #     return True
-        # return False
+        return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
@@ -530,12 +525,7 @@ class IS800_2007(object):
                     Reference:
                     IS 800:2007,  cl 10.4.6
         """
-        combined_friction = (V_sf/V_df)**2 + (T_f/T_df)**2
-
-        return combined_friction
-        # if (V_sf/V_df)**2 + (T_f/T_df)**2 <= 1:
-        #     return True
-        # return False
+        return (V_sf/V_df)**2 + (T_f/T_df)**2
 
     # cl. 10.4.7 Prying force bolts
     @staticmethod

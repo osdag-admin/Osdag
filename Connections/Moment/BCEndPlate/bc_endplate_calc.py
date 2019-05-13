@@ -779,25 +779,25 @@ def bc_endplate_design(uiObj):
             pass
 
     if weld_method == 'fillet':
-        outputobj["Weld"]["FlangeSizeMin"] = flange_weld_size_min
-        outputobj["Weld"]["FlangeSizeMax"] = flange_weld_throat_max
-        outputobj["Weld"]["FlangeLengthTop"] = flange_weld_effective_length_top
-        outputobj["Weld"]["FlangeLengthBottom"] = flange_weld_effective_length_bottom
-        outputobj["Weld"]["FlangeThroat"] = flange_weld_throat_size
-        outputobj["Weld"]["FlangeThroatMin"] = flange_weld_throat_reqd
-        outputobj["Weld"]["FlangeStress"] = flange_weld_stress
-        outputobj["Weld"]["FlangeStrength"] = flange_weld_strength
+        outputobj["Weld"]["FlangeSizeMin"] = float(round(flange_weld_size_min, 3))
+        outputobj["Weld"]["FlangeSizeMax"] = float(round(flange_weld_throat_max, 3))
+        outputobj["Weld"]["FlangeLengthTop"] = float(round(flange_weld_effective_length_top, 3))
+        outputobj["Weld"]["FlangeLengthBottom"] = float(round(flange_weld_effective_length_bottom, 3))
+        outputobj["Weld"]["FlangeThroat"] = float(round(flange_weld_throat_size, 3))
+        outputobj["Weld"]["FlangeThroatMin"] = float(round(flange_weld_throat_reqd, 3))
+        outputobj["Weld"]["FlangeStress"] = float(round(flange_weld_stress, 3))
+        outputobj["Weld"]["FlangeStrength"] = float(round(flange_weld_strength, 3))
 
-        outputobj["Weld"]["WebSizeMin"] = web_weld_size_min
-        outputobj["Weld"]["WebSizeMax"] = web_weld_throat_max
-        outputobj["Weld"]["WebLength"] = web_weld_effective_length
-        outputobj["Weld"]["WebThroat"] = web_weld_throat_size
-        outputobj["Weld"]["WebThroatMin"] = web_weld_throat_reqd
-        outputobj["Weld"]["WebStress"] = web_weld_stress
-        outputobj["Weld"]["WebStrength"] = web_weld_strength
+        outputobj["Weld"]["WebSizeMin"] = float(round(web_weld_size_min, 3))
+        outputobj["Weld"]["WebSizeMax"] = float(round(web_weld_throat_max, 3))
+        outputobj["Weld"]["WebLength"] = float(round(web_weld_effective_length, 3))
+        outputobj["Weld"]["WebThroat"] = float(round(web_weld_throat_size, 3))
+        outputobj["Weld"]["WebThroatMin"] = float(round(web_weld_throat_reqd, 3))
+        outputobj["Weld"]["WebStress"] = float(round(web_weld_stress, 3))
+        outputobj["Weld"]["WebStrength"] = float(round(web_weld_strength, 3))
 
     else:  # weld_method == 'groove':
-        outputobj["Weld"]["Size"] = groove_weld_size
+        outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
 
     # End of SAMPLE Output dictionary
     

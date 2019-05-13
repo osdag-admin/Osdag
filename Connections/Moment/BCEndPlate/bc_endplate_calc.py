@@ -480,10 +480,10 @@ def bc_endplate_design(uiObj):
         # Check for combined tension and shear
         if bolt_type == "Friction Grip Bolt":
             bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(
-                V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity)
+                V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity) <= 1.0
         else:
             bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(
-                V_sb=shear_in_bolt, V_db=bolt_capacity, T_b=tension_in_bolt, T_db=bolt_tension_capacity)
+                V_sb=shear_in_bolt, V_db=bolt_capacity, T_b=tension_in_bolt, T_db=bolt_tension_capacity) <= 1.0
 
         if bolt_combined_status is False:
             no_tension_side += 2

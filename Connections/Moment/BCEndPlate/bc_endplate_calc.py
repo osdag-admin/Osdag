@@ -640,35 +640,10 @@ def bc_endplate_design(uiObj):
       '''
 
     #######################################################################
-    # Design of Stiffener,  output dictionary
-    '''
-    # TODO: add material strengths for below condition (design preference?)
+    # Design of Stiffener
     stiffener_fy = end_plate_fy
     stiffener_fu = end_plate_fu
 
-    ###################################################################################################
-
-    # End of Calculation, Output dictionary
-    outputobj = {}
-    outputobj['Bolt'] = {}
-    # outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-    # outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-    # outputobj['Bolt']['kb'] = float(round(k_b, 3))
-    # outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-    # outputobj['Bolt']['BoltFy'] = bolt_fy
-    # outputobj['Bolt']['PryingForce'] = round(prying_force, 3)
-
-    
-    outputobj['Plate'] = {}
-
-    # outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-    # outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-    #
-    # outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
-    # outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-    # End of Output dictionary
-'''
     ######################################
     # End of Calculation, SAMPLE Output dictionary
     outputobj = dict()
@@ -677,6 +652,9 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt'] = {}
     outputobj["Weld"] = {}
     outputobj['Plate'] = {}
+    outputobj['ContPlateTens'] = {}
+    outputobj['ContPlateComp'] = {}
+    outputobj['Stiffener'] = {}
 
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
@@ -706,6 +684,18 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
+
+    outputobj['ContPlateTens']['Length'] = 0.0
+    outputobj['ContPlateTens']['Width'] = 0.0
+    outputobj['ContPlateTens']['Thickness'] = 10.0
+
+    outputobj['ContPlateComp']['Length'] = 0.0
+    outputobj['ContPlateTens']['Width'] = 0.0
+    outputobj['ContPlateTens']['Thickness'] = 10.0
+
+    outputobj['Stiffener']['Length'] = 0.0
+    outputobj['Stiffener']['Width'] = 0.0
+    outputobj['Stiffener']['Thickness'] = 10.0
 
     # Detailing
     if endplate_type == 'flush':

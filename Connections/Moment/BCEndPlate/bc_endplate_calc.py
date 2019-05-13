@@ -299,6 +299,7 @@ def bc_endplate_design(uiObj):
 
     # Detailing
     bolt_combined_status = False
+    detailing_status = True
     while bolt_combined_status is False:
 
         if endplate_type == 'flush':
@@ -312,10 +313,10 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 2,
                            'out_compression_flange': 0, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    # logger.warning()
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # # logger.warning()
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
@@ -325,18 +326,18 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 3,
                            'out_compression_flange': 0, 'in_compression_flange': 3}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
 
             else:
-                design_status = False
-                logger.error("Large number of bolts are required for the connection")
-                logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                detailing_status = False
+                # logger.error("Large number of bolts are required for the connection")
+                # logger.info(": Re-design the connection using bolt of higher grade or diameter")
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
@@ -353,10 +354,10 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
                 if beam_d - 2 * beam_tf - 2 * l_v < 2 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    # logger.warning()
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # # logger.warning()
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
@@ -366,9 +367,9 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 3,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
@@ -377,14 +378,14 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 2, 'in_tension_flange': 3,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
             else:
-                design_status = False
-                logger.error("Large number of bolts are required for the connection")
-                logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                detailing_status = False
+                # logger.error("Large number of bolts are required for the connection")
+                # logger.info(": Re-design the connection using bolt of higher grade or diameter")
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
@@ -401,10 +402,10 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
                            'out_compression_flange': 1, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 3 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    # logger.warning()
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # # logger.warning()
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
@@ -414,9 +415,9 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 3,
                            'out_compression_flange': 1, 'in_compression_flange': 3}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
                     # TODO Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
@@ -425,16 +426,17 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
                            'out_compression_flange': 3, 'in_compression_flange': 2}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
-                    design_status = False
-                    logger.error("Large number of bolts are required for the connection")
-                    logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
             else:
-                design_status = False
-                logger.error("Large number of bolts are required for the connection")
-                logger.info(": Re-design the connection using bolt of higher grade or diameter")
+                detailing_status = False
+                # logger.error("Large number of bolts are required for the connection")
+                # logger.info(": Re-design the connection using bolt of higher grade or diameter")
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
+
 
             # #######################################################################
 
@@ -451,7 +453,7 @@ def bc_endplate_design(uiObj):
             comp_plate_no_pitch = end_dist + l_v
 
         plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
-                       comp_plate_no_pitch + tens_plate_no_pitch
+                       beam_d + comp_plate_no_pitch + tens_plate_no_pitch
         plate_width = g_1 + 2 * edge_dist
         while plate_width < beam_B:
             edge_dist += 5
@@ -471,7 +473,7 @@ def bc_endplate_design(uiObj):
         sigma_yi_sq = 0
         for bolt_row in range(int(no_rows['out_tension_flange'])):
             sigma_yi_sq += (beam_d - beam_tf/2 + l_v + bolt_row * pitch_dist) ** 2
-        for bolt_row in range(int(no_rows['out_compression_flange'])):
+        for bolt_row in range(int(no_rows['in_tension_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
         moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
@@ -487,6 +489,11 @@ def bc_endplate_design(uiObj):
 
         if bolt_combined_status is False:
             no_tension_side += 2
+        if detailing_status is False:
+            design_status = False
+            logger.error("Large number of bolts are required for the connection")
+            logger.info(": Re-design the connection using bolt of higher grade or diameter")
+            break
 
     #######################################################################
     # WELD DESIGN

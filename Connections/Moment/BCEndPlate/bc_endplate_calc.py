@@ -686,6 +686,8 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
+    outputobj['Bolt']['BoltFy'] = 0.0          ###
+
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
@@ -795,6 +797,8 @@ def bc_endplate_design(uiObj):
 
     else:  # weld_method == 'groove':
         outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
+
+    outputobj['Weld']['WeldFuGovern'] = 0.0   ###
 
     # End of SAMPLE Output dictionary
     

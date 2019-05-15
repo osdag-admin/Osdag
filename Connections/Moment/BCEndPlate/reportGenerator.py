@@ -115,12 +115,12 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     number_of_bolts = str(int(outObj['Bolt']['NumberOfBolts']))
 
     if float(number_of_bolts) <= 20:
-        number_of_rows = str(int(round(outObj['Bolt']['NumberOfRows'])))
-        bolts_per_column = str(outObj['Bolt']['BoltsPerColumn'])
+        no_rows = str(int(round(outObj['Bolt']['NumberOfRows'])))
+        #bolts_per_column = str(outObj['Bolt']['BoltsPerColumn'])
         cross_centre_gauge = str(outObj['Bolt']['CrossCentreGauge'])
     else:
-        number_of_rows = str(0)
-        bolts_per_column = str(0)
+        no_rows = str(0)
+        #bolts_per_column = str(0)
         cross_centre_gauge = str(outObj['Bolt']['CrossCentreGauge'])
 
     end_distance = str(int(float(outObj['Bolt']['End'])))
@@ -130,33 +130,43 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     bearingcapacity = str(outObj['Bolt']['BearingCapacity'])
     shearcapacity = str(outObj['Bolt']['ShearCapacity'])
     boltcapacity = str(outObj['Bolt']['BoltCapacity'])
+
+    slip_capacity = str(float(outObj["Bolt"]["SlipCapacity"]))
+    shear_capacity = str(float(outObj["Bolt"]["ShearCapacity"]))
+    bearing_capacity = str(float(outObj["Bolt"]["BearingCapacity"]))
+    bolt_capacity = str(float(outObj["Bolt"]["BoltCapacity"]))
+    bolt_tension_capacity = str(float(outObj["Bolt"]["TensionCapacity"]))
+    tension_in_bolt = str(float(outObj["Bolt"]["TensionBolt"]))
+    combined_capacity = str(float(outObj["Bolt"]["CombinedCapacity"]))
+
+
     kb = str(outObj['Bolt']['kb'])
     plate_thk = str(outObj['Bolt']['SumPlateThick'])  # Sum of plate thickness experiencing bearing in same direction
 
     if float(number_of_bolts) <= 20:
         if bolt_type == "Friction Grip Bolt":
-            Vsf = str(float(outObj['Bolt']['Vsf']))
-            Vdf = str(float(outObj['Bolt']['Vdf']))
-            Tf = str(float(outObj['Bolt']['Tf']))
-            Tdf = str(float(outObj['Bolt']['Tdf']))
+            Vsf = str(float(outObj['Bolt']['ShearBolt']))
+            Vdf = str(float(outObj['Bolt']['BoltCapacity']))
+            Tf = str(float(outObj['Bolt']['TensionBolt']))
+            Tdf = str(float(outObj['Bolt']['TensionCapacity']))
         else:
-            Vsb = str(float(outObj['Bolt']['Vsb']))
-            Vdb = str(float(outObj['Bolt']['Vdb']))
-            Tb = str(float(outObj['Bolt']['Tb']))
-            Tdb = str(float(outObj['Bolt']['Tdb']))
+            Vsb = str(float(outObj['Bolt']['ShearBolt']))
+            Vdb = str(float(outObj['Bolt']['BoltCapacity']))
+            Tb = str(float(outObj['Bolt']['TensionBolt']))
+            Tdb = str(float(outObj['Bolt']['TensionCapacity']))
 
         combinedcapacity = str(float(outObj['Bolt']['CombinedCapacity']))
     else:
         if bolt_type == "Friction Grip Bolt":
-            Vsf = str(float(outObj['Bolt']['Vsf']))
-            Vdf = str(float(outObj['Bolt']['Vdf']))
-            Tf = str(float(outObj['Bolt']['Tf']))
-            Tdf = str(float(outObj['Bolt']['Tdf']))
+            Vsf = str(float(outObj['Bolt']['ShearBolt']))
+            Vdf = str(float(outObj['Bolt']['BoltCapacity']))
+            Tf = str(float(outObj['Bolt']['TensionBolt']))
+            Tdf = str(float(outObj['Bolt']['TensionCapacity']))
         else:
-            Vsb = str(float(outObj['Bolt']['Vsb']))
-            Vdb = str(float(outObj['Bolt']['Vdb']))
-            Tb = str(float(outObj['Bolt']['Tb']))
-            Tdb = str(float(outObj['Bolt']['Tdb']))
+            Vsb = str(float(outObj['Bolt']['ShearBolt']))
+            Vdb = str(float(outObj['Bolt']['BoltCapacity']))
+            Tb = str(float(outObj['Bolt']['TensionBolt']))
+            Tdb = str(float(outObj['Bolt']['TensionCapacity']))
 
         combinedcapacity = str(0)
 
@@ -528,7 +538,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Bolts Per Column", number_of_rows]
+    row = [2, "Bolts Per Column", no_rows]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -945,13 +955,73 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="header1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    # Check for tension in critical bolt
-    if float(number_of_bolts) <= float(20):
-        row = [0, "Tension in critical bolt (kN)", " Tension in bolt due to external factored moment + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " ", ""]
-    else:
-        row = [0, "Tension in critical bolt (kN)",
-               " Tension in bolt due to external factored moment + Prying force = Cannot compute" " <br> [cl. 10.4.7] ", " ", ""]
+    # # Check for tension in critical bolt
+    # if float(number_of_bolts) <= float(20):
+    #     row = [0, "Tension in critical bolt (kN)", " Tension in bolt due to external factored moment + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " ", ""]
+    # else:
+    #     row = [0, "Tension in critical bolt (kN)",
+    #            " Tension in bolt due to external factored moment + Prying force = Cannot compute" " <br> [cl. 10.4.7] ", " ", ""]
+    #
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
+
+
+# Check for shear capacity
+    rstr += t('tr')
+
+    required_shear_force = str(float(factored_shear_load) / float(number_of_bolts))
+    const = str(round(math.pi / 4 * 0.78, 4))
+    n_e = str(1)
+    n_n = str(1)
+
+    if float(required_shear_force) > float(shearcapacity):
+        if bolt_type == "Friction Grip Bolt":
+            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
+                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsf</sub> = (" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
+                ") / 1.25 = " + slip_capacity + "<br> [cl. 10.4.3]", " <p align=left style=color:red><b>Fail</b></p> "]
+        else:
+            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
+                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + n_n + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+            ")/(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]", " <p align=left style=color:red><b>Fail</b></p> "]
+    else:
+        if bolt_type == "Friction Grip Bolt":
+            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
+                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsf</sub> = (" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
+                ") / 1.25 = " + slip_capacity + "<br> [cl. 10.4.3]", " <p align=left style=color:green><b>Pass</b></p> "]
+        else:
+            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
+                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + n_n + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
+            ")/(&#8730;3*1.25*1000) = " + shear_capacity + "<br> [cl. 10.3.3]", " <p align=left style=color:green><b>Pass</b></p> "]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    # Check for bearing capacity
+    rstr += t('tr')
+    if bolt_type == "Friction Grip Bolt" :
+        row = [0, "Bolt bearing capacity (kN)", "N/A", "N/A", ""]
+    else:
+        row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + plate_thk + "*" + beam_fu + ")"
+
+                " / (1.25*1000)  = " + bearing_capacity + "<br> [cl. 10.3.4]", ""]
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    rstr += t('/tr')
+
+    # Check for bolt capacity
+    rstr += t('tr')
+    if bearingcapacity == "N/A":
+        row = [0, "Bolt capacity (kN)", " ", bolt_capacity, ""]
+    else:
+        row = [0, "Bolt capacity (kN)", " min (" + shear_capacity + ", " + bearing_capacity + ") ", bolt_capacity, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -963,15 +1033,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('tr')
 
     if float(number_of_bolts) <= float(20):
-        tension_critical_bolt = str(float(tension_critical) + float(prying_force))
 
-        if float(tension_critical_bolt) > float(tension_capacity):
-            row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt, " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / (1.25*1000) = "
-                   + tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:red><b>Fail</b></p> "]
+        if float(tension_in_bolt) > float(bolt_tension_capacity):
+            row = [0, "Tension capacity of bolt (kN)", tension_in_bolt,
+                   " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / (1.25*1000) = "
+                   + bolt_tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:red><b>Fail</b></p> "]
         else:
 
-            row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt, " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / " "(1.25*1000) = "
-                   + tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:green><b>Pass</b></p> "]
+            row = [0, "Tension capacity of bolt (kN)", tension_in_bolt,
+                   " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / " "(1.25*1000) = "
+                   + bolt_tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:green><b>Pass</b></p> "]
     else:
         row = [0, "Tension capacity of critical bolt (kN)", "Cannot compute",
                " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / (1.25*1000) = "
@@ -983,85 +1054,27 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-# Check for shear capacity
-    rstr += t('tr')
-
-    required_shear_force = str(float(factored_shear_load) / float(number_of_bolts))
-    const = str(round(math.pi / 4 * 0.78, 4))
-    n_e = str(1)
-    n_n = str(1)
-
-    if float(required_shear_force) > float(shearcapacity):
-        if bearingcapacity == "N/A" :
-            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
-                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsf</sub> = (" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
-                ") / 1.25 = " + shearcapacity + "<br> [cl. 10.4.3]", " <p align=left style=color:red><b>Fail</b></p> "]
-        else:
-            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
-                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + n_n + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
-            ")/(&#8730;3*1.25*1000) = " + shearcapacity + "<br> [cl. 10.3.3]", " <p align=left style=color:red><b>Fail</b></p> "]
-    else:
-        if bearingcapacity == "N/A":
-            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
-                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsf</sub> = (" + slip_factor + "*" + n_e + "*" + k_h + "*" + F_0 +
-                ") / 1.25 = " + shearcapacity + "<br> [cl. 10.4.3]", " <p align=left style=color:green><b>Pass</b></p> "]
-        else:
-            row = [0, "Bolt shear capacity (kN)", "Factored shear force / Number of bolts = " + factored_shear_load + " / " + number_of_bolts + " = "
-                   + str(round(float(required_shear_force), 3)), "<i>V</i><sub>dsb</sub> = (" + bolt_fu + "*" + n_n + "*" + const + "*" + bolt_dia + "*" + bolt_dia +
-            ")/(&#8730;3*1.25*1000) = " + shearcapacity + "<br> [cl. 10.3.3]", " <p align=left style=color:green><b>Pass</b></p> "]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    # Check for bearing capacity
-    rstr += t('tr')
-    if bearingcapacity == "N/A" :
-        row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
-    else:
-        row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + plate_thk + "*" + beam_fu + ")"
-
-                " / (1.25*1000)  = " + bearingcapacity + "<br> [cl. 10.3.4]", ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    # Check for bolt capacity
-    rstr += t('tr')
-    if bearingcapacity == "N/A":
-        row = [0, "Bolt capacity (kN)", " ", boltcapacity, ""]
-    else:
-        row = [0, "Bolt capacity (kN)", " min (" + shearcapacity + ", " + bearingcapacity + ") ", boltcapacity, ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
     # Check for Combined capacity
     rstr += t('tr')
     if float(number_of_bolts) <= float(20):
         if bolt_type == "Friction Grip Bolt":
-            if float(combinedcapacity) > float(1):
+            if float(combined_capacity) > float(1):
                 row = [0, "Combined shear and tension capacity of bolt", "&#8804; 1.0", "(<i>V</i><sub>sf</sub>/<i>V</i><sub>df</sub>)^2 + (<i>T</i><sub>f</sub>/<i>T</i><sub>df</sub>)^2 = (" + Vsf + "/" + Vdf + ")^2 + ("
-                    + Tf + "/" + Tdf + ")^2 = " + combinedcapacity + " <br> [cl. 10.4.6]", " <p align=left style=color:red><b>Fail</b></p> "]
+                    + Tf + "/" + Tdf + ")^2 = " + combined_capacity + " <br> [cl. 10.4.6]", " <p align=left style=color:red><b>Fail</b></p> "]
             else:
 
                 row = [0, "Combined shear and tension capacity of bolt", "&#8804; 1.0",
                        "(<i>V</i><sub>sf</sub>/<i>V</i><sub>df</sub>)^2 + (<i>T</i><sub>f</sub>/<i>T</i><sub>df</sub>)^2 = (" + Vsf + "/" + Vdf + ")^2 + ("
-                       + Tf + "/" + Tdf + ")^2 = " + combinedcapacity + " <br> [cl. 10.4.6]", " <p align=left style=color:green><b>Pass</b></p> "]
+                       + Tf + "/" + Tdf + ")^2 = " + combined_capacity + " <br> [cl. 10.4.6]", " <p align=left style=color:green><b>Pass</b></p> "]
         else:
-            if float(combinedcapacity) > float(1):
+            if float(combined_capacity) > float(1):
                 row = [0, "Combined shear and tension capacity of bolt", "&#8804; 1.0", "(<i>V</i><sub>sb</sub>/<i>V</i><sub>db</sub>)^2 + (<i>T</i><sub>b</sub>/<i>T</i><sub>db</sub>)^2 = (" + Vsb + "/" + Vdb + ")^2 + ("
-                       + Tb + "/" + Tdb + ")^2 = " + combinedcapacity + " <br> [cl. 10.3.6]", " <p align=left style=color:red><b>Fail</b></p> "]
+                       + Tb + "/" + Tdb + ")^2 = " + combined_capacity + " <br> [cl. 10.3.6]", " <p align=left style=color:red><b>Fail</b></p> "]
                 # print(type(row))
 
             else:
                 row = [0, "Combined shear and tension capacity of bolt", "&#8804; 1.0", "(<i>V</i><sub>sb</sub>/<i>V</i><sub>db</sub>)^2 + (<i>T</i><sub>b</sub>/<i>T</i><sub>db</sub>)^2 = (" + Vsb + "/" + Vdb + ")^2 + ("
-                       + Tb + "/" + Tdb + ")^2 = " + combinedcapacity + " <br> [cl. 10.3.6]", " <p align=left style=color:green><b>Pass</b></p> "]
+                       + Tb + "/" + Tdb + ")^2 = " + combined_capacity + " <br> [cl. 10.3.6]", " <p align=left style=color:green><b>Pass</b></p> "]
     else:
         row = [0, "Combined shear and tension capacity of bolt", "&#8804; 1.0",
                "(<i>V</i><sub>sb</sub>/<i>V</i><sub>db</sub>)^2 + (<i>T</i><sub>b</sub>/<i>T</i><sub>db</sub>)^2 = Cannot compute" " <br> [cl. 10.3.6]", " <p align=left style=color:red><b>Fail</b></p> "]
@@ -1081,27 +1094,27 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    # Number of Column(s)
-    rstr += t('tr')
-
-    row = [0, "No. of column(s)", " ", "2", ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    # Number of bolts per column
-    rstr += t('tr')
-    if float(number_of_bolts) <= float(20):
-        row = [0, "No. of row(s)", " ", bolts_per_column, ""]
-    else:
-        row = [0, "No. of row(s)", " ", " Cannot compute", ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+    # # Number of Column(s)
+    # rstr += t('tr')
+    #
+    # row = [0, "No. of column(s)", " ", "2", ""]
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
+    #
+    # # Number of bolts per column
+    # rstr += t('tr')
+    # if float(number_of_bolts) <= float(20):
+    #     row = [0, "No. of row(s)", " ", no_rows, ""]
+    # else:
+    #     row = [0, "No. of row(s)", " ", " Cannot compute", ""]
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
 
     # TODO: Add pitch checks (Danish)
@@ -1484,6 +1497,19 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+
+    # Stiffener Checks
+    row = [0, "Stiffener Checks", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail" align="center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    row = [0, "Any of the below condition is not satisfied then horizontal stiffener has to be provided.", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="4" class="detail1" align="center"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('tr')
 
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break

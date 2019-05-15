@@ -677,11 +677,21 @@ def bc_endplate_design(uiObj):
       '''
 
     #######################################################################
-    # Design of Stiffener
-    stiffener_fy = end_plate_fy
-    stiffener_fu = end_plate_fu
-
-    ######################################
+    # # Design of Stiffener
+    # stiffener_fy = end_plate_fy
+    # stiffener_fu = end_plate_fu
+    #
+    # P_bf = M_f/d_b
+    #    # d_b = beam depth
+    #    # M_f = external moment on beam
+    #
+    # web_strength_web_yielding = f_yw * t_wc /(5*k + t_fb)
+    #    # f_yw = yield stress of column web
+    #    # t_wc = thickness of column web
+    #    # t_fb = thickness of beam flange
+    #    # k = dist from extreme fibre to toe of web fillet (column)
+    #
+    # ######################################
     # End of Calculation, SAMPLE Output dictionary
     outputobj = dict()
 
@@ -716,13 +726,26 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-    outputobj['Bolt']['BoltFy'] = 0.0          ###
+    outputobj['Bolt']['BoltFy'] = 0.0           ###
+    outputobj['Bolt']['NumberOfRows'] = int(no_rows)     ###
+    outputobj['Bolt']['BoltsPerColumn'] = 0.0   ###
+    outputobj['Bolt']['Gauge'] = 0.0            ###
+    outputobj['Bolt']['kb'] = 0.0               ###
+    outputobj['Bolt']['SumPlateThick'] = 0.0     ###
+
 
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
+
+    outputobj['Plate']['Mp'] = 0.0      ##
+    outputobj['Plate']['MomentDemand'] = 0.0    ##
+    outputobj['Plate']['MomentCapacity'] = 0.0    ##
+
+
+
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
@@ -735,6 +758,9 @@ def bc_endplate_design(uiObj):
     outputobj['Stiffener']['Length'] = 10.0
     outputobj['Stiffener']['Width'] = 10.0
     outputobj['Stiffener']['Thickness'] = 10.0
+
+
+
 
     # Detailing
     if endplate_type == 'flush':

@@ -552,4 +552,27 @@ class CADGroove(object):
         return self.bcWeldWeb_3Model
 
 
-# class CADcolweb
+class CADcolwebGroove(CADGroove):
+    def createBeamLGeometry(self):
+        beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+
+
+        ##############################################  Adding stiffeners ########################################
+
+    def create_stiffener_L1Geometry(self):
+        beamOriginL = numpy.array(
+            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    def create_stiffener_L2Geometry(self):
+        beamOriginL = numpy.array(
+            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)

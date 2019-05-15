@@ -49,6 +49,7 @@ from Connections.Component.plate import Plate
 from Connections.Moment.BCEndPlate.extendedBothWays import CADFillet
 from Connections.Moment.BCEndPlate.extendedBothWays import CADGroove
 from Connections.Moment.BCEndPlate.extendedBothWays import CADColWebFillet
+from Connections.Moment.BCEndPlate.extendedBothWays import CADcolwebGroove
 from Connections.Moment.BCEndPlate.nutBoltPlacement import NutBoltArray
 
 from Connections.Component.quarterCone import QuarterCone
@@ -1730,8 +1731,29 @@ class Maincontroller(QMainWindow):
 
 				return col_web_connectivity
 
-			else:
-				pass
+			else:  # Groove Weld
+
+				# else:
+				bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
+										   L=beam_B)
+				bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
+
+				# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+				bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
+										 L=beam_d - 2 * beam_T)
+
+				#######################################
+				#       WELD SECTIONS QUARTER CONE    #
+				#######################################
+
+				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+										stiffener_L1, stiffener_L2, stiffener_R1,
+										stiffener_R2, endplate_type)
+
+				col_web_connectivity.create_3DModel()
+
+				return col_web_connectivity
 
 		#######################################
 		#       WELD SECTIONS QUARTER CONE    #

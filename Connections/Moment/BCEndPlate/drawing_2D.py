@@ -1089,7 +1089,7 @@ class ExtendedEnd2DTop(object):
 
         ptP2x = ptP1x + self.data_object.plate_thickness_p1
         ptP2y = ptP1y
-        self.P2 = np.array([ptP2x, ptP2y])right
+        self.P2 = np.array([ptP2x, ptP2y])
 
         ptP3x = ptP2x
         ptP3y = ptP2y + self.data_object.plate_width_B1

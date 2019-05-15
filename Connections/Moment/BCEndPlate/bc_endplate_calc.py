@@ -427,8 +427,8 @@ def bc_endplate_design(uiObj):
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
             elif no_tension_side == 10:
-                no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
-                           'out_compression_flange': 3, 'in_compression_flange': 2}
+                no_rows = {'out_tension_flange': 2, 'in_tension_flange': 3,
+                           'out_compression_flange': 2, 'in_compression_flange': 3}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
                     detailing_status = False
                     # logger.error("Large number of bolts are required for the connection")

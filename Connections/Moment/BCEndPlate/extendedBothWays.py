@@ -60,9 +60,6 @@ class CAD_Fillet(object):
         self.create_bbWeldSideWeb_21()  # right beam weld behind left beam
         self.create_bbWeldSideWeb_22()  # right beam weld behind left beam
 
-        self.create_bcWeldFlang_1()
-        self.create_bcWeldFlang_2()
-        self.create_bcWeldWeb_3()
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()

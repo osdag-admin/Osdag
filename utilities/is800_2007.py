@@ -421,16 +421,13 @@ class IS800_2007(object):
             T_b - factored tensile force acting on the bolt,
             T_db - design tension capacity.
 
-        return: Safety status of bolt (Boolean)
+        return: combined shear and friction value
 
         Note:
             Reference:
             IS 800:2007,  cl 10.3.6
         """
-
-        if (V_sb / V_db) ** 2 + (T_b / T_db) ** 2 <= 1:
-            return True
-        return False
+        return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
 
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
@@ -522,16 +519,13 @@ class IS800_2007(object):
                    T_df - design tension strength
 
                 return:
-                    Safety status of friction grip bolt (Boolean)
+                    combined shear and friction value
 
                 Note:
                     Reference:
                     IS 800:2007,  cl 10.4.6
         """
-
-        if (V_sf/V_df)**2 + (T_f/T_df)**2 <= 1:
-            return True
-        return False
+        return (V_sf/V_df)**2 + (T_f/T_df)**2
 
     # cl. 10.4.7 Prying force bolts
     @staticmethod
@@ -661,6 +655,25 @@ class IS800_2007(object):
             return
         return K * fillet_size
 
+    # Cl. 10.5.3.3 Effective throat size of groove (butt) welds
+    @staticmethod
+    def cl_10_5_3_3_groove_weld_effective_throat_thickness(*args):
+
+        """Calculate effective throat thickness of complete penetration butt welds
+
+        *args:
+            Thicknesses of each plate element being welded in mm (float)
+
+        Returns:
+            maximum effective throat thickness of CJP butt weld in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.3
+
+        """
+        return min(*args)
+
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
@@ -678,8 +691,10 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.5.4.1
 
         """
-        # TODO :  if available_length >= 4 * fillet_size
-        effective_length = available_length - 2 * fillet_size
+        if available_length <= 4 * fillet_size:
+            effective_length = 0
+        else:
+            effective_length = available_length - 2 * fillet_size
         return effective_length
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
@@ -705,6 +720,31 @@ class IS800_2007(object):
         gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
         f_wd = f_wn / gamma_mw
         return f_wd
+
+    # cl. 10.5.7.3 Long joints
+    @staticmethod
+    def cl_10_5_7_3_weld_long_joint(l_j, t_t):
+
+        """Calculate the reduction factor for long joints in welds
+
+        Args:
+            l_j - length of joints in the direction of force transfer in mm (float)
+            t_t - throat size of the weld in mm (float)
+
+        Returns:
+             Reduction factor, beta_lw for long joints in welds (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.3
+
+        """
+        if l_j <= 150 * t_t:
+            return 1.0
+        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        if beta_lw >= 1.0:
+            beta_lw = 1.0
+        return beta_lw
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

@@ -11,7 +11,7 @@ class ExtendedBothWays(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21, bbWeldSideWeb_22,
-                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2):
+                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2, endplate_type):
 
         # Initializing the arguments
         self.beamLeft = beamLeft                            # beamLeft represents the column
@@ -23,6 +23,7 @@ class ExtendedBothWays(object):
         self.stiffener_L2 = stiffener_L2
         self.stiffener_R1 = stiffener_R1
         self.stiffener_R2 = stiffener_R2
+        self.endplate_type = endplate_type
 
 
         # Weld above flange for left and right beam
@@ -99,25 +100,54 @@ class ExtendedBothWays(object):
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-        gap = self.beamRight.D /2  +  self.plateRight.T
+        gap = self.beamLeft.D /2  +  self.plateRight.T
         beamOriginR = numpy.array([0.0, gap, self.beamLeft.length /2 ])
         beamR_uDir = numpy.array([1.0, 0.0, 0.0])
         beamR_wDir = numpy.array([0.0, 1.0, 0.0])
         self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateRGeometry(self):
-        gap = 0.5 * self.plateRight.T + self.beamRight.D/2
-        plateOriginR = numpy.array([-self.plateRight.W/2, gap, self.beamLeft.length /2 ])
-        plateR_uDir = numpy.array([0.0, 1.0, 0.0])
-        plateR_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
+
+        if self.endplate_type == "one_way":
+            gap = 0.5 * self.plateRight.T + self.beamLeft.D / 2
+            plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (self.plateRight.L/2 - (10 ) - self.beamRight.D /2)])  #TODO #Add weld thickness here
+            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateR_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
+
+        else:         #self.endplate_type == "both_way" and flushed
+            gap = 0.5 * self.plateRight.T + self.beamLeft.D/2
+            plateOriginR = numpy.array([-self.plateRight.W/2, gap, self.beamLeft.length /2 ])
+            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateR_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
+
+
+        # elif self.endplate_type == "flush":
+        #     pass
 
     def create_nut_bolt_array(self):
-        nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamRight.T/2, self.plateRight.L/2])
-        gaugeDir = numpy.array([1.0, 0, 0])
-        pitchDir = numpy.array([0, 0, -1.0])
-        boltDir = numpy.array([0, -1.0, 0])
-        self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+        if self.endplate_type == "one_way":
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamRight.T/2, self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40 ])       #TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            gaugeDir = numpy.array([1.0, 0, 0])
+            pitchDir = numpy.array([0, 0, -1.0])
+            boltDir = numpy.array([0, -1.0, 0])
+            self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+        elif self.endplate_type == "both_way":
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, self.plateRight.L /2])
+            gaugeDir = numpy.array([1.0, 0, 0])
+            pitchDir = numpy.array([0, 0, -1.0])
+            boltDir = numpy.array([0, -1.0, 0])
+            self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
+
+        elif self.endplate_type == "flush":
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2,  self.plateRight.L/2 + 50])       #TODO Add self.Lv instead of 50
+            gaugeDir = numpy.array([1.0, 0, 0])
+            pitchDir = numpy.array([0, 0, -1.0])
+            boltDir = numpy.array([0, -1.0, 0])
+            self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
     ##############################################  Adding stiffeners ########################################
 
@@ -134,13 +164,13 @@ class ExtendedBothWays(object):
         self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_R1Geometry(self):
-        beamOriginL = numpy.array([-self.beamRight.B/2 , 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 , 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 0.0, 1.0])
         beamL_wDir = numpy.array([1.0, 0.0, 0.0])
         self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_R2Geometry(self):
-        beamOriginL = numpy.array([-self.beamRight.B/2 , 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 , 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 0.0, 1.0])
         beamL_wDir = numpy.array([1.0, 0.0, 0.0])
         self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -148,42 +178,42 @@ class ExtendedBothWays(object):
     ##############################################  creating weld sections ########################################
 
     def create_bbWeldAbvFlang_21(self):
-        weldAbvFlangOrigin_21 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.D/2 +  self.plateRight.T, self.beamLeft.length / 2 +self.beamRight.D/2])
+        weldAbvFlangOrigin_21 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D/2 +  self.plateRight.T, self.beamLeft.length / 2 +self.beamRight.D/2])
         uDirAbv_21 = numpy.array([0, 1.0, 0])
         wDirAbv_21 = numpy.array([1.0, 0, 0])
         self.bbWeldAbvFlang_21.place(weldAbvFlangOrigin_21, uDirAbv_21, wDirAbv_21)
 
     def create_bbWeldAbvFlang_22(self):
-        weldAbvFlangOrigin_22 = numpy.array([self.beamLeft.B / 2, self.beamLeft.D/2 +  self.plateRight.T, self.beamLeft.length / 2 -self.beamRight.D/2 ])
+        weldAbvFlangOrigin_22 = numpy.array([self.beamRight.B / 2, self.beamLeft.D/2 +  self.plateRight.T, self.beamLeft.length / 2 -self.beamRight.D/2 ])
         uDirAbv_22 = numpy.array([0, 1.0, 0])
         wDirAbv_22 = numpy.array([-1.0, 0, 0])
         self.bbWeldAbvFlang_22.place(weldAbvFlangOrigin_22, uDirAbv_22, wDirAbv_22)
 
 
     def create_bbWeldBelwFlang_21(self):
-        weldBelwFlangOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2 +(self.beamLeft.D / 2) -
-                                              self.beamLeft.T])
+        weldBelwFlangOrigin_21 = numpy.array([-self.beamRight.t / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2 +(self.beamRight.D / 2) -
+                                              self.beamRight.T])
         uDirBelw_21 = numpy.array([0, 1.0, 0])
         wDirBelw_21 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_21.place(weldBelwFlangOrigin_21, uDirBelw_21, wDirBelw_21)
 
     def create_bbWeldBelwFlang_22(self):
-        weldBelwFlangOrigin_22 = numpy.array([self.beamLeft.B / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2+(self.beamLeft.D / 2) -
-                                              self.beamLeft.T])
+        weldBelwFlangOrigin_22 = numpy.array([self.beamRight.B / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2+(self.beamRight.D / 2) -
+                                              self.beamRight.T])
         uDirBelw_22 = numpy.array([0, 1.0, 0])
         wDirBelw_22 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_22.place(weldBelwFlangOrigin_22, uDirBelw_22, wDirBelw_22)
 
     def create_bbWeldBelwFlang_23(self):
-        weldBelwFlangOrigin_23 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2 -(self.beamLeft.D / 2) +
-                                              self.beamLeft.T])
+        weldBelwFlangOrigin_23 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2 -(self.beamRight.D / 2) +
+                                              self.beamRight.T])
         uDirBelw_23 = numpy.array([0, 1.0, 0])
         wDirBelw_23 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_23.place(weldBelwFlangOrigin_23, uDirBelw_23, wDirBelw_23)
 
     def create_bbWeldBelwFlang_24(self):
-        weldBelwFlangOrigin_24 = numpy.array([self.beamLeft.t / 2,self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2-(self.beamLeft.D / 2) +
-                                              self.beamLeft.T])
+        weldBelwFlangOrigin_24 = numpy.array([self.beamRight.t / 2,self.beamLeft.D/2 +  self.plateRight.T,  self.beamLeft.length / 2-(self.beamRight.D / 2) +
+                                              self.beamRight.T])
         uDirBelw_24 = numpy.array([0, 1.0, 0])
         wDirBelw_24 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_24.place(weldBelwFlangOrigin_24, uDirBelw_24, wDirBelw_24)

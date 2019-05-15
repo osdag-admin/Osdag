@@ -1327,7 +1327,16 @@ class Maincontroller(QMainWindow):
 		self.result_obj = bc_endplate_design(self.alist)
 		self.column_data = self.fetchColumnPara()
 		self.beam_data = self.fetchBeamPara()
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+
+		#TODO added endplate_type here, find new way to redue this lines
+		if self.alist['Member']['EndPlate_type'] == "Extended one way":
+			endplate_type = "one_way"
+		elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
+			endplate_type = "flush"
+		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+			endplate_type = "both_way"
+
+		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder, endplate_type)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":
@@ -1524,6 +1533,17 @@ class Maincontroller(QMainWindow):
 		column_data = self.fetchColumnPara()
 		beam_data = self.fetchBeamPara()
 
+		#TODO check if column data is working
+
+		column_tw = float(column_data["tw"])
+		column_T = float(column_data["T"])
+		column_d = float(column_data["D"])
+		column_B = float(column_data["B"])
+		column_R1 = float(column_data["R1"])
+		column_R2 = float(column_data["R2"])
+		column_alpha = float(column_data["FlangeSlope"])
+		column_length = 1600.0
+
 		beam_tw = float(beam_data["tw"])
 		beam_T = float(beam_data["T"])
 		beam_d = float(beam_data["D"])
@@ -1533,10 +1553,15 @@ class Maincontroller(QMainWindow):
 		beam_alpha = float(beam_data["FlangeSlope"])
 		beam_length = 1600.0
 
-		beam_Left = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
+
+
+		beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
+							 R1=column_R1, R2=column_R2, alpha=column_alpha,
+							 length=column_length, notchObj=None)
+
+		beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
 							 R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-							 length=beam_length, notchObj=None)
-		beam_Right = copy.copy(beam_Left)  # Since both the beams are same
+							 length=beam_length, notchObj=None)  # Since both the beams are same
 
 		outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
@@ -1544,18 +1569,29 @@ class Maincontroller(QMainWindow):
 							L=outputobj["Plate"]["Height"],
 							T=outputobj["Plate"]["Thickness"])
 
-		# TODO make dictionary for the stiffeners
-
-		stiffener_L1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_L2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_R1 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-		stiffener_R2 = Plate(W=(float(beam_data["B"]) - float(beam_data["tw"])) / 2,
-							 L=float(beam_data["D"]) - 2 * float(beam_data["T"]), T=float(beam_data["T"]))
-
 		alist = self.designParameters()  # An object to save all input values entered by user
+
+		# TODO make dictionary for the stiffeners
+		#TODO adding enpplate type and check if code is working
+
+		# endplate_type = alist['Member']['EndPlate_type']
+		if alist['Member']['EndPlate_type'] == "Extended one way":
+			endplate_type = "one_way"
+		elif alist['Member']['EndPlate_type'] == "Flush end plate":
+			endplate_type = "flush"
+		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+			endplate_type = "both_way"
+
+		stiffener_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+
+
 
 		bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
 		bolt_r = bolt_d / 2
@@ -1574,7 +1610,7 @@ class Maincontroller(QMainWindow):
 		nutSpace = float(beam_data["T"]) + float(
 			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
-		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
 		###########################
 		#       WELD SECTIONS     #
@@ -1612,7 +1648,7 @@ class Maincontroller(QMainWindow):
 									   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 									   bbWeldBelwFlang_24,
 									   bbWeldSideWeb_21, bbWeldSideWeb_22, stiffener_L1, stiffener_L2, stiffener_R1,
-									   stiffener_R2)
+									   stiffener_R2, endplate_type)
 		extbothWays.create_3DModel()
 
 		return extbothWays
@@ -1747,10 +1783,10 @@ class Maincontroller(QMainWindow):
 		# Displays the beams #TODO ANAND
 		if component == "Column":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
+			# osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Beam":
-			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
+			# osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Connector":

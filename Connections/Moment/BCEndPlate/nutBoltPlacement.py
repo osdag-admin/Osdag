@@ -133,7 +133,7 @@ class NutBoltArray(object):
         elif self.endplate_type == "flush":
 
             self.Lv = boltPlaceObj["Bolt"]["Lv"]
-            if numberOfBolts == 2:
+            if numberOfBolts == 4:
                 self.pitch12 = 250      #boltPlaceObj["Bolt"]["Pitch12"]
                 # self.endDist = boltPlaceObj["Bolt"]["End"]
                 # self.edgeDist = boltPlaceObj["Bolt"]["Edge"]

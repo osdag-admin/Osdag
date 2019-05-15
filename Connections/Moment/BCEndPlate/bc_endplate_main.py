@@ -46,8 +46,8 @@ from Connections.Component.filletweld import FilletWeld
 from Connections.Component.groove_weld import GrooveWeld
 from Connections.Component.plate import Plate
 
-from Connections.Moment.BCEndPlate.extendedBothWays import CAD_Fillet
-from Connections.Moment.BCEndPlate.extendedBothWays import CAD_Groove
+from Connections.Moment.BCEndPlate.extendedBothWays import CADFillet
+from Connections.Moment.BCEndPlate.extendedBothWays import CADGroove
 from Connections.Moment.BCEndPlate.nutBoltPlacement import NutBoltArray
 
 from Connections.Component.quarterCone import QuarterCone
@@ -1575,6 +1575,12 @@ class Maincontroller(QMainWindow):
 
 		# TODO make dictionary for the stiffeners
 		#TODO adding enpplate type and check if code is working
+		#TODO added connectivity type here
+
+		if alist['Member']['Connectivity'] == "Column web-Beam web":
+			conn_type = 'col_web_connectivity'
+		else:  # "Column flange-Beam web"
+			conn_type = 'col_flange_connectivity'
 
 		# endplate_type = alist['Member']['EndPlate_type']
 		if alist['Member']['EndPlate_type'] == "Extended one way":
@@ -1644,13 +1650,13 @@ class Maincontroller(QMainWindow):
 			#       WELD SECTIONS QUARTER CONE    #
 			#######################################
 
-			extbothWays = CAD_Fillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+			extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
 									 bbWeldAbvFlang_22,
 									 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 									 bbWeldBelwFlang_24,
 									 bbWeldSideWeb_21, bbWeldSideWeb_22,
 									 stiffener_L1, stiffener_L2, stiffener_R1,
-									 stiffener_R2, endplate_type)
+									 stiffener_R2, endplate_type, conn_type)
 			extbothWays.create_3DModel()
 
 			return extbothWays
@@ -1669,7 +1675,7 @@ class Maincontroller(QMainWindow):
 			#       WELD SECTIONS QUARTER CONE    #
 			#######################################
 
-			extbothWays = CAD_Groove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+			extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 									  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 									 stiffener_L1, stiffener_L2, stiffener_R1,
 									 stiffener_R2, endplate_type)
@@ -1684,7 +1690,7 @@ class Maincontroller(QMainWindow):
 
 		# # Following weld cones are placed for Left beam
 
-		# extbothWays = CAD_Fillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+		# extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
 		# 							   bbWeldAbvFlang_22,
 		# 							   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 		# 							   bbWeldBelwFlang_24,

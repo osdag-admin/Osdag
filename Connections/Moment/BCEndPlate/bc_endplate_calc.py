@@ -608,31 +608,40 @@ def bc_endplate_design(uiObj):
         groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             beam_tf, beam_tw, end_plate_thickness)
 
-    # Continuity Plates
+    # Continuity Plates on compression side
     cont_plate_fu = beam_fu
     cont_plate_fy = beam_fy
     cont_plate_e = math.sqrt(250/cont_plate_fy)
     gamma_m0 = 1.10
-    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load
+    gamma_m1 = 1.10
+    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load   # Compressive force at beam flanges
 
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
     available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
     for plate_tk in available_plates:
         if plate_tk >= beam_tf:
-            cont_plate_comp_tk_flange = plate_tk
+            cont_plate_tk_flange = plate_tk
             break
 
+    col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
+
+    col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
+        1 + 3 * (beam_tf / column_d) * (column_tw / column_tf) ** 1.5) * math.sqrt(column_fy * column_tf / column_tw)
+    col_web_capacity_buckling = (10710 * (column_tw ** 3) / column_d) * math.sqrt(column_fy / gamma_m0)
+    col_web_capacity = max(col_web_capacity_yielding, col_web_capacity_crippling, col_web_capacity_buckling)
+
     cont_plate_comp_tk_local_buckling = cont_plate_comp_length / (9.4 * cont_plate_e)
-    cont_plate_comp_tk_yielding = 0
+    cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, cont_plate_tk_flange,
+                                 (p_bf - col_web_capacity) / (cont_plate_fy / gamma_m0))
 
-
-
+    # Continuity Plates on compression side
     cont_plate_tens_length = column_d - 2 * column_tf
     cont_plate_tens_width = (column_B - column_tw) / 2
 
-
-
+    t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load   # Tensile force at beam flanges
+    col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
+    cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
 
     # TODO Check for Shear yielding and shear rupture of end plate
     '''
@@ -677,9 +686,9 @@ def bc_endplate_design(uiObj):
       '''
 
     #######################################################################
-    # Design of Stiffener
-    stiffener_fy = end_plate_fy
-    stiffener_fu = end_plate_fu
+    # # Design of Stiffener
+    # stiffener_fy = end_plate_fy
+    # stiffener_fu = end_plate_fu
 
     ######################################
     # End of Calculation, SAMPLE Output dictionary
@@ -722,13 +731,15 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
-    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
-    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
-    outputobj['ContPlateTens']['Thickness'] = 10.0
-
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
-    outputobj['ContPlateComp']['Thickness'] = 10.0
+    outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange
+    outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
+
+    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
+    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
+    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange
+    outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
 
     outputobj['Stiffener']['Length'] = 10.0
     outputobj['Stiffener']['Width'] = 10.0

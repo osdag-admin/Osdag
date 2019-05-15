@@ -48,6 +48,7 @@ from Connections.Component.plate import Plate
 
 from Connections.Moment.BCEndPlate.extendedBothWays import CADFillet
 from Connections.Moment.BCEndPlate.extendedBothWays import CADGroove
+from Connections.Moment.BCEndPlate.extendedBothWays import CADColFlang
 from Connections.Moment.BCEndPlate.nutBoltPlacement import NutBoltArray
 
 from Connections.Component.quarterCone import QuarterCone
@@ -1627,62 +1628,110 @@ class Maincontroller(QMainWindow):
 		Following sections are for creating Fillet Welds and Groove Welds
 		Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
 		'''
-		if alist["Weld"]["Method"] == "Fillet Weld":
+		if conn_type == 'col_flange_connectivity':
 
-			# Followings welds are welds above beam flange, Qty = 4
-			bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
-										   L=beam_B)
-			bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
+			if alist["Weld"]["Method"] == "Fillet Weld":
 
-			# Followings welds are welds below beam flange, Qty = 8
-			bbWeldBelwFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
-											h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
-			bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_21)
-			bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_21)
-			bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_21)
+				# Followings welds are welds above beam flange, Qty = 4
+				bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
+											   L=beam_B)
+				bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
 
-			# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-			bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										  L=beam_d - 2 * beam_T - 40)
-			bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
+				# Followings welds are welds below beam flange, Qty = 8
+				bbWeldBelwFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
+												h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+				bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_21)
+				bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_21)
+				bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_21)
 
-			#######################################
-			#       WELD SECTIONS QUARTER CONE    #
-			#######################################
+				# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+				bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+											  L=beam_d - 2 * beam_T - 40)
+				bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
 
-			extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-									 bbWeldAbvFlang_22,
-									 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-									 bbWeldBelwFlang_24,
-									 bbWeldSideWeb_21, bbWeldSideWeb_22,
-									 stiffener_L1, stiffener_L2, stiffener_R1,
-									 stiffener_R2, endplate_type, conn_type)
-			extbothWays.create_3DModel()
+				#######################################
+				#       WELD SECTIONS QUARTER CONE    #
+				#######################################
 
-			return extbothWays
+				extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+										 bbWeldAbvFlang_22,
+										 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+										 bbWeldBelwFlang_24,
+										 bbWeldSideWeb_21, bbWeldSideWeb_22,
+										 stiffener_L1, stiffener_L2, stiffener_R1,
+										 stiffener_R2, endplate_type, conn_type)
+				extbothWays.create_3DModel()
 
-		else:  #Groove Weld
-			bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
-										   L=beam_B)
-			bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
+				return extbothWays
+
+			else:  #Groove Weld
+				bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
+											   L=beam_B)
+				bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
 
 
-			# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-			bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
-										  L=beam_d - 2 * beam_T)
+				# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+				bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
+											  L=beam_d - 2 * beam_T)
 
-			#######################################
-			#       WELD SECTIONS QUARTER CONE    #
-			#######################################
+				#######################################
+				#       WELD SECTIONS QUARTER CONE    #
+				#######################################
 
-			extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
-									  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-									 stiffener_L1, stiffener_L2, stiffener_R1,
-									 stiffener_R2, endplate_type)
-			extbothWays.create_3DModel()
+				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+										 stiffener_L1, stiffener_L2, stiffener_R1,
+										 stiffener_R2, endplate_type)
+				extbothWays.create_3DModel()
 
-			return extbothWays
+				return extbothWays
 
+		else: #conn_type = 'col_web_connectivity'
+			if alist["Weld"]["Method"] == "Fillet Weld":
+				# Followings welds are welds above beam flange, Qty = 4
+				bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
+											   h=float(alist["Weld"]["Flange (mm)"]),
+											   L=beam_B)
+				bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
+
+				# Followings welds are welds below beam flange, Qty = 8
+				bbWeldBelwFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
+												h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+				bbWeldBelwFlang_22 = copy.copy(bbWeldBelwFlang_21)
+				bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_21)
+				bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_21)
+
+				# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
+				bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+											  L=beam_d - 2 * beam_T - 40)
+				bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
+
+				#######################################
+				#       WELD SECTIONS QUARTER CONE    #
+				#######################################
+
+				# extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+				# 						bbWeldAbvFlang_22,
+				# 						bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+				# 						bbWeldBelwFlang_24,
+				# 						bbWeldSideWeb_21, bbWeldSideWeb_22,
+				# 						stiffener_L1, stiffener_L2, stiffener_R1,
+				# 						stiffener_R2, endplate_type, conn_type)
+
+				col_web_connectivity = CADColFlang(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+										bbWeldAbvFlang_22,
+										bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+										bbWeldBelwFlang_24,
+										bbWeldSideWeb_21, bbWeldSideWeb_22,
+										stiffener_L1, stiffener_L2, stiffener_R1,
+										stiffener_R2, endplate_type, conn_type)
+
+				col_web_connectivity.create_3DModel()
+
+				return col_web_connectivity
+
+			else:
+				pass
 
 		#######################################
 		#       WELD SECTIONS QUARTER CONE    #
@@ -1816,6 +1865,11 @@ class Maincontroller(QMainWindow):
 		self.display.EraseAll()
 		self.display.View_Iso()
 		self.display.FitAll()
+		alist = self.designParameters()
+		if alist['Member']['Connectivity'] == "Column web-Beam web":
+			conn_type = 'col_web_connectivity'
+		else:  # "Column flange-Beam web"
+			conn_type = 'col_flange_connectivity'
 
 		self.display.DisableAntiAliasing()
 		if bgcolor == "gradient_bg":
@@ -1841,16 +1895,20 @@ class Maincontroller(QMainWindow):
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
+			if conn_type == 'col_flange_connectivity':
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
+			else:
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
 				osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 			# Display all the Welds including the quarter cone
-			alist = self.designParameters()  # An object to save all input values entered by user
+			  # An object to save all input values entered by user
 			if alist["Weld"]["Method"] == "Fillet Weld":
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')
@@ -1878,10 +1936,14 @@ class Maincontroller(QMainWindow):
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
+			if conn_type == 'col_flange_connectivity':
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
+			else:
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
@@ -1890,7 +1952,7 @@ class Maincontroller(QMainWindow):
 
 			# Display all the Welds including the quarter cone
 
-			alist = self.designParameters()  # An object to save all input values entered by user
+			  # An object to save all input values entered by user
 			if alist["Weld"]["Method"] == "Fillet Weld":
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_22Model(), update=True, color='Red')

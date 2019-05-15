@@ -90,17 +90,17 @@ class CADFillet(object):
     #############################################################################################################
 
     def createBeamLGeometry(self):
-        if self.conn_type == 'col_flange_connectivity':
-            beamOriginL = numpy.array([0.0, 0.0, 0.0])
-            beamL_uDir = numpy.array([1.0, 0.0, 0.0])
-            beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-            self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
+        # if self.conn_type == 'col_flange_connectivity':
+        beamOriginL = numpy.array([0.0, 0.0, 0.0])
+        beamL_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-        else: #self.conn_type ==  'col_web_connectivity'
-            beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
-            beamL_uDir = numpy.array([0.0, 1.0, 0.0])
-            beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-            self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
+        # else: #self.conn_type ==  'col_web_connectivity'
+        #     beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
+        #     beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        #     beamL_wDir = numpy.array([0.0, 0.0, 1.0])
+        #     self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
         gap = self.beamLeft.D / 2 + self.plateRight.T
@@ -159,44 +159,38 @@ class CADFillet(object):
 
 
     def create_stiffener_L1Geometry(self):
-        if self.conn_type == 'col_flange_connectivity':
-            beamOriginL = numpy.array(
-                [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-            beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-            beamL_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-        else:
-            pass
+        beamOriginL = numpy.array(
+            [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_L2Geometry(self):
-        if self.conn_type == 'col_flange_connectivity':
-            beamOriginL = numpy.array(
-                [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-            beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-            beamL_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
-        else:
-            pass
+
+        beamOriginL = numpy.array(
+            [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
     def create_stiffener_R1Geometry(self):
-        if self.conn_type == 'col_flange_connectivity':
-            beamOriginL = numpy.array(
-                [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-            beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-            beamL_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
-        else:
-            pass
+
+        beamOriginL = numpy.array(
+            [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
 
     def create_stiffener_R2Geometry(self):
-        if self.conn_type == 'col_flange_connectivity':
-            beamOriginL = numpy.array(
-                [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-            beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-            beamL_wDir = numpy.array([1.0, 0.0, 0.0])
-            self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
-        else:
-            pass
+
+        beamOriginL = numpy.array(
+            [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
 
     ##############################################  creating weld sections ########################################
     def create_bbWeldAbvFlang_21(self):
@@ -310,7 +304,53 @@ class CADFillet(object):
     def get_bbWeldSideWeb_22Model(self):
         return self.bbWeldSideWeb_22Model
 
-# Class CAD_
+class CADColFlang(CADFillet):
+
+    def createBeamLGeometry(self):
+        beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+
+
+        ##############################################  Adding stiffeners ########################################
+
+    def create_stiffener_L1Geometry(self):
+        beamOriginL = numpy.array(
+            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+    def create_stiffener_L2Geometry(self):
+        beamOriginL = numpy.array(
+            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
+        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+
+
+
+
+        #############################################################################################################
+        #   Following functions returns the CAD model to the function display_3DModel of main file                  #
+        #############################################################################################################
+
+    def get_beamLModel(self):
+        return self.beamLModel
+
+
+    def get_stiffener_L1Model(self):
+        return self.stiffener_L1Model
+
+    def get_stiffener_L2Model(self):
+        return self.stiffener_L2Model
+
+
+
+
+
 
 class CADGroove(object):
 

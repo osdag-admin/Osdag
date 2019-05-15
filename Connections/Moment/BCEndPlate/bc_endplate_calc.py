@@ -279,7 +279,7 @@ def bc_endplate_design(uiObj):
     # Calculation for number of bolts around tension flange
     flange_tension = factored_moment / (beam_d - beam_tf) + factored_axial_load / 2
     no_tension_side_rqd = flange_tension / (0.80 * bolt_tension_capacity)
-    no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=4)
+    no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=2)
 
     # Prying force
     b_e = beam_B
@@ -346,7 +346,9 @@ def bc_endplate_design(uiObj):
         elif endplate_type == 'one_way':
             number_of_bolts = no_tension_side + 2
 
-            if no_tension_side == 4:
+            if no_tension_side <= 4:
+                no_tension_side = 4
+                number_of_bolts = no_tension_side + 2
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
 
@@ -394,7 +396,9 @@ def bc_endplate_design(uiObj):
         else:   # endplate_type == "both_way":
             number_of_bolts = 2 * no_tension_side
 
-            if no_tension_side == 4:
+            if no_tension_side <= 4:
+                no_tension_side = 4
+                number_of_bolts = 2 * no_tension_side
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 1, 'in_compression_flange': 1}
 
@@ -604,6 +608,32 @@ def bc_endplate_design(uiObj):
         groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             beam_tf, beam_tw, end_plate_thickness)
 
+    # Continuity Plates
+    cont_plate_fu = beam_fu
+    cont_plate_fy = beam_fy
+    cont_plate_e = math.sqrt(250/cont_plate_fy)
+    gamma_m0 = 1.10
+    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load
+
+    cont_plate_comp_length = column_d - 2 * column_tf
+    cont_plate_comp_width = (column_B - column_tw) / 2
+    available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
+    for plate_tk in available_plates:
+        if plate_tk >= beam_tf:
+            cont_plate_comp_tk_flange = plate_tk
+            break
+
+    cont_plate_comp_tk_local_buckling = cont_plate_comp_length / (9.4 * cont_plate_e)
+    cont_plate_comp_tk_yielding = 0
+
+
+
+    cont_plate_tens_length = column_d - 2 * column_tf
+    cont_plate_tens_width = (column_B - column_tw) / 2
+
+
+
+
     # TODO Check for Shear yielding and shear rupture of end plate
     '''
 
@@ -692,16 +722,16 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
-    outputobj['ContPlateTens']['Length'] = 0.0
-    outputobj['ContPlateTens']['Width'] = 0.0
+    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
+    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = 10.0
 
-    outputobj['ContPlateComp']['Length'] = 0.0
-    outputobj['ContPlateTens']['Width'] = 0.0
-    outputobj['ContPlateTens']['Thickness'] = 10.0
+    outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
+    outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
+    outputobj['ContPlateComp']['Thickness'] = 10.0
 
-    outputobj['Stiffener']['Length'] = 0.0
-    outputobj['Stiffener']['Width'] = 0.0
+    outputobj['Stiffener']['Length'] = 10.0
+    outputobj['Stiffener']['Width'] = 10.0
     outputobj['Stiffener']['Thickness'] = 10.0
 
     # Detailing

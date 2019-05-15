@@ -12,6 +12,7 @@ import os
 
 
 class ExtendedEndPlate(object):
+
     def __init__(self, input_dict, output_dict, column_data, beam_data, folder):
         """
 
@@ -111,6 +112,7 @@ class ExtendedEndPlate(object):
 
     def add_s_marker(self, dwg):
         """
+
 
 		Args:
 			dwg: svgwrite (obj)
@@ -462,6 +464,10 @@ class ExtendedEnd2DFront(object):
         # ================ Column 1 ================
 
         # darshan
+	#	ptS1x = self.data_object.flange_thickness_T1
+	#	ptS1y = self.data_object.column_length_L1/2 - self.data_object.beam_depth_D2/2 +\
+		#		self.data_object.flange_thickness_T2/2 + self.data_object.stiffener_thickness_t1/2			#This formula will be right once the aspect ratio of the column is adjusted
+		#self.S1 = np.array([ptS1x, ptS1y])
 
         """	
 		defining co-ordinates of Beam B1 in front view
@@ -991,7 +997,6 @@ class ExtendedEnd2DFront(object):
             dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
-
 
 class ExtendedEnd2DTop(object):
     """
@@ -1994,3 +1999,4 @@ class ExtendedEnd2DSide(object):
             dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
 
         dwg.save()
+

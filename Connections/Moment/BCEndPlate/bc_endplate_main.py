@@ -998,7 +998,7 @@ class Maincontroller(QMainWindow):
 					resultObj = outputObj
 		print resultObj
 
-		critical_tension = resultObj["Bolt"]["CriticalTension"]
+		critical_tension = resultObj["Bolt"]["TensionBolt"]
 		self.ui.txt_tensionCritical.setText(str(critical_tension))
 
 		tension_capacity = resultObj["Bolt"]["TensionCapacity"]
@@ -1019,13 +1019,15 @@ class Maincontroller(QMainWindow):
 		bolts_required = resultObj["Bolt"]["NumberOfBolts"]
 		self.ui.txt_noBolts.setText(str(bolts_required))
 
-		bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
+		# bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
+		bolts_in_rows = 1
 		self.ui.txt_rowBolts.setText(str(bolts_in_rows))
 
 		# pitch = resultObj["Bolt"]["Pitch"]
 		# self.ui.txt_pitch.setText(str(pitch))
 
-		gauge = resultObj["Bolt"]["Gauge"]
+		# gauge = resultObj["Bolt"]["Gauge"]
+		gauge = 0.0
 		self.ui.txt_gauge.setText(str(gauge))
 
 		cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
@@ -1037,10 +1039,12 @@ class Maincontroller(QMainWindow):
 		edge_distance = resultObj["Bolt"]["Edge"]
 		self.ui.txt_edgeDist.setText(str(edge_distance))
 
-		weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
+		# weld_stress_flange = resultObj["Weld"]["FlangeStress"]
+		weld_stress_flange = 0.0
 		self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 
-		weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
+		# weld_stress_web = resultObj["Weld"]["WebStress"]
+		weld_stress_web = 0.0
 		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
 	def display_log_to_textedit(self):

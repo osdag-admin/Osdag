@@ -48,7 +48,7 @@ from Connections.Component.plate import Plate
 
 from Connections.Moment.BCEndPlate.extendedBothWays import CADFillet
 from Connections.Moment.BCEndPlate.extendedBothWays import CADGroove
-from Connections.Moment.BCEndPlate.extendedBothWays import CADColFlang
+from Connections.Moment.BCEndPlate.extendedBothWays import CADColWebFillet
 from Connections.Moment.BCEndPlate.nutBoltPlacement import NutBoltArray
 
 from Connections.Component.quarterCone import QuarterCone
@@ -1718,7 +1718,7 @@ class Maincontroller(QMainWindow):
 				# 						stiffener_L1, stiffener_L2, stiffener_R1,
 				# 						stiffener_R2, endplate_type, conn_type)
 
-				col_web_connectivity = CADColFlang(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+				col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
 										bbWeldAbvFlang_22,
 										bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 										bbWeldBelwFlang_24,

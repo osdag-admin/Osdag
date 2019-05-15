@@ -304,7 +304,7 @@ class CADFillet(object):
     def get_bbWeldSideWeb_22Model(self):
         return self.bbWeldSideWeb_22Model
 
-class CADColFlang(CADFillet):
+class CADColWebFillet(CADFillet):
 
     def createBeamLGeometry(self):
         beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
@@ -346,11 +346,6 @@ class CADColFlang(CADFillet):
 
     def get_stiffener_L2Model(self):
         return self.stiffener_L2Model
-
-
-
-
-
 
 class CADGroove(object):
 
@@ -555,3 +550,6 @@ class CADGroove(object):
 
     def get_bcWeldWeb_3Model(self):
         return self.bcWeldWeb_3Model
+
+
+# class CADcolweb

@@ -301,7 +301,7 @@ class CADFillet(object):
 class CADColWebFillet(CADFillet):
 
     def createBeamLGeometry(self):
-        beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
+        beamOriginL = numpy.array([0.0, self.beamLeft.D/2 - self.beamLeft.t/2, 0.0])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -550,7 +550,7 @@ class CADGroove(object):
 
 class CADcolwebGroove(CADGroove):
     def createBeamLGeometry(self):
-        beamOriginL = numpy.array([0.0, self.beamLeft.D/2, 0.0])
+        beamOriginL = numpy.array([0.0, self.beamLeft.D/2 - self.beamLeft.t/2, 0.0])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)

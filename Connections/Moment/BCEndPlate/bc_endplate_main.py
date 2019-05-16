@@ -1624,9 +1624,14 @@ class Maincontroller(QMainWindow):
 
 		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
+		#TODO remove all the clutter later
+
 		# nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
-		nutSpace = float(column_data["T"]) + float(
-			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+		if conn_type == 'col_flange_connectivity':
+			nutSpace = float(column_data["T"]) + float(outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+		else:
+			nutSpace = float(column_data["tw"]) + float(
+				outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
 		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 

@@ -643,6 +643,41 @@ def bc_endplate_design(uiObj):
     col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
     cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
 
+    # Beam stiffeners
+    st_fu = beam_fu
+    st_fy = beam_fy
+    st_height = l_v + pitch_dist + end_dist
+    for plate_tk in available_plates:
+        if plate_tk >= beam_tw:
+            st_thickness = plate_tk
+            break
+    st_width = st_height + 100.0
+    st_notch_top = 50.0
+    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5)
+    st_beam_weld = 1.0
+    st_plate_weld = 10.0
+
+    st_force = 4 * tension_in_bolt
+    st_moment = st_force * (l_v + pitch_dist / 2)
+    st_eff_length = st_width - st_notch_bottom
+
+    st_shear_capacity = st_eff_length * st_thickness * st_fy / (math.sqrt(3) * gamma_m0)
+    st_moment_capacity = st_eff_length ** 2 * st_thickness * st_fy / (4 * gamma_m0)
+
+    st_weld_eff = st_eff_length - 2 * st_beam_weld
+    st_weld_shear_capacity = 2 * st_weld_eff * 0.7 * st_beam_weld * st_fu / (math.sqrt(3) * gamma_mw)
+
+    st_shear_stress = st_force / (2 * st_weld_eff * 0.7 * st_beam_weld)
+
+    st_moment_stress = st_moment / (2 * st_beam_weld ** 2 / 4)
+
+    st_eq_weld_stress = math.sqrt(st_shear_stress ** 2 + st_moment_stress ** 2)
+
+    st_weld_fu_gov = min(st_fu, beam_fu, weld_fu)
+
+    st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
+
+
     # TODO Check for Shear yielding and shear rupture of end plate
     '''
 
@@ -742,8 +777,11 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
 
     outputobj['Stiffener']['Length'] = 10.0
-    outputobj['Stiffener']['Width'] = 10.0
+    outputobj['Stiffener']['Height'] = 10.0
     outputobj['Stiffener']['Thickness'] = 10.0
+    outputobj['Stiffener']['NotchBottom'] = 10.0
+    outputobj['Stiffener']['NotchTop'] = 50.0
+
 
     # Detailing
     if endplate_type == 'flush':

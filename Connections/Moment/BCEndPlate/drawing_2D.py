@@ -1501,9 +1501,9 @@ class ExtendedEnd2DSide(object):
                                            patternTransform="rotate(45 1 1)"))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
 
-        dwg.add(dwg.rect(insert=self.P,
+        dwg.add(dwg.rect(insert=self.A11 - self.data_object.web_weld_thickness * np.array([1, 0]),
                          size=(self.data_object.web_weld_thickness,
-                               (self.data_object.column_depth_D1 - (2 * self.data_object.flange_thickness_T1))),
+                               (self.data_object.beam_depth_D2 - (2 * self.data_object.flange_thickness_T2))),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=self.A4,
                          size=(self.data_object.web_weld_thickness,
@@ -1514,27 +1514,27 @@ class ExtendedEnd2DSide(object):
                                             patternTransform="rotate(45 2 2)", ))
         pattern1.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A1 - self.data_object.flange_weld_thickness * np.array([0, 1])),
-                         size=(self.data_object.column_width_B1, self.data_object.flange_weld_thickness),
+                         size=(self.data_object.beam_width_B2, self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white',
                          stroke_width=1.0))
         dwg.add(dwg.rect(insert=self.A4,
-                         size=((self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2),
+                         size=((self.data_object.beam_width_B2/2 - self.data_object.web_thickness_tw1 / 2),
                                self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=(self.A9 - self.data_object.flange_weld_thickness * np.array([0, 1])),
-                         size=((self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2),
+                         size=((self.data_object.beam_width_B2 / 2 - self.data_object.web_thickness_tw2 / 2),
                                self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=(self.A5 - self.data_object.flange_weld_thickness * np.array([0, 1])),
-                         size=((self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2),
+                         size=((self.data_object.beam_width_B2 / 2 - self.data_object.web_thickness_tw2 / 2),
                                self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=self.A12,
-                         size=((self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2),
+                         size=((self.data_object.beam_width_B2 / 2 - self.data_object.web_thickness_tw2 / 2),
                                self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
         dwg.add(dwg.rect(insert=self.A8,
-                         size=(self.data_object.column_width_B1, self.data_object.flange_weld_thickness),
+                         size=(self.data_object.beam_width_B2, self.data_object.flange_weld_thickness),
                          fill="url(#diagonalHatch1)", stroke='white',
                          stroke_width=1.0))
         # dwg.add(dwg.rect(insert=(self.A1-self.data_object.flange_weld_thickness * np.array([1, 0])), size=(self.data_object.beam_width_B1, self.data_object.flange_weld_thickness), fill="url(#diagonalHatch1)", stroke='white', stroke_width=1.0))
@@ -1858,7 +1858,7 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point3, str(self.data_object.pitch45), params)
 
-            point4 = ptx5 + self.data_object.pitch56 * np.array([0, 1])
+            point4 = ptx5 + (self.data_object.pitch56-self.data_object.bolt_diameter) * np.array([0, 1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point4, str(self.data_object.pitch56), params)
@@ -1977,7 +1977,7 @@ class ExtendedEnd2DSide(object):
         point = self.A11 + self.data_object.beam_depth_D2 / 2 * np.array([0, 1])
         theta = 60
         offset = 50
-        textup = "     z         " + str(self.data_object.web_thickness_tw1)
+        textup = "     z         " + str(self.data_object.web_thickness_tw2)
         textdown = " "
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)

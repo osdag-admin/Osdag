@@ -1,18 +1,23 @@
 '''
-Created on 27-May-2015
+Created on 15-May-2019
 
-@author: deepa
+@author: Anand Swaroop
+
+
+
+
+
 '''
 import numpy
-from Connections.Component.ModelUtils import getGpPt, makeEdgesFromPoints, makeWireFromEdges, makeFaceFromWire, makePrismFromFace
+from ModelUtils import *
 
 
-class FilletWeld(object):
+class GrooveWeld(object):
 
     def __init__(self, b, h, L):
-        self.L = L
         self.b = b
         self.h = h
+        self.L = L
         self.sec_origin = numpy.array([0, 0, 0])
         self.uDir = numpy.array([1.0, 0, 0])
         self.wDir = numpy.array([0.0, 0, 1.0])
@@ -26,16 +31,19 @@ class FilletWeld(object):
 
     def compute_params(self):
         self.vDir = numpy.cross(self.wDir, self.uDir)
-        self.a1 = self.sec_origin
-        self.a2 = self.sec_origin + self.b * self.uDir
-        self.a3 = self.sec_origin + self.h * self.vDir
-        self.points = [self.a1, self.a2, self.a3]
+        self.a1 = self.sec_origin + (self.b / 2.0) * self.uDir + (self.h / 2.0) * self.vDir
+        self.a2 = self.sec_origin + (-self.b / 2.0) * self.uDir + (self.h / 2.0) * self.vDir
+        self.a3 = self.sec_origin + (-self.b / 2.0) * self.uDir + (-self.h / 2.0) * self.vDir
+        self.a4 = self.sec_origin + (self.b / 2.0) * self.uDir + (-self.h / 2.0) * self.vDir
+        self.points = [self.a1, self.a2, self.a3, self.a4]
 
     def create_model(self):
-        Pnt = getGpPt(self.sec_origin)
         edges = makeEdgesFromPoints(self.points)
         wire = makeWireFromEdges(edges)
         aFace = makeFaceFromWire(wire)
-        extrudeDir = self.L * (self.wDir)  # extrudeDir is a numpy array
+        extrudeDir = self.L * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
+
         return prism
+
+

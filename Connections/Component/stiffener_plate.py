@@ -42,7 +42,7 @@ class StiffenerPlate(object):
 
     '''
 
-    def __init__(self, L, W, T,L11=0.0, L12=0.0, R11=0.0, R12=0.0, R21=0.0, R22=0.0, L21=0.0, L22=0.0):
+    def __init__(self, L, W, T,L11=0.01, L12=0.0, R11=0.01, R12=0.0, R21=0.01, R22=0.0, L21=0.01, L22=0.0):
         self.L = L
         self.W = W
         self.T = T

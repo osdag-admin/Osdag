@@ -1594,7 +1594,7 @@ class Maincontroller(QMainWindow):
 			endplate_type = "both_way"
 
 		stiffener_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
-							  T=float(column_data["T"]),L11=10.0, L12=20.0, R11=30.0, R12=40.0, R21=1.0, R22=1.0, L21=1.0, L22=1.0)
+							  T=float(column_data["T"]))
 
 		stiffener_L2 = copy.copy(stiffener_L1)
 		stiffener_R1 = copy.copy(stiffener_L1)

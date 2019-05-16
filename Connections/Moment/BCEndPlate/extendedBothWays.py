@@ -157,38 +157,32 @@ class CADFillet(object):
 
     ##############################################  Adding stiffeners ########################################
 
-
     def create_stiffener_L1Geometry(self):
-
-        beamOriginL = numpy.array(
-            [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.stiffener_L1.W / 2, 0.0,
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_L2Geometry(self):
-
-        beamOriginL = numpy.array(
-            [self.beamLeft.t / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.stiffener_L2.W / 2, 0.0,
+                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_R1Geometry(self):
-
-        beamOriginL = numpy.array(
-            [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.stiffener_R1.W / 2, 0.0,
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-
     def create_stiffener_R2Geometry(self):
-
-        beamOriginL = numpy.array(
-            [-self.beamLeft.B / 2, 0.0, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([1.0, 0.0, 0.0])
+        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.stiffener_R2.W / 2, 0.0,
+                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([0.0, 1.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
 
@@ -318,16 +312,18 @@ class CADColWebFillet(CADFillet):
 
     def create_stiffener_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.stiffener_L1.W / 2,
+             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.stiffener_L2.W / 2,
+             self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
 
@@ -476,19 +472,19 @@ class CADGroove(object):
         self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_L2Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B/2 - self.stiffener_L1.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamOriginL = numpy.array([self.beamLeft.B/2 - self.stiffener_L2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_R1Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_L1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_R1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_R2Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_L1.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_R2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -565,14 +561,14 @@ class CADcolwebGroove(CADGroove):
 
     def create_stiffener_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+            [0.0, self.beamLeft.D/2 - self.beamLeft.t/2 - self.stiffener_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        beamL_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_stiffener_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/4 - self.beamLeft.t/2 - self.plateRight.T, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
-        beamL_uDir = numpy.array([0.0, 0.0, 1.0])
-        beamL_wDir = numpy.array([0.0, 1.0, 0.0])
+            [0.0,  self.beamLeft.D/2 - self.beamLeft.t/2 - self.stiffener_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        beamL_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)

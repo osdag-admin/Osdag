@@ -1620,7 +1620,7 @@ class Maincontroller(QMainWindow):
 		nutSpace = float(column_data["T"]) + float(
 			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
-		bbNutBoltArray = NutBoltArray(alist, beam_data, column_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
+		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
 		###########################
 		#       WELD SECTIONS     #

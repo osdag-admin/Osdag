@@ -1336,7 +1336,7 @@ class Maincontroller(QMainWindow):
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 			endplate_type = "both_way"
 
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder, self.endplate_type)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":

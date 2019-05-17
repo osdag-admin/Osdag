@@ -1601,6 +1601,14 @@ class Maincontroller(QMainWindow):
 		contPlate_R1 = copy.copy(contPlate_L1)
 		contPlate_R2 = copy.copy(contPlate_L2)
 
+
+		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L= outputobj['Stiffener']['Length'],
+							  T= outputobj['Stiffener']['Thickness'], R11 = outputobj['Stiffener']['NotchTop'],
+							R22 = outputobj['Stiffener']['NotchTop'], L21 = outputobj['Stiffener']['NotchBottom'],
+							L22 =outputobj['Stiffener']['NotchBottom'])
+
+		beam_stiffener_2 = copy.copy(beam_stiffener_1)
+
 		# contPlate_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 							 # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 		# contPlate_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
@@ -1674,7 +1682,7 @@ class Maincontroller(QMainWindow):
 										 bbWeldBelwFlang_24,
 										 bbWeldSideWeb_21, bbWeldSideWeb_22,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2, endplate_type, conn_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1696,7 +1704,7 @@ class Maincontroller(QMainWindow):
 				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2, endplate_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1739,7 +1747,7 @@ class Maincontroller(QMainWindow):
 										bbWeldBelwFlang_24,
 										bbWeldSideWeb_21, bbWeldSideWeb_22,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2, endplate_type, conn_type)
+										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1763,7 +1771,7 @@ class Maincontroller(QMainWindow):
 				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2, endplate_type)
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1936,9 +1944,21 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
+
+				# TODO: add if else statement for the type of endplate and also the number of bolts
+
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+
 			else:
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+			#TODO: add if else statement for the type of endplate and also the number of bolts
+
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1977,9 +1997,18 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
+
+				# TODO: add if else statement for the type of endplate and also the number of bolts
+
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+
 			else:
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+
+
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

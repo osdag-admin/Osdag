@@ -19,7 +19,6 @@ ASCII diagram
 """
 
 from model import *
-from Connections.connection_calculations import ConnectionCalculations
 from utilities.is800_2007 import IS800_2007
 from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002, IS1367_Part3_2002
 from utilities.common_calculation import *
@@ -35,22 +34,6 @@ def module_setup():
 
 
 module_setup()
-
-# Function for calculating Shear yielding capacity of End Plate
-# Reference: Cl 8.4.1 - General Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-# def shear_yielding(A_v, plate_fy):
-#     """
-#
-#     Args:
-#         A_v: (float)- Gross shear area of end plate
-#         plate_fy: (float)- Yield stress of plate material
-#
-#     Returns: (float)- Shear yielding capacity of End Plate in kN
-#
-#     """
-#     V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
-#     return V_d
 
 #######################################################################
 
@@ -161,7 +144,6 @@ def bc_endplate_design(uiObj):
     beam_R1 = float(dictbeamdata["R1"])
     beam_R2 = float(dictbeamdata["R2"])
 
-
     #######################################################################
     # Read input values from column database
     # Here,
@@ -186,7 +168,6 @@ def bc_endplate_design(uiObj):
 
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]
-
 
     #######################################################################
     # Calculation of Spacing (Min values rounded to next multiple of 5)
@@ -407,7 +388,6 @@ def bc_endplate_design(uiObj):
                 # logger.info(": Re-design the connection using bolt of higher grade or diameter")
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
-
 
             # #######################################################################
 
@@ -644,27 +624,21 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
+    # Shear yielding of end plate (TODO: Clause 8.4.1, IS 800:2007)
 
-    # TODO Check for Shear yielding and shear rupture of end plate
-    '''
-
-    # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
     A_v = plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = shear_yielding(A_v, end_plate_fy)
+    V_d = 0.6 * A_v * end_plate_fy / (math.sqrt(3) * gamma_m0)
 
     if V_d < factored_shear_load:
         design_status = False
         logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The minimum required shear yielding capacity is %2.2f kN" % factored_shear_load)
+        logger.warning(": The maximum allowable shear in end plate is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
 
-      '''
-
-    #######################################################################
-    # Strength of flange under compression or tension
+    # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
-    capacity_beam_flange = (beam_fy / 1.10) * A_f
+    capacity_beam_flange = (beam_fy / gamma_m0) * A_f
     force_flange = max(t_bf, p_bf)
 
     if capacity_beam_flange < force_flange:

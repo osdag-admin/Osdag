@@ -720,11 +720,6 @@ def bc_endplate_design(uiObj):
     #######################################################################
       '''
 
-    #######################################################################
-    # # Design of Stiffener
-    # stiffener_fy = end_plate_fy
-    # stiffener_fu = end_plate_fu
-
     ######################################
     # End of Calculation, SAMPLE Output dictionary
     outputobj = dict()
@@ -885,4 +880,3 @@ def bc_endplate_design(uiObj):
         logger.debug(" :=========End Of design===========")
 
     return outputobj
-

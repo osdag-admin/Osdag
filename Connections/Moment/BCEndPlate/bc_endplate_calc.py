@@ -768,7 +768,7 @@ def bc_endplate_design(uiObj):
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
-    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO bottom continuity plate thickness Anand
+    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
 
     outputobj['Stiffener']['Length'] = 300.0     # TODO:

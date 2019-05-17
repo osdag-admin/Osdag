@@ -159,28 +159,28 @@ class CADFillet(object):
 
     def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array([self.beamLeft.B / 2 - self.contPlate_L1.W / 2, 0.0,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array([self.beamLeft.B / 2 - self.contPlate_L2.W / 2, 0.0,
-                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L2.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_R1Geometry(self):
         beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.contPlate_R1.W / 2, 0.0,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_R1.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.contPlate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_R2Geometry(self):
         beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.contPlate_R2.W / 2, 0.0,
-                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+                                   self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 - self.contPlate_R1.T/2 ])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -313,7 +313,7 @@ class CADColWebFillet(CADFillet):
     def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array(
             [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.contPlate_L1.W / 2,
-             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -321,7 +321,7 @@ class CADColWebFillet(CADFillet):
     def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array(
             [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.contPlate_L2.W / 2,
-             self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+             self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L2.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -466,25 +466,25 @@ class CADGroove(object):
     ##############################################  Adding contPlates ########################################
 
     def create_contPlate_L1Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2 + self.contPlate_L1.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_L2Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2 + self.contPlate_L2.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_R1Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2 - self.contPlate_R1.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.contPlate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_R2Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2 - self.contPlate_R2.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
         self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
@@ -561,14 +561,14 @@ class CADcolwebGroove(CADGroove):
 
     def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+            [0.0, self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0,  self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+            [0.0,  self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L2.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)

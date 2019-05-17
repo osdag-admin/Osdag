@@ -45,6 +45,7 @@ from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
 from Connections.Component.groove_weld import GrooveWeld
 from Connections.Component.plate import Plate
+from Connections.Component.stiffener_plate import StiffenerPlate
 
 from Connections.Moment.BCEndPlate.extendedBothWays import CADFillet
 from Connections.Moment.BCEndPlate.extendedBothWays import CADGroove
@@ -1592,14 +1593,21 @@ class Maincontroller(QMainWindow):
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 			endplate_type = "both_way"
 
-		stiffener_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		stiffener_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		stiffener_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		stiffener_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-							 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		stiffener_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
+							  T=float(column_data["T"]))
+
+		stiffener_L2 = copy.copy(stiffener_L1)
+		stiffener_R1 = copy.copy(stiffener_L1)
+		stiffener_R2 = copy.copy(stiffener_L1)
+
+		# stiffener_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+							 # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		# stiffener_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		# stiffener_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		# stiffener_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 
 
 
@@ -1616,9 +1624,14 @@ class Maincontroller(QMainWindow):
 
 		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
+		#TODO remove all the clutter later
+
 		# nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
-		nutSpace = float(beam_data["T"]) + float(
-			outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+		if conn_type == 'col_flange_connectivity':
+			nutSpace = float(column_data["T"]) + float(outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+		else:
+			nutSpace = float(column_data["tw"]) + float(
+				outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 
 		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 

@@ -1083,7 +1083,7 @@ class ExtendedEnd2DFront(object):
 			# ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
 			pt_inside_top_column_list = []
 			for i in range(1, (bitfr + 1)):
-				if self.data_object.no_of_bolts == 6:
+				if self.data_object.no_of_bolts == 6:					#TODO problem with pitch23
 					ptx = self.P2 + (( self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T2 + self.Lv) * np.array(
 						[0, 1]) - ( self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
 						[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])

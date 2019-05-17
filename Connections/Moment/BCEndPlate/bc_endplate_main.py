@@ -1910,6 +1910,9 @@ class Maincontroller(QMainWindow):
 		self.display.View_Iso()
 		self.display.FitAll()
 		alist = self.designParameters()
+		outputobj = self.outputs
+		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
+
 		if alist['Member']['Connectivity'] == "Column web-Beam web":
 			conn_type = 'col_web_connectivity'
 		else:  # "Column flange-Beam web"
@@ -1956,8 +1959,9 @@ class Maincontroller(QMainWindow):
 
 			#TODO: add if else statement for the type of endplate and also the number of bolts
 
-			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+			if numberOfBolts == 20:
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
@@ -2000,8 +2004,9 @@ class Maincontroller(QMainWindow):
 
 				# TODO: add if else statement for the type of endplate and also the number of bolts
 
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+				if numberOfBolts == 20:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 
 			else:
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')

@@ -37,58 +37,25 @@ def module_setup():
 module_setup()
 
 # Function for calculating Shear yielding capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
+# Reference: Cl 8.4.1 - General Construction in Steel - Code of practice (3rd revision) IS 800:2007
 
-
-def shear_yielding(A_v, plate_fy):
-    """
-
-    Args:
-        A_v: (float)- Gross shear area of end plate
-        plate_fy: (float)- Yield stress of plate material
-
-    Returns: (float)- Shear yielding capacity of End Plate in kN
-
-    """
-    V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
-    return V_d
-
+# def shear_yielding(A_v, plate_fy):
+#     """
+#
+#     Args:
+#         A_v: (float)- Gross shear area of end plate
+#         plate_fy: (float)- Yield stress of plate material
+#
+#     Returns: (float)- Shear yielding capacity of End Plate in kN
+#
+#     """
+#     V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
+#     return V_d
 
 #######################################################################
 
-# Function for calculating Shear rupture capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def shear_rupture(A_vn, plate_fu):
-    """
-
-    Args:
-        A_vn: (float)- Net shear area of end plate
-        plate_fu: (float)- Ultimate stress of plate material
-
-    Returns: (float)- Shear rupture capacity of End Plate in kN
-
-    """
-    R_n = 0.6 * A_vn * plate_fu / 1000
-    return R_n
-
-
-# #######################################################################
-# # Function for fetching column and beam parameters from the database
-#
-# def fetchColumnPara(self):
-#     column_sec = self.ui.combo_Column.currentText()
-#     dictcolumndata = get_beamdata(column_sec)
-#     return dictcolumndata
-#
-# def fetchBeamPara(self):
-#     beam_sec = self.ui.combo_Beam.currentText()
-#     dictbeamdata = get_beamdata(beam_sec)
-#     return dictbeamdata
-#
-
-#######################################################################
 # Start of Main Program
+
 
 def bc_endplate_design(uiObj):
     global logger
@@ -691,34 +658,21 @@ def bc_endplate_design(uiObj):
         logger.warning(": The minimum required shear yielding capacity is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
 
-    # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
-    A_vn = A_v - (number_of_bolts * dia_hole)
-    R_n = shear_rupture(A_vn, end_plate_fu)
-
-    if R_n < factored_shear_load:
-        design_status = False
-        logger.error(": The End Plate might rupture due to Shear")
-        logger.warning(": The minimum shear rupture capacity required is %2.2f kN" % factored_shear_load)
-        logger.info(": Increase the thickness of End Plate")
-
-    # TODO add block shear check
+      '''
 
     #######################################################################
-    # Member Checks
-    # Strength of flange under Compression (Reference: Example 5.23 & 5.27, Design of Steel structures by Dr. N. Subramanian)
+    # Strength of flange under compression or tension
 
     A_f = beam_B * beam_tf  # area of beam flange
-    capacity_beam_flange = ((beam_fy / 1.10) * A_f) / 1000  # kN
-    force_flange = M_u * 10 ** 3 / (beam_d - beam_tf)
+    capacity_beam_flange = (beam_fy / 1.10) * A_f
+    force_flange = max(t_bf, p_bf)
 
     if capacity_beam_flange < force_flange:
         design_status = False
-        logger.error(": Force in the flange is greater than its load carrying capacity")
-        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
+        logger.error(": Forces in the beam flange is greater than its load carrying capacity")
+        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN"
+                       % capacity_beam_flange)
         logger.info(": Use a higher beam section with wider and/or thicker flange")
-
-    #######################################################################
-      '''
 
     ######################################
     # End of Calculation, SAMPLE Output dictionary

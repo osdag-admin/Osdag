@@ -684,6 +684,7 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
+    outputobj['Plate']['Height'] = 595.0
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))

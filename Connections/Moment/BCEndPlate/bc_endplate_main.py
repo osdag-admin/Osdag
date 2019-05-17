@@ -23,6 +23,7 @@ from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
+from drawing2D_oneway import OnewayEndPlate
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
@@ -1335,13 +1336,15 @@ class Maincontroller(QMainWindow):
 
 		#TODO added endplate_type here, find new way to redue this lines
 		if self.alist['Member']['EndPlate_type'] == "Extended one way":
-			endplate_type = "one_way"
+			self.endplate_type = "one_way"
+			beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
-			endplate_type = "flush"
+			self.endplate_type = "flush"
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
-			endplate_type = "both_way"
+			self.endplate_type = "both_way"
+			beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+		# beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":

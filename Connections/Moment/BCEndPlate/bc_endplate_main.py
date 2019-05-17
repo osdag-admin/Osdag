@@ -1948,20 +1948,30 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
 
-				# TODO: add if else statement for the type of endplate and also the number of bolts
 
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 
-			else:
+			else:		#col_web_connectivity"
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
 
-			#TODO: add if else statement for the type of endplate and also the number of bolts
+			# TODO: add if else statement for the type of endplate and also the number of bolts
 
-			if numberOfBolts == 20:
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+			if alist['Member']['EndPlate_type'] == "Extended both ways":
+				if numberOfBolts == 20:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			elif alist['Member']['EndPlate_type'] == "Extended one way":
+				if numberOfBolts == 12:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
+				pass
+
+
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
@@ -2002,18 +2012,28 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
 
-				# TODO: add if else statement for the type of endplate and also the number of bolts
 
-				if numberOfBolts == 20:
-					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
-					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 
 			else:
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
 
+			# TODO: add if else statement for the type of endplate and also the number of bolts
 
-
+			if alist['Member']['EndPlate_type'] == "Extended both ways":
+				if numberOfBolts == 20:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			elif alist['Member']['EndPlate_type'] == "Extended one way":
+				if numberOfBolts == 12:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
+				pass
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

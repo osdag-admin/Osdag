@@ -9,7 +9,7 @@ import numpy
 class CADFillet(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21,
-                 bbWeldSideWeb_22, stiffener_L1, stiffener_L2, stiffener_R1, stiffener_R2, endplate_type, conn_type):
+                 bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2, endplate_type, conn_type):
 
         # Initializing the arguments
         self.beamLeft = beamLeft  # beamLeft represents the column
@@ -17,10 +17,10 @@ class CADFillet(object):
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
         self.beamRight.length = 1000.0
-        self.stiffener_L1 = stiffener_L1
-        self.stiffener_L2 = stiffener_L2
-        self.stiffener_R1 = stiffener_R1
-        self.stiffener_R2 = stiffener_R2
+        self.contPlate_L1 = contPlate_L1
+        self.contPlate_L2 = contPlate_L2
+        self.contPlate_R1 = contPlate_R1
+        self.contPlate_R2 = contPlate_R2
         self.endplate_type = endplate_type
         self.conn_type = conn_type
 
@@ -45,10 +45,10 @@ class CADFillet(object):
         self.createBeamRGeometry()
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
-        self.create_stiffener_L1Geometry()
-        self.create_stiffener_L2Geometry()
-        self.create_stiffener_R1Geometry()
-        self.create_stiffener_R2Geometry()
+        self.create_contPlate_L1Geometry()
+        self.create_contPlate_L2Geometry()
+        self.create_contPlate_R1Geometry()
+        self.create_contPlate_R2Geometry()
 
         self.create_bbWeldAbvFlang_21()  # left beam above flange weld
         self.create_bbWeldAbvFlang_22()  # left beam above 2nd (lower) flange
@@ -67,10 +67,10 @@ class CADFillet(object):
         self.beamRModel = self.beamRight.create_model()
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
-        self.stiffener_L1Model = self.stiffener_L1.create_model()
-        self.stiffener_L2Model = self.stiffener_L2.create_model()
-        self.stiffener_R1Model = self.stiffener_R1.create_model()
-        self.stiffener_R2Model = self.stiffener_R2.create_model()
+        self.contPlate_L1Model = self.contPlate_L1.create_model()
+        self.contPlate_L2Model = self.contPlate_L2.create_model()
+        self.contPlate_R1Model = self.contPlate_R1.create_model()
+        self.contPlate_R2Model = self.contPlate_R2.create_model()
 
         self.bbWeldAbvFlang_21Model = self.bbWeldAbvFlang_21.create_model()
         self.bbWeldAbvFlang_22Model = self.bbWeldAbvFlang_22.create_model()
@@ -155,35 +155,35 @@ class CADFillet(object):
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
-    ##############################################  Adding stiffeners ########################################
+    ##############################################  Adding contPlates ########################################
 
-    def create_stiffener_L1Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.stiffener_L1.W / 2, 0.0,
+    def create_contPlate_L1Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.contPlate_L1.W / 2, 0.0,
                                    self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_L2Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.stiffener_L2.W / 2, 0.0,
+    def create_contPlate_L2Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.B / 2 - self.contPlate_L2.W / 2, 0.0,
                                    self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_R1Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.stiffener_R1.W / 2, 0.0,
+    def create_contPlate_R1Geometry(self):
+        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.contPlate_R1.W / 2, 0.0,
                                    self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_R2Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.stiffener_R2.W / 2, 0.0,
+    def create_contPlate_R2Geometry(self):
+        beamOriginL = numpy.array([-self.beamLeft.B / 2 + self.contPlate_R2.W / 2, 0.0,
                                    self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
 
     ##############################################  creating weld sections ########################################
@@ -262,17 +262,17 @@ class CADFillet(object):
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
 
-    def get_stiffener_L1Model(self):
-        return self.stiffener_L1Model
+    def get_contPlate_L1Model(self):
+        return self.contPlate_L1Model
 
-    def get_stiffener_L2Model(self):
-        return self.stiffener_L2Model
+    def get_contPlate_L2Model(self):
+        return self.contPlate_L2Model
 
-    def get_stiffener_R1Model(self):
-        return self.stiffener_R1Model
+    def get_contPlate_R1Model(self):
+        return self.contPlate_R1Model
 
-    def get_stiffener_R2Model(self):
-        return self.stiffener_R2Model
+    def get_contPlate_R2Model(self):
+        return self.contPlate_R2Model
 
     def get_bbWeldAbvFlang_21Model(self):
         return self.bbWeldAbvFlang_21Model
@@ -308,23 +308,23 @@ class CADColWebFillet(CADFillet):
 
 
 
-        ##############################################  Adding stiffeners ########################################
+        ##############################################  Adding contPlates ########################################
 
-    def create_stiffener_L1Geometry(self):
+    def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.stiffener_L1.W / 2,
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.contPlate_L1.W / 2,
              self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_L2Geometry(self):
+    def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.stiffener_L2.W / 2,
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t / 2 - self.contPlate_L2.W / 2,
              self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
 
 
@@ -337,16 +337,16 @@ class CADColWebFillet(CADFillet):
         return self.beamLModel
 
 
-    def get_stiffener_L1Model(self):
-        return self.stiffener_L1Model
+    def get_contPlate_L1Model(self):
+        return self.contPlate_L1Model
 
-    def get_stiffener_L2Model(self):
-        return self.stiffener_L2Model
+    def get_contPlate_L2Model(self):
+        return self.contPlate_L2Model
 
 class CADGroove(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-                 stiffener_L1,stiffener_L2,stiffener_R1,stiffener_R2, endplate_type):
+                 contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2, endplate_type):
 
         # Initializing the arguments
         self.beamLeft = beamLeft                            # beamLeft represents the column
@@ -354,10 +354,10 @@ class CADGroove(object):
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
         self.beamRight.length = 1000.0
-        self.stiffener_L1 = stiffener_L1
-        self.stiffener_L2 = stiffener_L2
-        self.stiffener_R1 = stiffener_R1
-        self.stiffener_R2 = stiffener_R2
+        self.contPlate_L1 = contPlate_L1
+        self.contPlate_L2 = contPlate_L2
+        self.contPlate_R1 = contPlate_R1
+        self.contPlate_R2 = contPlate_R2
         self.endplate_type = endplate_type
 
 
@@ -377,10 +377,10 @@ class CADGroove(object):
         self.createBeamRGeometry()
         self.createPlateRGeometry()
         self.create_nut_bolt_array()
-        self.create_stiffener_L1Geometry()
-        self.create_stiffener_L2Geometry()
-        self.create_stiffener_R1Geometry()
-        self.create_stiffener_R2Geometry()
+        self.create_contPlate_L1Geometry()
+        self.create_contPlate_L2Geometry()
+        self.create_contPlate_R1Geometry()
+        self.create_contPlate_R2Geometry()
 
 
         self.create_bcWeldFlang_1()
@@ -393,10 +393,10 @@ class CADGroove(object):
         self.beamRModel = self.beamRight.create_model()
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
-        self.stiffener_L1Model = self.stiffener_L1.create_model()
-        self.stiffener_L2Model = self.stiffener_L2.create_model()
-        self.stiffener_R1Model = self.stiffener_R1.create_model()
-        self.stiffener_R2Model = self.stiffener_R2.create_model()
+        self.contPlate_L1Model = self.contPlate_L1.create_model()
+        self.contPlate_L2Model = self.contPlate_L2.create_model()
+        self.contPlate_R1Model = self.contPlate_R1.create_model()
+        self.contPlate_R2Model = self.contPlate_R2.create_model()
 
         self.bcWeldFlang_1Model =  self.bcWeldFlang_1.create_model()
         self.bcWeldFlang_2Model = self.bcWeldFlang_2.create_model()
@@ -463,31 +463,31 @@ class CADGroove(object):
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
-    ##############################################  Adding stiffeners ########################################
+    ##############################################  Adding contPlates ########################################
 
-    def create_stiffener_L1Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B/2 - self.stiffener_L1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+    def create_contPlate_L1Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_L2Geometry(self):
-        beamOriginL = numpy.array([self.beamLeft.B/2 - self.stiffener_L2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+    def create_contPlate_L2Geometry(self):
+        beamOriginL = numpy.array([self.beamLeft.B/2 - self.contPlate_L2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_R1Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_R1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
+    def create_contPlate_R1Geometry(self):
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R1.W/2, 0.0, self.beamLeft.length/2 + self.beamRight.D/2 - self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.stiffener_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_R1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_R2Geometry(self):
-        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.stiffener_R2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
+    def create_contPlate_R2Geometry(self):
+        beamOriginL = numpy.array([-self.beamLeft.B/2 + self.contPlate_R2.W/2, 0.0, self.beamLeft.length/2 - self.beamRight.D/2 + self.beamRight.T/2])
         beamL_uDir = numpy.array([0.0, 1.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, 1.0])
-        self.stiffener_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_R2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     ##############################################  creating weld sections ########################################
 
@@ -526,17 +526,17 @@ class CADGroove(object):
     def get_nutboltmodels(self):
         return self.nut_bolt_array.get_models()
 
-    def get_stiffener_L1Model(self):
-        return self.stiffener_L1Model
+    def get_contPlate_L1Model(self):
+        return self.contPlate_L1Model
 
-    def get_stiffener_L2Model(self):
-        return self.stiffener_L2Model
+    def get_contPlate_L2Model(self):
+        return self.contPlate_L2Model
 
-    def get_stiffener_R1Model(self):
-        return self.stiffener_R1Model
+    def get_contPlate_R1Model(self):
+        return self.contPlate_R1Model
 
-    def get_stiffener_R2Model(self):
-        return self.stiffener_R2Model
+    def get_contPlate_R2Model(self):
+        return self.contPlate_R2Model
 
     def get_bcWeldFlang_1Model(self):
         return self.bcWeldFlang_1Model
@@ -557,18 +557,18 @@ class CADcolwebGroove(CADGroove):
 
 
 
-        ##############################################  Adding stiffeners ########################################
+        ##############################################  Adding contPlates ########################################
 
-    def create_stiffener_L1Geometry(self):
+    def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/2 - self.beamLeft.t/2 - self.stiffener_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+            [0.0, self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
-    def create_stiffener_L2Geometry(self):
+    def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0,  self.beamLeft.D/2 - self.beamLeft.t/2 - self.stiffener_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+            [0.0,  self.beamLeft.D/2 - self.beamLeft.t/2 - self.contPlate_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
-        self.stiffener_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
+        self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)

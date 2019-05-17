@@ -1,8 +1,10 @@
 """
-Created on 4th January, 2018
+Created on April, 2019
 
-@author: Danish Ansari
+@author: Yash Lokhande
 """
+
+
 
 from __builtin__ import str
 import time
@@ -70,6 +72,11 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     beam_fy = str(float(uiObj['Member']['fy (MPa)']))
     weld_fu_govern = str(outObj['Weld']['WeldFuGovern'])
 
+    column_sec = uiObj['Member']['ColumnSection']
+    column_fu = str(float(uiObj['Member']['fu (MPa)']))
+
+
+
     factored_moment = str(float(uiObj['Load']['Moment (kNm)']))
     factored_shear_load = str(float(uiObj['Load']['ShearForce (kN)']))
 
@@ -128,10 +135,6 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     end_distance = str(int(float(outObj['Bolt']['End'])))
     edge_distance = str(int(float(outObj['Bolt']['Edge'])))
     gauge_distance = str(int(float(outObj['Bolt']['Gauge'])))
-    # tension_capacity = str(float(outObj['Bolt']['TensionCapacity']))
-    # bearingcapacity = str(outObj['Bolt']['BearingCapacity'])
-    # shearcapacity = str(outObj['Bolt']['ShearCapacity'])
-    # boltcapacity = str(outObj['Bolt']['BoltCapacity'])
 
     slip_capacity = str(float(outObj["Bolt"]["SlipCapacity"]))
     shear_capacity = str(float(outObj["Bolt"]["ShearCapacity"]))
@@ -459,7 +462,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Loading (Factored Load) ", " "]
+    row = [0, "Loading Details ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -494,6 +497,18 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('/tr')
 
     row = [2, "Material", "Fe " + beam_fu]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Column Section", column_sec]
+    rstr += t('tr')
+    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [2, "Material", "Fe " + column_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -1529,9 +1544,9 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         if float(number_of_bolts) <= 20:
 
             if float(web_weld_throat_size) < float(web_weld_size_min) or float(web_weld_throat_size) > (web_weld_throat_max):
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_throat_max)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Fail</b></p>"]
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Fail</b></p>"]
             else:
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_throat_max)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Pass</b></p>"]
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Pass</b></p>"]
 
         else:
             row = [0, "Weld thickness at web (mm)", " Cannot compute ", web_weld_throat_size, "<p align=left style=color:red><b>Fail</b></p>"]
@@ -1750,7 +1765,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     datatop = '<object type="image/PNG" data= %s width ="500"  ></object>' % top
 
     front = folder + "/images_html/extendFront.png"
-    datafront = '<object type="image/PNG" data= %s width ="400"></object>' % front
+    datafront = '<object type="image/PNG" data= %s width ="400"> height = "400"</object>' % front
 
     if status == 'True':
         row = [1, dataside]

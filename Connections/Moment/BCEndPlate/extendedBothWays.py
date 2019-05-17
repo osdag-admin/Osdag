@@ -194,19 +194,18 @@ class CADFillet(object):
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffener_1Geometry(self):
-        gap = self.beamLeft.D / 2 + self.plateRight.T
-        stiffenerOrigin1 = numpy.array([0.0, gap, self.beamLeft.length / 2])
+        gap = self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L/2
+        stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T/2, gap, self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.W/2])
         stiffener1_uDir = numpy.array([0.0, 1.0, 0.0])
-        stiffener1_wDir = numpy.array([0.0, 0.0, 1.0])
+        stiffener1_wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam_stiffener_1.place(stiffenerOrigin1, stiffener1_uDir, stiffener1_wDir)
 
     def create_beam_stiffener_2Geometry(self):
-        gap = self.beamLeft.D / 2 + self.plateRight.T
-        stiffenerOrigin2 = numpy.array([0.0, gap, self.beamLeft.length / 2])
+        gap = self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L/2
+        stiffenerOrigin2 = numpy.array([self.beam_stiffener_1.T/2, gap, self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.W/2])
         stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
-        stiffener2_wDir = numpy.array([0.0, 0.0, 1.0])
+        stiffener2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.beam_stiffener_2.place(stiffenerOrigin2, stiffener2_uDir, stiffener2_wDir)
-
 
     ##############################################  creating weld sections ########################################
     def create_bbWeldAbvFlang_21(self):
@@ -525,17 +524,17 @@ class CADGroove(object):
 
     ##############################################  Adding beam stiffeners #############################################
     def create_beam_stiffener_1Geometry(self):
-        gap = self.beamLeft.D / 2 + self.plateRight.T
-        stiffenerOrigin1 = numpy.array([0.0, gap, self.beamLeft.length / 2])
+        gap = self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L/2
+        stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T/2, gap, self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.W/2])
         stiffener1_uDir = numpy.array([0.0, 1.0, 0.0])
-        stiffener1_wDir = numpy.array([0.0, 0.0, 1.0])
+        stiffener1_wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam_stiffener_1.place(stiffenerOrigin1, stiffener1_uDir, stiffener1_wDir)
 
     def create_beam_stiffener_2Geometry(self):
-        gap = self.beamLeft.D / 2 + self.plateRight.T
-        stiffenerOrigin2 = numpy.array([0.0, gap, self.beamLeft.length / 2])
+        gap = self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L/2
+        stiffenerOrigin2 = numpy.array([self.beam_stiffener_1.T/2, gap, self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.W/2])
         stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
-        stiffener2_wDir = numpy.array([0.0, 0.0, 1.0])
+        stiffener2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.beam_stiffener_2.place(stiffenerOrigin2, stiffener2_uDir, stiffener2_wDir)
 
     ##############################################  creating weld sections ########################################

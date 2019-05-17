@@ -1604,7 +1604,7 @@ class Maincontroller(QMainWindow):
 
 		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L= outputobj['Stiffener']['Length'],
 							  T= outputobj['Stiffener']['Thickness'], R11 = outputobj['Stiffener']['NotchTop'],
-							R22 = outputobj['Stiffener']['NotchTop'], L21 = outputobj['Stiffener']['NotchBottom'],
+							R12 = outputobj['Stiffener']['NotchTop'], L21 = outputobj['Stiffener']['NotchBottom'],
 							L22 =outputobj['Stiffener']['NotchBottom'])
 
 		beam_stiffener_2 = copy.copy(beam_stiffener_1)

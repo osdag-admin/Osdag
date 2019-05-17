@@ -287,14 +287,14 @@ def bc_endplate_design(uiObj):
         T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
         end_dist=end_dist, pre_tensioned=False)
     toe_of_weld_moment = abs(flange_tension/2 * l_v - prying_force * end_dist)
-    plate_tk_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
+    plate_tk_min_prying = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
     # End Plate Thickness
-    if end_plate_thickness < max(column_tf, plate_tk_min):
-        end_plate_thickness = math.ceil(max(column_tf, plate_tk_min))
+    if end_plate_thickness < max(column_tf, plate_tk_min_prying):
+        end_plate_thickness_min = math.ceil(max(column_tf, plate_tk_min_prying))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
+        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness_min)
         logger.info(": Increase the thickness of end plate ")
 
     # Detailing
@@ -758,7 +758,7 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-    outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
+    outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length

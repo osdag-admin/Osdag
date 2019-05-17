@@ -286,7 +286,7 @@ def bc_endplate_design(uiObj):
     prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(
         T_e=flange_tension/4, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
         end_dist=end_dist, pre_tensioned=False)
-    toe_of_weld_moment = abs(flange_tension/2 * l_v - prying_force * end_dist)
+    toe_of_weld_moment = abs(flange_tension/4 * l_v - prying_force * end_dist)
     end_plate_thickness_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
     # End Plate Thickness

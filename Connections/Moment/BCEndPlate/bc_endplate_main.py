@@ -1532,7 +1532,7 @@ class Maincontroller(QMainWindow):
 
 	def call_pannig(self):
 		self.display.Pan(50, 0)
-		
+
 	def clear_log_messages(self):
 		self.ui.textEdit.clear()
 
@@ -1579,7 +1579,7 @@ class Maincontroller(QMainWindow):
 
 		alist = self.designParameters()  # An object to save all input values entered by user
 
-		# TODO make dictionary for the stiffeners
+		# TODO make dictionary for the contPlates
 		#TODO adding enpplate type and check if code is working
 		#TODO added connectivity type here
 
@@ -1596,20 +1596,29 @@ class Maincontroller(QMainWindow):
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 			endplate_type = "both_way"
 
-		stiffener_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
-							  T=float(column_data["T"]))
+		contPlate_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
+							  T=outputobj['ContPlateComp']['Thickness'])
 
-		stiffener_L2 = copy.copy(stiffener_L1)
-		stiffener_R1 = copy.copy(stiffener_L1)
-		stiffener_R2 = copy.copy(stiffener_L1)
+		contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
+							  T=outputobj['ContPlateTens']['Thickness'])
+		contPlate_R1 = copy.copy(contPlate_L1)
+		contPlate_R2 = copy.copy(contPlate_L2)
 
-		# stiffener_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+
+		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L= outputobj['Stiffener']['Length'],
+							  T= outputobj['Stiffener']['Thickness'], R11 = outputobj['Stiffener']['NotchTop'],
+							R12 = outputobj['Stiffener']['NotchTop'], L21 = outputobj['Stiffener']['NotchBottom'],
+							L22 =outputobj['Stiffener']['NotchBottom'])
+
+		beam_stiffener_2 = copy.copy(beam_stiffener_1)
+
+		# contPlate_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 							 # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		# stiffener_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# contPlate_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		# stiffener_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# contPlate_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-		# stiffener_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+		# contPlate_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 
 
@@ -1675,8 +1684,8 @@ class Maincontroller(QMainWindow):
 										 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 										 bbWeldBelwFlang_24,
 										 bbWeldSideWeb_21, bbWeldSideWeb_22,
-										 stiffener_L1, stiffener_L2, stiffener_R1,
-										 stiffener_R2, endplate_type, conn_type)
+										 contPlate_L1, contPlate_L2, contPlate_R1,
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1697,8 +1706,8 @@ class Maincontroller(QMainWindow):
 
 				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-										 stiffener_L1, stiffener_L2, stiffener_R1,
-										 stiffener_R2, endplate_type)
+										 contPlate_L1, contPlate_L2, contPlate_R1,
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1732,16 +1741,16 @@ class Maincontroller(QMainWindow):
 				# 						bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 				# 						bbWeldBelwFlang_24,
 				# 						bbWeldSideWeb_21, bbWeldSideWeb_22,
-				# 						stiffener_L1, stiffener_L2, stiffener_R1,
-				# 						stiffener_R2, endplate_type, conn_type)
+				# 						contPlate_L1, contPlate_L2, contPlate_R1,
+				# 						contPlate_R2, endplate_type, conn_type)
 
 				col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
 										bbWeldAbvFlang_22,
 										bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 										bbWeldBelwFlang_24,
 										bbWeldSideWeb_21, bbWeldSideWeb_22,
-										stiffener_L1, stiffener_L2, stiffener_R1,
-										stiffener_R2, endplate_type, conn_type)
+										contPlate_L1, contPlate_L2, contPlate_R1,
+										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1764,8 +1773,8 @@ class Maincontroller(QMainWindow):
 
 				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-										stiffener_L1, stiffener_L2, stiffener_R1,
-										stiffener_R2, endplate_type)
+										contPlate_L1, contPlate_L2, contPlate_R1,
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1781,8 +1790,8 @@ class Maincontroller(QMainWindow):
 		# 							   bbWeldAbvFlang_22,
 		# 							   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
 		# 							   bbWeldBelwFlang_24,
-		# 							   bbWeldSideWeb_21, bbWeldSideWeb_22, bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3, stiffener_L1, stiffener_L2, stiffener_R1,
-		# 							   stiffener_R2, endplate_type, weld_method)
+		# 							   bbWeldSideWeb_21, bbWeldSideWeb_22, bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3, contPlate_L1, contPlate_L2, contPlate_R1,
+		# 							   contPlate_R2, endplate_type, weld_method)
 		# extbothWays.create_3DModel()
 		#
 		# return extbothWays
@@ -1904,6 +1913,9 @@ class Maincontroller(QMainWindow):
 		self.display.View_Iso()
 		self.display.FitAll()
 		alist = self.designParameters()
+		outputobj = self.outputs
+		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
+
 		if alist['Member']['Connectivity'] == "Column web-Beam web":
 			conn_type = 'col_web_connectivity'
 		else:  # "Column flange-Beam web"
@@ -1934,13 +1946,36 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
 			if conn_type == 'col_flange_connectivity':
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
-			else:
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
+
+
+
+			else:		#col_web_connectivity"
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+			# TODO: add if else statement for the type of endplate and also the number of bolts
+
+			if alist['Member']['EndPlate_type'] == "Extended both ways":
+				if numberOfBolts == 20:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			elif alist['Member']['EndPlate_type'] == "Extended one way":
+				if numberOfBolts == 12:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
+				pass
+
+
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1975,13 +2010,33 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
 			if conn_type == 'col_flange_connectivity':
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_R2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
+
+
+
 			else:
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L1Model(), update=True, color='Blue')
-				osdag_display_shape(self.display, self.ExtObj.get_stiffener_L2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+			# TODO: add if else statement for the type of endplate and also the number of bolts
+
+			if alist['Member']['EndPlate_type'] == "Extended both ways":
+				if numberOfBolts == 20:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			elif alist['Member']['EndPlate_type'] == "Extended one way":
+				if numberOfBolts == 12:
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
+										color='Blue')
+					osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+										color='Blue')
+			else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
+				pass
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

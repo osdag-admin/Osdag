@@ -395,20 +395,15 @@ def bc_endplate_design(uiObj):
             ''' tens_plate_no_pitch : projection of end plate beyond the beam flange excluding the 
                                         distances b/w bolts on tension side '''
         if no_rows['out_tension_flange'] == 0:
-            tens_plate_no_pitch = flange_projection
-            tens_plate_with_pitch = 0.0
+            tens_plate_outer = flange_projection
         else:
-            tens_plate_no_pitch = end_dist + l_v
-            tens_plate_with_pitch = (no_rows['out_tension_flange'] - 1) * pitch_dist
+            tens_plate_outer = end_dist + l_v + (no_rows['out_tension_flange'] - 1) * pitch_dist
         if no_rows['out_compression_flange'] == 0:
-            comp_plate_no_pitch = flange_projection
-            comp_plate_with_pitch = 0.0
+            comp_plate_outer = flange_projection
         else:
-            comp_plate_no_pitch = end_dist + l_v
-            comp_plate_with_pitch = (no_rows['out_compression_flange'] - 1) * pitch_dist
+            comp_plate_outer = end_dist + l_v + (no_rows['out_compression_flange'] - 1) * pitch_dist
 
-        plate_height = beam_d + \
-                       comp_plate_no_pitch + comp_plate_with_pitch + tens_plate_no_pitch + tens_plate_with_pitch
+        plate_height = beam_d + comp_plate_outer + tens_plate_outer
         plate_width = g_1 + 2 * edge_dist
         while plate_width < beam_B:
             edge_dist += 5

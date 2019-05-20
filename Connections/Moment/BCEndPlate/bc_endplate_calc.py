@@ -196,7 +196,7 @@ def bc_endplate_design(uiObj):
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
     # TODO: for different end plate type
     if endplate_type == 'flush':
-        l_v = 50.0
+        l_v = 45.0
         g_1 = 90.0
     elif endplate_type == 'one_way':
         l_v = 50.0

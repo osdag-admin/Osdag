@@ -486,14 +486,14 @@ class NutBoltArray(object):
                     if rw == 1:
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
-                            space12 = 2 * (self.Lv) + self.beamDim["T"]         #TODO  check if this formula is right, shanged this formula
+                            space12 = (self.Lv) + self.beamDim["T"]         #TODO  check if this formula is right, shanged this formula
                             pos = pos + self.boltOrigin + space12 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
                     if rw == 2:
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
-                            space23 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12
+                            space23 =  (self.Lv) + self.beamDim["T"] + self.pitch12
                             pos = pos + self.boltOrigin + space23 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
@@ -509,28 +509,28 @@ class NutBoltArray(object):
                         if rw == 1:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space12 = 2 * (self.Lv)  + self.beamDim["T"]
+                                space12 = (self.Lv)  + self.beamDim["T"]
                                 pos = pos + self.boltOrigin + space12 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 2:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space23 = 2 * (self.Lv)  + self.beamDim["T"]  + self.pitch12
+                                space23 =  (self.Lv)  + self.beamDim["T"]  + self.pitch12
                                 pos = pos + self.boltOrigin + space23 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 3:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space34 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 #+ self.pitch34
+                                space34 =  (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 #+ self.pitch34
                                 pos = pos + self.boltOrigin + space34 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 4:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space34 = 2 * (self.Lv)  + self.beamDim["T"] + self.pitch12 + self.pitch23 + self.pitch34 \
+                                space34 =  (self.Lv)  + self.beamDim["T"] + self.pitch12 + self.pitch23 + self.pitch34 \
                                           # + self.pitch45
                                 pos = pos + self.boltOrigin + space34 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
@@ -544,28 +544,28 @@ class NutBoltArray(object):
                         if rw == 1:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space23 = 2 * (self.Lv) + self.beamDim["T"]
+                                space23 =  (self.Lv) + self.beamDim["T"]
                                 pos = pos + self.boltOrigin + space23 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 2:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space34 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12
+                                space34 =  (self.Lv) + self.beamDim["T"] + self.pitch12
                                 pos = pos + self.boltOrigin + space34 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 3:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space45 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23
+                                space45 = (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23
                                 pos = pos + self.boltOrigin + space45 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
                                 self.positions.append(pos)
                         if rw == 4:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space56 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
+                                space56 = (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
                                           self.pitch45 + self.pitch56
                                 pos = pos + self.boltOrigin + space56 * self.pitchDir  #
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
@@ -573,7 +573,7 @@ class NutBoltArray(object):
                         if rw == 5:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space67 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
+                                space67 = (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
                                           self.pitch34 + self.pitch45
                                 pos = pos + self.boltOrigin + space67 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir
@@ -581,7 +581,7 @@ class NutBoltArray(object):
                         if rw == 6:
                             for col in range(self.col):
                                 pos = np.array([0.0, 0.0, 0.0])
-                                space78 = 2 * (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
+                                space78 =  (self.Lv) + self.beamDim["T"] + self.pitch12 + self.pitch23 +\
                                           self.pitch34 + self.pitch45 + self.pitch56 # + self.pitch78
                                 pos = pos + self.boltOrigin + space78 * self.pitchDir
                                 pos = pos + col * self.crossCgauge * self.gaugeDir

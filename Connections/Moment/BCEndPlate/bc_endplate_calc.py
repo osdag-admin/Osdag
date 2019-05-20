@@ -194,7 +194,7 @@ def bc_endplate_design(uiObj):
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     l_v = float(50.0)
-    flange_projection = weld_thickness_flange + 10
+    flange_projection = weld_thickness_flange + 10 #TODO: roundup to multiple of 5
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
     g_1 = 100.0
@@ -396,15 +396,19 @@ def bc_endplate_design(uiObj):
                                         distances b/w bolts on tension side '''
         if no_rows['out_tension_flange'] == 0:
             tens_plate_no_pitch = flange_projection
+            tens_plate_with_pitch = 0.0
         else:
             tens_plate_no_pitch = end_dist + l_v
+            tens_plate_with_pitch = (no_rows['out_tension_flange'] - 1) * pitch_dist
         if no_rows['out_compression_flange'] == 0:
             comp_plate_no_pitch = flange_projection
+            comp_plate_with_pitch = 0.0
         else:
             comp_plate_no_pitch = end_dist + l_v
+            comp_plate_with_pitch = (no_rows['out_compression_flange'] - 1) * pitch_dist
 
-        plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
-                       beam_d + comp_plate_no_pitch + tens_plate_no_pitch
+        plate_height = beam_d + \
+                       comp_plate_no_pitch + comp_plate_with_pitch + tens_plate_no_pitch + tens_plate_with_pitch
         plate_width = g_1 + 2 * edge_dist
         while plate_width < beam_B:
             edge_dist += 5
@@ -692,18 +696,18 @@ def bc_endplate_design(uiObj):
 
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
-    outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange
+    outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
-    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange
+    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
 
-    outputobj['Stiffener']['Length'] = 10.0
-    outputobj['Stiffener']['Height'] = 10.0
+    outputobj['Stiffener']['Length'] = 300.0     # TODO:
+    outputobj['Stiffener']['Height'] = 100.0
     outputobj['Stiffener']['Thickness'] = 10.0
-    outputobj['Stiffener']['NotchBottom'] = 10.0
+    outputobj['Stiffener']['NotchBottom'] = 15.0
     outputobj['Stiffener']['NotchTop'] = 50.0
 
 

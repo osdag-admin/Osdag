@@ -194,7 +194,7 @@ def bc_endplate_design(uiObj):
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     l_v = float(50.0)
-    flange_projection = 15
+    flange_projection = weld_thickness_flange + 10 #TODO: roundup to multiple of 5
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
     g_1 = 100.0
@@ -681,14 +681,14 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['End'] = float(round(end_dist, 3))
     outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
     outputobj['Bolt']['Lv'] = float(round(l_v, 3))
-    outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
+    outputobj['Bolt']['PitchMipni'] = float(round(pitch_dist_min, 3))
     outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
     outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
-    outputobj['Plate']['Height'] = 595.0
+    outputobj['Plate']['Height'] = 548
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))

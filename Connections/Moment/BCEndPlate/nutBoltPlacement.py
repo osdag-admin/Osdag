@@ -123,8 +123,8 @@ class NutBoltArray(object):
 
             # TODO give dictionary to this values
             elif numberOfBolts == 8:
-                self.pitch23 = 50.0             # boltPlaceObj['Bolt']['Pitch23'] & 50.0
-                self.pitch34 = 145.0          #boltPlaceObj['Bolt']['Pitch34'] & 200.0     # TODO may be different in Ajmal code
+                self.pitch23 = boltPlaceObj['Bolt']['Pitch23']      #50.0             #  & 50.0
+                self.pitch34 = boltPlaceObj['Bolt']['Pitch34']      #145.0          # & 200.0     # TODO may be different in Ajmal code
 
             elif numberOfBolts == 10:
                 self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
@@ -135,7 +135,7 @@ class NutBoltArray(object):
 
             self.Lv = boltPlaceObj["Bolt"]["Lv"]
             if numberOfBolts == 4:
-                self.pitch12 = 250      #boltPlaceObj["Bolt"]["Pitch12"]
+                self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]      #250      #
                 # self.endDist = boltPlaceObj["Bolt"]["End"]
                 # self.edgeDist = boltPlaceObj["Bolt"]["Edge"]
                 # self.crossCgauge = float(boltPlaceObj["Plate"]["Width"]) - 2 * float(self.edgeDist)
@@ -143,9 +143,9 @@ class NutBoltArray(object):
                 # self.col = 2
 
             elif numberOfBolts == 8:
-                self.pitch12 = 50       #boltPlaceObj["Bolt"]["Pitch12"] # TODO give dictionary values here
-                self.pitch23 = 150      #boltPlaceObj["Bolt"]["Pitch23"]
-                self.pitch34 = 50       #boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]       #50       #] # TODO give dictionary values here
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]      #150      #
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]      #50       #
                 # self.pitch = boltPlaceObj["Bolt"]["Pitch23"]
                 # self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
                 # self.endDist = boltPlaceObj["Bolt"]["End"]

@@ -28,7 +28,7 @@ class CADFillet(object):
         self.conn_type = conn_type                  #TODO: Remove this type if not needed
         self.outputobj = outputobj
         self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
-        self.Lv = float(outputobj["Bolt"]["Lv"])
+        # self.Lv = float(outputobj["Bolt"]["Lv"])
 
         # Weld above flange for left and right beam
         self.bbWeldAbvFlang_21 = bbWeldAbvFlang_21  # Right beam upper side
@@ -141,7 +141,7 @@ class CADFillet(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, + (self.plateRight.L / 2 - self.boltProjection)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , + (self.plateRight.L / 2 - self.boltProjection)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -149,7 +149,7 @@ class CADFillet(object):
 
         elif self.endplate_type == "both_way":
             nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamRight.T / 2, self.plateRight.L / 2])
+                [0.0, self.beamLeft.T, self.plateRight.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -157,7 +157,7 @@ class CADFillet(object):
 
         elif self.endplate_type == "flush":
             nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamRight.T / 2, self.beamRight.D/2])  # TODO Add self.Lv instead of 25   #+ 30
+                [0.0, self.beamLeft.T, self.beamRight.D/2])  # TODO Add self.Lv instead of 25   #+ 30
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -390,6 +390,8 @@ class CADGroove(object):
         self.beam_stiffener_2 = beam_stiffener_2
         self.endplate_type = endplate_type
         self.outputobj = outputobj
+        self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
+        # self.Lv = float(outputobj["Bolt"]["Lv"])
 
         self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection d
 
@@ -478,21 +480,21 @@ class CADGroove(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamRight.T/2,  + (self.plateRight.L/2 - (10 ))])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamLeft.T,  + (self.plateRight.L/2 - self.boltProjection)])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, self.plateRight.L /2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , self.plateRight.L /2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])

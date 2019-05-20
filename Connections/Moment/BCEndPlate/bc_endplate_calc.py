@@ -194,10 +194,14 @@ def bc_endplate_design(uiObj):
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     l_v = float(50.0)
-    flange_projection = weld_thickness_flange + 10 #TODO: roundup to multiple of 5
+
+    if weld_method == 'fillet':
+        flange_projection = round_up(value=weld_thickness_flange + 2, multiplier=5, minimum_value=5)
+    else:   # 'groove'
+        flange_projection = 5
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
-    g_1 = 100.0
+    g_1 = 100.0     # TODO: Cross centre gauge for different end plate type
 
     #######################################################################
     # Calculate bolt capacities

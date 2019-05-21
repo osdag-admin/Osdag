@@ -572,6 +572,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
     # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )
     M_u = factored_moment + ((factored_axial_load * (beam_d / 2 - beam_tf / 2)) / 1000)  # kN-m
+    T_flange = (factored_moment * 1000) / ((beam_d - beam_tf) + (factored_axial_load / 2))  # (kN) calculating axial force (tension) in flange due to the moment
 
     if uiObj["Member"]["Connectivity"] == "Extended both ways":  # calculating trial number of bolts for extended both way end plate
 
@@ -580,7 +581,6 @@ def bbExtendedEndPlateSplice(uiObj):
         n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
         n = math.ceil(n)
     else:  # calculating trial number of bolts for extended one way and flushed end plate
-        T_flange = (factored_moment * 1000) / ((beam_d - beam_tf) + (factored_axial_load / 2))  # (kN) calculating axial force (tension) in flange due to the moment
         n_flange = T_flange / bolt_tension_capacity  # trial number of bolts near the tension flange
         n = n_flange + 2  # add 2 bolts near the compression flange to complete the trial required number of bolts in the configuration
 

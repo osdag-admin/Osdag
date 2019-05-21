@@ -13,7 +13,8 @@ class ExtendedBothWays(object):
                  bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
-                 bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22, beam_stiffener_1, beam_stiffener_2):
+                 bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+                 beam_stiffener_1, beam_stiffener_2, beam_stiffener_3,beam_stiffener_4):
 
         # Initializing the arguments
         self.beamLeft = beamLeft
@@ -27,6 +28,8 @@ class ExtendedBothWays(object):
         self.plateRModel = None
         self.beam_stiffener_1 = beam_stiffener_1
         self.beam_stiffener_2 = beam_stiffener_2
+        self.beam_stiffener_3 = beam_stiffener_3
+        self.beam_stiffener_4 = beam_stiffener_4
 
         self.bbWeldAbvFlang_11Model = None
         self.bbWeldAbvFlang_12Model = None
@@ -83,6 +86,8 @@ class ExtendedBothWays(object):
         self.create_nut_bolt_array()
         self.createbeam_stiffener_1Geometry()
         self.createbeam_stiffener_2Geometry()
+        self.createbeam_stiffener_3Geometry()
+        self.createbeam_stiffener_4Geometry()
 
         self.create_bbWeldAbvFlang_11()
         self.create_bbWeldAbvFlang_12()
@@ -113,6 +118,8 @@ class ExtendedBothWays(object):
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
         self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
         self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
+        self.beam_stiffener_3Model = self.beam_stiffener_3.create_model()
+        self.beam_stiffener_4Model = self.beam_stiffener_4.create_model()
 
         self.bbWeldAbvFlang_11Model = self.bbWeldAbvFlang_11.create_model()
         self.bbWeldAbvFlang_12Model = self.bbWeldAbvFlang_12.create_model()
@@ -188,6 +195,22 @@ class ExtendedBothWays(object):
         stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
         stiffener2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.beam_stiffener_2.place(stiffenerOrigin2, stiffener2_uDir, stiffener2_wDir)
+
+    def createbeam_stiffener_3Geometry(self):
+        gap = self.beamLeft.length - self.beam_stiffener_1.L / 2
+        stiffenerOrigin3 = numpy.array([self.beam_stiffener_1.T / 2, gap,
+                                         self.beamRight.D / 2 + self.beam_stiffener_1.W / 2])
+        stiffener3_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener3_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.beam_stiffener_3.place(stiffenerOrigin3, stiffener3_uDir, stiffener3_wDir)
+
+    def createbeam_stiffener_4Geometry(self):
+        gap = self.beamLeft.length - self.beam_stiffener_1.L / 2
+        stiffenerOrigin4 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
+                                         - self.beamRight.D / 2 - self.beam_stiffener_1.W / 2])
+        stiffener4_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener4_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.beam_stiffener_4.place(stiffenerOrigin4, stiffener4_uDir, stiffener4_wDir)
 
     def create_bbWeldAbvFlang_11(self):
         weldAbvFlangOrigin_11 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2])
@@ -306,7 +329,8 @@ class ExtendedBothWays(object):
         Returns: Returns model related to connector (plates and weld)
 
         '''
-        return [self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+        return [self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+                self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
                 self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
                 self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
                 self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
@@ -318,7 +342,8 @@ class ExtendedBothWays(object):
         Returns: Returns model related to complete model (beams, plates and weld)
 
         '''
-        return [self.beamRModel, self.beamLModel, self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+        return [self.beamRModel, self.beamLModel, self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
+                self.beam_stiffener_3Model, self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
                 self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
                 self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
                 self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
@@ -345,6 +370,12 @@ class ExtendedBothWays(object):
 
     def get_beam_stiffener_2Model(self):
         return self.beam_stiffener_2Model
+
+    def get_beam_stiffener_3Model(self):
+        return self.beam_stiffener_3Model
+
+    def get_beam_stiffener_4Model(self):
+        return self.beam_stiffener_4Model
 
     def get_bbWeldAbvFlang_11Model(self):
         return self.bbWeldAbvFlang_11Model

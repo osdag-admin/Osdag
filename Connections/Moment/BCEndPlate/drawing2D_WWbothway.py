@@ -998,7 +998,7 @@ class ExtendedEnd2DFront(object):
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
         # ------------------------------------------  Sectional arrow -------------------------------------------
-        pt_a1 = self.A1 + (300) * np.array([0, -1])
+        pt_a1 = self.A1 + (300) * np.array([0, -1]) + 100 * np.array([-1, 0])
         pt_b1 = pt_a1 + (50 * np.array([0, 1]))
         txt_1 = pt_b1 + (80 * np.array([-1, 0])) + (60 * np.array([0, 1]))
         text = "A"
@@ -1784,9 +1784,10 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point3, str(self.data_object.Lv), params)
 
-            point2 = ptx2 + self.data_object.pitch34 * np.array([0, 1])
+            # point2 = ptx2 + self.data_object.pitch34 * np.array([0, 1])
+            point2 = np.array(pt_inside_bottom_column_list[1][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-                      "endlinedim": 10, "arrowlen": 20}
+                     "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point2, str(self.data_object.pitch34), params)
             #
             point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
@@ -1825,7 +1826,8 @@ class ExtendedEnd2DSide(object):
                       "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx4, point2, str(self.data_object.pitch34), params)
 
-            point2 = ptx4 + self.data_object.pitch45 * np.array([0, 1])
+            # point2 = ptx4 + self.data_object.pitch45 * np.array([0, 1])
+            point2 = np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10,
                       "arrowlen": 20}
@@ -1871,7 +1873,8 @@ class ExtendedEnd2DSide(object):
             ptx5 = np.array(pt_inside_top_column_list[2][1])
             pty5 = ptx5 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx5, pty5, dwg)
-            point3 = ptx5 + self.data_object.pitch45 * np.array([0, -1])
+            # point3 = ptx5 + self.data_object.pitch45 * np.array([0, -1])
+            point3 = np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point3, str(self.data_object.pitch45), params)
@@ -1895,10 +1898,10 @@ class ExtendedEnd2DSide(object):
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
-            point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
+            point1 = ptx2 + self.data_object.pitch45 * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch45), params)
 
         elif self.data_object.no_of_bolts == 16:
             ptx5 = np.array(pt_inside_bottom_column_list[2][1])

@@ -36,6 +36,7 @@ from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
 from Connections.Component.plate import Plate
+from Connections.Component.stiffener_plate import StiffenerPlate
 from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
 from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
@@ -1607,6 +1608,13 @@ class Maincontroller(QMainWindow):
 						   T=outputobj["Plate"]["Thickness"])
 		plate_Right = copy.copy(plate_Left)     # Since both the end plates are identical
 
+		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
+										  T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['Length'] - 25,
+										  R12=outputobj['Stiffener']['Height']-25,
+										  L21=15,L22 =15)		#TODO: given hard inputs to L21 and L22
+
+		beam_stiffener_2 = copy.copy(beam_stiffener_1)
+
 		alist = self.designParameters()         # An object to save all input values entered by user
 
 		bolt_d = float(alist["Bolt"]["Diameter (mm)"])      # Bolt diameter, entered by user
@@ -1662,7 +1670,7 @@ class Maincontroller(QMainWindow):
 									   bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
 									   bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
 									   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
-									   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,)
+									   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,beam_stiffener_1,beam_stiffener_2)
 		extbothWays.create_3DModel()
 
 		return extbothWays
@@ -1787,7 +1795,11 @@ class Maincontroller(QMainWindow):
 		elif component == "Connector":
 			# Displays the end plates
 			osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')\
+
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1820,6 +1832,9 @@ class Maincontroller(QMainWindow):
 			# Displays the end plates
 			osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

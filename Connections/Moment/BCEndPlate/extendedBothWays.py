@@ -123,7 +123,7 @@ class CADFillet(object):
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plateRight.T + self.beamLeft.D / 2
             plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (
-                        self.plateRight.L / 2 - (10) - self.beamRight.D / 2)])  # TODO #Add weld thickness here
+                        self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])  # TODO #Add weld thickness here
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -141,7 +141,7 @@ class CADFillet(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , + (self.plateRight.L / 2 - self.boltProjection)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , + (self.plateRight.L / 2)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -480,7 +480,7 @@ class CADGroove(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamLeft.T,  + (self.plateRight.L/2 - self.boltProjection)])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamLeft.T,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])

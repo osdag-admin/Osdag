@@ -274,78 +274,190 @@ class Pitch(QDialog):
 		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
 		print "result plate", resultObj_plate
 		no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
-		if no_of_bolts == 8:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
-			self.ui.lbl_1.setText('Pitch')
-			self.ui.lbl_mem2.hide()
-			self.ui.lbl_mem3.hide()
-			self.ui.lbl_mem4.hide()
-			self.ui.lbl_mem5.hide()
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_2.hide()
-			self.ui.lbl_3.hide()
-			self.ui.lbl_4.hide()
-			self.ui.lbl_5.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch2.hide()
-			self.ui.lineEdit_pitch3.hide()
-			self.ui.lineEdit_pitch4.hide()
-			self.ui.lineEdit_pitch5.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 12:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lbl_1.setText('Pitch_2_3')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_mem4.hide()
-			self.ui.lbl_mem5.hide()
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_4.hide()
-			self.ui.lbl_5.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch4.hide()
-			self.ui.lineEdit_pitch5.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 16:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
-			self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
-			self.ui.lbl_1.setText('Pitch_2_3')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_4.setText('Pitch_5_6')
-			self.ui.lbl_5.setText('Pitch_6_7')
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 20:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
-			self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
-			self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
-			self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
-			self.ui.lbl_1.setText('Pitch_1_2')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_4.setText('Pitch_5_6')
-			self.ui.lbl_5.setText('Pitch_6_7')
-			self.ui.lbl_6.setText('Pitch_7_8')
-			self.ui.lbl_7.setText('Pitch_9_10')
+
+		if uiObj["Member"]["Connectivity"] == "Flush":
+
+			if no_of_bolts == 4:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+				self.ui.lbl_1.setText('Pitch')
+				self.ui.lbl_mem2.hide()
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_2.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch2.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+
+			elif no_of_bolts == 6:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lbl_1.setText('Pitch12')
+				self.ui.lbl_2.setText('Pitch23')
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+
+		elif uiObj["Member"]["Connectivity"] == "Extended one way":
+
+			if no_of_bolts == 6:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lbl_1.setText('Pitch23')
+				self.ui.lbl_mem2.hide()
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_2.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch2.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+
+			elif no_of_bolts == 8:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lbl_1.setText('Pitch23')
+				self.ui.lbl_2.setText('Pitch34')
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+
+			elif no_of_bolts == 10:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lbl_1.setText('Pitch12')
+				self.ui.lbl_2.setText('Pitch34')
+				self.ui.lbl_3.setText('Pitch45')
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+		else:
+
+			if no_of_bolts == 8:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+				self.ui.lbl_1.setText('Pitch')
+				self.ui.lbl_mem2.hide()
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_2.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch2.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+			elif no_of_bolts == 12:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lbl_1.setText('Pitch_2_3')
+				self.ui.lbl_2.setText('Pitch_3_4')
+				self.ui.lbl_3.setText('Pitch_4_5')
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+			elif no_of_bolts == 16:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+				self.ui.lbl_1.setText('Pitch_2_3')
+				self.ui.lbl_2.setText('Pitch_3_4')
+				self.ui.lbl_3.setText('Pitch_4_5')
+				self.ui.lbl_4.setText('Pitch_5_6')
+				self.ui.lbl_5.setText('Pitch_6_7')
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+			elif no_of_bolts == 20:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
+				self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
+				self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
+				self.ui.lbl_1.setText('Pitch_1_2')
+				self.ui.lbl_2.setText('Pitch_3_4')
+				self.ui.lbl_3.setText('Pitch_4_5')
+				self.ui.lbl_4.setText('Pitch_5_6')
+				self.ui.lbl_5.setText('Pitch_6_7')
+				self.ui.lbl_6.setText('Pitch_7_8')
+				self.ui.lbl_7.setText('Pitch_9_10')
 
 
 class DesignReportDialog(QDialog):
@@ -441,8 +553,8 @@ class Maincontroller(QMainWindow):
 		self.result_obj = None
 
 		self.designPrefDialog = DesignPreference(self)
-		self.ui.combo_connLoc.model().item(1).setEnabled(False)
-		self.ui.combo_connLoc.model().item(2).setEnabled(False)
+		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
+		# self.ui.combo_connLoc.model().item(2).setEnabled(False)
 		# self.ui.combo_connLoc.currentIndexChanged.connect(self.get_beamdata)
 		# self.ui.combo_beamSec.setCurrentIndex(0)
 
@@ -521,13 +633,12 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_plateHeight.setValidator(doubl_validator)
 		self.ui.txt_plateWidth.setValidator(doubl_validator)
 
-		min_fu = 290
+		min_fu = 410  # The values of ultimate strength have been referred from IS 2062:2011
 		max_fu = 780
 		self.ui.txt_Fu.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fu, min_fu, max_fu))
-		self.ui.txt_Fu.editingFinished.connect(
-			lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fu, self.ui.lbl_fu))
+		self.ui.txt_Fu.editingFinished.connect(lambda: self.validate_fu_fy(self.ui.txt_Fu, self.ui.txt_Fy, self.ui.txt_Fu, self.ui.lbl_fu))
 
-		min_fy = 165
+		min_fy = 230  # The values of yield strength have been referred from IS 2062:2011
 		max_fy = 650
 		self.ui.txt_Fy.editingFinished.connect(lambda: self.check_range(self.ui.txt_Fy, min_fy, max_fy))
 		self.ui.txt_Fy.editingFinished.connect(
@@ -697,6 +808,7 @@ class Maincontroller(QMainWindow):
 		uiObj["Plate"]["Width (mm)"] = str(self.ui.txt_plateWidth.text())
 
 		uiObj["Weld"] = {}
+		uiObj["Weld"]["Type"] = str(self.ui.combo_weld_method.currentText())
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
 		uiObj["Connection"] = self.connection
@@ -1176,7 +1288,7 @@ class Maincontroller(QMainWindow):
 			if plate_thickness != "Select plate thickness":
 				plate_thick = float(plate_thickness)
 
-				if str(self.ui.combo_connLoc.currentText()) == "Extended both ways":
+				if str(self.ui.combo_connLoc.currentText()) == "Extended both ways" or "Flush" or "Extended one way":
 					if str(self.ui.combo_beamSec.currentText()) == "Select section":
 						self.ui.combo_flangeSize.clear()
 						return
@@ -1215,7 +1327,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		items = self.gradeType[str(index)]
-		if items != 0 :
+		if items != 0:
 			self.ui.combo_grade.clear()
 			stritems = []
 			for val in items:

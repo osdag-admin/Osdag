@@ -27,7 +27,7 @@ class IS800_2007(object):
     # -------------------------------------------------------------
 
     # Table 5 Partial Safety Factors for Materials, gamma_m (dict)
-    cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
+    IS800_2007_cl_5_4_1_Table_5 = {"gamma_m0": {'yielding': 1.10, 'buckling': 1.10},
                         "gamma_m1": {'ultimate_stress': 1.25},
                         "gamma_mf": {'shop': 1.25, 'field': 1.25},
                         "gamma_mb": {'shop': 1.25, 'field': 1.25},

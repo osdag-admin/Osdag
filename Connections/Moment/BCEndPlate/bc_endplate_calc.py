@@ -687,7 +687,8 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['End'] = float(round(end_dist, 3))
     outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
     outputobj['Bolt']['Lv'] = float(round(l_v, 3))
-    outputobj['Bolt']['PitchMipni'] = float(round(pitch_dist_min, 3))
+    outputobj['Bolt']['Pitch'] = float(round(pitch_dist, 3))
+    outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
     outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
     outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
@@ -714,7 +715,6 @@ def bc_endplate_design(uiObj):
     outputobj['Stiffener']['Thickness'] = 10.0
     outputobj['Stiffener']['NotchBottom'] = 15.0
     outputobj['Stiffener']['NotchTop'] = 50.0
-
 
     # Detailing
     if endplate_type == 'flush':

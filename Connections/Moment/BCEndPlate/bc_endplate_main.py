@@ -1687,7 +1687,7 @@ class Maincontroller(QMainWindow):
 										 bbWeldBelwFlang_24,
 										 bbWeldSideWeb_21, bbWeldSideWeb_22,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1709,7 +1709,7 @@ class Maincontroller(QMainWindow):
 				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1752,7 +1752,7 @@ class Maincontroller(QMainWindow):
 										bbWeldBelwFlang_24,
 										bbWeldSideWeb_21, bbWeldSideWeb_22,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
+										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1776,7 +1776,7 @@ class Maincontroller(QMainWindow):
 				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type)
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
 
 				col_web_connectivity.create_3DModel()
 

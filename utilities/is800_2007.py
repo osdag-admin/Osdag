@@ -386,6 +386,49 @@ class IS800_2007(object):
             V_dpb *= 0.5
         return V_dpb
 
+    # cl. 10.3.5 Tension Capacity
+    @staticmethod
+    def cl_10_3_5_bearing_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n):
+        """Calculate design tensile strength of bearing bolt
+
+        Args:
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb - Yield strength of the bolt in MPa (float)
+            A_sb - Shank area of bolt in sq. mm  (float)
+            A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+
+        return:
+            T_db - Design tensile strength of bearing bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.5
+        """
+        gamma_mb = IS800_2007.cl_5_4_1_Table_5['gamma_mb']['shop']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        T_nb = min(0.90 * f_ub * A_n, f_yb * A_sb * gamma_mb / gamma_m0)
+        return T_nb / gamma_mb
+
+    # cl. 10.3.6 Bolt subjected to combined shear and tension of bearing bolts
+    @staticmethod
+    def cl_10_3_6_bearing_bolt_combined_shear_and_tension(V_sb, V_db, T_b, T_db):
+
+        """Check for bolt subjected to combined shear and tension
+
+        Args:
+            V_sb - factored shear force acting on the bolt,
+            V_db - design shear capacity,
+            T_b - factored tensile force acting on the bolt,
+            T_db - design tension capacity.
+
+        return: combined shear and friction value
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.3.6
+        """
+        return (V_sb / V_db) ** 2 + (T_b / T_db) ** 2
+
     # -------------------------------------------------------------
     #   10.4 Friction Grip Type Bolting
     # -------------------------------------------------------------
@@ -437,6 +480,82 @@ class IS800_2007(object):
     # Table 20 Typical Average Values for Coefficient of Friction, mu_f (list)
     cl_10_4_3_Table_20 = [0.20, 0.50, 0.10, 0.25, 0.30, 0.52, 0.30, 0.30, 0.50, 0.33, 0.48, 0.1]
 
+    # cl. 10.4.5 Tension Resistance
+    @staticmethod
+    def cl_10_4_5_friction_bolt_tension_resistance(f_ub, f_yb, A_sb, A_n):
+        """Calculate design tensile strength of friction grip bolt
+
+        Args:
+            f_ub - Ultimate tensile strength of the bolt in MPa (float)
+            f_yb - Yield strength of the bolt in MPa (float)
+            A_sb - Shank area of bolt in sq. mm  (float)
+            A_n - Net tensile stress area of the bolts as per IS 1367 in sq. mm  (float)
+
+        return:
+            T_df - Design tensile strength of friction grip bolt in N (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.4.5
+            AMENDMENT NO. 1 (JANUARY 2012) to IS 800:2007
+
+        """
+        gamma_mf = IS800_2007.cl_5_4_1_Table_5['gamma_mf']['shop']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5['gamma_m1']['ultimate_stress']
+
+        T_nf = min(0.9 * f_ub * A_n, f_yb * A_sb * gamma_m1/gamma_m0)
+        return T_nf / gamma_mf
+
+    # cl. 10.4.6 Combined shear and Tension for friction grip bolts
+    @staticmethod
+    def cl_10_4_6_friction_bolt_combined_shear_and_tension(V_sf, V_df, T_f, T_df):
+        """Calculate combined shear and tension of friction grip bolt
+
+                Args:
+                   V_sf - applied factored shear at design load
+                   V_df - design shear strength
+                   T_f - externally applied factored tension at design load
+                   T_df - design tension strength
+
+                return:
+                    combined shear and friction value
+
+                Note:
+                    Reference:
+                    IS 800:2007,  cl 10.4.6
+        """
+        return (V_sf/V_df)**2 + (T_f/T_df)**2
+
+    # cl. 10.4.7 Prying force bolts
+    @staticmethod
+    def cl_10_4_7_bolt_prying_force(T_e, l_v, f_o, b_e, t, f_y, end_dist, pre_tensioned=False, eta=1.5):
+        """Calculate prying force of friction grip bolt
+
+                       Args:
+                          2 * T_e - Force in
+                          l_v - distance from the bolt centre line to the toe of the fillet weld or to half
+                                the root radius for a rolled section,
+                          beta - 2 for non pre-tensioned bolt and 1 for pre-tensioned bolt
+                          eta - 1.5
+                          b_e - effective width of flange per pair of bolts
+                          f_o - proof stress in consistent units
+                          t - thickness of the end plate
+
+                       return:
+                           Prying force of friction grip bolt
+
+                       Note:
+                           Reference:
+                           IS 800:2007,  cl 10.4.7
+
+        """
+        beta = 2
+        if pre_tensioned is True:
+            beta = 1
+        l_e = min(end_dist, 1.1 * t * math.sqrt(beta * f_o / f_y))
+        Q = (l_v/2/l_e) * (T_e - ((beta * eta * f_o * b_e * t ** 4) / (27 * l_e * l_v ** 2)))
+        return Q
 
     # -------------------------------------------------------------
     #   10.5 Welds and Welding
@@ -536,6 +655,25 @@ class IS800_2007(object):
             return
         return K * fillet_size
 
+    # Cl. 10.5.3.3 Effective throat size of groove (butt) welds
+    @staticmethod
+    def cl_10_5_3_3_groove_weld_effective_throat_thickness(*args):
+
+        """Calculate effective throat thickness of complete penetration butt welds
+
+        *args:
+            Thicknesses of each plate element being welded in mm (float)
+
+        Returns:
+            maximum effective throat thickness of CJP butt weld in mm (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.3.3
+
+        """
+        return min(*args)
+
     @staticmethod
     def cl_10_5_4_1_fillet_weld_effective_length(fillet_size, available_length):
 
@@ -553,8 +691,10 @@ class IS800_2007(object):
             IS 800:2007,  cl 10.5.4.1
 
         """
-        # TODO :  if available_length >= 4 * fillet_size
-        effective_length = available_length - 2 * fillet_size
+        if available_length <= 4 * fillet_size:
+            effective_length = 0
+        else:
+            effective_length = available_length - 2 * fillet_size
         return effective_length
 
     # cl. 10.5.7.1.1 Design stresses in fillet welds
@@ -580,6 +720,31 @@ class IS800_2007(object):
         gamma_mw = IS800_2007.cl_5_4_1_Table_5['gamma_mw'][fabrication]
         f_wd = f_wn / gamma_mw
         return f_wd
+
+    # cl. 10.5.7.3 Long joints
+    @staticmethod
+    def cl_10_5_7_3_weld_long_joint(l_j, t_t):
+
+        """Calculate the reduction factor for long joints in welds
+
+        Args:
+            l_j - length of joints in the direction of force transfer in mm (float)
+            t_t - throat size of the weld in mm (float)
+
+        Returns:
+             Reduction factor, beta_lw for long joints in welds (float)
+
+        Note:
+            Reference:
+            IS 800:2007,  cl 10.5.7.3
+
+        """
+        if l_j <= 150 * t_t:
+            return 1.0
+        beta_lw = 1.2 - 0.2 * l_j / (150 * t_t)
+        if beta_lw >= 1.0:
+            beta_lw = 1.0
+        return beta_lw
 
     # -------------------------------------------------------------
     #   10.6 Design of Connections

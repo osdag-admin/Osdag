@@ -191,78 +191,77 @@ class ExtendedBothWays(object):
         self.bbWeldAbvFlang_22.place(weldAbvFlangOrigin_22, uDirAbv_22, wDirAbv_22)
 
     def create_bbWeldBelwFlang_11(self):
-        weldBelwFlangOrigin_11 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
+        weldBelwFlangOrigin_11 = numpy.array([self.beamLeft.R2 -self.beamLeft.B / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
         uDirBelw_11 = numpy.array([0, -1.0, 0])
         wDirBelw_11 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_11.place(weldBelwFlangOrigin_11, uDirBelw_11, wDirBelw_11)
 
     def create_bbWeldBelwFlang_12(self):
-        weldBelwFlangOrigin_12 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
+        weldBelwFlangOrigin_12 = numpy.array([self.beamLeft.R1 + self.beamLeft.t / 2, self.beamLeft.length, (self.beamLeft.D / 2) - self.beamLeft.T])
         uDirBelw_12 = numpy.array([0, -1.0, 0])
         wDirBelw_12 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_12.place(weldBelwFlangOrigin_12, uDirBelw_12, wDirBelw_12)
 
     def create_bbWeldBelwFlang_13(self):
-        weldBelwFlangOrigin_13 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
+        weldBelwFlangOrigin_13 = numpy.array([-self.beamLeft.R1-self.beamLeft.t / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
         uDirBelw_13 = numpy.array([0, -1.0, 0])
         wDirBelw_13 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_13.place(weldBelwFlangOrigin_13, uDirBelw_13, wDirBelw_13)
 
     def create_bbWeldBelwFlang_14(self):
-        weldBelwFlangOrigin_14 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
+        weldBelwFlangOrigin_14 = numpy.array([-self.beamLeft.R2+self.beamLeft.B / 2, self.beamLeft.length, -(self.beamLeft.D / 2) + self.beamLeft.T])
         uDirBelw_14 = numpy.array([0, -1.0, 0])
         wDirBelw_14 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_14.place(weldBelwFlangOrigin_14, uDirBelw_14, wDirBelw_14)
 
     def create_bbWeldBelwFlang_21(self):
-        weldBelwFlangOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
+        weldBelwFlangOrigin_21 = numpy.array([-self.beamLeft.R1-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
                                               self.beamLeft.T])
         uDirBelw_21 = numpy.array([0, 1.0, 0])
         wDirBelw_21 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_21.place(weldBelwFlangOrigin_21, uDirBelw_21, wDirBelw_21)
 
     def create_bbWeldBelwFlang_22(self):
-        weldBelwFlangOrigin_22 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
+        weldBelwFlangOrigin_22 = numpy.array([-self.beamLeft.R2+self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, (self.beamLeft.D / 2) -
                                               self.beamLeft.T])
         uDirBelw_22 = numpy.array([0, 1.0, 0])
         wDirBelw_22 = numpy.array([-1.0, 0, 0])
         self.bbWeldBelwFlang_22.place(weldBelwFlangOrigin_22, uDirBelw_22, wDirBelw_22)
 
     def create_bbWeldBelwFlang_23(self):
-        weldBelwFlangOrigin_23 = numpy.array([-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
+        weldBelwFlangOrigin_23 = numpy.array([self.beamLeft.R2-self.beamLeft.B / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
                                               self.beamLeft.T])
         uDirBelw_23 = numpy.array([0, 1.0, 0])
         wDirBelw_23 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_23.place(weldBelwFlangOrigin_23, uDirBelw_23, wDirBelw_23)
 
     def create_bbWeldBelwFlang_24(self):
-        weldBelwFlangOrigin_24 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
+        weldBelwFlangOrigin_24 = numpy.array([self.beamLeft.R1+self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -(self.beamLeft.D / 2) +
                                               self.beamLeft.T])
         uDirBelw_24 = numpy.array([0, 1.0, 0])
         wDirBelw_24 = numpy.array([1.0, 0, 0])
         self.bbWeldBelwFlang_24.place(weldBelwFlangOrigin_24, uDirBelw_24, wDirBelw_24)
 
     def create_bbWeldSideWeb_11(self):
-        weldSideWebOrigin_11 = numpy.array([-self.beamLeft.t/2, self.beamLeft.length, self.beamLeft.D / 2 - self.beamLeft.T])
+        weldSideWebOrigin_11 = numpy.array([-self.beamLeft.t/2, self.beamLeft.length, self.bbWeldSideWeb_21.L / 2])
         uDirWeb_11 = numpy.array([0, -1.0, 0])
         wDirWeb_11 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_11.place(weldSideWebOrigin_11, uDirWeb_11, wDirWeb_11)
 
     def create_bbWeldSideWeb_12(self):
-        weldSideWebOrigin_12 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length, -self.beamLeft.D / 2 + self.beamLeft.T])
+        weldSideWebOrigin_12 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length, -self.bbWeldSideWeb_21.L / 2])
         uDirWeb_12 = numpy.array([0, -1.0, 0])
         wDirWeb_12 = numpy.array([0, 0, 1.0])
         self.bbWeldSideWeb_12.place(weldSideWebOrigin_12, uDirWeb_12, wDirWeb_12)
 
     def create_bbWeldSideWeb_21(self):
-        weldSideWebOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.beamLeft.D / 2 +
-                                            self.beamLeft.T])
+        weldSideWebOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, -self.bbWeldSideWeb_21.L / 2])
         uDirWeb_21 = numpy.array([0, 1.0, 0])
         wDirWeb_21 = numpy.array([0, 0, 1.0])
         self.bbWeldSideWeb_21.place(weldSideWebOrigin_21, uDirWeb_21, wDirWeb_21)
 
     def create_bbWeldSideWeb_22(self):
-        weldSideWebOrigin_22 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.beamLeft.D / 2 - self.beamLeft.T])
+        weldSideWebOrigin_22 = numpy.array([self.beamLeft.t / 2, self.beamLeft.length + 2 * self.plateLeft.T, self.bbWeldSideWeb_21.L / 2])
         uDirWeb_22 = numpy.array([0, 1.0, 0])
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)

@@ -856,6 +856,14 @@ class FlushEnd2DFront(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
+        point = self.A1
+        theta = 60
+        offset = 50
+        textup = "Beam " + str(self.data_object.column_designation)
+        textdown = " "
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+
         # ------------------------------------------  End Plate 1 & 2-------------------------------------------
         point = self.P1
         theta = 60
@@ -1293,6 +1301,44 @@ class FlushEnd2DSide(object):
         ptAA8y = ptAA4y
         self.AA8 = np.array([ptAA8x, ptAA8y])
 
+        # =========================  Continuity Plate  =========================
+        """	
+        defining co-ordinates of plate in side view
+        right of origin is considered as +ve X axis
+        downward to the origin is considered as +ve Y axis
+        """
+
+        ptS1x = ptA1x - self.data_object.column_depth_D1/2 + self.data_object.beam_width_B2/2 + self.data_object.flange_thickness_T1
+        ptS1y = ptA1y
+        self.S1 = np.array([ptS1x, ptS1y])
+
+        ptS2x = ptA12x - self.data_object.column_depth_D1/2 + self.data_object.beam_width_B2/2 + self.data_object.flange_thickness_T1
+        ptS2y = ptA12y
+        self.S2 = np.array([ptS2x, ptS2y])
+
+        ptS3x = ptA9x - self.data_object.column_depth_D1/2 + self.data_object.beam_width_B2/2 + self.data_object.flange_thickness_T1
+        ptS3y = ptA9y
+        self.S3 = np.array([ptS3x, ptS3y])
+
+        ptS4x = ptA8x - self.data_object.column_depth_D1/2 + self.data_object.beam_width_B2/2 + self.data_object.flange_thickness_T1
+        ptS4y = ptA8y
+        self.S4 = np.array([ptS4x, ptS4y])
+
+        ptS5x = ptA7x + self.data_object.column_depth_D1 / 2 - self.data_object.beam_width_B2 / 2 - self.data_object.flange_thickness_T1
+        ptS5y = ptA7y
+        self.S5 = np.array([ptS5x, ptS5y])
+
+        ptS6x = ptA6x + self.data_object.column_depth_D1 / 2 - self.data_object.beam_width_B2 / 2 - self.data_object.flange_thickness_T1
+        ptS6y = ptA6y
+        self.S6 = np.array([ptS6x, ptS6y])
+
+        ptS7x = ptA3x + self.data_object.column_depth_D1 / 2 - self.data_object.beam_width_B2 / 2 - self.data_object.flange_thickness_T1
+        ptS7y = ptA3y
+        self.S7 = np.array([ptS7x, ptS7y])
+
+        ptS8x = ptA2x + self.data_object.column_depth_D1 / 2 - self.data_object.beam_width_B2 / 2 - self.data_object.flange_thickness_T1
+        ptS8y = ptA2y
+        self.S8 = np.array([ptS8x, ptS8y])
 
     def call_flush_side(self, filename):
         """
@@ -1315,7 +1361,14 @@ class FlushEnd2DSide(object):
                              stroke_width='2.5'))
         dwg.add(dwg.line(self.AA5, self.AA8).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.AA6, self.AA7).stroke('black', width=2.5, linecap='square'))
-
+        dwg.add(dwg.line(self.S1, self.A1).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S2, self.A12).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S3, self.A9).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S4, self.A8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S5, self.A7).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S6, self.A6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S7, self.A3).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S8, self.A2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",
                                                patternTransform="rotate(45 1 1)"))
@@ -1620,6 +1673,14 @@ class FlushEnd2DSide(object):
         offset = 1
         textup = " "
         textdown = "Beam " + str(self.data_object.beam_designation)
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+
+        point = self.AA1 + 5 * np.array([0, 1])
+        theta = 1
+        offset = 1
+        textup = " "
+        textdown = "Beam " + str(self.data_object.column_designation)
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 

@@ -1641,7 +1641,7 @@ class Maincontroller(QMainWindow):
 		bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_11)
 
 		# Followings welds are welds below beam flange, Qty = 8
-		bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+		bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw )/ 2- beam_R1-beam_R2)
 		bbWeldBelwFlang_12 = copy.copy(bbWeldBelwFlang_11)
 		bbWeldBelwFlang_13 = copy.copy(bbWeldBelwFlang_11)
 		bbWeldBelwFlang_14 = copy.copy(bbWeldBelwFlang_11)
@@ -1651,7 +1651,7 @@ class Maincontroller(QMainWindow):
 		bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_11)
 
 		# Followings welds are welds placed aside of beam web, Qty = 4
-		bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_T)
+		bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * (beam_T+beam_R1) - (2*5))
 		bbWeldSideWeb_12 = copy.copy(bbWeldSideWeb_11)
 		bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
 		bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)

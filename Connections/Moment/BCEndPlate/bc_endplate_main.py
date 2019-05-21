@@ -27,6 +27,7 @@ from drawing2D_oneway import OnewayEndPlate
 from drawing2D_flush import FlushEndPlate
 from drawing2D_WWbothway import ExtendedEndPlate_WW
 from drawing2D_WWoneway import OnewayEndPlate_WW
+from drawing2D_WWflush import FlushEndPlate_WW
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
@@ -1346,8 +1347,10 @@ class Maincontroller(QMainWindow):
 				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 			elif self.alist['Member']['EndPlate_type'] == "Extended one way":
 				self.endplate_type = "one_way"
-				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
-												self.folder)
+				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,self.folder)
+			else:
+				self.endplate_type = "flush"
+				beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		else:  # "Column flange-Beam web"
 			# conn_type = 'col_flange_connectivity'
 			if self.alist['Member']['EndPlate_type'] == "Extended one way":

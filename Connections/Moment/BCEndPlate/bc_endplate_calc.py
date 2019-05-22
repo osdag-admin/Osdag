@@ -673,14 +673,14 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
 
-    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt, 3))
-    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity, 3))
-    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity, 3))
-    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity, 3))
-    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity, 3))
+    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt/1000, 3))    # kN
+    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity/1000, 3))
+    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity/1000, 3))
+    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity/1000, 3))
+    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
-    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity, 3))
-    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt, 3))
+    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
@@ -709,12 +709,11 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
 
-    outputobj['Stiffener']['Length'] = 300.0     # TODO:
-    outputobj['Stiffener']['Height'] = 100.0
+    outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
+    outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0
-    outputobj['Stiffener']['NotchBottom'] = 15.0
-    outputobj['Stiffener']['NotchTop'] = 50.0
-
+    outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
+    outputobj['Stiffener']['NotchTop'] = st_notch_top
 
     # Detailing
     if endplate_type == 'flush':

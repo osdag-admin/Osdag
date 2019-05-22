@@ -298,6 +298,7 @@ def fetchBeamPara(self):
 def bbExtendedEndPlateSplice(uiObj):
     global logger
     global design_status
+
     design_status = True
 
     beam_sec = uiObj['Member']['BeamSection']
@@ -1354,9 +1355,11 @@ def bbExtendedEndPlateSplice(uiObj):
                 # T1 is the tension in each bolt in the 1st row (T indicates tension and 1 indicates row number) [T1 is the tension in critical bolt in the first row from top or
                 # bottom, depending on the direction of the moment. Since we are interested in finding the tension in the critical bolt for bolt design we shall ignore he
                 # calculation of bolt force in other bolts as it will be lesser than the critical bolt]
+                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
             elif number_of_bolts == 6:
                 T1 = ((beam_d - beam_tf - beam_tf / 2 - p_fi) * T_flange) / (2 * (beam_d - beam_tf))
                 T2 = ((beam_d - beam_tf - beam_tf / 2 - p_fi - pitch_distance_1_2) * T_flange) / (2 * (beam_d - beam_tf))
+                v_st = 2 * (T1 + T2)
 
             tension_critical_bolt = T1
 
@@ -2017,7 +2020,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Increase the Ultimate strength of weld and/or length of weld")
 
         # Weld at web
-        L_effective_web = 4 * (beam_d - (2 * beam_tf))
+        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) + weld_thickness_web)
 
         # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
         f_a_web = factored_axial_load * 10 ** 3 / (3 * L_effective_web)
@@ -2049,83 +2052,93 @@ def bbExtendedEndPlateSplice(uiObj):
 
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
-        # size of notch in the stiffener
+        # size of notch (n_s) in the stiffener
         n_s = weld_thickness_flange + 5
 
-        if uiObj["Member"]["Connectivity"] == "Flush":
-            pass
+        # calculating effective length of the stiffener and the weld
+        l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
+        l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+
+
+        # if uiObj["Member"]["Connectivity"] == "Flush":
+        #     pass
+        # else:
+        #     l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
+        #     l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+
+        # Height of stiffener (h_st) (mm)
+        # TODO: Do calculation for actual height of end plate above
+
+        if uiObj["Member"]["Connectivity"] == "Extended one way":
+            h_st = end_plate_height_provided - beam_d - weld_thickness_flange - 10
+        elif uiObj["Member"]["Connectivity"] == "Extended both ways":
+            h_st = (end_plate_height_provided - beam_d) / 2
         else:
-            l_st_effective = ((v_st * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener
-            l_weld_effective = ((v_st * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides)
+            w_st = end_plate_width_provided - beam_tw  # width in case of flush end plate
 
-            # Height of stiffener (mm)
-            # TODO: Do calculation for actual height of end plate above
+        # Length of stiffener (l_st) (as per AISC, DG 16 recommendations)
+        cf = math.pi/180  # conversion factor to convert degree into radian
+        l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
 
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                h_st = end_plate_height_provided - beam_d - weld_thickness_flange - 10
-            elif uiObj["Member"]["Connectivity"] == "Extended both ways":
-                h_st = (end_plate_height_provided - beam_d) / 2
-            else:
-                pass
+        l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
 
-            # Length of stiffener (as per AISC, DG 16 recommendations)
-            cf = math.pi/180  # conversion factor to convert degree into radian
-            l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+        # Length and size of weld for the stiffener (on each side)
+        l_weld_st = l_st  # length of weld provided along the length of the stiffener
 
-            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            w_weld_st = w_st  # length of weld along the width of the stiffener
+        else:
+            h_weld_st = h_st  # length of weld provided along the height of the stiffener
+        z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld
 
-            # Length and size of weld for the stiffener (on each side)
-            l_weld_st = l_st
-            h_weld_st = h_st
-            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)
+        # Check for Moment in stiffener
 
-            # Check for Moment in stiffener
+        # Calculating the eccentricity (e) of the bolt group
 
-            # Calculating the eccentricity of the bolt group
+        if uiObj["Member"]["Connectivity"] == "Extended one way" or uiObj["Member"]["Connectivity"] == "Extended both ways":
+            if number_of_bolts == 6 or 8 or 12 or 16:
+                e = h_st - end_dist_mini
+            elif number_of_bolts == 10 or 20:
+                e = h_st - end_dist_mini - (pitch_distance_1_2 / 2)
+        else:
+            pass
 
-            if uiObj["Member"]["Connectivity"] == "Extended one way" or uiObj["Member"]["Connectivity"] == "Extended both ways":
-                if number_of_bolts == 6 or 8 or 12 or 16:
-                    e = h_st - end_dist_mini
-                elif number_of_bolts == 10 or 20:
-                    e = h_st - end_dist_mini - (pitch_distance_1_2 / 2)
-            else:
-                pass
+        # Moment in stiffener (M_st)
+        M_st = v_st * e
 
-            # Moment in stiffener
-            M_st = v_st * e
+        # Moment capacity of stiffener
+        M_capacity_st = ((l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)) * 10 ** -3
 
-            # Moment capacity of stiffener
-            M_capacity_st = (l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)
+        if M_st > M_capacity_st:
+            design_status = False
+            logger.error(": The moment in stiffener exceeds its moment carrying capacity")
+            logger.warning(": The moment carrying capacity of the stiffener is % 2.2f mm" % M_capacity_st)
+            logger.info(": Increase the length and/or thickness of the stiffener")
 
-            if M_st > M_capacity_st:
-                design_status = False
-                logger.error(": The moment in stiffener exceeds its moment carrying capacity")
-                logger.warning(": The moment carrying capacity of the stiffener is % 2.2f mm" % M_capacity_st)
-                logger.info(": Increase the length and/or thickness of the stiffener")
+        # Check in weld for the combined forces
 
-            # Check in weld for the combined forces
+        f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
+        q = v_st / (2 * l_weld_st * k * z_weld_st)
+        f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
-            f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
-            q = v_st / (2 * l_weld_st * k * z_weld_st)
-            f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))
-
-            if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
-                design_status = False
-                logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
-                logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f mm (Cl. 10.5.10, IS 800:2007)" % f_e)
-                # logger.info(": ")
+        if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
+            design_status = False
+            logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
+            logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f mm (Cl. 10.5.10, IS 800:2007)" % f_e)
+            logger.info(": Increase the size of weld at the stiffener")
 
 
-            # Check of stiffener against local buckling
-            E = 2 * 10 ** 5  # MPa
-            ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+        # Check of stiffener against local buckling
+        E = 2 * 10 ** 5  # MPa
+        ts_required = 1.79 * h_st * stiffener_fy / E  # mm
 
-            if thickness_stiffener_provided < ts_required:
-                design_status = False
-                logger.error(": The thickness of stiffener is not sufficient")
-                logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
-                logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
-                logger.info(": Increase the thickness of stiffener")
+        if thickness_stiffener_provided < ts_required:
+            design_status = False
+            logger.error(": The thickness of stiffener is not sufficient")
+            logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
+            logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
+            logger.info(": Increase the thickness of stiffener")
+
     else:
         design_status = False
         logger.error(": The number of bolts exceeds 20")

@@ -137,6 +137,9 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     edge_distance = str(int(float(outObj['Bolt']['Edge'])))
     gauge_distance = str(int(float(outObj['Bolt']['Gauge'])))
     l_v = str(int(float(outObj['Bolt']['Lv'])))
+    pitch_dist = str(int(float(outObj['Bolt']['Pitch'])))
+    pitch_dist_min = str(int(float(outObj['Bolt']['PitchMin'])))
+    pitch_dist_max = str(int(float(outObj['Bolt']['PitchMax'])))
 
     slip_capacity = str(float(outObj["Bolt"]["SlipCapacity"]))
     shear_capacity = str(float(outObj["Bolt"]["ShearCapacity"]))
@@ -1274,16 +1277,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                 rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
                 rstr += t('/tr')
 
-    # Bolt Gauge
+    # Pitch Distance
     rstr += t('tr')
 
-    if float(gauge_distance) < float(gauge_mini) or float(gauge_distance) > float(gauge_max):
-        row = [0, "Bolt gauge (mm)"," &#8805; 2.5*" + bolt_dia + " = " + gauge_mini + ", &#8804; min(32*" + end_plate_thickness + ", 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",
-               gauge_distance, " <p align=left style=color:red><b>Fail</b></p> "]
+    if float(pitch_dist) < float(pitch_dist_min) or float(pitch_dist) > float(pitch_dist_max):
+        row = [0, "Pitch distance (mm)"," &#8805; 2.5*" + bolt_dia + " = " + pitch_dist_min + ", &#8804; min(32*" + end_plate_thickness + ", 300) = " + pitch_dist_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",
+               pitch_dist, " <p align=left style=color:red><b>Fail</b></p> "]
     else:
-        row = [0, "Bolt gauge (mm)",
-               " &#8805; 2.5*" + bolt_dia + " = " + gauge_mini + ", &#8804; min(32*" + end_plate_thickness + ", 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",
-               gauge_distance, " <p align=left style=color:green><b>Pass</b></p> "]
+        row = [0, "Pitch distance (mm)",
+               " &#8805; 2.5*" + bolt_dia + " = " + pitch_dist_min + ", &#8804; min(32*" + end_plate_thickness + ", 300) = " + pitch_dist_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",
+               pitch_dist, " <p align=left style=color:green><b>Pass</b></p> "]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1359,16 +1362,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     edge_mini_actual = end_mini_actual
     if typeof_edge == "a - Sheared or hand flame cut":
         if float(edge_distance) < float(edge_mini) or float(edge_distance) > float(edge_max):
-            row = [0, "Edge distance (mm)"," &#8804; 1.7 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8805; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",
+            row = [0, "Edge distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8804; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",
                    end_distance, "  <p align=left style=color:red><b>Fail</b></p>"]
         else:
-            row = [0, "Edge distance (mm)"," &#8804; 1.7 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8805; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",
+            row = [0, "Edge distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8804; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",
                    end_distance, "  <p align=left style=color:green><b>Pass</b></p>"]
     else:
         if float(edge_distance) < float(edge_mini) or float(edge_distance) > float(edge_max):
-            row = [0, "Edge distance (mm)"," &#8804; 1.5 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8805; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",end_distance, "<p align=left style=color:red><b>Fail</b></p>"]
+            row = [0, "Edge distance (mm)"," &#8805; 1.5 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8804; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",end_distance, "<p align=left style=color:red><b>Fail</b></p>"]
         else:
-            row = [0, "Edge distance (mm)"," &#8804; 1.5 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8805; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",end_distance, "  <p align=left style=color:green><b>Pass</b></p>"]
+            row = [0, "Edge distance (mm)"," &#8805; 1.5 <i>d</i><sub>o</sub>" + " = " + edge_mini_actual + ", &#8804; 12*t*&#949;" + " = " + edge_max + " <br> [cl. 10.2.4]",end_distance, "  <p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')

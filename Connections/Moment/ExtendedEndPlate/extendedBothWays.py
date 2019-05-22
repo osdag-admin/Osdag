@@ -157,26 +157,17 @@ class ExtendedBothWays(object):
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-
-        if self.alist["Member"]["Connectivity"] == "Extended one way":
-            gap = self.beamRight.length + 2 * self.plateRight.T
-            beamOriginR = numpy.array([0.0, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])     #TODO:self.boltProjection
-            beamR_uDir = numpy.array([1.0, 0.0, 0.0])
-            beamR_wDir = numpy.array([0.0, 1.0, 0.0])
-            self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
-
-        else:
-            gap = self.beamRight.length + 2 * self.plateRight.T
-            beamOriginR = numpy.array([0.0, gap, 0.0])
-            beamR_uDir = numpy.array([1.0, 0.0, 0.0])
-            beamR_wDir = numpy.array([0.0, 1.0, 0.0])
-            self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
+        gap = self.beamRight.length + 2 * self.plateRight.T
+        beamOriginR = numpy.array([0.0, gap, 0.0])
+        beamR_uDir = numpy.array([1.0, 0.0, 0.0])
+        beamR_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateLGeometry(self):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
-            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
-            plateL_uDir = numpy.array([0.0, 1.0, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])    #TODO: self.boltProjection
+            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateL_uDir = numpy.array([0.0, 1.0, 0.0])    #TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
@@ -187,11 +178,20 @@ class ExtendedBothWays(object):
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
     def createPlateRGeometry(self):
-        gap = 1.5 * self.plateRight.T + self.beamLeft.length
-        plateOriginR = numpy.array([-self.plateRight.W/2, gap, 0.0])
-        plateR_uDir = numpy.array([0.0, 1.0, 0.0])
-        plateR_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
+
+        if self.alist["Member"]["Connectivity"] == "Extended one way":
+            gap = 1.5 * self.plateRight.T + self.beamLeft.length
+            plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateR_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
+
+        else:
+            gap = 1.5 * self.plateRight.T + self.beamLeft.length
+            plateOriginR = numpy.array([-self.plateRight.W / 2, gap, 0.0])
+            plateR_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateR_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def create_nut_bolt_array(self):
         nutboltArrayOrigin = self.plateLeft.sec_origin + numpy.array([0.0, -0.5 * self.plateLeft.T, self.plateLeft.L/2])

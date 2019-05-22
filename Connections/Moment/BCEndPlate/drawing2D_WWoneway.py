@@ -1,5 +1,5 @@
 '''
-Created on 10-May-2019
+Created on 22-May-2019
 
 @author: darshan
 '''
@@ -691,7 +691,7 @@ class Oneway2DFront(object):
         vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
         vb_ht = (int(3 * self.data_object.plate_length_L1))
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-800 -400 2000 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+             '-800 -400 2000 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
@@ -876,12 +876,11 @@ class Oneway2DFront(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
         # ------------------------------------------  Labeling Weld of Web -------------------------------------------
-        # point = self.AA1 + 40 * np.array([0, 1])
         point = self.AA1 + self.data_object.beam_depth_D2/2 * np.array([0, 1])
         theta = 60
         offset = 100
         textup = "         z  " + str(self.data_object.web_weld_thickness)
-        textdown = "fillet both side"
+        textdown = " "
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
@@ -930,7 +929,7 @@ class Oneway2DFront(object):
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
         # ------------------------------------------  View details-------------------------------------------
-        ptx = self.P4 - 100 * np.array([1, 0]) + 300 * np.array([0, 1])
+        ptx = self.A3 - 100 * np.array([1, 0]) + 300 * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(
@@ -1014,7 +1013,7 @@ class Oneway2DTop(object):
 		"""
 
         ptP1x = ptA10x
-        ptP1y = ptA10y + self.data_object.column_depth_D1/2 - self.data_object.web_thickness_tw1 - self.data_object.plate_width_B1/2
+        ptP1y = ptA10y + self.data_object.column_depth_D1/2 - self.data_object.flange_thickness_T1 - self.data_object.plate_width_B1/2
         self.P1 = np.array([ptP1x, ptP1y])
 
         ptP2x = ptP1x + self.data_object.plate_thickness_p1
@@ -1079,7 +1078,7 @@ class Oneway2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -400 1500 1200'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 1500 1500'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A5, self.A6, self.A7, self.A8, self.A5], stroke='black', fill='none',
@@ -1148,7 +1147,7 @@ class Oneway2DTop(object):
                                                     params)
 
         # ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
-        point = self.A2
+        point = self.A1
         theta = 60
         offset = 50
         textdown = " "
@@ -1158,7 +1157,7 @@ class Oneway2DTop(object):
 
         point = self.AA2 - self.data_object.beam_length_L2 / 2 * np.array([1, 0])
         theta = 60
-        offset = 50
+        offset = 75
         textup = "Beam " + str(self.data_object.beam_designation)
         textdown = " "
         element = " "
@@ -1191,7 +1190,7 @@ class Oneway2DTop(object):
         text = "C"
         self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
-        pt_a2 = pt_a1 + (self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
+        pt_a2 = pt_a1 + (self.data_object.column_width_B1+ self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
             [1, 0]) + 200 * np.array([1, 0])
         pt_b2 = pt_a2 + (50 * np.array([0, -1]))
         txt_2 = pt_b2 + (10 * np.array([1, 0])) + (40 * np.array([0, 1]))
@@ -1389,7 +1388,7 @@ class Oneway2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 2000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 2000'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],stroke='black', fill= 'none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
@@ -1488,19 +1487,19 @@ class Oneway2DSide(object):
             col_inside_list_top = []
             for j in range(1, (nofc + 1)):
                 if self.data_object.no_of_bolts == 6:
-                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23* np.array(
                         [0, 1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 elif self.data_object.no_of_bolts == 8:
-                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 elif self.data_object.no_of_bolts == 10:
-                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 elif self.data_object.no_of_bolts == 20:
-                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
@@ -1592,11 +1591,6 @@ class Oneway2DSide(object):
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
-            # point1 = ptx2 + self.data_object.pitch23* np.array([0, -1])
-            # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
-            #           "endlinedim": 10, "arrowlen": 20}
-            # self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
-
             point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
@@ -1604,9 +1598,8 @@ class Oneway2DSide(object):
 
             point2 = ptx1 + self.data_object.Lv * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
-                      "endlinedim": 10,
-                      "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point2, str(self.data_object.Lv), params)
+                      "endlinedim": 10,"arrowlen": 20}
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
 
         elif self.data_object.no_of_bolts == 8:
             ptx2 = np.array(pt_inside_top_column_list[1][1])
@@ -1645,13 +1638,13 @@ class Oneway2DSide(object):
             point1 = ptx3 + self.data_object.pitch23 * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point1, str(self.data_object.pitch23), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, ptx3, str(self.data_object.pitch23), params)
 
-            point3 = ptx3 + self.data_object.Lv * np.array([0, 1])
+            point3 = ptx3 + self.data_object.Lv * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10,
                       "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point3, str(self.data_object.Lv), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, point3, ptx3, str(self.data_object.Lv), params)
 
             ptx4 = np.array(pt_inside_top_column_list[2][1])
             pty4 = ptx4 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
@@ -1783,7 +1776,7 @@ class Oneway2DSide(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textdown, textup, element)
 
         # ------------------------------------------  View details-------------------------------------------
-        ptx = self.P4 * np.array([0, 1]) + 300 * np.array([0, 1])
+        ptx = self.P4 * np.array([0, 1]) + 400 * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(

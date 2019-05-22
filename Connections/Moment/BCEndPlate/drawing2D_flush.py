@@ -1,5 +1,5 @@
 '''
-Created on 10-May-2017
+Created on 21-May-2019
 
 @author: darshan
 '''
@@ -1971,7 +1971,7 @@ class FlushEnd2DSide(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
         # ---------------------------------------------  Flange Welding -------------------------------------------
-        point = self.A1 + 20 * np.array([1, 0])
+        point = self.A2 + 20 * np.array([1, 0])
         theta = 60
         offset = 50
         textup = " "

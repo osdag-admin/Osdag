@@ -36,6 +36,7 @@ from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
 from Connections.Component.plate import Plate
+from Connections.Component.stiffener_plate import StiffenerPlate
 from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import ExtendedBothWays
 from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
@@ -1066,15 +1067,15 @@ class Maincontroller(QMainWindow):
 		if isempty[0] == True:
 			status = self.resultObj['Bolt']['status']
 			self.call_3DModel("gradient_bg")
-			if status is True:
-				self.call_2D_drawing("All")
-			else:
-				self.ui.btn_pitchDetail.setDisabled(False)
-				self.ui.btn_plateDetail.setDisabled(False)
-				self.ui.btn_stiffnrDetail.setDisabled(False)
-				self.ui.chkBx_connector.setDisabled(True)
-				self.ui.chkBx_beamSec.setDisabled(True)
-				self.ui.btn3D.setDisabled(True)
+			# if status is True:
+			# 	self.call_2D_drawing("All")
+			# else:
+			# 	self.ui.btn_pitchDetail.setDisabled(False)
+			# 	self.ui.btn_plateDetail.setDisabled(False)
+			# 	self.ui.btn_stiffnrDetail.setDisabled(False)
+			# 	self.ui.chkBx_connector.setDisabled(True)
+			# 	self.ui.chkBx_beamSec.setDisabled(True)
+			# 	self.ui.btn3D.setDisabled(True)
 
 	def display_output(self, outputObj):
 		for k in outputObj.keys():
@@ -1380,40 +1381,40 @@ class Maincontroller(QMainWindow):
 			palette = QPalette()
 			lblwidget.setPalette(palette)
 
-	def call_2D_drawing(self, view):
-		"""
-
-		Args:
-			view: Front, Side & Top view of 2D svg drawings
-
-		Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
-				 parameters from Extended endplate GUI
-
-		"""
-		self.alist = self.designParameters()
-		self.result_obj = bbExtendedEndPlateSplice(self.alist)
-		self.beam_data = self.fetchBeamPara()
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
-		status = self.resultObj['Bolt']['status']
-		if status is True:
-			if view != "All":
-				if view == "Front":
-					filename = os.path.join(self.folder, "images_html", "extendFront.svg")
-
-				elif view == "Side":
-					filename = os.path.join(self.folder, "images_html", "extendSide.svg")
-
-				else:
-					filename = os.path.join(self.folder, "images_html", "extendTop.svg")
-
-				beam_beam.save_to_svg(filename, view)
-				svg_file = SvgWindow()
-				svg_file.call_svgwindow(filename, view, self.folder)
-			else:
-				fname = ''
-				beam_beam.save_to_svg(fname, view)
-		else:
-			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
+	# def call_2D_drawing(self, view):
+	# 	"""
+	#
+	# 	Args:
+	# 		view: Front, Side & Top view of 2D svg drawings
+	#
+	# 	Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
+	# 			 parameters from Extended endplate GUI
+	#
+	# 	"""
+	# 	self.alist = self.designParameters()
+	# 	self.result_obj = bbExtendedEndPlateSplice(self.alist)
+	# 	self.beam_data = self.fetchBeamPara()
+	# 	beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+	# 	status = self.resultObj['Bolt']['status']
+	# 	if status is True:
+	# 		if view != "All":
+	# 			if view == "Front":
+	# 				filename = os.path.join(self.folder, "images_html", "extendFront.svg")
+	#
+	# 			elif view == "Side":
+	# 				filename = os.path.join(self.folder, "images_html", "extendSide.svg")
+	#
+	# 			else:
+	# 				filename = os.path.join(self.folder, "images_html", "extendTop.svg")
+	#
+	# 			beam_beam.save_to_svg(filename, view)
+	# 			svg_file = SvgWindow()
+	# 			svg_file.call_svgwindow(filename, view, self.folder)
+	# 		else:
+	# 			fname = ''
+	# 			beam_beam.save_to_svg(fname, view)
+	# 	else:
+	# 		QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 
 	def dockbtn_clicked(self, widgets):
 		"""
@@ -1470,28 +1471,28 @@ class Maincontroller(QMainWindow):
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-	def create_2D_CAD(self):
-		'''
-
-		Returns: The 3D model of extendedplate depending upon component selected
-
-		'''
-		self.ExtObj = self.create_extended_both_ways()
-		if self.component == "Beam":
-			final_model = self.ExtObj.get_beam_models()
-
-		elif self.component == "Connector":
-			cadlist = self.ExtObj.get_connector_models()
-			final_model = cadlist[0]
-			for model in cadlist[1:]:
-				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-		else:
-			cadlist = self.ExtObj.get_models()
-			final_model = cadlist[0]
-			for model in cadlist[1:]:
-				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-
-		return final_model
+	# def create_2D_CAD(self):
+	# 	'''
+	#
+	# 	Returns: The 3D model of extendedplate depending upon component selected
+	#
+	# 	'''
+	# 	self.ExtObj = self.create_extended_both_ways()
+	# 	if self.component == "Beam":
+	# 		final_model = self.ExtObj.get_beam_models()
+	#
+	# 	elif self.component == "Connector":
+	# 		cadlist = self.ExtObj.get_connector_models()
+	# 		final_model = cadlist[0]
+	# 		for model in cadlist[1:]:
+	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+	# 	else:
+	# 		cadlist = self.ExtObj.get_models()
+	# 		final_model = cadlist[0]
+	# 		for model in cadlist[1:]:
+	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+	#
+	# 	return final_model
 
 	def save_3D_cad_images(self):
 		'''
@@ -1607,6 +1608,15 @@ class Maincontroller(QMainWindow):
 						   T=outputobj["Plate"]["Thickness"])
 		plate_Right = copy.copy(plate_Left)     # Since both the end plates are identical
 
+		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
+										  T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['Length'] - 25,
+										  R12=outputobj['Stiffener']['Height']-25,
+										  L21=15,L22 =15)		#TODO: given hard inputs to L21 and L22
+
+		beam_stiffener_2 = copy.copy(beam_stiffener_1)
+		beam_stiffener_3 = copy.copy(beam_stiffener_1)
+		beam_stiffener_4 = copy.copy(beam_stiffener_1)
+
 		alist = self.designParameters()         # An object to save all input values entered by user
 
 		bolt_d = float(alist["Bolt"]["Diameter (mm)"])      # Bolt diameter, entered by user
@@ -1624,7 +1634,7 @@ class Maincontroller(QMainWindow):
 
 		nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
 
-		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace)
+		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, alist)
 
 		###########################
 		#       WELD SECTIONS     #
@@ -1641,7 +1651,7 @@ class Maincontroller(QMainWindow):
 		bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_11)
 
 		# Followings welds are welds below beam flange, Qty = 8
-		bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw) / 2)
+		bbWeldBelwFlang_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=(beam_B - beam_tw )/ 2- beam_R1-beam_R2)
 		bbWeldBelwFlang_12 = copy.copy(bbWeldBelwFlang_11)
 		bbWeldBelwFlang_13 = copy.copy(bbWeldBelwFlang_11)
 		bbWeldBelwFlang_14 = copy.copy(bbWeldBelwFlang_11)
@@ -1650,58 +1660,20 @@ class Maincontroller(QMainWindow):
 		bbWeldBelwFlang_23 = copy.copy(bbWeldBelwFlang_11)
 		bbWeldBelwFlang_24 = copy.copy(bbWeldBelwFlang_11)
 
-		# Followings welds are welds placed aside beam flange, Qty = 8
-		bbWeldSideFlange_11 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), L=beam_T)
-		bbWeldSideFlange_12 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_13 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_14 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_21 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_22 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_23 = copy.copy(bbWeldSideFlange_11)
-		bbWeldSideFlange_24 = copy.copy(bbWeldSideFlange_11)
-
 		# Followings welds are welds placed aside of beam web, Qty = 4
-		bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * beam_T)
+		bbWeldSideWeb_11 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=beam_d - 2 * (beam_T+beam_R1) - (2*5))
 		bbWeldSideWeb_12 = copy.copy(bbWeldSideWeb_11)
 		bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
 		bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)
 
-		#######################################
-		#       WELD SECTIONS QUARTER CONE    #
-		#######################################
-
-		# Following weld cones are placed for Left beam
-		weldQtrCone_11 = QuarterCone(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]), coneAngle=90)
-		weldQtrCone_12 = copy.copy(weldQtrCone_11)
-		weldQtrCone_13 = copy.copy(weldQtrCone_11)
-		weldQtrCone_14 = copy.copy(weldQtrCone_11)
-		weldQtrCone_15 = copy.copy(weldQtrCone_11)
-		weldQtrCone_16 = copy.copy(weldQtrCone_11)
-		weldQtrCone_17 = copy.copy(weldQtrCone_11)
-		weldQtrCone_18 = copy.copy(weldQtrCone_11)
-
-		# Following weld cones are placed for Right beam
-		weldQtrCone_21 = copy.copy(weldQtrCone_11)
-		weldQtrCone_22 = copy.copy(weldQtrCone_11)
-		weldQtrCone_23 = copy.copy(weldQtrCone_11)
-		weldQtrCone_24 = copy.copy(weldQtrCone_11)
-		weldQtrCone_25 = copy.copy(weldQtrCone_11)
-		weldQtrCone_26 = copy.copy(weldQtrCone_11)
-		weldQtrCone_27 = copy.copy(weldQtrCone_11)
-		weldQtrCone_28 = copy.copy(weldQtrCone_11)
 
 
 		extbothWays = ExtendedBothWays(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
 									   bbWeldAbvFlang_11, bbWeldAbvFlang_12, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
 									   bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
 									   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
-									   bbWeldSideFlange_11, bbWeldSideFlange_12, bbWeldSideFlange_13, bbWeldSideFlange_14,
-									   bbWeldSideFlange_21, bbWeldSideFlange_22, bbWeldSideFlange_23, bbWeldSideFlange_24,
 									   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
-									   weldQtrCone_11, weldQtrCone_12, weldQtrCone_13, weldQtrCone_14,
-									   weldQtrCone_15, weldQtrCone_16, weldQtrCone_17, weldQtrCone_18,
-									   weldQtrCone_21, weldQtrCone_22, weldQtrCone_23, weldQtrCone_24,
-									   weldQtrCone_25, weldQtrCone_26, weldQtrCone_27, weldQtrCone_28)
+									   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4, alist, outputobj)
 		extbothWays.create_3DModel()
 
 		return extbothWays
@@ -1826,7 +1798,16 @@ class Maincontroller(QMainWindow):
 		elif component == "Connector":
 			# Displays the end plates
 			osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')\
+
+			if self.alist["Member"]["Connectivity"] == "Extended both ways" or  self.alist["Member"]["Connectivity"] == "Extended one way":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_3Model(), update=True, color='Blue')
+
+			if self.alist["Member"]["Connectivity"] == "Extended both ways":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1846,37 +1827,12 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
-
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
 		elif component == "Model":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
@@ -1885,6 +1841,15 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
 
+			if self.alist["Member"]["Connectivity"] == "Extended both ways" or self.alist["Member"][
+				"Connectivity"] == "Extended one way":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_3Model(), update=True, color='Blue')
+
+			if self.alist["Member"]["Connectivity"] == "Extended both ways":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1905,37 +1870,12 @@ class Maincontroller(QMainWindow):
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_23Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldBelwFlang_24Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_11Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_12Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_13Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_14Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_21Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_22Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_23Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideFlange_24Model(), update=True, color='Red')
-
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_11Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 			osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_11Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_12Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_13Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_14Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_15Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_16Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_17Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_18Model(), update=True, color='Red')
 
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_21Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_22Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_23Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_24Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_25Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_26Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_27Model(), update=True, color='Red')
-			osdag_display_shape(self.display, self.ExtObj.get_bbWeldQtrCone_28Model(), update=True, color='Red')
 
 	# =================================================================================
 	def open_about_osdag(self):

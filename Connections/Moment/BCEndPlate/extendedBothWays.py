@@ -16,7 +16,7 @@ class CADFillet(object):
         self.beamRight = beamRight
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
-        self.beamRight.length = 1000.0
+        # self.beamRight.length = 1000.0
         self.contPlate_L1 = contPlate_L1
         self.contPlate_L2 = contPlate_L2
         self.contPlate_R1 = contPlate_R1

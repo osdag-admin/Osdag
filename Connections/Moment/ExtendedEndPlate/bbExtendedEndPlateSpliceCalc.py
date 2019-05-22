@@ -298,6 +298,7 @@ def fetchBeamPara(self):
 def bbExtendedEndPlateSplice(uiObj):
     global logger
     global design_status
+
     design_status = True
 
     beam_sec = uiObj['Member']['BeamSection']
@@ -2017,7 +2018,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Increase the Ultimate strength of weld and/or length of weld")
 
         # Weld at web
-        L_effective_web = 4 * (beam_d - (2 * beam_tf))
+        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) + weld_thickness_web)
 
         # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
         f_a_web = factored_axial_load * 10 ** 3 / (3 * L_effective_web)
@@ -2049,16 +2050,16 @@ def bbExtendedEndPlateSplice(uiObj):
 
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
-        # size of notch in the stiffener
+        # size of notch (n_s) in the stiffener
         n_s = weld_thickness_flange + 5
 
         if uiObj["Member"]["Connectivity"] == "Flush":
             pass
         else:
-            l_st_effective = ((v_st * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener
-            l_weld_effective = ((v_st * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides)
+            l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
+            l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
 
-            # Height of stiffener (mm)
+            # Height of stiffener (h_st) (mm)
             # TODO: Do calculation for actual height of end plate above
 
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2068,20 +2069,20 @@ def bbExtendedEndPlateSplice(uiObj):
             else:
                 pass
 
-            # Length of stiffener (as per AISC, DG 16 recommendations)
+            # Length of stiffener (l_st) (as per AISC, DG 16 recommendations)
             cf = math.pi/180  # conversion factor to convert degree into radian
             l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
 
-            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)
+            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
 
             # Length and size of weld for the stiffener (on each side)
-            l_weld_st = l_st
-            h_weld_st = h_st
-            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)
+            l_weld_st = l_st  # length of weld provided along the length of the stiffener
+            h_weld_st = h_st  # length of weld provided along the height of the stiffener
+            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld
 
             # Check for Moment in stiffener
 
-            # Calculating the eccentricity of the bolt group
+            # Calculating the eccentricity (e) of the bolt group
 
             if uiObj["Member"]["Connectivity"] == "Extended one way" or uiObj["Member"]["Connectivity"] == "Extended both ways":
                 if number_of_bolts == 6 or 8 or 12 or 16:
@@ -2091,11 +2092,11 @@ def bbExtendedEndPlateSplice(uiObj):
             else:
                 pass
 
-            # Moment in stiffener
+            # Moment in stiffener (M_st)
             M_st = v_st * e
 
             # Moment capacity of stiffener
-            M_capacity_st = (l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)
+            M_capacity_st = ((l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)) * 10 ** -3
 
             if M_st > M_capacity_st:
                 design_status = False
@@ -2107,13 +2108,13 @@ def bbExtendedEndPlateSplice(uiObj):
 
             f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
             q = v_st / (2 * l_weld_st * k * z_weld_st)
-            f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))
+            f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
             if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
                 design_status = False
                 logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
                 logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f mm (Cl. 10.5.10, IS 800:2007)" % f_e)
-                # logger.info(": ")
+                logger.info(": Increase the size of weld at the stiffener")
 
 
             # Check of stiffener against local buckling

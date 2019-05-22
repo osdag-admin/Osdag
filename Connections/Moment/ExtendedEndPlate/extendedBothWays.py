@@ -14,7 +14,7 @@ class ExtendedBothWays(object):
                  bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
                  bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
-                 beam_stiffener_1, beam_stiffener_2, beam_stiffener_3,beam_stiffener_4):
+                 beam_stiffener_1, beam_stiffener_2, beam_stiffener_3,beam_stiffener_4, alist, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft
@@ -30,6 +30,9 @@ class ExtendedBothWays(object):
         self.beam_stiffener_2 = beam_stiffener_2
         self.beam_stiffener_3 = beam_stiffener_3
         self.beam_stiffener_4 = beam_stiffener_4
+        self.alist = alist
+        self.outputobj = outputobj
+        # self.boltProjection = float(outputobj["Bolt"]['projection'])          #TODO: ask danish to edit it into dictionary
 
         self.bbWeldAbvFlang_11Model = None
         self.bbWeldAbvFlang_12Model = None
@@ -154,17 +157,34 @@ class ExtendedBothWays(object):
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-        gap = self.beamRight.length + 2 * self.plateRight.T
-        beamOriginR = numpy.array([0.0, gap, 0.0])
-        beamR_uDir = numpy.array([1.0, 0.0, 0.0])
-        beamR_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
+
+        if self.alist["Member"]["Connectivity"] == "Extended one way":
+            gap = self.beamRight.length + 2 * self.plateRight.T
+            beamOriginR = numpy.array([0.0, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])     #TODO:self.boltProjection
+            beamR_uDir = numpy.array([1.0, 0.0, 0.0])
+            beamR_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
+
+        else:
+            gap = self.beamRight.length + 2 * self.plateRight.T
+            beamOriginR = numpy.array([0.0, gap, 0.0])
+            beamR_uDir = numpy.array([1.0, 0.0, 0.0])
+            beamR_wDir = numpy.array([0.0, 1.0, 0.0])
+            self.beamRight.place(beamOriginR, beamR_uDir, beamR_wDir)
 
     def createPlateLGeometry(self):
-        plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
-        plateL_uDir = numpy.array([0.0, 1.0, 0.0])
-        plateL_wDir = numpy.array([1.0, 0.0, 0.0])
-        self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
+
+        if self.alist["Member"]["Connectivity"] == "Extended one way":
+            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
+            plateL_uDir = numpy.array([0.0, 1.0, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])    #TODO: self.boltProjection
+            plateL_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
+
+        else:
+            plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
+            plateL_uDir = numpy.array([0.0, 1.0, 0.0])
+            plateL_wDir = numpy.array([1.0, 0.0, 0.0])
+            self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
     def createPlateRGeometry(self):
         gap = 1.5 * self.plateRight.T + self.beamLeft.length
@@ -315,39 +335,39 @@ class ExtendedBothWays(object):
 #############################################################################################################
 #   Following functions returns the CAD model to the function display_3DModel of main file                  #
 #############################################################################################################
-    def get_beam_models(self):
-        '''
-
-        Returns: Returns model of beam (left and right)
-
-        '''
-        return [self.beamRModel, self.beamLModel]
-
-    def get_connector_models(self):
-        '''
-
-        Returns: Returns model related to connector (plates and weld)
-
-        '''
-        return [self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.beam_stiffener_3Model,
-                self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
-                self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
-                self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
-                self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
-                self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model] + self.nut_bolt_array.get_models()
-
-    def get_models(self):
-        '''
-
-        Returns: Returns model related to complete model (beams, plates and weld)
-
-        '''
-        return [self.beamRModel, self.beamLModel, self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
-                self.beam_stiffener_3Model, self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
-                self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
-                self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
-                self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
-                self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model] + self.nut_bolt_array.get_models()
+    # def get_beam_models(self):
+    #     '''
+    #
+    #     Returns: Returns model of beam (left and right)
+    #
+    #     '''
+    #     return [self.beamRModel, self.beamLModel]
+    #
+    # def get_connector_models(self):
+    #     '''
+    #
+    #     Returns: Returns model related to connector (plates and weld)
+    #
+    #     '''
+    #     return [self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+    #             self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+    #             self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
+    #             self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
+    #             self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
+    #             self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model] + self.nut_bolt_array.get_models()
+    #
+    # def get_models(self):
+    #     '''
+    #
+    #     Returns: Returns model related to complete model (beams, plates and weld)
+    #
+    #     '''
+    #     return [self.beamRModel, self.beamLModel, self.plateRModel, self.plateLModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model,
+    #             self.beam_stiffener_3Model, self.beam_stiffener_4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model,
+    #             self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model,
+    #             self.bbWeldBelwFlang_13Model, self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model, self.bbWeldBelwFlang_22Model,
+    #             self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model, self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,
+    #             self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model] + self.nut_bolt_array.get_models()
 
 
     def get_beamLModel(self):

@@ -2056,19 +2056,64 @@ def bbExtendedEndPlateSplice(uiObj):
             pass
         else:
             l_st_effective = ((v_st * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener
-            l_effective_weld = (v_st * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)  # effective required length of weld (either sides)
+            l_weld_effective = ((v_st * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides)
 
-            # Height of stiffener (mm) (AISC Design guide 4, page 16)
+            # Height of stiffener (mm)
             # TODO: Do calculation for actual height of end plate above
 
             if uiObj["Member"]["Connectivity"] == "Extended one way":
                 h_st = end_plate_height_provided - beam_d - weld_thickness_flange - 10
-            else:
+            elif uiObj["Member"]["Connectivity"] == "Extended both ways":
                 h_st = (end_plate_height_provided - beam_d) / 2
-    
-            # Length of stiffener
+            else:
+                pass
+
+            # Length of stiffener (as per AISC, DG 16 recommendations)
             cf = math.pi/180  # conversion factor to convert degree into radian
-            l_st = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+            l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+
+            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)
+
+            # Length and size of weld for the stiffener (on each side)
+            l_weld_st = l_st
+            h_weld_st = h_st
+            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)
+
+            # Check for Moment in stiffener
+
+            # Calculating the eccentricity of the bolt group
+
+            if uiObj["Member"]["Connectivity"] == "Extended one way" or uiObj["Member"]["Connectivity"] == "Extended both ways":
+                if number_of_bolts == 6 or 8 or 12 or 16:
+                    e = h_st - end_dist_mini
+                elif number_of_bolts == 10 or 20:
+                    e = h_st - end_dist_mini - (pitch_distance_1_2 / 2)
+            else:
+                pass
+
+            # Moment in stiffener
+            M_st = v_st * e
+
+            # Moment capacity of stiffener
+            M_capacity_st = (l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)
+
+            if M_st > M_capacity_st:
+                design_status = False
+                logger.error(": The moment in stiffener exceeds its moment carrying capacity")
+                logger.warning(": The moment carrying capacity of the stiffener is % 2.2f mm" % M_capacity_st)
+                logger.info(": Increase the length and/or thickness of the stiffener")
+
+            # Check in weld for the combined forces
+
+            f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
+            q = v_st / (2 * l_weld_st * k * z_weld_st)
+            f_e = math.sqrt(f_a ** 2 + (3 * q ** 2))
+
+            if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
+                design_status = False
+                logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f mm (Cl. 10.5.10, IS 800:2007)" % f_e)
+                # logger.info(": ")
 
 
             # Check of stiffener against local buckling
@@ -2219,6 +2264,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round(M_st, 3)
+            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
@@ -2345,6 +2394,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round(M_st, 3)
+            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -2471,6 +2524,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round(M_st, 3)
+            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -2598,6 +2655,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round(M_st, 3)
+            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
     else:
         outputobj = {}
         outputobj['Bolt'] = {}
@@ -2673,6 +2734,10 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener']['Height'] = 0
         outputobj['Stiffener']['Length'] = 0
         outputobj['Stiffener']['Thickness'] = 0
+        outputobj['Stiffener']['NotchSize'] = 0
+        outputobj['Stiffener']['WeldSize'] = 0
+        outputobj['Stiffener']['Moment'] = 0
+        outputobj['Stiffener']['MomentCapacity'] = 0
 
     ###########################################################################
     # End of Output dictionary

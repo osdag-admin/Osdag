@@ -704,20 +704,20 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
-    outputobj['ContPlateComp']['Weld'] = 8
+    outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
-    outputobj['ContPlateTens']['Weld'] = 8
+    outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
-    outputobj['Stiffener']['Thickness'] = 10.0
+    outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
     outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
     outputobj['Stiffener']['NotchTop'] = st_notch_top
-    outputobj['Stiffener']['Weld'] = 8.0
+    outputobj['Stiffener']['Weld'] = 8.0    # TODO: Sourabh give calculated values
 
     # Detailing
     if endplate_type == 'flush':

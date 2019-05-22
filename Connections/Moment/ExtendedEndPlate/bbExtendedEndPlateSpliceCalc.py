@@ -1364,13 +1364,16 @@ def bbExtendedEndPlateSplice(uiObj):
             if number_of_bolts == 6:
                 T1 = (0.50 * T_flange) / 2
                 T2 = (T_flange - T1) / 2
+                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
             elif number_of_bolts == 8:
                 T1 = (0.40 * T_flange) / 2
                 T2 = T1
                 T3 = (T_flange - (T1 + T2)) / 2
+                v_st = 2 * T1
             elif number_of_bolts == 10:
                 T1 = T4 = (0.10 * T_flange) / 2
                 T2 = T3 = ((T_flange - (T1 + T4)) / 2) / 2
+                v_st = 2 * (T1 + T2)
 
             tension_critical_bolt = T2
 
@@ -1389,6 +1392,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 12:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1405,6 +1409,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 16:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1425,6 +1430,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 20:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
@@ -1447,6 +1453,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
                 else:
                     design_status = False
@@ -1464,6 +1471,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 12:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1480,6 +1488,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 16:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1500,6 +1509,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 20:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
@@ -1522,6 +1532,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
                 else:
                     design_status = False
@@ -1539,6 +1550,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 12:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1555,6 +1567,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 16:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1575,6 +1588,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 20:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
@@ -1597,6 +1611,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
                 else:
                     design_status = False
@@ -1614,6 +1629,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 12:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1630,6 +1646,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 16:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
@@ -1650,6 +1667,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
                 elif number_of_bolts == 20:
                     y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
@@ -1672,6 +1690,7 @@ def bbExtendedEndPlateSplice(uiObj):
                     T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
                     T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
                 else:
                     design_status = False
@@ -2023,14 +2042,6 @@ def bbExtendedEndPlateSplice(uiObj):
         stiffener_fy = beam_fy
         stiffener_fu = beam_fu
 
-        # Height of stiffener (mm) (AISC Design guide 4, page 16)
-        # TODO: Do calculation for actual height of end plate above
-        h_st = math.ceil((end_plate_height_provided - beam_d) / 2)
-
-        # Length of stiffener
-        cf = math.pi/180  # conversion factor to convert degree into radian
-        l_st = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
-
         # Thickness of stiffener
         ts1 = beam_tw
         ts2 = (beam_fy / stiffener_fy) * beam_tw
@@ -2038,16 +2049,38 @@ def bbExtendedEndPlateSplice(uiObj):
 
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
-        # Check of stiffener against local buckling
-        E = 2 * 10 ** 5  # MPa
-        ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+        # size of notch in the stiffener
+        n_s = weld_thickness_flange + 5
 
-        if thickness_stiffener_provided < ts_required:
-            design_status = False
-            logger.error(": The thickness of stiffener is not sufficient")
-            logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
-            logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
-            logger.info(": Increase the thickness of stiffener")
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            pass
+        else:
+            l_st_effective = ((v_st * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener
+            l_effective_weld = (v_st * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)  # effective required length of weld (either sides)
+
+            # Height of stiffener (mm) (AISC Design guide 4, page 16)
+            # TODO: Do calculation for actual height of end plate above
+
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                h_st = end_plate_height_provided - beam_d - weld_thickness_flange - 10
+            else:
+                h_st = (end_plate_height_provided - beam_d) / 2
+    
+            # Length of stiffener
+            cf = math.pi/180  # conversion factor to convert degree into radian
+            l_st = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+
+
+            # Check of stiffener against local buckling
+            E = 2 * 10 ** 5  # MPa
+            ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+
+            if thickness_stiffener_provided < ts_required:
+                design_status = False
+                logger.error(": The thickness of stiffener is not sufficient")
+                logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
+                logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
+                logger.info(": Increase the thickness of stiffener")
     else:
         design_status = False
         logger.error(": The number of bolts exceeds 20")

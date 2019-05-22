@@ -262,8 +262,8 @@ class PlateDetails(QDialog):
 		resultObj_plate = bc_endplate_design(uiObj)
 		self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
 		self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
-		self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
-		self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
+		# self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+		# self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
 
 
 class Stiffener(QDialog):

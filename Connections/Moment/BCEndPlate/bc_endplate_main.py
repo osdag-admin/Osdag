@@ -24,6 +24,12 @@ from bc_endplate_calc import bc_endplate_design
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
+from drawing2D_bothway import ExtendedEndPlate
+from drawing2D_oneway import OnewayEndPlate
+from drawing2D_flush import FlushEndPlate
+from drawing2D_WWbothway import ExtendedEndPlate_WW
+from drawing2D_WWoneway import OnewayEndPlate_WW
+from drawing2D_WWflush import FlushEndPlate_WW
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
@@ -260,8 +266,8 @@ class PlateDetails(QDialog):
 		resultObj_plate = bc_endplate_design(uiObj)
 		self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
 		self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
-		self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
-		self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
+		# self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+		# self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
 
 
 class Stiffener(QDialog):
@@ -1335,14 +1341,31 @@ class Maincontroller(QMainWindow):
 		self.beam_data = self.fetchBeamPara()
 
 		#TODO added endplate_type here, find new way to redue this lines
-		if self.alist['Member']['EndPlate_type'] == "Extended one way":
-			endplate_type = "one_way"
-		elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
-			endplate_type = "flush"
-		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
-			endplate_type = "both_way"
 
-		beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder, endplate_type)
+		if self.alist['Member']['Connectivity'] == "Column web-Beam web":
+			# conn_type = 'col_web_connectivity'
+			if self.alist['Member']['EndPlate_type'] == "Extended both ways":
+				self.endplate_type = "both_way"
+				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			elif self.alist['Member']['EndPlate_type'] == "Extended one way":
+				self.endplate_type = "one_way"
+				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,self.folder)
+			else:
+				self.endplate_type = "flush"
+				beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+		else:  # "Column flange-Beam web"
+			# conn_type = 'col_flange_connectivity'
+			if self.alist['Member']['EndPlate_type'] == "Extended one way":
+				self.endplate_type = "one_way"
+				beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
+				self.endplate_type = "flush"
+				beam_beam = FlushEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+				self.endplate_type = "both_way"
+				beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+
+		# beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		status = self.resultObj['Bolt']['status']
 		if status is True:
 			if view != "All":
@@ -1683,7 +1706,7 @@ class Maincontroller(QMainWindow):
 										 bbWeldBelwFlang_24,
 										 bbWeldSideWeb_21, bbWeldSideWeb_22,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1705,7 +1728,7 @@ class Maincontroller(QMainWindow):
 				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type)
+										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
@@ -1748,7 +1771,7 @@ class Maincontroller(QMainWindow):
 										bbWeldBelwFlang_24,
 										bbWeldSideWeb_21, bbWeldSideWeb_22,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type)
+										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1772,7 +1795,7 @@ class Maincontroller(QMainWindow):
 				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
 										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
 										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type)
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
 
 				col_web_connectivity.create_3DModel()
 

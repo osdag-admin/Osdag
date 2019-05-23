@@ -9,7 +9,7 @@ import numpy
 class CADFillet(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21,
-                 bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type):
+                 bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft  # beamLeft represents the column
@@ -26,7 +26,9 @@ class CADFillet(object):
 
         self.endplate_type = endplate_type
         self.conn_type = conn_type                  #TODO: Remove this type if not needed
-
+        self.outputobj = outputobj
+        self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
+        # self.Lv = float(outputobj["Bolt"]["Lv"])
 
         # Weld above flange for left and right beam
         self.bbWeldAbvFlang_21 = bbWeldAbvFlang_21  # Right beam upper side
@@ -121,7 +123,7 @@ class CADFillet(object):
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plateRight.T + self.beamLeft.D / 2
             plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (
-                        self.plateRight.L / 2 - (10) - self.beamRight.D / 2)])  # TODO #Add weld thickness here
+                        self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])  # TODO #Add weld thickness here
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -139,8 +141,7 @@ class CADFillet(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T / 2,self.plateRight.L / 2 + (self.plateRight.L / 2 - (
-                                   10) - self.beamRight.D / 2) - 40])  # TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , + (self.plateRight.L / 2)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -148,7 +149,7 @@ class CADFillet(object):
 
         elif self.endplate_type == "both_way":
             nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamLeft.T / 2, self.plateRight.L / 2])     #[0.0, self.beamRight.T / 2, self.plateRight.L / 2])
+                [0.0, self.beamLeft.T, self.plateRight.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -156,7 +157,7 @@ class CADFillet(object):
 
         elif self.endplate_type == "flush":
             nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamLeft.T / 2, self.plateRight.L / 2 + 50])  # TODO Add self.Lv instead of 50
+                [0.0, self.beamLeft.T, self.beamRight.D/2])  # TODO Add self.Lv instead of 25   #+ 30
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -373,7 +374,7 @@ class CADColWebFillet(CADFillet):
 class CADGroove(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-                 contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type):
+                 contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft                            # beamLeft represents the column
@@ -388,6 +389,11 @@ class CADGroove(object):
         self.beam_stiffener_1 = beam_stiffener_1
         self.beam_stiffener_2 = beam_stiffener_2
         self.endplate_type = endplate_type
+        self.outputobj = outputobj
+        self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
+        # self.Lv = float(outputobj["Bolt"]["Lv"])
+
+        self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection d
 
 
         # Weld above flange for left and right beam
@@ -457,7 +463,7 @@ class CADGroove(object):
 
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plateRight.T + self.beamLeft.D / 2
-            plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (self.plateRight.L/2 - (10 ) - self.beamRight.D /2)])  #TODO #Add weld thickness here
+            plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (self.plateRight.L/2 - self.boltProjection - self.beamRight.D /2)])  #TODO #Add weld thickness here
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -470,27 +476,25 @@ class CADGroove(object):
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
 
 
-        # elif self.endplate_type == "flush":
-        #     pass
 
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamRight.T/2, self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40 ])       #TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamLeft.T,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2, self.plateRight.L /2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , self.plateRight.L /2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamRight.T / 2,  self.plateRight.L/2 + 50])       #TODO Add self.Lv instead of 50
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])

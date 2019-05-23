@@ -2080,16 +2080,20 @@ def bbExtendedEndPlateSplice(uiObj):
         cf = math.pi/180  # conversion factor to convert degree into radian
         l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
 
-        l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            l_st = max(l_st_effective, (l_weld_effective / 2))  # taking the maximum length out of the two possibilities
+        else:
+            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
 
         # Length and size of weld for the stiffener (on each side)
         l_weld_st = l_st  # length of weld provided along the length of the stiffener
 
         if uiObj["Member"]["Connectivity"] == "Flush":
-            w_weld_st = w_st  # length of weld along the width of the stiffener
+            w_weld_st = w_st  # length of weld to be provided along the width of the stiffener
+            z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
         else:
             h_weld_st = h_st  # length of weld provided along the height of the stiffener
-        z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld
+            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
 
         # Check for Moment in stiffener
 
@@ -2101,7 +2105,10 @@ def bbExtendedEndPlateSplice(uiObj):
             elif number_of_bolts == 10 or 20:
                 e = h_st - end_dist_mini - (pitch_distance_1_2 / 2)
         else:
-            pass
+            if number_of_bolts == 4:
+                e = pitch_dist_min
+            elif number_of_bolts == 6:
+                e = pitch_dist_min + (pitch_distance_1_2 / 2)
 
         # Moment in stiffener (M_st)
         M_st = v_st * e
@@ -2274,13 +2281,23 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Width'] = round(w_st, 3)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round(M_st, 3)
             outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
@@ -2404,13 +2421,23 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Width'] = round(w_st, 3)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round(M_st, 3)
             outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -2534,13 +2561,23 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Width'] = round(w_st, 3)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round(M_st, 3)
             outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -2665,13 +2702,23 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Width'] = round(w_st, 3)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round(M_st, 3)
             outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
     else:
         outputobj = {}
         outputobj['Bolt'] = {}
@@ -2744,13 +2791,23 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
         outputobj['Stiffener'] = {}
-        outputobj['Stiffener']['Height'] = 0
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            outputobj['Stiffener']['Width'] = 0
+        else:
+            outputobj['Stiffener']['Height'] = 0
         outputobj['Stiffener']['Length'] = 0
         outputobj['Stiffener']['Thickness'] = 0
         outputobj['Stiffener']['NotchSize'] = 0
         outputobj['Stiffener']['WeldSize'] = 0
         outputobj['Stiffener']['Moment'] = 0
         outputobj['Stiffener']['MomentCapacity'] = 0
+
+        # ===================  CAD ===================
+        if uiObj["Member"]["Connectivity"] == "Extended one way":
+            outputobj['Plate']['Projection'] = 0
+        else:
+            pass
+        # ===================  CAD ===================
 
     ###########################################################################
     # End of Output dictionary

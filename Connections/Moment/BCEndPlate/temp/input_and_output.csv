@@ -1,0 +1,66 @@
+input data starts 
+ ------------- 
+Load,Moment (kNm),50 
+Load,ShearForce (kN),40 
+Load,AxialForce (kN),0 
+Plate,Thickness (mm),20 
+Weld,Flange (mm),8 
+Weld,Web (mm),6 
+Weld,Method,Fillet Weld 
+detailing,typeof_edge,a - Sheared or hand flame cut  
+detailing,is_env_corrosive,No  
+detailing,min_edgend_dist,1.7 
+Member,fu (MPa),410 
+Member,Connectivity,Extended both ways 
+Member,BeamSection,MB 350 
+Member,fy (MPa),250 
+Member,EndPlate_type,Extended both ways  
+Member,ColumnSection,HB 400 
+design,design_method,Limit State Design  
+Bolt,Grade,9.8 
+Bolt,Diameter (mm),20 
+Bolt,Type,Bearing Bolt  
+weld,typeof_weld,Shop weld  
+weld,fu_overwrite,410 
+weld,safety_factor,1.25 
+bolt,bolt_hole_clrnce,2 
+bolt,slip_factor,0.3 
+bolt,bolt_fu,900 
+bolt,bolt_type,Non-pretensioned  
+bolt,bolt_hole_type,Standard  
+ ------------- 
+ End of Input Data 
+ -------------- 
+ ============== 
+ Output data starts 
+ ------------- 
+Plate,Width,180 
+Plate,Thickness,25.0 
+Plate,Height,530 
+Weld,CriticalStressflange,0 
+Weld,CriticalStressWeb,0 
+Bolt,status,False 
+Bolt,BoltCapacity,0 
+Bolt,ShearCapacity,0 
+Bolt,End,50.0 
+Bolt,EndMax,300.0 
+Bolt,NumberOfBolts,8 
+Bolt,EndMini,50.0 
+Bolt,DiaHole,22 
+Bolt,CriticalTension,0 
+Bolt,CrossCentreGauge,100.0 
+Bolt,NumberOfRows,0 
+Bolt,Lv,50.0 
+Bolt,CombinedCapacity,0 
+Bolt,PitchMini,50.0 
+Bolt,Edge,50.0 
+Bolt,Gauge,50.0 
+Bolt,TensionCapacity,0 
+Bolt,Pitch,234.6 
+Bolt,PitchMax,300.0 
+Bolt,BearingCapacity,0 
+ ------------- 
+ End of Output Data 
+ -------------- 
+ ------------ 
+ 

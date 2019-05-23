@@ -19,7 +19,6 @@ ASCII diagram
 """
 
 from model import *
-from Connections.connection_calculations import ConnectionCalculations
 from utilities.is800_2007 import IS800_2007
 from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002, IS1367_Part3_2002
 from utilities.common_calculation import *
@@ -36,59 +35,10 @@ def module_setup():
 
 module_setup()
 
-# Function for calculating Shear yielding capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-
-def shear_yielding(A_v, plate_fy):
-    """
-
-    Args:
-        A_v: (float)- Gross shear area of end plate
-        plate_fy: (float)- Yield stress of plate material
-
-    Returns: (float)- Shear yielding capacity of End Plate in kN
-
-    """
-    V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
-    return V_d
-
-
 #######################################################################
 
-# Function for calculating Shear rupture capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def shear_rupture(A_vn, plate_fu):
-    """
-
-    Args:
-        A_vn: (float)- Net shear area of end plate
-        plate_fu: (float)- Ultimate stress of plate material
-
-    Returns: (float)- Shear rupture capacity of End Plate in kN
-
-    """
-    R_n = 0.6 * A_vn * plate_fu / 1000
-    return R_n
-
-
-# #######################################################################
-# # Function for fetching column and beam parameters from the database
-#
-# def fetchColumnPara(self):
-#     column_sec = self.ui.combo_Column.currentText()
-#     dictcolumndata = get_beamdata(column_sec)
-#     return dictcolumndata
-#
-# def fetchBeamPara(self):
-#     beam_sec = self.ui.combo_Beam.currentText()
-#     dictbeamdata = get_beamdata(beam_sec)
-#     return dictbeamdata
-#
-
-#######################################################################
 # Start of Main Program
+
 
 def bc_endplate_design(uiObj):
     global logger
@@ -194,7 +144,6 @@ def bc_endplate_design(uiObj):
     beam_R1 = float(dictbeamdata["R1"])
     beam_R2 = float(dictbeamdata["R2"])
 
-
     #######################################################################
     # Read input values from column database
     # Here,
@@ -220,7 +169,6 @@ def bc_endplate_design(uiObj):
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]
 
-
     #######################################################################
     # Calculation of Spacing (Min values rounded to next multiple of 5)
 
@@ -245,11 +193,22 @@ def bc_endplate_design(uiObj):
 
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
-    l_v = float(50.0)
-    flange_projection = 5
-
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
-    g_1 = 100.0
+    # TODO: for different end plate type
+    if endplate_type == 'flush':
+        l_v = 45.0
+        g_1 = 90.0
+    elif endplate_type == 'one_way':
+        l_v = 50.0
+        g_1 = 100.0
+    else:   # endplate_type == 'both_ways':
+        l_v = 50.0
+        g_1 = 100.0
+
+    if weld_method == 'fillet':
+        flange_projection = round_up(value=weld_thickness_flange + 2, multiplier=5, minimum_value=5)
+    else:   # 'groove'
+        flange_projection = 5
 
     #######################################################################
     # Calculate bolt capacities
@@ -282,19 +241,19 @@ def bc_endplate_design(uiObj):
     no_tension_side = round_up(no_tension_side_rqd, multiplier=2, minimum_value=2)
 
     # Prying force
-    b_e = beam_B
+    b_e = beam_B / 2
     prying_force = IS800_2007.cl_10_4_7_bolt_prying_force(
-        T_e=flange_tension/2, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
+        T_e=flange_tension/4, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
         end_dist=end_dist, pre_tensioned=False)
-    toe_of_weld_moment = abs(flange_tension/2 * l_v - prying_force * end_dist)
-    plate_tk_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
+    toe_of_weld_moment = abs(flange_tension/4 * l_v - prying_force * end_dist)
+    end_plate_thickness_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
     # End Plate Thickness
-    if end_plate_thickness < max(column_tf, plate_tk_min):
-        end_plate_thickness = math.ceil(max(column_tf, plate_tk_min))
+    if end_plate_thickness < max(column_tf, end_plate_thickness_min):
+        end_plate_thickness_min = math.ceil(max(column_tf, end_plate_thickness_min))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
+        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness_min)
         logger.info(": Increase the thickness of end plate ")
 
     # Detailing
@@ -427,8 +386,8 @@ def bc_endplate_design(uiObj):
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
             elif no_tension_side == 10:
-                no_rows = {'out_tension_flange': 3, 'in_tension_flange': 2,
-                           'out_compression_flange': 3, 'in_compression_flange': 2}
+                no_rows = {'out_tension_flange': 2, 'in_tension_flange': 3,
+                           'out_compression_flange': 2, 'in_compression_flange': 3}
                 if beam_d - 2 * beam_tf - 2 * l_v < 5 * pitch_dist:
                     detailing_status = False
                     # logger.error("Large number of bolts are required for the connection")
@@ -441,23 +400,21 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
-
             # #######################################################################
 
         # Plate height and width
             ''' tens_plate_no_pitch : projection of end plate beyond the beam flange excluding the 
                                         distances b/w bolts on tension side '''
         if no_rows['out_tension_flange'] == 0:
-            tens_plate_no_pitch = flange_projection
+            tens_plate_outer = flange_projection
         else:
-            tens_plate_no_pitch = end_dist + l_v
+            tens_plate_outer = end_dist + l_v + (no_rows['out_tension_flange'] - 1) * pitch_dist
         if no_rows['out_compression_flange'] == 0:
-            comp_plate_no_pitch = flange_projection
+            comp_plate_outer = flange_projection
         else:
-            comp_plate_no_pitch = end_dist + l_v
+            comp_plate_outer = end_dist + l_v + (no_rows['out_compression_flange'] - 1) * pitch_dist
 
-        plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
-                       beam_d + comp_plate_no_pitch + tens_plate_no_pitch
+        plate_height = beam_d + comp_plate_outer + tens_plate_outer
         plate_width = g_1 + 2 * edge_dist
         while plate_width < beam_B:
             edge_dist += 5
@@ -608,75 +565,101 @@ def bc_endplate_design(uiObj):
         groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             beam_tf, beam_tw, end_plate_thickness)
 
-    # Continuity Plates
+    # Continuity Plates on compression side
     cont_plate_fu = beam_fu
     cont_plate_fy = beam_fy
     cont_plate_e = math.sqrt(250/cont_plate_fy)
     gamma_m0 = 1.10
-    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load
+    gamma_m1 = 1.10
+    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load   # Compressive force at beam flanges
 
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
     available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
     for plate_tk in available_plates:
         if plate_tk >= beam_tf:
-            cont_plate_comp_tk_flange = plate_tk
+            cont_plate_tk_flange = plate_tk
             break
 
+    col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
+
+    col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
+        1 + 3 * (beam_tf / column_d) * (column_tw / column_tf) ** 1.5) * math.sqrt(column_fy * column_tf / column_tw)
+    col_web_capacity_buckling = (10710 * (column_tw ** 3) / column_d) * math.sqrt(column_fy / gamma_m0)
+    col_web_capacity = max(col_web_capacity_yielding, col_web_capacity_crippling, col_web_capacity_buckling)
+
     cont_plate_comp_tk_local_buckling = cont_plate_comp_length / (9.4 * cont_plate_e)
-    cont_plate_comp_tk_yielding = 0
+    cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, cont_plate_tk_flange,
+                                 (p_bf - col_web_capacity) / (cont_plate_fy / gamma_m0))
 
-
-
+    # Continuity Plates on compression side
     cont_plate_tens_length = column_d - 2 * column_tf
     cont_plate_tens_width = (column_B - column_tw) / 2
 
+    t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load   # Tensile force at beam flanges
+    col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
+    cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
 
+    # Beam stiffeners
+    st_fu = beam_fu
+    st_fy = beam_fy
+    st_height = l_v + pitch_dist + end_dist
+    for plate_tk in available_plates:
+        if plate_tk >= beam_tw:
+            st_thickness = plate_tk
+            break
+    st_width = st_height + 100.0
+    st_notch_top = 50.0
+    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5)
+    st_beam_weld = 1.0
+    st_plate_weld = 10.0
 
+    st_force = 4 * tension_in_bolt
+    st_moment = st_force * (l_v + pitch_dist / 2)
+    st_eff_length = st_width - st_notch_bottom
 
-    # TODO Check for Shear yielding and shear rupture of end plate
-    '''
+    st_shear_capacity = st_eff_length * st_thickness * st_fy / (math.sqrt(3) * gamma_m0)
+    st_moment_capacity = st_eff_length ** 2 * st_thickness * st_fy / (4 * gamma_m0)
 
-    # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
+    st_weld_eff = st_eff_length - 2 * st_beam_weld
+    st_weld_shear_capacity = 2 * st_weld_eff * 0.7 * st_beam_weld * st_fu / (math.sqrt(3) * gamma_mw)
+
+    st_shear_stress = st_force / (2 * st_weld_eff * 0.7 * st_beam_weld)
+
+    st_moment_stress = st_moment / (2 * st_beam_weld ** 2 / 4)
+
+    st_eq_weld_stress = math.sqrt(st_shear_stress ** 2 + st_moment_stress ** 2)
+
+    st_weld_fu_gov = min(st_fu, beam_fu, weld_fu)
+
+    st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
+
+    # Shear yielding of end plate (TODO: Clause 8.4.1, IS 800:2007)
+
     A_v = plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = shear_yielding(A_v, end_plate_fy)
+    V_d = 0.6 * A_v * end_plate_fy / (math.sqrt(3) * gamma_m0)
 
     if V_d < factored_shear_load:
         design_status = False
         logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The minimum required shear yielding capacity is %2.2f kN" % factored_shear_load)
+        logger.warning(": The maximum allowable shear in end plate is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
 
-    # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
-    A_vn = A_v - (number_of_bolts * dia_hole)
-    R_n = shear_rupture(A_vn, end_plate_fu)
-
-    if R_n < factored_shear_load:
-        design_status = False
-        logger.error(": The End Plate might rupture due to Shear")
-        logger.warning(": The minimum shear rupture capacity required is %2.2f kN" % factored_shear_load)
-        logger.info(": Increase the thickness of End Plate")
-
-    # TODO add block shear check
-
-    #######################################################################
-    # Member Checks
-    # Strength of flange under Compression (Reference: Example 5.23 & 5.27, Design of Steel structures by Dr. N. Subramanian)
+    # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
-    capacity_beam_flange = ((beam_fy / 1.10) * A_f) / 1000  # kN
-    force_flange = M_u * 10 ** 3 / (beam_d - beam_tf)
+    capacity_beam_flange = (beam_fy / gamma_m0) * A_f
+    force_flange = max(t_bf, p_bf)
 
     if capacity_beam_flange < force_flange:
         design_status = False
-        logger.error(": Force in the flange is greater than its load carrying capacity")
-        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
+        logger.error(": Forces in the beam flange is greater than its load carrying capacity")
+        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN"
+                       % capacity_beam_flange)
         logger.info(": Use a higher beam section with wider and/or thicker flange")
 
-    #######################################################################
-      '''
 
-    #######################################################################
+
     # # Design of Stiffener
     # stiffener_fy = end_plate_fy
     # stiffener_fu = end_plate_fu
@@ -691,7 +674,7 @@ def bc_endplate_design(uiObj):
     #    # t_fb = thickness of beam flange
     #    # k = dist from extreme fibre to toe of web fillet (column)
     #
-    # ######################################
+
     # End of Calculation, SAMPLE Output dictionary
     outputobj = dict()
 
@@ -706,20 +689,21 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
 
-    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt, 3))
-    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity, 3))
-    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity, 3))
-    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity, 3))
-    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity, 3))
+    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt/1000, 3))    # kN
+    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity/1000, 3))
+    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity/1000, 3))
+    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity/1000, 3))
+    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
-    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity, 3))
-    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt, 3))
+    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
     outputobj['Bolt']['End'] = float(round(end_dist, 3))
     outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
     outputobj['Bolt']['Lv'] = float(round(l_v, 3))
+    outputobj['Bolt']['Pitch'] = float(round(pitch_dist, 3))
     outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
     outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
     outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
@@ -728,6 +712,7 @@ def bc_endplate_design(uiObj):
 
     outputobj['Bolt']['BoltFy'] = 0.0           ###
 #    outputobj['Bolt']['NumberOfRows'] = int(no_rows)     ###
+
     outputobj['Bolt']['BoltsPerColumn'] = 0.0   ###
     outputobj['Bolt']['Gauge'] = 0.0            ###
     outputobj['Bolt']['kb'] = 0.0               ###
@@ -737,8 +722,9 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-    outputobj['Plate']['ThickRequired'] = float(round(plate_tk_min, 3))
+    outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
+
 
     outputobj['Plate']['Mp'] = 0.0      ##
     outputobj['Plate']['MomentDemand'] = 0.0    ##
@@ -751,13 +737,25 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = 10.0
 
+
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
-    outputobj['ContPlateComp']['Thickness'] = 10.0
+    outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
+    outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
+    outputobj['ContPlateComp']['Weld'] = 8
 
-    outputobj['Stiffener']['Length'] = 10.0
-    outputobj['Stiffener']['Width'] = 10.0
+    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
+    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
+    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
+    outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
+    outputobj['ContPlateTens']['Weld'] = 8
+
+    outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
+    outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0
+    outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
+    outputobj['Stiffener']['NotchTop'] = st_notch_top
+    outputobj['Stiffener']['Weld'] = 8.0
 
 
 
@@ -866,4 +864,3 @@ def bc_endplate_design(uiObj):
         logger.debug(" :=========End Of design===========")
 
     return outputobj
-

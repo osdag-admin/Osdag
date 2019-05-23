@@ -29,7 +29,7 @@ class FilletWeld(object):
         self.a1 = self.sec_origin
         self.a2 = self.sec_origin + self.b * self.uDir
         self.a3 = self.sec_origin + self.h * self.vDir
-        self.points = [self.a1, self.a2, self.a3, ]
+        self.points = [self.a1, self.a2, self.a3]
 
     def create_model(self):
         Pnt = getGpPt(self.sec_origin)

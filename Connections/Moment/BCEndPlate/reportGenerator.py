@@ -1849,7 +1849,6 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
     if status == "True":
 
-
         row = [0, "Different Views of the Connection", " "]
         rstr += t('tr')
         rstr += t('td colspan="2" class=" detail" align=center '
@@ -1867,6 +1866,11 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         front = folder + "/images_html/extendFront.png"
         datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
 
+        if status == 'True':
+            row = [0, datapng]
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
 
         if status == 'True':
             row = [0, datapng]
@@ -1875,15 +1879,15 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('/tr')
 
 
-
             row = [1, datatop]
             rstr += t('tr')
             rstr += t('td align="center" class=" header2 "') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
 
-
-
-
+            row = [1, datatop]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2 "') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
 
         else:
             pass
@@ -1896,7 +1900,6 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
 
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-
         row = [0, "Different Views of the Connection", " "]
         rstr += t('tr')
         rstr += t('td colspan="2" class=" detail" align=center '

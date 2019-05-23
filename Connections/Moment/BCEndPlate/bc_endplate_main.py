@@ -22,6 +22,8 @@ from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
 from reportGenerator import save_html
+from drawing_2D import ExtendedEndPlate
+from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from drawing2D_bothway import ExtendedEndPlate
 from drawing2D_oneway import OnewayEndPlate
 from drawing2D_flush import FlushEndPlate
@@ -2023,7 +2025,7 @@ class Maincontroller(QMainWindow):
 
 		elif component == "Model":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
+			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True, material=Graphic3d_NOT_2D_ALUMINUM)
 			# Displays the end plates
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')

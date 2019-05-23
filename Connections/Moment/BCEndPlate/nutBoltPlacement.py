@@ -131,6 +131,15 @@ class NutBoltArray(object):
                 self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
                 self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
                 self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+
+            else: #1 numberOfBolts == 12:
+                self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
+                self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
+                self.pitch34 = boltPlaceObj["Bolt"]["Pitch34"]
+                self.pitch45 = boltPlaceObj["Bolt"]["Pitch45"]
+                self.pitch56 = boltPlaceObj["Bolt"]["Pitch56"]
+
+
         elif self.endplate_type == "flush":
 
             self.Lv = boltPlaceObj["Bolt"]["Lv"]

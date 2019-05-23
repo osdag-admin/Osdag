@@ -160,11 +160,25 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
+    column_clear_d = column_d - 2 * (column_tf + column_R1)
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
+
+        if beam_B > column_clear_d:
+            design_status = False
+            logger.error(": Beam is wider than column clear depth")
+            logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
+            logger.info(": Currently, Osdag doesn't design such connections")
+
     else:
         bolt_plates_tk = [column_tf, end_plate_thickness]
+
+        if beam_B > column_B:
+            design_status = False
+            logger.error(": Beam is wider than column width")
+            logger.warning(": Width of beam should be less than %s mm" % column_B)
+            logger.info(": Currently, Osdag doesn't design such connections")
 
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]

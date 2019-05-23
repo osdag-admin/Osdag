@@ -259,11 +259,26 @@ class Stiffener(QDialog):
 
 		uiObj = self.maincontroller.designParameters()
 		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
-		self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
-		self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
-		self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
-		self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
-		self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
+
+		# loc = self.ui.plateHeight.currentText()
+
+		if uiObj["Member"]["Connectivity"] == "Flush":
+			self.ui.plateHeight.setText("Width (mm)")
+
+			self.ui.txt_stiffnrHeight.setText(str(resultObj_plate['Stiffener']['Width']))
+			self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
+			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
+			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
+
+		else:
+			self.ui.plateHeight.setText("Height (mm)")
+
+			self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
+			self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
+			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
+			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
 
 
 class Pitch(QDialog):

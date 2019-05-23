@@ -2074,15 +2074,15 @@ def bbExtendedEndPlateSplice(uiObj):
         elif uiObj["Member"]["Connectivity"] == "Extended both ways":
             h_st = (end_plate_height_provided - beam_d) / 2
         else:
-            w_st = end_plate_width_provided - beam_tw  # width in case of flush end plate
-
-        # Length of stiffener (l_st) (as per AISC, DG 16 recommendations)
-        cf = math.pi/180  # conversion factor to convert degree into radian
-        l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+            w_st = (end_plate_width_provided - beam_tw) / 2  # width in case of flush end plate
 
         if uiObj["Member"]["Connectivity"] == "Flush":
             l_st = max(l_st_effective, (l_weld_effective / 2))  # taking the maximum length out of the two possibilities
         else:
+            # Length of stiffener (l_st) (as per AISC, DG 16 recommendations)
+            cf = math.pi / 180  # conversion factor to convert degree into radian
+            l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+
             l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
 
         # Length and size of weld for the stiffener (on each side)
@@ -2136,15 +2136,15 @@ def bbExtendedEndPlateSplice(uiObj):
 
 
         # Check of stiffener against local buckling
-        E = 2 * 10 ** 5  # MPa
-        ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+        # E = 2 * 10 ** 5  # MPa
+        # ts_required = 1.79 * h_st * stiffener_fy / E  # mm
 
-        if thickness_stiffener_provided < ts_required:
-            design_status = False
-            logger.error(": The thickness of stiffener is not sufficient")
-            logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
-            logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
-            logger.info(": Increase the thickness of stiffener")
+        # if thickness_stiffener_provided < ts_required:
+        #     design_status = False
+        #     logger.error(": The thickness of stiffener is not sufficient")
+        #     logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
+        #     logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
+        #     logger.info(": Increase the thickness of stiffener")
 
     else:
         design_status = False

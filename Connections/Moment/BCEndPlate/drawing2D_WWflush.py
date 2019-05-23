@@ -1,5 +1,5 @@
 '''
-Created on 10-May-2019
+Created on 22-May-2019
 
 @author: darshan
 '''
@@ -680,7 +680,7 @@ class FlushEnd2DFront(object):
         vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
         vb_ht = (int(3 * self.data_object.plate_length_L1))
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-800 -400 1800 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+            '-800 -400 2000 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
@@ -692,10 +692,7 @@ class FlushEnd2DFront(object):
         dwg.add(dwg.line(self.A7, self.P4).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
                              stroke_width='2.5').dasharray(dasharray=[5, 5]))
-        # dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
 
-        # dwg.add(dwg.polyline(points=[self.AA2, self.AA3, self.AA4, self.AA5, self.AA2], stroke='black', fill='none',
-        #                      stroke_width=2.5))
         dwg.add(dwg.line(self.AA1, self.AA2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.AA2, self.AA3).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.AA3, self.AA4).stroke('black', width=2.5, linecap='square'))
@@ -716,9 +713,6 @@ class FlushEnd2DFront(object):
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
                                                patternTransform="rotate(45 2 2)"))
             pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-            # dwg.add(dwg.rect(insert=self.Q, size=(self.data_object.web_weld_thickness, (
-            # 			self.data_object.beam_depth_D1 - self.data_object.flange_thickness_T1 - self.data_object.flange_weld_thickness - 10)),
-            # 				 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
             dwg.add(dwg.rect(insert=self.AA7, size=(self.data_object.web_weld_thickness, (
                     self.data_object.beam_depth_D2 - self.data_object.flange_thickness_T2 - self.data_object.flange_weld_thickness - 10)),
                              fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
@@ -892,7 +886,7 @@ class FlushEnd2DFront(object):
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
         # ------------------------------------------  View details-------------------------------------------
-        ptx = self.P4 - 100 * np.array([1, 0]) + 300 * np.array([0, 1])
+        ptx = self.A3- 100 * np.array([1, 0]) + 200 * np.array([0, 1])
         dwg.add(dwg.text('Front view (Sec C-C) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(
@@ -976,7 +970,7 @@ class FlushEnd2DTop(object):
 		"""
 
         ptP1x = ptA10x
-        ptP1y = ptA10y + self.data_object.column_depth_D1/2 - self.data_object.web_thickness_tw1 - self.data_object.plate_width_B1/2
+        ptP1y = ptA10y + self.data_object.column_depth_D1/2 - self.data_object.flange_thickness_T1 - self.data_object.plate_width_B1/2
         self.P1 = np.array([ptP1x, ptP1y])
 
         ptP2x = ptP1x + self.data_object.plate_thickness_p1
@@ -1041,7 +1035,7 @@ class FlushEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -400 1500 1200'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 1500 1500'))
 
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
@@ -1109,7 +1103,7 @@ class FlushEnd2DTop(object):
                                                     params)
 
         # ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
-        point = self.A2
+        point = self.A1
         theta = 60
         offset = 50
         textdown = " "
@@ -1119,7 +1113,7 @@ class FlushEnd2DTop(object):
 
         point = self.AA2 - self.data_object.beam_length_L2 / 2 * np.array([1, 0])
         theta = 60
-        offset = 50
+        offset = 75
         textup = "Beam " + str(self.data_object.beam_designation)
         textdown = " "
         element = " "
@@ -1152,7 +1146,7 @@ class FlushEnd2DTop(object):
         text = "C"
         self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
-        pt_a2 = pt_a1 + (self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
+        pt_a2 = pt_a1 + (self.data_object.column_width_B1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
             [1, 0]) + 200 * np.array([1, 0])
         pt_b2 = pt_a2 + (50 * np.array([0, -1]))
         txt_2 = pt_b2 + (10 * np.array([1, 0])) + (40 * np.array([0, 1]))
@@ -1350,7 +1344,7 @@ class FlushEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 2000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 2000'))
         dwg.add(dwg.polyline(
             points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],
@@ -1704,7 +1698,7 @@ class FlushEnd2DSide(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textdown, textup, element)
 
         # ------------------------------------------  View details-------------------------------------------
-        ptx = self.P4 * np.array([0, 1]) + 300 * np.array([0, 1])
+        ptx = self.AA3 * np.array([0, 1]) + 200 * np.array([0, 1])
         dwg.add(dwg.text('Side view (Sec B-B) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(

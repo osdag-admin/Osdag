@@ -437,7 +437,7 @@ def bc_endplate_design(uiObj):
         for bolt_row in range(int(no_rows['in_tension_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
-        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
+        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq / 2
         tension_in_bolt = axial_tension + moment_tension + prying_force
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear
@@ -704,20 +704,20 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
-    outputobj['ContPlateComp']['Weld'] = 8
+    outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
-    outputobj['ContPlateTens']['Weld'] = 8
+    outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
-    outputobj['Stiffener']['Thickness'] = 10.0
+    outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
     outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
     outputobj['Stiffener']['NotchTop'] = st_notch_top
-    outputobj['Stiffener']['Weld'] = 8.0
+    outputobj['Stiffener']['Weld'] = 8.0    # TODO: Sourabh give calculated values
 
     # Detailing
     if endplate_type == 'flush':

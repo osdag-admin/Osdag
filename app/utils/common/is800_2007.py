@@ -6,7 +6,6 @@ Started on 01 - Nov - 2018
 """
 import math
 
-
 class IS800_2007(object):
     """Perform calculations on steel design as per IS 800:2007
 
@@ -86,6 +85,396 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
+    # --------------------------------------------------------------------------
+    # cl.9.2 Combined Shear and Bending
+    @staticmethod
+    def cl_9_2(Md, V, Vd, Mfd, Ze, section_type, fy, gamma_m0):
+        """To calculate change in Moment Carrying Capacity due to shear force
+        Args:
+            Md - plastic design moment of whole section disregarding shear force
+                 effect considering web buckling effects
+            V - factored applied shear force
+            Vd - design shear strength
+            Mfd - plastic design strength of c/s excluding shear area considering
+                  gamma_m0
+            Ze - elastic section modulus
+            section_type - 'plastic','compact' or 'semi_compact'
+            fy - yeild strength
+            gamma_m0 - partial safety factor
+        Returns:
+            Mdv - Moment Carrying Capacity under action of high shear force
+
+        Note:
+            Reference:
+                IS 800:2007, cl.9.2
+        """
+        if (V > 0.6 * Vd):  # cl.9.2.2
+            if (section_type == 'plastic' or section_type == 'compact'):
+                beta = (2 * V / Vd - 1) ** 2
+                Mdv = min(Md - beta * (Md - Mfd), 1.2 * Ze * fy / gamma_m0)
+            elif (section_type == 'semi_compact'):
+                Mdv = Ze * fy / gamma_m0
+            else:
+                return 'enter section type in valid format'
+        else:
+            Mdv = Md  # V < 0.6 * Vd.....cl 9.2.1
+        return Mdv
+
+    # cl.9.3.1.1 Combined Axial Force and Bending - Section Strength - Plastic and Compact Sections
+    # for this clause there are 2 functions
+
+    # function1
+    @staticmethod
+    def cl_9_3_1_1(My, Mz, Mndy, Mndz, N, Nd, section_type):
+        """Safety check for reduced flexural strength under combined axial force and
+        respective uniaxial bending moment acting alone
+        Args:
+            My - factored applied moments about minor axis of c/s
+            Mz - factored applied moments about major axis of c/s
+            Mndy - reduced flexural strength along minor axis
+            Mndz - reduced flexural strength along major axis
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+            section_type - I/channel,Circular Tubes,Rectangular Tubes,Solid Rectangles
+        Returns:
+            'OK' - If condition is satisfied
+            else 'Warning : Reduced flexural strength does not satisfy cl.9.3.1.1'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.1
+        """
+        n = N / Nd
+        table_17 = {
+            'I and channel': (max(5 * n, 1), 2),
+            'Circular tubes': (2, 2),
+            'Rectangular tubes': (min(1.66 / (1 - 1.13 * n * n), 6), min(1.66 / (1 - 1.13 * n * n), 6)),
+            'Solid rectangles': (1.73 + 1.8 * n ** 3, 1.73 + 1.8 * n ** 3)
+        }
+        alpha_1 = table_17[section_type][0]
+        alpha_2 = table_17[section_type][1]
+
+        if (((My / Mndy) ** alpha_1 + (Mz / Mndz) ** alpha_2) <= 1):
+            return 'OK'
+        else:
+            return 'Warning : Reduced flexural strength not sufficient cl.9.3.1.1'
+
+    # function 2
+    @staticmethod
+    def cl_9_3_1_1_cons(My, Mz, Mdy, Mdz, N, Nd):
+        """Safety check for reduced flexural strength under combined axial force and
+        respective uniaxial bending moment acting alone
+        using a more conservative formula
+        Args:
+            My - factored applied moments about minor axis of c/s
+            Mz - factored applied moments about major axis of c/s
+            Mndy - reduced flexural strength along minor axis
+            Mndz - reduced flexural strength along major axis
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+        Returns:
+            'OK' - If condition is satisfied
+            else 'Warning : Reduced flexural strength does not satisfy cl.9.3.1.1'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.1
+        """
+        if ((N / Nd + My / Mdy + Mz / Mdz) <= 1):
+            return 'OK'
+        else:
+            return 'Warning : Design reduced flexural strength not sufficient cl.9.3.1.1'
+
+    # cl.9.3.1.2 Combined Axial Force and Bending - Approximate Section Strength Calculation- Plastic and Compact Sections
+    # without bolt holes
+    # 5 functions - 'plates','welded I or H section','standard I or H section','rectangular hollow sections and welded box sections',
+    #              'circular hollow tubes'
+
+    # plates
+    @staticmethod
+    def cl_9_3_1_2_a(Md, N, Nd):
+        """Calculates reduced flexural strength for plates
+        Args:
+            Md - plastic design moment of whole section disregarding axial force
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+        Returns:
+            'OK' - If condition is satisfied
+            else 'Warning : Reduced flexural strength does not satisfy cl.9.3.1.1'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.2
+        """
+        n = N / Nd
+        Mnd = Md * (1 - n ** 2)
+        return Mnd
+
+    # Welded I or H section
+    @staticmethod
+    def cl_9_3_1_2_b(Mdy, Mdz, N, Nd, tf, b, A):
+        """Calculates reduced flexural strength for Welded I or H sections
+        Args:
+            Mdy,Mdz - design strength of section along minor and major axes respectively
+                      disregarding axial force
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+            tf - thickness of flange
+            b - width of flange
+            A - area of c/s
+        Returns:
+            Mndy - reduced flexural strength along minor axis
+            Mndz - reduced flexural strength along major axis
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.2
+        """
+        n = N / Nd
+        a = min((A - 2 * b * tf) / A, 0.5)
+        if (n < a):
+            Mndy = Mdy
+        else:
+            Mndy = min(Mdy * (1 - ((n - a) / (1 - a)) ** 2), Mdy)
+        Mndz = min(Mdz * (1 - n) / (1 - 0.5 * a), Mdz)
+        return (Mndy, Mndz)
+
+    # Standard I or H section
+    @staticmethod
+    def cl_9_3_1_2_c(Mdy, Mdz, N, Nd):
+        """Calculates reduced flexural strength for Welded I or H sections
+        Args:
+            Mdy,Mdz - design strength of section along minor and major axes respectively
+                      disregarding axial force
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+        Returns:
+            Mndy - reduced flexural strength along minor axis
+            Mndz - reduced flexural strength along major axis
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.2
+        """
+        n = N / Nd
+        if (n <= 0.2):
+            Mndy = Mdy
+        else:
+            Mndy = 1.56 * Mdy * (1 - n) * (n + 0.6)
+        Mndz = min(1.11 * Mdz * (1 - n), Mdz)
+        return (Mndy, Mndz)
+
+    # Rectangular hollow section and welded box sections
+    @staticmethod
+    def cl_9_3_1_2_d(Mdy, Mdz, N, Nd, A, tf, tw, b, h):
+        """Calculates reduced flexural strength for rectangular hollow section and welded box sections
+        section must be symmetric
+        Args:
+            Mdy,Mdz - design strength of section along minor and major axes respectively
+                      disregarding axial force
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+            b - width of flange
+            A - Area of c/s
+            tf - thickness of flange
+            tw - thickness of web
+            h - depth of web
+        Returns:
+            Mndy - reduced flexural strength along minor axis
+            Mndz - reduced flexural strength along major axis
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.2
+        """
+        n = N / Nd
+        aw = min((A - 2 * b * tf) / A, 0.5)
+        af = min((A - 2 * h * tw) / A, 0.5)
+        Mndy = min(Mdy * (1 - n) / (1 - 0.5 * af), Mdy)
+        Mndz = min(Mdz * (1 - n) / (1 - 0.5 * aw), Mdz)
+        return (Mndy, Mndz)
+
+    # Circular hollow tubes
+    @staticmethod
+    def cl_9_3_1_2_e(Md, N, Nd):
+        """Calculates reduced flexural strength for rectangular hollow section and welded box sections
+        section must be symmetric
+        Args:
+            Md - plastic design moment of whole section disregarding axial force
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+        Returns:
+            Mnd - design reduced flexural strength
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.2
+        """
+        n = N / Nd
+        Mnd = min(1.04 * Md * (1 - n ** 1.7), Md)
+        return Mnd
+
+    # cl.9.3.1.3 Combined Axial Force and Bending - Section Strength - Semi-compact section - Safety Criteria
+    # 2 functions
+
+    # function 1 - general criteria
+    @staticmethod
+    def cl_9_3_1_3_a(fx, fy, gamma_m0):
+        """Evaluates safety criteria for semi-compact section design(general)
+        Args:
+            fx - max. longitudinal stress under combined axial force and bending
+            fy - yield stress
+            gamma_m0 - partial safety factor
+        Returns:
+            'OK' - If criteria is satisfied
+            else 'Warning : cl.3.1.3 - max. longitudinal stress exceeds limiting value'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.1.3
+        """
+        if (fx <= fy / gamma_m0):
+            return 'OK'
+        else:
+            return 'Warning : cl.3.1.3 - max. longitudinal stress exceeds limiting value'
+
+    # funtion  2 - c/s without holes
+    @staticmethod
+    def cl_9_3_1_3_b(N, Nd, My, Mdy, Mz, Mdz):
+        """Evaluates safety criteria for semi-compact section design for c/s without holes
+        Args:
+            Mdy,Mdz - design strength of section along minor and major axes respectively
+                      disregarding axial force
+            My - factored applied moments about minor axis of c/s
+            Mz - factored applied moments about major axis of c/s
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+        Returns:
+            'OK' - If criteria is satisfied
+            else 'Warning : cl.3.1.3 - max. longitudinal stress exceeds limiting value'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3 'Warning : cl.9.3.1.3 - semi-comapct is not safe under given axial force and bending moment'
+        """
+        if ((N / Nd + My / Mdy + Mz / Mdz) <= 1):
+            return 'OK'
+        else:
+            return 'Warning : cl.9.3.1.3 - semi-comapct is not safe under given axial force and bending moment'
+
+    # cl.9.3.2.1 Check for safety against buckling - Combined Axial Tension Force and Bending
+    @staticmethod
+    def cl_9_3_2_1(Md, M, T, Zec, A, psi_check):
+        """Calculates and checks if reduced effective moment under tension and bending exceeds bending strength
+        due to lateral torsional buckling.
+        Args:
+            Md - Strength due to lateral torsional buckling
+            M,T - factored applied moment and tension respectively
+            Zec - elastic section modulus w.r.t extreme compression fibre
+            A - area of c/s
+            N - factored applied axial force
+            Nd - design strength in compression or tension
+            psi_check - 'True' if T & M are independent else 'False'
+        Returns:
+            If (criteria is satisfied):
+                Meff - reduced effective moment under tenion and bucling
+            else:
+                'Warning : reduced effective moment under tension and bending exceeds bending strength
+                 due to lateral torsional buckling'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.2.1
+        """
+        if (psi_check is True):
+            psi = 0.8
+        else:
+            psi = 1
+        Meff = M - psi * T * Zec / A
+        if (Md >= Meff):
+            return Meff
+        else:
+            return 'Warning : cl.9.3.2.1 - reduced effective moment under tension and bending exceeds bending streng due to lateral torsional buckling'
+
+    # cl.9.3.2.2 Check for safety against buckling - Combined Axial Compression and Bending
+    # 2 functions
+
+    # function1_based on table18
+    @staticmethod
+    def cl_9_3_2_2_table18(loading_type, psi, Mh, Ms=None):
+        """Evaluates and returns equivalent moment factor
+        Args:
+            loading_type - True if loading is unifrorm, False if load is concentrated
+            psi - ratio of BM at the end with higher BM to that of the other end
+            Mh - BM at end with greater BM
+            Ms - BM at point of zero shear, takes a default value of None (if Load is linearly varying)
+        Returns:
+            Cm - equivalent uniform moment factor
+        Note:
+            Reference:
+                IS 800:2007, Table 18 (cl9.3.2.2)
+        """
+        if (abs(psi) > 1): return 'warning: psi must be between -1 and 1'
+        if (Ms == None):
+            Cm = max(0.6 + 0.4 * psi, 0.4)
+        elif (abs(Ms) < abs(Mh)):
+            alpha_s = Ms / Mh
+            if (alpha_s >= 0):
+                Cm = max(0.2 + 0.8 * alpha_s, 0.4)
+            else:
+                if (loading_type == True):
+                    Cm = max((0.1 * max(1 - psi, 1) - 0.8 * alpha_s), 0.4)
+                else:
+                    Cm = max((0.2 * max(-psi, 0) - 0.8 * alpha_s), 0.4)
+        elif (abs(Ms) > abs(Mh)):
+            alpha_h = Mh / Ms
+            if (alpha_h >= 0):
+                if (loading_type == True):
+                    Cm = 0.95 - 0.05 * alpha_h
+                else:
+                    Cm = 0.90 + 0.10 * alpha_h
+            else:
+                if (loading_type == True):
+                    Cm = 0.95 + 0.05 * alpha_h * min(1 + 2 * psi, 1)
+                else:
+                    Cm = 0.90 + 0.1 * alpha_h * min(1 + 2 * psi, 1)
+        else:
+            return 'Warning:Ms cannot be equal to Mh,but can be NULL'
+
+        return Cm
+
+    @staticmethod
+    def cl_9_3_2_2_main(P, Pd=[], M=[], Mh=[], Md=[], N=[], Nd=[], loading_type=[], psi=[], lambda_=[],
+                        Ms=[None, None, None]):
+        """Checks safety criteria for members subjected to combined axial compresssion and biaxial bending
+        Args:
+            P - applied axial compression under factored load
+            loading_type[0],loading_type[1],loading_type[2] - loading type(True if uniform,False if concentrated)
+                                                              for y,z axes and lateral torsion
+            psi[0],psi[1],psi[2] - psi values for y/Z aand lateral torsion
+            M[0]=My,M[1]=Mz - max factored applied bending moments about y and z axes of member
+            M[2]=Mmlt - max factored applied bending moment for lateral torsion
+            Mh[0]=Mhy,Mh[1]=Mhz - factored applied bending moments about y and z axes of member at point of zero shear
+            Mh[2]=Mhmlt - factored applied bending moment for lateral torsion at point of zero shear
+            Pd[0]=Pdy,Pd[1]=Pdz - design strength under axial compression as governed by buckling about y and z axes resp
+            Md[0]=Mdy,Md[1]=Mdz - design bending strength about y and z axes considering laterally unsupported length of c/s
+            N[0]=Ny,N[1]=Nz - factored applied axial force about y/z axes resp.
+            Nd[0]=Ndy,Nd[1]=Ndz - design strength in compression about y/z axes resp.
+            lambda[0]=lambda_y,lambda[1]=lambda_z,lambda[3]=lambda_Lt - slenderness ratio about y/z axes and that for lateral torsion
+            Ms[] - BM @ point of zero shear
+        Returns:
+            'OK' - If criteria is satisfied
+            else -'Warning : Member does not satisfy safety criteria of cl.9.3.2.2'
+        Note:
+            Reference:
+                IS 800:2007, cl.9.3.2.2
+        """
+        Cmy = IS800_2007()
+        Cmz = IS800_2007()
+        CmLt = IS800_2007()
+        Cm = [Cmy.cl_9_3_2_2_table18(loading_type[0], psi[0], Mh[0], Ms[0]),
+              Cmz.cl_9_3_2_2_table18(loading_type[1], psi[1], Mh[1], Ms[1]),
+              CmLt.cl_9_3_2_2_table18(loading_type[2], psi[2], Mh[2], Ms[2])]
+
+        Ky = min(1 + (lambda_[0] - 0.2) * N[0] / Nd[0], 1 + 0.8 * N[0] / Nd[0])
+        Kz = min(1 + (lambda_[1] - 0.2) * N[1] / Nd[1], 1 + 0.8 * N[1] / Nd[1])
+        Klt = max(1 - (0.1 * lambda_[3] * (N[0] / Nd[0])) / (Cm[3] - 0.25), 1 - (0.1 * N[0] / Nd[0]) / (Cm[3] - 0.25))
+
+        if ((P / Pd[0] + Ky * Cm[0] * M[0] / Md[0] + Klt * M[1] / Md[1] <= 1) and (
+                P / Pd[1] + 0.6 * Ky * Cm[0] * M[0] / Md[0] + Kz * Cm[1] * M[1] / Md[1] <= 1)):
+            return 'OK'
+        else:
+            return 'warning: member does not satisfy safety criteria of cl.9.3.2.2'
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """
     # -------------------------------------------------------------

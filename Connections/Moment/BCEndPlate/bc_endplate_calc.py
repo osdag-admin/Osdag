@@ -648,17 +648,6 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
-    # Shear yielding of end plate (TODO: Clause 8.4.1, IS 800:2007)
-
-    A_v = plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = 0.6 * A_v * end_plate_fy / (math.sqrt(3) * gamma_m0)
-
-    if V_d < factored_shear_load:
-        design_status = False
-        logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The maximum allowable shear in end plate is %2.2f kN" % factored_shear_load)
-        logger.info(": Increase the thickness of End Plate")
-
     # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange

@@ -71,17 +71,11 @@ class ExtendedEndPlate(object):
         self.Lv = float(output_dict['Bolt']['Lv'])
         self.weld = input_dict["Weld"]["Method"]
 
-        # outputobj['Stiffener']['Length'] = 300.0  # TODO:
-        # outputobj['Stiffener']['Height'] = 100.0
-        # outputobj['Stiffener']['Thickness'] = 10.0
-        # outputobj['Stiffener']['NotchBottom'] = 15.0
-        # outputobj['Stiffener']['NotchTop'] = 50.0
-
         self.stiffener_length =  output_dict['Stiffener']['Length']
         self.stiffener_height= output_dict['Stiffener']['Height']
         self.stiffener_thickness = output_dict['Stiffener']['Thickness']
         self.stiffener_NotchBottom = output_dict['Stiffener']['NotchBottom']
-        self.stiffener_NotchBottom = output_dict['Stiffener']['NotchTop']
+        self.stiffener_NotchTop = output_dict['Stiffener']['NotchTop']
 
         self.no_of_columns = 2
         self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
@@ -627,6 +621,59 @@ class ExtendedEnd2DFront(object):
         ptS8y = ptAA4y
         self.S8 = np.array([ptS8x, ptS8y])
 
+        # ================ Stiffener - UP ==================
+
+        ptSU1x = ptAA1x
+        ptSU1y = ptAA1y - self.data_object.stiffener_height
+        self.SU1 = np.array([ptSU1x, ptSU1y])
+
+        ptSU2x = ptSU1x + self.data_object.stiffener_length - self.data_object.stiffener_NotchTop
+        ptSU2y = ptSU1y
+        self.SU2 = np.array([ptSU2x, ptSU2y])
+
+        ptSU6x = ptAA1x
+        ptSU6y = ptAA1y - self.data_object.stiffener_NotchBottom
+        self.SU6 = np.array([ptSU6x, ptSU6y])
+
+        ptSU5x = ptAA1x + self.data_object.stiffener_NotchBottom
+        ptSU5y = ptAA1y
+        self.SU5 = np.array([ptSU5x, ptSU5y])
+
+        ptSU4x = ptAA1x + self.data_object.stiffener_length
+        ptSU4y = ptAA1y
+        self.SU4 = np.array([ptSU4x, ptSU4y])
+
+        ptSU3x = ptSU4x
+        ptSU3y = ptSU4y - self.data_object.stiffener_NotchTop
+        self.SU3 = np.array([ptSU3x, ptSU3y])
+
+        # ================ Stiffener - DOWN ==================
+
+        ptSD1x = ptAA4x
+        ptSD1y = ptAA4y + self.data_object.stiffener_height
+        self.SD1 = np.array([ptSD1x, ptSD1y])
+
+        ptSD2x = ptSD1x + self.data_object.stiffener_length - self.data_object.stiffener_NotchTop
+        ptSD2y = ptSD1y
+        self.SD2 = np.array([ptSD2x, ptSD2y])
+
+        ptSD6x = ptAA4x
+        ptSD6y = ptAA4y + self.data_object.stiffener_NotchBottom
+        self.SD6 = np.array([ptSD6x, ptSD6y])
+
+        ptSD5x = ptAA4x + self.data_object.stiffener_NotchBottom
+        ptSD5y = ptAA4y
+        self.SD5 = np.array([ptSD5x, ptSD5y])
+
+        ptSD4x = ptAA4x + self.data_object.stiffener_length
+        ptSD4y = ptAA4y
+        self.SD4 = np.array([ptSD4x, ptSD4y])
+
+        ptSD3x = ptSD4x
+        ptSD3y = ptSD4y + self.data_object.stiffener_NotchTop
+        self.SD3 = np.array([ptSD3x, ptSD3y])
+
+
         # ================ Weld  ==================
         # darshan
 
@@ -702,6 +749,16 @@ class ExtendedEnd2DFront(object):
         dwg.add(dwg.line(self.S3, self.S4).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.S5, self.S6).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.S7, self.S8).stroke('black', width=2.5, linecap='square'))
+
+        if self.data_object.no_of_bolts == 20:
+            dwg.add(dwg.polyline(points=[self.SU1, self.SU2, self.SU3, self.SU4, self.SU5,self.SU6, self.SU1], stroke='black', fill='none',
+                                 stroke_width='2.5'))
+            dwg.add(dwg.polyline(points=[self.SD1, self.SD2, self.SD3, self.SD4, self.SD5, self.SD6, self.SD1], stroke='black',
+                             fill='none',
+                             stroke_width='2.5'))
+
+        else:
+            pass
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
@@ -910,11 +967,11 @@ class ExtendedEnd2DFront(object):
         # ------------------------------------------  Labeling Weld of flange -------------------------------------------
         point = self.AA1
         theta = 60
-        offset = 100
+        offset = 50
         textup = "          z  " + str(self.data_object.flange_weld_thickness)
         textdown = " "
         element = "weld"
-        self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
         # ------------------------------------------  Labeling Weld of Web -------------------------------------------
         point = self.AA1 + self.data_object.beam_depth_D2/2* np.array([0, 1])
@@ -1096,6 +1153,10 @@ class ExtendedEnd2DTop(object):
         ptAA5y = ptAA1y + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2) / 2
         self.AA5 = np.array([ptAA5x, ptAA5y])
 
+        ptAS5x = ptAA5x + self.data_object.stiffener_length
+        ptAS5y = ptAA5y
+        self.AS5 = np.array([ptAS5x, ptAS5y])
+
         ptAA6x = ptAA2x
         ptAA6y = ptAA2y + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2) / 2
         self.AA6 = np.array([ptAA6x, ptAA6y])
@@ -1108,6 +1169,9 @@ class ExtendedEnd2DTop(object):
         ptAA8y = ptAA5y + self.data_object.web_thickness_tw2
         self.AA8 = np.array([ptAA8x, ptAA8y])
 
+        ptAS8x = ptAA8x + self.data_object.stiffener_length
+        ptAS8y = ptAA8y
+        self.AS8 = np.array([ptAS8x, ptAS8y])
 
     def call_ExtndBoth_top(self, filename):
         """
@@ -1128,8 +1192,18 @@ class ExtendedEnd2DTop(object):
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
                              stroke_width='2.5'))
-        dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
+        if self.data_object.no_of_bolts == 20:
+            dwg.add(dwg.line(self.AA5, self.AS5).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AS5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+            dwg.add(dwg.line(self.AA8, self.AS8).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AS8, self.AA7).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        else:
+            dwg.add(
+                dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+            dwg.add(
+                dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
         dwg.add(dwg.line(self.A2, self.A9).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.A3, self.A12).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',
@@ -1450,6 +1524,24 @@ class ExtendedEnd2DSide(object):
         ptS8y = ptA2y
         self.S8 = np.array([ptS8x, ptS8y])
 
+        # =========================  Stiffener UP =========================
+        ptSU1x = ptA11x
+        ptSU1y = ptA11y - self.data_object.flange_thickness_T2
+        self.SU1 = np.array([ptSU1x, ptSU1y])
+
+        ptSU2x = ptA4x
+        ptSU2y = ptA4y - self.data_object.flange_thickness_T2
+        self.SU2 = np.array([ptSU2x, ptSU2y])
+
+        # =========================  Stiffener DOWN =========================
+        ptSD1x = ptA10x
+        ptSD1y = ptA10y + self.data_object.flange_thickness_T2
+        self.SD1 = np.array([ptSD1x, ptSD1y])
+
+        ptSD2x = ptA5x
+        ptSD2y = ptA5y + self.data_object.flange_thickness_T2
+        self.SD2 = np.array([ptSD2x, ptSD2y])
+
 
     def call_ExtndBoth_side(self, filename):
         """
@@ -1489,6 +1581,15 @@ class ExtendedEnd2DSide(object):
         dwg.add(dwg.line(self.S6, self.A6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.S7, self.A3).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.S8, self.A2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
+        if self.data_object.no_of_bolts == 20:
+            dwg.add(dwg.line(self.AA12, self.SU1).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AA11, self.SU2).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AA13, self.SD1).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AA14, self.SD2).stroke('black', width=2.5, linecap='square'))
+        else:
+            pass
+
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",

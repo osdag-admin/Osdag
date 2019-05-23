@@ -78,6 +78,12 @@ class OnewayEndPlate(object):
         self.Lv = float(output_dict['Bolt']['Lv'])
         self.weld = input_dict["Weld"]["Method"]
 
+        self.stiffener_length = output_dict['Stiffener']['Length']
+        self.stiffener_height = output_dict['Stiffener']['Height']
+        self.stiffener_thickness = output_dict['Stiffener']['Thickness']
+        self.stiffener_NotchBottom = output_dict['Stiffener']['NotchBottom']
+        self.stiffener_NotchTop = output_dict['Stiffener']['NotchTop']
+
         self.no_of_columns = 2
         self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
         if self.no_of_bolts == 6:
@@ -616,6 +622,32 @@ class Oneway2DFront(object):
         ptS8y = ptAA4y
         self.S8 = np.array([ptS8x, ptS8y])
 
+        # ================ Stiffener - UP ==================
+
+        ptSU1x = ptAA1x
+        ptSU1y = ptAA1y - self.data_object.stiffener_height
+        self.SU1 = np.array([ptSU1x, ptSU1y])
+
+        ptSU2x = ptSU1x + self.data_object.stiffener_length - self.data_object.stiffener_NotchTop
+        ptSU2y = ptSU1y
+        self.SU2 = np.array([ptSU2x, ptSU2y])
+
+        ptSU6x = ptAA1x
+        ptSU6y = ptAA1y - self.data_object.stiffener_NotchBottom
+        self.SU6 = np.array([ptSU6x, ptSU6y])
+
+        ptSU5x = ptAA1x + self.data_object.stiffener_NotchBottom
+        ptSU5y = ptAA1y
+        self.SU5 = np.array([ptSU5x, ptSU5y])
+
+        ptSU4x = ptAA1x + self.data_object.stiffener_length
+        ptSU4y = ptAA1y
+        self.SU4 = np.array([ptSU4x, ptSU4y])
+
+        ptSU3x = ptSU4x
+        ptSU3y = ptSU4y - self.data_object.stiffener_NotchTop
+        self.SU3 = np.array([ptSU3x, ptSU3y])
+
         # ================ Weld  ==================
         # darshan
 
@@ -690,6 +722,12 @@ class Oneway2DFront(object):
         dwg.add(dwg.line(self.S3, self.S4).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.S5, self.S6).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.S7, self.S8).stroke('black', width=2.5, linecap='square'))
+
+        if self.data_object.no_of_bolts == 12:
+            dwg.add(dwg.polyline(points=[self.SU1, self.SU2, self.SU3, self.SU4, self.SU5,self.SU6, self.SU1], stroke='black', fill='none',
+                                 stroke_width='2.5'))
+        else:
+            pass
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
@@ -1027,6 +1065,10 @@ class Oneway2DTop(object):
         ptAA5y = ptAA1y + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2) / 2
         self.AA5 = np.array([ptAA5x, ptAA5y])
 
+        ptAS5x = ptAA5x + self.data_object.stiffener_length
+        ptAS5y = ptAA5y
+        self.AS5 = np.array([ptAS5x, ptAS5y])
+
         ptAA6x = ptAA2x
         ptAA6y = ptAA2y + (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2) / 2
         self.AA6 = np.array([ptAA6x, ptAA6y])
@@ -1038,6 +1080,10 @@ class Oneway2DTop(object):
         ptAA8x = ptAA5x
         ptAA8y = ptAA5y + self.data_object.web_thickness_tw2
         self.AA8 = np.array([ptAA8x, ptAA8y])
+
+        ptAS8x = ptAA8x + self.data_object.stiffener_length
+        ptAS8y = ptAA8y
+        self.AS8 = np.array([ptAS8x, ptAS8y])
 
 
     def call_Oneway_top(self, filename):
@@ -1051,18 +1097,14 @@ class Oneway2DTop(object):
 
 		"""
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1500'))
-        # dwg.add(dwg.line(self.A5, self.A6).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        # dwg.add(dwg.line(self.A7, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A5, self.A6, self.A7, self.A8, self.A5], stroke='black', fill='none',
                              stroke_width=2.5))
-        # dwg.add(dwg.polyline(points=[self.A6, self.A9, self.A10, self.A11, self.A12, self.A7], stroke='blue', fill='none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
                              stroke_width='2.5'))
-        # dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
 
         dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1070,6 +1112,19 @@ class Oneway2DTop(object):
         dwg.add(dwg.line(self.A3, self.A12).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',
                              stroke_width=2.5))
+
+        if self.data_object.no_of_bolts == 12:
+            dwg.add(dwg.line(self.AA5, self.AS5).stroke('black', width=2.5, linecap='square'))
+            dwg.add(
+                dwg.line(self.AS5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+            dwg.add(dwg.line(self.AA8, self.AS8).stroke('black', width=2.5, linecap='square'))
+            dwg.add(
+                dwg.line(self.AS8, self.AA7).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        else:
+            dwg.add(
+                dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+            dwg.add(
+                dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
@@ -1387,6 +1442,16 @@ class Oneway2DSide(object):
         ptS8y = ptA2y
         self.S8 = np.array([ptS8x, ptS8y])
 
+        # =========================  Stiffener UP =========================
+        ptSU1x = ptA11x
+        ptSU1y = ptA11y - self.data_object.flange_thickness_T2
+        self.SU1 = np.array([ptSU1x, ptSU1y])
+
+        ptSU2x = ptA4x
+        ptSU2y = ptA4y - self.data_object.flange_thickness_T2
+        self.SU2 = np.array([ptSU2x, ptSU2y])
+
+
     def call_Oneway_side(self, filename):
         """
 
@@ -1425,6 +1490,13 @@ class Oneway2DSide(object):
         dwg.add(dwg.line(self.S6, self.A6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.S7, self.A3).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.S8, self.A2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
+        if self.data_object.no_of_bolts == 12:
+            dwg.add(dwg.line(self.AA12, self.SU1).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.AA11, self.SU2).stroke('black', width=2.5, linecap='square'))
+
+        else:
+            pass
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",

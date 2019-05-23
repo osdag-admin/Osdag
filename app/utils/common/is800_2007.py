@@ -673,12 +673,12 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
 
     # cl7.7  Batten plate
     # cl7.7.1.4 effective slenderness ratio of batten plate
-    def efective_slenderness_ratio_of_batten_plate(L, r_zz):
+    def efective_slenderness_ratio_of_batten_plate(l, r_zz):
         """
             Calculation  of effective slenderness ratio of batten plate
 
             Args:
-                L - length of column  in mm
+                l - length of column  in mm
                 r_zz- minimin radius of gyration of built-up section
             Return:
                 lambda_e = effcetive slenderness ration of patten plate
@@ -714,7 +714,7 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """
 
         V_t = 2.5 / 100 * P
-        V_b = V_t * C / (N * C)
+        V_b = V_t * C / (N * S)
         M = V_t * C / (N * 2)
 
         return (V_t, V_b, M)
@@ -2199,6 +2199,541 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
     """    ANNEX  D       DETERMINATION OF EFFECTIVE LENGTH OF COLUMNS   """
     # ==========================================================================
     """    ANNEX  E       ELASTIC LATERAL TORSIONAL BUCKLING   """
+
+    # CALCULATION OF EFFECTIVE LENGTH AGAINST LATERAL TORSIONAL BUCKLING.
+    def cl_8_3_1_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1, Restraint_Condition_2,
+                                                             Loading_Condition):
+
+        """
+            Calculate effective length against lateral torsional buckling for simply supported Beams and girders
+            where no lateral restraint  to the compression falnge is provided as per cl.8.3.1
+
+            Args:
+                L -  Span of simply suppotred beams and girders in mm (float)
+                D -  Overall depth of he beam in mm (float)
+
+                Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
+                Restraint_Condition_1- "Torsional Restraint"
+                Restraint_Condition_2- "Warping_Restraint"
+
+                "Torsional Restrained" - Either "Fully_resrtrained" or
+                                        "Partially_restrained_by_bottom_flange_support_condition" or
+                                        "Partially_restrained_by_bottom_flange_support_condition"
+
+                "Warping_Restraint" - Either "Both_flange_fully_restrained" or
+                                     "compression_flange_fully_restrained" or
+                                     "Compression_flange_partially_restrained" or
+                                     "Warping_not_restrained_in_both_flange"
+
+
+                Loading_Condition  - Either "Normal" or " Destabilizing"
+
+
+
+            Returns:
+                L_LT  - cl_8_3_1_Effective length for simply supported Beams in mm (float)
+
+
+            Note:
+                References:
+                IS800:2007, Table 15 (cl 8.3.1)
+
+        """
+
+        if Restraint_Condition_1 == "Fully Restrained":
+            if Restraint_Condition_2 == "Both flanges fully restrained":
+                if Loading_Condition == "Normal":
+                    return 0.70 * L
+                else:
+                    return 0.85 * L
+            if Restraint_Condition_2 == "Compression flange fully Restrained":
+                if Loading_Condition == "Normal":
+                    return 0.75 * L
+                else:
+                    return 0.90 * L
+            if Restraint_Condition_2 == "Both flanges partially restrained":
+                if Loading_Condition == "Normal":
+                    return 0.80 * L
+                else:
+                    return 0.95 * L
+            if Restraint_Condition_2 == "Compression flange partially Restrained":
+                if Loading_Condition == "Normal":
+                    return 0.85 * L
+                else:
+                    return 1.00 * L
+            if Restraint_Condition_2 == "Wraping not restrained in both flanges":
+                if Loading_Condition == "Normal":
+                    return 1.00 * L
+                else:
+                    return 1.20 * L
+        if Restraint_Condition_1 == "Partially restrained by bottom flange support connection":
+            if Restraint_Condition_2 == "Wraping not restrained in both flages":
+                if Loading_Condition == "Normal":
+                    return 1.00 * L + 2 * D
+                else:
+                    return 1.20 * L + 2 * D
+        if Restraint_Condition_1 == "Partially restrained by bottom flage bearing support":
+            if Restraint_Condition_2 == "Wraping not restrained in both flages":
+                if Loading_Condition == "Normal":
+                    return 1.2 * L + 2 * D
+                else:
+                    return 1.4 * L + 2 * D
+
+    # Effective length for cantilever Beam
+
+    def cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, D, Restraint_Condition_1, Restraint_Condition_2,
+                                                              Loading_condition):
+        """
+            Calculate effective length for catiliver beam of projecting length L as per cl.8.3.3
+
+            Args:
+                L - Projecting Length of cantiliver beam in mm (float)
+                D -  Overall depth of he beam in mm (float)
+
+                Restrained_condition - Either "At support" or "At Top"
+
+                Restraint_Condition_1- "At support"
+                Restraint_Condition_2- "At Top"
+
+                At_support -  Either "continous, with lateral restraint to top"
+                              or "continous, with  partial torsional restraint"
+                              or "continous, with lateral and tosional restraint "
+                              or "Restrained laterally,torsionally and against rotation on plan "
+
+                At_top - Either  "free"
+                        or "lateral restraint to top flange"
+                        or "Torsional restraint"
+                        or  "Lateral and torsional restraint"
+
+                Loading_condition - Either "Normal" or  "Destablizing"
+
+            Returns:
+                L_LT =  cl_8_3_3_Table_16_Efective_length_for_cantiliver_beam
+            Note:
+                References:
+                IS800:2007, Table 16 (cl 8.3.3)
+        """
+
+        if Restraint_Condition_1 == "Continuous, with lateral restraint to top flage":
+            if Restraint_Condition_2 == "Free":
+                if Loading_condition == "Normal":
+                    return (3.0 * L + 0 * D)
+                else:
+                    return (7.5 * L + 0 * D)
+            if Restraint_Condition_2 == "Lateral restraint to top flage":
+                if Loading_condition == "Normal":
+                    return (2.7 * L + 0 * D)
+                else:
+                    return (7.5 * L + 0 * D)
+            if Restraint_Condition_2 == "Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (2.4 * L + 0 * D)
+                else:
+                    return (4.5 * L + 0 * D)
+            if Restraint_Condition_2 == "Lateral and Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (2.1 * L + 0 * D)
+                else:
+                    return (3.6 * L + 0 * D)
+        if Restraint_Condition_1 == "Continuous,with partial torsional restraint":
+            if Restraint_Condition_2 == "Free":
+                if Loading_condition == "Normal":
+                    return (2.0 * L + 0 * D)
+                else:
+                    return (5.0 * L + 0 * D)
+            if Restraint_Condition_2 == "Lateral restraint to top flage":
+                if Loading_condition == "Normal":
+                    return (1.8 * L + 0 * D)
+                else:
+                    return (5.0 * L + 0 * D)
+            if Restraint_Condition_2 == "Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (1.6 * L + 0 * D)
+                else:
+                    return (3.0 * L + 0 * D)
+                if Restraint_Condition_2 == " Lateral and Torsional restraint":
+                    if Loading_condition == "Normal":
+                        return (1.4 * L + 0 * D)
+                    else:
+                        return (2.4 * L + 0 * D)
+        if Restraint_Condition_1 == "Continuous,with lateral and torsional restraint":
+            if Restraint_Condition_2 == "Free":
+                if Loading_condition == "Normal":
+                    return (1.0 * L + 0 * D)
+                else:
+                    return (2.5 * l + 0 * D)
+            if Restraint_Condition_2 == "Lateral restraint to top flage":
+                if Loading_condition == "Normal":
+                    return (0.9 * L + 0 * D)
+                else:
+                    return (2.5 * L + 0 * D)
+            if Restraint_Condition_2 == "Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (0.8 * L + 0 * D)
+                else:
+                    return (1.5 * L + 0 * D)
+            if Restraint_Condition_2 == " Lateral and Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (0.7 * L + 0 * D)
+                else:
+                    return (1.2 * L + 0 * D)
+        if Restraint_Condition_1 == "Restrained laterally,torsionally and against rotation on plan":
+            if Restraint_Condition_2 == "Free":
+                if Loading_condition == "Normal":
+                    return (0.8 * L + 0 * D)
+                else:
+                    return (1.4 * L + 0 * D)
+            if Restraint_Condition_2 == "Lateral restraint to top flage":
+                if Loading_condition == "Normal":
+                    return (0.7 * L + 0 * D)
+                else:
+                    return (1.4 * L + 0 * D)
+            if Restraint_Condition_2 == "Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (0.6 * L + 0 * D)
+                else:
+                    return (0.6 * L + 0 * D)
+            if Restraint_Condition_2 == "Lateral and Torsional restraint":
+                if Loading_condition == "Normal":
+                    return (0.5 * L + 0 * D)
+                else:
+                    return (0.5 * L + 0 * D)
+
+    def cl_8_3_Effective_length_against_torsional_restraint(L, D, Beam_type, Restraint_Condition_1,
+                                                            Restraint_Condition_2, Loading_Condition):
+        """
+            Calculation of effective length for given type of beam type as per cl.8.3
+
+        Args:
+            L-  Span of simply suppotred beams and girders in mm (float) for
+                "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges",
+                 Projecting Length of cantiliver beam in mm (float) for
+                 "Cantilever_beam",
+                 Length of relevent segment between the lateral restraint in mm (float) for
+                 "Simply_supported_with_intermediate_lateral_restraints",
+                 Centre-to-centre distance of the restraint member in mm (float) for
+                 "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval"
+
+            D -  Overall depth of he beam in mm (float)
+
+
+            Beam_type - Either "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
+                        or "Simply_supported_with_intermediate_lateral_restraints"
+                        or "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval"
+                        or "Cantilever_beam"
+
+            FOR "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
+
+            Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
+
+            Restraint_Condition_1- "Torsional Restraint"
+            Restraint_Condition_2- "Warping_Restraint"
+
+            "Torsional Restrained" - Either "Fully_resrtrained" or
+                                        "Partially_restrained_by_bottom_flange_support_condition" or
+                                        "Partially_restrained_by_bottom_flange_support_condition"
+
+            "Warping_Restraint" - Either "Both_flange_fully_restrained" or
+                                     "compression_flange_fully_restrained" or
+                                     "Compression_flange_partially_restrained" or
+                                     "Warping_not_restrained_in_both_flange"
+
+
+            FOR "Cantilever_beam"
+
+            Restrained_condition - Either "At support" or "At Top" for "Cantilever_beam"
+
+            Restraint_Condition_1- "At support"
+            Restraint_Condition_2- "At Top"
+
+            At_support -  Either "continous, with lateral restraint to top"
+                              or "continous, with  partial torsional restraint"
+                              or "continous, with lateral and tosional restraint "
+                              or "Restrained laterally,torsionally and against rotation on plan "
+
+            At_top - Either  "free"
+                        or "lateral restraint to top flange"
+                        or "Torsional restraint"
+                        or  "Lateral and torsional restraint"
+
+            Loading_condition - Either "Normal" or  "Destablizing"
+
+
+
+        Returns :
+            L_LT - Effective_length_of_beam in m (float)
+
+        Note:
+                References:
+                IS800:2007,  cl 8.3.
+
+        """
+
+        if Beam_type == "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges":
+            L_LT = cl_8_3_1_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
+                                                                        Restraint_Condition_2, Loading_Condition)
+        elif Beam_type == "Simply_supported_with_intermediate_lateral_restraints":
+            L_LT = 1.2 * L
+        elif Beam_type == "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval":
+            L_LT = 1.2 * L
+        else:
+            L_LT = cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, D, Restraint_Condition_1,
+                                                                         Restraint_Condition_2, Loading_Condition)
+
+        return L_LT
+
+        # E-1 ELASTIC CRITICAL MOMENT
+
+    # E-1.1 General
+    # TODO:Calculate L_LT = L_LT = cl_8_3_Effective_length_against_lateral_torsional_buckling(L,D,Beam_type,Restraint_Condition_1,Restraint_Condition_2,Loading_Condition)
+
+    def Annex_E_1_1_elastic_critical_moment_corresponding_to_lateral_torsional_buckling_of_doubly_symmetric_prismatic_beam(
+            I_y, I_w, I_t, G, E, L_LT):
+
+        """
+            Calculate the elastic critical moment corresponding to lateral
+                torsional buckling of a doubly symmetric prismatic beam subjected to uniform
+                moment in the unsupported length and torsionally restraining lateral supports as per Annex E-1.1
+
+            Args:
+                I_y - Moment of inertia about the minor axis (in quartic mm) (float)
+                I_w - Warping constant of the cross- section (mm**4)(float)
+                I_t - St. Venants torsion constant of the cross-section (mm**4)(float)
+                G -   Modulus of rigidity (float)
+                L_LT = cl_8_3_Effective_length_against_lateral_torsional_buckling(L,D,Beam_type,Restraint_Condition_1,Restraint_Condition_2,Loading_Condition)
+
+
+            Returns:
+                M_cr - Elastic critical moment corresponding to lateral torsional
+                        buckling of doubly symmetric prismatic beam ( in N*mm) (float)
+
+
+            Note:
+                Reference:
+                IS800:2007, Annex - E-1.1
+
+        """
+
+        sum_value = (I_w / I_y) + (G * I_t * L_LT * L_LT) / (pi * pi * E * I_y)
+
+        M_cr = ((pi * pi * E * I_y) / (L_LT * L_LT)) * ((sum_value) ** 0.5)
+
+        return M_cr
+
+    def Annex_E_Table_42_constant_c_1_c_2_c_3(Loading_and_Support_condition, si, K):
+        """
+            Calculate Value of constant c_1,c_2,c_3 as per Table_42 Annex-E
+            Args:
+                Loading_and_Support_condition - Either "Simply supported with ends moments (M,si*M)"
+                                                or "simply Supported beam with UDL"
+                                                or "Fixed support with UDL"
+                                                or "Simply Supported beam with point load at centre"
+                                                or "Fixed Supported beam with point load at centre"
+                                                or "Simply Supported beam with point at L/4 distance from both ends"
+
+                Bending_Moment_diagram- BMD for "Simply supported with ends moments (M,si*M)" by varying value of 'si' as-
+                                                si - [ +1,+3/4,+1/2,+1/4,0,-1/4,-1/2,-3/4,-1 ]
+                                        BMD for "simply Supported beam with UDL"
+                                        si - 0 (Assumed value)
+                                        BMD for "Fixed support with UDL"
+                                        si - 0 (Assumed value)
+                                        BMD for "Simply Supported beam with point load at centre"
+                                        si - 0 (Assumed value)
+                                        BMD for "Fixed Supported beam with point load at centre"
+                                        si - 0 (Assumed value)
+                                        BMD for "Simply Supported beam with point at L/4 distance from both ends"
+                                        si - 0 (Assumed value)
+
+                K - [1.0,0.7,0.5]
+
+            Returns:
+                Value of constant c_1,c_2,c_3
+
+            Note:
+                References:
+                IS800:2007,Table 42,cl E-1.2
+        """
+
+        if Loading_and_Support_condition == "Simply supported with ends moments (M,si*M)":
+            if si == 1:
+                if K == 1.0:
+                    return {"c1": 1.000, "c2": 0, "c3": 1.000}
+                if K == 0.7:
+                    return {"c1": 1.000, "c2": 0, "c3": 1.113}
+                if K == 0.5:
+                    return {"c1": 1.000, "c2": 0, "c3": 1.144}
+            if si == +3 / 4:
+                if K == 1.0:
+                    return {"c1": 1.141, "c2": 0, "c3": 0.998}
+                if K == 0.7:
+                    return {"c1": 1.270, "c2": 0, "c3": 1.565}
+                if K == 0.5:
+                    return {"c1": 1.305, "c2": 0, "c3": 2.283}
+            if si == +1 / 2:
+                if K == 1.0:
+                    return {"c1": 1.323, "c2": 0, "c3": 0.992}
+                if K == 0.7:
+                    return {"c1": 1.473, "c2": 0, "c3": 1.556}
+                if K == 0.5:
+                    return {"c1": 1.514, "c2": 0, "c3": 2.271}
+            if si == +1 / 4:
+                if K == 1.0:
+                    return {"c1": 1.879, "c2": 0, "c3": 0.939}
+                if K == 0.7:
+                    return {"c1": 2.092, "c2": 0, "c3": 1.473}
+                if K == 0.5:
+                    return {"c1": 2.150, "c2": 0, "c3": 2.150}
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.563, "c2": 0, "c3": 0.977}
+                if K == 0.7:
+                    return {"c1": 1.739, "c2": 0, "c3": 1.531}
+                if K == 0.5:
+                    return {"c1": 1.788, "c2": 0, "c3": 2.235}
+            if si == -1 / 4:
+                if K == 1.0:
+                    return {"c1": 2.281, "c2": 0, "c3": 0.855}
+                if K == 0.7:
+                    return {"c1": 2.538, "c2": 0, "c3": 1.340}
+                if K == 0.5:
+                    return {"c1": 2.609, "c2": 0, "c3": 1.957}
+            if si == -1 / 2:
+                if K == 1.0:
+                    return {"c1": 2.704, "c2": 0, "c3": 0.676}
+                if K == 0.7:
+                    return {"c1": 3.009, "c2": 0, "c3": 1.059}
+                if K == 0.5:
+                    return {"c1": 3.093, "c2": 0, "c3": 1.546}
+            if si == -3 / 4:
+                if K == 1.0:
+                    return {"c1": 2.927, "c2": 0, "c3": 0.366}
+                if K == 0.7:
+                    return {"c1": 3.009, "c2": 0, "c3": 0.575}
+                if K == 0.5:
+                    return {"c1": 3.093, "c2": 0, "c3": 0.837}
+            if si == -1:
+                if k == 1.0:
+                    return {"c1": 2.752, "c2": 0, "c3": 0}
+                if k == 0.7:
+                    return {"c1": 3.063, "c2": 0, "c3": 0}
+                if k == 0.5:
+                    return {"c1": 3.149, "c2": 0, "c3": 0}
+        if Loading_and_Support_condition == "simply Supported beam with UDL":
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.132, "c2": 0.459, "c3": 0.525}
+                if K == 0.5:
+                    return {"c1": 0.972, "c2": 0.304, "c3": 0.980}
+        if Loading_and_Support_condition == "Fixed support with UDL":
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.285, "c2": 1.562, "c3": 0.753}
+                if K == 0.5:
+                    return {"c1": 0.712, "c2": 0.652, "c3": 1.070}
+        if Loading_and_Support_condition == "Simply Supported beam with point load at centre":
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.365, "c2": 0.553, "c3": 1.780}
+                if K == 0.5:
+                    return {"c1": 1.070, "c2": 0.432, "c3": 3.050}
+        if Loading_and_Support_condition == "Fixed Supported beam with point load at centre":
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.565, "c2": 1.257, "c3": 2.640}
+                if K == 0.5:
+                    return {"c1": 0.938, "c2": 0.715, "c3": 4.800}
+        if Loading_and_Support_condition == "Simply Supported beam with point at L/4 distance from both ends":
+            if si == 0:
+                if K == 1.0:
+                    return {"c1": 1.046, "c2": 0.430, "c3": 1.120}
+                if K == 0.5:
+                    return {"c1": 1.010, "c2": 0.410, "c3": 1.390}
+
+    # E-1.2 Elastic Critical Moment of a Section Symmetrical About Minor Axis
+    # TODO: Calculate c_1,c_2,c_3 = Annex_E_Table_42_constant_c_1_c_2_c_3(Loading_and_Support_condition,si,K)
+    def Elastic_critical_moment_of_a_section_symmetrical_about_minor_axis(L_LT, c_1, c_2, c_3, E, K, K_w, y_g, A_e, b,
+                                                                          t, I_fc, I_ft, I_y, G, h, h_L, h_y, n,
+                                                                          I_section=True, Open_section=True,
+                                                                          Plain_flange=False):
+        """
+            Calculate the elastic critical moment for lateral torsional buckling for beam which is
+            symmetrical only about the minor axis, and bending about major axis as per Annex E-1.2
+
+            Args:
+                c_1,c_2,c_3- Annex_E_Table_42_constant_c_1_c_2_c_3(Loading_and_Support_condition,si,K)
+                K -  Effective length factors of the unsupported length accounting for boundry condition
+                     at the end letral supports. It is analogus to the effective length factirs for
+                     compression members with end rotational restraint.
+                K_w -Warping restraint factor.
+                y_g -y distance between the point of application of the load and the shear centre of
+                     the cross-section and is positive when the load is acting towards the shear
+                     centre from the point of application.
+                y_s-  co-ordinate of the shear centre with respect to centriod,positive when the shear
+                        centre is on the compression side of the centriod.
+                y,z-  co-ordinate of the elemental area with respect to centriod of the section
+                E -   Youngs modulus of elasticity  ( N per sq.mm)(float)
+                G-     Modulus of regidity (float)
+                I_y  - Moment of inertia about minor axis (in mm**4)(float)
+                I_fc - Moment of inertia of the compression flange about minor axis of the entire section (in mm**4)(float)
+                I_ft - Moment of inertia of the tension flange about minor axis of the entire section (in mm**4)(float)
+                I_w  - The wraping constant either for "I_section_mono_symmetric_about_weak_axis" or for
+                                                        "Angle,Tee,narrow_rectangle_section and approximetly for hollow_section"
+                I_t - Torsion constant either "for open_section" or "hollow_section"
+                A_e - Area encloed by the section (in sq mm)(float)
+                b -   Breadth of the elements of the section(mm)(float)
+                t -   Thickness of the elements of the section (mm)(float)
+                h_L-  Height of the lip in mm(float)
+                h-    overall height of the section in  mm(float)
+                h_y - Distance between shear centre of the two flange of the cross-section in mm (float)
+                Flange type - Either "Plain_flange" or "Lipped_flange"
+                L_LT = cl_8_3_Effective_length_against_lateral_torsional_buckling(L,D,Beam_type,Restraint_Condition_1,Restraint_Condition_2,Loading_Condition)
+            Returns:
+                M_cr- Elastic_critical_moment_of_a_section_symmetrical_about_minor_axis (in N*mm)(float)
+
+            Note:
+                References:
+                IS800:2007,cl E-1.2
+        """
+
+        beta_f = I_fc / (I_ft + I_fc)
+
+        if I_section is True:
+            I_w = (1 - beta_f) * beta_f * I_y * h_y * h_y
+        else:
+            I_w = 0
+
+        if Plain_flange is True:
+            if beta_f > 0.5:
+                y_j = 0.8 * (2 * beta_f - 1) * h_y / 2.0
+            else:
+                y_j = 1.0 * (2 * beta_f - 1) * h_y / 2.0
+        else:
+            if beta_f > 0.5:
+                y_j = 0.8 * (2 * beta_f - 1) * (1 + h_L / h_) * h_y / 2.0
+            else:
+                y_j = (2 * beta_f - 1) * (1 + h_L / h) * h_y / 2
+
+        if Open_section is True:
+            sum_value = 0
+            for i in range(n - 1):
+                sum_value += (b * t * t * t) / 3
+                I_t = sum_value
+        else:
+            sum_value = 0
+            for i in range(n - 1):
+                sum_value += (b / t)
+
+        I_t = 4 * A_e / sum_value
+
+        T_1 = c_1 * (pi * pi * E * I_y) / (L_LT)
+        T_2 = (K / K_w) ** 2 * (I_w / I_y)
+        T_3 = (G * I_t * L_LT * L_LT) / (pi * pi * E * I_y)
+        T_4 = ((c_2 * y_g) - (c_3 * y_j)) ** 2
+        T_5 = ((c_2 * y_g) - (c_3 * y_j))
+
+        M_cr = T_1 * (((T_2 + T_3 + T_4) ** 0.5) - T_5)
+
+        return M_cr
     # ==========================================================================
     """    ANNEX  F       CONNECTIONS   """
     # ==========================================================================

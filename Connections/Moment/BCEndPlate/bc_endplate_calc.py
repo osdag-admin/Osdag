@@ -727,7 +727,7 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
     outputobj['Bolt']['BoltFy'] = 0.0           ###
-    outputobj['Bolt']['NumberOfRows'] = int(no_rows)     ###
+   # outputobj['Bolt']['NumberOfRows'] = int(no_rows)     ###
     outputobj['Bolt']['BoltsPerColumn'] = 0.0   ###
     outputobj['Bolt']['Gauge'] = 0.0            ###
     outputobj['Bolt']['kb'] = 0.0               ###

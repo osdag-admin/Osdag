@@ -37,7 +37,7 @@ class IS800_2007(object):
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
-    
+
 
 # DESIGN OF TENSION MEMBER
 # 6.1 Tension member

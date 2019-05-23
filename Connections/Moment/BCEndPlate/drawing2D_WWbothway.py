@@ -1997,7 +1997,7 @@ class ExtendedEnd2DSide(object):
         point = self.A11 + self.data_object.beam_depth_D2 / 2 * np.array([0, 1])
         theta = 60
         offset = 50
-        textup = "     z         " + str(self.data_object.web_thickness_tw2)
+        textup = "     z         " + str(self.data_object.web_weld_thickness)
         textdown = " "
         element = "weld"
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)

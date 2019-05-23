@@ -437,7 +437,7 @@ def bc_endplate_design(uiObj):
         for bolt_row in range(int(no_rows['in_tension_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
-        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
+        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq / 2
         tension_in_bolt = axial_tension + moment_tension + prying_force
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear

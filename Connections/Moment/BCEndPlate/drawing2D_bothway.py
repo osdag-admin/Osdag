@@ -71,6 +71,18 @@ class ExtendedEndPlate(object):
         self.Lv = float(output_dict['Bolt']['Lv'])
         self.weld = input_dict["Weld"]["Method"]
 
+        # outputobj['Stiffener']['Length'] = 300.0  # TODO:
+        # outputobj['Stiffener']['Height'] = 100.0
+        # outputobj['Stiffener']['Thickness'] = 10.0
+        # outputobj['Stiffener']['NotchBottom'] = 15.0
+        # outputobj['Stiffener']['NotchTop'] = 50.0
+
+        self.stiffener_length =  output_dict['Stiffener']['Length']
+        self.stiffener_height= output_dict['Stiffener']['Height']
+        self.stiffener_thickness = output_dict['Stiffener']['Thickness']
+        self.stiffener_NotchBottom = output_dict['Stiffener']['NotchBottom']
+        self.stiffener_NotchBottom = output_dict['Stiffener']['NotchTop']
+
         self.no_of_columns = 2
         self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
         if self.no_of_bolts == 8:
@@ -573,7 +585,7 @@ class ExtendedEnd2DFront(object):
         ptAA8y = ptAA4y - self.data_object.flange_thickness_T2
         self.AA8 = np.array([ptAA8x, ptAA8y])
 
-        # ================ Stiffeners ==================
+        # ================ Continuity Plate ==================
 
         # darshan
 
@@ -1438,6 +1450,7 @@ class ExtendedEnd2DSide(object):
         ptS8y = ptA2y
         self.S8 = np.array([ptS8x, ptS8y])
 
+
     def call_ExtndBoth_side(self, filename):
         """
 
@@ -1696,14 +1709,9 @@ class ExtendedEnd2DSide(object):
                   "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point2, str(self.data_object.edge_dist), params)
 
-        ptxx3 = np.array(pt_outside_top_column_list[0][1])
-        ptyy3 = ptxx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-        self.data_object.draw_faint_line(ptxx3, ptyy3, dwg)
 
         if self.data_object.no_of_bolts == 20:
             ptx3 = np.array(pt_outside_top_column_list[1][1])
-            pty3 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-            self.data_object.draw_faint_line(ptx3, pty3, dwg)
             point2 = ptx3 + self.data_object.Lv * np.array([0, 1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}
@@ -1720,8 +1728,6 @@ class ExtendedEnd2DSide(object):
                                                     params)
 
         ptx3 = np.array(pt_outside_top_column_list[0][1])
-        pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-        self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
         point2 = ptx3 + self.data_object.end_dist * np.array([0, -1])
         params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
@@ -1787,16 +1793,16 @@ class ExtendedEnd2DSide(object):
             pty3 = ptx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx3, pty3, dwg)
 
-            point1 = ptx3 + self.data_object.pitch23 * np.array([0, -1])
+            point1 = np.array(pt_inside_top_column_list[1][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point1, str(self.data_object.pitch23), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, point1, ptx3, str(self.data_object.pitch23), params)
 
-            point3 = ptx3 + self.data_object.Lv * np.array([0, 1])
+            point3 = ptx3 + self.data_object.Lv * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10,
                       "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point3, str(self.data_object.Lv), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, point3, ptx3, str(self.data_object.Lv), params)
 
             ptx4 = np.array(pt_inside_top_column_list[2][1])
             pty4 = ptx4 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
@@ -1827,12 +1833,6 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch12), params)
 
-            point5 = ptx2 + self.data_object.Lv * np.array([0, 1])
-            params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-                      "endlinedim": 10,
-                      "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point5, str(self.data_object.Lv), params)
-
             ptx3 = np.array(pt_inside_top_column_list[1][1])
             pty3 = ptx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx3, pty3, dwg)
@@ -1859,7 +1859,7 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point3, str(self.data_object.pitch45), params)
 
-            point4 = ptx5 + (self.data_object.pitch56-self.data_object.bolt_diameter) * np.array([0, 1])
+            point4 = np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point4, str(self.data_object.pitch56), params)
@@ -1923,7 +1923,7 @@ class ExtendedEnd2DSide(object):
             ptx7 = np.array(pt_inside_bottom_column_list[1][1])
             pty7 = ptx7 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx7, pty7, dwg)
-            point3 = ptx7 + self.data_object.pitch67 * np.array([0, -1])
+            point3 =  np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10,
                       "arrowlen": 20}
@@ -1970,8 +1970,6 @@ class ExtendedEnd2DSide(object):
 
         if self.data_object.no_of_bolts == 20:
             ptx3 = np.array(pt_outside_bottom_column_list[1][1])
-            pty3 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-            self.data_object.draw_faint_line(ptx3, pty3, dwg)
             point2 = ptx3 + self.data_object.Lv * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}

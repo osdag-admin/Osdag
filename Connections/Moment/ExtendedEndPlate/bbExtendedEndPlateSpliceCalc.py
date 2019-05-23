@@ -2289,8 +2289,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round(M_st, 3)
-            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2429,8 +2429,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round(M_st, 3)
-            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2569,8 +2569,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round(M_st, 3)
-            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2710,8 +2710,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round(M_st, 3)
-            outputobj['Stiffener']['MomentCapacity'] = round(M_capacity_st, 3)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":

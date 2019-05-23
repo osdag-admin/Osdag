@@ -160,25 +160,11 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
-    column_clear_d = column_d - 2 * (column_tf + column_R1)
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
-
-        if beam_B > column_clear_d:
-            design_status = False
-            logger.error(": Beam is wider than column clear depth")
-            logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
-            logger.info(": Currently, Osdag doesn't design such connections")
-
     else:
         bolt_plates_tk = [column_tf, end_plate_thickness]
-
-        if beam_B > column_B:
-            design_status = False
-            logger.error(": Beam is wider than column width")
-            logger.warning(": Width of beam should be less than %s mm" % column_B)
-            logger.info(": Currently, Osdag doesn't design such connections")
 
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]
@@ -451,7 +437,7 @@ def bc_endplate_design(uiObj):
         for bolt_row in range(int(no_rows['in_tension_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
-        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq / 2
+        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
         tension_in_bolt = axial_tension + moment_tension + prying_force
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear
@@ -672,7 +658,23 @@ def bc_endplate_design(uiObj):
                        % capacity_beam_flange)
         logger.info(": Use a higher beam section with wider and/or thicker flange")
 
-    ######################################
+
+
+    # # Design of Stiffener
+    # stiffener_fy = end_plate_fy
+    # stiffener_fu = end_plate_fu
+    #
+    # P_bf = M_f/d_b
+    #    # d_b = beam depth
+    #    # M_f = external moment on beam
+    #
+    # web_strength_web_yielding = f_yw * t_wc /(5*k + t_fb)
+    #    # f_yw = yield stress of column web
+    #    # t_wc = thickness of column web
+    #    # t_fb = thickness of beam flange
+    #    # k = dist from extreme fibre to toe of web fillet (column)
+    #
+
     # End of Calculation, SAMPLE Output dictionary
     outputobj = dict()
 
@@ -708,30 +710,55 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
     outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
+    outputobj['Bolt']['BoltFy'] = 0.0           ###
+#    outputobj['Bolt']['NumberOfRows'] = int(no_rows)     ###
+
+    outputobj['Bolt']['BoltsPerColumn'] = 0.0   ###
+    outputobj['Bolt']['Gauge'] = 0.0            ###
+    outputobj['Bolt']['kb'] = 0.0               ###
+    outputobj['Bolt']['SumPlateThick'] = 0.0     ###
+
+
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
+
+    outputobj['Plate']['Mp'] = 0.0      ##
+    outputobj['Plate']['MomentDemand'] = 0.0    ##
+    outputobj['Plate']['MomentCapacity'] = 0.0    ##
+
+
+
+
+    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
+    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
+    outputobj['ContPlateTens']['Thickness'] = 10.0
+
+
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
-    outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
+    outputobj['ContPlateComp']['Weld'] = 8
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
-    outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
+    outputobj['ContPlateTens']['Weld'] = 8
 
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
-    outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
+    outputobj['Stiffener']['Thickness'] = 10.0
     outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
     outputobj['Stiffener']['NotchTop'] = st_notch_top
-    outputobj['Stiffener']['Weld'] = 8.0    # TODO: Sourabh give calculated values
+    outputobj['Stiffener']['Weld'] = 8.0
+
+
+
 
     # Detailing
     if endplate_type == 'flush':
@@ -824,6 +851,8 @@ def bc_endplate_design(uiObj):
 
     else:  # weld_method == 'groove':
         outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
+
+    outputobj['Weld']['WeldFuGovern'] = 0.0   ###
 
     # End of SAMPLE Output dictionary
     

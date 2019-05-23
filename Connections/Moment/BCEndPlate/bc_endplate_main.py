@@ -22,8 +22,6 @@ from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
 from reportGenerator import save_html
-from drawing_2D import ExtendedEndPlate
-from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
 from drawing2D_bothway import ExtendedEndPlate
 from drawing2D_oneway import OnewayEndPlate
 from drawing2D_flush import FlushEndPlate
@@ -1931,10 +1929,8 @@ class Maincontroller(QMainWindow):
 		self.component = component
 
 		self.display.EraseAll()
-		# self.display.View_Iso()
-		# self.display.StartRotation(2000,0)
+		self.display.View_Iso()
 		self.display.FitAll()
-		# self.display.Rotation(2000, 0)
 		alist = self.designParameters()
 		outputobj = self.outputs
 		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
@@ -1954,20 +1950,16 @@ class Maincontroller(QMainWindow):
 		# ExtObj is an object which gets all the calculated values of CAD models
 		self.ExtObj = self.create_extended_both_ways()
 
-
 		# Displays the beams #TODO ANAND
 		if component == "Column":
-			self.display.View_Iso()
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			# osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Beam":
-			self.display.View_Iso()
 			# osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
 			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
 		elif component == "Connector":
-			self.display.View_Iso()
 			# Displays the end plates
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
@@ -2031,7 +2023,7 @@ class Maincontroller(QMainWindow):
 
 		elif component == "Model":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True, material=Graphic3d_NOT_2D_ALUMINUM)
+			osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)
 			# Displays the end plates
 			# osdag_display_shape(self.display, self.ExtObj.get_plateLModel(), update=True, color='Blue')
 			osdag_display_shape(self.display, self.ExtObj.get_plateRModel(), update=True, color='Blue')
@@ -2091,6 +2083,7 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bcWeldFlang_2Model(), update=True, color='Red')
 
 				osdag_display_shape(self.display, self.ExtObj.get_bcWeldWeb_3Model(), update=True, color='Red')
+
 
 	# =================================================================================
 	def open_about_osdag(self):

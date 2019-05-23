@@ -10,10 +10,16 @@ import cairosvg
 import numpy as np
 import os
 
+########
+########
+########
+############################one way##################################
+########
+########
+########
+class OnewayEndPlate(object):
 
-class ExtendedEndPlate(object):
-
-    def __init__(self, input_dict, output_dict, column_data, beam_data, folder, endplate_type):
+    def __init__(self, input_dict, output_dict, column_data, beam_data, folder):
         """
 
 		Args:
@@ -28,7 +34,7 @@ class ExtendedEndPlate(object):
 		"""
         print "calculation", input_dict
         self.folder = folder
-        #self.endplate_type = endplate_type
+        # self.endplate_type = endplate_type
 
         self.column_length_L1 = 1000
         self.beam_length_L2 = 500
@@ -42,18 +48,18 @@ class ExtendedEndPlate(object):
         self.column_width_B1 = int(column_data["B"])
         self.beam_width_B2 = int(beam_data["B"])
 
-        self.plate_thickness_p1 = int(output_dict['Plate']['Thickness'])
-        self.plate_thickness_p2 = int(output_dict['Plate']['Thickness'])
+        self.plate_thickness_p1 = float(output_dict['Plate']['Thickness'])
+        self.plate_thickness_p2 = float(output_dict['Plate']['Thickness'])
 
-        self.plate_width_B1 = int(output_dict['Plate']['Width'])
+        self.plate_width_B1 = float(output_dict['Plate']['Width'])
 
-        self.plate_length_L1 = int(output_dict['Plate']['Height'])
+        self.plate_length_L1 = float(output_dict['Plate']['Height'])
 
         self.flange_thickness_T1 = (column_data["T"])
         self.flange_thickness_T2 = (beam_data["T"])
 
-        self.web_thickness_tw1 = int(column_data["tw"])
-        self.web_thickness_tw2 = int(beam_data["tw"])
+        self.web_thickness_tw1 = float(column_data["tw"])
+        self.web_thickness_tw2 = float(beam_data["tw"])
 
         self.flange_weld_thickness = int(input_dict['Weld']['Flange (mm)'])  # 12
         self.web_weld_thickness = int(input_dict["Weld"]['Web (mm)'])  # 8
@@ -63,75 +69,50 @@ class ExtendedEndPlate(object):
         self.bolt_hole_type = input_dict['bolt']['bolt_hole_type']
         self.cal_bolt_holedia = ConnectionCalculations.bolt_hole_clearance(self.bolt_hole_type, self.bolt_diameter)
         self.bolt_hole_diameter = self.cal_bolt_holedia + self.bolt_diameter
-        self.edge_dist = int(output_dict['Bolt']['Edge'])
-        self.end_dist = int(output_dict['Bolt']['End'])
-        self.cross_centre_gauge_dist = int(output_dict['Bolt']['CrossCentreGauge'])  # 90
+        self.edge_dist = float (output_dict['Bolt']['Edge'])
+        self.end_dist = float (output_dict['Bolt']['End'])
+        self.flange_projection = float (output_dict['Bolt']['projection'])
+        self.cross_centre_gauge_dist = float (output_dict['Bolt']['CrossCentreGauge'])  # 90
         # self.pitch = 60
 
         self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
         self.Lv = float(output_dict['Bolt']['Lv'])
 
-        if self.endplate_type == "both ways":
-
-            self.no_of_columns = 2
-            self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
-            if self.no_of_bolts == 8:
-                self.pitch = float(output_dict['Bolt']['Pitch'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 1
-                self.bolts_inside_bottom_flange_row = 1
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 12:
-                self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 2
-                self.bolts_inside_bottom_flange_row = 2
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 16:
-                self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-                self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 3
-                self.bolts_inside_bottom_flange_row = 3
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 20:
-                self.pitch12 = float(output_dict['Bolt']['Pitch12'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-                self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-                self.pitch78 = float(output_dict['Bolt']['Pitch78'])
-                self.pitch910 = float(output_dict['Bolt']['Pitch910'])
-                self.bolts_outside_top_flange_row = 2
-                self.bolts_inside_top_flange_row = 3
-                self.bolts_inside_bottom_flange_row = 3
-                self.bolts_outside_bottom_flange_row = 2
-
-        # elif self.endplate_type == "one ways":
-        #
-        #     self.no_of_columns = 2
-        #     self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
-        #
-        #     if self.no_of_bolts == 6:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.endDist = boltPlaceObj["Bolt"]["End"]
-        #     elif self.no_of_bolts == 8:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.endDist = boltPlaceObj["Bolt"]["End"]
-
-
-
-
-
-
-
-
-
+        self.no_of_columns = 2
+        self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
+        if self.no_of_bolts == 6:
+            self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 1
+            self.bolts_inside_bottom_flange_row = 1
+            self.bolts_outside_bottom_flange_row = 0
+        elif self.no_of_bolts == 8:
+            self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 2
+            self.bolts_inside_bottom_flange_row = 1
+            self.bolts_outside_bottom_flange_row = 0
+        elif self.no_of_bolts == 10:
+            self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 3
+            self.bolts_inside_bottom_flange_row = 1
+            self.bolts_outside_bottom_flange_row = 0
+        elif self.no_of_bolts == 12:
+            self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+            self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+            self.bolts_outside_top_flange_row = 2
+            self.bolts_inside_top_flange_row = 3
+            self.bolts_inside_bottom_flange_row = 1
+            self.bolts_outside_bottom_flange_row = 0
 
     def add_s_marker(self, dwg):
         """
@@ -447,32 +428,32 @@ class ExtendedEndPlate(object):
 
 
 		"""
-        extnd_bothway_end_2d_front = ExtendedEnd2DFront(self)
-        extnd_bothway_end_2d_top = ExtendedEnd2DTop(self)
-        extnd_bothway_end_2d_side = ExtendedEnd2DSide(self)
+        Oneway_2d_front = Oneway2DFront(self)
+        Oneway_2d_top = Oneway2DTop(self)
+        Oneway_2d_side = Oneway2DSide(self)
         if view == "Front":
-            extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
+            Oneway_2d_front.call_Oneway_front(filename)
         elif view == "Top":
-            extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
+            Oneway_2d_top.call_Oneway_top(filename)
         elif view == "Side":
-            extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
+            Oneway_2d_side.call_Oneway_side(filename)
         else:
             filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
-            extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
+            Oneway_2d_front.call_Oneway_front(filename)
             cairosvg.svg2png(file_obj=filename,
                              write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
 
             filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
-            extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
+            Oneway_2d_top.call_Oneway_top(filename)
             cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
 
             filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
-            extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
+            Oneway_2d_side.call_Oneway_side(filename)
             cairosvg.svg2png(file_obj=filename,
                              write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
 
 
-class ExtendedEnd2DFront(object):
+class Oneway2DFront(object):
     """
 	Contains functions for generating the front view of the Extended bothway endplate connection.
 	"""
@@ -537,27 +518,25 @@ class ExtendedEnd2DFront(object):
         # darshan
 
         """	
-		defining co-ordinates of Connecting plate in front view
-		right of origin is considered as +ve X axis
-		downward to the origin is considered as +ve Y axis
-		"""
+        defining co-ordinates of Connecting plate in front view
+        right of origin is considered as +ve X axis
+        downward to the origin is considered as +ve Y axis
+        """
+        ptP4x = ptA1x + self.data_object.column_depth_D1
+        ptP4y = ptA1y + self.data_object.column_length_L1 / 2 + self.data_object.beam_depth_D2/2 + self.data_object.flange_projection
+        self.P4 = np.array([ptP4x, ptP4y])
 
-        ptP1x = ptA1x + self.data_object.column_depth_D1
-        # ptP1y = ptA1y + self.data_object.column_length_L1 / 2 - self.data_object.beam_depth_D2 / 2 - self.data_object.end_dist - self.data_object.Lv
-        ptP1y = ptA1y + self.data_object.column_length_L1 / 2 - self.data_object.plate_length_L1 /2
-        self.P1 = np.array([ptP1x, ptP1y])
-
-        ptP2x = ptP1x + self.data_object.plate_thickness_p1
-        ptP2y = ptP1y
-        self.P2 = np.array([ptP2x, ptP2y])
-
-        ptP3x = ptP2x
-        ptP3y = ptP2y + self.data_object.plate_length_L1
+        ptP3x = ptP4x + self.data_object.plate_thickness_p1
+        ptP3y = ptP4y
         self.P3 = np.array([ptP3x, ptP3y])
 
-        ptP4x = ptP1x
-        ptP4y = ptP3y
-        self.P4 = np.array([ptP4x, ptP4y])
+        ptP1x = ptP4x
+        ptP1y = ptP4y - self.data_object.plate_length_L1
+        self.P1 = np.array([ptP1x, ptP1y])
+
+        ptP2x = ptP3x
+        ptP2y = ptP3y - self.data_object.plate_length_L1
+        self.P2 = np.array([ptP2x, ptP2y])
 
         # ================ Beam ==================
 
@@ -569,8 +548,8 @@ class ExtendedEnd2DFront(object):
 		downward to the origin is considered as +ve Y axis
 		"""
 
-        ptAA1x = ptP2x  # self.data_object.beam_length_L1 + self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
-        ptAA1y = ptP2y + self.data_object.plate_length_L1/2 - self.data_object.beam_depth_D2/2
+        ptAA1x = ptA1x + self.data_object.column_depth_D1 + self.data_object.plate_thickness_p1 # self.data_object.beam_length_L1 + self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+        ptAA1y = ptA2y + self.data_object.column_length_L1/2 - self.data_object.beam_depth_D2/2
         self.AA1 = np.array([ptAA1x, ptAA1y])
 
         ptAA2x = ptAA1x + self.data_object.beam_length_L2
@@ -689,7 +668,7 @@ class ExtendedEnd2DFront(object):
         # self.Lv = self.PP2 + ((self.data_object.plate_length_L2 - self.data_object.beam_depth_D2) / 2 - self.data_object.end_dist - self.data_object.flange_weld_thickness)
         self.Lv = self.data_object.Lv
 
-    def call_ExtndBoth_front(self, filename):
+    def call_Oneway_front(self, filename):
         """
 
 		Args:
@@ -756,7 +735,7 @@ class ExtendedEnd2DFront(object):
         # ------------------------------------------  Bolts Outside Top Flange -------------------------------------------
         pt_outside_top_column_list = []
         for i in range(1, botfr + 1):
-            if self.data_object.no_of_bolts == 20:
+            if self.data_object.no_of_bolts == 12:
                 ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) \
                       * np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
@@ -766,7 +745,7 @@ class ExtendedEnd2DFront(object):
                                  stroke_width=2.5))
             else:
                 ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - \
-                      (self.data_object.plate_thickness_p1 + + self.data_object.flange_thickness_T1) * np.array([1, 0])
+                      (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array([1, 0])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
                 rect_width = self.data_object.bolt_diameter
                 rect_length = self.data_object.plate_thickness_p1 + + self.data_object.flange_thickness_T1
@@ -786,22 +765,15 @@ class ExtendedEnd2DFront(object):
         # ------------------------------------------  Bolts Inside Top Flange -------------------------------------------
         pt_inside_top_column_list = []
         for i in range(bitfr):
-            if self.data_object.no_of_bolts == 8:
+            if self.data_object.no_of_bolts == 6:
                 ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch * np.array([0, 1])
-            elif self.data_object.no_of_bolts == 12:
-                ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
-            elif self.data_object.no_of_bolts == 16:
-                ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + + i * self.data_object.pitch23 * np.array([0, 1])
+                    [1, 0])
             else:
                 ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch34 * np.array([0, 1])
+                    [1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
+
 
             ptx1 = ptx - bolt_r * np.array([0, 1])
             rect_width = self.data_object.bolt_diameter
@@ -821,76 +793,74 @@ class ExtendedEnd2DFront(object):
             bobfr = self.data_object.bolts_outside_bottom_flange_row
             bibfr = self.data_object.bolts_inside_bottom_flange_row
 
-        # ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
-        pt_outside_bottom_column_list = []
-        for i in range(bobfr):
-            if self.data_object.no_of_bolts == 20:
-                ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - (
-                            self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * \
-                      np.array([1, 0]) - (i - 1) * self.data_object.pitch910* np.array([0, -1])
-                ptx1 = ptx - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_diameter
-                rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
-                dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
-                                 stroke_width=2.5))
-            else:
-                ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - \
-                      (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0])  # + column * self.data_object.gauge * np.array([0, 1])
-
-            ptx1 = ptx - bolt_r * np.array([0, 1])
-            rect_width = self.data_object.bolt_diameter
-            rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
-            dwg.add(
-                dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
-
-            pt_Cx = ptx + np.array([1, 0])
-            pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-            dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-            pt_outside_bottom_column_list.append(ptx)
-            pt_Cx1 = ptx + np.array([-1, 0])
-            pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-            dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-            pt_outside_bottom_column_list.append(ptx)
+        # # ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
+        # pt_outside_bottom_column_list = []
+        # for i in range(bobfr):
+        #     if self.data_object.no_of_bolts == 20:
+        #         ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - (
+        #                     self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * \
+        #               np.array([1, 0]) - (i - 1) * self.data_object.pitch910* np.array([0, -1])
+        #         ptx1 = ptx - bolt_r * np.array([0, 1])
+        #         rect_width = self.data_object.bolt_diameter
+        #         rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+        #         dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
+        #                          stroke_width=2.5))
+        #     else:
+        #         ptx = self.P3 + (self.data_object.end_dist) * np.array([0, -1]) - \
+        #               (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+        #             [1, 0])  # + column * self.data_object.gauge * np.array([0, 1])
+        #
+        #     ptx1 = ptx - bolt_r * np.array([0, 1])
+        #     rect_width = self.data_object.bolt_diameter
+        #     rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+        #     dwg.add(
+        #         dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+        #
+        #     pt_Cx = ptx + np.array([1, 0])
+        #     pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+        #     dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+        #     pt_outside_bottom_column_list.append(ptx)
+        #     pt_Cx1 = ptx + np.array([-1, 0])
+        #     pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+        #     dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+        #     pt_outside_bottom_column_list.append(ptx)
 
         # ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
         pt_inside_bottom_column_list = []
         for i in range(bibfr):
-            if self.data_object.no_of_bolts == 8:
-                ptx = self.AA4 + ( self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+             ptx = self.AA4 + ( self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch * np.array(
-                    [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-            elif self.data_object.no_of_bolts == 12:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch23 * np.array(
-                    [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-            elif self.data_object.no_of_bolts == 16:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch23 * np.array(
-                    [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
-            else:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) * np.array(
-                    [0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
-                    [1, 0]) + i * self.data_object.pitch34 * np.array([0, -1])
+                    [1, 0])  # + column * self.data_object.gauge * np.array([0, 1])
+            # elif self.data_object.no_of_bolts == 12:
+            #     ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
+            #           * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+            #         [1, 0]) + i * self.data_object.pitch23 * np.array(
+            #         [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+            # elif self.data_object.no_of_bolts == 16:
+            #     ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
+            #           * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+            #         [1, 0]) + i * self.data_object.pitch23 * np.array(
+            #         [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
+            # else:
+            #     ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) * np.array(
+            #         [0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+            #         [1, 0]) + i * self.data_object.pitch34 * np.array([0, -1])
 
-            ptx1 = ptx - bolt_r * np.array([0, 1])
-            rect_width = self.data_object.bolt_diameter
-            rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
-            dwg.add(
-                dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
+        ptx1 = ptx - bolt_r * np.array([0, 1])
+        rect_width = self.data_object.bolt_diameter
+        rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+        dwg.add(
+            dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
-            pt_Cx = ptx + np.array([1, 0])
-            pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
-            dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
-            pt_inside_bottom_column_list.append(ptx)
+        pt_Cx = ptx + np.array([1, 0])
+        pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
+        dwg.add(dwg.line(pt_Cx, pt_Dx).stroke('black', width=2.0, linecap='square'))
+        pt_inside_bottom_column_list.append(ptx)
 
-            pt_Cx1 = ptx + np.array([-1, 0])
-            pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
-            dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
-            pt_inside_bottom_column_list.append(ptx)
+        pt_Cx1 = ptx + np.array([-1, 0])
+        pt_Dx1 = ptx + (rect_length - 20) * np.array([-1, 0])
+        dwg.add(dwg.line(pt_Cx1, pt_Dx1).stroke('black', width=2.0, linecap='square'))
+        pt_inside_bottom_column_list.append(ptx)
 
         # ------------------------------------------  Labeling Outside top bolt of flange -------------------------------------------
         no_of_bolts_flange = self.data_object.bolts_outside_top_flange_row * self.data_object.no_of_columns
@@ -904,17 +874,17 @@ class ExtendedEnd2DFront(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
-        # ------------------------------------------  Labeling Outside bottom bolt of flange -------------------------------------------
-        no_of_bolts_flange = self.data_object.bolts_outside_bottom_flange_row * self.data_object.no_of_columns
-        point = np.array(pt_outside_bottom_column_list[0])
-        theta = 60
-        offset = 50
-        textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
-        textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
-            self.data_object.bolt_type) + " bolts (grade " + str(
-            self.data_object.grade) + ")"
-        element = " "
-        self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
+        # # ------------------------------------------  Labeling Outside bottom bolt of flange -------------------------------------------
+        # no_of_bolts_flange = self.data_object.bolts_outside_bottom_flange_row * self.data_object.no_of_columns
+        # point = np.array(pt_outside_bottom_column_list[0])
+        # theta = 60
+        # offset = 50
+        # textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
+        # textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
+        #     self.data_object.bolt_type) + " bolts (grade " + str(
+        #     self.data_object.grade) + ")"
+        # element = " "
+        # self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
 
         # ------------------------------------------  Labeling Inside top bolt of flange -------------------------------------------
         no_of_bolts_flange = self.data_object.bolts_inside_top_flange_row * self.data_object.no_of_columns
@@ -1021,7 +991,7 @@ class ExtendedEnd2DFront(object):
 
         dwg.save()
 
-class ExtendedEnd2DTop(object):
+class Oneway2DTop(object):
     """
 	Contains functions for generating the top view of the Extended bothway endplate connection.
 
@@ -1171,7 +1141,7 @@ class ExtendedEnd2DTop(object):
     # self.BB5 = self.BB4 + self.data_object.web_weld_thickness * np.array([1, 0])
     # self.BB6 = self.BB4 + self.data_object.web_weld_thickness * np.array([0, 1])
 
-    def call_ExtndBoth_top(self, filename):
+    def call_Oneway_top(self, filename):
         """
 
 		Args:
@@ -1341,7 +1311,7 @@ class ExtendedEnd2DTop(object):
         dwg.save()
 
 
-class ExtendedEnd2DSide(object):
+class Oneway2DSide(object):
     """
 	Contains functions for generating the side view of the Extended bothway endplate connection.
 
@@ -1376,7 +1346,7 @@ class ExtendedEnd2DSide(object):
         # ========================= Beam  =========================
 
         ptA1x = ptP1x + (self.data_object.plate_width_B1 - self.data_object.beam_width_B2) / 2
-        ptA1y = ptP1y + (self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2
+        ptA1y = ptP1y + (self.data_object.plate_length_L1 - self.data_object.beam_depth_D2 - self.data_object.flange_projection)
         self.A1 = np.array([ptA1x, ptA1y])
 
         ptA2x = ptA1x + self.data_object.beam_width_B2
@@ -1396,7 +1366,7 @@ class ExtendedEnd2DSide(object):
         self.A4 = np.array([ptA4x, ptA4y])
 
         ptA8x = ptA1x
-        ptA8y = (self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2
+        ptA8y = ptA1y + (self.data_object.beam_depth_D2)
         self.A8 = np.array([ptA8x, ptA8y])
 
         ptA9x = ptA1x
@@ -1491,7 +1461,7 @@ class ExtendedEnd2DSide(object):
         ptAA16y = ptAA7y
         self.AA16 = np.array([ptAA16x, ptAA16y])
 
-    def call_ExtndBoth_side(self, filename):
+    def call_Oneway_side(self, filename):
         """
 
 		Args:
@@ -1577,25 +1547,14 @@ class ExtendedEnd2DSide(object):
         for i in range(1, (botfr + 1)):
             col_outside_list_top = []
             for j in range(1, (nofc + 1)):
-                if self.data_object.no_of_bolts == 8:
-                    pt = self.P1 + self.data_object.end_dist * np.array([0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, 1]) + (
+                # if self.data_object.no_of_bolts == 12:
+                pt = self.P1 + self.data_object.end_dist * np.array([0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 12:
-                    pt = self.P1 + self.data_object.end_dist * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
-                                 j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 16:
-                    pt = self.P1 + self.data_object.end_dist * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
-                                 j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 20:
-                    pt = self.P1 + self.data_object.end_dist * np.array(
-                        [0, 1]) + \
-                         self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array(
-                        [0, 1]) + (j - 1) * \
-                         self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+                # else:
+                #     pt = self.P1 + self.data_object.end_dist * np.array([0, 1]) + self.data_object.edge_dist * np.array(
+                #         [1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1]) + (
+                #                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+
                 dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
                 pt_C = pt - (bolt_r + 4) * np.array([1, 0])
                 pt_D = pt + (bolt_r + 4) * np.array([1, 0])
@@ -1613,20 +1572,20 @@ class ExtendedEnd2DSide(object):
         for i in range(1, (bitfr + 1)):
             col_inside_list_top = []
             for j in range(1, (nofc + 1)):
-                if self.data_object.no_of_bolts == 8:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T2 + self.data_object.Lv + self.data_object.flange_weld_thickness) * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array(
+                if self.data_object.no_of_bolts == 6:
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
+                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23* np.array(
                         [0, 1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 12:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T1 + self.data_object.Lv + self.data_object.flange_weld_thickness) * np.array(
+                elif self.data_object.no_of_bolts == 8:
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 16:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T1 + self.data_object.Lv + self.data_object.flange_weld_thickness) * np.array(
+                elif self.data_object.no_of_bolts == 10:
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 elif self.data_object.no_of_bolts == 20:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 - self.data_object.beam_depth_D2) / 2 + self.data_object.flange_thickness_T1 + self.data_object.Lv + self.data_object.flange_weld_thickness) * np.array(
+                    pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.web_thickness_tw2 +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
                 dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
@@ -1647,59 +1606,60 @@ class ExtendedEnd2DSide(object):
         bibfr = self.data_object.bolts_inside_bottom_flange_row
         # ------------------------------------------  Bolts Outside Bottom Flange -------------------------------------------
 
-        pt_outside_bottom_column_list = []
-        for i in range(1, (bobfr + 1)):
-            col_outside_list_bottom = []
-            for j in range(1, (nofc + 1)):
-                if self.data_object.no_of_bolts == 8:
-                    pt = self.P4 + self.data_object.end_dist * np.array(
-                        [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch * np.array([0, - 1]) + (
-                                 j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 12:
-                    pt = self.P4 + self.data_object.end_dist * np.array(
-                        [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (
-                                 j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 16:
-                    pt = self.P4 + self.data_object.end_dist * np.array(
-                        [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (
-                                 j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 20:
-                    pt = self.P4 + self.data_object.end_dist * \
-                         np.array([0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
-                                     i - 1) * self.data_object.pitch34 * np.array([0, -1]) + \
-                         (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
-                pt_C = pt - (bolt_r + 4) * np.array([1, 0])
-                pt_D = pt + (bolt_r + 4) * np.array([1, 0])
-                dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
-
-                pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
-                pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
-                dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
-
-                col_outside_list_bottom.append(pt)
-            pt_outside_bottom_column_list.append(col_outside_list_bottom)
+        # pt_outside_bottom_column_list = []
+        # for i in range(1, (bobfr + 1)):
+        #     col_outside_list_bottom = []
+        #     for j in range(1, (nofc + 1)):
+        #         if self.data_object.no_of_bolts == 8:
+        #             pt = self.P4 + self.data_object.end_dist * np.array(
+        #                 [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
+        #                              i - 1) * self.data_object.pitch * np.array([0, - 1]) + (
+        #                          j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+        #         elif self.data_object.no_of_bolts == 12:
+        #             pt = self.P4 + self.data_object.end_dist * np.array(
+        #                 [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
+        #                              i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (
+        #                          j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+        #         elif self.data_object.no_of_bolts == 16:
+        #             pt = self.P4 + self.data_object.end_dist * np.array(
+        #                 [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
+        #                              i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (
+        #                          j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+        #         elif self.data_object.no_of_bolts == 20:
+        #             pt = self.P4 + self.data_object.end_dist * \
+        #                  np.array([0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (
+        #                              i - 1) * self.data_object.pitch34 * np.array([0, -1]) + \
+        #                  (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+        #         dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
+        #         pt_C = pt - (bolt_r + 4) * np.array([1, 0])
+        #         pt_D = pt + (bolt_r + 4) * np.array([1, 0])
+        #         dwg.add(dwg.line(pt_C, pt_D).stroke('red', width=1.0, linecap='square'))
+        #
+        #         pt_C1 = pt - (bolt_r + 4) * np.array([0, 1])
+        #         pt_D1 = pt + (bolt_r + 4) * np.array([0, 1])
+        #         dwg.add(dwg.line(pt_C1, pt_D1).stroke('red', width=1.0, linecap='square'))
+        #
+        #         col_outside_list_bottom.append(pt)
+        #     pt_outside_bottom_column_list.append(col_outside_list_bottom)
 
         # ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
         pt_inside_bottom_column_list = []
         for i in range(1, (bibfr + 1)):
             col_inside_list_bottom = []
             for j in range(1, (nofc + 1)):
-                if self.data_object.no_of_bolts == 8:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 12:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 16:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 20:
-                    pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
-                        [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+                pt = self.P4 + (self.data_object.flange_projection + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.data_object.Lv) * np.array(
+                        [0, -1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23* np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+
+                # elif self.data_object.no_of_bolts == 12:
+
+                #     pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
+                #         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+                # elif self.data_object.no_of_bolts == 16:
+                #     pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
+                #         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
+                # elif self.data_object.no_of_bolts == 20:
+                #     pt = self.P1 + ((self.data_object.plate_length_L1 + self.data_object.beam_depth_D2) / 2 - self.data_object.flange_thickness_T1 - self.data_object.Lv - self.data_object.flange_weld_thickness) * np.array(
+                #         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array([0, -1]) + (j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
 
                 dwg.add(dwg.circle(center=pt, r=bolt_r, stroke='black', fill='none', stroke_width=1.5))
                 pt_C = pt - (bolt_r + 4) * np.array([1, 0])
@@ -1756,7 +1716,7 @@ class ExtendedEnd2DSide(object):
                                                     params)
 
         # ------------------------------------------  Faint line for inside top flange bolts-------------------------------------------
-        if self.data_object.no_of_bolts == 8:
+        if self.data_object.no_of_bolts == 6:
             ptx1 = np.array(pt_inside_top_column_list[0][1])
             pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx1, pty1, dwg)
@@ -1765,18 +1725,23 @@ class ExtendedEnd2DSide(object):
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
-            point1 = ptx2 + self.data_object.pitch * np.array([0, -1])
+            # point1 = ptx2 + self.data_object.pitch23* np.array([0, -1])
+            # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
+            #           "endlinedim": 10, "arrowlen": 20}
+            # self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
+
+            point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx2,ptx1, str(self.data_object.pitch23), params)
 
-            point2 = ptx1 + self.data_object.Lv * np.array([0, -1])
-            params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
-                      "endlinedim": 10,
-                      "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
+            # point2 = ptx2 + self.data_object.Lv * np.array([0, -1])
+            # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
+            #           "endlinedim": 10,
+            #           "arrowlen": 20}
+            # self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point2, str(self.data_object.Lv), params)
 
-        elif self.data_object.no_of_bolts == 12:
+        elif self.data_object.no_of_bolts == 8:
             ptx2 = np.array(pt_inside_top_column_list[1][1])
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
@@ -1800,7 +1765,7 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
 
-        elif self.data_object.no_of_bolts == 16:
+        elif self.data_object.no_of_bolts == 10:
             ptx2 = np.array(pt_inside_top_column_list[1][1])
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
@@ -1836,7 +1801,7 @@ class ExtendedEnd2DSide(object):
                       "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx4, point2, str(self.data_object.pitch45), params)
 
-        elif self.data_object.no_of_bolts == 20:
+        elif self.data_object.no_of_bolts == 12:
             ptx1 = np.array(pt_outside_top_column_list[0][1])
             pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx1, pty1, dwg)
@@ -1888,13 +1853,29 @@ class ExtendedEnd2DSide(object):
 
         # -------------------------------------------------------------------------------------------
         # ------------------------------------------  Faint line for inside bottom flange bolts-------------------------------------------
-        if self.data_object.no_of_bolts == 8:
-            pass
-
-        elif self.data_object.no_of_bolts == 12:
-            ptx1 = np.array(pt_inside_bottom_column_list[1][1])
-            pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+        if self.data_object.no_of_bolts == 6:
+            ptx1 = np.array(pt_inside_bottom_column_list[0][1])
+            pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([-1, 0])
             self.data_object.draw_faint_line(ptx1, pty1, dwg)
+
+            ptx2 = ptx1 + self.data_object.Lv * np.array([0, 1])
+            pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([-1, 0])
+            self.data_object.draw_faint_line(ptx2, pty2, dwg)
+
+            params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
+                      "endlinedim": 10, "arrowlen": 20}
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, ptx1, str(self.data_object.Lv), params)
+
+            # point2 = ptx1 + self.data_object.Lv * np.array([0, -1])
+            # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
+            #           "endlinedim": 10,
+            #           "arrowlen": 20}
+            # self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
+
+        elif self.data_object.no_of_bolts == 8:
+            # ptx1 = np.array(pt_inside_bottom_column_list[1][1])
+            # pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+            # self.data_object.draw_faint_line(ptx1, pty1, dwg)
 
             ptx2 = np.array(pt_inside_bottom_column_list[0][1])
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
@@ -1905,17 +1886,17 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
 
-        elif self.data_object.no_of_bolts == 16:
-            ptx5 = np.array(pt_inside_bottom_column_list[2][1])
+        elif self.data_object.no_of_bolts == 10:
+            ptx5 = np.array(pt_inside_bottom_column_list[0][1])
             pty5 = ptx5 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx5, pty5, dwg)
 
-            point2 = ptx5 + self.data_object.pitch56 * np.array([0, 1])
+            point2 = ptx5 + self.data_object.pitch45 * np.array([0, 1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point2, str(self.data_object.pitch56), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point2, str(self.data_object.pitch45), params)
 
-            ptx6 = np.array(pt_inside_bottom_column_list[1][1])
+            ptx6 = np.array(pt_inside_bottom_column_list[0][1])
             pty6 = ptx6 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx6, pty6, dwg)
 
@@ -1928,12 +1909,12 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx7, point1, str(self.data_object.pitch67), params)
 
-        elif self.data_object.no_of_bolts == 20:
-            ptx6 = np.array(pt_inside_bottom_column_list[2][1])
+        elif self.data_object.no_of_bolts == 12:
+            ptx6 = np.array(pt_inside_bottom_column_list[0][1])
             pty6 = ptx6 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx6, pty6, dwg)
 
-            ptx7 = np.array(pt_inside_bottom_column_list[1][1])
+            ptx7 = np.array(pt_inside_bottom_column_list[0][1])
             pty7 = ptx7 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx7, pty7, dwg)
             point3 = ptx7 + self.data_object.pitch67 * np.array([0, -1])
@@ -1950,31 +1931,31 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx8, point1, str(self.data_object.pitch78), params)
 
-            ptx9 = np.array(pt_outside_bottom_column_list[1][1])
-            pty9 = ptx9 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-            self.data_object.draw_faint_line(ptx9, pty9, dwg)
-
-            ptx10 = np.array(pt_outside_bottom_column_list[0][1])
-            pty10 = ptx10 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-            self.data_object.draw_faint_line(ptx10, pty10, dwg)
-            point2 = ptx10 + self.data_object.pitch910 * np.array([0, -1])
-            params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
-                      "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx10, point2, str(self.data_object.pitch910), params)
+            # ptx9 = np.array(pt_outside_bottom_column_list[0][1])
+            # pty9 = ptx9 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+            # self.data_object.draw_faint_line(ptx9, pty9, dwg)
+            #
+            # ptx10 = np.array(pt_outside_bottom_column_list[0][1])
+            # pty10 = ptx10 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+            # self.data_object.draw_faint_line(ptx10, pty10, dwg)
+            # point2 = ptx10 + self.data_object.pitch910 * np.array([0, -1])
+            # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
+            #           "endlinedim": 10, "arrowlen": 20}
+            # self.data_object.draw_dimension_outer_arrow(dwg, ptx10, point2, str(self.data_object.pitch910), params)
 
         # ------------------------------------------  Faint line for bottom bolts showing end distance-------------------------------------------
-        ptx1 = self.P3
-        pty1 = ptx1 + self.data_object.beam_width_B2 * np.array([1, 0])
-        self.data_object.draw_faint_line(ptx1, pty1, dwg)
-
-        ptx2 = np.array(pt_outside_bottom_column_list[0][1])
-        pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-        self.data_object.draw_faint_line(ptx2, pty2, dwg)
-
-        point1 = ptx2 + self.data_object.end_dist * np.array([0, 1])
-        params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-                  "endlinedim": 10, "arrowlen": 20}
-        self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.end_dist), params)
+        # ptx1 = self.P3
+        # pty1 = ptx1 + self.data_object.beam_width_B2 * np.array([1, 0])
+        # self.data_object.draw_faint_line(ptx1, pty1, dwg)
+        #
+        # ptx2 = np.array(pt_outside_bottom_column_list[0][1])
+        # pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+        # self.data_object.draw_faint_line(ptx2, pty2, dwg)
+        #
+        # point1 = ptx2 + self.data_object.end_dist * np.array([0, 1])
+        # params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
+        #           "endlinedim": 10, "arrowlen": 20}
+        # self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.end_dist), params)
 
         # ------------------------------------------  End Plate 1 -------------------------------------------
         point = self.P1 + 10 * np.array([1, 0])

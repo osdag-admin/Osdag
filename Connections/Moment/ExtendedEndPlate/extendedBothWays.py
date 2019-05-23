@@ -487,12 +487,12 @@ class CADGroove(object):
         self.createbeam_stiffener_2Geometry()
         self.createbeam_stiffener_3Geometry()
         self.createbeam_stiffener_4Geometry()
-        self.bbWeldFlang_R1()
-        self.bbWeldFlang_R2()
-        self/bbWeldFlang_L1()
-        self.bbWeldFlang_L2()
-        self.bbWeldWeb_R3()
-        self.bbWeldWeb_L3()
+        self.create_bbWeldFlang_R1()
+        self.create_bbWeldFlang_R2()
+        self.create_bbWeldFlang_L1()
+        self.create_bbWeldFlang_L2()
+        self.create_bbWeldWeb_R3()
+        self.create_bbWeldWeb_L3()
 
 
         # call for create_model of filletweld from Components directory
@@ -510,7 +510,7 @@ class CADGroove(object):
         self.bbWeldFlang_L1Model = self.bbWeldFlang_L1.create_model()
         self.bbWeldFlang_L2Model = self.bbWeldFlang_L2.create_model()
         self.bbWeldWeb_R3Model = self.bbWeldWeb_R3.create_model()
-        self.bbWeldWeb_L3Model = self.bbWeldWeb_R3.create_model()
+        self.bbWeldWeb_L3Model = self.bbWeldWeb_L3.create_model()
 
 
 
@@ -526,7 +526,7 @@ class CADGroove(object):
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-        gap = self.beamRight.length + 2 * self.plateRight.T
+        gap = self.beamRight.length + 2 * self.plateRight.T + 2* self.bbWeldWeb_L3.b
         beamOriginR = numpy.array([0.0, gap, 0.0])
         beamR_uDir = numpy.array([1.0, 0.0, 0.0])
         beamR_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -535,14 +535,14 @@ class CADGroove(object):
     def createPlateLGeometry(self):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
-            plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T,
+            plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b,
                                         (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
 
         else:
-            plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T, 0.0])
+            plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b, 0.0])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
@@ -550,7 +550,7 @@ class CADGroove(object):
     def createPlateRGeometry(self):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
-            gap = 1.5 * self.plateRight.T + self.beamLeft.length
+            gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array(
                 [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -558,22 +558,21 @@ class CADGroove(object):
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
 
         else:
-            gap = 1.5 * self.plateRight.T + self.beamLeft.length
+            gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array([-self.plateRight.W / 2, gap, 0.0])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
 
     def create_nut_bolt_array(self):
-        nutboltArrayOrigin = self.plateLeft.sec_origin + numpy.array(
-            [0.0, -0.5 * self.plateLeft.T, self.plateLeft.L / 2])
+        nutboltArrayOrigin = self.plateLeft.sec_origin + numpy.array([0.0, -0.5 * self.plateLeft.T, self.plateLeft.L / 2])
         gaugeDir = numpy.array([1.0, 0, 0])
         pitchDir = numpy.array([0, 0, -1.0])
         boltDir = numpy.array([0, 1.0, 0])
         self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
     def createbeam_stiffener_1Geometry(self):
-        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2 + 2*self.bbWeldWeb_L3.b
         stiffenerOrigin1 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
                                         self.beamRight.D / 2 + self.beam_stiffener_1.W / 2])
         stiffener1_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -581,7 +580,7 @@ class CADGroove(object):
         self.beam_stiffener_1.place(stiffenerOrigin1, stiffener1_uDir, stiffener1_wDir)
 
     def createbeam_stiffener_2Geometry(self):
-        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2 + 2*self.bbWeldWeb_L3.b
         stiffenerOrigin2 = numpy.array([self.beam_stiffener_1.T / 2, gap,
                                         - self.beamRight.D / 2 - self.beam_stiffener_1.W / 2])
         stiffener2_uDir = numpy.array([0.0, 1.0, 0.0])
@@ -607,43 +606,40 @@ class CADGroove(object):
     ##############################################  creating weld sections ########################################
 
     def create_bbWeldFlang_R1(self):
-        weldFlangOrigin_R1 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                         self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T  + self.bbWeldWeb_L3.b/2
+        weldFlangOrigin_R1 = numpy.array([- self.beamLeft.B/2, gap, self.beamLeft.D/2 - self.beamLeft.T/2])
         uDir_1 = numpy.array([0, 1.0, 0])
         wDir_1 = numpy.array([1.0, 0, 0])
         self.bbWeldFlang_R1.place(weldFlangOrigin_R1, uDir_1, wDir_1)
 
     def create_bbWeldFlang_R2(self):
-        weldFlangOrigin_R2 = numpy.array([self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                         self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T  + self.bbWeldWeb_L3.b / 2
+        weldFlangOrigin_R2 = numpy.array([self.beamLeft.B/2, gap, -(self.beamLeft.D/2 - self.beamLeft.T/2)])
         uDir_2 = numpy.array([0, 1.0, 0])
         wDir_2 = numpy.array([-1.0, 0, 0])
         self.bbWeldFlang_R2.place(weldFlangOrigin_R2, uDir_2, wDir_2)
 
     def create_bbWeldFlang_L1(self):
-        weldFlangOrigin_L1 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                         self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2])
+        weldFlangOrigin_L1 = numpy.array([ - self.beamLeft.B/2 , self.beamLeft.length + self.bbWeldWeb_L3.b/2, self.beamLeft.D/2 - self.beamLeft.T/2])
         uDir_1 = numpy.array([0, 1.0, 0])
         wDir_1 = numpy.array([1.0, 0, 0])
         self.bbWeldFlang_L1.place(weldFlangOrigin_L1, uDir_1, wDir_1)
 
     def create_bbWeldFlang_L2(self):
-        weldFlangOrigin_L2 = numpy.array([self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                         self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2])
+        weldFlangOrigin_L2 = numpy.array([self.beamLeft.B/2, self.beamLeft.length + self.bbWeldWeb_L3.b/2,-(self.beamLeft.D/2 - self.beamLeft.T/2)])
         uDir_2 = numpy.array([0, 1.0, 0])
         wDir_2 = numpy.array([-1.0, 0, 0])
         self.bbWeldFlang_L2.place(weldFlangOrigin_L2, uDir_2, wDir_2)
 
     def create_bbWeldWeb_R3(self):
-        weldWebOrigin_R3 = numpy.array([0.0, self.beamLeft.D / 2 + self.plateRight.T,
-                                       self.beamLeft.length / 2 - self.bbWeldWeb_R3.L / 2])
+        gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T  + self.bbWeldWeb_L3.b / 2
+        weldWebOrigin_R3 = numpy.array([0.0, gap,-self.bbWeldWeb_L3.L/2])
         uDirWeb_3 = numpy.array([0, 1.0, 0])
         wDirWeb_3 = numpy.array([0, 0, 1.0])
-        self.bbWeldWeb_R3.place(weldWebOrigin_3, uDirWeb_3, wDirWeb_3)
+        self.bbWeldWeb_R3.place(weldWebOrigin_R3, uDirWeb_3, wDirWeb_3)
 
     def create_bbWeldWeb_L3(self):
-        weldWebOrigin_L3 = numpy.array([0.0, self.beamLeft.D / 2 + self.plateRight.T,
-                                       self.beamLeft.length / 2 - self.bbWeldWeb_L3.L / 2])
+        weldWebOrigin_L3 = numpy.array([0.0, self.beamLeft.length + self.bbWeldWeb_L3.b/2, -self.bbWeldWeb_L3.L/2])
         uDirWeb_3 = numpy.array([0, 1.0, 0])
         wDirWeb_3 = numpy.array([0, 0, 1.0])
         self.bbWeldWeb_L3.place(weldWebOrigin_L3, uDirWeb_3, wDirWeb_3)
@@ -718,7 +714,7 @@ class CADGroove(object):
         return self.bbWeldFlang_R1Model
 
     def get_bbWeldFlang_R2Model(self):
-        return self.bbWeldFlang_R1Model
+        return self.bbWeldFlang_R2Model
 
     def get_bbWeldFlang_L1Model(self):
         return self.bbWeldFlang_L1Model
@@ -730,6 +726,6 @@ class CADGroove(object):
         return self.bbWeldWeb_R3Model
 
     def get_bbWeldWeb_L3Model(self):
-        return self.bbWeldWeb_L3
+        return self.bbWeldWeb_L3Model
 
 

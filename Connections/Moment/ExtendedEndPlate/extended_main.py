@@ -35,10 +35,12 @@ from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
+from Connections.Component.groove_weld import GrooveWeld
 from Connections.Component.plate import Plate
 from Connections.Component.stiffener_plate import StiffenerPlate
 from Connections.Moment.ExtendedEndPlate.bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from Connections.Moment.ExtendedEndPlate.extendedBothWays import CADFillet
+from Connections.Moment.ExtendedEndPlate.extendedBothWays import CADGroove
 from Connections.Moment.ExtendedEndPlate.nutBoltPlacement import NutBoltArray
 from Connections.Component.quarterCone import QuarterCone
 from OCC.Quantity import Quantity_NOC_SADDLEBROWN
@@ -1637,7 +1639,7 @@ class Maincontroller(QMainWindow):
 		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, alist)
 
 
-		if alist["Weld"]["Method"] == "Fillet Weld":
+		if alist["Weld"]["Type"] == "Fillet Weld":
 
 			###########################
 			#       WELD SECTIONS     #
@@ -1682,16 +1684,16 @@ class Maincontroller(QMainWindow):
 			return extbothWays
 
 		else:  # Groove Weld
-			bbWeldFlang_R1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
-									   L=beam_B)
-			bbWeldFlang_R2 = copy.copy(bcWeldFlang_1)
+			bbWeldFlang_R1 = GrooveWeld(b=15, h=float(beam_data["T"]),
+									   L=beam_B)			#outputobj["Weld"]["Size"]
+			bbWeldFlang_R2 = copy.copy(bbWeldFlang_R1)
 
-			bbWeldFlang_L1 = copy.copy(bcWeldFlang_1)
-			bbWeldFlang_L2 = copy.copy(bcWeldFlang_1)
+			bbWeldFlang_L1 = copy.copy(bbWeldFlang_R1)
+			bbWeldFlang_L2 = copy.copy(bbWeldFlang_R1)
 
 			# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-			bbWeldWeb_R3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
-									 L=beam_d - 2 * beam_T)
+			bbWeldWeb_R3 = GrooveWeld(b=15.0, h=float(beam_data["tw"]),
+									 L=beam_d - 2 * beam_T)		#outputobj["Weld"]["Size"]
 
 			bbWeldWeb_L3 = copy.copy(bbWeldWeb_R3)
 
@@ -1809,6 +1811,8 @@ class Maincontroller(QMainWindow):
 		self.display.View_Iso()
 		self.display.FitAll()
 
+		alist = self.designParameters()
+
 		self.display.DisableAntiAliasing()
 		if bgcolor == "gradient_bg":
 
@@ -1844,7 +1848,7 @@ class Maincontroller(QMainWindow):
 
 			# Display all the Welds including the quarter cone
 
-			if alist["Weld"]["Method"] == "Fillet Weld":
+			if alist["Weld"]["Type"] == "Fillet Weld":
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
@@ -1864,7 +1868,7 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
-			else:
+			else:		 #Groove weld
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R1Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R2Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_L1Model(), update=True, color='Red')
@@ -1896,7 +1900,7 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, nutbolt, color=Quantity_NOC_SADDLEBROWN, update=True)
 
 			# Display all the Welds including the quarter cone
-			if alist["Weld"]["Method"] == "Fillet Weld":
+			if alist["Weld"]["Type"] == "Fillet Weld":
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_11Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_12Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldAbvFlang_21Model(), update=True, color='Red')
@@ -1916,7 +1920,7 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
-			else:
+			else:	 #Groove weld
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R1Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R2Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_L1Model(), update=True, color='Red')

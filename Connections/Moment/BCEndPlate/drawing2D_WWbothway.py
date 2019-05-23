@@ -11,9 +11,9 @@ import numpy as np
 import os
 
 
-class ExtendedEndPlate(object):
+class ExtendedEndPlate_WW(object):
 
-    def __init__(self, input_dict, output_dict, column_data, beam_data, folder, endplate_type):
+    def __init__(self, input_dict, output_dict, column_data, beam_data, folder):
         """
 
 		Args:
@@ -28,7 +28,6 @@ class ExtendedEndPlate(object):
 		"""
         print "calculation", input_dict
         self.folder = folder
-        #self.endplate_type = endplate_type
 
         self.column_length_L1 = 1000
         self.beam_length_L2 = 500
@@ -71,67 +70,44 @@ class ExtendedEndPlate(object):
         self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
         self.Lv = float(output_dict['Bolt']['Lv'])
 
-        if self.endplate_type == "both ways":
-
-            self.no_of_columns = 2
-            self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
-            if self.no_of_bolts == 8:
-                self.pitch = float(output_dict['Bolt']['Pitch'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 1
-                self.bolts_inside_bottom_flange_row = 1
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 12:
-                self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 2
-                self.bolts_inside_bottom_flange_row = 2
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 16:
-                self.pitch23 = float(output_dict['Bolt']['Pitch23'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-                self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-                self.bolts_outside_top_flange_row = 1
-                self.bolts_inside_top_flange_row = 3
-                self.bolts_inside_bottom_flange_row = 3
-                self.bolts_outside_bottom_flange_row = 1
-            elif self.no_of_bolts == 20:
-                self.pitch12 = float(output_dict['Bolt']['Pitch12'])
-                self.pitch34 = float(output_dict['Bolt']['Pitch34'])
-                self.pitch45 = float(output_dict['Bolt']['Pitch45'])
-                self.pitch56 = float(output_dict['Bolt']['Pitch56'])
-                self.pitch67 = float(output_dict['Bolt']['Pitch67'])
-                self.pitch78 = float(output_dict['Bolt']['Pitch78'])
-                self.pitch910 = float(output_dict['Bolt']['Pitch910'])
-                self.bolts_outside_top_flange_row = 2
-                self.bolts_inside_top_flange_row = 3
-                self.bolts_inside_bottom_flange_row = 3
-                self.bolts_outside_bottom_flange_row = 2
-
-        # elif self.endplate_type == "one ways":
-        #
-        #     self.no_of_columns = 2
-        #     self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
-        #
-        #     if self.no_of_bolts == 6:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.endDist = boltPlaceObj["Bolt"]["End"]
-        #     elif self.no_of_bolts == 8:
-        #         self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
-        #         self.endDist = boltPlaceObj["Bolt"]["End"]
-
-
-
-
-
-
-
-
-
+        self.no_of_columns = 2
+        self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
+        if self.no_of_bolts == 8:
+            self.pitch = float(output_dict['Bolt']['Pitch'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 1
+            self.bolts_inside_bottom_flange_row = 1
+            self.bolts_outside_bottom_flange_row = 1
+        elif self.no_of_bolts == 12:
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 2
+            self.bolts_inside_bottom_flange_row = 2
+            self.bolts_outside_bottom_flange_row = 1
+        elif self.no_of_bolts == 16:
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+            self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+            self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+            self.bolts_outside_top_flange_row = 1
+            self.bolts_inside_top_flange_row = 3
+            self.bolts_inside_bottom_flange_row = 3
+            self.bolts_outside_bottom_flange_row = 1
+        elif self.no_of_bolts == 20:
+            self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch34 = float(output_dict['Bolt']['Pitch34'])
+            self.pitch45 = float(output_dict['Bolt']['Pitch45'])
+            self.pitch56 = float(output_dict['Bolt']['Pitch56'])
+            self.pitch67 = float(output_dict['Bolt']['Pitch67'])
+            self.pitch78 = float(output_dict['Bolt']['Pitch78'])
+            self.pitch910 = float(output_dict['Bolt']['Pitch910'])
+            self.bolts_outside_top_flange_row = 2
+            self.bolts_inside_top_flange_row = 3
+            self.bolts_inside_bottom_flange_row = 3
+            self.bolts_outside_bottom_flange_row = 2
 
     def add_s_marker(self, dwg):
         """
@@ -502,7 +478,7 @@ class ExtendedEnd2DFront(object):
         ptA1y = 0
         self.A1 = np.array([ptA1x, ptA1y])
 
-        ptA2x = ptA1x + self.data_object.column_depth_D1
+        ptA2x = ptA1x + self.data_object.column_width_B1
         ptA2y = ptA1y
         self.A2 = np.array([ptA2x, ptA2y])
 
@@ -514,20 +490,20 @@ class ExtendedEnd2DFront(object):
         ptA4y = ptA1y + self.data_object.column_length_L1
         self.A4 = np.array([ptA4x, ptA4y])
 
-        ptA5x = ptA1x + self.data_object.flange_thickness_T1
+        ptA5x = ptA1x + self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1/2
         ptA5y = ptA1y
         self.A5 = np.array([ptA5x, ptA5y])
 
-        ptA6x = ptA2x - self.data_object.flange_thickness_T1
-        ptA6y = ptA2y
+        ptA6x = ptA5x + self.data_object.web_thickness_tw1
+        ptA6y = ptA5y
         self.A6 = np.array([ptA6x, ptA6y])
 
-        ptA7x = ptA3x - self.data_object.flange_thickness_T1
-        ptA7y = ptA3y
+        ptA7x = ptA6x
+        ptA7y = ptA6y + self.data_object.column_length_L1
         self.A7 = np.array([ptA7x, ptA7y])
 
-        ptA8x = ptA4x + self.data_object.flange_thickness_T1
-        ptA8y = ptA4y  # (self.data_object.beam_depth_D1 - self.data_object.flange_thickness_T1)
+        ptA8x = ptA5x
+        ptA8y = ptA5y + self.data_object.column_length_L1  # (self.data_object.beam_depth_D1 - self.data_object.flange_thickness_T1)
         self.A8 = np.array([ptA8x, ptA8y])
 
         # self.Q = self.A6 + self.data_object.web_weld_thickness * np.array([-1, 0]) dont know
@@ -542,7 +518,7 @@ class ExtendedEnd2DFront(object):
 		downward to the origin is considered as +ve Y axis
 		"""
 
-        ptP1x = ptA1x + self.data_object.column_depth_D1
+        ptP1x = ptA1x + self.data_object.column_width_B1/2 + self.data_object.web_thickness_tw1/2
         # ptP1y = ptA1y + self.data_object.column_length_L1 / 2 - self.data_object.beam_depth_D2 / 2 - self.data_object.end_dist - self.data_object.Lv
         ptP1y = ptA1y + self.data_object.column_length_L1 / 2 - self.data_object.plate_length_L1 /2
         self.P1 = np.array([ptP1x, ptP1y])
@@ -573,33 +549,49 @@ class ExtendedEnd2DFront(object):
         ptAA1y = ptP2y + self.data_object.plate_length_L1/2 - self.data_object.beam_depth_D2/2
         self.AA1 = np.array([ptAA1x, ptAA1y])
 
-        ptAA2x = ptAA1x + self.data_object.beam_length_L2
+        ptAA2x = ptAA1x + self.data_object.column_width_B1/2-self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1/2
         ptAA2y = ptAA1y
         self.AA2 = np.array([ptAA2x, ptAA2y])
 
-        ptAA3x = ptAA2x
-        ptAA3y = ptAA2y + self.data_object.beam_depth_D2
+        ptAA3x = ptAA1x + self.data_object.beam_length_L2
+        ptAA3y = ptAA1y
         self.AA3 = np.array([ptAA3x, ptAA3y])
 
-        ptAA4x = ptAA3x - self.data_object.beam_length_L2
-        ptAA4y = ptAA3y
+        ptAA4x = ptAA3x
+        ptAA4y = ptAA3y + self.data_object.beam_depth_D2
         self.AA4 = np.array([ptAA4x, ptAA4y])
 
-        ptAA5x = ptAA1x
-        ptAA5y = ptAA1y + self.data_object.flange_thickness_T2
+        ptAA5x = ptAA4x - self.data_object.beam_length_L2 + self.data_object.column_width_B1/2- self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1/2
+        ptAA5y = ptAA4y
         self.AA5 = np.array([ptAA5x, ptAA5y])
 
-        ptAA6x = ptAA2x
-        ptAA6y = ptAA2y + self.data_object.flange_thickness_T2
+        ptAA6x = ptAA4x - self.data_object.beam_length_L2
+        ptAA6y = ptAA4y
         self.AA6 = np.array([ptAA6x, ptAA6y])
 
-        ptAA7x = ptAA3x
-        ptAA7y = ptAA3y - self.data_object.flange_thickness_T2
+        ptAA7x = ptAA1x
+        ptAA7y = ptAA1y + self.data_object.flange_thickness_T2
         self.AA7 = np.array([ptAA7x, ptAA7y])
 
-        ptAA8x = ptAA4x
-        ptAA8y = ptAA4y - self.data_object.flange_thickness_T2
+        ptAA8x = ptAA7x + self.data_object.column_width_B1/2-self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1/2
+        ptAA8y = ptAA7y
         self.AA8 = np.array([ptAA8x, ptAA8y])
+
+        ptAA9x = ptAA7x + self.data_object.beam_length_L2
+        ptAA9y = ptAA7y
+        self.AA9 = np.array([ptAA9x, ptAA9y])
+
+        ptAA10x = ptAA4x
+        ptAA10y = ptAA4y - self.data_object.flange_thickness_T2
+        self.AA10 = np.array([ptAA10x, ptAA10y])
+
+        ptAA11x = ptAA10x - self.data_object.beam_length_L2 + self.data_object.column_width_B1/2 - self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1/2
+        ptAA11y = ptAA10y
+        self.AA11 = np.array([ptAA11x, ptAA11y])
+
+        ptAA12x = ptAA10x - self.data_object.beam_length_L2
+        ptAA12y = ptAA10y
+        self.AA12 = np.array([ptAA12x, ptAA12y])
 
         # ================ Stiffeners ==================
 
@@ -611,36 +603,36 @@ class ExtendedEnd2DFront(object):
         downward to the origin is considered as +ve Y axis
         """
 
-        ptS1x = ptAA1x - self.data_object.plate_thickness_p1 - self.data_object.column_depth_D1 + self.data_object.flange_thickness_T1
+        ptS1x = ptAA1x - self.data_object.plate_thickness_p1 - self.data_object.column_width_B1/2- self.data_object.web_thickness_tw1/2
         ptS1y = ptAA1y
         self.S1 = np.array([ptS1x, ptS1y])
 
-        ptS2x = ptAA1x - self.data_object.plate_thickness_p1 - self.data_object.flange_thickness_T1
+        ptS2x = ptAA1x - self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1
         ptS2y = ptAA1y
         self.S2 = np.array([ptS2x, ptS2y])
 
-        ptS3x = ptAA5x - self.data_object.plate_thickness_p1 - self.data_object.flange_thickness_T1
-        ptS3y = ptAA5y
-        self.S3 = np.array([ptS3x, ptS3y])
-
-        ptS4x = ptAA5x - self.data_object.plate_thickness_p1 - self.data_object.column_depth_D1 + self.data_object.flange_thickness_T1
-        ptS4y = ptAA5y
+        ptS4x = ptAA7x - self.data_object.plate_thickness_p1 - self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1/2
+        ptS4y = ptAA7y
         self.S4 = np.array([ptS4x, ptS4y])
 
-        ptS5x = ptAA8x - self.data_object.plate_thickness_p1 - self.data_object.column_depth_D1 + self.data_object.flange_thickness_T1
-        ptS5y = ptAA8y
+        ptS3x = ptAA7x - self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1
+        ptS3y = ptAA7y
+        self.S3 = np.array([ptS3x, ptS3y])
+
+        ptS5x = ptAA12x - self.data_object.plate_thickness_p1 - self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1/2
+        ptS5y = ptAA12y
         self.S5 = np.array([ptS5x, ptS5y])
 
-        ptS6x = ptAA8x - self.data_object.plate_thickness_p1 - self.data_object.flange_thickness_T1
-        ptS6y = ptAA8y
+        ptS6x = ptAA12x - self.data_object.plate_thickness_p1 - self.data_object.web_thickness_tw1
+        ptS6y = ptAA12y
         self.S6 = np.array([ptS6x, ptS6y])
 
-        ptS7x = ptAA4x - self.data_object.plate_thickness_p1 - self.data_object.flange_thickness_T1
-        ptS7y = ptAA4y
+        ptS7x = ptAA6x - self.data_object.plate_thickness_p1 - self.data_object.flange_thickness_T1
+        ptS7y = ptAA6y
         self.S7 = np.array([ptS7x, ptS7y])
 
-        ptS8x = ptAA4x - self.data_object.plate_thickness_p1 - self.data_object.column_depth_D1 + self.data_object.flange_thickness_T1
-        ptS8y = ptAA4y
+        ptS8x = ptAA6x - self.data_object.plate_thickness_p1 - self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1/2
+        ptS8y = ptAA6y
         self.S8 = np.array([ptS8x, ptS8y])
 
         # ================ Weld  ==================
@@ -656,16 +648,16 @@ class ExtendedEnd2DFront(object):
         self.B2 = self.B3 + self.data_object.flange_weld_thickness * np.array([1, 0])
         self.B1 = self.B3 + self.data_object.flange_weld_thickness * np.array([0, -1])
 
-        self.B6 = self.AA5
+        self.B6 = self.AA7
         self.B5 = self.B6 + self.data_object.flange_weld_thickness * np.array([1, 0])
         self.B4 = self.B6 + self.data_object.flange_weld_thickness * np.array([0, 1])
 
         # ------------------------------------------  Weld triangle  DOWN -------------------------------------------
-        self.B7 = self.AA8
+        self.B7 = self.AA12
         self.B8 = self.B7 + self.data_object.flange_weld_thickness * np.array([0, -1])
         self.B9 = self.B7 + self.data_object.flange_weld_thickness * np.array([1, 0])
 
-        self.B11 = self.AA4
+        self.B11 = self.AA6
         self.B12 = self.B11 + self.data_object.flange_weld_thickness * np.array([1, 0])
         self.B13 = self.B11 + self.data_object.flange_weld_thickness * np.array([0, 1])
         # # ------------------------------------------  Weld triangle UP -------------------------------------------
@@ -702,28 +694,37 @@ class ExtendedEnd2DFront(object):
         vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
         vb_ht = (int(3 * self.data_object.plate_length_L1))
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-600 -400 2000 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+            '-800 -400 1800 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
 
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
-        dwg.add(dwg.line(self.A5, self.A8).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.A6, self.A7).stroke('black', width=2.5, linecap='square'))
-
+        dwg.add(dwg.line(self.A5, self.A8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.A6, self.P1).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.A7, self.P4).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
-                             stroke_width='2.5'))
+                             stroke_width='2.5').dasharray(dasharray=[5, 5]))
         # dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
 
-        dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',
-                             stroke_width=2.5))
-        dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA8, self.AA7).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.S1, self.S2).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.S3, self.S4).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.S5, self.S6).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.S7, self.S8).stroke('black', width=2.5, linecap='square'))
+        # dwg.add(dwg.polyline(points=[self.AA2, self.AA3, self.AA4, self.AA5, self.AA2], stroke='black', fill='none',
+        #                      stroke_width=2.5))
+        dwg.add(dwg.line(self.AA1, self.AA2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.AA2, self.AA3).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.AA3, self.AA4).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.AA4, self.AA5).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.AA8, self.AA9).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.AA11, self.AA10).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.AA12, self.AA11).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.AA6, self.AA5).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
+
+        dwg.add(dwg.line(self.S1, self.S2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S3, self.S4).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S5, self.S6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        dwg.add(dwg.line(self.S7, self.S8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
                                            patternTransform="rotate(45 2 2)"))
@@ -731,7 +732,7 @@ class ExtendedEnd2DFront(object):
         # dwg.add(dwg.rect(insert=self.Q, size=(self.data_object.web_weld_thickness, (
         # 			self.data_object.beam_depth_D1 - self.data_object.flange_thickness_T1 - self.data_object.flange_weld_thickness - 10)),
         # 				 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-        dwg.add(dwg.rect(insert=self.AA5, size=(self.data_object.web_weld_thickness, (
+        dwg.add(dwg.rect(insert=self.AA7, size=(self.data_object.web_weld_thickness, (
                 self.data_object.beam_depth_D2 - self.data_object.flange_thickness_T2 - self.data_object.flange_weld_thickness - 10)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
@@ -857,22 +858,22 @@ class ExtendedEnd2DFront(object):
         pt_inside_bottom_column_list = []
         for i in range(bibfr):
             if self.data_object.no_of_bolts == 8:
-                ptx = self.AA4 + ( self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+                ptx = self.AA6 + ( self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
                     [1, 0]) + i * self.data_object.pitch * np.array(
                     [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
             elif self.data_object.no_of_bolts == 12:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
+                ptx = self.AA6 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
                     [1, 0]) + i * self.data_object.pitch23 * np.array(
                     [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
             elif self.data_object.no_of_bolts == 16:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
+                ptx = self.AA6 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) \
                       * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
                     [1, 0]) + i * self.data_object.pitch23 * np.array(
                     [0, -1])  # + column * self.data_object.gauge * np.array([0, 1])
             else:
-                ptx = self.AA4 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) * np.array(
+                ptx = self.AA6 + (self.data_object.flange_thickness_T2 + self.Lv + self.data_object.flange_weld_thickness) * np.array(
                     [0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
                     [1, 0]) + i * self.data_object.pitch34 * np.array([0, -1])
 
@@ -968,7 +969,7 @@ class ExtendedEnd2DFront(object):
         # element = " "
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
-        point = self.AA2 - 100 * np.array([1, 0])
+        point = self.AA3 - 100 * np.array([1, 0])
         theta = 60
         offset = 50
         textup = "Beam " + str(self.data_object.beam_designation)
@@ -997,7 +998,7 @@ class ExtendedEnd2DFront(object):
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
         # ------------------------------------------  Sectional arrow -------------------------------------------
-        pt_a1 = self.A1 + (300) * np.array([0, -1])
+        pt_a1 = self.A1 + (300) * np.array([0, -1]) + 100 * np.array([-1, 0])
         pt_b1 = pt_a1 + (50 * np.array([0, 1]))
         txt_1 = pt_b1 + (80 * np.array([-1, 0])) + (60 * np.array([0, 1]))
         text = "A"
@@ -1044,48 +1045,48 @@ class ExtendedEnd2DTop(object):
         ptA1y = 0
         self.A1 = np.array([ptA1x, ptA1y])
 
-        ptA2x = ptA1x + self.data_object.flange_thickness_T1
+        ptA2x = ptA1x + self.data_object.column_width_B1
         ptA2y = 0
         self.A2 = np.array([ptA2x, ptA2y])
 
         ptA3x = ptA2x
-        ptA3y = ptA2y + self.data_object.column_width_B1
+        ptA3y = ptA2y + self.data_object.flange_thickness_T1
         self.A3 = np.array([ptA3x, ptA3y])
 
         ptA4x = ptA1x
-        ptA4y = ptA1y + self.data_object.column_width_B1
+        ptA4y = ptA1y + self.data_object.flange_thickness_T1
         self.A4 = np.array([ptA4x, ptA4y])
 
-        ptA5x = ptA2x
-        ptA5y = ptA2y + self.data_object.column_width_B1 / 2 - self.data_object.flange_thickness_T1 / 2
+        ptA5x = ptA1x
+        ptA5y = ptA1y + self.data_object.column_depth_D1 - self.data_object.flange_thickness_T1
         self.A5 = np.array([ptA5x, ptA5y])
 
-        ptA6x = ptA5x + self.data_object.column_depth_D1 - (2 * self.data_object.flange_thickness_T1)
+        ptA6x = ptA5x + self.data_object.column_width_B1
         ptA6y = ptA5y
         self.A6 = np.array([ptA6x, ptA6y])
 
         ptA7x = ptA6x
-        ptA7y = ptA6y + self.data_object.web_thickness_tw1
+        ptA7y = ptA6y + self.data_object.flange_thickness_T1
         self.A7 = np.array([ptA7x, ptA7y])
 
         ptA8x = ptA5x
-        ptA8y = ptA5y + self.data_object.web_thickness_tw1
+        ptA8y = ptA5y + self.data_object.flange_thickness_T1
         self.A8 = np.array([ptA8x, ptA8y])
 
-        ptA9x = ptA1x + self.data_object.column_depth_D1 - self.data_object.flange_thickness_T1
-        ptA9y = ptA1y
+        ptA9x = ptA4x + self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1/2
+        ptA9y = ptA4y
         self.A9 = np.array([ptA9x, ptA9y])
 
-        ptA10x = ptA9x + self.data_object.flange_thickness_T1
+        ptA10x = ptA9x + self.data_object.web_thickness_tw1
         ptA10y = ptA9y
         self.A10 = np.array([ptA10x, ptA10y])
 
-        ptA11x = ptA10x
-        ptA11y = ptA10y + self.data_object.column_width_B1
+        ptA11x = ptA6x - self.data_object.column_width_B1/2 + self.data_object.web_thickness_tw1/2
+        ptA11y = ptA6y
         self.A11 = np.array([ptA11x, ptA11y])
 
-        ptA12x = ptA9x
-        ptA12y = ptA9y + self.data_object.column_width_B1
+        ptA12x = ptA11x - self.data_object.web_thickness_tw1
+        ptA12y = ptA11y
         self.A12 = np.array([ptA12x, ptA12y])
 
         # # ------------------------------------------  Weld triangle  UP-------------------------------------------
@@ -1107,7 +1108,7 @@ class ExtendedEnd2DTop(object):
 		"""
 
         ptP1x = ptA10x
-        ptP1y = ptA10y + self.data_object.column_width_B1 / 2 - self.data_object.plate_width_B1 / 2
+        ptP1y = ptA10y + self.data_object.column_depth_D1/2 - self.data_object.web_thickness_tw1 - self.data_object.plate_width_B1/2
         self.P1 = np.array([ptP1x, ptP1y])
 
         ptP2x = ptP1x + self.data_object.plate_thickness_p1
@@ -1181,13 +1182,13 @@ class ExtendedEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -400 1500 1000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-300 -400 1500 1200'))
         # dwg.add(dwg.line(self.A5, self.A6).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         # dwg.add(dwg.line(self.A7, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
-        dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
-                             stroke_width=2.5))
+        # dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
+        #                      stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A5, self.A6, self.A7, self.A8, self.A5], stroke='black', fill='none',
                              stroke_width=2.5))
         # dwg.add(dwg.polyline(points=[self.A6, self.A9, self.A10, self.A11, self.A12, self.A7], stroke='blue', fill='none', stroke_width=2.5))
@@ -1197,8 +1198,8 @@ class ExtendedEnd2DTop(object):
 
         dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.A2, self.A9).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.A3, self.A12).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.A9, self.A12).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.line(self.A10, self.A11).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',
                              stroke_width=2.5))
 
@@ -1304,7 +1305,7 @@ class ExtendedEnd2DTop(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
         # ------------------------------------------  Sectional arrow -------------------------------------------
-        pt_a1 = self.A4 - (200) * np.array([0, -1]) - (100 * np.array([1, 0]))
+        pt_a1 = self.A8 - (150) * np.array([0, -1]) - (100 * np.array([1, 0]))
         pt_b1 = pt_a1 + (50 * np.array([0, -1]))
         txt_1 = pt_b1 + (40 * np.array([-1, 0])) + (40 * np.array([0, 1]))
         text = "C"
@@ -1318,13 +1319,13 @@ class ExtendedEnd2DTop(object):
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 500) * np.array([1, 0])
+        pt_a3 = self.A2 + (self.data_object.beam_length_L2) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
         txt_3 = pt_b3 + (-20 * np.array([0, 1])) + (40 * np.array([1, 0]))
         text = "B"
         self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
 
-        pt_a4 = pt_a3 + (self.data_object.column_width_B1 * np.array([0, 1]))
+        pt_a4 = pt_a3 + (self.data_object.column_depth_D1 * np.array([0, 1]))
         pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
         txt_4 = pt_b4 + (50 * np.array([0, 1])) + (40 * np.array([1, 0]))
         self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
@@ -1332,7 +1333,7 @@ class ExtendedEnd2DTop(object):
         dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 
         # ------------------------------------------  View details -------------------------------------------
-        ptx = self.P4 - 50 * np.array([1, 0]) + 300 * np.array([0, 1])
+        ptx = self.P4 - 50 * np.array([1, 0]) + 350 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(
@@ -1427,69 +1428,69 @@ class ExtendedEnd2DSide(object):
 
         # ========================= Column  =========================
 
-        ptAA1x = ptP1x + self.data_object.plate_width_B1 / 2 - self.data_object.column_width_B1 / 2
+        ptAA1x = ptP1x + self.data_object.plate_width_B1 / 2 - self.data_object.column_depth_D1 / 2
         ptAA1y = ptP1y + self.data_object.plate_length_L1 / 2 - self.data_object.column_length_L1 / 2
         self.AA1 = np.array([ptAA1x, ptAA1y])
 
-        ptAA2x = ptAA1x + self.data_object.column_width_B1
+        ptAA2x = ptAA1x + self.data_object.column_depth_D1
         ptAA2y = ptAA1y
         self.AA2 = np.array([ptAA2x, ptAA2y])
 
         ptAA3x = ptAA2x
-        ptAA3y = ptAA2y + self.data_object.column_length_L1 / 2 - self.data_object.plate_length_L1 / 2
+        ptAA3y = ptAA2y + self.data_object.column_length_L1
         self.AA3 = np.array([ptAA3x, ptAA3y])
 
         ptAA4x = ptAA1x
-        ptAA4y = ptAA1y + self.data_object.column_length_L1 / 2 - self.data_object.plate_length_L1 / 2
+        ptAA4y = ptAA1y + self.data_object.column_length_L1
         self.AA4 = np.array([ptAA4x, ptAA4y])
 
-        ptAA5x = ptAA4x
-        ptAA5y = ptAA4y + self.data_object.plate_length_L1
+        ptAA5x = ptAA1x + self.data_object.flange_thickness_T1
+        ptAA5y = ptAA1y
         self.AA5 = np.array([ptAA5x, ptAA5y])
 
-        ptAA6x = ptAA3x
-        ptAA6y = ptAA3y + self.data_object.plate_length_L1
+        ptAA6x = ptAA2x - self.data_object.flange_thickness_T1
+        ptAA6y = ptAA2y
         self.AA6 = np.array([ptAA6x, ptAA6y])
 
-        ptAA7x = ptAA6x
-        ptAA7y = ptAA6y - self.data_object.plate_length_L1 / 2 + self.data_object.column_length_L1 / 2
+        ptAA7x = ptAA3x - self.data_object.flange_thickness_T1
+        ptAA7y = ptAA3y
         self.AA7 = np.array([ptAA7x, ptAA7y])
 
-        ptAA8x = ptAA7x - self.data_object.column_width_B1
-        ptAA8y = ptAA7y
+        ptAA8x = ptAA4x + self.data_object.flange_thickness_T1
+        ptAA8y = ptAA4y
         self.AA8 = np.array([ptAA8x, ptAA8y])
 
-        ptAA9x = ptAA1x + self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2
-        ptAA9y = ptAA1y
-        self.AA9 = np.array([ptAA9x, ptAA9y])
-
-        ptAA10x = ptAA9x + self.data_object.web_thickness_tw1
-        ptAA10y = ptAA1y
-        self.AA10 = np.array([ptAA10x, ptAA10y])
-
-        ptAA11x = ptAA4x + self.data_object.column_width_B1 / 2 + self.data_object.web_thickness_tw1 / 2
-        ptAA11y = ptAA4y
-        self.AA11 = np.array([ptAA11x, ptAA11y])
-
-        ptAA12x = ptAA11x - self.data_object.web_thickness_tw1
-        ptAA12y = ptAA11y
-        self.AA12 = np.array([ptAA12x, ptAA12y])
-
-        ptAA13x = ptAA5x + self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2
-        ptAA13y = ptAA5y
-        self.AA13 = np.array([ptAA13x, ptAA13y])
-
-        ptAA14x = ptAA13x + self.data_object.web_thickness_tw1
-        ptAA14y = ptAA5y
-        self.AA14 = np.array([ptAA14x, ptAA14y])
-
-        ptAA15x = ptAA7x - self.data_object.column_width_B1 / 2 + self.data_object.web_thickness_tw1 / 2
-        ptAA15y = ptAA7y
-        self.AA15 = np.array([ptAA15x, ptAA15y])
-
-        ptAA16x = ptAA15x - self.data_object.web_thickness_tw1
-        ptAA16y = ptAA7y
-        self.AA16 = np.array([ptAA16x, ptAA16y])
+        # ptAA9x = ptAA1x + self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2
+        # ptAA9y = ptAA1y
+        # self.AA9 = np.array([ptAA9x, ptAA9y])
+        #
+        # ptAA10x = ptAA9x + self.data_object.web_thickness_tw1
+        # ptAA10y = ptAA1y
+        # self.AA10 = np.array([ptAA10x, ptAA10y])
+        #
+        # ptAA11x = ptAA4x + self.data_object.column_width_B1 / 2 + self.data_object.web_thickness_tw1 / 2
+        # ptAA11y = ptAA4y
+        # self.AA11 = np.array([ptAA11x, ptAA11y])
+        #
+        # ptAA12x = ptAA11x - self.data_object.web_thickness_tw1
+        # ptAA12y = ptAA11y
+        # self.AA12 = np.array([ptAA12x, ptAA12y])
+        #
+        # ptAA13x = ptAA5x + self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2
+        # ptAA13y = ptAA5y
+        # self.AA13 = np.array([ptAA13x, ptAA13y])
+        #
+        # ptAA14x = ptAA13x + self.data_object.web_thickness_tw1
+        # ptAA14y = ptAA5y
+        # self.AA14 = np.array([ptAA14x, ptAA14y])
+        #
+        # ptAA15x = ptAA7x - self.data_object.column_width_B1 / 2 + self.data_object.web_thickness_tw1 / 2
+        # ptAA15y = ptAA7y
+        # self.AA15 = np.array([ptAA15x, ptAA15y])
+        #
+        # ptAA16x = ptAA15x - self.data_object.web_thickness_tw1
+        # ptAA16y = ptAA7y
+        # self.AA16 = np.array([ptAA16x, ptAA16y])
 
     def call_ExtndBoth_side(self, filename):
         """
@@ -1508,18 +1509,11 @@ class ExtendedEnd2DSide(object):
             stroke='black', fill='#E0E0E0', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
                              stroke_width='2.5'))
-        dwg.add(dwg.line(self.AA1, self.AA2).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA1, self.AA4).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA2, self.AA3).stroke('black', width=2.5, linecap='square'))
+        dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',
+                             stroke_width='2.5'))
         dwg.add(dwg.line(self.AA5, self.AA8).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA8, self.AA7).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.AA6, self.AA7).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA9, self.AA12).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA10, self.AA11).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA13, self.AA16).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA14, self.AA15).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA4, self.AA5).stroke('black', width=2.5, linecap='square'))
-        dwg.add(dwg.line(self.AA3, self.AA6).stroke('black', width=2.5, linecap='square'))
+
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",
                                            patternTransform="rotate(45 1 1)"))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
@@ -1790,12 +1784,14 @@ class ExtendedEnd2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point3, str(self.data_object.Lv), params)
 
-            point2 = ptx2 + self.data_object.pitch34 * np.array([0, 1])
+            # point2 = ptx2 + self.data_object.pitch34 * np.array([0, 1])
+            point2 = np.array(pt_inside_bottom_column_list[1][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-                      "endlinedim": 10, "arrowlen": 20}
+                     "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point2, str(self.data_object.pitch34), params)
-
+            #
             point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
+            # point1 = np.array(pt_inside_bottom_column_list[1][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
@@ -1830,7 +1826,8 @@ class ExtendedEnd2DSide(object):
                       "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx4, point2, str(self.data_object.pitch34), params)
 
-            point2 = ptx4 + self.data_object.pitch45 * np.array([0, 1])
+            # point2 = ptx4 + self.data_object.pitch45 * np.array([0, 1])
+            point2 = np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10,
                       "arrowlen": 20}
@@ -1876,7 +1873,8 @@ class ExtendedEnd2DSide(object):
             ptx5 = np.array(pt_inside_top_column_list[2][1])
             pty5 = ptx5 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx5, pty5, dwg)
-            point3 = ptx5 + self.data_object.pitch45 * np.array([0, -1])
+            # point3 = ptx5 + self.data_object.pitch45 * np.array([0, -1])
+            point3 = np.array(pt_inside_bottom_column_list[2][1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point3, str(self.data_object.pitch45), params)
@@ -1900,10 +1898,10 @@ class ExtendedEnd2DSide(object):
             pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
             self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
-            point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
+            point1 = ptx2 + self.data_object.pitch45 * np.array([0, -1])
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right",
                       "endlinedim": 10, "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
+            self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch45), params)
 
         elif self.data_object.no_of_bolts == 16:
             ptx5 = np.array(pt_inside_bottom_column_list[2][1])

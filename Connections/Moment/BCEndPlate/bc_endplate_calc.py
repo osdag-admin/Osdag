@@ -19,7 +19,6 @@ ASCII diagram
 """
 
 from model import *
-from Connections.connection_calculations import ConnectionCalculations
 from utilities.is800_2007 import IS800_2007
 from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002, IS1367_Part3_2002
 from utilities.common_calculation import *
@@ -36,59 +35,10 @@ def module_setup():
 
 module_setup()
 
-# Function for calculating Shear yielding capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-
-def shear_yielding(A_v, plate_fy):
-    """
-
-    Args:
-        A_v: (float)- Gross shear area of end plate
-        plate_fy: (float)- Yield stress of plate material
-
-    Returns: (float)- Shear yielding capacity of End Plate in kN
-
-    """
-    V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
-    return V_d
-
-
 #######################################################################
 
-# Function for calculating Shear rupture capacity of End Plate
-# Reference: Cl 8.4.1 - Genereal Construction in Steel - Code of practice (3rd revision) IS 800:2007
-
-def shear_rupture(A_vn, plate_fu):
-    """
-
-    Args:
-        A_vn: (float)- Net shear area of end plate
-        plate_fu: (float)- Ultimate stress of plate material
-
-    Returns: (float)- Shear rupture capacity of End Plate in kN
-
-    """
-    R_n = 0.6 * A_vn * plate_fu / 1000
-    return R_n
-
-
-# #######################################################################
-# # Function for fetching column and beam parameters from the database
-#
-# def fetchColumnPara(self):
-#     column_sec = self.ui.combo_Column.currentText()
-#     dictcolumndata = get_beamdata(column_sec)
-#     return dictcolumndata
-#
-# def fetchBeamPara(self):
-#     beam_sec = self.ui.combo_Beam.currentText()
-#     dictbeamdata = get_beamdata(beam_sec)
-#     return dictbeamdata
-#
-
-#######################################################################
 # Start of Main Program
+
 
 def bc_endplate_design(uiObj):
     global logger
@@ -194,7 +144,6 @@ def bc_endplate_design(uiObj):
     beam_R1 = float(dictbeamdata["R1"])
     beam_R2 = float(dictbeamdata["R2"])
 
-
     #######################################################################
     # Read input values from column database
     # Here,
@@ -220,7 +169,6 @@ def bc_endplate_design(uiObj):
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]
 
-
     #######################################################################
     # Calculation of Spacing (Min values rounded to next multiple of 5)
 
@@ -245,11 +193,22 @@ def bc_endplate_design(uiObj):
 
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
-    l_v = float(50.0)
-    flange_projection = 5
-
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
-    g_1 = 100.0
+    # TODO: for different end plate type
+    if endplate_type == 'flush':
+        l_v = 45.0
+        g_1 = 90.0
+    elif endplate_type == 'one_way':
+        l_v = 50.0
+        g_1 = 100.0
+    else:   # endplate_type == 'both_ways':
+        l_v = 50.0
+        g_1 = 100.0
+
+    if weld_method == 'fillet':
+        flange_projection = round_up(value=weld_thickness_flange + 2, multiplier=5, minimum_value=5)
+    else:   # 'groove'
+        flange_projection = 5
 
     #######################################################################
     # Calculate bolt capacities
@@ -441,23 +400,21 @@ def bc_endplate_design(uiObj):
                 no_rows = {'out_tension_flange': (no_tension_side-6)/2, 'in_tension_flange': 2,
                            'out_compression_flange': (no_tension_side-6)/2, 'in_compression_flange': 2}
 
-
             # #######################################################################
 
         # Plate height and width
             ''' tens_plate_no_pitch : projection of end plate beyond the beam flange excluding the 
                                         distances b/w bolts on tension side '''
         if no_rows['out_tension_flange'] == 0:
-            tens_plate_no_pitch = flange_projection
+            tens_plate_outer = flange_projection
         else:
-            tens_plate_no_pitch = end_dist + l_v
+            tens_plate_outer = end_dist + l_v + (no_rows['out_tension_flange'] - 1) * pitch_dist
         if no_rows['out_compression_flange'] == 0:
-            comp_plate_no_pitch = flange_projection
+            comp_plate_outer = flange_projection
         else:
-            comp_plate_no_pitch = end_dist + l_v
+            comp_plate_outer = end_dist + l_v + (no_rows['out_compression_flange'] - 1) * pitch_dist
 
-        plate_height = (no_rows['out_tension_flange'] + no_rows['out_compression_flange'] - 2) * pitch_dist + \
-                       beam_d + comp_plate_no_pitch + tens_plate_no_pitch
+        plate_height = beam_d + comp_plate_outer + tens_plate_outer
         plate_width = g_1 + 2 * edge_dist
         while plate_width < beam_B:
             edge_dist += 5
@@ -677,48 +634,29 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
+    # Shear yielding of end plate (TODO: Clause 8.4.1, IS 800:2007)
 
-    # TODO Check for Shear yielding and shear rupture of end plate
-    '''
-
-    # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
     A_v = plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = shear_yielding(A_v, end_plate_fy)
+    V_d = 0.6 * A_v * end_plate_fy / (math.sqrt(3) * gamma_m0)
 
     if V_d < factored_shear_load:
         design_status = False
         logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The minimum required shear yielding capacity is %2.2f kN" % factored_shear_load)
+        logger.warning(": The maximum allowable shear in end plate is %2.2f kN" % factored_shear_load)
         logger.info(": Increase the thickness of End Plate")
 
-    # 2. Shear rupture of end plate (Clause 8.4.1, IS 800:2007)
-    A_vn = A_v - (number_of_bolts * dia_hole)
-    R_n = shear_rupture(A_vn, end_plate_fu)
-
-    if R_n < factored_shear_load:
-        design_status = False
-        logger.error(": The End Plate might rupture due to Shear")
-        logger.warning(": The minimum shear rupture capacity required is %2.2f kN" % factored_shear_load)
-        logger.info(": Increase the thickness of End Plate")
-
-    # TODO add block shear check
-
-    #######################################################################
-    # Member Checks
-    # Strength of flange under Compression (Reference: Example 5.23 & 5.27, Design of Steel structures by Dr. N. Subramanian)
+    # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
-    capacity_beam_flange = ((beam_fy / 1.10) * A_f) / 1000  # kN
-    force_flange = M_u * 10 ** 3 / (beam_d - beam_tf)
+    capacity_beam_flange = (beam_fy / gamma_m0) * A_f
+    force_flange = max(t_bf, p_bf)
 
     if capacity_beam_flange < force_flange:
         design_status = False
-        logger.error(": Force in the flange is greater than its load carrying capacity")
-        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
+        logger.error(": Forces in the beam flange is greater than its load carrying capacity")
+        logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN"
+                       % capacity_beam_flange)
         logger.info(": Use a higher beam section with wider and/or thicker flange")
-
-    #######################################################################
-      '''
 
     ######################################
     # End of Calculation, SAMPLE Output dictionary
@@ -735,20 +673,21 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
 
-    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt, 3))
-    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity, 3))
-    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity, 3))
-    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity, 3))
-    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity, 3))
+    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt/1000, 3))    # kN
+    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity/1000, 3))
+    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity/1000, 3))
+    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity/1000, 3))
+    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
-    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity, 3))
-    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt, 3))
+    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
     outputobj['Bolt']['End'] = float(round(end_dist, 3))
     outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
     outputobj['Bolt']['Lv'] = float(round(l_v, 3))
+    outputobj['Bolt']['Pitch'] = float(round(pitch_dist, 3))
     outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
     outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
     outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
@@ -765,18 +704,20 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
+    outputobj['ContPlateComp']['Weld'] = 8
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
+    outputobj['ContPlateTens']['Weld'] = 8
 
-    outputobj['Stiffener']['Length'] = 300.0     # TODO:
-    outputobj['Stiffener']['Height'] = 100.0
+    outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
+    outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0
-    outputobj['Stiffener']['NotchBottom'] = 15.0
-    outputobj['Stiffener']['NotchTop'] = 50.0
-
+    outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
+    outputobj['Stiffener']['NotchTop'] = st_notch_top
+    outputobj['Stiffener']['Weld'] = 8.0
 
     # Detailing
     if endplate_type == 'flush':

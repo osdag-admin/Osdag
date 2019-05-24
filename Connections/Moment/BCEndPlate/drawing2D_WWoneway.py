@@ -1180,8 +1180,8 @@ class Oneway2DTop(object):
                              stroke_width='2.5'))
 
 
-        dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        # dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        # dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.A9, self.A12).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.A10, self.A11).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.A4, self.A5).stroke('black', width=2.5, linecap='square'))
@@ -1507,7 +1507,7 @@ class Oneway2DSide(object):
         self.SU2 = np.array([ptSU2x, ptSU2y])
 
 
-def call_Oneway_side(self, filename):
+    def call_Oneway_side(self, filename):
         """
 
 		Args:
@@ -1634,7 +1634,7 @@ def call_Oneway_side(self, filename):
                     pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch23 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
-                elif self.data_object.no_of_bolts == 20:
+                elif self.data_object.no_of_bolts == 12:
                     pt = self.P1 + (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2 + self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness +self.data_object.Lv) * np.array(
                         [0, 1]) + self.data_object.edge_dist * np.array([1, 0]) + (i - 1) * self.data_object.pitch34 * np.array([0, 1]) + (
                                  j - 1) * self.data_object.cross_centre_gauge_dist * np.array([1, 0])
@@ -1702,16 +1702,6 @@ def call_Oneway_side(self, filename):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point2, str(self.data_object.edge_dist), params)
 
-            ptxx3 = np.array(pt_outside_top_column_list[0][1])
-            ptyy3 = ptxx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-            self.data_object.draw_faint_line(ptxx3, ptyy3, dwg)
-
-            point3 = ptxx2 + self.data_object.Lv * np.array([0, 1])
-            params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-                      "endlinedim": 10,
-                      "arrowlen": 20}
-            self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point3, str(self.data_object.Lv), params)
-
             params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, point1, point2,
@@ -1720,12 +1710,23 @@ def call_Oneway_side(self, filename):
 
             if self.data_object.no_of_bolts == 12:
                 ptx3 = np.array(pt_outside_top_column_list[1][1])
-                pty3 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+                pty3 = ptx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
                 self.data_object.draw_faint_line(ptx3, pty3, dwg)
                 point2 = ptx3 + self.data_object.Lv * np.array([0, 1])
                 params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                           "endlinedim": 10, "arrowlen": 20}
                 self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point2, str(self.data_object.Lv), params)
+
+                ptxx3 = np.array(pt_outside_top_column_list[0][1])
+                ptyy3 = ptxx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+                self.data_object.draw_faint_line(ptxx3, ptyy3, dwg)
+
+                point3 = np.array(pt_outside_top_column_list[1][1])
+                ptyy3 = ptxx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
+                params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
+                          "endlinedim": 10,
+                          "arrowlen": 20}
+                self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point3, str(self.data_object.pitch12), params)
             else:
                 point2 = ptxx2 + self.data_object.Lv * np.array([0, 1])
                 params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",

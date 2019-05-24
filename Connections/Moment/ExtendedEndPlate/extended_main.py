@@ -1720,7 +1720,7 @@ class Maincontroller(QMainWindow):
 			bbWeldStiffH_3 = copy.copy(bbWeldStiffH_1)
 			bbWeldStiffH_4 = copy.copy(bbWeldStiffH_1)
 			
-			bbWeldStiffL_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length'] - 25)
+			bbWeldStiffL_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length']-15)
 			bbWeldStiffL_2 = copy.copy(bbWeldStiffL_1)
 			bbWeldStiffL_3 = copy.copy(bbWeldStiffL_1)
 			bbWeldStiffL_4 = copy.copy(bbWeldStiffL_1)
@@ -1970,16 +1970,19 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_R3Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_L3Model(), update=True, color='Red')
 
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_1Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_2Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_3Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_4Model(), update=True, color='Red')
+				if self.alist["Member"]["Connectivity"] == "Extended both ways" or self.alist["Member"][
+					"Connectivity"] == "Extended one way":
 
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_1Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_2Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_3Model(), update=True, color='Red')
-				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_4Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_3Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_3Model(), update=True, color='Red')
 
+				if self.alist["Member"]["Connectivity"] == "Extended both ways":
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_4Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_4Model(), update=True, color='Red')
 
 
 	# =================================================================================

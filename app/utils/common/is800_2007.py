@@ -295,7 +295,7 @@ class IS800_2007(object):
                 if t_f <= 40:
                     return {'z-z': 'a','y-y': 'b'}
 
-                if t_f>40 and tf<=100:
+                if t_f>40 and t_f<=100:
                     return {'z-z': 'b','y-y': 'c'}
 
             if h / b_f <= 1.2:
@@ -335,7 +335,7 @@ class IS800_2007(object):
 
     # Imperfection Factor, alpha
 
-    cl_7_1_1_cl_7_1_2_1_Table_7 = {
+    cl_7_1_Table_7 = {
         "Buckling_class_a": {"alpha": 0.21},
         "Buckling_class_b": {"alpha": 0.34},
         "Buckling_class_c": {"alpha": 0.49},

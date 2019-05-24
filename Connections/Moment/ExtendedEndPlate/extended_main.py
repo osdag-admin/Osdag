@@ -1684,7 +1684,7 @@ class Maincontroller(QMainWindow):
 			return extbothWays
 
 		else:  # Groove Weld
-			bbWeldFlang_R1 = GrooveWeld(b=15, h=float(beam_data["T"]),
+			bbWeldFlang_R1 = GrooveWeld(b=15.0, h=float(beam_data["T"]),
 									   L=beam_B)			#outputobj["Weld"]["Size"]
 			bbWeldFlang_R2 = copy.copy(bbWeldFlang_R1)
 
@@ -1696,6 +1696,18 @@ class Maincontroller(QMainWindow):
 									 L=beam_d - 2 * beam_T)		#outputobj["Weld"]["Size"]
 
 			bbWeldWeb_L3 = copy.copy(bbWeldWeb_R3)
+			
+			#Following welds are to join beam stiffeners to the beam
+			bbWeldStiffH_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Height']-15)		#outputobj['Stiffener']['Length'] - 25
+			bbWeldStiffH_2 = copy.copy(bbWeldStiffH_1)
+			bbWeldStiffH_3 = copy.copy(bbWeldStiffH_1)
+			bbWeldStiffH_4 = copy.copy(bbWeldStiffH_1)
+			
+			bbWeldStiffL_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length'] - 25)
+			bbWeldStiffL_2 = copy.copy(bbWeldStiffL_1)
+			bbWeldStiffL_3 = copy.copy(bbWeldStiffL_1)
+			bbWeldStiffL_4 = copy.copy(bbWeldStiffL_1)
+			
 
 			#######################################
 			#       WELD SECTIONS QUARTER CONE    #
@@ -1703,6 +1715,8 @@ class Maincontroller(QMainWindow):
 
 			extbothWays = CADGroove(beam_Left, beam_Right,plate_Left, plate_Right, bbNutBoltArray,
 									bbWeldFlang_R1, bbWeldFlang_R2, bbWeldWeb_R3,bbWeldFlang_L1, bbWeldFlang_L2, bbWeldWeb_L3,
+									bbWeldStiffH_1, bbWeldStiffH_2, bbWeldStiffH_3, bbWeldStiffH_4,
+									bbWeldStiffL_1, bbWeldStiffL_2, bbWeldStiffL_3, bbWeldStiffL_4,
 									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4, alist, outputobj)
 			extbothWays.create_3DModel()
 
@@ -1877,6 +1891,16 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_R3Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_L3Model(), update=True, color='Red')
 
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_3Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_4Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_3Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_4Model(), update=True, color='Red')
+
 
 		elif component == "Model":
 			osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
@@ -1928,6 +1952,16 @@ class Maincontroller(QMainWindow):
 
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_R3Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldWeb_L3Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_3Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffH_4Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_3Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffL_4Model(), update=True, color='Red')
 
 
 

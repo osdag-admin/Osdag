@@ -473,8 +473,8 @@ class CADFillet(object):
         self.bbWeldStiffHR_3.place(weldstiffOriginH_3, uDirstiffH_3, wDirstiffH_3)
 
     def create_bbWeldStiffLR_3(self):
-        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_3.L22 + self.bbWeldStiffLL_3.L
-        weldstiffOriginL_3 = numpy.array([self.beamLeft.t/2, gap , -self.beamLeft.D/2 - self.bbWeldStiffLR_2.b])
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_3.L22
+        weldstiffOriginL_3 = numpy.array([self.beamLeft.t/2, gap , self.beamLeft.D/2 ])
         uDirstiffL_3 = numpy.array([0.0, 0.0, 1.0])
         wDirstiffL_3 = numpy.array([0.0, 1.0,0.0])
         self.bbWeldStiffLR_3.place(weldstiffOriginL_3, uDirstiffL_3, wDirstiffL_3)

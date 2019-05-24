@@ -109,6 +109,8 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     # gap = float(uiObj["detailing"]["gap"])
     corrosive = str(uiObj["detailing"]["is_env_corrosive"])
     design_method = str(uiObj["design"]["design_method"])
+    endplate_type = str(uiObj['Member']['EndPlate_type'])
+
 
     # Bolt
     # print "out", outObj
@@ -202,10 +204,6 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         resultant = float(outObj['Weld']['Resultant'])
         capacity_flange = float(outObj['Weld']['UnitCapacity'])
 
-        # Stiffener
-        stiffener_height = str(float(outObj['Stiffener']['Height']))
-        stiffener_length = str(float(outObj['Stiffener']['Length']))
-        stiffener_thickness = str(float(outObj['Stiffener']['Thickness']))
     else:
         critical_stress_flange = str(float(outObj['Weld']['CriticalStressflange']))
         critical_stress_web = str(float(outObj['Weld']['CriticalStressWeb']))
@@ -218,10 +216,16 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         resultant = float(outObj['Weld']['Resultant'])
         capacity_flange = float(outObj['Weld']['UnitCapacity'])
 
-        # Stiffener
-        stiffener_height = str(float(outObj['Stiffener']['Height']))
-        stiffener_length = str(float(outObj['Stiffener']['Length']))
-        stiffener_thickness = str(float(outObj['Stiffener']['Thickness']))
+
+    # stiffener
+    stiffener_height = str(float(outObj['Stiffener']['Height']))
+    stiffener_length = str(float(outObj['Stiffener']['Length']))
+    stiffener_thickness = str(float(outObj['Stiffener']['Thickness']))
+    stiffener_width = str(float(outObj['Stiffener']['Width']))
+    stiffener_notch = str(float(outObj['Stiffener']['NotchSize']))
+    stiffener_weld = str(float(outObj['Stiffener']['WeldSize']))
+    stiffener_moment = str(float(outObj['Stiffener']['Moment']))
+
 
     # Calling pitch distance values from Output dict of calc file
     if float(number_of_bolts) == float(8):
@@ -339,17 +343,12 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     if status == 'True':
-        row = [1, "Extended End Plate", "<p align=left style=color:green><b>Pass</b></p>"]
+        row = [1, "Beam to Beam Extended End Plate", "<p align=left style=color:green><b>Pass</b></p>"]
     else:
-        row = [1, "Extended End Plate", "<p align=left style=color:red><b>Fail</b></p>"]
+        row = [1, "Beam to Beam Extended End Plate", "<p align=left style=color:red><b>Fail</b></p>"]
     rstr += t('tr')
     rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail1"') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    row = [0, "Extended End Plate", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="header0"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
     row = [0, "Connection Properties", " "]
@@ -364,13 +363,30 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     # TODO: should we add Single Extended End Plate
     # row = [1, "Connection Title", " Single Fin Plate"]
-    row = [1, "Connection Title", "Extended End Plate"]
+    row = [1, "Connection Title", "Beam to Beam Extended End Plate"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
     row = [1, "Connection Type", "Moment Connection"]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    row = [1, "Connection Title", "Extended End Plate"]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    if endplate_type == "Flush end plate":
+        row = [1, "End plate type", "Flush end plate"]
+    elif endplate_type == "Extended one way":
+        row = [1, "End plate type", "Extended one way"]
+    else:
+        row = [1, "End plate type", "Extended both way"]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -522,17 +538,17 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Columns (Vertical Lines)", "2"]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    row = [2, "Bolts Per Column", number_of_rows]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+    # row = [2, "Columns (Vertical Lines)", "2"]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
+    # row = [2, "Bolts Per Column", number_of_rows]
+    # rstr += t('tr')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
 
     row = [2, "End Distance (mm)", end_distance]
     rstr += t('tr')
@@ -681,7 +697,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Beam-Beam Clearance (mm)", "N/A"]
+    row = [1, "Beam-Beam Clearance (mm)", str(float(2*plate_thk))]
     rstr += t('tr')
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -797,9 +813,9 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     if bolt_Type == "Pretensioned":
-        row = [1, "Beta (pre-tensioned bolt)", str(1)]
+        row = [1, "Beta (&#946;) (pre-tensioned bolt)", str(1)]
     else:
-        row = [1, "Beta (non pre-tensioned)", str(2)]
+        row = [1, "Beta (&#946;)(non pre-tensioned)", str(2)]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')

@@ -2107,8 +2107,10 @@ def bbExtendedEndPlateSplice(uiObj):
         else:
             if number_of_bolts == 4:
                 e = pitch_dist_min
+                s = beam_tf + p_fi + pitch_dist_min  # s is the distance of the stiffener from the outer edge of the beam flange to the outer edge of the stiffener plate
             elif number_of_bolts == 6:
                 e = pitch_dist_min + (pitch_distance_1_2 / 2)
+                s = beam_tf + p_fi + pitch_distance_1_2 + pitch_dist_min
 
         # Moment in stiffener (M_st)
         M_st = v_st * e
@@ -2129,10 +2131,25 @@ def bbExtendedEndPlateSplice(uiObj):
         f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
         if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
-            design_status = False
-            logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f mm (Cl. 10.5.10, IS 800:2007)" % f_e)
-            logger.info(": Increase the size of weld at the stiffener")
+
+            # updating weld size
+
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                z_weld_st = max(weld_thickness_web, thickness_stiffener_provided)  # updated size of weld for stiffener at web
+            else:
+                z_weld_st = max(weld_thickness_flange, thickness_stiffener_provided)  # updated size of weld for stiffener at flange
+
+            f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
+            q = v_st / (2 * l_weld_st * k * z_weld_st)
+            f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
+
+            if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
+                design_status = False
+                logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f N/mm^2 (Cl. 10.5.10, IS 800:2007)" % f_e)
+                logger.info(": Increase the size of weld at the stiffener")
+        else:
+            pass
 
 
         # Check of stiffener against local buckling
@@ -2283,6 +2300,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Width'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
@@ -2423,6 +2441,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Width'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
@@ -2563,6 +2582,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Width'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
@@ -2704,6 +2724,7 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Width'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
@@ -2793,6 +2814,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         if uiObj["Member"]["Connectivity"] == "Flush":
             outputobj['Stiffener']['Width'] = 0
+            outputobj['Stiffener']['Location'] = 0
         else:
             outputobj['Stiffener']['Height'] = 0
         outputobj['Stiffener']['Length'] = 0

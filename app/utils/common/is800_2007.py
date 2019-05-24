@@ -38,10 +38,10 @@ class IS800_2007(object):
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
 
 
-# DESIGN OF TENSION MEMBER
-# 6.1 Tension member
-def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
-    """
+    # DESIGN OF TENSION MEMBER
+    # 6.1 Tension member
+    def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
+        """
         Calculation of Design Strength of the member as per cl.6.1
         Args:
             T_d:  design strength of the number under axial tension in N (float),
@@ -55,40 +55,40 @@ def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
         Note:
             References:
             IS800:2007,cl.6.1
-    """
-    T_d = min(T_dg, T_dn, T_db)
-    return T_d
+        """
+        T_d = min(T_dg, T_dn, T_db)
+        return T_d
 
 
-# cl.6.2 Design Strength due to yielding of Gross Section
+    # cl.6.2 Design Strength due to yielding of Gross Section
 
-def cl_6_2_Design_strength_of_member_due_to_yielding_of_gross_section(A_g, f_y):
-    """
-    Calculate the design strength due to yielding of gross section as per cl.6.2
-    Args:
-        A_g: Gross area of cross section[in sq.mm](float)
-        f_y: Yield stree of the material in Mpa (float)
+    def cl_6_2_Design_strength_of_member_due_to_yielding_of_gross_section(A_g, f_y):
+        """
+        Calculate the design strength due to yielding of gross section as per cl.6.2
+        Args:
+            A_g: Gross area of cross section[in sq.mm](float)
+            f_y: Yield stree of the material in Mpa (float)
 
-    Return:
-        Design strength of member due to yielding of gross section in N(float)
-
-
-    Note:
-        Reference:
-         IS 800:2007, cl.6.2
-    """
-
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    T_dg = A_g * f_y / gamma_m0
-    return T_dg
+        Return:
+            Design strength of member due to yielding of gross section in N(float)
 
 
-# cl.6.3 Design Strength Due to Repture of Critical Section
+        Note:
+            Reference:
+            IS 800:2007, cl.6.2
+        """
 
-# cl.6.3.1 Plates
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = A_g * f_y / gamma_m0
+        return T_dg
 
-def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
-    """
+
+    # cl.6.3 Design Strength Due to Repture of Critical Section
+
+    # cl.6.3.1 Plates
+
+    def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
+        """
         Calculate the design strength in tension of a plate as per cl.6.3.1
         Args:
             A_n: net effective area of the member[in sq.mm](float)
@@ -106,22 +106,22 @@ def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
         Note:
             Reference:
             IS 800:2007, cl.6.3.1
-    """
+        """
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    sum_value = 0
-    for i in range(n - 1):
-        sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        sum_value = 0
+        for i in range(n - 1):
+            sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
 
-    A_n = (b - n * d_h + sum_value) * t
-    T_dn = 0.9 * A_n * f_u / gamma_m1
-    return T_dn
+        A_n = (b - n * d_h + sum_value) * t
+        T_dn = 0.9 * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.2 Threaded Rods
+    # cl.6.3.2 Threaded Rods
 
-def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
-    """
+    def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
+        """
         Calculate the design strength of threaded rods in tension as per cl.6.3.2
 
         Args:
@@ -135,17 +135,17 @@ def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
         Note:
             Reference:
             IS800:2007, cl.6.3.2
-    """
+        """
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_dn = 0.9 * A_n * f_u / gamma_m1
-    return T_dn
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = 0.9 * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.3 Single Angles
+    # cl.6.3.3 Single Angles
 
-def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, t, f_y, b_s, L_c, A_go):
-    """
+    def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, t, f_y, b_s, L_c, A_go):
+        """
         Calculation of design strenth of an angle connected through one leg as per cl.6.3.3
 
         Args:
@@ -167,20 +167,20 @@ def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, 
                 Reference:
                 IS800:2007, cl.6.3.3
 
-    """
+        """
 
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-    X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
-    beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
-    T_dn = (0.9 * A_nc * f_u / gamma_m1) / (beta * A_go * f_y / gamma_m0)
-    return T_dn
+        X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
+        beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
+        T_dn = (0.9 * A_nc * f_u / gamma_m1) / (beta * A_go * f_y / gamma_m0)
+        return T_dn
 
 
-# For preliminary sizing
-def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
-    """
+    # For preliminary sizing
+    def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
+        """
         Calculation of repture strength of net section for preliminary sizing as per cl.6.3.3
 
         Args:
@@ -194,26 +194,26 @@ def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
         Note:
             Reference:
             IS800:2007,cl.6.3.3
-    """
-    if n in [1, 2]:
-        alpha = 0.6
-    else:
-        if n == 3:
-            alpha = 0.7
+        """
+        if n in [1, 2]:
+            alpha = 0.6
         else:
-            alpha = 0.8
+            if n == 3:
+                alpha = 0.7
+            else:
+                alpha = 0.8
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_dn = alpha * A_n * f_u / gamma_m1
-    return T_dn
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = alpha * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.4 Other Section
+    # cl.6.3.4 Other Section
 
-# cl.6.4.1 Block shear strength of bolted connections
+    # cl.6.4.1 Block shear strength of bolted connections
 
-def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
-    """
+    def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """
         Calculation of the block shear strength of bolted connection as per cl.6.4.1
 
         Args:
@@ -232,15 +232,15 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         Note:
             Reference:
             IS800:2007, cl.6.4.1
-    """
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        """
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
 
-    T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
-    T_db = min(T_db1, T_db2)
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        T_db = min(T_db1, T_db2)
 
-    return T_db
+        return T_db
 
 
 
@@ -250,17 +250,16 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
 
 
     # clause 7.1 Design Strength
-    # cl7.1.2
+    # cl.7.1.2
 
     def design_copmressive_strength_of_a_member(A_c, f_cd):
         """calculation of design compressive strength
-            Arga:
-                P_d - Design  Compressive Strength of a member (in N)
+            Args:
                 A_c - Effective sectional area (in square mm)
                 f_cd - Design Compressive stress(in N)
 
             Return
-                P_d= f_cd*A_c
+                P_d  - Design  Compressive Strength of a member (in N)
 
             Note:
                 References:
@@ -270,131 +269,69 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         P_d = f_cd * A_c
         return P_d
 
-    print (design_copmressive_strength_of_a_member(200, 150))
-
     # Calculation of buckling class of given cross-section
-    def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f):
+    def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section,t_f,t_w,h,b_f):
         """ Defining Buckling Class of Cross-Section
 
-            Args:
-                Cross_section - Either Rolled_I_Section or Welded_Section
-                                or Hot_rolled or cold_Formed or Welded_Box_Section
-                                Channel,Angle,T,Solid,Section or Built-up Member,
+        Args:
+            Cross_section - Either 'Rolled_I_Section' or 'Welded_I_Section'
+                            or 'Hot_rolled_hollow' or 'cold_Formed_hollow' or 'Welded_Box_Section'
+                            or 'Channel,Angle,T,Solid Section' or 'Built_up_Member'
 
-                h- Depth of the section in mm,
-                b_f - width of flange in mm,
-                t_f - Thickness of flange in mm
+            h- Depth of the section in mm,
+            b_f - width of flange or width in case of welded box section(mm)
+            t_f - Thickness of flange in mm
+            t_w - Thickness of web in mm
 
-            Return:
-                    Buckling axis and Buckling class
+        Return:
+            Dictionary of Buckling axis and Buckling class with Buckling axis as key
 
-            Note:
-                Reference:
-                IS 800:2007, cl.7.1.2.2, Table_10
-            """
-
+        Note:
+            Reference:
+            IS 800:2007, cl.7.1.2.2, Table_10
+        """
         if Cross_section == "Rolled_I_Section":
-            if h / b_f > 1.2:
+            if h / b_f > 1.2 :
                 if t_f <= 40:
-                    Buckling_About_Axis_1 = "z_z"
-                    Buckling_Class_1 = "a"
-                    Buckling_About_Axis_2 = "y_y"
-                    Buckling_Class_2 = "b"
-                    return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                            'Buckling_Class_1': Buckling_Class_1,
-                            'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                            'Buckling_Class_2': Buckling_Class_2
-                            }
+                    return {'z-z': 'a','y-y': 'b'}
 
-                    if t_f == range(40, 100):
-                        for i in t_f:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "b"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "c"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
+                if t_f>40 and tf<=100:
+                    return {'z-z': 'b','y-y': 'c'}
 
-                    if h / b_f <= 1.2:
-                        if t_f <= 100:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "b"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "c"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
+            if h / b_f <= 1.2:
+                if t_f <= 100:
+                    return {'z-z': 'b','y-y': 'c'}
 
-                        elif t_f > 100:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "d"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "d"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
-        if Cross_section == "Welded_Section":
-            if t_f <= 40:
-                Buckling_About_Axis_1 = "z_z"
-                Buckling_Class_1 = "b"
-                Buckling_About_Axis_2 = "y_y"
-                Buckling_Class_2 = "c"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                        'Buckling_Class_1': Buckling_Class_1,
-                        'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                        'Buckling_Class_2': Buckling_Class_2
-                        }
+                if t_f>100:
+                    return {'z-z': 'd','y-y': 'd'}
 
-            elif t_f > 40:
-                Buckling_About_Axis_1 = "z_z"
-                Buckling_Class_1 = "c"
-                Buckling_About_Axis_2 = "y_y"
-                Buckling_Class_2 = "d"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                        'Buckling_Class_1': Buckling_Class_1,
-                        'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                        'Buckling_Class_2': Buckling_Class_2
-                        }
-        if Cross_section == "Hot_rolled":
-            Buckling_Class = a
-            return Buckling_Class
+                
+                
+        if Cross_section == "Welded_I_Section":
+            if t_f <= 40:return {'z-z': 'b','y-y': 'c'}
+            if t_f>40:return {'z-z': 'c','y-y': 'd'}
 
-        if Cross_section == "cold_Formed":
-            Buckling_Class = b
-            return Buckling_Class
+        if Cross_section == "Hot_rolled_hollow":
+            return {'z-z': 'a','y-y': 'a'}
+
+        if Cross_section == "cold_Formed_hollow":
+            return {'z-z': 'b','y-y': 'b'}
 
         if Cross_section == "Welded_Box_Section":
-            if h / t_f < 30:
-                Buckling_About_Axis = "z_z"
-                Buckling_Class = "c"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis,
-                        'Buckling_Class_1': Buckling_Class
-                        }
+            Buckling_Class_1 = 'b'
+            Buckling_Class_2 = 'b'
+            
+            if b_f / t_f < 30:        #here bf reffers to width of section
+                Buckling_Class_1 = "c"
+                
             if h / t_w < 30:
-                Buckling_About_Axis = "y_y"
-                Buckling_Class = "c"
-                return {'Buckling_About_Axis': Buckling_About_Axis,
-                        'Buckling_Class': Buckling_Class
-
-                        }
-            else:
-                Buckling_Class = b
-                return Buckling_Class
-
-        if Cross_section == "Channel_Angle_T_Solid_Section":
-            Buckling_Class = c
-            return Buckling_Class
-
-        if Cross_section == "Built_up_member":
-            Buckling_Class = c
-            return Buckling_Class
+                Buckling_Class_2 = "c"
+            
+            return {'z-z': Buckling_Class_1,'y-y': Buckling_Class_1}
+            
+        if Cross_section == "Channel_Angle_T_Solid_Section" or Cross_section == "Built_up_Member":
+            return {'z-z': 'c','y-y': 'c'}
+            
 
     # Imperfection Factor, alpha
 
@@ -405,9 +342,7 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         "Buckling_class_d": {"alpha": 0.76},
     }
 
-    print (cl_7_1_2_2_Table_10_Buckling_class_of_cross_section("Rolled_I_Section", 100, 50, 22))
-    print(cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_class_a"]["alpha"])
-
+    
     # Table 11 Effective Length of Prismatic Compression Members
 
     def cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,

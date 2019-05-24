@@ -143,6 +143,7 @@ def bc_endplate_design(uiObj):
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
     beam_R2 = float(dictbeamdata["R2"])
+    beam_Zz = float(dictbeamdata["Zz"]) * 1e3   # cu. mm
 
     #######################################################################
     # Read input values from column database
@@ -161,6 +162,13 @@ def bc_endplate_design(uiObj):
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
     column_clear_d = column_d - 2 * (column_tf + column_R1)
+
+    # Minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
+    beam_moment = 1.0 * beam_Zz * beam_fy / 1.10
+    if factored_moment < 0.5 * beam_moment:
+        beam_moment_kNm = round((beam_moment/1e6), 3)
+        logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % beam_moment_kNm)
+        factored_moment = 0.5 * beam_moment
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]

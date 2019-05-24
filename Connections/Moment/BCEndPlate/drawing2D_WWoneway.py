@@ -112,6 +112,7 @@ class OnewayEndPlate_WW(object):
             self.bolts_outside_bottom_flange_row = 0
         elif self.no_of_bolts == 12:
             self.pitch12 = float(output_dict['Bolt']['Pitch12'])
+            self.pitch23 = float(output_dict['Bolt']['Pitch23'])
             self.pitch34 = float(output_dict['Bolt']['Pitch34'])
             self.pitch45 = float(output_dict['Bolt']['Pitch45'])
             self.pitch56 = float(output_dict['Bolt']['Pitch56'])
@@ -1355,6 +1356,22 @@ class Oneway2DSide(object):
         ptP4y = ptP1x + self.data_object.plate_length_L1
         self.P4 = np.array([ptP4x, ptP4y])
 
+        ptP5x = ptP1x + self.data_object.plate_width_B1 / 2 - self.data_object.web_thickness_tw2 / 2
+        ptP5y = ptP1y
+        self.P5 = np.array([ptP5x, ptP5y])
+
+        ptP6x = ptP1x + self.data_object.plate_width_B1 / 2 + self.data_object.web_thickness_tw2 / 2
+        ptP6y = ptP1y
+        self.P6 = np.array([ptP6x, ptP6y])
+
+        ptP7x = ptP4x + self.data_object.plate_width_B1 / 2 - self.data_object.web_thickness_tw2 / 2
+        ptP7y = ptP4y
+        self.P7 = np.array([ptP7x, ptP7y])
+
+        ptP8x = ptP4x + self.data_object.plate_width_B1 / 2 + self.data_object.web_thickness_tw2 / 2
+        ptP8y = ptP4y
+        self.P8 = np.array([ptP8x, ptP8y])
+
         # ========================= Beam  =========================
 
         ptA1x = ptP1x + (self.data_object.plate_width_B1 - self.data_object.beam_width_B2) / 2
@@ -1489,16 +1506,8 @@ class Oneway2DSide(object):
         ptSU2y = ptA4y - self.data_object.flange_thickness_T2
         self.SU2 = np.array([ptSU2x, ptSU2y])
 
-        # =========================  Stiffener DOWN =========================
-        ptSD1x = ptA10x
-        ptSD1y = ptA10y + self.data_object.flange_thickness_T2
-        self.SD1 = np.array([ptSD1x, ptSD1y])
 
-        ptSD2x = ptA5x
-        ptSD2y = ptA5y + self.data_object.flange_thickness_T2
-        self.SD2 = np.array([ptSD2x, ptSD2y])
-
-    def call_Oneway_side(self, filename):
+def call_Oneway_side(self, filename):
         """
 
 		Args:
@@ -1527,11 +1536,9 @@ class Oneway2DSide(object):
         dwg.add(dwg.line(self.S7, self.A3).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.S8, self.A2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 
-        if self.data_object.no_of_bolts == 12:
+        if self.data_object.no_of_bolts ==12:
             dwg.add(dwg.line(self.P5, self.SU1).stroke('black', width=2.5, linecap='square'))
             dwg.add(dwg.line(self.P6, self.SU2).stroke('black', width=2.5, linecap='square'))
-            dwg.add(dwg.line(self.P7, self.SD1).stroke('black', width=2.5, linecap='square'))
-            dwg.add(dwg.line(self.P8, self.SD2).stroke('black', width=2.5, linecap='square'))
         else:
             pass
 

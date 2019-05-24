@@ -1237,8 +1237,8 @@ class ExtendedEnd2DTop(object):
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',
                              stroke_width='2.5'))
 
-        dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-        dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        # dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+        # dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
         dwg.add(dwg.line(self.A9, self.A12).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.A10, self.A11).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='black', fill='none',

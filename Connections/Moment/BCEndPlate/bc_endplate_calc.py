@@ -614,6 +614,16 @@ def bc_endplate_design(uiObj):
     col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
     cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
 
+    #  Weld design for column web continuity plates # TODO: Anjali
+
+
+
+
+
+
+
+
+
     # Beam stiffeners
     st_fu = beam_fu
     st_fy = beam_fy
@@ -647,6 +657,18 @@ def bc_endplate_design(uiObj):
     st_weld_fu_gov = min(st_fu, beam_fu, weld_fu)
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
+
+
+
+
+
+
+
+
+
+
+
+
 
     # Strength of flange under compression or tension TODO IS 800
 

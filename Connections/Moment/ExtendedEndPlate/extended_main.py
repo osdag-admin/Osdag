@@ -1688,6 +1688,35 @@ class Maincontroller(QMainWindow):
 			bbWeldSideWeb_21 = copy.copy(bbWeldSideWeb_11)
 			bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_11)
 
+			#Following welds are for to weld stiffeners
+			#bbWeld for stiffener hight on left side
+			bbWeldStiffHL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=outputobj['Stiffener'][
+																							 'Height'] - 15)  # outputobj['Stiffener']['Length'] - 25
+			bbWeldStiffHL_2 = copy.copy(bbWeldStiffHL_1)
+			bbWeldStiffHL_3 = copy.copy(bbWeldStiffHL_1)
+			bbWeldStiffHL_4 = copy.copy(bbWeldStiffHL_1)
+
+			# bbWeld for stiffener length on left side
+			bbWeldStiffLL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+										L=outputobj['Stiffener']['Length'] - 15)
+			bbWeldStiffLL_2 = copy.copy(bbWeldStiffLL_1)
+			bbWeldStiffLL_3 = copy.copy(bbWeldStiffLL_1)
+			bbWeldStiffLL_4 = copy.copy(bbWeldStiffLL_1)
+
+			# bbWeld for stiffener hight on Right side
+			bbWeldStiffHR_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=outputobj['Stiffener'][
+																							 'Height'] - 15)  # outputobj['Stiffener']['Length'] - 25
+			bbWeldStiffHR_2 = copy.copy(bbWeldStiffHR_1)
+			bbWeldStiffHR_3 = copy.copy(bbWeldStiffHR_1)
+			bbWeldStiffHR_4 = copy.copy(bbWeldStiffHR_1)
+
+			# bbWeld for stiffener length on right side
+			bbWeldStiffLR_1 = FilletWeld(b= float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+										L=outputobj['Stiffener']['Length'] - 15)
+			bbWeldStiffLR_2 = copy.copy(bbWeldStiffLR_1)
+			bbWeldStiffLR_3 = copy.copy(bbWeldStiffLR_1)
+			bbWeldStiffLR_4 = copy.copy(bbWeldStiffLR_1)
+
 
 
 			extbothWays = CADFillet(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
@@ -1695,6 +1724,10 @@ class Maincontroller(QMainWindow):
 										   bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
 										   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
 										   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+										bbWeldStiffHL_1, bbWeldStiffHL_2, bbWeldStiffHL_3, bbWeldStiffHL_4,
+										bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
+										bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
+										bbWeldStiffLR_1, bbWeldStiffLR_2, bbWeldStiffLR_3, bbWeldStiffLR_4,
 										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4, alist, outputobj)
 			extbothWays.create_3DModel()
 
@@ -1960,6 +1993,32 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
+				if self.alist["Member"]["Connectivity"] == "Extended both ways" or self.alist["Member"][
+					"Connectivity"] == "Extended one way":
+
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHL_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLL_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHL_3Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLL_3Model(), update=True, color='Red')
+
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHR_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_1Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHR_3Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_3Model(), update=True, color='Red')
+
+				if self.alist["Member"]["Connectivity"] == "Extended both ways":
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHL_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLL_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHL_4Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLL_4Model(), update=True, color='Red')
+
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHR_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_2Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHR_4Model(), update=True, color='Red')
+					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_4Model(), update=True, color='Red')
+
+
 
 			else:	 #Groove weld
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R1Model(), update=True, color='Red')

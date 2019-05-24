@@ -251,6 +251,8 @@ class IS800_2007(object):
 
     # clause 7.1 Design Strength
     # cl.7.1.2
+    
+    
 
     def design_copmressive_strength_of_a_member(A_c, f_cd):
         """calculation of design compressive strength
@@ -268,6 +270,41 @@ class IS800_2007(object):
 
         P_d = f_cd * A_c
         return P_d
+        
+    
+    # cl 7.1.2.1 design compressive stress of axially loaded member
+    def calculation_of_design_compressive_stress(f_y, r, gamma_m0, ):
+
+        """Calculation of design compressive stress
+
+            Args:
+                K_L  - Effective length of compression member
+                alpha - Imperfection factor
+                E - Young's Modulus of Elasticity
+                f_y - Yield Stress
+                r - radius of gyration
+
+            Return:
+                f_cd - Design  strength of compression member
+
+            Note:
+                Reference:
+                IS 800:2007, cl.7.1.2.1
+        """
+        ob = IS800_2007()
+        
+        Buckling_class = ob.cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
+        alpha = ob.cl_7_1_1_cl_7_1_2_1_Table_7[Buckling_Class]
+        K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
+                                                                         At_other_end_Translation,
+                                                                         At_other_end_Rotation, L)
+        f_cc = (pi * pi * E) / (K_L / r) ** 2
+        lambda_c = math.sqrt(f_y / f_cc)
+        phi = 0.5 * (1 + (alpha * (lambda_c - 0.2)) + (lambda_c * lambda_c))
+        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_c ** 2))
+        f_cd = min(((f_y / gamma_m0) * srf), f_y / gamma_m0)
+        return f_cd
+
 
     # Calculation of buckling class of given cross-section
     def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section,t_f,t_w,h,b_f):
@@ -335,111 +372,43 @@ class IS800_2007(object):
 
     # Imperfection Factor, alpha
 
-    cl_7_1_Table_7 = {
-        "Buckling_class_a": {"alpha": 0.21},
-        "Buckling_class_b": {"alpha": 0.34},
-        "Buckling_class_c": {"alpha": 0.49},
-        "Buckling_class_d": {"alpha": 0.76},
+    cl_7_1_Table_7_alpha = {
+        'a': 0.21,
+        'b': 0.34,
+        'c': 0.49,
+        'd': 0.76,
     }
 
     
     # Table 11 Effective Length of Prismatic Compression Members
 
-    def cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
-                                                                   At_other_end_Translation, At_other_end_Rotation, L):
+    def cl_7_2_2_effective_length_of_prismatic_Compression_members(L,BC=[]):
 
-        """ Effective length of Prismatic Compression Member
+        """ Effective length of Prismatic Compression Member 
 
         Args:
-            Boundry Condition at one end - Either Translation and Rotation
-                                           Translation and Rotation- Restrained or free.
-            Boundry Condition at one end - Either Translation and Rotation
-                                           Translation and Rotation- Restrained or free.
-            L - Length of the Compression member in mm
+            BC - linked list of Boundary Conditions
+                 =[BC_translation_end1,BC_rotation_end1,BC_translation_end2,BC_rotation_end2]
+            L -  Length of the Compression member
 
         Return:
-            K_L - Effective length of Compression Member in mm
+            K_L - Effective length of Compression Member
 
         Note:
             Reference:
             IS 800:2007, cl.7.2.2, Table_11
         """
 
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 2.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Free":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 2.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Free":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 1.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 1.2 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 0.8 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 0.65 * L
-                        return K_L
+        if BC == ['Restrained','Restrained','Free','Free'] or BC == ['Free','Restrained','Free','Restrained']:K_L = 2.0 * L
+        elif BC == ['Restrained','Free','Restrained','Free']:K_L = L            
+        elif BC == ['Restrained','Restrained','Free','Restrained']:K_L = 1.2 * L 
+        elif BC == ['Restrained','Restrained','Restrained','Free']:K_L = 0.8 * L
+        elif BC == ['Restrained','Restrained','Restrained','Restrained']:K_L = 0.65 * L
+        return K_L
 
 
 
-    # cl 7.1.2.1 design compressive stress of axially loaded member
-    def calculation_of_design_compressive_stress(f_y, r, gamma_m0, ):
-
-        """Calculation of design compressive stress
-
-            Args:
-                K_L  - Effective length of compression member
-                alpha - Imperfection factor
-                E - Young's Modulus of Elasticity
-                f_y - Yield Stress
-                r - radius of the section
-
-            Return:
-                f_cd - Design  strength of compression member
-
-            Note:
-                Reference:
-                IS 800:2007, cl.7.1.2.1
-        """
-        Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
-        K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
-                                                                         At_other_end_Translation,
-                                                                         At_other_end_Rotation, L)
-        f_cc = (pi * pi * E) / (K_L / r) ** 2
-        lambda_c = math.sqrt(f_y / f_cc)
-        phi = 0.5 * (1 + (alpha * (lambda_c - 0.2)) + (lambda_c * lamda_c))
-        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_c ** 2))
-        f_cd = min(((f_y / gamma_m0) * srf), f_y / gamma_m0)
-        return f_cd
-
+    
     # Design of Column Base
     def Calculation_of_thickness_of_column_base(P, A, a, b, gamma_m0, f_y):
         """Calculation of thickenss of Column base

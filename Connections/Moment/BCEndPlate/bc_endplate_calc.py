@@ -165,10 +165,11 @@ def bc_endplate_design(uiObj):
 
     # Minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
     beam_moment = 1.2 * beam_Zz * beam_fy / 1.10
-    if factored_moment < 0.5 * beam_moment:
-        beam_moment_kNm = round((beam_moment/1e6), 3)
-        logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % beam_moment_kNm)
-        factored_moment = 0.5 * beam_moment
+    min_connection_moment = 0.5 * beam_moment
+    if factored_moment < min_connection_moment:
+        min_connection_moment_kNm = round((min_connection_moment/1e6), 3)
+        logger.warning(": The connection is designed for %s kNm (Cl. 10.7, IS 800:2007)" % min_connection_moment_kNm)
+        factored_moment = min_connection_moment
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
@@ -216,7 +217,6 @@ def bc_endplate_design(uiObj):
     #######################################################################
     # l_v = Distance from the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge, Steel designers manual, pp733, 6th edition - 2003)
-    # TODO: for different end plate type
     if endplate_type == 'flush':
         l_v = 45.0
         g_1 = 90.0
@@ -311,7 +311,7 @@ def bc_endplate_design(uiObj):
                     # logger.error("Large number of bolts are required for the connection")
                     # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
-                    # TODO Re-detail the connection
+                    #  Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
 
@@ -342,7 +342,7 @@ def bc_endplate_design(uiObj):
                     # # logger.warning()
                     # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
-                    # TODO Re-detail the connection
+                    #  Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
                     #            'out_compression_flange': 0, 'in_compression_flange': 1}
 
@@ -354,7 +354,7 @@ def bc_endplate_design(uiObj):
                     # logger.error("Large number of bolts are required for the connection")
                     # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
-                    # TODO Re-detail the connection
+                    #  Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 0, 'in_compression_flange': 1}
             elif no_tension_side == 10:
@@ -392,7 +392,7 @@ def bc_endplate_design(uiObj):
                     # # logger.warning()
                     # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
-                    # TODO Re-detail the connection
+                    #  Re-detail the connection
                     # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
                     #            'out_compression_flange': 2, 'in_compression_flange': 1}
 
@@ -404,7 +404,7 @@ def bc_endplate_design(uiObj):
                     # logger.error("Large number of bolts are required for the connection")
                     # logger.info(": Re-design the connection using bolt of higher grade or diameter")
 
-                    # TODO Re-detail the connection
+                    #  Re-detail the connection
                     # no_rows = {'out_tension_flange': 3, 'in_tension_flange': 1,
                     #            'out_compression_flange': 3, 'in_compression_flange': 1}
             elif no_tension_side == 10:
@@ -666,7 +666,7 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
-    # Strength of flange under compression or tension TODO IS 800
+    # Strength of flange under compression or tension TODO: Get function from IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
     capacity_beam_flange = (beam_fy / gamma_m0) * A_f
@@ -676,7 +676,7 @@ def bc_endplate_design(uiObj):
         design_status = False
         logger.error(": Forces in the beam flange is greater than its load carrying capacity")
         logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN"
-                       % capacity_beam_flange)
+                       % (round(capacity_beam_flange/1000, 3)))
         logger.info(": Use a higher beam section with wider and/or thicker flange")
 
     ######################################
@@ -710,10 +710,6 @@ def bc_endplate_design(uiObj):
     # outputobj['Bolt']['Gauge'] = 0.0
     # outputobj['Bolt']['kb'] = 0.0
     # outputobj['Bolt']['SumPlateThick'] = 0.0
-    # outputobj['Plate']['Mp'] = 0.0
-    # outputobj['Plate']['MomentDemand'] = 0.0
-    # outputobj['Plate']['MomentCapacity'] = 0.0
-
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
     outputobj['Bolt']['End'] = float(round(end_dist, 3))

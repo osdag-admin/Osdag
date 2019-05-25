@@ -2150,11 +2150,11 @@ def launch_bc_endplate_controller(osdagMainWindow, folder):
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
 	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','BCEndPlate','extnd.log'), mode='w')
-	file_handler = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+	file_handler = logging.FileHandler("Connections/Moment/BCEndPlate/extnd.log", mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment', 'BCEndPlate', 'log.css') +'''/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -2164,6 +2164,8 @@ def launch_bc_endplate_controller(osdagMainWindow, folder):
 
 
 if __name__ == "__main__":
+
+	set_osdaglogger()
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
@@ -2173,12 +2175,12 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/ajmalbabums/Osdag_workspace"
+	folder_path = "D:\Osdag_Workspace\bcendplate"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

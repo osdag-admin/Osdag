@@ -666,18 +666,6 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
-
-
-
-
-
-
-
-
-
-
-
-
     # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
@@ -715,6 +703,17 @@ def bc_endplate_design(uiObj):
     outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
     outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
+
+    # outputobj['Bolt']['BoltFy'] = 0.0
+    # outputobj['Bolt']['NumberOfRows'] = int(no_rows)
+    # outputobj['Bolt']['BoltsPerColumn'] = 0.0
+    # outputobj['Bolt']['Gauge'] = 0.0
+    # outputobj['Bolt']['kb'] = 0.0
+    # outputobj['Bolt']['SumPlateThick'] = 0.0
+    # outputobj['Plate']['Mp'] = 0.0
+    # outputobj['Plate']['MomentDemand'] = 0.0
+    # outputobj['Plate']['MomentCapacity'] = 0.0
+
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
     outputobj['Bolt']['End'] = float(round(end_dist, 3))

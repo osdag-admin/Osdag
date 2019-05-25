@@ -1198,6 +1198,7 @@ class ExtendedEnd2DTop(object):
             dwg.add(dwg.line(self.AS5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
             dwg.add(dwg.line(self.AA8, self.AS8).stroke('black', width=2.5, linecap='square'))
             dwg.add(dwg.line(self.AS8, self.AA7).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+            dwg.add(dwg.line(self.AS8, self.AS5).stroke('black', width=2.5, linecap='square'))
         else:
             dwg.add(
                 dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))

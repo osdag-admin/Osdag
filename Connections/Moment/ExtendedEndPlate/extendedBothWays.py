@@ -397,9 +397,9 @@ class CADFillet(object):
 
 
     def create_bbWeldStiffHL_1(self):
-        weldstiffOriginH_1 = numpy.array([0, 0.0, 0])
-        uDirstiffH_1 = numpy.array([0, 1.0, 0])
-        wDirstiffH_1 = numpy.array([0, 0, 1.0])
+        weldstiffOriginH_1 = numpy.array([-self.beam_stiffener_1.T/2, self.beamLeft.length , self.beamLeft.D/2 + self.beam_stiffener_1.W ])
+        uDirstiffH_1 = numpy.array([0, -1.0, 0])
+        wDirstiffH_1 = numpy.array([0, 0, -1.0])
         self.bbWeldStiffHL_1.place(weldstiffOriginH_1, uDirstiffH_1, wDirstiffH_1)
 
 
@@ -426,8 +426,8 @@ class CADFillet(object):
 
 
     def create_bbWeldStiffHL_2(self):
-        weldstiffOriginH_2 = numpy.array([0, 0.0, 0])
-        uDirstiffH_2 = numpy.array([0, 1.0, 0])
+        weldstiffOriginH_2 = numpy.array([self.beam_stiffener_2.T/2, self.beamLeft.length, -(self.beamLeft.D/2 + self.beam_stiffener_3.W )])
+        uDirstiffH_2 = numpy.array([0, -1.0, 0])
         wDirstiffH_2 = numpy.array([0, 0, 1.0])
         self.bbWeldStiffHL_2.place(weldstiffOriginH_2, uDirstiffH_2, wDirstiffH_2)
 
@@ -453,8 +453,8 @@ class CADFillet(object):
         self.bbWeldStiffLL_4.place(weldstiffOriginL_4, uDirstiffL_4, wDirstiffL_4)
 
     def create_bbWeldStiffHR_1(self):
-        weldstiffOriginH_1 = numpy.array([0, 0.0, 0])
-        uDirstiffH_1 = numpy.array([0, 1.0, 0])
+        weldstiffOriginH_1 = numpy.array([self.beam_stiffener_1.T/2, self.beamLeft.length, self.beamLeft.D/2 + self.beam_stiffener_1.L21])
+        uDirstiffH_1 = numpy.array([0, -1.0, 0])
         wDirstiffH_1 = numpy.array([0, 0, 1.0])
         self.bbWeldStiffHR_1.place(weldstiffOriginH_1, uDirstiffH_1, wDirstiffH_1)
 
@@ -481,9 +481,9 @@ class CADFillet(object):
 
 
     def create_bbWeldStiffHR_2(self):
-        weldstiffOriginH_2 = numpy.array([0, 0.0, 0])
-        uDirstiffH_2 = numpy.array([0, 1.0, 0])
-        wDirstiffH_2 = numpy.array([0, 0, 1.0])
+        weldstiffOriginH_2 = numpy.array([-self.beam_stiffener_2.T/2, self.beamLeft.length, -(self.beamLeft.D/2 + self.beam_stiffener_2.L21)])
+        uDirstiffH_2 = numpy.array([0, -1.0, 0])
+        wDirstiffH_2 = numpy.array([0, 0, -1.0])
         self.bbWeldStiffHR_2.place(weldstiffOriginH_2, uDirstiffH_2, wDirstiffH_2)
 
 

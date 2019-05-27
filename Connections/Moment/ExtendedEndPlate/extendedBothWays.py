@@ -396,6 +396,9 @@ class CADFillet(object):
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
 
 
+    ################################################# Welding Beam Stiffeners ###################################################
+
+
     def create_bbWeldStiffHL_1(self):
         weldstiffOriginH_1 = numpy.array([-self.beam_stiffener_1.T/2, self.beamLeft.length , self.beamLeft.D/2 + self.beam_stiffener_1.W ])
         uDirstiffH_1 = numpy.array([0, -1.0, 0])
@@ -411,15 +414,15 @@ class CADFillet(object):
 
 
     def create_bbWeldStiffHL_3(self):
-        # gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b / 2
-        weldstiffOriginH_3 = numpy.array([0.0,0.0,0.0])
+        gap = self.beamLeft.length  + self.plateLeft.T + self.plateRight.T
+        weldstiffOriginH_3 = numpy.array([self.beam_stiffener_3.T/2, gap, self.beamLeft.D/2 + self.beam_stiffener_3.W])
         uDirstiffH_3 = numpy.array([0, 1.0, 0])
-        wDirstiffH_3 = numpy.array([0, 0, 1.0])
+        wDirstiffH_3 = numpy.array([0, 0, -1.0])
         self.bbWeldStiffHL_3.place(weldstiffOriginH_3, uDirstiffH_3, wDirstiffH_3)
 
     def create_bbWeldStiffLL_3(self):
         gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_3.L22 + self.bbWeldStiffLL_3.L
-        weldstiffOriginL_3 = numpy.array([-self.beamLeft.t/2, gap, self.beamLeft.D/2])
+        weldstiffOriginL_3 = numpy.array([-self.beam_stiffener_3.T/2, gap, self.beamLeft.D/2])
         uDirstiffL_3 = numpy.array([0.0, 0.0, 1.0])
         wDirstiffL_3 = numpy.array([0.0, -1.0,0.0])
         self.bbWeldStiffLL_3.place(weldstiffOriginL_3, uDirstiffL_3, wDirstiffL_3)
@@ -439,8 +442,8 @@ class CADFillet(object):
         self.bbWeldStiffLL_2.place(weldstiffOriginL_2, uDirstiffL_2, wDirstiffL_2)
 
     def create_bbWeldStiffHL_4(self):
-        # gap =  self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_3.L22 + self.bbWeldStiffLL_3.L
-        weldstiffOriginH_4 = numpy.array([0, 0.0, 0])
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T
+        weldstiffOriginH_4 = numpy.array([-self.beam_stiffener_3.T/2, gap, -(self.beamLeft.D/2 + self.beam_stiffener_4.W)])
         uDirstiffH_4 = numpy.array([0, 1.0, 0])
         wDirstiffH_4 = numpy.array([0, 0, 1.0])
         self.bbWeldStiffHL_4.place(weldstiffOriginH_4, uDirstiffH_4, wDirstiffH_4)
@@ -466,8 +469,8 @@ class CADFillet(object):
 
 
     def create_bbWeldStiffHR_3(self):
-        # gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b / 2
-        weldstiffOriginH_3 = numpy.array([0, 0.0, 0])
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T
+        weldstiffOriginH_3 = numpy.array([-self.beam_stiffener_3.T/2, gap, self.beamLeft.D/2 + self.beam_stiffener_3.L21 ])
         uDirstiffH_3 = numpy.array([0, 1.0, 0])
         wDirstiffH_3 = numpy.array([0, 0, 1.0])
         self.bbWeldStiffHR_3.place(weldstiffOriginH_3, uDirstiffH_3, wDirstiffH_3)
@@ -494,10 +497,10 @@ class CADFillet(object):
         self.bbWeldStiffLR_2.place(weldstiffOriginL_2, uDirstiffL_2, wDirstiffL_2)
 
     def create_bbWeldStiffHR_4(self):
-        # gap = self.beamLeft.length + self.bbWeldWeb_L3.b + self.plateLeft.T + self.plateRight.T + self.bbWeldWeb_L3.b / 2
-        weldstiffOriginH_4 = numpy.array([0, 0.0, 0])
+        gap = self.beamLeft.length  + self.plateLeft.T + self.plateRight.T
+        weldstiffOriginH_4 = numpy.array([self.beam_stiffener_4.T/2, gap, -(self.beamLeft.D/2 + self.beam_stiffener_4.L21)])
         uDirstiffH_4 = numpy.array([0, 1.0, 0])
-        wDirstiffH_4 = numpy.array([0, 0, 1.0])
+        wDirstiffH_4 = numpy.array([0, 0, -1.0])
         self.bbWeldStiffHR_4.place(weldstiffOriginH_4, uDirstiffH_4, wDirstiffH_4)
 
     def create_bbWeldStiffLR_4(self):

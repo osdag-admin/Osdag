@@ -458,7 +458,7 @@ class NutBoltArray(object):
                     if rw == 1:
                         for col in range(self.col):
                             pos = np.array([0.0, 0.0, 0.0])
-                            space12 =  (self.Lv ) + self.beamDim["T"]  # TODO  check if this formula is right, changed this formula
+                            space12 =  (self.Lv) + self.beamDim["T"]  # TODO  check if this formula is right, changed this formula
                             pos = pos + self.boltOrigin + space12 * self.pitchDir
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)

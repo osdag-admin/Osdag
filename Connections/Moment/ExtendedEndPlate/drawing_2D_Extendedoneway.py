@@ -66,10 +66,21 @@ class OnewayEndPlate(object):
 		self.cross_centre_gauge_dist = int(output_dict['Bolt']['CrossCentreGauge'])  # 90
 		# self.pitch = 60
 
+		self.stiffener_height = int(output_dict['Stiffener']['Height'])
+		self.stiffener_length = int(output_dict['Stiffener']['Length'])
+		self.stiffener_thickness = int(output_dict['Stiffener']['Thickness'])
+		self.stiffener_notchsize = int(output_dict['Stiffener']['NotchSize'])
+		self.stiffener_weldsize = int(output_dict['Stiffener']['WeldSize'])
+
 		self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
 		self.Lv = float(output_dict['Bolt']['Lv'])
 		self.flange_projection = output_dict['Plate']['Projection']
-
+		# if uiObj["weld"]["typeof_weld"] == "Fillet":
+		# 	pass
+		# else:
+		# 	pass
+		# # self.weld = int(input_dict ["weld"]["Type"])
+		# # self.weld = input_dict["Weld"]["Method"]
 
 		self.no_of_columns = 2
 		self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
@@ -571,6 +582,58 @@ class OnewayEnd2DFront(object):
 		ptAA5y = self.data_object.flange_thickness_T2
 		self.AA5 = np.array([ptAA5x, ptAA5y])
 
+		# ========================= Stiffener Top Right =========================
+
+		ptS1x = ptPP2x
+		ptS1y = ptAA1y - self.data_object.stiffener_height
+		self.S1 = np.array([ptS1x, ptS1y])
+
+		ptS2x = ptS1x + 25
+		ptS2y = ptS1y
+		self.S2 = np.array([ptS2x, ptS2y])
+
+		ptS6x = ptS1x
+		ptS6y = ptAA1y - self.data_object.stiffener_notchsize
+		self.S6 = np.array([ptS6x, ptS6y])
+
+		ptS5x = ptS1x +  self.data_object.stiffener_notchsize
+		ptS5y = ptAA1y
+		self.S5 = np.array([ptS5x, ptS5y])
+
+		ptS4x = ptAA1x + self.data_object.stiffener_length
+		ptS4y = ptAA1y
+		self.S4 = np.array([ptS4x, ptS4y])
+
+		ptS3x = ptS4x
+		ptS3y = ptS4y - 25
+		self.S3 = np.array([ptS3x, ptS3y])
+
+		# ========================= Stiffener Top Left =========================
+
+		ptSS1x = ptA2x
+		ptSS1y = ptA2y - self.data_object.stiffener_height
+		self.SS1 = np.array([ptSS1x, ptSS1y])
+
+		ptSS2x = ptSS1x - 25
+		ptSS2y = ptSS1y
+		self.SS2 = np.array([ptSS2x, ptSS2y])
+
+		ptSS6x = ptSS1x
+		ptSS6y = ptA2y - self.data_object.stiffener_notchsize
+		self.SS6 = np.array([ptSS6x, ptSS6y])
+
+		ptSS5x = ptSS1x - self.data_object.stiffener_notchsize
+		ptSS5y = ptA2y
+		self.SS5 = np.array([ptSS5x, ptSS5y])
+
+		ptSS4x = ptA2x - self.data_object.stiffener_length
+		ptSS4y = ptAA1y
+		self.SS4 = np.array([ptSS4x, ptSS4y])
+
+		ptSS3x = ptSS4x
+		ptSS3y = ptSS4y - 25
+		self.SS3 = np.array([ptSS3x, ptSS3y])
+
 		# ------------------------------------------  Weld triangle UP -------------------------------------------
 		self.BB3 = self.AA1
 		self.BB2 = self.BB3 + self.data_object.flange_weld_thickness * np.array([1, 0])
@@ -615,6 +678,15 @@ class OnewayEnd2DFront(object):
 		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.AA5, self.AA6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.AA8, self.AA7).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S1, self.S2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S2, self.S3).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S3, self.S4).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S5, self.S6).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS1, self.SS2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS2, self.SS3).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS3, self.SS4).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS5, self.SS6).stroke('blue', width=2.5, linecap='square'))
+
 
 		pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)"))
 		pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
@@ -657,7 +729,7 @@ class OnewayEnd2DFront(object):
 				ptx1 = ptx - bolt_r * np.array([0, 1])
 				rect_width = self.data_object.bolt_diameter
 				rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
-				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='green', stroke='black',
+				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
 								 stroke_width=2.5))
 
 			pt_Cx = ptx + np.array([1, 0])
@@ -675,18 +747,18 @@ class OnewayEnd2DFront(object):
 		pt_inside_top_column_list = []
 		for i in range(bitfr):
 			if self.data_object.no_of_bolts == 6:
-				ptx = self.AA1 + (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+				ptx = self.AA1 + (self.data_object.flange_thickness_T2  + self.Lv) \
 					  * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) * np.array(
 					[1, 0])
 			else:
-				ptx = self.AA1 + (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+				ptx = self.AA1 + (self.data_object.flange_thickness_T2 + self.Lv) \
 					  * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
 					[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
 
 			ptx1 = ptx - bolt_r * np.array([0, 1])
 			rect_width = self.data_object.bolt_diameter
 			rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
-			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='red', stroke='black', stroke_width=2.5))
+			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 			pt_Cx = ptx + np.array([1, 0])
 			pt_Dx = ptx + (rect_length + 20) * np.array([1, 0])
@@ -705,7 +777,7 @@ class OnewayEnd2DFront(object):
 		# ------------------------------------------  Bolts Inside Bottom Flange -------------------------------------------
 		pt_inside_bottom_column_list = []
 		for i in range(bibfr):
-			ptx = self.AA4 - (self.data_object.flange_thickness_T2 + self.data_object.flange_weld_thickness + self.Lv) \
+			ptx = self.AA4 - (self.data_object.flange_thickness_T2 + self.Lv) \
 				  * np.array([0, -1]) - (self.data_object.plate_thickness_p1 +  self.data_object.plate_thickness_p2) * np.array(
 				[1, 0])
 
@@ -859,9 +931,17 @@ class OnewayEnd2DTop(object):
 		ptA7y = ptA2y + (self.data_object.beam_width_B1 - self.data_object.web_thickness_tw1) / 2
 		self.A7 = np.array([ptA7x, ptA7y])
 
+		ptAS7x = ptA7x - self.data_object.stiffener_length
+		ptAS7y = ptA7y
+		self.AS7 = np.array([ptAS7x, ptAS7y])
+
 		ptA8x = ptA2x
 		ptA8y = ptA7y + self.data_object.web_thickness_tw1
 		self.A8 = np.array([ptA8x, ptA8y])
+
+		ptAS8x = ptA8x - self.data_object.stiffener_length
+		ptAS8y = ptA8y
+		self.AS8 = np.array([ptAS8x, ptAS8y])
 
 		ptA3x = ptA2x
 		ptA3y = ptA2y + self.data_object.beam_width_B1
@@ -952,9 +1032,17 @@ class OnewayEnd2DTop(object):
 		ptAA5y = ptAA4y - (self.data_object.beam_width_B2 - self.data_object.web_thickness_tw2) / 2
 		self.AA5 = np.array([ptAA5x, ptAA5y])
 
+		ptAAS5x = ptAA5x + self.data_object.stiffener_length
+		ptAAS5y = ptAA5y
+		self.AAS5 = np.array([ptAAS5x, ptAAS5y])
+
 		ptAA6x = ptAA1x
 		ptAA6y = ptAA5y - self.data_object.web_thickness_tw2
 		self.AA6 = np.array([ptAA6x, ptAA6y])
+
+		ptAAS6x = ptAA6x + self.data_object.stiffener_length
+		ptAAS6y = ptAA6y
+		self.AAS6 = np.array([ptAAS6x, ptAAS6y])
 
 		self.P = self.A2 + self.data_object.flange_weld_thickness * np.array([-1, 0])
 
@@ -978,16 +1066,24 @@ class OnewayEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-80 -700 2000 1800'))
-		dwg.add(dwg.line(self.A5, self.A8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.A6, self.A7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-80 -700 1900 1800'))
+		dwg.add(dwg.line(self.A5, self.AS8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AS8, self.A8).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.A6, self.AS7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AS7, self.A7).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.AS7, self.AS8).stroke('blue', width=2.5, linecap='square'))
+
+
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
 
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 		dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
 
-		dwg.add(dwg.line(self.AA5, self.AA8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.AA6, self.AA7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AA5, self.AAS5).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.AAS5, self.AA8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AA6, self.AAS6).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.AAS6, self.AA7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.AAS6, self.AAS5).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='blue', fill='none', stroke_width=2.5))
 
 		dwg.add(dwg.polyline(points=[self.B1, self.B2, self.B3, self.B1], stroke='red', fill='red', stroke_width=2.5))
@@ -1001,6 +1097,15 @@ class OnewayEnd2DTop(object):
 						 stroke='white', stroke_width=1.0))
 		dwg.add(dwg.rect(insert=self.AA1, size=(self.data_object.flange_weld_thickness, self.data_object.beam_width_B2), fill="url(#diagonalHatch)",
 						 stroke='white', stroke_width=1.0))
+
+		dwg.add(dwg.rect(insert=self.AA5 , size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.AA6 - self.data_object.stiffener_weldsize * np.array([0,1]), size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.AS8, size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.AS7 - self.data_object.stiffener_weldsize * np.array([0,1]), size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
 		nofc = self.data_object.no_of_columns
 		bolt_r = int(self.data_object.bolt_diameter) / 2
@@ -1086,6 +1191,14 @@ class OnewayEnd2DTop(object):
 		element = "weld"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
+		point = self.AAS5
+		theta = 60
+		offset = 50
+		textup = "   z      " + str(self.data_object.stiffener_weldsize)
+		textdown = " "
+		element = "weld"
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
 	# ------------------------------------------  Sectional arrow -------------------------------------------
 		pt_a1 = self.A4 - (self.data_object.plate_length_L1/3) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
@@ -1148,6 +1261,14 @@ class OnewayEnd2DSide(object):
 		ptP4y = self.data_object.plate_length_L1
 		self.P4 = np.array([ptP4x, ptP4y])
 
+		ptP5x = ptP1x + self.data_object.plate_width_B1/2 - self.data_object.stiffener_thickness/2
+		ptP5y = ptP1y
+		self.P5 = np.array([ptP5x, ptP5y])
+
+		ptP6x = ptP1x + self.data_object.plate_width_B1/ 2 + self.data_object.stiffener_thickness / 2
+		ptP6y = ptP1y
+		self.P6 = np.array([ptP6x, ptP6y])
+
 		# =========================  Primary Beam 1  =========================
 		ptA1x = ptP1x + (self.data_object.plate_width_B1 - self.data_object.beam_width_B2) / 2
 		ptA1y = ptP1y + (self.data_object.plate_length_L1 - self.data_object.beam_depth_D2 - self.data_object.flange_projection)
@@ -1168,6 +1289,10 @@ class OnewayEnd2DSide(object):
 		ptA4x = ptA12x + (self.data_object.beam_width_B2 / 2 + self.data_object.web_thickness_tw2 / 2)
 		ptA4y = ptA3y
 		self.A4 = np.array([ptA4x, ptA4y])
+
+		ptAS4x = ptA1x + self.data_object.beam_width_B2/2 - self.data_object.stiffener_thickness/2
+		ptAS4y = ptA1y
+		self.AS4 = np.array([ptAS4x, ptAS4y])
 
 		ptA8x = ptA1x
 		ptA8y = ptA1y + (self.data_object.beam_depth_D2)
@@ -1193,6 +1318,10 @@ class OnewayEnd2DSide(object):
 		ptA11y = ptA12y
 		self.A11 = np.array([ptA11x, ptA11y])
 
+		ptAS11x = ptA1x + self.data_object.beam_width_B2/2 + self.data_object.stiffener_thickness/2
+		ptAS11y = ptA1y
+		self.AS11 = np.array([ptAS11x, ptAS11y])
+
 		ptA10x = ptA11x
 		ptA10y = ptA9y
 		self.A10 = np.array([ptA10x, ptA10y])
@@ -1210,20 +1339,24 @@ class OnewayEnd2DSide(object):
 
 		"""
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 1400'))
-		dwg.add(dwg.polyline(
-			points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],
+		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],
 			stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
-
+		dwg.add(dwg.line(self.P6, self.AS11).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.P5, self.AS4).stroke('blue', width=2.5, linecap='square'))
 		pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 1 1)"))
 		pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
 
-		dwg.add(dwg.rect(insert=self.P,
-						 size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D1 - (2 * self.data_object.flange_thickness_T1))),
+		dwg.add(dwg.rect(insert=self.P,size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D1 - (2 * self.data_object.flange_thickness_T1))),
 						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-		dwg.add(dwg.rect(insert=self.A4,
-						 size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D2 - (2 * self.data_object.flange_thickness_T2))),
+		dwg.add(dwg.rect(insert=self.A4,size=(self.data_object.web_weld_thickness, (self.data_object.beam_depth_D2 - (2 * self.data_object.flange_thickness_T2))),
 						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+
+		dwg.add(dwg.rect(insert=(self.P5 + self.data_object.stiffener_weldsize*np.array([-1,0])), size=(self.data_object.stiffener_weldsize, (
+					self.data_object.plate_length_L1- self.data_object.flange_projection - self.data_object.beam_depth_D2)),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.P6, size=(self.data_object.stiffener_weldsize, (self.data_object.plate_length_L1 - self.data_object.flange_projection - self.data_object.beam_depth_D2)),
+		fill = "url(#diagonalHatch)", stroke = 'white', stroke_width = 1.0))
 
 		pattern1 = dwg.defs.add(dwg.pattern(id="diagonalHatch1", size=(6, 6), patternUnits="userSpaceOnUse", patternTransform="rotate(45 2 2)", ))
 		pattern1.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
@@ -1443,9 +1576,9 @@ class OnewayEnd2DSide(object):
 			pty3 = ptx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 			self.data_object.draw_faint_line(ptx3, pty3, dwg)
 
-			point1 = ptx3 + self.data_object.pitch23 * np.array([0, -1])
-			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point1, str(self.data_object.pitch23), params)
+			# point1 = ptx3 + self.data_object.pitch23 * np.array([0, -1])
+			# params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
+			# self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point1, str(self.data_object.pitch23), params)
 
 			point3 = ptx3 + self.data_object.Lv * np.array([0, 1])
 			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left", "endlinedim": 10,
@@ -1468,46 +1601,11 @@ class OnewayEnd2DSide(object):
 
 		# -------------------------------------------------------------------------------------------
 		# ------------------------------------------  Faint line for inside bottom flange bolts-------------------------------------------
-		if self.data_object.no_of_bolts == 6:
-			ptx1 = np.array(pt_inside_bottom_column_list[0][1])
-			point2 = ptx1 + self.data_object.Lv * np.array([0, 1])
-			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
-					  "endlinedim": 10, "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
-
-		elif self.data_object.no_of_bolts == 8:
-			ptx1 = np.array(pt_inside_bottom_column_list[1][1])
-			pty1 = ptx1 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-			self.data_object.draw_faint_line(ptx1, pty1, dwg)
-
-			ptx2 = np.array(pt_inside_bottom_column_list[0][1])
-			pty2 = ptx2 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-			self.data_object.draw_faint_line(ptx2, pty2, dwg)
-
-			point1 = ptx2 + self.data_object.pitch23 * np.array([0, -1])
-			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.pitch23), params)
-
-		elif self.data_object.no_of_bolts == 10:
-			ptx5 = np.array(pt_inside_bottom_column_list[2][1])
-			pty5 = ptx5 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-			self.data_object.draw_faint_line(ptx5, pty5, dwg)
-
-			point2 = ptx5 + self.data_object.pitch56 * np.array([0, 1])
-			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left", "endlinedim": 10, "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx5, point2, str(self.data_object.pitch56), params)
-
-			ptx6 = np.array(pt_inside_bottom_column_list[1][1])
-			pty6 = ptx6 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-			self.data_object.draw_faint_line(ptx6, pty6, dwg)
-
-			ptx7 = np.array(pt_inside_bottom_column_list[0][1])
-			pty7 = ptx7 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
-			self.data_object.draw_faint_line(ptx7, pty7, dwg)
-
-			point1 = ptx7 + self.data_object.pitch67 * np.array([0, -1])
-			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-			self.data_object.draw_dimension_outer_arrow(dwg, ptx7, point1, str(self.data_object.pitch67), params)
+		ptx1 = np.array(pt_inside_bottom_column_list[0][1])
+		point2 = ptx1 + self.data_object.Lv * np.array([0, 1])
+		params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
+				  "endlinedim": 10, "arrowlen": 20}
+		self.data_object.draw_dimension_outer_arrow(dwg, ptx1, point2, str(self.data_object.Lv), params)
 
 		# ------------------------------------------  End Plate 1 -------------------------------------------
 		point = self.P1 + 10 * np.array([1, 0])
@@ -1536,6 +1634,15 @@ class OnewayEnd2DSide(object):
 		textdown = " "
 		element = "weld"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+
+		# ---------------------------------------------  Stiffener Welding ----------------------------------------------
+		point = self.P6
+		theta = 60
+		offset = 50
+		textup = "     z         " + str(self.data_object.stiffener_weldsize)
+		textdown = " "
+		element = "weld"
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Flange Welding -------------------------------------------
 		point = self.A1 + 20*np.array([1, 0])

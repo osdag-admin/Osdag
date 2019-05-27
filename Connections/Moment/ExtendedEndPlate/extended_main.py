@@ -16,7 +16,11 @@ from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
-from drawing_2D import ExtendedEndPlate
+from drawing_2D_ExtendedBothways import ExtendedEndPlate
+from drawing_2D_Extendedoneway import OnewayEndPlate
+from drawing_2D_Flush import FlushEndPlate
+
+
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
@@ -1398,40 +1402,48 @@ class Maincontroller(QMainWindow):
 			palette = QPalette()
 			lblwidget.setPalette(palette)
 
-	# def call_2D_drawing(self, view):
-	# 	"""
-	#
-	# 	Args:
-	# 		view: Front, Side & Top view of 2D svg drawings
-	#
-	# 	Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
-	# 			 parameters from Extended endplate GUI
-	#
-	# 	"""
-	# 	self.alist = self.designParameters()
-	# 	self.result_obj = bbExtendedEndPlateSplice(self.alist)
-	# 	self.beam_data = self.fetchBeamPara()
-	# 	beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
-	# 	status = self.resultObj['Bolt']['status']
-	# 	if status is True:
-	# 		if view != "All":
-	# 			if view == "Front":
-	# 				filename = os.path.join(self.folder, "images_html", "extendFront.svg")
-	#
-	# 			elif view == "Side":
-	# 				filename = os.path.join(self.folder, "images_html", "extendSide.svg")
-	#
-	# 			else:
-	# 				filename = os.path.join(self.folder, "images_html", "extendTop.svg")
-	#
-	# 			beam_beam.save_to_svg(filename, view)
-	# 			svg_file = SvgWindow()
-	# 			svg_file.call_svgwindow(filename, view, self.folder)
-	# 		else:
-	# 			fname = ''
-	# 			beam_beam.save_to_svg(fname, view)
-	# 	else:
-	# 		QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
+	def call_2D_drawing(self, view):
+		"""
+
+		Args:
+			view: Front, Side & Top view of 2D svg drawings
+
+		Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
+				 parameters from Extended endplate GUI
+
+		"""
+		self.alist = self.designParameters()
+		self.result_obj = bbExtendedEndPlateSplice(self.alist)
+		self.beam_data = self.fetchBeamPara()
+
+		if self.alist["Member"]["Connectivity"] == "Extended both ways":
+			beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+		elif self.alist["Member"]["Connectivity"] == "Extended one way":
+			beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+		elif self.alist["Member"]["Connectivity"] == "Flush":
+			beam_beam = FlushEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+
+
+		status = self.resultObj['Bolt']['status']
+		if status is True:
+			if view != "All":
+				if view == "Front":
+					filename = os.path.join(self.folder, "images_html", "extendFront.svg")
+
+				elif view == "Side":
+					filename = os.path.join(self.folder, "images_html", "extendSide.svg")
+
+				else:
+					filename = os.path.join(self.folder, "images_html", "extendTop.svg")
+
+				beam_beam.save_to_svg(filename, view)
+				svg_file = SvgWindow()
+				svg_file.call_svgwindow(filename, view, self.folder)
+			else:
+				fname = ''
+				beam_beam.save_to_svg(fname, view)
+		else:
+			QMessageBox.about(self, 'Information', 'Design Unsafe: %s view cannot be viewed' % (view))
 
 	def dockbtn_clicked(self, widgets):
 		"""

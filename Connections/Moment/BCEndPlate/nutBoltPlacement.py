@@ -531,7 +531,6 @@ class NutBoltArray(object):
                             pos = pos + col * self.crossCgauge * self.gaugeDir
                             self.positions.append(pos)
 
-
         elif self.endplate_type == "flush":
 
             if numberOfBolts == 4:

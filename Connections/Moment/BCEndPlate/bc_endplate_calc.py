@@ -160,11 +160,25 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
+    column_clear_d = column_d - 2 * (column_tf + column_R1)
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
+
+        if beam_B > column_clear_d:
+            design_status = False
+            logger.error(": Beam is wider than column clear depth")
+            logger.warning(": Width of beam should be less than %s mm" % column_clear_d)
+            logger.info(": Currently, Osdag doesn't design such connections")
+
     else:
         bolt_plates_tk = [column_tf, end_plate_thickness]
+
+        if beam_B > column_B:
+            design_status = False
+            logger.error(": Beam is wider than column width")
+            logger.warning(": Width of beam should be less than %s mm" % column_B)
+            logger.info(": Currently, Osdag doesn't design such connections")
 
     web_weld_plates = [end_plate_thickness, beam_tw]
     flange_weld_plates = [end_plate_thickness, beam_tf]
@@ -437,7 +451,7 @@ def bc_endplate_design(uiObj):
         for bolt_row in range(int(no_rows['in_tension_flange'])):
             sigma_yi_sq += (beam_d - 3 * beam_tf/2 - l_v - bolt_row * pitch_dist) ** 2
 
-        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq
+        moment_tension = factored_moment * extreme_bolt_dist / sigma_yi_sq / 2
         tension_in_bolt = axial_tension + moment_tension + prying_force
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear
@@ -634,17 +648,6 @@ def bc_endplate_design(uiObj):
 
     st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
 
-    # Shear yielding of end plate (TODO: Clause 8.4.1, IS 800:2007)
-
-    A_v = plate_width * end_plate_thickness  # gross shear area of end plate
-    V_d = 0.6 * A_v * end_plate_fy / (math.sqrt(3) * gamma_m0)
-
-    if V_d < factored_shear_load:
-        design_status = False
-        logger.error(": The End Plate might yield due to Shear")
-        logger.warning(": The maximum allowable shear in end plate is %2.2f kN" % factored_shear_load)
-        logger.info(": Increase the thickness of End Plate")
-
     # Strength of flange under compression or tension TODO IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange
@@ -673,21 +676,22 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['status'] = design_status
     outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
 
-    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt, 3))
-    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity, 3))
-    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity, 3))
-    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity, 3))
-    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity, 3))
+    outputobj["Bolt"]["ShearBolt"] = float(round(shear_in_bolt/1000, 3))    # kN
+    outputobj["Bolt"]["ShearCapacity"] = float(round(bolt_shear_capacity/1000, 3))
+    outputobj["Bolt"]["SlipCapacity"] = float(round(bolt_slip_capacity/1000, 3))
+    outputobj["Bolt"]["BearingCapacity"] = float(round(bearing_capacity/1000, 3))
+    outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
-    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity, 3))
-    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt, 3))
+    outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
 
     outputobj['Bolt']['CrossCentreGauge'] = float(round(g_1, 3))
     outputobj['Bolt']['End'] = float(round(end_dist, 3))
     outputobj['Bolt']['Edge'] = float(round(edge_dist, 3))
     outputobj['Bolt']['Lv'] = float(round(l_v, 3))
-    outputobj['Bolt']['PitchMipni'] = float(round(pitch_dist_min, 3))
+    outputobj['Bolt']['Pitch'] = float(round(pitch_dist, 3))
+    outputobj['Bolt']['PitchMini'] = float(round(pitch_dist_min, 3))
     outputobj['Bolt']['PitchMax'] = float(round(pitch_dist_max, 3))
     outputobj['Bolt']['EndMax'] = float(round(end_dist_max, 3))
     outputobj['Bolt']['EndMini'] = float(round(end_dist_min, 3))
@@ -703,18 +707,20 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
+    outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
+    outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
-    outputobj['Stiffener']['Length'] = 300.0     # TODO:
-    outputobj['Stiffener']['Height'] = 100.0
-    outputobj['Stiffener']['Thickness'] = 10.0
-    outputobj['Stiffener']['NotchBottom'] = 15.0
-    outputobj['Stiffener']['NotchTop'] = 50.0
-
+    outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
+    outputobj['Stiffener']['Height'] = st_height
+    outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
+    outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
+    outputobj['Stiffener']['NotchTop'] = st_notch_top
+    outputobj['Stiffener']['Weld'] = 8.0    # TODO: Sourabh give calculated values
 
     # Detailing
     if endplate_type == 'flush':

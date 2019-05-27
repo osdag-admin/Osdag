@@ -2304,10 +2304,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-            outputobj['Stiffener']['Location'] = int(s)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
@@ -2450,10 +2450,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-            outputobj['Stiffener']['Location'] = int(s)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
@@ -2596,10 +2596,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-            outputobj['Stiffener']['Location'] = int(s)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
@@ -2743,10 +2743,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
                 outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
             else:
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-            outputobj['Stiffener']['Location'] = int(s)
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
@@ -2838,10 +2838,10 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener'] = {}
         if uiObj["Member"]["Connectivity"] == "Flush":
             outputobj['Stiffener']['Height'] = 0
+            outputobj['Stiffener']['Location'] = 0
         else:
             outputobj['Stiffener']['Height'] = 0
 
-        outputobj['Stiffener']['Location'] = 0
         outputobj['Stiffener']['Length'] = 0
         outputobj['Stiffener']['Thickness'] = 0
         outputobj['Stiffener']['NotchSize'] = 0

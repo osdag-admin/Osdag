@@ -1826,6 +1826,9 @@ class Ui_MainWindow(object):
         self.combo_flangeSize.setCurrentIndex(0)
         self.combo_webSize.setCurrentIndex(0)
         self.combo_columnSec.setCurrentIndex(-1)
+        self.combo_flangeSize.setEnabled(False)
+        self.combo_webSize.setEnabled(False)
+        self.combo_weld_method.currentTextChanged.connect(self.on_change)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.combo_connect, self.combo_connLoc)
         MainWindow.setTabOrder(self.combo_connLoc, self.combo_columnSec)
@@ -1931,9 +1934,22 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.pushButton_2, self.txtGuage_3)
         MainWindow.setTabOrder(self.txtGuage_3, self.btnDesign_2)'''
 
+    def on_change(self, newIndex):
+        if newIndex == "Groove Weld (CJP)":
+            self.combo_webSize.setCurrentIndex(1)
+            self.combo_flangeSize.setCurrentIndex(1)
+            self.combo_flangeSize.setEnabled(False)
+            self.combo_webSize.setEnabled(False)
+
+        else:
+            self.combo_flangeSize.setEnabled(True)
+            self.combo_webSize.setEnabled(True)
+
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Extended End Plate"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Beam to Column End Plate Moment Connection"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))

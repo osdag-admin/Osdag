@@ -15,7 +15,7 @@ from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
 
-
+import bc_endplate_calc
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
@@ -563,6 +563,15 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
+	def on_change(self, newIndex):
+		if newIndex == "Groove Weld (CJP)":
+
+			self.combo_flangeSize.setEnabled(False)
+			self.combo_webSize.setEnabled(False)
+
+		else:
+			self.combo_flangeSize.setEnabled(True)
+			self.combo_webSize.setEnabled(True)
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
 
@@ -755,6 +764,7 @@ class Maincontroller(QMainWindow):
 		"""
 		uiInput = self.designParameters()
 		self.save_inputs_totext(uiInput)
+		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
 			self.closed.emit()
@@ -816,7 +826,7 @@ class Maincontroller(QMainWindow):
 				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
 				return
 
-			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
+			self.ui.combo_connect.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["EndPlate_type"])))
 			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
 				# self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
@@ -869,13 +879,38 @@ class Maincontroller(QMainWindow):
 		'''
 		self.ui.lbl_connectivity.show()
 		loc = self.ui.combo_connLoc.currentText()
-		if loc == "Extended both ways":
-			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
+		loc2 = self.ui.combo_connect.currentText()
+
+		if loc == "Extended both ways" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webextnboth.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush end plate" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webflush.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended one way" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webextnone.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended both ways" and loc2 == "Column web-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/fextnboth.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush end plate" and loc2 == "Column web-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/ff.png")
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
 		else:
-			pass
+			pixmap = QPixmap(":/newPrefix/images/fextnone.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
 
 		return True
 
@@ -1157,6 +1192,11 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)
 		self.ui.btn_stiffnrDetail.setDisabled(True)
+
+		self.ui.btnFront.setDisabled(True)
+		self.ui.btnSide.setDisabled(True)
+		self.ui.btnTop.setDisabled(True)
+
 
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
@@ -1779,6 +1819,7 @@ class Maincontroller(QMainWindow):
 
 			else:  # Groove Weld
 
+
 				# else:
 				bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
 										   L=beam_B)
@@ -2128,7 +2169,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'), mode='a')
+	fh = logging.FileHandler("Connections/Moment/BCEndPlate/extnd.log", mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -2190,3 +2231,7 @@ if __name__ == "__main__":
 	window = Maincontroller(folder_path)
 	window.show()
 	sys.exit(app.exec_())
+
+
+
+

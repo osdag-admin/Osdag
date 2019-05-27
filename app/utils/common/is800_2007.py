@@ -273,7 +273,7 @@ class IS800_2007(object):
         
     
     # cl 7.1.2.1 design compressive stress of axially loaded member
-    def cl_7_1_2_1_calculation_of_design_compressive_stress(K_L,alpha,E,f_y,r,gamma_m0):
+    def cl_7_1_2_1_design_compressive_stress(K_L,alpha,E,f_y,r,gamma_m0):
 
         """Calculation of design compressive stress
 
@@ -358,7 +358,7 @@ class IS800_2007(object):
             if h / t_w < 30:
                 Buckling_Class_2 = "c"
             
-            return {'z-z': Buckling_Class_1,'y-y': Buckling_Class_1}
+            return {'z-z': Buckling_Class_1,'y-y': Buckling_Class_2}
             
         if Cross_section == "Channel_Angle_T_Solid_Section" or Cross_section == "Built_up_Member":
             return {'z-z': 'c','y-y': 'c'}
@@ -394,7 +394,7 @@ class IS800_2007(object):
             IS 800:2007, cl.7.2.2, Table_11
         """
 
-        if BC == ['Restrained','Restrained','Free','Free'] or BC == ['Free','Restrained','Free','Restrained']:K_L = 2.0 * L
+        if BC == ['Restrained','Restrained','Free','Free'] or BC == ['Restrained','Free','Free','Restrained']:K_L = 2.0 * L
         elif BC == ['Restrained','Free','Restrained','Free']:K_L = L            
         elif BC == ['Restrained','Restrained','Free','Restrained']:K_L = 1.2 * L 
         elif BC == ['Restrained','Restrained','Restrained','Free']:K_L = 0.8 * L
@@ -404,20 +404,18 @@ class IS800_2007(object):
 
 
     
-    # Design of Column Base
-    def Calculation_of_thickness_of_column_base(P, A, a, b, gamma_m0, f_y):
+    #cl.7.4.3 thickness of column base
+    def cl_7_4_3_1_Calculation_of_thickness_of_column_base(w,a,b,t_f,f_y):
         """Calculation of thickenss of Column base
         Args:
-            P - Load on column,
-            A- Area of the column base
+            w - uniform pressure from below on the slab base
             a - Larger Projection
             b - Smaller Projection
             f_y - Yield Stress
-            gamma_m0 - cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
             t_f - Thicknedd pf flange of Compression member
 
         Return:
-            t_f - thickness of column base
+            t_f - thickness of rectangular slab column base
 
         Note:
             Reference:
@@ -425,12 +423,14 @@ class IS800_2007(object):
 
 
          """
-
-        t_s = max(t_f, math.sqrt(2.5 * w * (a * a - 0.3 * b * b) * gamma_m0 / f_y))
-        w = P / A
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
-
-    def cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity):
+        ob = IS800_2007()
+        gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
+        t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
+        return t_s
+        
+    #cl.7.5.1.2
+    #Table 12 - evaluation of constants K1,K2,K3 for effective slenderness ratio
+    def cl_7_5_1_2_table12_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity):
 
         """Value of constant K_1,K_2, K_3
         Args:
@@ -438,7 +438,7 @@ class IS800_2007(object):
             Fixity - Either Fixed or Hinged.
 
         Return:
-            {K_1,K_2,K_3}
+            [K_1,K_2,K_3]
 
         Note:
             Reference:
@@ -453,64 +453,63 @@ class IS800_2007(object):
                 K_1 = 0.20
                 K_2 = 0.35
                 K_3 = 20
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
-
+                
             elif Connecting_member_Fixity == "Hinged":
                 K_1 = 0.70
                 K_2 = 0.60
                 K_3 = 5
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
 
         if No_of_Bolts_at_Each_End_Connection == 1:
             if Connecting_member_Fixity == "Fixed":
                 K_1 = 0.75
                 K_2 = 0.35
                 K_3 = 20
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
 
             if Connecting_member_Fixity == "Hinged":
                 K_1 = 1.25
                 K_2 = 0.50
                 K_3 = 60
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
+                
+        return [K_1,K_2,K_3]
 
-    # Design  strength of angle strut loaded through one leg
-    def Calculation_of_design_strength_of_single_angle_strut_loaded_through_one_leg(L, b_1, b_2, f_y, r_vv, t, E):
+    # cl.7.5.1.2.Design strength of angle strut loaded through one leg
+    def cl_7_5_1_2_Calculation_of_design_strength_of_single_angle_strut_loaded_through_one_leg(L, b_1, b_2, f_y, r_vv, t, E,K_list):
         """ Calculation of design strength of single angle strut loaded through one leg
 
         Args:
-            L - Lengrth of Angle section
+            L - Length of Angle section
             b_1,b_2 - width of legs of angle section
             f_y - yield stree
-            r_vv - root radius
-            t - thickenss of the angle section
-            E - Youngs Modulusof elasticity
+            r_vv - radius og gyration about minor axis
+            t - thickenss of the leg
+            E - Youngs Modulus of elasticity
 
         Return:
-            f_cd - Design compressive strength pf the section
+            f_cd - Design compressive strength of the section
 
         Note:
             Reference:
             IS 800:2007, cl.7.5.1.2
 
         """
+        ob = IS800_2007()
+        
+        [K_1,K_2,K_3] = K_list
+        
+        alpha = 0.49 #according to ammendment 1
+        
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        
+        epsilon = math.sqrt(250 / f_y)
 
-        K_1 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
-        K_2 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
-        K_3 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
+        lambda_vv = (L / r_vv) / (epsilon * math.sqrt(math.pi ** 2 * E / 250))
 
-        apsilon = math.sqrt(250 / f_y)
-        Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
+        lambda_phi = (b_1 + b_2) / (2 * t * epsilon * math.sqrt(math.pi * math.pi * E / 250))
 
-        lambda_vv = (L / r_vv) / (apsilon * math.sqrt(pi * pi * E / 250))
+        lambda_e = math.sqrt(K_1 + (K_2 * lambda_vv ** 2) + (K_3 * lambda_phi ** 2))
 
-        lambda_phi = (b_1 + b_2) / (2 * t * apsilon * math.sqrt(pi * pi * E / 250))
-
-        lambda_e = math.sqrt(k_1 + (K_2 * lambda_vv * lambda_vv) + (K_3 * lambda_phi * lambda_phi))
-
-        phi_1 = 0.5 * (1 + (alpha * (lambda_e - 0.2)) + lambda_e ** 2)
-        f_cd = min(f_y / (gamma_m0 * (phi_1 + math.sqrt(phi_1 ** phi_1 - lambda_e ** 2))), f_y / gamma_m0)
+        phi = 0.5 * (1 + alpha * (lambda_e - 0.2) + lambda_e ** 2)
+        f_cd = min(f_y / (gamma_m0 * (phi + math.sqrt(phi ** phi - lambda_e ** 2))), f_y / gamma_m0)
 
         return f_cd
 

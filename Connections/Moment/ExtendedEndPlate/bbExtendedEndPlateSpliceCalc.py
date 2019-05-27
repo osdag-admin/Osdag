@@ -2316,7 +2316,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
 
             # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
+            # if uiObj["Member"]["Connectivity"] == "Extended one way":
+            if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush": #TOdo added by darshan
                 outputobj['Plate']['Projection'] = weld_thickness_flange + 10
             else:
                 pass

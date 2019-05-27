@@ -973,18 +973,18 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('tr')
 
-    # Check for tension in critical bolt
-    if float(number_of_bolts) <= float(20):
-        row = [0, "Tension in critical bolt (kN)", " Tension in bolt due to external factored moment + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " ", ""]
-    else:
-        row = [0, "Tension in critical bolt (kN)",
-               " Tension in bolt due to external factored moment + Prying force = Cannot compute" " <br> [cl. 10.4.7] ", " ", ""]
-
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+    # # Check for tension in critical bolt
+    # if float(number_of_bolts) <= float(20):
+    #     row = [0, "Tension in critical bolt (kN)", " Tension in bolt due to external factored moment + external axial load + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " ", ""]
+    # else:
+    #     row = [0, "Tension in critical bolt (kN)",
+    #            " Tension in bolt due to external factored moment + Prying force = Cannot compute" " <br> [cl. 10.4.7] ", " ", ""]
+    #
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
     # Check for Tension capacity of bolt
     # TODO: Check for bearing bolt type (Danish)
@@ -994,11 +994,11 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         tension_critical_bolt = str(float(tension_critical) + float(prying_force))
 
         if float(tension_critical_bolt) > float(tension_capacity):
-            row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt, " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / (1.25*1000) = "
+            row = [0, "Tension capacity of critical bolt (kN)", " Tension in bolt due to external factored moment + external axial load + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / (1.25*1000) = "
                    + tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:red><b>Fail</b></p> "]
         else:
 
-            row = [0, "Tension capacity of critical bolt (kN)", tension_critical_bolt, " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / " "(1.25*1000) = "
+            row = [0, "Tension capacity of critical bolt (kN)", " Tension in bolt due to external factored moment + external axial load + Prying force = " + tension_critical + "+" + prying_force + " = " + str(float(tension_critical) + float(prying_force)) + " <br> [cl. 10.4.7] ", " Tension capacity = "  "(0.9" "*" + bolt_fu + "*" + net_area_thread + ") / " "(1.25*1000) = "
                    + tension_capacity + " <br> [cl. 10.4.5]", " <p align=left style=color:green><b>Pass</b></p> "]
     else:
         row = [0, "Tension capacity of critical bolt (kN)", "Cannot compute",
@@ -1046,7 +1046,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     # Check for bearing capacity
     rstr += t('tr')
     if bearingcapacity == "N/A" :
-        row = [0, "Bolt bearing capacity (kN)", "", "N/A", ""]
+        row = [0, "Bolt bearing capacity (kN)", "N/A", "N/A", ""]
     else:
         row = [0, "Bolt bearing capacity (kN)", "", " <i>V</i><sub>dpb</sub> = (2.5*" + kb + "*" + bolt_dia + "*" + plate_thk + "*" + beam_fu + ")"
 
@@ -1060,7 +1060,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     # Check for bolt capacity
     rstr += t('tr')
     if bearingcapacity == "N/A":
-        row = [0, "Bolt capacity (kN)", " ", boltcapacity, ""]
+        row = [0, "Bolt capacity (kN)", " ","Bolt Shear Capacity ="+ boltcapacity, ""]
     else:
         row = [0, "Bolt capacity (kN)", " min (" + shearcapacity + ", " + bearingcapacity + ") ", boltcapacity, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1243,10 +1243,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     end_mini_actual = str(float(min_edgend_dist) * float(dia_hole))
 
     if float(end_distance) < float(end_mini) or float(end_distance) > float(end_max):
-        row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + end_mini_actual + ", &#8804; 12*" + end_plate_thickness + " = " + end_max + " <br> [cl. 10.2.4]",
+        row = [0, "End distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub> ="+" &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + end_mini_actual + ",&#8804; 12*t*&#949; = &#8804; 12*" + end_plate_thickness + " = " + end_max + " <br> [cl. 10.2.4]",
                end_distance,"  <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "End distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + end_mini_actual + ", &#8804; 12*" + end_plate_thickness + " = " + end_max + " <br> [cl. 10.2.4]",
+        row = [0, "End distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub> ="+" &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + end_mini_actual + ",&#8804; 12*t*&#949; &#8804; 12*" + end_plate_thickness + " = " + end_max + " <br> [cl. 10.2.4]",
                end_distance,"  <p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1278,10 +1278,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     edge_mini_actual = end_mini_actual
 
     if float(edge_distance) < float(edge_mini) or float(edge_distance) > float(edge_max):
-        row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + edge_mini_actual + ", &#8804; 12*" + end_plate_thickness + " = " + edge_max + " <br> [cl. 10.2.4]",
+        row = [0, "Edge distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub> ="+" &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + edge_mini_actual + ",&#8804; 12*t*&#949; &#8804; 12*" + end_plate_thickness + " = " + edge_max + " <br> [cl. 10.2.4]",
                end_distance, "  <p align=left style=color:red><b>Fail</b></p>"]
     else:
-        row = [0, "Edge distance (mm)"," &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + edge_mini_actual + ", &#8804; 12*" + end_plate_thickness + " = " + edge_max + " <br> [cl. 10.2.4]",
+        row = [0, "Edge distance (mm)"," &#8805; 1.7 <i>d</i><sub>o</sub> ="+" &#8805; " + min_edgend_dist + "*" + dia_hole + " = " + edge_mini_actual + ",&#8804; 12*t*&#949; &#8804; 12*" + end_plate_thickness + " = " + edge_max + " <br> [cl. 10.2.4]",
                end_distance, "  <p align=left style=color:green><b>Pass</b></p>"]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
@@ -1586,15 +1586,11 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
-    row = [0, "Moment Demand (KN-m)", "", stiffener_moment, ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+    if float(stiffener_moment) > float(stiffener_moment_capacity):
+        row = [0, "MomentCapacity (KN-m)", "&#8805; "+stiffener_moment, stiffener_moment_capacity, " <p align=left style=color:red><b>Fail</b></p>"]
+    else:
+        row = [0, "MomentCapacity (KN-m)", "&#8805; "+stiffener_moment, stiffener_moment_capacity, " <p align=left style=color:green><b>Pass</b></p>"]
 
-    rstr += t('tr')
-    row = [0, "MomentCapacity (KN-m)", stiffener_moment, stiffener_moment_capacity, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

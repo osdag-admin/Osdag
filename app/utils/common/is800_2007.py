@@ -254,7 +254,7 @@ class IS800_2007(object):
     
     
 
-    def design_copmressive_strength_of_a_member(A_c, f_cd):
+    def cl_7_1_2_design_copmressive_strength_of_a_member(A_c, f_cd):
         """calculation of design compressive strength
             Args:
                 A_c - Effective sectional area (in square mm)
@@ -273,7 +273,7 @@ class IS800_2007(object):
         
     
     # cl 7.1.2.1 design compressive stress of axially loaded member
-    def calculation_of_design_compressive_stress(f_y, r, gamma_m0, ):
+    def cl_7_1_2_1_calculation_of_design_compressive_stress(K_L,alpha,E,f_y,r,gamma_m0):
 
         """Calculation of design compressive stress
 
@@ -291,18 +291,12 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007, cl.7.1.2.1
         """
-        ob = IS800_2007()
         
-        Buckling_class = ob.cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = ob.cl_7_1_1_cl_7_1_2_1_Table_7[Buckling_Class]
-        K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
-                                                                         At_other_end_Translation,
-                                                                         At_other_end_Rotation, L)
-        f_cc = (pi * pi * E) / (K_L / r) ** 2
-        lambda_c = math.sqrt(f_y / f_cc)
-        phi = 0.5 * (1 + (alpha * (lambda_c - 0.2)) + (lambda_c * lambda_c))
-        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_c ** 2))
-        f_cd = min(((f_y / gamma_m0) * srf), f_y / gamma_m0)
+        f_cc = (math.pi ** 2 * E) / (K_L / r) ** 2 #euler buckling stress
+        lambda_ = math.sqrt(f_y / f_cc) #non-dimensional slenderness ratio
+        phi = 0.5 * (1 + alpha * (lambda_ - 0.2) + lambda_ **2)
+        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_ ** 2)) #stress reduction factor,kai
+        f_cd = min( f_y / gamma_m0 * srf, f_y / gamma_m0)
         return f_cd
 
 
@@ -371,7 +365,7 @@ class IS800_2007(object):
             
 
     # Imperfection Factor, alpha
-
+    # gives alpha for a given buckling class,'a','b','c' or 'd'
     cl_7_1_Table_7_alpha = {
         'a': 0.21,
         'b': 0.34,
@@ -382,9 +376,10 @@ class IS800_2007(object):
     
     # Table 11 Effective Length of Prismatic Compression Members
 
-    def cl_7_2_2_effective_length_of_prismatic_Compression_members(L,BC=[]):
+    def cl_7_2_2_table11_effective_length_of_prismatic_compression_members(L,BC=[]):
 
-        """ Effective length of Prismatic Compression Member 
+        """ Effective length of Prismatic Compression Member when the boundary conditions in the plane of buckling
+        can be assessed  
 
         Args:
             BC - linked list of Boundary Conditions

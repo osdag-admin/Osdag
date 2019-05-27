@@ -18,6 +18,7 @@ from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D_ExtendedBothways import ExtendedEndPlate
 from drawing_2D_Extendedoneway import OnewayEndPlate
+from drawing_2D_Flush import FlushEndPlate
 
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
@@ -1419,6 +1420,8 @@ class Maincontroller(QMainWindow):
 			beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
 		elif self.alist["Member"]["Connectivity"] == "Extended one way":
 			beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+		elif self.alist["Member"]["Connectivity"] == "Flush":
+			beam_beam = FlushEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
 
 
 		status = self.resultObj['Bolt']['status']

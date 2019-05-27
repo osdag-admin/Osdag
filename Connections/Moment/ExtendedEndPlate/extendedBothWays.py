@@ -18,7 +18,8 @@ class CADFillet(object):
                  bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
                  bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
                  bbWeldStiffLR_1, bbWeldStiffLR_2, bbWeldStiffLR_3, bbWeldStiffLR_4,
-                 beam_stiffener_1, beam_stiffener_2, beam_stiffener_3,beam_stiffener_4, alist, outputobj):
+                 beam_stiffener_1, beam_stiffener_2, beam_stiffener_3,beam_stiffener_4,
+                 beam_stiffener_F1,beam_stiffener_F2,alist, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft
@@ -34,6 +35,9 @@ class CADFillet(object):
         self.beam_stiffener_2 = beam_stiffener_2
         self.beam_stiffener_3 = beam_stiffener_3
         self.beam_stiffener_4 = beam_stiffener_4
+
+        self.beam_stiffener_F1 = beam_stiffener_F1
+        self.beam_stiffener_F2 = beam_stiffener_F2
         self.alist = alist
         self.outputobj = outputobj
         # self.boltProjection = float(outputobj["Bolt"]['projection'])          #TODO: ask danish to edit it into dictionary
@@ -116,6 +120,9 @@ class CADFillet(object):
         self.createbeam_stiffener_3Geometry()
         self.createbeam_stiffener_4Geometry()
 
+        self.createbeam_stiffener_F1Geometry()
+        self.createbeam_stiffener_F2Geometry()
+
         self.create_bbWeldAbvFlang_11()
         self.create_bbWeldAbvFlang_12()
         self.create_bbWeldAbvFlang_21()
@@ -167,6 +174,9 @@ class CADFillet(object):
         self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
         self.beam_stiffener_3Model = self.beam_stiffener_3.create_model()
         self.beam_stiffener_4Model = self.beam_stiffener_4.create_model()
+
+        self.beam_stiffener_F1Model = self.beam_stiffener_F1.create_model()
+        self.beam_stiffener_F2Model = self.beam_stiffener_F2.create_model()
 
         self.bbWeldAbvFlang_11Model = self.bbWeldAbvFlang_11.create_model()
         self.bbWeldAbvFlang_12Model = self.bbWeldAbvFlang_12.create_model()
@@ -294,6 +304,22 @@ class CADFillet(object):
         stiffener4_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffener4_wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam_stiffener_4.place(stiffenerOrigin4, stiffener4_uDir, stiffener4_wDir)
+
+    def createbeam_stiffener_F1Geometry(self):
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2
+        stiffenerOriginF1 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
+                                        self.beamRight.D / 2 + self.beam_stiffener_1.W / 2])
+        stiffenerF1_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerF1_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.beam_stiffener_F1.place(stiffenerOriginF1, stiffenerF1_uDir, stiffenerF1_wDir)
+
+    def createbeam_stiffener_F2Geometry(self):
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_1.L / 2
+        stiffenerOriginF2 = numpy.array([-self.beam_stiffener_1.T / 2, gap,
+                                        self.beamRight.D / 2 + self.beam_stiffener_1.W / 2])
+        stiffenerF2_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerF2_wDir = numpy.array([1.0, 0.0, 0.0])
+        self.beam_stiffener_F2.place(stiffenerOriginF2, stiffenerF2_uDir, stiffenerF2_wDir)
 
     def create_bbWeldAbvFlang_11(self):
         weldAbvFlangOrigin_11 = numpy.array([self.beamLeft.B / 2, self.beamLeft.length, self.beamLeft.D / 2])
@@ -574,6 +600,12 @@ class CADFillet(object):
 
     def get_beam_stiffener_4Model(self):
         return self.beam_stiffener_4Model
+
+    def get_beam_stiffener_F1Model(self):
+        return self.beam_stiffener_F1Model
+
+    def get_beam_stiffener_F2Model(self):
+        return self.beam_stiffener_F2Model
 
     def get_bbWeldAbvFlang_11Model(self):
         return self.bbWeldAbvFlang_11Model

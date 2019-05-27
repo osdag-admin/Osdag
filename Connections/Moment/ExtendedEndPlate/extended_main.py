@@ -1639,6 +1639,7 @@ class Maincontroller(QMainWindow):
 						   T=outputobj["Plate"]["Thickness"])
 		plate_Right = copy.copy(plate_Left)     # Since both the end plates are identical
 
+		#Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
 		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
 										  T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['Length'] - 25,
 										  R12=outputobj['Stiffener']['Height']-25,
@@ -1647,6 +1648,15 @@ class Maincontroller(QMainWindow):
 		beam_stiffener_2 = copy.copy(beam_stiffener_1)
 		beam_stiffener_3 = copy.copy(beam_stiffener_1)
 		beam_stiffener_4 = copy.copy(beam_stiffener_1)
+
+
+		#Beam stiffeners for the flush type endplate
+		beam_stiffener_F1 =  StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
+										  T=outputobj['Stiffener']['Thickness'],
+										  L21=outputobj['Stiffener']['NotchSize'],L22 =outputobj['Stiffener']['NotchSize'])
+
+		beam_stiffener_F2 = copy.copy(beam_stiffener_F1)
+
 
 		alist = self.designParameters()         # An object to save all input values entered by user
 
@@ -1740,7 +1750,8 @@ class Maincontroller(QMainWindow):
 										bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
 										bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
 										bbWeldStiffLR_1, bbWeldStiffLR_2, bbWeldStiffLR_3, bbWeldStiffLR_4,
-										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4, alist, outputobj)
+										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4,
+									beam_stiffener_F1,beam_stiffener_F2, alist, outputobj)
 			extbothWays.create_3DModel()
 
 			return extbothWays
@@ -1979,6 +1990,10 @@ class Maincontroller(QMainWindow):
 			if self.alist["Member"]["Connectivity"] == "Extended both ways":
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
+
+			if self.alist["Member"]["Connectivity"] == "Flush":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F2Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

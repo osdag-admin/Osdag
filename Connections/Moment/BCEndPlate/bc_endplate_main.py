@@ -6,7 +6,6 @@ Started on 22nd April, 2019.
 
 Module: Beam to column end plate moment connection
 """
-
 # UI files
 from ui_bc_endplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreferences
@@ -14,7 +13,6 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
-
 
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
@@ -32,7 +30,8 @@ from drawing2D_WWoneway import OnewayEndPlate_WW
 from drawing2D_WWflush import FlushEndPlate_WW
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
-from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, QPixmap, QPalette
+from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, \
+	QPixmap, QPalette
 from PyQt5 import QtGui, QtCore, QtWidgets, QtOpenGL
 from model import *
 import sys
@@ -44,7 +43,6 @@ import ConfigParser
 import cairosvg
 import shutil
 import subprocess
-
 
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
@@ -74,27 +72,27 @@ import copy
 
 
 class MyTutorials(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_Tutorial()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_Tutorial()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class MyAskQuestion(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_AskQuestion()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_AskQuestion()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class MyAboutOsdag(QDialog):
-    def __init__(self, parent=None):
-        QDialog.__init__(self, parent)
-        self.ui = Ui_AboutOsdag()
-        self.ui.setupUi(self)
-        self.mainController = parent
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_AboutOsdag()
+		self.ui.setupUi(self)
+		self.mainController = parent
 
 
 class DesignPreference(QDialog):
@@ -244,7 +242,7 @@ class DesignPreference(QDialog):
 		# boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
 		# 		  12.9: 1220}
 		boltGrd = float(boltGrade)
-		boltFu = int(boltGrd) * 100 # Nominal strength of bolt
+		boltFu = int(boltGrd) * 100  # Nominal strength of bolt
 		return boltFu
 
 	def close_designPref(self):
@@ -266,8 +264,8 @@ class PlateDetails(QDialog):
 		resultObj_plate = bc_endplate_design(uiObj)
 		self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
 		self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
-		# self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
-		# self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
+	# self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
+	# self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
 
 
 class Stiffener(QDialog):
@@ -295,79 +293,232 @@ class Pitch(QDialog):
 		resultObj_plate = bc_endplate_design(uiObj)
 		print "result plate", resultObj_plate
 		no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
-		if no_of_bolts == 8:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
-			self.ui.lbl_1.setText('Pitch')
-			self.ui.lbl_mem2.hide()
-			self.ui.lbl_mem3.hide()
-			self.ui.lbl_mem4.hide()
-			self.ui.lbl_mem5.hide()
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_2.hide()
-			self.ui.lbl_3.hide()
-			self.ui.lbl_4.hide()
-			self.ui.lbl_5.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch2.hide()
-			self.ui.lineEdit_pitch3.hide()
-			self.ui.lineEdit_pitch4.hide()
-			self.ui.lineEdit_pitch5.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 12:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lbl_1.setText('Pitch_2_3')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_mem4.hide()
-			self.ui.lbl_mem5.hide()
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_4.hide()
-			self.ui.lbl_5.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch4.hide()
-			self.ui.lineEdit_pitch5.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 16:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
-			self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
-			self.ui.lbl_1.setText('Pitch_2_3')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_4.setText('Pitch_5_6')
-			self.ui.lbl_5.setText('Pitch_6_7')
-			self.ui.lbl_mem6.hide()
-			self.ui.lbl_mem7.hide()
-			self.ui.lbl_6.hide()
-			self.ui.lbl_7.hide()
-			self.ui.lineEdit_pitch6.hide()
-			self.ui.lineEdit_pitch7.hide()
-		elif no_of_bolts == 20:
-			self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
-			self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
-			self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
-			self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch56']))
-			self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
-			self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
-			self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
-			self.ui.lbl_1.setText('Pitch_1_2')
-			self.ui.lbl_2.setText('Pitch_3_4')
-			self.ui.lbl_3.setText('Pitch_4_5')
-			self.ui.lbl_4.setText('Pitch_5_6')
-			self.ui.lbl_5.setText('Pitch_6_7')
-			self.ui.lbl_6.setText('Pitch_7_8')
-			self.ui.lbl_7.setText('Pitch_9_10')
-
+		if self.maincontroller.endplate_type == 'both_way':
+			if no_of_bolts == 8:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+			elif no_of_bolts == 12:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+			elif no_of_bolts == 16:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch67']))
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+			elif no_of_bolts == 20:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch67']))
+				self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch78']))
+				self.ui.lineEdit_pitch8.setText(str(resultObj_plate['Bolt']['Pitch89']))
+				self.ui.lineEdit_pitch9.setText(str(resultObj_plate['Bolt']['Pitch910']))
+			else:
+				pass
+		
+		elif self.maincontroller.endplate_type == "flush":
+			if no_of_bolts == 4:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.hide()
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem2.hide()
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_2.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			elif no_of_bolts == 8:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			elif no_of_bolts == 12:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			else:
+				pass
+		elif self.maincontroller.endplate_type == "one_way":
+			if no_of_bolts == 6:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.hide()
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem3.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			elif no_of_bolts == 8:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.hide()
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem4.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_4.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			elif no_of_bolts == 10:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.hide()
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem5.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_5.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			elif no_of_bolts == 12:
+				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
+				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
+				self.ui.lineEdit_pitch6.hide()
+				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
+				self.ui.lbl_mem6.hide()
+				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
+				self.ui.lbl_6.hide()
+				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+			else:
+				pass
+		else:
+			pass
 
 class DesignReportDialog(QDialog):
 	def __init__(self, parent=None):
@@ -403,9 +554,11 @@ class DesignReportDialog(QDialog):
 
 	def desired_location(self, filename, base_type):
 		if base_type == ".svg":
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.svg"))
+			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.maincontroller.folder), "images_html",
+																	  "cmpylogoExtendEndplate.svg"))
 		else:
-			shutil.copyfile(filename, os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
+			shutil.copyfile(filename,
+							os.path.join(str(self.maincontroller.folder), "images_html", "cmpylogoExtendEndplate.png"))
 
 	def saveUserProfile(self):
 		inputData = self.get_report_summary()
@@ -461,7 +614,7 @@ class Maincontroller(QMainWindow):
 		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None
-
+		self.endplate_type = ''
 		self.designPrefDialog = DesignPreference(self)
 		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
 		# self.ui.combo_connLoc.model().item(2).setEnabled(False)
@@ -486,9 +639,9 @@ class Maincontroller(QMainWindow):
 		self.retrieve_prevstate()
 		self.ui.combo_connLoc.currentIndexChanged[str].connect(self.setimage_connection)
 
-		self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
-		self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
-		self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
+		self.ui.btnFront.clicked.connect(lambda: self.call_2D_drawing("Front"))
+		self.ui.btnTop.clicked.connect(lambda: self.call_2D_drawing("Top"))
+		self.ui.btnSide.clicked.connect(lambda: self.call_2D_drawing("Side"))
 		self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
 		self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 		self.ui.txt_Fu.textChanged.connect(self.call_weld_fu)
@@ -506,9 +659,9 @@ class Maincontroller(QMainWindow):
 		self.ui.actionSave_3D_model.triggered.connect(self.save_3D_cad_images)
 		self.ui.actionCreate_design_report.triggered.connect(self.design_report)
 		self.ui.actionChange_background.triggered.connect(self.show_color_dialog)
-		self.ui.actionSave_Front_View.triggered.connect(lambda : self.call_2D_drawing("Front"))
-		self.ui.actionSave_Side_View.triggered.connect(lambda : self.call_2D_drawing("Side"))
-		self.ui.actionSave_Top_View.triggered.connect(lambda : self.call_2D_drawing("Top"))
+		self.ui.actionSave_Front_View.triggered.connect(lambda: self.call_2D_drawing("Front"))
+		self.ui.actionSave_Side_View.triggered.connect(lambda: self.call_2D_drawing("Side"))
+		self.ui.actionSave_Top_View.triggered.connect(lambda: self.call_2D_drawing("Top"))
 		self.ui.actionShow_all.triggered.connect(lambda: self.call_3DModel("gradient_bg"))
 		self.ui.actionShow_column.triggered.connect(lambda: self.call_3DColumn("gradient_bg"))
 		self.ui.actionShow_beam.triggered.connect(lambda: self.call_3DBeam("gradient_bg"))
@@ -529,10 +682,10 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
-		self.ui.btn3D.clicked.connect(lambda : self.call_3DModel("gradient_bg"))
-		self.ui.chkBx_columnSec.clicked.connect(lambda : self.call_3DColumn("gradient_bg"))
-		self.ui.chkBx_beamSec.clicked.connect(lambda : self.call_3DBeam("gradient_bg"))
-		self.ui.chkBx_connector.clicked.connect(lambda :self.call_3DConnector("gradient_bg"))
+		self.ui.btn3D.clicked.connect(lambda: self.call_3DModel("gradient_bg"))
+		self.ui.chkBx_columnSec.clicked.connect(lambda: self.call_3DColumn("gradient_bg"))
+		self.ui.chkBx_beamSec.clicked.connect(lambda: self.call_3DBeam("gradient_bg"))
+		self.ui.chkBx_connector.clicked.connect(lambda: self.call_3DConnector("gradient_bg"))
 
 		validator = QIntValidator()
 
@@ -542,7 +695,6 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_Moment.setValidator(doubl_validator)
 		self.ui.txt_Shear.setValidator(doubl_validator)
 		self.ui.txt_Axial.setValidator(doubl_validator)
-
 
 		min_fu = 290
 		max_fu = 780
@@ -563,6 +715,10 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
+	def on_change(self, newIndex):
+			if newIndex == "Groove Weld (CJP)":
+				self.ui.combo_flangeSize.setEnabled(False)
+				self.ui.combo_webSize.setEnabled(False)
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
 
@@ -592,8 +748,8 @@ class Maincontroller(QMainWindow):
 		def centerOnScreen(self):
 			'''Centers the window on the screen.'''
 			resolution = QtGui.QDesktopWidget().screenGeometry()
-			self.move((resolution.width()/2) - (self.frameSize().width()/2),
-					  (resolution.height()/2) - (self.frameSize().height()/2))
+			self.move((resolution.width() / 2) - (self.frameSize().width() / 2),
+					  (resolution.height() / 2) - (self.frameSize().height() / 2))
 
 		def start_display():
 			self.ui.modelTab.raise_()
@@ -615,7 +771,6 @@ class Maincontroller(QMainWindow):
 		out_file.close()
 		pass
 
-
 	def load_design_inputs(self):
 		filename, _ = QFileDialog.getOpenFileName(self, "Open Design", str(self.folder), "(*.osi)")
 		if not filename:
@@ -634,7 +789,7 @@ class Maincontroller(QMainWindow):
 													"Text files (*.txt)")
 		return self.save_file(filename + ".txt")
 
-	def save_file(self,filename):
+	def save_file(self, filename):
 		"""
 
 		Args:
@@ -672,7 +827,7 @@ class Maincontroller(QMainWindow):
 		config.readfp(open(r'Osdag.config'))
 		wkhtmltopdf_path = config.get('wkhtml_path', 'path1')
 
-		config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path )
+		config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
 
 		options = {
 			'margin-bottom': '10mm',
@@ -720,13 +875,15 @@ class Maincontroller(QMainWindow):
 		uiObj["Plate"] = {}
 		uiObj["Plate"]["Thickness (mm)"] = str(self.ui.combo_plateThick.currentText())
 
-
 		uiObj["Weld"] = {}
 		uiObj["Weld"]["Method"] = str(self.ui.combo_weld_method.currentText())
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
+
 		uiObj["Connection"] = self.connection
+
 		return uiObj
+
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
@@ -813,7 +970,8 @@ class Maincontroller(QMainWindow):
 
 		if uiObj is not None:
 			if uiObj["Connection"] != "BCEndPlate":
-				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
+				QMessageBox.information(self, "Information",
+										"You can load this input file only from the corresponding design problem")
 				return
 
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
@@ -821,7 +979,8 @@ class Maincontroller(QMainWindow):
 			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
 				# self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 				self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(uiObj["Member"]["EndPlate_type"]))
-				self.ui.combo_columnSec.setCurrentIndex(self.ui.combo_columnSec.findText(uiObj["Member"]["ColumnSection"]))
+				self.ui.combo_columnSec.setCurrentIndex(
+					self.ui.combo_columnSec.findText(uiObj["Member"]["ColumnSection"]))
 				self.ui.combo_beamSec.setCurrentIndex(self.ui.combo_beamSec.findText(uiObj["Member"]["BeamSection"]))
 				self.ui.txt_Fu.setText(str(uiObj["Member"]["fu (MPa)"]))
 				self.ui.txt_Fy.setText(str(uiObj["Member"]["fy (MPa)"]))
@@ -831,20 +990,29 @@ class Maincontroller(QMainWindow):
 				self.ui.combo_diameter.setCurrentIndex(self.ui.combo_diameter.findText(uiObj["Bolt"]["Diameter (mm)"]))
 				self.ui.combo_type.setCurrentIndex(self.ui.combo_type.findText(uiObj["Bolt"]["Type"]))
 				self.ui.combo_grade.setCurrentIndex(self.ui.combo_grade.findText(uiObj["Bolt"]["Grade"]))
-				self.ui.combo_plateThick.setCurrentIndex(self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
+				self.ui.combo_plateThick.setCurrentIndex(
+					self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
 				self.ui.combo_weld_method.setCurrentIndex(self.ui.combo_weld_method.findText(uiObj["Weld"]["Method"]))
-				self.ui.combo_flangeSize.setCurrentIndex(self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
+				self.ui.combo_flangeSize.setCurrentIndex(
+					self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
 				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
 
-				self.designPrefDialog.ui.combo_boltType.setCurrentIndex(self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))
-				self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
+				self.designPrefDialog.ui.combo_boltType.setCurrentIndex(
+					self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))
+				self.designPrefDialog.ui.combo_boltHoleType.setCurrentIndex(
+					self.designPrefDialog.ui.combo_boltHoleType.findText(uiObj["bolt"]["bolt_hole_type"]))
 				self.designPrefDialog.ui.txt_boltFu.setText(str(uiObj["bolt"]["bolt_fu"]))
-				self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
-				self.designPrefDialog.ui.combo_weldType.setCurrentIndex(self.designPrefDialog.ui.combo_weldType.findText(uiObj["weld"]["typeof_weld"]))
+				self.designPrefDialog.ui.combo_slipfactor.setCurrentIndex(
+					self.designPrefDialog.ui.combo_slipfactor.findText(str(uiObj["bolt"]["slip_factor"])))
+				self.designPrefDialog.ui.combo_weldType.setCurrentIndex(
+					self.designPrefDialog.ui.combo_weldType.findText(uiObj["weld"]["typeof_weld"]))
 				self.designPrefDialog.ui.txt_weldFu.setText(str(uiObj["weld"]["fu_overwrite"]))
-				self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
-				self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
-				self.designPrefDialog.ui.combo_design_method.setCurrentIndex(self.designPrefDialog.ui.combo_design_method.findText(uiObj["design"]["design_method"]))
+				self.designPrefDialog.ui.combo_detailingEdgeType.setCurrentIndex(
+					self.designPrefDialog.ui.combo_detailingEdgeType.findText(uiObj["detailing"]["typeof_edge"]))
+				self.designPrefDialog.ui.combo_detailing_memebers.setCurrentIndex(
+					self.designPrefDialog.ui.combo_detailing_memebers.findText(uiObj["detailing"]["is_env_corrosive"]))
+				self.designPrefDialog.ui.combo_design_method.setCurrentIndex(
+					self.designPrefDialog.ui.combo_design_method.findText(uiObj["design"]["design_method"]))
 
 		else:
 			pass
@@ -856,6 +1024,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		self.uiObj = self.get_user_inputs()
+		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
 		# if self.designPrefDialog.saved is not True:
 		# 	design_pref = self.designPrefDialog.save_default_para()
 		# else:
@@ -869,13 +1038,38 @@ class Maincontroller(QMainWindow):
 		'''
 		self.ui.lbl_connectivity.show()
 		loc = self.ui.combo_connLoc.currentText()
-		if loc == "Extended both ways":
-			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
+		loc2 = self.ui.combo_connect.currentText()
+
+		if loc == "Extended both ways" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webextnboth.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush end plate" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webflush.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended one way" and loc2 == "Column flange-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/webextnone.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended both ways" and loc2 == "Column web-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/fextnboth.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush end plate" and loc2 == "Column web-Beam web":
+			pixmap = QPixmap(":/newPrefix/images/ff.png")
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
 		else:
-			pass
+			pixmap = QPixmap(":/newPrefix/images/fextnone.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
 
 		return True
 
@@ -932,7 +1126,7 @@ class Maincontroller(QMainWindow):
 		if self.ui.txt_Fy.text() == "":
 			incomplete_list.append("Yield strength")
 
-		#if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
+		# if self.ui.txt_Axial.text() == '' or float(self.ui.txt_Axial.text()) == 0:
 		#	incomplete_list.append("Axial force")
 
 		if self.ui.txt_Moment.text() == '' or float(self.ui.txt_Moment.text()) == 0:
@@ -952,6 +1146,7 @@ class Maincontroller(QMainWindow):
 
 		if self.ui.combo_webSize.currentIndex() == 0:
 			incomplete_list.append("Web weld thickness")
+
 
 		if self.ui.combo_flangeSize.currentIndex() == 0:
 			incomplete_list.append("Flange weld thickness")
@@ -1090,7 +1285,7 @@ class Maincontroller(QMainWindow):
 		self.ui.actionSave_Front_View.setEnabled(False)
 		self.ui.actionSave_Side_View.setEnabled(False)
 		self.ui.actionSave_Top_View.setEnabled(False)
-		self.ui.menuGraphics.setEnabled(False)
+		self.ui.menuGraphics.setEnabled(True)
 
 	def enable_buttons(self):
 		self.ui.btn_CreateDesign.setEnabled(True)
@@ -1164,7 +1359,7 @@ class Maincontroller(QMainWindow):
 	def get_columndata(self):
 		"""Fetch  old and new column sections from "Intg_osdag" database.
 		Returns:
-        	"""
+			"""
 		columndata = get_columncombolist()
 		old_colList = get_oldcolumncombolist()
 
@@ -1272,7 +1467,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		items = self.gradeType[str(index)]
-		if items != 0 :
+		if items != 0:
 			self.ui.combo_grade.clear()
 			stritems = []
 			for val in items:
@@ -1302,8 +1497,8 @@ class Maincontroller(QMainWindow):
 
 	def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
 		'''(QlineEdit,QLable,Number,Number)---> NoneType
-        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
-        '''
+		Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+		'''
 		try:
 			fu_value = float(fu_widget.text())
 		except ValueError:
@@ -1340,16 +1535,17 @@ class Maincontroller(QMainWindow):
 		self.column_data = self.fetchColumnPara()
 		self.beam_data = self.fetchBeamPara()
 
-		#TODO added endplate_type here, find new way to redue this lines
 
 		if self.alist['Member']['Connectivity'] == "Column web-Beam web":
 			# conn_type = 'col_web_connectivity'
 			if self.alist['Member']['EndPlate_type'] == "Extended both ways":
 				self.endplate_type = "both_way"
-				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
+												self.folder)
 			elif self.alist['Member']['EndPlate_type'] == "Extended one way":
 				self.endplate_type = "one_way"
-				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,self.folder)
+				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
+											  self.folder)
 			else:
 				self.endplate_type = "flush"
 				beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
@@ -1424,13 +1620,13 @@ class Maincontroller(QMainWindow):
 		design_report_dialog = DesignReportDialog(self)
 		design_report_dialog.show()
 
-		# fileName = ("Connections\Moment\BCEndPlate\Html_Report.html")
-		# fileName = str(fileName)
-		# self.alist = self.designParameters()
-		# self.result = bc_endplate_design(self.alist)
-		# print "result_obj", self.result
-		# self.beam_data = self.fetchBeamPara()
-		# save_html(self.result, self.alist, self.beam_data, fileName)
+	# fileName = ("Connections\Moment\BCEndPlate\Html_Report.html")
+	# fileName = str(fileName)
+	# self.alist = self.designParameters()
+	# self.result = bc_endplate_design(self.alist)
+	# print "result_obj", self.result
+	# self.beam_data = self.fetchBeamPara()
+	# save_html(self.result, self.alist, self.beam_data, fileName)
 
 	# ===========================  CAD ===========================
 	def show_color_dialog(self):
@@ -1483,7 +1679,7 @@ class Maincontroller(QMainWindow):
 			files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
 
 			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
-			                                          files_types)
+													  files_types)
 			fName = str(fileName)
 
 			flag = True
@@ -1531,7 +1727,8 @@ class Maincontroller(QMainWindow):
 		if status is True:
 
 			files_types = "PNG (*.png);;JPEG (*.jpeg);;TIFF (*.tiff);;BMP(*.bmp)"
-			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"), files_types)
+			fileName, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.png"),
+													  files_types)
 			fName = str(fileName)
 			file_extension = fName.split(".")[-1]
 
@@ -1562,7 +1759,7 @@ class Maincontroller(QMainWindow):
 		column_data = self.fetchColumnPara()
 		beam_data = self.fetchBeamPara()
 
-		#TODO check if column data is working
+		# TODO check if column data is working
 
 		column_tw = float(column_data["tw"])
 		column_T = float(column_data["T"])
@@ -1582,15 +1779,13 @@ class Maincontroller(QMainWindow):
 		beam_alpha = float(beam_data["FlangeSlope"])
 		beam_length = 1600.0
 
-
-
 		beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
 							 R1=column_R1, R2=column_R2, alpha=column_alpha,
 							 length=column_length, notchObj=None)
 
 		beam_Right = ISection(B=beam_B, T=beam_T, D=beam_d, t=beam_tw,
-							 R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
-							 length=beam_length, notchObj=None)  # Since both the beams are same
+							  R1=beam_R1, R2=beam_R2, alpha=beam_alpha,
+							  length=beam_length, notchObj=None)  # Since both the beams are same
 
 		outputobj = self.outputs  # Save all the claculated/displayed out in outputobj
 
@@ -1601,8 +1796,8 @@ class Maincontroller(QMainWindow):
 		alist = self.designParameters()  # An object to save all input values entered by user
 
 		# TODO make dictionary for the contPlates
-		#TODO adding enpplate type and check if code is working
-		#TODO added connectivity type here
+		# TODO adding enpplate type and check if code is working
+		# TODO added connectivity type here
 
 		if alist['Member']['Connectivity'] == "Column web-Beam web":
 			conn_type = 'col_web_connectivity'
@@ -1617,32 +1812,32 @@ class Maincontroller(QMainWindow):
 		else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 			endplate_type = "both_way"
 
-		contPlate_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
-							  T=outputobj['ContPlateComp']['Thickness'])
+		contPlate_L1 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+									  L=float(column_data["D"]) - 2 * float(column_data["T"]),
+									  T=outputobj['ContPlateComp']['Thickness'])
 
-		contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,L=float(column_data["D"]) - 2 * float(column_data["T"]),
-							  T=outputobj['ContPlateTens']['Thickness'])
+		contPlate_L2 = StiffenerPlate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
+									  L=float(column_data["D"]) - 2 * float(column_data["T"]),
+									  T=outputobj['ContPlateTens']['Thickness'])
 		contPlate_R1 = copy.copy(contPlate_L1)
 		contPlate_R2 = copy.copy(contPlate_L2)
 
-
-		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L= outputobj['Stiffener']['Length'],
-							  T= outputobj['Stiffener']['Thickness'], R11 = outputobj['Stiffener']['NotchTop'],
-							R12 = outputobj['Stiffener']['NotchTop'], L21 = outputobj['Stiffener']['NotchBottom'],
-							L22 =outputobj['Stiffener']['NotchBottom'])
+		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
+										  T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['NotchTop'],
+										  R12=outputobj['Stiffener']['NotchTop'],
+										  L21=outputobj['Stiffener']['NotchBottom'],
+										  L22=outputobj['Stiffener']['NotchBottom'])
 
 		beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
 		# contPlate_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-							 # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
+		# L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 		# contPlate_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 		# contPlate_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 		# contPlate_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
 		# 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-
-
 
 		bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
 		bolt_r = bolt_d / 2
@@ -1657,11 +1852,12 @@ class Maincontroller(QMainWindow):
 
 		numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
-		#TODO remove all the clutter later
+		# TODO remove all the clutter later
 
 		# nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
 		if conn_type == 'col_flange_connectivity':
-			nutSpace = float(column_data["T"]) + float(outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+			nutSpace = float(column_data["T"]) + float(
+				outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
 		else:
 			nutSpace = float(column_data["tw"]) + float(
 				outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
@@ -1680,7 +1876,8 @@ class Maincontroller(QMainWindow):
 			if alist["Weld"]["Method"] == "Fillet Weld":
 
 				# Followings welds are welds above beam flange, Qty = 4
-				bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
+				bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
+											   h=float(alist["Weld"]["Flange (mm)"]),
 											   L=beam_B)
 				bbWeldAbvFlang_22 = copy.copy(bbWeldAbvFlang_21)
 
@@ -1701,39 +1898,39 @@ class Maincontroller(QMainWindow):
 				#######################################
 
 				extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-										 bbWeldAbvFlang_22,
-										 bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-										 bbWeldBelwFlang_24,
-										 bbWeldSideWeb_21, bbWeldSideWeb_22,
-										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
+										bbWeldAbvFlang_22,
+										bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+										bbWeldBelwFlang_24,
+										bbWeldSideWeb_21, bbWeldSideWeb_22,
+										contPlate_L1, contPlate_L2, contPlate_R1,
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, conn_type,
+										outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
 
-			else:  #Groove Weld
+			else:  # Groove Weld
 				bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
-											   L=beam_B)
+										   L=beam_B)
 				bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
-
 
 				# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
 				bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
-											  L=beam_d - 2 * beam_T)
+										 L=beam_d - 2 * beam_T)
 
 				#######################################
 				#       WELD SECTIONS QUARTER CONE    #
 				#######################################
 
 				extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
-										  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-										 contPlate_L1, contPlate_L2, contPlate_R1,
-										 contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj)
+										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+										contPlate_L1, contPlate_L2, contPlate_R1,
+										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
 				extbothWays.create_3DModel()
 
 				return extbothWays
 
-		else: #conn_type = 'col_web_connectivity'
+		else:  # conn_type = 'col_web_connectivity'
 			if alist["Weld"]["Method"] == "Fillet Weld":
 				# Followings welds are welds above beam flange, Qty = 4
 				bbWeldAbvFlang_21 = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]),
@@ -1765,13 +1962,15 @@ class Maincontroller(QMainWindow):
 				# 						contPlate_L1, contPlate_L2, contPlate_R1,
 				# 						contPlate_R2, endplate_type, conn_type)
 
-				col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-										bbWeldAbvFlang_22,
-										bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-										bbWeldBelwFlang_24,
-										bbWeldSideWeb_21, bbWeldSideWeb_22,
-										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj)
+				col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+													   bbWeldAbvFlang_21,
+													   bbWeldAbvFlang_22,
+													   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+													   bbWeldBelwFlang_24,
+													   bbWeldSideWeb_21, bbWeldSideWeb_22,
+													   contPlate_L1, contPlate_L2, contPlate_R1,
+													   contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
+													   conn_type, outputobj)
 
 				col_web_connectivity.create_3DModel()
 
@@ -1792,30 +1991,31 @@ class Maincontroller(QMainWindow):
 				#       WELD SECTIONS QUARTER CONE    #
 				#######################################
 
-				col_web_connectivity  = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
-										bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
-										contPlate_L1, contPlate_L2, contPlate_R1,
-										contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
+				col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+													   bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+													   contPlate_L1, contPlate_L2, contPlate_R1,
+													   contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
+													   outputobj)
 
 				col_web_connectivity.create_3DModel()
 
 				return col_web_connectivity
 
-		#######################################
-		#       WELD SECTIONS QUARTER CONE    #
-		#######################################
+	#######################################
+	#       WELD SECTIONS QUARTER CONE    #
+	#######################################
 
-		# # Following weld cones are placed for Left beam
+	# # Following weld cones are placed for Left beam
 
-		# extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-		# 							   bbWeldAbvFlang_22,
-		# 							   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-		# 							   bbWeldBelwFlang_24,
-		# 							   bbWeldSideWeb_21, bbWeldSideWeb_22, bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3, contPlate_L1, contPlate_L2, contPlate_R1,
-		# 							   contPlate_R2, endplate_type, weld_method)
-		# extbothWays.create_3DModel()
-		#
-		# return extbothWays
+	# extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+	# 							   bbWeldAbvFlang_22,
+	# 							   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
+	# 							   bbWeldBelwFlang_24,
+	# 							   bbWeldSideWeb_21, bbWeldSideWeb_22, bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3, contPlate_L1, contPlate_L2, contPlate_R1,
+	# 							   contPlate_R2, endplate_type, weld_method)
+	# extbothWays.create_3DModel()
+	#
+	# return extbothWays
 
 	def bolt_head_thick_calculation(self, bolt_diameter):
 		'''
@@ -1875,6 +2075,7 @@ class Maincontroller(QMainWindow):
 		'''
 		Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
 		'''
+
 		nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23,
 				   30: 25.35, 36: 30.65}
 		return nut_dia[bolt_diameter]
@@ -2115,7 +2316,6 @@ class Maincontroller(QMainWindow):
 					opener = "open" if sys.platform == "darwin" else "xdg-open"
 					subprocess.call([opener, "%s/%s" % (root_path, html_file)])
 
-
 def set_osdaglogger():
 	global logger
 	if logger is None:
@@ -2154,7 +2354,9 @@ def launch_bc_endplate_controller(osdagMainWindow, folder):
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment', 'BCEndPlate', 'log.css') +'''/>''')
+	rawLogger.info(
+		'''<link rel="stylesheet" type="text/css" href=''' + os.path.join('Connections', 'Moment', 'BCEndPlate',
+																		  'log.css') + '''/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -2173,12 +2375,12 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\BCEndPlate\log.css"/>''')
 	# ----------------------------------------------------------------------------
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/ajmalbabums/Osdag_workspace"
+	folder_path = "C:\Users\User\Desktop\Osdag IITB\Cloned\osdag_workspace"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

@@ -613,7 +613,7 @@ class Maincontroller(QMainWindow):
 		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None
-
+		self.endplate_type = ''
 		self.designPrefDialog = DesignPreference(self)
 		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
 		# self.ui.combo_connLoc.model().item(2).setEnabled(False)
@@ -1493,7 +1493,7 @@ class Maincontroller(QMainWindow):
 		self.beam_data = self.fetchBeamPara()
 
 		#TODO added endplate_type here, find new way to redue this lines
-
+		
 		if self.alist['Member']['Connectivity'] == "Column web-Beam web":
 			# conn_type = 'col_web_connectivity'
 			if self.alist['Member']['EndPlate_type'] == "Extended both ways":

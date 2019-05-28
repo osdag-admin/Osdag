@@ -1656,6 +1656,8 @@ class Maincontroller(QMainWindow):
 										  L21=outputobj['Stiffener']['NotchSize'],L22 =outputobj['Stiffener']['NotchSize'])
 
 		beam_stiffener_F2 = copy.copy(beam_stiffener_F1)
+		beam_stiffener_F3 = copy.copy(beam_stiffener_F1)
+		beam_stiffener_F4 = copy.copy(beam_stiffener_F1)
 
 
 		alist = self.designParameters()         # An object to save all input values entered by user
@@ -1751,7 +1753,7 @@ class Maincontroller(QMainWindow):
 										bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
 										bbWeldStiffLR_1, bbWeldStiffLR_2, bbWeldStiffLR_3, bbWeldStiffLR_4,
 										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4,
-									beam_stiffener_F1,beam_stiffener_F2, alist, outputobj)
+									beam_stiffener_F1,beam_stiffener_F2,beam_stiffener_F3,beam_stiffener_F4, alist, outputobj)
 			extbothWays.create_3DModel()
 
 			return extbothWays
@@ -1928,6 +1930,12 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
 
+			if self.alist["Member"]["Connectivity"] == "Flush":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F3Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F4Model(), update=True, color='Blue')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1994,6 +2002,8 @@ class Maincontroller(QMainWindow):
 			if self.alist["Member"]["Connectivity"] == "Flush":
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F1Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F3Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F4Model(), update=True, color='Blue')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

@@ -702,6 +702,10 @@ def bc_endplate_design(uiObj):
     outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
     outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionMoment"] = float(round(moment_tension/1000, 3))
+    outputobj["Bolt"]["TensionAxial"] = float(round(axial_tension/1000, 3))
+    outputobj["Bolt"]["TensionPrying"] = float(round(prying_force/1000, 3))
+
     outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
     outputobj["Bolt"]["CombinedCapacity"] = float(round(combined_capacity, 3))
 

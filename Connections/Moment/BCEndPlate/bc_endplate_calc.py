@@ -608,7 +608,7 @@ def bc_endplate_design(uiObj):
 
     cont_plate_comp_tk_local_buckling = cont_plate_comp_width / (9.4 * cont_plate_e)
     cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, beam_tf,
-                                 (p_bf - col_web_capacity) / (cont_plate_fy / gamma_m0))
+                                 (p_bf - col_web_capacity) / (cont_plate_comp_width * cont_plate_fy / gamma_m0))
     available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
     for plate_tk in available_plates:
         if plate_tk >= cont_plate_comp_tk_min:
@@ -621,7 +621,8 @@ def bc_endplate_design(uiObj):
 
     t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load   # Tensile force at beam flanges
     col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
-    cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
+    cont_plate_tens_tk_min = max(cont_plate_tk_flange,
+                                 (t_bf - col_flange_tens_capacity) / (cont_plate_tens_width * cont_plate_fy / gamma_m0))
 
     #  Weld design for column web continuity plates # TODO: Anjali
 

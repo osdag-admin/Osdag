@@ -14,7 +14,7 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
-
+from bc_endplate_calc import checkvalid
 
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
@@ -493,6 +493,7 @@ class Maincontroller(QMainWindow):
 
 		self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 		self.ui.btn_Design.clicked.connect(self.osdag_header)
+		self.ui.btn_Design.clicked.connect(self.showcheckValid)
 		self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
 		self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
 		self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -526,6 +527,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
+		self.ui.btn_SaveMessages.clicked.connect(self.save_log_messages)
 
 		self.ui.btn3D.clicked.connect(lambda : self.call_3DModel("gradient_bg"))
 		self.ui.chkBx_columnSec.clicked.connect(lambda : self.call_3DColumn("gradient_bg"))
@@ -560,6 +562,22 @@ class Maincontroller(QMainWindow):
 		self.fuse_model = None
 		self.resultObj = None
 		self.disable_buttons()
+
+
+	def showcheckValid(self):
+		if checkvalid()==True:
+			#dialog = QDialog()
+			#label = QtWidgets.QLabel(self)
+			#label.setText("Correct")
+			#dialog.show(label)
+		    QMessageBox.information(self,"Message","Correct")
+
+		else:
+			'''dialog = QDialog()
+			ulabel = QtWidgets.QLabel(self)
+			ulabel.setText("Incorrect")
+			dialog.show(ulabel)'''
+			QMessageBox.information(self, "Warning","Incorrect! Currently, this option is not in Osdag for Wfc < Wfb")
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -814,7 +832,7 @@ class Maincontroller(QMainWindow):
 				QMessageBox.information(self, "Information", "You can load this input file only from the corresponding design problem")
 				return
 
-			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
+			self.ui.combo_connect.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["EndPlate_type"])))
 			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
 				# self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
@@ -1155,6 +1173,9 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)
 		self.ui.btn_stiffnrDetail.setDisabled(True)
+		self.ui.btnFront.setDisabled(True)
+		self.ui.btnTop.setDisabled(True)
+		self.ui.btnSide.setDisabled(True)
 
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
@@ -2173,7 +2194,7 @@ if __name__ == "__main__":
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "D:\Osdag_Workspace\bcendplate"
+	folder_path = "D:\Osdag_Workspace\\bcendplate"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

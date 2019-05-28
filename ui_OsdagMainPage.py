@@ -668,7 +668,7 @@ class Ui_MainWindow(object):
         self.gridLayout_5.addItem(spacerItem35, 0, 1, 1, 1)
         self.myStackedWidget.addWidget(self.beamtobeampage)
 
-        print "yyyy"
+
         self.beamtocolumnpage = QtWidgets.QWidget()
 
         self.beamtocolumnpage.setObjectName("beamtocolumnpage")
@@ -731,9 +731,9 @@ class Ui_MainWindow(object):
         self.gridLayout_bcpage.addWidget(self.btn_start_3, 5, 2, 1, 1)
         spacerItem39 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_bcpage.addItem(spacerItem39, 0, 1, 1, 1)
-        print "yyyy"
+
         self.myStackedWidget.addWidget(self.beamtocolumnpage)
-        print "yyyy"
+
 
 
 

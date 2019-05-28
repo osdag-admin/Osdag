@@ -26,6 +26,10 @@ import math
 import logging
 flag = 1
 logger = None
+beam_d = 0
+beam_B = 0
+
+
 
 
 def module_setup():
@@ -143,6 +147,7 @@ def bc_endplate_design(uiObj):
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
     beam_R2 = float(dictbeamdata["R2"])
+
 
     #######################################################################
     # Read input values from column database
@@ -821,3 +826,9 @@ def bc_endplate_design(uiObj):
         logger.debug(" :=========End Of design===========")
 
     return outputobj
+
+def checkvalid():
+    if beam_d>beam_B:
+        return True
+    else:
+        return False

@@ -1807,7 +1807,7 @@ class Ui_MainWindow(object):
         self.menuGraphics.addAction(self.actionPan)
         self.menuGraphics.addAction(self.actionRotate_3D_model)
         self.menuGraphics.addSeparator()
-        self.menuGraphics.addAction(self.actionShow_column_2)
+        self.menuGraphics.addAction(self.actionShow_column)
         self.menuGraphics.addAction(self.actionShow_beam)
         self.menuGraphics.addAction(self.actionShow_connector)
         self.menuGraphics.addAction(self.actionShow_all)

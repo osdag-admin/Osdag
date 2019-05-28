@@ -1743,8 +1743,26 @@ class Maincontroller(QMainWindow):
 
 			bbWeldstiff1_u1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
 										 L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchSize'])
+			bbWeldstiff1_l1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff2_u1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff2_l1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff3_u1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff3_l1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff4_u1 = copy.copy(bbWeldstiff1_u1)
+			bbWeldstiff4_l1 = copy.copy(bbWeldstiff1_u1)
+
+
 			bbWeldstiff1_u2 = FilletWeld(b= float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
 										L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
+			bbWeldstiff1_l2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff2_u2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff2_l2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff3_u2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff3_l2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff4_u2 = copy.copy(bbWeldstiff1_u2)
+			bbWeldstiff4_l2 = copy.copy(bbWeldstiff1_u2)
+
+
 
 
 			extbothWays = CADFillet(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray,
@@ -1752,7 +1770,10 @@ class Maincontroller(QMainWindow):
 										   bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
 										   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
 										   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
-									bbWeldstiff1_u1,bbWeldstiff1_u2,
+										bbWeldstiff1_u1,bbWeldstiff1_u2,bbWeldstiff2_u1,bbWeldstiff2_u2,bbWeldstiff3_u1,
+										bbWeldstiff3_u2,bbWeldstiff4_u1,bbWeldstiff4_u2,
+									bbWeldstiff1_l1, bbWeldstiff1_l2, bbWeldstiff2_l1, bbWeldstiff2_l2, bbWeldstiff3_l1,
+									bbWeldstiff3_l2, bbWeldstiff4_l1, bbWeldstiff4_l2,
 										bbWeldStiffHL_1, bbWeldStiffHL_2, bbWeldStiffHL_3, bbWeldStiffHL_4,
 										bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
 										bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
@@ -1944,6 +1965,23 @@ class Maincontroller(QMainWindow):
 
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u1Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l2Model(), update=True, color='Red')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
@@ -2018,6 +2056,23 @@ class Maincontroller(QMainWindow):
 
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u1Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l2Model(), update=True, color='Red')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()

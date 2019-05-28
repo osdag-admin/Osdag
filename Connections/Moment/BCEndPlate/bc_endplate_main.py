@@ -6,7 +6,6 @@ Started on 22nd April, 2019.
 
 Module: Beam to column end plate moment connection
 """
-ep_type = '' #Universal variable equal to endplate_type(ary)
 # UI files
 from ui_bc_endplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreferences
@@ -301,7 +300,6 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch34']))
-				
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
@@ -323,7 +321,6 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch45']))
 				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch56']))
-				
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
 				self.ui.lbl_mem7_2.hide()
@@ -616,7 +613,7 @@ class Maincontroller(QMainWindow):
 		self.get_columndata()
 		self.get_beamdata()
 		self.result_obj = None
-
+		self.endplate_type = ''
 		self.designPrefDialog = DesignPreference(self)
 		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
 		# self.ui.combo_connLoc.model().item(2).setEnabled(False)
@@ -1496,34 +1493,28 @@ class Maincontroller(QMainWindow):
 		self.beam_data = self.fetchBeamPara()
 
 		#TODO added endplate_type here, find new way to redue this lines
-
+		
 		if self.alist['Member']['Connectivity'] == "Column web-Beam web":
 			# conn_type = 'col_web_connectivity'
 			if self.alist['Member']['EndPlate_type'] == "Extended both ways":
 				self.endplate_type = "both_way"
-				ep_type = "both_way"
 				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 			elif self.alist['Member']['EndPlate_type'] == "Extended one way":
 				self.endplate_type = "one_way"
-				ep_type = "one_way"
 				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,self.folder)
 			else:
 				self.endplate_type = "flush"
-				ep_type = "flush"
 				beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		else:  # "Column flange-Beam web"
 			# conn_type = 'col_flange_connectivity'
 			if self.alist['Member']['EndPlate_type'] == "Extended one way":
 				self.endplate_type = "one_way"
-				ep_type = "one_way"
 				beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 			elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
 				self.endplate_type = "flush"
-				ep_type = "flush"
 				beam_beam = FlushEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 			else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
 				self.endplate_type = "both_way"
-				ep_type = "both_way"
 				beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 
 		# beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)

@@ -609,12 +609,13 @@ def bc_endplate_design(uiObj):
     cont_plate_comp_tk_local_buckling = cont_plate_comp_width / (9.4 * cont_plate_e)
     cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, beam_tf,
                                  (p_bf - col_web_capacity) / (cont_plate_comp_width * cont_plate_fy / gamma_m0))
-    available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
+    available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30, 32, 34, 35, 36, 40, 45, 50, 55, 60]
     for plate_tk in available_plates:
         if plate_tk >= cont_plate_comp_tk_min:
             cont_plate_tk_flange = plate_tk
             break
-
+        else:
+            cont_plate_tk_flange = 0
     # Continuity Plates on compression side
     cont_plate_tens_length = column_d - 2 * column_tf
     cont_plate_tens_width = (column_B - column_tw) / 2

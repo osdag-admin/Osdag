@@ -464,11 +464,12 @@ def bc_endplate_design(uiObj):
         shear_in_bolt = factored_shear_load / number_of_bolts
         # Check for combined tension and shear
         if bolt_type == "Friction Grip Bolt":
-            bolt_combined_status = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(
-                V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity) <= 1.0
+            combined_capacity = IS800_2007.cl_10_4_6_friction_bolt_combined_shear_and_tension(
+                V_sf=shear_in_bolt, V_df=bolt_capacity, T_f=tension_in_bolt, T_df=bolt_tension_capacity)
         else:
-            bolt_combined_status = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(
-                V_sb=shear_in_bolt, V_db=bolt_capacity, T_b=tension_in_bolt, T_db=bolt_tension_capacity) <= 1.0
+            combined_capacity = IS800_2007.cl_10_3_6_bearing_bolt_combined_shear_and_tension(
+                V_sb=shear_in_bolt, V_db=bolt_capacity, T_b=tension_in_bolt, T_db=bolt_tension_capacity)
+        bolt_combined_status = combined_capacity <= 1.0
 
         if bolt_combined_status is False:
             no_tension_side += 2
@@ -597,11 +598,6 @@ def bc_endplate_design(uiObj):
 
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
-    available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
-    for plate_tk in available_plates:
-        if plate_tk >= beam_tf:
-            cont_plate_tk_flange = plate_tk
-            break
 
     col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
 
@@ -610,9 +606,14 @@ def bc_endplate_design(uiObj):
     col_web_capacity_buckling = (10710 * (column_tw ** 3) / column_d) * math.sqrt(column_fy / gamma_m0)
     col_web_capacity = max(col_web_capacity_yielding, col_web_capacity_crippling, col_web_capacity_buckling)
 
-    cont_plate_comp_tk_local_buckling = cont_plate_comp_length / (9.4 * cont_plate_e)
-    cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, cont_plate_tk_flange,
-                                 (p_bf - col_web_capacity) / (cont_plate_fy / gamma_m0))
+    cont_plate_comp_tk_local_buckling = cont_plate_comp_width / (9.4 * cont_plate_e)
+    cont_plate_comp_tk_min = max(cont_plate_comp_tk_local_buckling, beam_tf,
+                                 (p_bf - col_web_capacity) / (cont_plate_comp_width * cont_plate_fy / gamma_m0))
+    available_plates = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 30]
+    for plate_tk in available_plates:
+        if plate_tk >= cont_plate_comp_tk_min:
+            cont_plate_tk_flange = plate_tk
+            break
 
     # Continuity Plates on compression side
     cont_plate_tens_length = column_d - 2 * column_tf
@@ -620,7 +621,8 @@ def bc_endplate_design(uiObj):
 
     t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load   # Tensile force at beam flanges
     col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
-    cont_plate_tens_tk_min = max(cont_plate_tk_flange, (t_bf - col_flange_tens_capacity) / (cont_plate_fy / gamma_m0))
+    cont_plate_tens_tk_min = max(cont_plate_tk_flange,
+                                 (t_bf - col_flange_tens_capacity) / (cont_plate_tens_width * cont_plate_fy / gamma_m0))
 
     #  Weld design for column web continuity plates # TODO: Anjali
 
@@ -701,8 +703,12 @@ def bc_endplate_design(uiObj):
     outputobj["Bolt"]["BoltCapacity"] = float(round(bolt_capacity/1000, 3))
 
     outputobj["Bolt"]["TensionCapacity"] = float(round(bolt_tension_capacity/1000, 3))
+    outputobj["Bolt"]["TensionMoment"] = float(round(moment_tension/1000, 3))
+    outputobj["Bolt"]["TensionAxial"] = float(round(axial_tension/1000, 3))
+    outputobj["Bolt"]["TensionPrying"] = float(round(prying_force/1000, 3))
+
     outputobj["Bolt"]["TensionBolt"] = float(round(tension_in_bolt/1000, 3))
-    outputobj["Bolt"]["CombinedCapacity"] = float(round(bolt_combined_status, 3))
+    outputobj["Bolt"]["CombinedCapacity"] = float(round(combined_capacity, 3))
 
     # outputobj['Bolt']['BoltFy'] = 0.0
     # outputobj['Bolt']['NumberOfRows'] = int(no_rows)
@@ -724,6 +730,11 @@ def bc_endplate_design(uiObj):
 
     outputobj['Plate']['Height'] = float(round(plate_height, 3))
     outputobj['Plate']['Width'] = float(round(plate_width, 3))
+    outputobj['Plate']['WidthMin'] = float(round(beam_B, 3))
+    # outputobj['Plate']['WidthMax'] = float(round(plate_width + 25.0, 3))
+    outputobj['Plate']['Moment'] = float(round(toe_of_weld_moment, 3))
+    outputobj['Plate']['be'] = float(round(beam_B/2, 3))
+    outputobj['Plate']['fy'] = float(round(end_plate_fy, 3))
     outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))

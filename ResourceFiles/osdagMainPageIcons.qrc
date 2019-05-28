@@ -17,5 +17,13 @@
     <file>images/iit_logo.png</file>
     <file>images/Osdag_header.png</file>
     <file>images/workspace_icon.png</file>
+    <file>images/ff.png</file>
+    <file>images/fextnone.png</file>
+    <file>images/fextnboth.png</file>
+    <file>images/webflush.png</file>
+    <file>images/webextnone.png</file>
+    <file>images/webextnboth.png</file>
+    <file>images/beam_column.png</file>
+    <file>images/beam_column_endplate.png</file>
   </qresource>
 </RCC>

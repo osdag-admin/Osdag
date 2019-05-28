@@ -14,6 +14,7 @@ class CADFillet(object):
                  bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
                  bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+                 bbWeldstiff1_u1,bbWeldstiff1_u2,
                  bbWeldStiffHL_1, bbWeldStiffHL_2, bbWeldStiffHL_3, bbWeldStiffHL_4,
                  bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
                  bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
@@ -112,10 +113,13 @@ class CADFillet(object):
         self.bbWeldStiffLR_3 = bbWeldStiffLR_3
         self.bbWeldStiffLR_4 = bbWeldStiffLR_4
 
+        self.bbWeldstiff1_u1 = bbWeldstiff1_u1
+        self.bbWeldstiff1_u2 = bbWeldstiff1_u2
+
 
     def create_3DModel(self):
         """
-        :return: CAD model of each entity such as Left beam, right beam, both end plates and so on 
+        :return: CAD model of each entity such as Left beam, right beam, both end plates and so on
         """
         self.createBeamLGeometry()
         self.createBeamRGeometry()
@@ -171,6 +175,9 @@ class CADFillet(object):
         self.create_bbWeldStiffLR_2()
         self.create_bbWeldStiffLR_3()
         self.create_bbWeldStiffLR_4()
+
+        self.create_bbWeldstiff1_u1()
+        self.create_bbWeldstiff1_u2()
 
 
         # call for create_model of filletweld from Components directory
@@ -228,6 +235,8 @@ class CADFillet(object):
         self.bbWeldStiffLR_3Model = self.bbWeldStiffLR_3.create_model()
         self.bbWeldStiffLR_4Model = self.bbWeldStiffLR_4.create_model()
 
+        self.bbWeldstiff1_u1Model = self.bbWeldstiff1_u1.create_model()
+        self.bbWeldstiff1_u2Model = self.bbWeldstiff1_u2.create_model()
 
 #############################################################################################################
 #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
@@ -448,6 +457,22 @@ class CADFillet(object):
         uDirWeb_22 = numpy.array([0, 1.0, 0])
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
+
+    def create_bbWeldstiff1_u1(self):
+        gap = self.beamLeft.length
+        stiffenerOrigin1_u1 = numpy.array([-self.beam_stiffener_F1.L22 - self.beamLeft.t / 2, gap,
+                                         self.beamRight.D / 2 - self.loc])
+        stiffener1_u1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffener1_u1_wDir = numpy.array([-1.0, 0.0, 0.0])
+        self.bbWeldstiff1_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
+
+    def create_bbWeldstiff1_u2(self):
+        gap = self.beamLeft.length - self.beam_stiffener_F1.L
+        stiffenerOrigin1_u2 = numpy.array([-self.beamLeft.t/2 , gap,
+                                         self.beamRight.D / 2 - self.loc])
+        stiffener1_u2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
+        self.bbWeldstiff1_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
 
 
     ################################################# Welding Beam Stiffeners ###################################################
@@ -736,6 +761,12 @@ class CADFillet(object):
 
     def get_bbWeldStiffLR_4Model(self):
         return self.bbWeldStiffLR_4Model
+
+    def get_bbWeldstiff1_u1Model(self):
+        return self.bbWeldstiff1_u1Model
+
+    def get_bbWeldstiff1_u2Model(self):
+        return self.bbWeldstiff1_u2Model
 
 
 

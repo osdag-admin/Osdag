@@ -745,7 +745,8 @@ class CADGroove(object):
 									bbWeldFlang_R1, bbWeldFlang_R2, bbWeldWeb_R3,bbWeldFlang_L1, bbWeldFlang_L2, bbWeldWeb_L3,
                                     bbWeldStiffH_1, bbWeldStiffH_2, bbWeldStiffH_3, bbWeldStiffH_4,
                                     bbWeldStiffL_1, bbWeldStiffL_2, bbWeldStiffL_3, bbWeldStiffL_4,
-									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4, alist, outputobj):
+									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4,
+                 beam_stiffener_F1,beam_stiffener_F2,beam_stiffener_F3,beam_stiffener_F4, alist, outputobj):
         self.beamLeft = beamLeft
         self.beamRight = beamRight
         self.plateLeft = plateLeft
@@ -759,8 +760,18 @@ class CADGroove(object):
         self.beam_stiffener_2 = beam_stiffener_2
         self.beam_stiffener_3 = beam_stiffener_3
         self.beam_stiffener_4 = beam_stiffener_4
+
+        self.beam_stiffener_F1 = beam_stiffener_F1
+        self.beam_stiffener_F2 = beam_stiffener_F2
+        self.beam_stiffener_F3 = beam_stiffener_F3
+        self.beam_stiffener_F4 = beam_stiffener_F4
         self.alist = alist
         self.outputobj = outputobj
+        if alist["Member"]["Connectivity"] == "Flush":
+            self.loc = float(outputobj['Stiffener']['Location'])
+
+        else:
+            self.loc = 0
 
         self.bbWeldFlang_R1 = bbWeldFlang_R1
         self.bbWeldFlang_R2 = bbWeldFlang_R2
@@ -796,6 +807,11 @@ class CADGroove(object):
         self.createbeam_stiffener_3Geometry()
         self.createbeam_stiffener_4Geometry()
 
+        self.createbeam_stiffener_F1Geometry()
+        self.createbeam_stiffener_F2Geometry()
+        self.createbeam_stiffener_F3Geometry()
+        self.createbeam_stiffener_F4Geometry()
+
         self.create_bbWeldFlang_R1()
         self.create_bbWeldFlang_R2()
         self.create_bbWeldFlang_L1()
@@ -820,10 +836,17 @@ class CADGroove(object):
         self.plateLModel = self.plateLeft.create_model()
         self.plateRModel = self.plateRight.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
+
         self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
         self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
         self.beam_stiffener_3Model = self.beam_stiffener_3.create_model()
         self.beam_stiffener_4Model = self.beam_stiffener_4.create_model()
+
+        self.beam_stiffener_F1Model = self.beam_stiffener_F1.create_model()
+        self.beam_stiffener_F2Model = self.beam_stiffener_F2.create_model()
+        self.beam_stiffener_F3Model = self.beam_stiffener_F3.create_model()
+        self.beam_stiffener_F4Model = self.beam_stiffener_F4.create_model()
+
         self.bbWeldFlang_R1Model = self.bbWeldFlang_R1.create_model()
         self.bbWeldFlang_R2Model = self.bbWeldFlang_R2.create_model()
         self.bbWeldFlang_L1Model = self.bbWeldFlang_L1.create_model()
@@ -932,6 +955,40 @@ class CADGroove(object):
         stiffener4_uDir = numpy.array([0.0, -1.0, 0.0])
         stiffener4_wDir = numpy.array([1.0, 0.0, 0.0])
         self.beam_stiffener_4.place(stiffenerOrigin4, stiffener4_uDir, stiffener4_wDir)
+
+
+    def createbeam_stiffener_F1Geometry(self):
+        gap = self.beamLeft.length - self.beam_stiffener_F1.L / 2
+        stiffenerOriginF1 = numpy.array([-self.beam_stiffener_F1.W/2 - self.beamLeft.t/2, gap,
+                                         self.beamRight.D / 2 - self.loc])
+        stiffenerF1_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffenerF1_wDir = numpy.array([0.0, 0.0, -1.0])
+        self.beam_stiffener_F1.place(stiffenerOriginF1, stiffenerF1_uDir, stiffenerF1_wDir)
+
+    def createbeam_stiffener_F2Geometry(self):
+        gap = self.beamLeft.length - self.beam_stiffener_F2.L / 2
+        stiffenerOriginF2 = numpy.array([self.beam_stiffener_F2.W/2 + self.beamLeft.t/2 , gap,
+                                         self.beamRight.D / 2 -self.beam_stiffener_2.T - self.loc])
+        stiffenerF2_uDir = numpy.array([0.0, -1.0, 0.0])
+        stiffenerF2_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.beam_stiffener_F2.place(stiffenerOriginF2, stiffenerF2_uDir, stiffenerF2_wDir)
+
+
+    def createbeam_stiffener_F3Geometry(self):
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L / 2 + 2* self.bbWeldWeb_L3.b
+        stiffenerOriginF3 = numpy.array([-(self.beam_stiffener_F3.W/2 + self.beamRight.t/2), gap,
+                                         self.beamRight.D / 2 -self.beam_stiffener_F3.T- self.loc])
+        stiffenerF3_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerF3_wDir = numpy.array([0.0, 0.0, 1.0])
+        self.beam_stiffener_F3.place(stiffenerOriginF3, stiffenerF3_uDir, stiffenerF3_wDir)
+
+    def createbeam_stiffener_F4Geometry(self):
+        gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F4.L / 2 + 2* self.bbWeldWeb_L3.b
+        stiffenerOriginF4 = numpy.array([(self.beam_stiffener_F4.W/2 + self.beamRight.t/2), gap,
+                                         self.beamRight.D / 2 - self.loc])
+        stiffenerF4_uDir = numpy.array([0.0, 1.0, 0.0])
+        stiffenerF4_wDir = numpy.array([0.0, 0.0, -1.0])
+        self.beam_stiffener_F4.place(stiffenerOriginF4, stiffenerF4_uDir, stiffenerF4_wDir)
 
     ##############################################  creating weld sections ########################################
 
@@ -1092,6 +1149,18 @@ class CADGroove(object):
 
     def get_beam_stiffener_4Model(self):
         return self.beam_stiffener_4Model
+
+    def get_beam_stiffener_F1Model(self):
+        return self.beam_stiffener_F1Model
+
+    def get_beam_stiffener_F2Model(self):
+        return self.beam_stiffener_F2Model
+
+    def get_beam_stiffener_F3Model(self):
+        return self.beam_stiffener_F3Model
+
+    def get_beam_stiffener_F4Model(self):
+        return self.beam_stiffener_F4Model
 
     def get_bbWeldFlang_R1Model(self):
         return self.bbWeldFlang_R1Model

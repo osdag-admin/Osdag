@@ -149,6 +149,8 @@ def bc_endplate_design(uiObj):
     beam_R2 = float(dictbeamdata["R2"])
 
 
+
+
     #######################################################################
     # Read input values from column database
     # Here,
@@ -827,8 +829,6 @@ def bc_endplate_design(uiObj):
 
     return outputobj
 
-def checkvalid():
-    if beam_d>beam_B:
-        return True
-    else:
-        return False
+
+
+

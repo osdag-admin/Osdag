@@ -14,7 +14,6 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
-from bc_endplate_calc import checkvalid
 
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
@@ -493,7 +492,7 @@ class Maincontroller(QMainWindow):
 
 		self.ui.btn_Design.clicked.connect(self.design_btnclicked)
 		self.ui.btn_Design.clicked.connect(self.osdag_header)
-		self.ui.btn_Design.clicked.connect(self.showcheckValid)
+
 		self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
 		self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
 		self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -563,27 +562,10 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
-
-	def showcheckValid(self):
-		if checkvalid()==True:
-			#dialog = QDialog()
-			#label = QtWidgets.QLabel(self)
-			#label.setText("Correct")
-			#dialog.show(label)
-		    QMessageBox.information(self,"Message","Correct")
-
-		else:
-			'''dialog = QDialog()
-			ulabel = QtWidgets.QLabel(self)
-			ulabel.setText("Incorrect")
-			dialog.show(ulabel)'''
-			QMessageBox.information(self, "Warning","Incorrect! Currently, this option is not in Osdag for Wfc < Wfb")
-
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
 
 		used_backend = load_backend(backend_str)
-
 		global display, start_display, app, _, USED_BACKEND
 		if 'qt' in used_backend:
 			from OCC.Display.qtDisplay import qtViewer3d
@@ -1600,6 +1582,16 @@ class Maincontroller(QMainWindow):
 		beam_R2 = float(beam_data["R2"])
 		beam_alpha = float(beam_data["FlangeSlope"])
 		beam_length = 1600.0
+
+		if beam_d > beam_B:
+			self.ui.btn_Design.setDisabled(True)
+			QMessageBox.warning(self,"Information","Width of Beam Flange should be less than Depth of Beam.")
+			self.ui.btn_Design.setDisabled(False)
+
+		else:
+
+		    self.ui.btn_Design.setDisabled(False)
+
 
 
 

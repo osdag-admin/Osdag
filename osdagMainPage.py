@@ -237,7 +237,7 @@ class OsdagMainWindow(QMainWindow):
 
 
     def show_moment_connection_bc(self):
-        print "yyyyy"
+
         folder = self.select_workspace_folder()
         folder = str(folder)
         if not os.path.exists(folder):
@@ -261,7 +261,7 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder))
 
 
-        print "yyy"
+
         if self.ui.rdbtn_endplate_bc.isChecked():
             launch_bc_endplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)

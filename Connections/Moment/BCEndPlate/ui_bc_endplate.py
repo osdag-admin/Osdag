@@ -21,6 +21,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.frame = QtWidgets.QFrame(self.centralwidget)
+
         self.frame.setMinimumSize(QtCore.QSize(0, 28))
         self.frame.setMaximumSize(QtCore.QSize(16777215, 28))
         self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
@@ -1210,6 +1211,7 @@ class Ui_MainWindow(object):
         self.combo_weld_method.setObjectName("combo_weld_method")
         self.combo_weld_method.addItem("")
         self.combo_weld_method.addItem("")
+        self.combo_weld_method.addItem("")
         self.label_12 = QtWidgets.QLabel(self.dockWidgetContents)
         self.label_12.setGeometry(QtCore.QRect(6, 550, 100, 25))
         font = QtGui.QFont()
@@ -1834,6 +1836,7 @@ class Ui_MainWindow(object):
         self.combo_flangeSize.setCurrentIndex(0)
         self.combo_webSize.setCurrentIndex(0)
         self.combo_columnSec.setCurrentIndex(-1)
+        self.combo_weld_method.currentTextChanged.connect(self.on_change)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.combo_connLoc, self.combo_beamSec)
         MainWindow.setTabOrder(self.combo_beamSec, self.txt_Fu)
@@ -1930,9 +1933,19 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.pushButton_2, self.txtGuage_3)
         MainWindow.setTabOrder(self.txtGuage_3, self.btnDesign_2)
 
+    def on_change(self, newIndex):
+            if newIndex == "Groove Weld (CJP)":
+                self.combo_webSize.setCurrentIndex(1)
+                self.combo_flangeSize.setCurrentIndex(1)
+                self.combo_flangeSize.setEnabled(False)
+                self.combo_webSize.setEnabled(False)
+
+            else:
+                self.combo_flangeSize.setEnabled(True)
+                self.combo_webSize.setEnabled(True)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Extended End Plate"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Beam to Column End Plate Moment Connection"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))
@@ -2098,8 +2111,9 @@ class Ui_MainWindow(object):
         self.combo_connect.setItemText(0, _translate("MainWindow", "Select Connectivity"))
         self.combo_connect.setItemText(1, _translate("MainWindow", "Column flange-Beam web"))
         self.combo_connect.setItemText(2, _translate("MainWindow", "Column web-Beam web"))
-        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Groove Weld (CJP)"))
-        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Fillet Weld"))
+        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Select type"))
+        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Groove Weld (CJP)"))
+        self.combo_weld_method.setItemText(2, _translate("MainWindow", "Fillet Weld"))
         self.label_12.setText(_translate("MainWindow", "Type *"))
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
         self.t_7.setText(_translate("MainWindow", "No. of bolts required"))
@@ -2206,6 +2220,7 @@ class Ui_MainWindow(object):
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionShow_column_2.setText(_translate("MainWindow", "Show column"))
         self.actionShow_column_2.setShortcut(_translate("MainWindow", "Alt+Shift+C"))
+
 
 import icons_rc
 

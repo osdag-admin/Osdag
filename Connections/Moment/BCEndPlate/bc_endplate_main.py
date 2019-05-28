@@ -14,6 +14,7 @@ from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
 
+import bc_endplate_calc
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
@@ -716,9 +717,15 @@ class Maincontroller(QMainWindow):
 		self.disable_buttons()
 
 	def on_change(self, newIndex):
-			if newIndex == "Groove Weld (CJP)":
-				self.ui.combo_flangeSize.setEnabled(False)
-				self.ui.combo_webSize.setEnabled(False)
+		if newIndex == "Groove Weld (CJP)":
+
+			self.combo_flangeSize.setEnabled(False)
+			self.combo_webSize.setEnabled(False)
+
+		else:
+			self.combo_flangeSize.setEnabled(True)
+			self.combo_webSize.setEnabled(True)
+
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
 
@@ -912,6 +919,7 @@ class Maincontroller(QMainWindow):
 		"""
 		uiInput = self.designParameters()
 		self.save_inputs_totext(uiInput)
+		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
 			self.closed.emit()
@@ -974,7 +982,7 @@ class Maincontroller(QMainWindow):
 										"You can load this input file only from the corresponding design problem")
 				return
 
-			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
+			self.ui.combo_connect.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
 			self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connLoc.findText(str(uiObj["Member"]["EndPlate_type"])))
 			if uiObj["Member"]["EndPlate_type"] == "Flush" or "Extended one way" or "Extended both ways":
 				# self.ui.combo_connLoc.setCurrentIndex(self.ui.combo_connect.findText(uiObj["Member"]["Connectivity"]))
@@ -1352,6 +1360,11 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)
 		self.ui.btn_stiffnrDetail.setDisabled(True)
+
+		self.ui.btnFront.setDisabled(True)
+		self.ui.btnSide.setDisabled(True)
+		self.ui.btnTop.setDisabled(True)
+
 
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
@@ -1978,6 +1991,7 @@ class Maincontroller(QMainWindow):
 
 			else:  # Groove Weld
 
+
 				# else:
 				bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
 										   L=beam_B)
@@ -2328,7 +2342,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'), mode='a')
+	fh = logging.FileHandler("Connections/Moment/BCEndPlate/extnd.log", mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -2350,13 +2364,11 @@ def launch_bc_endplate_controller(osdagMainWindow, folder):
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
 	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','BCEndPlate','extnd.log'), mode='w')
-	file_handler = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+	file_handler = logging.FileHandler("Connections/Moment/BCEndPlate/extnd.log", mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
-	rawLogger.info(
-		'''<link rel="stylesheet" type="text/css" href=''' + os.path.join('Connections', 'Moment', 'BCEndPlate',
-																		  'log.css') + '''/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -2366,6 +2378,8 @@ def launch_bc_endplate_controller(osdagMainWindow, folder):
 
 
 if __name__ == "__main__":
+
+	set_osdaglogger()
 	# --------------- To display log messages in different colors ---------------
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
@@ -2375,12 +2389,14 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections\Moment\BCEndPlate\log.css"/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
+
 	# ----------------------------------------------------------------------------
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "C:\Users\User\Desktop\Osdag IITB\Cloned\osdag_workspace"
+	folder_path = "D:\Osdag_Workspace\bcendplate"
+
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')
@@ -2390,3 +2406,7 @@ if __name__ == "__main__":
 	window = Maincontroller(folder_path)
 	window.show()
 	sys.exit(app.exec_())
+
+
+
+

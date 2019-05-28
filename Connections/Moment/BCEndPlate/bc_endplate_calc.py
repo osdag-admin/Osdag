@@ -24,6 +24,7 @@ from utilities.other_standards import IS1363_part_1_2002, IS1363_part_3_2002, IS
 from utilities.common_calculation import *
 import math
 import logging
+import bc_endplate_main
 flag = 1
 logger = None
 

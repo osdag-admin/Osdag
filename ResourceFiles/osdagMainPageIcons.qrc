@@ -19,5 +19,6 @@
     <file>images/workspace_icon.png</file>
 	<file>images/beam_column.png</file>
 	<file>images/beam_column_endplate.png</file>
+
   </qresource>
 </RCC>

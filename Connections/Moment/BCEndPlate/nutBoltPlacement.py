@@ -117,10 +117,9 @@ class NutBoltArray(object):
                 self.pitch23 = boltPlaceObj["Bolt"]["Pitch23"]
                 self.endDist = boltPlaceObj["Bolt"]["End"]
 
-            # TODO give dictionary to this values
             elif numberOfBolts == 8:
-                self.pitch23 = boltPlaceObj['Bolt']['Pitch23']      #50.0             #  & 50.0
-                self.pitch34 = boltPlaceObj['Bolt']['Pitch34']      #145.0          # & 200.0     # TODO may be different in Ajmal code
+                self.pitch23 = boltPlaceObj['Bolt']['Pitch23']
+                self.pitch34 = boltPlaceObj['Bolt']['Pitch34']
 
             elif numberOfBolts == 10:
                 self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]
@@ -138,7 +137,6 @@ class NutBoltArray(object):
 
         elif self.endplate_type == "flush":
 
-            self.Lv = boltPlaceObj["Bolt"]["Lv"]
             if numberOfBolts == 4:
                 self.pitch12 = boltPlaceObj["Bolt"]["Pitch12"]      #250      #
 

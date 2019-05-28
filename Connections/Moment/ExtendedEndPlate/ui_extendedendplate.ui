@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1328</width>
+    <width>1422</width>
     <height>769</height>
    </rect>
   </property>
@@ -385,8 +385,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1328</width>
-     <height>26</height>
+     <width>1422</width>
+     <height>19</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -711,7 +711,7 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Select Connectivity</string>
+       <string>Select type</string>
       </property>
      </item>
      <item>
@@ -825,7 +825,7 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Connectivity *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;End plate type *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="lbl_fu">
@@ -1139,7 +1139,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>510</y>
+       <y>500</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -1159,7 +1159,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>430</y>
+       <y>420</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -1179,7 +1179,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>450</y>
+       <y>440</y>
        <width>141</width>
        <height>25</height>
       </rect>
@@ -1199,7 +1199,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>480</y>
+       <y>470</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1222,7 +1222,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>480</y>
+       <y>470</y>
        <width>111</width>
        <height>25</height>
       </rect>
@@ -1242,7 +1242,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>450</y>
+       <y>440</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -1334,7 +1334,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>3</x>
-       <y>550</y>
+       <y>530</y>
        <width>151</width>
        <height>25</height>
       </rect>
@@ -1345,14 +1345,14 @@ QMenu::item:selected {
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Weld size&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Weld&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_43">
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>570</y>
+       <y>590</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3103,7 +3103,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>510</y>
+       <y>500</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3123,7 +3123,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>640</y>
+       <y>660</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3152,7 +3152,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>640</y>
+       <y>660</y>
        <width>100</width>
        <height>30</height>
       </rect>
@@ -3181,7 +3181,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>570</y>
+       <y>590</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3211,7 +3211,7 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Select weld thickness</string>
+       <string>Select weld size</string>
       </property>
      </item>
      <item>
@@ -3351,7 +3351,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>150</x>
-       <y>600</y>
+       <y>620</y>
        <width>160</width>
        <height>27</height>
       </rect>
@@ -3381,7 +3381,7 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Select weld thickness</string>
+       <string>Select weld size</string>
       </property>
      </item>
      <item>
@@ -3434,7 +3434,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>6</x>
-       <y>600</y>
+       <y>620</y>
        <width>131</width>
        <height>25</height>
       </rect>
@@ -3449,6 +3449,63 @@ QMenu::item:selected {
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Web (mm) *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
+    </widget>
+    <widget class="QLabel" name="label_93">
+     <property name="geometry">
+      <rect>
+       <x>6</x>
+       <y>560</y>
+       <width>141</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type *&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="combo_weld_method">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>560</y>
+       <width>160</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QComboBox { combobox-popup: 0; }</string>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <property name="maxVisibleItems">
+      <number>5</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>Groove Weld (CJP)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fillet Weld</string>
+      </property>
+     </item>
     </widget>
    </widget>
   </widget>

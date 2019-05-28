@@ -2268,10 +2268,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                l_v = p_fi
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
                 outputobj['Bolt']['Lv'] = float(l_v)
             else:
+                l_v = p_fi
                 outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
@@ -2417,10 +2417,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                l_v = p_fi
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
                 outputobj['Bolt']['Lv'] = float(l_v)
             else:
+                l_v = p_fi
                 outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
@@ -2563,10 +2563,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                l_v = p_fi
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
                 outputobj['Bolt']['Lv'] = float(l_v)
             else:
+                l_v = p_fi
                 outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
@@ -2709,10 +2709,10 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                l_v = p_fi
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
                 outputobj['Bolt']['Lv'] = float(l_v)
             else:
+                l_v = p_fi
                 outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
@@ -2804,10 +2804,10 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['End'] = float(end_dist_mini)
         outputobj['Bolt']['Edge'] = float(edge_dist_mini)
         # ===================  CAD ===================
-        if uiObj["Member"]["Connectivity"] == "Flush" or "Extended one way":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-            l_v = p_fi
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
             outputobj['Bolt']['Lv'] = float(l_v)
         else:
+            l_v = p_fi
             outputobj['Bolt']['Lv'] = float(l_v)
         # ===================  CAD ===================
 

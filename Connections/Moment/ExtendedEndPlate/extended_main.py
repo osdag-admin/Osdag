@@ -1610,7 +1610,7 @@ class Maincontroller(QMainWindow):
 
 	def call_pannig(self):
 		self.display.Pan(50, 0)
-		
+
 	def clear_log_messages(self):
 		self.ui.textEdit.clear()
 
@@ -1639,14 +1639,26 @@ class Maincontroller(QMainWindow):
 						   T=outputobj["Plate"]["Thickness"])
 		plate_Right = copy.copy(plate_Left)     # Since both the end plates are identical
 
+		#Beam stiffeners 4 if extended both ways, only 1 and 3 if extended oneway and non for flus type
 		beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
 										  T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['Length'] - 25,
 										  R12=outputobj['Stiffener']['Height']-25,
-										  L21=15,L22 =15)		#TODO: given hard inputs to L21 and L22
+										  L21=outputobj['Stiffener']['NotchSize'],L22 =outputobj['Stiffener']['NotchSize'])		#TODO: given hard inputs to L21 and L22
 
 		beam_stiffener_2 = copy.copy(beam_stiffener_1)
 		beam_stiffener_3 = copy.copy(beam_stiffener_1)
 		beam_stiffener_4 = copy.copy(beam_stiffener_1)
+
+
+		#Beam stiffeners for the flush type endplate
+		beam_stiffener_F1 =  StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
+										  T=outputobj['Stiffener']['Thickness'],
+										  L21=outputobj['Stiffener']['NotchSize'],L22 =outputobj['Stiffener']['NotchSize'])
+
+		beam_stiffener_F2 = copy.copy(beam_stiffener_F1)
+		beam_stiffener_F3 = copy.copy(beam_stiffener_F1)
+		beam_stiffener_F4 = copy.copy(beam_stiffener_F1)
+
 
 		alist = self.designParameters()         # An object to save all input values entered by user
 
@@ -1666,6 +1678,26 @@ class Maincontroller(QMainWindow):
 		nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
 
 		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, alist)
+
+		bbWeldstiff1_u1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+									 L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchSize'])
+		bbWeldstiff1_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff2_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff2_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff3_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff3_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff4_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff4_l1 = copy.copy(bbWeldstiff1_u1)
+
+		bbWeldstiff1_u2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+									 L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
+		bbWeldstiff1_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff2_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff2_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff3_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff3_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff4_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff4_l2 = copy.copy(bbWeldstiff1_u2)
 
 
 		if alist["Weld"]["Type"] == "Fillet Weld":
@@ -1703,31 +1735,33 @@ class Maincontroller(QMainWindow):
 			#Following welds are for to weld stiffeners
 			#bbWeld for stiffener hight on left side
 			bbWeldStiffHL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=outputobj['Stiffener'][
-																							 'Height'] - 15)  # outputobj['Stiffener']['Length'] - 25
+																							 'Height'] - outputobj['Stiffener']['NotchSize'])  # outputobj['Stiffener']['Length'] - 25
 			bbWeldStiffHL_2 = copy.copy(bbWeldStiffHL_1)
 			bbWeldStiffHL_3 = copy.copy(bbWeldStiffHL_1)
 			bbWeldStiffHL_4 = copy.copy(bbWeldStiffHL_1)
 
 			# bbWeld for stiffener length on left side
 			bbWeldStiffLL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										L=outputobj['Stiffener']['Length'] - 15)
+										L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
 			bbWeldStiffLL_2 = copy.copy(bbWeldStiffLL_1)
 			bbWeldStiffLL_3 = copy.copy(bbWeldStiffLL_1)
 			bbWeldStiffLL_4 = copy.copy(bbWeldStiffLL_1)
 
 			# bbWeld for stiffener hight on Right side
 			bbWeldStiffHR_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]), L=outputobj['Stiffener'][
-																							 'Height'] - 15)  # outputobj['Stiffener']['Length'] - 25
+																							 'Height'] - outputobj['Stiffener']['NotchSize'])  # outputobj['Stiffener']['Length'] - 25
 			bbWeldStiffHR_2 = copy.copy(bbWeldStiffHR_1)
 			bbWeldStiffHR_3 = copy.copy(bbWeldStiffHR_1)
 			bbWeldStiffHR_4 = copy.copy(bbWeldStiffHR_1)
 
 			# bbWeld for stiffener length on right side
 			bbWeldStiffLR_1 = FilletWeld(b= float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										L=outputobj['Stiffener']['Length'] - 15)
+										L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
 			bbWeldStiffLR_2 = copy.copy(bbWeldStiffLR_1)
 			bbWeldStiffLR_3 = copy.copy(bbWeldStiffLR_1)
 			bbWeldStiffLR_4 = copy.copy(bbWeldStiffLR_1)
+
+
 
 
 
@@ -1736,17 +1770,22 @@ class Maincontroller(QMainWindow):
 										   bbWeldBelwFlang_11, bbWeldBelwFlang_12, bbWeldBelwFlang_13, bbWeldBelwFlang_14,
 										   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24,
 										   bbWeldSideWeb_11, bbWeldSideWeb_12, bbWeldSideWeb_21, bbWeldSideWeb_22,
+										bbWeldstiff1_u1,bbWeldstiff1_u2,bbWeldstiff2_u1,bbWeldstiff2_u2,bbWeldstiff3_u1,
+										bbWeldstiff3_u2,bbWeldstiff4_u1,bbWeldstiff4_u2,
+									bbWeldstiff1_l1, bbWeldstiff1_l2, bbWeldstiff2_l1, bbWeldstiff2_l2, bbWeldstiff3_l1,
+									bbWeldstiff3_l2, bbWeldstiff4_l1, bbWeldstiff4_l2,
 										bbWeldStiffHL_1, bbWeldStiffHL_2, bbWeldStiffHL_3, bbWeldStiffHL_4,
 										bbWeldStiffLL_1, bbWeldStiffLL_2, bbWeldStiffLL_3, bbWeldStiffLL_4,
 										bbWeldStiffHR_1, bbWeldStiffHR_2, bbWeldStiffHR_3, bbWeldStiffHR_4,
 										bbWeldStiffLR_1, bbWeldStiffLR_2, bbWeldStiffLR_3, bbWeldStiffLR_4,
-										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4, alist, outputobj)
+										   beam_stiffener_1,beam_stiffener_2,beam_stiffener_3,beam_stiffener_4,
+									beam_stiffener_F1,beam_stiffener_F2,beam_stiffener_F3,beam_stiffener_F4, alist, outputobj)
 			extbothWays.create_3DModel()
 
 			return extbothWays
 
 		else:  # Groove Weld
-			bbWeldFlang_R1 = GrooveWeld(b=15.0, h=float(beam_data["T"]),
+			bbWeldFlang_R1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h=float(beam_data["T"]),
 									   L=beam_B)			#outputobj["Weld"]["Size"]
 			bbWeldFlang_R2 = copy.copy(bbWeldFlang_R1)
 
@@ -1754,22 +1793,22 @@ class Maincontroller(QMainWindow):
 			bbWeldFlang_L2 = copy.copy(bbWeldFlang_R1)
 
 			# Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-			bbWeldWeb_R3 = GrooveWeld(b=15.0, h=float(beam_data["tw"]),
+			bbWeldWeb_R3 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h=float(beam_data["tw"]),
 									 L=beam_d - 2 * beam_T)		#outputobj["Weld"]["Size"]
 
 			bbWeldWeb_L3 = copy.copy(bbWeldWeb_R3)
-			
+
 			#Following welds are to join beam stiffeners to the beam
-			bbWeldStiffH_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Height']-15)		#outputobj['Stiffener']['Length'] - 25
+			bbWeldStiffH_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Height']-outputobj['Stiffener']['NotchSize'])		#outputobj['Stiffener']['Length'] - 25
 			bbWeldStiffH_2 = copy.copy(bbWeldStiffH_1)
 			bbWeldStiffH_3 = copy.copy(bbWeldStiffH_1)
 			bbWeldStiffH_4 = copy.copy(bbWeldStiffH_1)
-			
-			bbWeldStiffL_1 = GrooveWeld(b=15.0, h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length']-15)
+
+			bbWeldStiffL_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length']-outputobj['Stiffener']['NotchSize'])
 			bbWeldStiffL_2 = copy.copy(bbWeldStiffL_1)
 			bbWeldStiffL_3 = copy.copy(bbWeldStiffL_1)
 			bbWeldStiffL_4 = copy.copy(bbWeldStiffL_1)
-			
+
 
 			#######################################
 			#       WELD SECTIONS QUARTER CONE    #
@@ -1779,7 +1818,12 @@ class Maincontroller(QMainWindow):
 									bbWeldFlang_R1, bbWeldFlang_R2, bbWeldWeb_R3,bbWeldFlang_L1, bbWeldFlang_L2, bbWeldWeb_L3,
 									bbWeldStiffH_1, bbWeldStiffH_2, bbWeldStiffH_3, bbWeldStiffH_4,
 									bbWeldStiffL_1, bbWeldStiffL_2, bbWeldStiffL_3, bbWeldStiffL_4,
-									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4, alist, outputobj)
+									bbWeldstiff1_u1, bbWeldstiff1_u2, bbWeldstiff2_u1, bbWeldstiff2_u2, bbWeldstiff3_u1,
+									bbWeldstiff3_u2, bbWeldstiff4_u1, bbWeldstiff4_u2,
+									bbWeldstiff1_l1, bbWeldstiff1_l2, bbWeldstiff2_l1, bbWeldstiff2_l2, bbWeldstiff3_l1,
+									bbWeldstiff3_l2, bbWeldstiff4_l1, bbWeldstiff4_l2,
+									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4,
+									beam_stiffener_F1,beam_stiffener_F2,beam_stiffener_F3,beam_stiffener_F4,alist, outputobj)
 			extbothWays.create_3DModel()
 
 			return extbothWays
@@ -1917,6 +1961,32 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
 
+			if self.alist["Member"]["Connectivity"] == "Flush":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F3Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F4Model(), update=True, color='Blue')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l2Model(), update=True, color='Red')
+
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
 			for nutbolt in nutboltlist:
@@ -1943,6 +2013,8 @@ class Maincontroller(QMainWindow):
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_12Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
+
 
 			else:		 #Groove weld
 				osdag_display_shape(self.display, self.ExtObj.get_bbWeldFlang_R1Model(), update=True, color='Red')
@@ -1979,6 +2051,32 @@ class Maincontroller(QMainWindow):
 			if self.alist["Member"]["Connectivity"] == "Extended both ways":
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True, color='Blue')
 				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_4Model(), update=True, color='Blue')
+
+			if self.alist["Member"]["Connectivity"] == "Flush":
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F1Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F2Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F3Model(), update=True, color='Blue')
+				osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_F4Model(), update=True, color='Blue')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff1_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff2_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff3_l2Model(), update=True, color='Red')
+
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_u2Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l1Model(), update=True, color='Red')
+				osdag_display_shape(self.display, self.ExtObj.get_bbWeldstiff4_l2Model(), update=True, color='Red')
 
 			# Display all nut-bolts, call to nutBoltPlacement.py
 			nutboltlist = self.ExtObj.nut_bolt_array.get_models()
@@ -2029,6 +2127,7 @@ class Maincontroller(QMainWindow):
 					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_2Model(), update=True, color='Red')
 					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffHR_4Model(), update=True, color='Red')
 					osdag_display_shape(self.display, self.ExtObj.get_bbWeldStiffLR_4Model(), update=True, color='Red')
+
 
 
 

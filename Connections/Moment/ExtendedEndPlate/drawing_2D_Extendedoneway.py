@@ -71,6 +71,7 @@ class OnewayEndPlate(object):
 		self.stiffener_thickness = int(output_dict['Stiffener']['Thickness'])
 		self.stiffener_notchsize = int(output_dict['Stiffener']['NotchSize'])
 		self.stiffener_weldsize = int(output_dict['Stiffener']['WeldSize'])
+		self.stiffener_weld = 0
 
 		self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
 		self.Lv = float(output_dict['Bolt']['Lv'])
@@ -370,14 +371,14 @@ class OnewayEndPlate(object):
 		text_point_up = None
 		text_point_down = None
 		if orientation == "NE":
-			text_point_up = p2 + 0.1 * length_B * (-label_vector) + text_offset * offset_vector
+			text_point_up = p2 + 0.2 * length_B * (-label_vector) + text_offset * offset_vector
 			text_point_down = p2 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
 		elif orientation == "NW":
-			text_point_up = p3 + 0.1 * length_B * (label_vector) + text_offset * offset_vector
-			text_point_down = p3 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
+			text_point_up = p3 + 0.05 * length_B * (label_vector) + text_offset * offset_vector
+			text_point_down = p3 - 0.05 * length_B * label_vector - (text_offset + 15) * offset_vector
 		elif orientation == "SE":
-			text_point_up = p2 + 0.1 * length_B * (-label_vector) + text_offset * offset_vector
-			text_point_down = p2 - 0.1 * length_B * label_vector - (text_offset + 15) * offset_vector
+			text_point_up = p2 + 0.2 * length_B * (-label_vector) + text_offset * offset_vector
+			text_point_down = p2 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
 		elif orientation == "SW":
 			text_point_up = p3 + 0.2 * length_B * (label_vector) + text_offset * offset_vector
 			text_point_down = p3 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
@@ -391,16 +392,50 @@ class OnewayEndPlate(object):
 		dwg.add(dwg.text(textdown, insert=text_point_down, fill='black', font_family='sans-serif', font_size=28))
 
 		if element == "weld":
-			if orientation == "NW":
-				self.draw_weld_marker(dwg, 15, 7.5, line)
+			if self.weld == "Fillet Weld":
+				if orientation =="NE":
+					self.draw_weld_marker1(dwg,30, 7.5, line)
+				else:
+					self.draw_weld_marker2(dwg, 30, 7.5, line)
 			else:
-				self.draw_weld_marker(dwg, 45, 7.5, line)
-		print "successful"
+				if orientation =="NE":
+					self.draw_weld_marker3(dwg, 15, -8.5, line)
+				else:
+					self.draw_weld_marker4(dwg, 15, 8.5, line)
 
-	def draw_weld_marker(self, dwg, oriX, oriY, line):
+			if self.stiffener_weld ==1:
+				self.draw_weld_marker1(dwg, 30, 7.5, line)
+			else:
+				pass
+
+			print "successful"
+
+	def draw_weld_marker1(self, dwg, oriX, oriY, line):
+		weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
+		# weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+		weldMarker.add(dwg.path(d="M 15 7.5 L 8 0 L 8 15 z", fill='none', stroke='black'))
+		dwg.defs.add(weldMarker)
+		self.draw_end_arrow(line, weldMarker)
+
+	def draw_weld_marker2(self, dwg, oriX, oriY, line):
 		weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
 		# weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
 		weldMarker.add(dwg.path(d="M 0 7.5 L 8 0 L 8 15 z", fill='none', stroke='black'))
+		dwg.defs.add(weldMarker)
+		self.draw_end_arrow(line, weldMarker)
+
+
+	def draw_weld_marker3(self, dwg, oriX, oriY, line):
+		weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
+		# weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+		weldMarker.add(dwg.path(d="M 0 0 L 0 -7.5 L 7.5 0 ", fill='none', stroke='black'))
+		dwg.defs.add(weldMarker)
+		self.draw_end_arrow(line, weldMarker)
+
+	def draw_weld_marker4(self, dwg, oriX, oriY, line):
+		weldMarker = dwg.marker(insert=(oriX, oriY), size=(15, 15), orient="auto")
+		# weldMarker.add(dwg.path(d="M 0 0 L 8 7.5 L 0 15 z", fill='none', stroke='black'))
+		weldMarker.add(dwg.path(d="M 0 0 L 0 7.5 L -7.5 0 ", fill='none', stroke='black'))
 		dwg.defs.add(weldMarker)
 		self.draw_end_arrow(line, weldMarker)
 
@@ -868,22 +903,40 @@ class OnewayEnd2DFront(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Weld of flange -------------------------------------------
-		point = self.BB2
-		theta = 60
-		offset = 100
-		textup = "          z  " + str(self.data_object.flange_weld_thickness)
-		textdown = " "
-		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		if self.data_object.weld == "Fillet Weld":
+			point = self.B2
+			theta = 60
+			offset = 150
+			textup = "          z " + str(self.data_object.flange_weld_thickness)
+			textdown = "          z " + str(self.data_object.flange_weld_thickness)
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		else:
+			point = self.B2
+			theta = 60
+			offset = 100
+			textup = "               "
+			textdown = "               "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Weld of Web -------------------------------------------
-		point = self.AA5 + 40 * np.array([0, 1])
-		theta = 60
-		offset = 100
-		textup = "         z  " + str(self.data_object.web_weld_thickness)
-		textdown = " "
-		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		if self.data_object.weld == "Fillet Weld":
+			point = self.AA5 + self.data_object.beam_depth_D2/2 * np.array([0, 1])
+			theta = 60
+			offset = 100
+			textup = "         z  " + str(self.data_object.web_weld_thickness)
+			textdown = "         z  " + str(self.data_object.web_weld_thickness)
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		else:
+			point = self.AA5 + self.data_object.beam_depth_D2/2 * np.array([0, 1])
+			theta = 60
+			offset = 100
+			textup = "               "
+			textdown = "               "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Primary Beam 1& 2 -------------------------------------------
 		point = self.A1 + 50 * np.array([1, 0])
@@ -1216,7 +1269,7 @@ class OnewayEnd2DTop(object):
 		# ------------------------------------------  End Plate 1 & 2 -------------------------------------------
 		point = self.P1 + self.data_object.plate_thickness_p1 / 2 * np.array([1, 0])
 		theta = 60
-		offset = 100
+		offset = 150
 		textdown = " "
 		textup = "End Plate " + str(self.data_object.plate_length_L1) + "x" + str(self.data_object.plate_width_B1) + "x" + str(
 			self.data_object.plate_thickness_p1)
@@ -1225,7 +1278,7 @@ class OnewayEnd2DTop(object):
 
 		point = self.PP1 + self.data_object.plate_thickness_p1 / 2 * np.array([1, 0])
 		theta = 60
-		offset = 100
+		offset = 150
 		textup = "End Plate " + str(self.data_object.plate_length_L2) + "x" + str(self.data_object.plate_width_B2) + "x" + str(
 			self.data_object.plate_thickness_p2)
 		textdown = " "
@@ -1233,21 +1286,32 @@ class OnewayEnd2DTop(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Weld label --------------------------------------------------
-		point = self.AA1 + 2
-		theta = 60
-		offset = 50
-		textup = "   z      " + str(self.data_object.flange_weld_thickness)
-		textdown = " "
-		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
-
+		self.data_object.stiffener_weld = 1
 		point = self.AAS5
 		theta = 60
 		offset = 50
-		textup = "   z      " + str(self.data_object.stiffener_weldsize)
-		textdown = " "
+		textup =  "          z " + str(self.data_object.stiffener_weldsize)
+		textdown = "          z " + str(self.data_object.stiffener_weldsize)
 		element = "weld"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		self.data_object.stiffener_weld = 0
+
+		if self.data_object.weld == "Fillet Weld":
+			point = self.AA1
+			theta = 60
+			offset = 100
+			textup = "          z " + str(self.data_object.flange_weld_thickness)
+			textdown = "          z " + str(self.data_object.flange_weld_thickness)
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+		else:
+			point = self.AA1
+			theta = 60
+			offset = 100
+			textup = "               "
+			textdown = "               "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 	# ------------------------------------------  Sectional arrow -------------------------------------------
 		pt_a1 = self.A4 - (self.data_object.plate_length_L1/3) * np.array([0, -1])
@@ -1687,31 +1751,58 @@ class OnewayEnd2DSide(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Web Welding ----------------------------------------------
-		point = self.A11 + self.data_object.beam_depth_D1 / 2 * np.array([0, 1])
-		theta = 60
-		offset = 50
-		textup = "     z         " + str(self.data_object.web_thickness_tw1)
-		textdown = " "
-		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		# point = self.A11 + self.data_object.beam_depth_D1 / 2 * np.array([0, 1])
+		# theta = 60
+		# offset = 50
+		# textup = "     z         " + str(self.data_object.web_thickness_tw1)
+		# textdown = " "
+		# element = "weld"
+		# self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		#
+		if self.data_object.weld == "Fillet Weld":
+			point = self.A4 + self.data_object.beam_depth_D2/2 *np.array([0, 1])
+			theta = 60
+			offset = 50
+			textup = "                    z " + str(self.data_object.web_thickness_tw1)
+			textdown = "                    z " + str(self.data_object.web_thickness_tw1)
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		else:
+			point = self.A4 + self.data_object.beam_depth_D2/2 *np.array([0, 1])
+			theta = 60
+			offset = 50
+			textup = "               "
+			textdown = "               "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Stiffener Welding ----------------------------------------------
+		self.data_object.stiffener_weld =1
 		point = self.P6
 		theta = 60
 		offset = 50
-		textup = "     z         " + str(self.data_object.stiffener_weldsize)
-		textdown = " "
+		textup =  "                    z " + str(self.data_object.stiffener_weldsize)
+		textdown = "                    z " + str(self.data_object.stiffener_weldsize)
 		element = "weld"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
-
+		self.data_object.stiffener_weld = 0
 		# ---------------------------------------------  Flange Welding -------------------------------------------
-		point = self.A1 + 20*np.array([1, 0])
-		theta = 60
-		offset = 50
-		textup = " "
-		textdown = "     z         " + str(self.data_object.flange_weld_thickness)
-		element = "weld"
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textdown, textup, element)
+		if self.data_object.weld == "Fillet Weld":
+			point = self.A1 + 20*np.array([1, 0])
+			theta = 60
+			offset = 50
+			textup = " z " + str(self.data_object.flange_weld_thickness) + "               "
+			textdown = " z " + str(self.data_object.flange_weld_thickness) + "              "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		else:
+			point = self.A1 + 20*np.array([1, 0])
+			theta = 60
+			offset = 50
+			textup = "               "
+			textdown = "               "
+			element = "weld"
+			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ------------------------------------------  View details-------------------------------------------
 		ptx = self.P4 * np.array([0, 1]) + 100 * np.array([0, 1])

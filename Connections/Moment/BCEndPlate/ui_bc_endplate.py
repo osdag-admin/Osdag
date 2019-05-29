@@ -21,6 +21,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.frame = QtWidgets.QFrame(self.centralwidget)
+
         self.frame.setMinimumSize(QtCore.QSize(0, 28))
         self.frame.setMaximumSize(QtCore.QSize(16777215, 28))
         self.frame.setFrameShape(QtWidgets.QFrame.NoFrame)
@@ -1210,6 +1211,7 @@ class Ui_MainWindow(object):
         self.combo_weld_method.setObjectName("combo_weld_method")
         self.combo_weld_method.addItem("")
         self.combo_weld_method.addItem("")
+        self.combo_weld_method.addItem("")
         self.label_12 = QtWidgets.QLabel(self.dockWidgetContents)
         self.label_12.setGeometry(QtCore.QRect(6, 550, 100, 25))
         font = QtGui.QFont()
@@ -1529,15 +1531,7 @@ class Ui_MainWindow(object):
         self.txt_edgeDist.setFont(font)
         self.txt_edgeDist.setReadOnly(True)
         self.txt_edgeDist.setObjectName("txt_edgeDist")
-        self.txt_boltcapacity1 = QtWidgets.QLineEdit(self.dockWidgetContents_2)
-        self.txt_boltcapacity1.setGeometry(QtCore.QRect(202, 140, 100, 25))
-        font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
-        self.txt_boltcapacity1.setFont(font)
-        self.txt_boltcapacity1.setText("")
-        self.txt_boltcapacity1.setReadOnly(True)
-        self.txt_boltcapacity1.setObjectName("txt_boltcapacity1")
+
         self.btn_pitchDetail = QtWidgets.QPushButton(self.dockWidgetContents_2)
         self.btn_pitchDetail.setGeometry(QtCore.QRect(200, 270, 101, 25))
         font = QtGui.QFont()
@@ -1834,8 +1828,14 @@ class Ui_MainWindow(object):
         self.combo_flangeSize.setCurrentIndex(0)
         self.combo_webSize.setCurrentIndex(0)
         self.combo_columnSec.setCurrentIndex(-1)
+        self.combo_flangeSize.setEnabled(False)
+        self.combo_webSize.setEnabled(False)
+
+        self.combo_weld_method.currentTextChanged.connect(self.on_change)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        MainWindow.setTabOrder(self.combo_connLoc, self.combo_beamSec)
+        MainWindow.setTabOrder(self.combo_connect, self.combo_connLoc)
+        MainWindow.setTabOrder(self.combo_connLoc, self.combo_columnSec)
+        MainWindow.setTabOrder(self.combo_columnSec, self.combo_beamSec)
         MainWindow.setTabOrder(self.combo_beamSec, self.txt_Fu)
         MainWindow.setTabOrder(self.txt_Fu, self.txt_Fy)
         MainWindow.setTabOrder(self.txt_Fy, self.txt_Moment)
@@ -1845,7 +1845,8 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.combo_diameter, self.combo_type)
         MainWindow.setTabOrder(self.combo_type, self.combo_grade)
         MainWindow.setTabOrder(self.combo_grade, self.combo_plateThick)
-        MainWindow.setTabOrder(self.combo_plateThick, self.combo_flangeSize)
+        MainWindow.setTabOrder(self.combo_plateThick, self.combo_weld_method)
+        MainWindow.setTabOrder(self.combo_weld_method, self.combo_flangeSize)
         MainWindow.setTabOrder(self.combo_flangeSize, self.combo_webSize)
         MainWindow.setTabOrder(self.combo_webSize, self.btn_Design)
         MainWindow.setTabOrder(self.btn_Design, self.btn_Reset)
@@ -1855,24 +1856,30 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.btnFront, self.btnSide)
         MainWindow.setTabOrder(self.btnSide, self.btnTop)
         MainWindow.setTabOrder(self.btnTop, self.btn3D)
-        MainWindow.setTabOrder(self.btn3D, self.chkBx_beamSec)
+        MainWindow.setTabOrder(self.btn3D, self.chkBx_columnSec)
+        MainWindow.setTabOrder(self.chkBx_columnSec, self.chkBx_beamSec)
         MainWindow.setTabOrder(self.chkBx_beamSec, self.chkBx_connector)
         MainWindow.setTabOrder(self.chkBx_connector, self.txt_tensionCritical)
         MainWindow.setTabOrder(self.txt_tensionCritical, self.txt_tensionCapacity)
         MainWindow.setTabOrder(self.txt_tensionCapacity, self.txt_shearCapacity)
         MainWindow.setTabOrder(self.txt_shearCapacity, self.txt_bearCapacity)
-        MainWindow.setTabOrder(self.txt_bearCapacity, self.txt_boltgrpcapacity)
+        MainWindow.setTabOrder(self.txt_bearCapacity, self.txt_boltcapacity)
+        MainWindow.setTabOrder(self.txt_boltcapacity, self.txt_boltgrpcapacity)
         MainWindow.setTabOrder(self.txt_boltgrpcapacity, self.txt_noBolts)
         MainWindow.setTabOrder(self.txt_noBolts, self.txt_rowBolts)
-        MainWindow.setTabOrder(self.txt_rowBolts, self.txt_gauge)
+        MainWindow.setTabOrder(self.txt_rowBolts, self.btn_pitchDetail)
+        MainWindow.setTabOrder(self.btn_pitchDetail, self.txt_gauge)
         MainWindow.setTabOrder(self.txt_gauge, self.txt_crossGauge)
         MainWindow.setTabOrder(self.txt_crossGauge, self.txt_endDist)
-        MainWindow.setTabOrder(self.txt_endDist, self.txt_criticalFlange)
+        MainWindow.setTabOrder(self.txt_endDist, self.txt_edgeDist)
+        MainWindow.setTabOrder(self.txt_edgeDist, self.btn_plateDetail)
+        MainWindow.setTabOrder(self.btn_plateDetail, self.btn_stiffnrDetail)
+        MainWindow.setTabOrder(self.btn_stiffnrDetail, self.txt_criticalFlange)
         MainWindow.setTabOrder(self.txt_criticalFlange, self.txt_criticalWeb)
         MainWindow.setTabOrder(self.txt_criticalWeb, self.btn_SaveMessages)
         MainWindow.setTabOrder(self.btn_SaveMessages, self.btn_CreateDesign)
-        MainWindow.setTabOrder(self.btn_CreateDesign, self.btnReset_3)
-        MainWindow.setTabOrder(self.btnReset_3, self.btnDesign_3)
+        #MainWindow.setTabOrder(self.btn_CreateDesign, self.btnReset_3)
+    ''' MainWindow.setTabOrder(self.btnReset_3, self.btnDesign_3)
         MainWindow.setTabOrder(self.btnDesign_3, self.txtShrCapacity_4)
         MainWindow.setTabOrder(self.txtShrCapacity_4, self.txtbearCapacity_4)
         MainWindow.setTabOrder(self.txtbearCapacity_4, self.txtBoltCapacity_4)
@@ -1928,11 +1935,34 @@ class Ui_MainWindow(object):
         MainWindow.setTabOrder(self.pushButton_3, self.lineEdit_6)
         MainWindow.setTabOrder(self.lineEdit_6, self.pushButton_2)
         MainWindow.setTabOrder(self.pushButton_2, self.txtGuage_3)
-        MainWindow.setTabOrder(self.txtGuage_3, self.btnDesign_2)
+        MainWindow.setTabOrder(self.txtGuage_3, self.btnDesign_2)'''
 
+    def on_change(self, newIndex):
+        if newIndex == "Groove Weld (CJP)":
+            self.combo_webSize.setCurrentIndex(1)
+            self.combo_flangeSize.setCurrentIndex(1)
+            self.combo_flangeSize.setEnabled(False)
+            self.combo_webSize.setEnabled(False)
+
+        else:
+            self.combo_flangeSize.setEnabled(True)
+            self.combo_webSize.setEnabled(True)
+
+
+
+    def on_change(self, newIndex):
+            if newIndex == "Groove Weld (CJP)":
+                self.combo_webSize.setCurrentIndex(1)
+                self.combo_flangeSize.setCurrentIndex(1)
+                self.combo_flangeSize.setEnabled(False)
+                self.combo_webSize.setEnabled(False)
+
+            else:
+                self.combo_flangeSize.setEnabled(True)
+                self.combo_webSize.setEnabled(True)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Extended End Plate"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Beam to Column End Plate Moment Connection"))
         self.btnInput.setToolTip(_translate("MainWindow", "Left Dock"))
         self.btnInput.setText(_translate("MainWindow", "input"))
         self.btnOutput.setToolTip(_translate("MainWindow", "Right Dock"))
@@ -2098,8 +2128,9 @@ class Ui_MainWindow(object):
         self.combo_connect.setItemText(0, _translate("MainWindow", "Select Connectivity"))
         self.combo_connect.setItemText(1, _translate("MainWindow", "Column flange-Beam web"))
         self.combo_connect.setItemText(2, _translate("MainWindow", "Column web-Beam web"))
-        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Groove Weld (CJP)"))
-        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Fillet Weld"))
+        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Select type"))
+        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Groove Weld (CJP)"))
+        self.combo_weld_method.setItemText(2, _translate("MainWindow", "Fillet Weld"))
         self.label_12.setText(_translate("MainWindow", "Type *"))
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
         self.t_7.setText(_translate("MainWindow", "No. of bolts required"))
@@ -2206,6 +2237,7 @@ class Ui_MainWindow(object):
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
         self.actionShow_column_2.setText(_translate("MainWindow", "Show column"))
         self.actionShow_column_2.setShortcut(_translate("MainWindow", "Alt+Shift+C"))
+
 
 import icons_rc
 

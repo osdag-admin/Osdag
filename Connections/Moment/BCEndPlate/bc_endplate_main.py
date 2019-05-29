@@ -1724,14 +1724,7 @@ class Maincontroller(QMainWindow):
         beam_alpha = float(beam_data["FlangeSlope"])
         beam_length = 1600.0
 
-        if beam_d > beam_B:
-            self.ui.btn_Design.setDisabled(True)
-            QMessageBox.warning(self, "Information", "Width of Beam Flange should be less than Depth of Beam.")
-            self.ui.btn_Design.setDisabled(False)
 
-        else:
-
-            self.ui.btn_Design.setDisabled(False)
 
         beam_Left = ISection(B=column_B, T=column_T, D=column_d, t=column_tw,
                              R1=column_R1, R2=column_R2, alpha=column_alpha,

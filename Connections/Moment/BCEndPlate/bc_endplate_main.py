@@ -186,8 +186,8 @@ class DesignPreference(QDialog):
 
     def set_weldFu(self):
         """
-		Returns: Set weld Fu based on member fu
-		"""
+        Returns: Set weld Fu based on member fu
+        """
         uiObj = self.maincontroller.get_user_inputs()
         Fu = str(uiObj["Member"]["fu (MPa)"])
         self.ui.txt_weldFu.setText(Fu)
@@ -221,10 +221,10 @@ class DesignPreference(QDialog):
 
     def get_boltFu(self, boltGrade):
         """
-		Args:
-			boltGrade: Friction Grip Bolt or Bearing Bolt
-		Returns: ultimate strength of bolt depending upon grade of bolt chosen
-		"""
+        Args:
+            boltGrade: Friction Grip Bolt or Bearing Bolt
+        Returns: ultimate strength of bolt depending upon grade of bolt chosen
+        """
         # boltFu = {3.6: 330, 4.6: 400, 4.8: 420, 5.6: 500, 5.8: 520, 6.8: 600, 8.8: 800, 9.8: 900, 10.9: 1040,
         # 		  12.9: 1220}
         boltGrd = float(boltGrade)
@@ -782,10 +782,10 @@ class Maincontroller(QMainWindow):
 
     def save_file(self, filename):
         """
-		Args:
-			filename: file name
-		Returns: open file for writing
-		"""
+        Args:
+            filename: file name
+        Returns: open file for writing
+        """
         fname = QFile(filename)
         if not fname.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -890,10 +890,10 @@ class Maincontroller(QMainWindow):
 
     def closeEvent(self, event):
         """
-		Args:
-			event: Yes or No
-		Returns: Ask for the confirmation while closing the window
-		"""
+        Args:
+            event: Yes or No
+        Returns: Ask for the confirmation while closing the window
+        """
         uiInput = self.designParameters()
         self.save_inputs_totext(uiInput)
         action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
@@ -905,10 +905,10 @@ class Maincontroller(QMainWindow):
 
     def save_inputs_totext(self, uiObj):
         """
-		Args:
-			uiObj: User inputs
-		Returns: Save the user input to txt format
-		"""
+        Args:
+            uiObj: User inputs
+        Returns: Save the user input to txt format
+        """
         input_file = QFile(os.path.join("Connections", "Moment", "BCEndPlate", "saveINPUT.txt"))
         if not input_file.open(QFile.WriteOnly | QFile.Text):
             QMessageBox.warning(self, "Application",
@@ -918,8 +918,8 @@ class Maincontroller(QMainWindow):
 
     def get_prevstate(self):
         """
-		Returns: Read for the previous user inputs design
-		"""
+        Returns: Read for the previous user inputs design
+        """
         filename = os.path.join("Connections", "Moment", "BCEndPlate", "saveINPUT.txt")
         if os.path.isfile(filename):
             file_object = open(filename, 'r')
@@ -930,17 +930,17 @@ class Maincontroller(QMainWindow):
 
     def retrieve_prevstate(self):
         """
-		Returns: Retrieve the previous user inputs
-		"""
+        Returns: Retrieve the previous user inputs
+        """
         uiObj = self.get_prevstate()
         self.set_dict_touser_inputs(uiObj)
 
     def set_dict_touser_inputs(self, uiObj):
         """
-		Args:
-			uiObj: User inputs
-		Returns: Set the dictionary to user inputs
-		"""
+        Args:
+            uiObj: User inputs
+        Returns: Set the dictionary to user inputs
+        """
 
         if uiObj is not None:
             if uiObj["Connection"] != "BCEndPlate":
@@ -993,8 +993,8 @@ class Maincontroller(QMainWindow):
 
     def designParameters(self):
         """
-		Returns: Design preference inputs
-		"""
+        Returns: Design preference inputs
+        """
         self.uiObj = self.get_user_inputs()
         self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
         # if self.designPrefDialog.saved is not True:
@@ -1006,8 +1006,8 @@ class Maincontroller(QMainWindow):
 
     def setimage_connection(self):
         '''
-		Setting image to connectivity.
-		'''
+        Setting image to connectivity.
+        '''
         self.ui.lbl_connectivity.show()
         loc = self.ui.combo_connLoc.currentText()
         loc2 = self.ui.combo_connect.currentText()
@@ -1047,11 +1047,11 @@ class Maincontroller(QMainWindow):
 
     def generate_incomplete_string(self, incomplete_list):
         """
-		Args:
-			incomplete_list: list of fields that are not selected or entered
-		Returns:
-			error string that has to be displayed
-		"""
+        Args:
+            incomplete_list: list of fields that are not selected or entered
+        Returns:
+            error string that has to be displayed
+        """
 
         # The base string which should be displayed
         information = "Please input the following required field"
@@ -1127,8 +1127,8 @@ class Maincontroller(QMainWindow):
 
     def design_btnclicked(self):
         """
-		Returns:
-		"""
+        Returns:
+        """
         if self.validate_inputs_on_design_btn() is not True:
             return
         self.alist = self.designParameters()
@@ -1279,8 +1279,8 @@ class Maincontroller(QMainWindow):
 
     def reset_btnclicked(self):
         """
-		Returns:
-		"""
+        Returns:
+        """
         self.ui.combo_connect.setCurrentIndex(0)
         self.ui.combo_connLoc.setCurrentIndex(0)
         self.ui.combo_columnSec.setCurrentIndex(0)
@@ -1325,8 +1325,8 @@ class Maincontroller(QMainWindow):
 
     def get_columndata(self):
         """Fetch  old and new column sections from "Intg_osdag" database.
-		Returns:
-			"""
+        Returns:
+            """
         columndata = get_columncombolist()
         old_colList = get_oldcolumncombolist()
 
@@ -1345,12 +1345,12 @@ class Maincontroller(QMainWindow):
 
     def color_oldDatabase_section(self, old_section, intg_section, combo_section):
         """
-		Args:
-			old_section: Old database
-			intg_section: Integrated database
-			combo_section: Contents of database
-		Returns: Differentiate the database by color code
-		"""
+        Args:
+            old_section: Old database
+            intg_section: Integrated database
+            combo_section: Contents of database
+        Returns: Differentiate the database by color code
+        """
         for col in old_section:
             if col in intg_section:
                 indx = intg_section.index(str(col))
@@ -1372,8 +1372,8 @@ class Maincontroller(QMainWindow):
 
     def populate_weld_thk_flange(self):
         """
-		Returns: The list of weld thickness in Gui
-		"""
+        Returns: The list of weld thickness in Gui
+        """
         if str(self.ui.combo_beamSec.currentText()) == "Select section":
             self.ui.combo_plateThick.setCurrentIndex(0)
             self.ui.combo_flangeSize.setCurrentIndex(0)
@@ -1421,10 +1421,10 @@ class Maincontroller(QMainWindow):
 
     def combotype_current_index_changed(self, index):
         """
-		Args:
-			index: Number
-		Returns: Types of Grade
-		"""
+        Args:
+            index: Number
+        Returns: Types of Grade
+        """
         items = self.gradeType[str(index)]
         if items != 0:
             self.ui.combo_grade.clear()
@@ -1438,12 +1438,12 @@ class Maincontroller(QMainWindow):
 
     def check_range(self, widget, min_val, max_val):
         """
-		Args:
-			widget: Fu , Fy lineedit
-			min_val: min value
-			max_val: max value
-		Returns: Check for the value mentioned for the given range
-		"""
+        Args:
+            widget: Fu , Fy lineedit
+            min_val: min value
+            max_val: max value
+        Returns: Check for the value mentioned for the given range
+        """
         text_str = widget.text()
         text_str = int(text_str)
         if (text_str < min_val or text_str > max_val or text_str == ''):
@@ -1453,8 +1453,8 @@ class Maincontroller(QMainWindow):
 
     def validate_fu_fy(self, fu_widget, fy_widget, current_widget, lblwidget):
         '''(QlineEdit,QLable,Number,Number)---> NoneType
-		Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
-		'''
+        Validating F_u(ultimate Strength) greater than F_y (Yeild Strength) textfields
+        '''
         try:
             fu_value = float(fu_widget.text())
         except ValueError:
@@ -1478,11 +1478,11 @@ class Maincontroller(QMainWindow):
 
     def call_2D_drawing(self, view):
         """
-		Args:
-			view: Front, Side & Top view of 2D svg drawings
-		Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
-				 parameters from Extended endplate GUI
-		"""
+        Args:
+            view: Front, Side & Top view of 2D svg drawings
+        Returns: SVG image created through svgwrite package which takes design INPUT and OUTPUT
+                 parameters from Extended endplate GUI
+        """
         self.alist = self.designParameters()
         self.result_obj = bc_endplate_design(self.alist)
         self.column_data = self.fetchColumnPara()
@@ -1537,10 +1537,10 @@ class Maincontroller(QMainWindow):
 
     def dockbtn_clicked(self, widgets):
         """
-		Args:
-			widgets: Input , Output dock
-		Returns: Dock & undock the widgets
-		"""
+        Args:
+            widgets: Input , Output dock
+        Returns: Dock & undock the widgets
+        """
         flag = widgets.isHidden()
         if flag:
             widgets.show()
@@ -1589,8 +1589,8 @@ class Maincontroller(QMainWindow):
 
     def create_2D_CAD(self):
         '''
-		Returns: The 3D model of extendedplate depending upon component selected
-		'''
+        Returns: The 3D model of extendedplate depending upon component selected
+        '''
         self.ExtObj = self.create_extended_both_ways()
         if self.component == "Column":
             final_model = self.ExtObj.get_column_models()
@@ -1613,8 +1613,8 @@ class Maincontroller(QMainWindow):
 
     def save_3D_cad_images(self):
         '''
-		Returns: Save 3D CAD images in *igs, *step, *stl, *brep format
-		'''
+        Returns: Save 3D CAD images in *igs, *step, *stl, *brep format
+        '''
         status = self.resultObj['Bolt']['status']
         if status is True:
             if self.fuse_model is None:
@@ -1822,9 +1822,9 @@ class Maincontroller(QMainWindow):
         #       WELD SECTIONS     #
         ###########################
         '''
-		Following sections are for creating Fillet Welds and Groove Welds
-		Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
-		'''
+        Following sections are for creating Fillet Welds and Groove Welds
+        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+        '''
         if conn_type == 'col_flange_connectivity':
 
             if alist["Weld"]["Method"] == "Fillet Weld":
@@ -1973,53 +1973,53 @@ class Maincontroller(QMainWindow):
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''
-		This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
-	   bolt Head Dia
-		<-------->
-		__________
-		|        | | T = Thickness
-		|________| |
-		   |  |
-		   |  |
-		   |  |
-		'''
+        This routine takes the bolt diameter and return bolt head thickness as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        | | T = Thickness
+        |________| |
+           |  |
+           |  |
+           |  |
+        '''
         bolt_head_thick = {5: 4, 6: 5, 8: 6, 10: 7, 12: 8, 16: 10, 20: 12.5, 22: 14, 24: 15, 27: 17, 30: 18.7,
                            36: 22.5}
         return bolt_head_thick[bolt_diameter]
 
     def bolt_head_dia_calculation(self, bolt_diameter):
         '''
-		This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
-	   bolt Head Dia
-		<-------->
-		__________
-		|        |
-		|________|
-		   |  |
-		   |  |
-		   |  |
-		'''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1989)
+       bolt Head Dia
+        <-------->
+        __________
+        |        |
+        |________|
+           |  |
+           |  |
+           |  |
+        '''
         bolt_head_dia = {5: 7, 6: 8, 8: 10, 10: 15, 12: 20, 16: 27, 20: 34, 22: 36, 24: 41, 27: 46, 30: 50, 36: 60}
         return bolt_head_dia[bolt_diameter]
 
     def bolt_length_calculation(self, bolt_diameter):
         '''
-		This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
-	   bolt Head Dia
-		<-------->
-		__________  ______
-		|        |    |
-		|________|    |
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |  |       |  l= length
-		   |  |       |
-		   |  |       |
-		   |  |       |
-		   |__|    ___|__
-		'''
+        This routine takes the bolt diameter and return bolt head diameter as per IS:3757(1985)
+       bolt Head Dia
+        <-------->
+        __________  ______
+        |        |    |
+        |________|    |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |
+           |  |       |  l= length
+           |  |       |
+           |  |       |
+           |  |       |
+           |__|    ___|__
+        '''
         bolt_head_dia = {5: 40, 6: 40, 8: 40, 10: 40, 12: 40, 16: 50, 20: 50, 22: 50, 24: 50, 27: 60, 30: 65,
                          36: 75}
 
@@ -2027,8 +2027,8 @@ class Maincontroller(QMainWindow):
 
     def nut_thick_calculation(self, bolt_diameter):
         '''
-		Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
-		'''
+        Returns the thickness of the nut depending upon the nut diameter as per IS1363-3(2002)
+        '''
 
         nut_dia = {5: 5, 6: 5.65, 8: 7.15, 10: 8.75, 12: 11.3, 16: 15, 20: 17.95, 22: 19.0, 24: 21.25, 27: 23,
                    30: 25.35, 36: 30.65}

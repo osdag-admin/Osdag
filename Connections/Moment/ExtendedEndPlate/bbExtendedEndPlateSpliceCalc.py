@@ -408,19 +408,23 @@ def bbExtendedEndPlateSplice(uiObj):
 
     #######################################################################
     # Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
-    # TODO: Implement l_v depending on excomm review
-    l_v = float(50)  # for extended end plate
+    # TODO: Improvise l_v, p_fi and p_fo after excomm review
+    # l_v = float(50)  # for extended end plate
+    # l_v = 2.5 * bolt_dia  # for extended end plate
 
-    # for extended one way and flushed end plate
-    if bolt_dia <= 24:
-        p_fi = p_fo = bolt_dia + 12
+    # for extended both ways, extended one way and flushed end plate
+
+    if bolt_dia <= 16:
+        l_v = p_fi = p_fo = 40
+    elif 16 < bolt_dia <= 24:
+        l_v = p_fi = p_fo = 50
     else:
-        p_fi = p_fo = bolt_dia + 25
+        l_v = p_fi = p_fo = 60
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
     # g_1 = max(90, (l_v + edge_dist_mini))
-    g_1 = 90
+    g_1 = max(90, ())
     #######################################################################
     # Validation of Input Dock
 

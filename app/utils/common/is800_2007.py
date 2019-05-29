@@ -44,14 +44,12 @@ class IS800_2007(object):
         """
         Calculation of Design Strength of the member as per cl.6.1
         Args:
-            T_d:  design strength of the number under axial tension in N (float),
             T_dg: design strength due to yielding of gross section in N (float),
             T_dn: design repture strength of critical section in N (float),
             T_db: design strength due to block shear in N (float)
 
         Return:
-            T_d= min( T_dg, T_dn, T_db)
-
+            T_d:  design strength of the number under axial tension in N (float),
         Note:
             References:
             IS800:2007,cl.6.1
@@ -512,98 +510,117 @@ class IS800_2007(object):
         f_cd = min(f_y / (gamma_m0 * (phi + math.sqrt(phi ** phi - lambda_e ** 2))), f_y / gamma_m0)
 
         return f_cd
+        
+    #cl7.6 Laced column
+    #cl 7.6.1.5.Effective slenderness ratiion of lacing member
+    def effective_slenderness_ratio_of_lacing_member(K_L, r_min):
+    """
+    Calculation of Effective slenderness ratiion of lacing member
+    to account for shear deformation
+    Args:
+        K_L -effective length of column
+        r_min - radius of gyration of column member
+        SR_0 - actual maximum slenderness ration of column
+    Returns:
+        SR_eff - effective slenderness ration of lacing
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.1.5
+    """
+        SR_0 = K_L/r_min
+        SR_eff = 1.05*SR_0
 
-    # Calculation of design strength of lacing member
+            return SR_eff
 
-    def Calculation_of_design_strength_of_lacing_system(g, column_type, Type_of_lacing, S, f_y, theta, lacing_section,
-                                                        P, L):
-        """ Calculation of design strength of lacing system
-        Args:
-            Column_type - Either Angle Containing Column or
-                          Channel containing Column (either Channel facing each other or opposite)
-            Type_of_lacing - Either Single lacing or Double lacing
-            S -sapcing between the column
-            f_y - yield stress
-            theta - angle of inclination
-            lacing_section - Either angle section or plate section
-            P - loading on column
-            L - Height of column
-            g - gauge distance
-            L_0 - Spacing between lacings
-            l - lenth of lacing
-            l_e - Effective length of lacing member
-            W_min - width of lacing
-            d - bolt diameter
-            t_min - minimum width of lacing
+    #cl 7.6.2 Width of Lacing  Bars
+    def cl_7_6_2_width_of_lacing_bars(d):
+    """
+    Calculation of min width of Lacing  Bars
+    Args:
+        d - nominal bolt/rivet diameter
+    Returns:
+        w_min - min Width of Lacing  Bars
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.2
+    """
 
-        Return:
-            P_l - load carried by lacing
+        w_min = 3*d
+        return w_min
 
-        Note:
-            Reference:
-            IS 800:2007, cl.7.5.1.2
+    #cl 7.6.3 Thickness of Lacing Bars
+    def cl_7_6_3_minimum_thickness_of_lacing_bars(lacing_type,L_eff):
+    """
+        Calculation of  min Thickness of Lacing Bars
+    Args:
+        Lacing_type - either 'single_lacing' or 'double_lacing'
+        L_eff - effective length of lacing bars
+    Returns:
+        t_min - mininimum thickness of Lacing Bars
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.3
+    """
 
-        """
-
-        a = 2 * g + S
-        if Type_of_lacing == 'Single_lacing':
-            L_0 = (2 * a) / tan(theta)
-            l_e = l
-            t_min = l / 40
+        if lacing_type == 'single_lacing':
+            t_min = 1/40 *L_eff
 
         else:
-            L_0 = a / tan(theta)
-            l_e = 0.7 * l_e
-            t_min = l / 60
+            t_min = 1 / 60 * L_eff
 
-            l = a / sin(theta)
-            # TODO- CHCEK - L_0/r_c  = min(50 , 0.7*lambda_max)
-            W_min = 3 * d
-            SR_lacing = (min(l_e * math.sqrt12) / t, 145)
+        return t_min
 
-            alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
+    #Cl7.6.6 Design of lacing
+    #7.6.6.1 Transverse shear in the lacing bar
+    def cl_7_6_6_1_transverse_shear_in_the_lacing_bar(P):
+        """
+        Calculation of Transverse shear in the lacing bar
+        Args:
+            P  -  axial load on column
+        Returns:
+            V_t_min - minimum design transverse shear
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.6.1
+        """
+        V_t_min = 2.5/100 * P
+    
+        return V_t_min
 
-            A_l = t_min * W_min
-            P_l = f_cd * A_l
 
-            return P_l
-
+    
     # cl7.7  Batten plate
     # cl7.7.1.4 effective slenderness ratio of batten plate
-    def efective_slenderness_ratio_of_batten_plate(l, r_zz):
+    def efective_slenderness_ratio_of_batten_plate(K_l,r_min):
         """
-            Calculation  of effective slenderness ratio of batten plate
-
-            Args:
-                l - length of column  in mm
-                r_zz- minimin radius of gyration of built-up section
-            Return:
-                lambda_e = effcetive slenderness ration of patten plate
-
-            Note:
-                Reference:
-                IS 800:2007, cl.7.7.1.4
+        Args:
+            K_L -effective length of column
+            r_min - minimum radius of gyration(rx,ry,rz) of column member
+        Returns:
+            SR_eff - effective slenderness ration of lacing
+        Note:
+            Reference:
+        IS 800:2007, cl 7.6.1.5
 
         """
-        lambda_e = 1.1 * (L / r_zz)
+        SR_eff = 1.1 * (K_L / r_min)
 
-        return lambda_e
+        return SR_eff
 
     # Design of Battens
     # Battens
-    def longitudinal_shear_transverse_shear_and_moment_at_connection(P, S, C, N):
+    def cl_7_7_2_1_longitudinal_shear_transverse_shear_and_moment_at_connection(P, S, C, N):
         """
             Calculation of longitudinal shear, transverse shear and moment at connetion
-
             Args:
                 P - total axial force on column
-                S - minimum transverse distnace between  the centroid of the rivet/bolt
+                S - minimum transverse distnace between the centroid of the rivet/bolt
                     group/welding connecting the batten to the main member
                 N  -number of parallel planes of battens
                 C  -  distance between centre -to- centre of battens
             Returns:
                 V_t - transverse shear force
-                V_b - longitudinal shear force
+                V_b - longitudinal shear force along column axis
                 M - moment at connection
             Note:
                 Reference:

@@ -2,6 +2,7 @@ from ui_bc_endplate import Ui_MainWindow
 from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
+from ui_plate_bottom import Ui_Plate_Bottom
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
 
@@ -249,7 +250,19 @@ class PlateDetails(QDialog):
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
         self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
-        self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
+        self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
+
+class PlateDetailsBottom(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.ui = Ui_Plate_Bottom()
+        self.ui.setupUi(self)
+        self.maincontroller = parent
+
+        uiObj = self.maincontroller.designParameters()
+        resultObj_plate = bc_endplate_design(uiObj)
+        #self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
+        #self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
 
 
 # self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
@@ -669,6 +682,7 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
+        self.ui.btn_plateDetail_2.clicked.connect(self.plate_details_bottom)
         self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
         self.ui.btn_CreateDesign.clicked.connect(self.design_report)
         self.ui.btn_SaveMessages.clicked.connect(self.save_log_messages)
@@ -1154,6 +1168,7 @@ class Maincontroller(QMainWindow):
             else:
                 self.ui.btn_pitchDetail.setDisabled(False)
                 self.ui.btn_plateDetail.setDisabled(False)
+                self.ui.btn_plateDetail_2.setDisabled(False)
                 self.ui.btn_stiffnrDetail.setDisabled(False)
                 self.ui.chkBx_connector.setDisabled(True)
                 self.ui.chkBx_columnSec.setDisabled(True)
@@ -1192,14 +1207,14 @@ class Maincontroller(QMainWindow):
 
         # bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
         bolts_in_rows = 1
-        self.ui.txt_rowBolts.setText(str(bolts_in_rows))
+        #self.ui.txt_rowBolts.setText(str(bolts_in_rows))
 
         # pitch = resultObj["Bolt"]["Pitch"]
         # self.ui.txt_pitch.setText(str(pitch))
 
         # gauge = resultObj["Bolt"]["Gauge"]
         gauge = 0.0
-        self.ui.txt_gauge.setText(str(gauge))
+        #self.ui.txt_gauge.setText(str(gauge))
 
         cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
         self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
@@ -1212,11 +1227,11 @@ class Maincontroller(QMainWindow):
 
         # weld_stress_flange = resultObj["Weld"]["FlangeStress"]
         weld_stress_flange = 0.0
-        self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
+        #self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 
         # weld_stress_web = resultObj["Weld"]["WebStress"]
         weld_stress_web = 0.0
-        self.ui.txt_criticalWeb.setText(str(weld_stress_web))
+        #self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 
     def display_log_to_textedit(self):
         file = QFile(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'))
@@ -1241,6 +1256,7 @@ class Maincontroller(QMainWindow):
         self.ui.chkBx_connector.setEnabled(False)
         self.ui.btn_pitchDetail.setEnabled(False)
         self.ui.btn_plateDetail.setEnabled(False)
+        self.ui.btn_plateDetail_2.setEnabled(False)
         self.ui.btn_stiffnrDetail.setEnabled(False)
 
         self.ui.action_save_input.setEnabled(False)
@@ -1265,6 +1281,7 @@ class Maincontroller(QMainWindow):
         self.ui.chkBx_connector.setEnabled(True)
         self.ui.btn_pitchDetail.setEnabled(True)
         self.ui.btn_plateDetail.setEnabled(True)
+        self.ui.btn_plateDetail_2.setEnabled(True)
         self.ui.btn_stiffnrDetail.setEnabled(True)
 
         self.ui.action_save_input.setEnabled(True)
@@ -1315,6 +1332,7 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)
+        self.ui.btn_plateDetail_2.setDisabled(True)
         self.ui.btn_stiffnrDetail.setDisabled(True)
         self.ui.btnFront.setDisabled(True)
         self.ui.btnTop.setDisabled(True)
@@ -1559,6 +1577,9 @@ class Maincontroller(QMainWindow):
 
     def plate_details(self):
         section = PlateDetails(self)
+        section.show()
+    def plate_details_bottom(self):
+        section = PlateDetailsBottom(self)
         section.show()
 
     def stiffener_details(self):

@@ -1,44 +1,18 @@
 """
-Created on 16th October, 2017.
+Created on 16th October, 2017 (Updated from 26th April 2019 for Extended One Way and Flush End Plate connection).
 
 @author: Danish Ansari
 
 
-Module: Beam to beam extended end plate splice connection (Moment connection)
+Module (Moment connection): 1. Beam to beam extended end plate splice connection
+                            2. Beam to beam extended one way end plate splice connection
+                            3. Beam to beam flushed end plate splice connection
 
 Reference:
             1) IS 800: 2007 General construction in steel - Code of practice (Third revision)
             2) Design of Steel structures by Dr. N Subramanian (chapter 5 and 6)
             3) Fundamentals of Structural steel design by M.L Gambhir
             4) AISC Design guide 16 and 4
-
-
-ASCII diagram
-                                      End plate
-                                     +---+
-                                 +----------+ Bolt
-                                     | | |
-+------------------------------------+ | +-------------------------------+
-+------------------------------------| | |-------------------------------+
-|                                   || | ||                              |
-|                                +----------+                            |
-|                                   || | ||   Bolt                       |
-|                                +----------+                            |
-|                                   || | ||                              |
-|           Beam Section            || | ||            Beam Section      |
-|                                   || | ||                              |
-|                                +-----------+                           |
-|                                   || | ||     Bolt                     |
-|                                +-----------+                           |
-|                                   || | ||                              |
-+------------------------------------| | |-------------------------------+
-+------------------------------------+ | +-------------------------------+
-                                     | | |
-                                 +----------+  Bolt
-                                     +---+
-
-                                      End plate
-Note: The above ASCII diagram does not show details of weld
 
 
 """
@@ -324,6 +298,7 @@ def fetchBeamPara(self):
 def bbExtendedEndPlateSplice(uiObj):
     global logger
     global design_status
+
     design_status = True
 
     beam_sec = uiObj['Member']['BeamSection']
@@ -367,6 +342,7 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
+    weld_type = str(uiObj["Weld"]["Type"])
     weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
@@ -380,12 +356,6 @@ def bbExtendedEndPlateSplice(uiObj):
 
     #######################################################################
     # Read input values from Beam database
-    # Here,
-    #    beam_tw - Thickness of beam web
-    #    beam_tf - Thickness of beam Flange
-    #    beam_d  - Depth of beam
-    #    beam_B  - Width of beam Flange
-    #    beam_R1 - Radius of beam at root
 
     dictbeamdata = get_beamdata(beam_sec)
 
@@ -419,6 +389,7 @@ def bbExtendedEndPlateSplice(uiObj):
     gauge_dist_max = pitch_dist_max
 
     # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
+
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         min_end_distance = int(math.ceil(1.7 * dia_hole))
     else:
@@ -436,9 +407,15 @@ def bbExtendedEndPlateSplice(uiObj):
     edge_dist_max = end_dist_max
 
     #######################################################################
-    # l_v = Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
+    # Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
     # TODO: Implement l_v depending on excomm review
-    l_v = float(50)
+    l_v = float(50)  # for extended end plate
+
+    # for extended one way and flushed end plate
+    if bolt_dia <= 24:
+        p_fi = p_fo = bolt_dia + 12
+    else:
+        p_fi = p_fo = bolt_dia + 25
 
     # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
     # TODO validate g_1 with correct value
@@ -454,19 +431,56 @@ def bbExtendedEndPlateSplice(uiObj):
         end_plate_thickness = math.ceil(max(beam_tf, beam_tw))
         design_status = False
         logger.error(": Chosen end plate thickness is not sufficient")
-        logger.warning(": Minimum required thickness of end plate is %2.2f mm " % end_plate_thickness)
+        logger.warning(": Minimum required thickness of end plate as per the detailing criteria is %2.2f mm " % end_plate_thickness)
         logger.info(": Increase the thickness of end plate ")
 
     # End Plate Height [Ref: Based on reasoning]
 
     # Minimum and Maximum Plate Height
     # TODO: Validate end_plate_height_mini after excomm review (currently used value of l_v is 50mm)
-    end_plate_height_mini = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_mini)
-
     # TODO: Validate end_plate_height_max after excomm review
     # Note: The distance between the toe of weld or the flange edge to the centre of the nearer bolt is 62.5mm (assumed to be maximum)
 
-    end_plate_height_max = beam_d + (2 * l_v) + (2 * weld_thickness_flange) + (2 * end_dist_max)
+    if uiObj["Member"]["Connectivity"] == "Extended both ways":
+        end_plate_height_mini = beam_d + (2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini)
+        end_plate_height_max = beam_d + (2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_max)
+
+    elif uiObj["Member"]["Connectivity"] == "Extended one way":
+        end_plate_height_mini = beam_d + p_fo + end_dist_mini + 10  # TODO 10 mm is the cover provided beyond flange which does not protrude that much (update after review)
+        end_plate_height_max = beam_d + p_fo + end_dist_max + 10    # mini and max heights for 6 and 8 bolt configuration
+
+    elif uiObj["Member"]["Connectivity"] == "Flush":
+        end_plate_height_mini = end_plate_height_max = beam_d + 2 * (weld_thickness_flange + 10)  # TODO 10 mm is the cover provided beyond flange on either sides
+
+    # Check for Minimum and Maximum values of End Plate Height from user input
+
+    if end_plate_height != 0:
+        if end_plate_height <= beam_d:
+            design_status = False
+            logger.error(": Height of End Plate is less than/or equal to the depth of the Beam ")
+            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+            logger.info(": Increase the Height of End Plate")
+
+        elif end_plate_height <= end_plate_height_mini:
+        # elif (end_plate_height <= end_plate_height_mini) or (end_plate_height <= (end_plate_height_mini + pitch_dist_min)):
+            design_status = False
+            logger.error(": Height of End Plate is less than the minimum required height")
+            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+            logger.info(": Increase the Height of End Plate")
+
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":
+            if end_plate_height > end_plate_height_max:
+                design_status = False
+                logger.error(": Height of End Plate exceeds the maximum allowed height")
+                logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                logger.info(": Decrease the Height of End Plate")
+
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if end_plate_height > end_plate_height_max:
+                design_status = False
+                logger.error(": Height of End Plate exceeds the maximum allowed height")
+                logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                logger.info(": Decrease the Height of End Plate")
 
     # End Plate Width
 
@@ -487,26 +501,6 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.error(": Width of the End Plate exceeds the maximum allowed width ")
             logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
             logger.info(": Decrease the width of End Plate")
-
-    # Check for Minimum and Maximum values of End Plate Height from user input
-
-    if end_plate_height != 0:
-        if end_plate_height <= beam_d:
-            design_status = False
-            logger.error(": Height of End Plate is less than/or equal to the depth of the Beam ")
-            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-            logger.info(": Increase the Height of End Plate")
-        elif end_plate_height <= end_plate_height_mini:
-            design_status = False
-            logger.error(": Height of End Plate is less than the minimum required height")
-            logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-            logger.info(": Increase the Height of End Plate")
-
-        if end_plate_height > end_plate_height_max:
-            design_status = False
-            logger.error(": Height of End Plate exceeds the maximum allowed height")
-            logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
-            logger.info(": Decrease the Height of End Plate")
 
     #######################################################################
     # Check for shear capacity of Friction Grip Bolt bolt (Cl. 10.4.3, IS 800:2007)
@@ -568,32 +562,28 @@ def bbExtendedEndPlateSplice(uiObj):
 
     if bolt_type == "Friction Grip Bolt":
         Tdf = bolt_tension_friction_grip_bolt(bolt_fu, netArea_thread(bolt_dia))
-        bolt_tension_capacity = Tdf
-        if Tdf > Tdf_1:
-            design_status = False
-            logger.error(": Tension capacity of Friction Grip Bolt bolt exceeds the specified limit (Clause 10.4.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-            logger.info(": Re-design the connection using bolt of smaller diameter")
+        bolt_tension_capacity = min(Tdf, Tdf_1)
     else:
         Tdb = bolt_tension_bearing(bolt_fu, netArea_thread(bolt_dia))
-        bolt_tension_capacity = Tdb
-
-        if Tdb > Tdf_1:
-            design_status = False
-            logger.error(": Tension capacity of Bearing bolt exceeds the specified limit (Clause 10.3.5, IS 800:2007)")
-            logger.warning(": Maximum allowed tension capacity for selected diameter of bolt is %2.2f kN" % Tdf_1)
-            logger.info(": Re-design the connection using bolt of smaller diameter")
+        bolt_tension_capacity = min(Tdb, Tdf_1)
 
     #######################################################################
-    # Calculation for number of bolts in each column
+    # Calculation for number of bolts
+    #######################################################################
 
     # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )
-    M_u = factored_moment + ((factored_axial_load * (beam_d/2 - beam_tf/2)) / 1000)  # kN-m
+    M_u = factored_moment + ((factored_axial_load * (beam_d / 2 - beam_tf / 2)) / 1000)  # kN-m
+    T_flange = (factored_moment * 1000) / ((beam_d - beam_tf) + (factored_axial_load / 2))  # (kN) calculating axial force (tension) in flange due to the moment
 
-    # Number of bolts
-    # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
-    n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
-    n = math.ceil(n)
+    if uiObj["Member"]["Connectivity"] == "Extended both ways":  # calculating trial number of bolts for extended both way end plate
+
+        # Number of bolts
+        # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
+        n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
+        n = math.ceil(n)
+    else:  # calculating trial number of bolts for extended one way and flushed end plate
+        n_flange = T_flange / bolt_tension_capacity  # trial number of bolts near the tension flange
+        n = n_flange + 2  # add 2 bolts near the compression flange to complete the trial required number of bolts in the configuration
 
     # number_of_bolts = Total number of bolts in the configuration
     # TODO: Update number of bolts after review
@@ -601,178 +591,353 @@ def bbExtendedEndPlateSplice(uiObj):
 
     if number_of_bolts <= 20:
 
-        if number_of_bolts <= 8:
-            number_of_bolts = 8
-        elif number_of_bolts > 8 and number_of_bolts <= 12:
-            number_of_bolts = 12
-        elif number_of_bolts > 12 and number_of_bolts <= 16:
-            number_of_bolts = 16
-        elif number_of_bolts > 16 and number_of_bolts <= 20:
-            number_of_bolts = 20
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":
+            if number_of_bolts <= 8:
+                number_of_bolts = 8
+            elif 8 < number_of_bolts <= 12:
+                number_of_bolts = 12
+            elif 12 < number_of_bolts <= 16:
+                number_of_bolts = 16
+            elif 16 < number_of_bolts <= 20:
+                number_of_bolts = 20
+
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if number_of_bolts <= 6:
+                number_of_bolts = 6
+            elif 6 < number_of_bolts <= 8:
+                number_of_bolts = 8
+            elif 8 < number_of_bolts <= 10:
+                number_of_bolts = 10
+            else:
+                design_status = False
+                logger.error(": Number of bolts required exceeds the maximum allowed value ")
+                logger.warning(": Maximum number of bolts allowed for the selected configuration is 10 [detailing best practice]")
+                logger.info(": Re-design the connection using a bolt of higher diameter/grade")
+
+        elif uiObj["Member"]["Connectivity"] == "Flush":
+            if number_of_bolts <= 4:
+                number_of_bolts = 4
+            elif 4 < number_of_bolts <= 6:
+                number_of_bolts = 6
+            else:
+                design_status = False
+                logger.error(": Number of bolts required exceeds the maximum allowed value ")
+                logger.warning(": Maximum number of bolts allowed for the selected configuration is 6 [detailing best practice]")
+                logger.info(": Re-design the connection using a bolt of higher diameter/grade")
 
         # Number of rows of bolt
-        if number_of_bolts == 8:
-            number_rows = 4
-        elif number_of_bolts == 12:
-            number_rows = 6
-        elif number_of_bolts == 16:
-            number_rows = 8
-        elif number_of_bolts == 20:
-            number_rows = 10
+        number_rows = int(number_of_bolts / 2)
 
         # Number of bolts per column
 
-        n_c = int(number_of_bolts / 2)
+        n_c = number_rows
         # #######################################################################
         # Calculating pitch, gauge, end and edge distances for different cases
 
         # Case 1: When the height and the width of end plate is not specified by user
         if end_plate_height == 0 and end_plate_width == 0:
 
-            if number_of_bolts == 8:
-                pitch_distance = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v))
+            if uiObj["Member"]["Connectivity"] == "Flush":
 
-                if pitch_distance < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-                if pitch_distance > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                if number_of_bolts == 4:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * p_fi))
 
-            elif number_of_bolts == 12:
-                pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min  # Distance between 2nd and 3rd bolt and 4th and 5th bolt from top
-                pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                elif number_of_bolts == 6:
+                    pitch_distance_1_2 = pitch_dist_min  # Distance between the 1st and 2nd row of bolt from top
+                    pitch_distance_2_3 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_1_2)  # Distance between 2nd and 3rd row of bolt from top
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_2_3 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_2_3 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-            elif number_of_bolts == 16:
-                pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                if number_of_bolts == 6:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * p_fi))
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-            elif number_of_bolts == 20:
-                pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
-                pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
+                elif number_of_bolts == 8:
+                    pitch_distance_2_3 = pitch_dist_min  # Distance between 2nd and 3rd row of bolt from top
+                    pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_2_3)  # Distance between the 3rd and 4th row of bolt from top
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_2_3 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_2_3 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                elif number_of_bolts == 10:
+                    pitch_distance_1_2 = pitch_distance_3_4 = pitch_dist_min  # Distance between 1st, 2nd and 3rd, 4th row of bolt from top
+                    pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_3_4)  # Distance between the 4th and 5th row of bolt from top
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min) or (pitch_distance_4_5 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max) or (pitch_distance_4_5 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+            else:
+                if number_of_bolts == 8:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v))
+
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 12:
+                    pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min  # Distance between 2nd, 3rd and 4th, 5th row of bolt from top
+                    pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 16:
+                    pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
+                    pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 20:
+                    pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+                    pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
+                    pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                end_plate_height_provided = beam_d + (2 * weld_thickness_flange) + (2 * 10)
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6 or number_of_bolts == 8:
+                    end_plate_height_provided = beam_d + p_fo + end_dist_mini + weld_thickness_flange + 10
+                elif number_of_bolts == 10:
+                    end_plate_height_provided = beam_d + p_fo + pitch_distance_1_2 + end_dist_mini + weld_thickness_flange + 10
 
             else:
-                design_status = False
-
-            if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
-            else:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
+                if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
+                    end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
+                else:
+                    end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
 
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
+
         elif end_plate_height != 0 and end_plate_width == 0:
             height_available = end_plate_height  # available height of end plate
 
-            if number_of_bolts == 8:
-                pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    pitch_distance = height_available - ((2 * 10) + (2 * weld_thickness_flange) + (2 * beam_tf) + (2 * p_fi))
 
-                if pitch_distance < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-                if pitch_distance > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-            elif number_of_bolts == 12:
-                pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
-                pitch_distance_3_4 = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+                elif number_of_bolts == 6:
+                    pitch_distance_1_2 = pitch_dist_min  # Distance between the 1st and 2nd row of bolt from top
+                    pitch_distance_2_3 = height_available - ((2 * 10) + (2 * weld_thickness_flange) + (2 * beam_tf) + (2 * p_fi) + pitch_distance_1_2)  # Distance between 2nd and 3rd row of bolt from top
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_2_3 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_2_3 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
-            elif number_of_bolts == 16:
-                pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
+                if number_of_bolts == 6:
+                    pitch_distance = height_available - (min_end_distance + p_fo + (2 * beam_tf) + (2 * p_fi) + 10)
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                elif number_of_bolts == 8:
+                    pitch_distance_2_3 = pitch_dist_min  # Distance between 2nd and 3rd row of bolt from top
+                    pitch_distance_3_4 = height_available - (min_end_distance + p_fo + weld_thickness_flange + (2 * beam_tf) + (2 * p_fi) + 10 + pitch_distance_2_3)  # Distance between the 3rd and 4th row of bolt from top
 
-            elif number_of_bolts == 20:
-                pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
-                pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
+                    if (pitch_distance_2_3 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_2_3 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                elif number_of_bolts == 10:
+                    pitch_distance_1_2 = pitch_distance_3_4 = pitch_dist_min  # Distance between 1st, 2nd and 3rd, 4th row of bolt from top
+                    pitch_distance_4_5 = height_available - (min_end_distance + pitch_distance_1_2 + p_fo + weld_thickness_flange + (2 * beam_tf) + 10 + (2 * p_fi) + pitch_distance_3_4)  # Distance between the 4th and 5th row of bolt from top
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
-
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min) or (pitch_distance_4_5 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max) or (pitch_distance_4_5 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
             else:
-                design_status = False
+                if number_of_bolts == 8:
+                    pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 12:
+                    pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
+                    pitch_distance_3_4 = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 16:
+                    pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
+                    pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 20:
+                    pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+                    pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
+                    pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
             end_plate_height_provided = height_available
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
@@ -782,79 +947,154 @@ def bbExtendedEndPlateSplice(uiObj):
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
 
-            if number_of_bolts == 8:
-                pitch_distance = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v))
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * p_fi))
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if pitch_distance < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-                if pitch_distance > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                elif number_of_bolts == 6:
+                    pitch_distance_1_2 = pitch_dist_min  # Distance between the 1st and 2nd row of bolt from top
+                    pitch_distance_2_3 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_1_2)  # Distance between 2nd and 3rd row of bolt from top
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_2_3 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_2_3 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-            elif number_of_bolts == 12:
-                pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
-                pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * p_fi))
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                elif number_of_bolts == 8:
+                    pitch_distance_2_3 = pitch_dist_min  # Distance between 2nd and 3rd row of bolt from top
+                    pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_2_3)  # Distance between the 3rd and 4th row of bolt from top
+                    if (pitch_distance_2_3 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_2_3 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
-
-            elif number_of_bolts == 16:
-                pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
-
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
-
-            elif number_of_bolts == 20:
-                pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
-                pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
-
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
-
+                elif number_of_bolts == 10:
+                    pitch_distance_1_2 = pitch_distance_3_4 = pitch_dist_min  # Distance between 1st, 2nd and 3rd, 4th row of bolt from top
+                    pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * p_fi) + pitch_distance_3_4)  # Distance between the 4th and 5th row of bolt from top
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min) or (pitch_distance_4_5 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max) or (pitch_distance_4_5 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
             else:
-                design_status = False
+                if number_of_bolts == 8:
+                    pitch_distance = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v))
 
-            if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 12:
+                    pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min  # Distance between 2nd, 3rd and 4th, 5th row of bolt from top
+                    pitch_distance_3_4 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 16:
+                    pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
+                    pitch_distance_4_5 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_3_4 + pitch_distance_5_6 + pitch_distance_6_7)
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 20:
+                    pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+                    pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
+                    pitch_distance_5_6 = beam_d - ((2 * beam_tf) + (2 * weld_thickness_flange) + (2 * l_v) + (4 * pitch_dist_min))
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                end_plate_height_provided = beam_d + (2 * weld_thickness_flange) + (2 * 10)
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6 or number_of_bolts == 8:
+                    end_plate_height_provided = beam_d + p_fo + end_dist_mini + weld_thickness_flange + 10
+                elif number_of_bolts == 10:
+                    end_plate_height_provided = beam_d + p_fo + pitch_distance_1_2 + end_dist_mini + weld_thickness_flange + 10
             else:
-                end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
+                if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
+                    end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini))
+                else:
+                    end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
-            width_available = end_plate_width
-            end_plate_width_provided = width_available
+            end_plate_width_provided = end_plate_width
 
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
@@ -863,108 +1103,219 @@ def bbExtendedEndPlateSplice(uiObj):
 
             height_available = end_plate_height
 
-            if number_of_bolts == 8:
-                pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    pitch_distance = height_available - ((2 * 10) + (2 * weld_thickness_flange) + (2 * beam_tf) + (2 * p_fi))
 
-                if pitch_distance < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
-                if pitch_distance > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-            elif number_of_bolts == 12:
-                pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
-                pitch_distance_3_4 = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+                elif number_of_bolts == 6:
+                    pitch_distance_1_2 = pitch_dist_min  # Distance between the 1st and 2nd row of bolt from top
+                    pitch_distance_2_3 = height_available - (
+                                (2 * 10) + (2 * weld_thickness_flange) + (2 * beam_tf) + (2 * p_fi) + pitch_distance_1_2)  # Distance between 2nd and 3rd row of bolt from top
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_2_3 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_2_3 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
-            elif number_of_bolts == 16:
-                pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
-                pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
+                if number_of_bolts == 6:
+                    pitch_distance = height_available - (min_end_distance + p_fo + (2 * beam_tf) + (2 * p_fi) + 10)
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
+                elif number_of_bolts == 8:
+                    pitch_distance_2_3 = pitch_dist_min  # Distance between 2nd and 3rd row of bolt from top
+                    pitch_distance_3_4 = height_available - (min_end_distance + p_fo + weld_thickness_flange + (2 * beam_tf) + (
+                                2 * p_fi) + 10 + pitch_distance_2_3)  # Distance between the 3rd and 4th row of bolt from top
 
-            elif number_of_bolts == 20:
-                pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
-                pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
-                pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (4 * pitch_dist_min))
+                    if (pitch_distance_2_3 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_2_3 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value (Clause 10.2.2, IS 800:2007)")
-                    logger.warning(": Minimum required Pitch distance is % 2.2f mm" % pitch_dist_min)
-                    logger.info(": Re-design the connection using bolt of smaller diameter")
+                elif number_of_bolts == 10:
+                    pitch_distance_1_2 = pitch_distance_3_4 = pitch_dist_min  # Distance between 1st, 2nd and 3rd, 4th row of bolt from top
+                    pitch_distance_4_5 = height_available - (min_end_distance + pitch_distance_1_2 + p_fo + weld_thickness_flange + (2 * beam_tf) + 10 + (
+                                2 * p_fi) + pitch_distance_3_4)  # Distance between the 4th and 5th row of bolt from top
 
-                if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
-                    design_status = False
-                    logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value (Clause 10.2.3, IS 800:2007)")
-                    logger.warning(": Maximum allowed Pitch distance is % 2.2f mm" % pitch_dist_max)
-                    logger.info(": Re-design the connection using bolt of higher diameter")
-
+                    if (pitch_distance_1_2 < pitch_dist_min) or (pitch_distance_3_4 < pitch_dist_min) or (pitch_distance_4_5 < pitch_dist_min):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if (pitch_distance_1_2 > pitch_dist_max) or (pitch_distance_3_4 > pitch_dist_max) or (pitch_distance_4_5 > pitch_dist_max):
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
             else:
-                design_status = False
+                if number_of_bolts == 8:
+                    pitch_distance = height_available - ((2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v))
+
+                    if pitch_distance < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+                    if pitch_distance > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 12:
+                    pitch_distance_2_3 = pitch_distance_4_5 = pitch_dist_min
+                    pitch_distance_3_4 = height_available - (
+                                (2 * end_dist_mini) + (2 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (2 * l_v) + pitch_distance_2_3 + pitch_distance_4_5)
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_4_5 and pitch_distance_3_4) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 16:
+                    pitch_distance_2_3 = pitch_distance_3_4 = pitch_distance_5_6 = pitch_distance_6_7 = pitch_dist_min
+                    pitch_distance_4_5 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (4 * weld_thickness_flange) + (2 * beam_tf) + (4 * pitch_dist_min))
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_2_3 and pitch_distance_3_4 and pitch_distance_5_6 and pitch_distance_6_7 and pitch_distance_4_5) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
+
+                elif number_of_bolts == 20:
+                    pitch_distance_1_2 = pitch_distance_9_10 = pitch_dist_min
+                    pitch_distance_3_4 = pitch_distance_4_5 = pitch_distance_6_7 = pitch_distance_7_8 = pitch_dist_min
+                    pitch_distance_5_6 = height_available - ((2 * end_dist_mini) + (4 * l_v) + (2 * beam_tf) + (4 * weld_thickness_flange) + (6 * pitch_dist_min))
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) < pitch_dist_min:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is smaller than the minimum required value ")
+                        logger.warning(": Minimum required Pitch distance (Clause 10.2.2, IS 800:2007) is % 2.2f mm" % pitch_dist_min)
+                        logger.info(": Re-design the connection using bolt of smaller diameter")
+
+                    if (pitch_distance_1_2 and pitch_distance_3_4 and pitch_distance_4_5 and pitch_distance_6_7 and pitch_distance_7_8 and pitch_distance_9_10 and pitch_distance_5_6) > pitch_dist_max:
+                        design_status = False
+                        logger.error(": Detailing Error - Pitch distance is greater than the maximum allowed value ")
+                        logger.warning(": Maximum allowed Pitch distance (Clause 10.2.3, IS 800:2007) is % 2.2f mm" % pitch_dist_max)
+                        logger.info(": Re-design the connection using bolt of higher diameter")
 
             end_plate_height_provided = height_available
 
-            width_available = end_plate_width
-            end_plate_width_provided = width_available
+            end_plate_width_provided = end_plate_width
 
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
         #######################################################################
         # Validation of calculated Height and Width of End Plate
 
-        if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
-            if end_plate_height_provided < end_plate_height_mini:
-                design_status = False
-                logger.error(": Height of End Plate is less than the minimum required height")
-                logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-                logger.info(": Increase the Height of End Plate")
-            if end_plate_height_provided > end_plate_height_max:
-                design_status = False
-                logger.error(": Height of End Plate exceeds the maximum allowed height")
-                logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
-                logger.info(": Decrease the Height of End Plate")
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            if number_of_bolts == 4 or number_of_bolts == 6:
+                if end_plate_height_provided < end_plate_height_mini:
+                    design_status = False
+                    logger.error(": Height of End Plate is less than the minimum required height")
+                    logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+                    logger.info(": Increase the Height of End Plate")
+                if end_plate_height_provided > end_plate_height_max:
+                    design_status = False
+                    logger.error(": Height of End Plate exceeds the maximum allowed height")
+                    logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                    logger.info(": Decrease the Height of End Plate")
 
-        elif number_of_bolts == 20:
-            if end_plate_height_provided < (end_plate_height_mini + (2 * pitch_dist_min)):
-                design_status = False
-                logger.error(": Height of End Plate is less than the minimum required height")
-                logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
-                logger.info(": Increase the Height of End Plate")
-            if end_plate_height_provided > (end_plate_height_max + (2 * pitch_dist_min)):
-                design_status = False
-                logger.error(": Height of End Plate exceeds the maximum allowed height")
-                logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
-                logger.info(": Decrease the Height of End Plate")
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if number_of_bolts == 6 or number_of_bolts == 8:
+                if end_plate_height_provided < end_plate_height_mini:
+                    design_status = False
+                    logger.error(": Height of End Plate is less than the minimum required height")
+                    logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+                    logger.info(": Increase the Height of End Plate")
+                if end_plate_height_provided > end_plate_height_max:
+                    design_status = False
+                    logger.error(": Height of End Plate exceeds the maximum allowed height")
+                    logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                    logger.info(": Decrease the Height of End Plate")
+            else:
+                if end_plate_height_provided < (end_plate_height_mini + pitch_distance_1_2):
+                    design_status = False
+                    logger.error(": Height of End Plate is less than the minimum required height")
+                    logger.warning(": Minimum End Plate height required is %2.2f mm" % (end_plate_height_mini + pitch_distance_1_2))
+                    logger.info(": Increase the Height of End Plate")
+                if end_plate_height_provided > (end_plate_height_max + pitch_distance_1_2):
+                    design_status = False
+                    logger.error(": Height of End Plate exceeds the maximum allowed height")
+                    logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % (end_plate_height_max + pitch_distance_1_2))
+                    logger.info(": Decrease the Height of End Plate")
 
         else:
-            design_status = False
+            if number_of_bolts == 8 or number_of_bolts == 12 or number_of_bolts == 16:
+                if end_plate_height_provided < end_plate_height_mini:
+                    design_status = False
+                    logger.error(": Height of End Plate is less than the minimum required height")
+                    logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+                    logger.info(": Increase the Height of End Plate")
+                if end_plate_height_provided > end_plate_height_max:
+                    design_status = False
+                    logger.error(": Height of End Plate exceeds the maximum allowed height")
+                    logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                    logger.info(": Decrease the Height of End Plate")
+
+            elif number_of_bolts == 20:
+                if end_plate_height_provided < (end_plate_height_mini + (2 * pitch_dist_min)):
+                    design_status = False
+                    logger.error(": Height of End Plate is less than the minimum required height")
+                    logger.warning(": Minimum End Plate height required is %2.2f mm" % end_plate_height_mini)
+                    logger.info(": Increase the Height of End Plate")
+                if end_plate_height_provided > (end_plate_height_max + (2 * pitch_dist_min)):
+                    design_status = False
+                    logger.error(": Height of End Plate exceeds the maximum allowed height")
+                    logger.warning(": Maximum allowed height of End Plate is %2.2f mm" % end_plate_height_max)
+                    logger.info(": Decrease the Height of End Plate")
 
         if end_plate_width_provided < end_plate_width_mini:
             design_status = False
@@ -998,327 +1349,452 @@ def bbExtendedEndPlateSplice(uiObj):
         # T1, T2, ..., Tn are the Tension in the bolts starting from top of the end plate and y1, y2, ..., yn are its corresponding distances from N.A
         # TODO : check the working of the below loop
 
-        # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
-            if number_of_bolts == 8:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = weld_thickness_flange + l_v + (beam_tf/2)
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            if number_of_bolts == 4:
+                T1 = ((beam_d - beam_tf - beam_tf / 2 - p_fi) * T_flange) / (2 * (beam_d - beam_tf))
+                # T1 is the tension in each bolt in the 1st row (T indicates tension and 1 indicates row number) [T1 is the tension in critical bolt in the first row from top or
+                # bottom, depending on the direction of the moment. Since we are interested in finding the tension in the critical bolt for bolt design we shall ignore he
+                # calculation of bolt force in other bolts as it will be lesser than the critical bolt]
+                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
+            elif number_of_bolts == 6:
+                T1 = ((beam_d - beam_tf - beam_tf / 2 - p_fi) * T_flange) / (2 * (beam_d - beam_tf))
+                T2 = ((beam_d - beam_tf - beam_tf / 2 - p_fi - pitch_distance_1_2) * T_flange) / (2 * (beam_d - beam_tf))
+                v_st = 2 * (T1 + T2)
 
-                # Tension in bolt is divided by 2 because there is two columns of bolt
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+            tension_critical_bolt = T1
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if number_of_bolts == 6:
+                T1 = (0.50 * T_flange) / 2
+                T2 = (T_flange - T1) / 2
+                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
+            elif number_of_bolts == 8:
+                T1 = (0.40 * T_flange) / 2
+                T2 = T1
+                T3 = (T_flange - (T1 + T2)) / 2
+                v_st = 2 * T1
+            elif number_of_bolts == 10:
+                T1 = T4 = (0.10 * T_flange) / 2
+                T2 = T3 = ((T_flange - (T1 + T4)) / 2) / 2
+                v_st = 2 * (T1 + T2)
 
-            elif number_of_bolts == 12:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
-                y5 = y4 - pitch_distance_4_5
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+            tension_critical_bolt = T2
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+        else:
+            # Case 1: When the height and the width of end plate is not specified by user
+            if end_plate_height == 0 and end_plate_width == 0:
+                if number_of_bolts == 8:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    # Tension in bolt is divided by 2 because there is two columns of bolt
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
-            elif number_of_bolts == 16:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = y3 - pitch_distance_3_4
-                y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                elif number_of_bolts == 12:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
+                    y5 = y4 - pitch_distance_4_5
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
-            elif number_of_bolts == 20:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                y2 = y1 - pitch_distance_1_2
-                y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                y4 = y3 - pitch_distance_3_4
-                y5 = y4 - pitch_distance_4_5
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y8 = y7 - pitch_distance_7_8
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+                elif number_of_bolts == 16:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
-            else:
-                design_status = False
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-        # Case 2: When the height of end plate is specified but the width is not specified by the user
-        elif end_plate_height != 0 and end_plate_width == 0:
-            if number_of_bolts == 8:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = weld_thickness_flange + l_v + (beam_tf/2)
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+                elif number_of_bolts == 20:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+                    y2 = y1 - pitch_distance_1_2
+                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = y4 - pitch_distance_4_5
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y8 = y7 - pitch_distance_7_8
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
-            elif number_of_bolts == 12:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
-                y5 = y4 - pitch_distance_4_5
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+                else:
+                    design_status = False
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+            # Case 2: When the height of end plate is specified but the width is not specified by the user
+            elif end_plate_height != 0 and end_plate_width == 0:
+                if number_of_bolts == 8:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
-            elif number_of_bolts == 16:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = y3 - pitch_distance_3_4
-                y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                elif number_of_bolts == 12:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
+                    y5 = y4 - pitch_distance_4_5
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
-            elif number_of_bolts == 20:
-                y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                y2 = y1 - pitch_distance_1_2
-                y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                y4 = y3 - pitch_distance_3_4
-                y5 = y4 - pitch_distance_4_5
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y8 = y7 - pitch_distance_7_8
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+                elif number_of_bolts == 16:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
-            else:
-                design_status = False
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-        # Case 3: When the height of end plate is not specified but the width is specified by the user
-        elif end_plate_height == 0 and end_plate_width != 0:
-            if number_of_bolts == 8:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = weld_thickness_flange + l_v + (beam_tf/2)
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+                elif number_of_bolts == 20:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+                    y2 = y1 - pitch_distance_1_2
+                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = y4 - pitch_distance_4_5
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y8 = y7 - pitch_distance_7_8
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
-            elif number_of_bolts == 12:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
-                y5 = y4 - pitch_distance_4_5
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+                else:
+                    design_status = False
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+            # Case 3: When the height of end plate is not specified but the width is specified by the user
+            elif end_plate_height == 0 and end_plate_width != 0:
+                if number_of_bolts == 8:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
-            elif number_of_bolts == 16:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = y3 - pitch_distance_3_4
-                y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                elif number_of_bolts == 12:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
+                    y5 = y4 - pitch_distance_4_5
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
-            elif number_of_bolts == 20:
-                y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                y2 = y1 - pitch_distance_1_2
-                y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                y4 = y3 - pitch_distance_3_4
-                y5 = y4 - pitch_distance_4_5
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y8 = y7 - pitch_distance_7_8
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+                elif number_of_bolts == 16:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
-            else:
-                design_status = False
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-        # Case 4: When the height and the width of End Plate is specified by the user
-        elif end_plate_height != 0 and end_plate_width != 0:
-            if number_of_bolts == 8:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = weld_thickness_flange + l_v + (beam_tf/2)
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+                elif number_of_bolts == 20:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+                    y2 = y1 - pitch_distance_1_2
+                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = y4 - pitch_distance_4_5
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y8 = y7 - pitch_distance_7_8
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
 
-            elif number_of_bolts == 12:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = (beam_tf/2) + weld_thickness_flange + l_v + pitch_dist_min
-                y5 = y4 - pitch_distance_4_5
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+                else:
+                    design_status = False
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+            # Case 4: When the height and the width of End Plate is specified by the user
+            elif end_plate_height != 0 and end_plate_width != 0:
+                if number_of_bolts == 8:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
 
-            elif number_of_bolts == 16:
-                y1 = (beam_d - beam_tf/2) + weld_thickness_flange + l_v
-                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                y3 = y2 - pitch_distance_2_3
-                y4 = y3 - pitch_distance_3_4
-                y5 = (beam_tf/2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                elif number_of_bolts == 12:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
+                    y5 = y4 - pitch_distance_4_5
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
 
-            elif number_of_bolts == 20:
-                y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                y2 = y1 - pitch_distance_1_2
-                y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                y4 = y3 - pitch_distance_3_4
-                y5 = y4 - pitch_distance_4_5
-                y6 = y5 - pitch_distance_5_6
-                y7 = y6 - pitch_distance_6_7
-                y8 = y7 - pitch_distance_7_8
-                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
 
-                T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+                elif number_of_bolts == 16:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                    y3 = y2 - pitch_distance_2_3
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
 
-                T_f = (T1 * (beam_d - beam_tf)) / y1
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
 
-            else:
-                design_status = False
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * T1
+
+                elif number_of_bolts == 20:
+                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+                    y2 = y1 - pitch_distance_1_2
+                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+                    y4 = y3 - pitch_distance_3_4
+                    y5 = y4 - pitch_distance_4_5
+                    y6 = y5 - pitch_distance_5_6
+                    y7 = y6 - pitch_distance_6_7
+                    y8 = y7 - pitch_distance_7_8
+                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+
+                    T_f = (T1 * (beam_d - beam_tf)) / y1
+                    v_st = 2 * (T1 + T2)
+
+                else:
+                    design_status = False
 
         #######################################################################
         # Calculating actual required thickness of End Plate (tp_required) as per bending criteria
-        b_e = beam_B / 2
-
-        # M_p = Plastic moment capacity of end plate
-        # TODO check if T_f value is getting assigned correctly
-        tension_flange = T_f
-        M_p = (tension_flange * l_v) / 2  # kN-mm
-        tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
-
-        tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
-
-        if end_plate_thickness < tp_provided:
-            design_status = False
-            logger.error(": Chosen end plate thickness in not sufficient")
-            logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-            logger.info(": Increase end plate thickness")
+        b_e = end_plate_width_provided / 2
+        if uiObj['bolt']['bolt_type'] == "pre-tensioned":
+            beta = float(1)
         else:
-            pass
+            beta = float(2)
+        eta = 1.5
+        f_0 = 0.7 * bolt_fu / 1000  # kN/mm**2
+        l_e = min(float(end_dist_mini), float(1.1 * end_plate_thickness * math.sqrt((beta * f_0 * 10 ** 3) / bolt_fy)))
 
+        if uiObj["Member"]["Connectivity"] == "Flush" or uiObj["Member"]["Connectivity"] == "Extended one way":
+
+            T_e = T_flange / 2
+            t_p = end_plate_thickness
+            Q = prying_force(T_e, p_fo, l_e, beta, eta, f_0, b_e, t_p)
+
+            if tension_critical_bolt >= bolt_tension_capacity:
+                design_status = False
+                logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
+                if bolt_type == "Friction Grip Bolt":
+                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
+                else:
+                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
+                logger.info(": Increase bolt diameter/grade")
+                Q_allowable = float(0)
+            else:
+                Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
+
+            if Q / 2 > Q_allowable:  # prying force in each bolt
+                design_status = False
+                logger.error(": Prying force in the critical bolt exceeds its allowable limit")
+                logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
+                logger.info(": Increase end plate thickness or bolt diameter")
+            else:
+                pass
+
+                # Finding the thickness of end plate
+
+            M_p = round(((T_flange / 2) * p_fo - (Q * l_e)), 3)  # kN-mm
+            tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (beam_fy * b_e))
+            tp_provided = math.ceil(tp_required / 2.) * 2
+
+            if end_plate_thickness < tp_provided:
+                design_status = False
+                logger.error(": Chosen end plate thickness in not sufficient")
+                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+                logger.info(": Increase end plate thickness")
+            else:
+                pass
+
+            T_b = tension_critical_bolt + Q / 2  # tension in the critical bolt due to flange tension plus prying force
+        else:
+            # M_p = Plastic moment capacity of end plate
+            # TODO check if T_f value is getting assigned correctly
+            tension_flange = T_f
+            M_p = (tension_flange * l_v) / 2  # kN-mm
+            tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
+
+            tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
+
+            if end_plate_thickness < tp_provided:
+                design_status = False
+                logger.error(": Chosen end plate thickness in not sufficient")
+                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+                logger.info(": Increase end plate thickness")
+            else:
+                pass
+
+            # Calculation of Prying Force at Tension flange
+            # TODO : add condition of beta depending on bolt type
+
+            T_e = T_f
+            t_p = tp_provided
+            Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
+            Q = round(Q.real, 3)
+
+            # Finding tension in critical bolt (T_b)
+            # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
+            T_b = T1 + Q
+
+        # Check for tension in the critical bolt
+
+        if bolt_type == "Friction Grip Bolt":
+            if T_b >= Tdf:
+                design_status = False
+                logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity ")
+                logger.warning(": Maximum allowed tension on Friction Grip Bolt bolt (Clause 10.4.5, IS 800:2007) of selected diameter is %2.2f kN" % Tdf)
+                logger.info(": Re-design the connection using bolt of higher diameter or grade")
+        else:
+            if T_b >= Tdb:
+                design_status = False
+                logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity ")
+                logger.warning(": Maximum allowed tension on Bearing bolt (Clause 10.3.5, IS 800:2007) of selected diameter is %2.2f kN" % Tdb)
+                logger.info(": Re-design the connection using bolt of higher diameter or grade")
+
+        #######################################################################
         # Moment demand of End Plate
         M_d = ((tp_required ** 2 * end_plate_fy * b_e) / 4.4 * 1000) * 10 ** -6  # kN-m
 
@@ -1330,39 +1806,6 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.error(": The moment demand on end plate exceeds its moment carrying capacity")
             logger.warning(": The moment carrying capacity of end plate is %2.2f kNm" % M_c)
             logger.info(": Increase end plate thickness")
-
-        # Calculation of Prying Force at Tension flange
-        # TODO : add condition of beta depending on bolt type
-        if uiObj['bolt']['bolt_type'] == "pre-tensioned":
-            beta = float(1)
-        else:
-            beta = float(2)
-
-        eta = 1.5
-        f_0 = 0.7 * bolt_fu / 1000  # kN/mm**2
-        l_e = min(end_dist_mini, 1.1 * tp_required * math.sqrt((beta * f_0 * 10 ** 3) / bolt_fy))
-        T_e = T_f
-        t_p = tp_provided
-
-        Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
-        Q = round(Q.real, 3)
-
-        # Finding tension in critical bolt (T_b)
-        # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
-        T_b = T1 + Q
-
-        if bolt_type == "Friction Grip Bolt":
-            if T_b >= Tdf:
-                design_status = False
-                logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.4.5, IS 800:2007)")
-                logger.warning(": Maximum allowed tension on Friction Grip Bolt bolt of selected diameter is %2.2f kN" % Tdf)
-                logger.info(": Re-design the connection using bolt of higher diameter or grade")
-        else:
-            if T_b >= Tdb:
-                design_status = False
-                logger.error(": Tension acting on the critical bolt exceeds its tension carrying capacity (Clause 10.3.5, IS 800:2007)")
-                logger.warning(": Maximum allowed tension on Bearing bolt of selected diameter is %2.2f kN" % Tdb)
-                logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
         #######################################################################
         # Check for Combined shear and tension capacity of bolt
@@ -1389,26 +1832,27 @@ def bbExtendedEndPlateSplice(uiObj):
 
             if combined_capacity > 1.0:
                 design_status = False
-                logger.error(": Load due to combined shear and tension on selected Friction Grip Bolt bolt exceeds the limiting value (Clause 10.4.6, IS 800:2007)")
-                logger.warning(": The maximum allowable value is 1.0")
+                logger.error(": Load due to combined shear and tension on selected Friction Grip Bolt bolt exceeds the limiting value")
+                logger.warning(": The maximum allowable value is 1.0 (Clause 10.4.6, IS 800:2007)")
                 logger.info(": Re-design the connection using bolt of higher diameter or grade")
         else:
             combined_capacity = (Vsb / Vdb) ** 2 + (Tb / Tdb) ** 2
 
             if combined_capacity > 1.0:
                 design_status = False
-                logger.error(": Load due to combined shear and tension on selected Bearing bolt exceeds the limiting value (Clause 10.3.6, IS 800:2007)")
-                logger.warning(": The maximum allowable value is 1.0")
+                logger.error(": Load due to combined shear and tension on selected Bearing Bolt exceeds the limiting value")
+                logger.warning(": The maximum allowable value is 1.0 (Clause 10.3.6, IS 800:2007)")
                 logger.info(": Re-design the connection using bolt of higher diameter or grade")
 
         #######################################################################
         # Check for Shear yielding and shear rupture of end plate
 
         # 1. Shear yielding of end plate (Clause 8.4.1, IS 800:2007)
-        if end_plate_width != 0:
-            A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
-        else:
-            A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
+        # if end_plate_width != 0:
+        #     A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
+        # else:
+
+        A_v = end_plate_width_provided * tp_provided  # gross shear area of end plate
         V_d = shear_yielding(A_v, end_plate_fy)
 
         if V_d < factored_shear_load:
@@ -1435,13 +1879,14 @@ def bbExtendedEndPlateSplice(uiObj):
 
         A_f = beam_B * beam_tf  # area of beam flange
         capacity_beam_flange = ((beam_fy / 1.10) * A_f) / 1000  # kN
-        force_flange = M_u * 10 ** 3 / (beam_d - beam_tf)
+        force_flange = T_flange  # T_flange will act as compressive force at the compression flange
+        # force_flange = (M_u * 10 ** 3 / (beam_d - beam_tf)) + (factored_axial_load / 2)
 
         if capacity_beam_flange < force_flange:
             design_status = False
-            logger.error(": Force in the flange is greater than its load carrying capacity")
-            logger.warning(": The maximum allowable force on beam flange of selected section is %2.2f kN" % capacity_beam_flange)
-            logger.info(": Use a higher beam section with wider and/or thicker flange")
+            logger.error(": Force acting on the compression flange is greater than its load carrying capacity")
+            logger.warning(": The maximum allowable force on the beam flange for the selected section is %2.2f kN" % capacity_beam_flange)
+            logger.info(": Use a deeper beam section with wider and/or thicker flange")
 
         #######################################################################
         # Design of Weld
@@ -1487,8 +1932,9 @@ def bbExtendedEndPlateSplice(uiObj):
         # capacity_unit_flange is the capacity of weld of unit throat thickness
         capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
 
-        # Calculating th effective length of weld at the flange
-        L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) + (4 * beam_tf)) + (2 * weld_thickness_flange)  # mm
+        # Calculating the effective length of weld at the flange
+        L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) + (2 * weld_thickness_flange)  # mm
+        # L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) - (2 * beam_R1)) + (2 * weld_thickness_flange)  # mm
 
         # Calculating the area of weld at flange (a_weld_flange) assuming minimum throat thickness i.e. 3mm (Clause 10.5.3, IS 800:2007)
         a_weld_flange = L_effective_flange * 3  # mm**2
@@ -1505,7 +1951,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # 2. Bending Stress (BS)
         # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
         Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
-        BS_flange = M_u * 10 ** 3 / Z
+        BS_flange = (M_u * 10 ** 3) / Z
 
         # Resultant (R)
         R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
@@ -1574,7 +2020,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.info(": Increase the Ultimate strength of weld and/or length of weld")
 
         # Weld at web
-        L_effective_web = 4 * (beam_d - (2 * beam_tf))
+        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) + weld_thickness_web)
 
         # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
         f_a_web = factored_axial_load * 10 ** 3 / (3 * L_effective_web)
@@ -1599,14 +2045,6 @@ def bbExtendedEndPlateSplice(uiObj):
         stiffener_fy = beam_fy
         stiffener_fu = beam_fu
 
-        # Height of stiffener (mm) (AISC Design guide 4, page 16)
-        # TODO: Do calculation for actual height of end plate above
-        h_st = math.ceil((end_plate_height_provided - beam_d) / 2)
-
-        # Length of stiffener
-        cf = math.pi/180  # conversion factor to convert degree into radian
-        l_st = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
-
         # Thickness of stiffener
         ts1 = beam_tw
         ts2 = (beam_fy / stiffener_fy) * beam_tw
@@ -1614,16 +2052,117 @@ def bbExtendedEndPlateSplice(uiObj):
 
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
-        # Check of stiffener against local buckling
-        E = 2 * 10 ** 5  # MPa
-        ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+        # size of notch (n_s) in the stiffener
+        n_s = weld_thickness_flange + 5
 
-        if thickness_stiffener_provided < ts_required:
+        # calculating effective length of the stiffener and the weld
+        l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
+        l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+
+
+        # if uiObj["Member"]["Connectivity"] == "Flush":
+        #     pass
+        # else:
+        #     l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
+        #     l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+
+        # Height of stiffener (h_st) (mm)
+        # TODO: Do calculation for actual height of end plate above
+
+        if uiObj["Member"]["Connectivity"] == "Extended one way":
+            h_st = end_plate_height_provided - beam_d - weld_thickness_flange - 10
+        elif uiObj["Member"]["Connectivity"] == "Extended both ways":
+            h_st = (end_plate_height_provided - beam_d) / 2
+        else:
+            w_st = (end_plate_width_provided - beam_tw) / 2  # width in case of flush end plate
+
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            l_st = max(l_st_effective, (l_weld_effective / 2))  # taking the maximum length out of the two possibilities
+        else:
+            # Length of stiffener (l_st) (as per AISC, DG 16 recommendations)
+            cf = math.pi / 180  # conversion factor to convert degree into radian
+            l_stiffener = math.ceil(((h_st - 25) / math.tan(30 * cf)) + 25)
+
+            l_st = max(l_st_effective, (l_weld_effective / 2), l_stiffener)  # taking the maximum length out of the three possibilities
+
+        # Length and size of weld for the stiffener (on each side)
+        l_weld_st = l_st  # length of weld provided along the length of the stiffener
+
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            w_weld_st = w_st  # length of weld to be provided along the width of the stiffener
+            z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
+        else:
+            h_weld_st = h_st  # length of weld provided along the height of the stiffener
+            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
+
+        # Check for Moment in stiffener
+
+        # Calculating the eccentricity (e) of the bolt group
+
+        if uiObj["Member"]["Connectivity"] == "Extended one way" or uiObj["Member"]["Connectivity"] == "Extended both ways":
+            if number_of_bolts == 6 or 8 or 12 or 16:
+                e = h_st - end_dist_mini
+            elif number_of_bolts == 10 or 20:
+                e = h_st - end_dist_mini - (pitch_distance_1_2 / 2)
+        else:
+            if number_of_bolts == 4:
+                e = pitch_dist_min
+                s = beam_tf + p_fi + pitch_dist_min  # s is the distance of the stiffener from the outer edge of the beam flange to the outer edge of the stiffener plate
+            elif number_of_bolts == 6:
+                e = pitch_dist_min + (pitch_distance_1_2 / 2)
+                s = beam_tf + p_fi + pitch_distance_1_2 + pitch_dist_min
+
+        # Moment in stiffener (M_st)
+        M_st = v_st * e
+
+        # Moment capacity of stiffener
+        M_capacity_st = ((l_st ** 2 * thickness_stiffener_provided * stiffener_fy) / (4 * 1.10)) * 10 ** -3
+
+        if M_st > M_capacity_st:
             design_status = False
-            logger.error(": The thickness of stiffener is not sufficient")
-            logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
-            logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
-            logger.info(": Increase the thickness of stiffener")
+            logger.error(": The moment in stiffener exceeds its moment carrying capacity")
+            logger.warning(": The moment carrying capacity of the stiffener is % 2.2f mm" % M_capacity_st)
+            logger.info(": Increase the length and/or thickness of the stiffener")
+
+        # Check in weld for the combined forces
+
+        f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
+        q = v_st / (2 * l_weld_st * k * z_weld_st)
+        f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
+
+        if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
+
+            # updating weld size
+
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                z_weld_st = max(weld_thickness_web, thickness_stiffener_provided)  # updated size of weld for stiffener at web
+            else:
+                z_weld_st = max(weld_thickness_flange, thickness_stiffener_provided)  # updated size of weld for stiffener at flange
+
+            f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
+            q = v_st / (2 * l_weld_st * k * z_weld_st)
+            f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
+
+            if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
+                design_status = False
+                logger.error(": The stress in the weld at stiffener subjected to a combination of normal and shear stress exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed stress in the weld under combined loading is % 2.2f N/mm^2 (Cl. 10.5.10, IS 800:2007)" % f_e)
+                logger.info(": Increase the size of weld at the stiffener")
+        else:
+            pass
+
+
+        # Check of stiffener against local buckling
+        # E = 2 * 10 ** 5  # MPa
+        # ts_required = 1.79 * h_st * stiffener_fy / E  # mm
+
+        # if thickness_stiffener_provided < ts_required:
+        #     design_status = False
+        #     logger.error(": The thickness of stiffener is not sufficient")
+        #     logger.error(": The stiffener might buckle locally (AISC Design guide 16)")
+        #     logger.warning(": Minimum required thickness of stiffener to prevent local bucklimg is % 2.2f mm" % ts_required)
+        #     logger.info(": Increase the thickness of stiffener")
+
     else:
         design_status = False
         logger.error(": The number of bolts exceeds 20")
@@ -1670,41 +2209,70 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if number_of_bolts == 8:
-                outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                elif number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 12:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+                elif number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                elif number_of_bolts == 10:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 16:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 20:
-                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
+
+            else:
+                if number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 12:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 16:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 20:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
 
             outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            outputobj['Bolt']['Lv'] = float(l_v)
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+                outputobj['Bolt']['Lv'] = float(l_v)
+            else:
+                l_v = p_fi
+                outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
             outputobj['Plate'] = {}
@@ -1734,9 +2302,26 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
+
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+
+            # ===================  CAD ===================
+            # if uiObj["Member"]["Connectivity"] == "Extended one way":
+            if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush": #TOdo added by darshan
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
         elif end_plate_height != 0 and end_plate_width == 0:
@@ -1773,39 +2358,70 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if number_of_bolts == 8:
-                outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                elif number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 12:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+                elif number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                elif number_of_bolts == 10:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 16:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 20:
-                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+
+            else:
+                if number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 12:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 16:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 20:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
 
             outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            outputobj['Bolt']['Lv'] = float(l_v)
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+                outputobj['Bolt']['Lv'] = float(l_v)
+            else:
+                l_v = p_fi
+                outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
             outputobj['Plate'] = {}
@@ -1833,9 +2449,25 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
+
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -1872,39 +2504,70 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if number_of_bolts == 8:
-                outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                elif number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 12:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+                elif number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                elif number_of_bolts == 10:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 16:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 20:
-                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+
+            else:
+                if number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 12:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 16:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 20:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
 
             outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            outputobj['Bolt']['Lv'] = float(l_v)
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+                outputobj['Bolt']['Lv'] = float(l_v)
+            else:
+                l_v = p_fi
+                outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
             outputobj['Plate'] = {}
@@ -1932,9 +2595,25 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
+
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -1971,39 +2650,70 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Bolt']['EndMini'] = end_dist_mini
             outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if number_of_bolts == 8:
-                outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                if number_of_bolts == 4:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                elif number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 12:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+
+            elif uiObj["Member"]["Connectivity"] == "Extended one way":
+                if number_of_bolts == 6:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+                elif number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                elif number_of_bolts == 10:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 16:
-                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-            elif number_of_bolts == 20:
-                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+
+            else:
+                if number_of_bolts == 8:
+                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 12:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 16:
+                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
+                elif number_of_bolts == 20:
+                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                    outputobj['Bolt']['PryingForce'] = Q
 
             outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
             outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
             outputobj['Bolt']['End'] = float(end_dist_mini)
             outputobj['Bolt']['Edge'] = float(edge_dist_mini)
             # ===================  CAD ===================
-            outputobj['Bolt']['Lv'] = float(l_v)
+            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+                outputobj['Bolt']['Lv'] = float(l_v)
+            else:
+                l_v = p_fi
+                outputobj['Bolt']['Lv'] = float(l_v)
             # ===================  CAD ===================
 
             outputobj['Plate'] = {}
@@ -2032,9 +2742,25 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
             outputobj['Stiffener'] = {}
-            outputobj['Stiffener']['Height'] = round(h_st, 3)
+            if uiObj["Member"]["Connectivity"] == "Flush":
+                outputobj['Stiffener']['Height'] = round(w_st, 3)
+                outputobj['Stiffener']['Location'] = int(s)
+            else:
+                outputobj['Stiffener']['Height'] = round(h_st, 3)
+
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+
+            # ===================  CAD ===================
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                pass
+            # ===================  CAD ===================
     else:
         outputobj = {}
         outputobj['Bolt'] = {}
@@ -2078,7 +2804,11 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Bolt']['End'] = float(end_dist_mini)
         outputobj['Bolt']['Edge'] = float(edge_dist_mini)
         # ===================  CAD ===================
-        outputobj['Bolt']['Lv'] = float(l_v)
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+            outputobj['Bolt']['Lv'] = float(l_v)
+        else:
+            l_v = p_fi
+            outputobj['Bolt']['Lv'] = float(l_v)
         # ===================  CAD ===================
 
         outputobj['Plate'] = {}
@@ -2107,9 +2837,25 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
         outputobj['Stiffener'] = {}
-        outputobj['Stiffener']['Height'] = 0
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            outputobj['Stiffener']['Height'] = 0
+            outputobj['Stiffener']['Location'] = 0
+        else:
+            outputobj['Stiffener']['Height'] = 0
+
         outputobj['Stiffener']['Length'] = 0
         outputobj['Stiffener']['Thickness'] = 0
+        outputobj['Stiffener']['NotchSize'] = 0
+        outputobj['Stiffener']['WeldSize'] = 0
+        outputobj['Stiffener']['Moment'] = 0
+        outputobj['Stiffener']['MomentCapacity'] = 0
+
+        # ===================  CAD ===================
+        if uiObj["Member"]["Connectivity"] == "Extended one way":
+            outputobj['Plate']['Projection'] = 0
+        else:
+            pass
+        # ===================  CAD ===================
 
     ###########################################################################
     # End of Output dictionary

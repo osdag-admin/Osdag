@@ -527,6 +527,7 @@ class IS800_2007(object):
         Reference:
         IS 800:2007, cl 7.6.1.5
     """
+
         SR_0 = K_L/r_min
         SR_eff = 1.05*SR_0
 
@@ -643,20 +644,19 @@ class IS800_2007(object):
     def cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, Restraint_Condition_1, Restraint_Condition_2,
                                                               Loading_condition):
         """
-            Calculate effective length for catiliver beam of projecting length L as per cl.8.3.3
+            Calculate effective length for cantilever beam of projecting length L as per cl.8.3.3
 
             Args:
-                L - Projecting Length of cantiliver beam in mm (float)
-                D -  Overall depth of he beam in mm (float)
+                L - Projecting Length of cantilever beam in mm (float)
 
                 Restrained_condition - Either "At support" or "At Top"
 
                 Restraint_Condition_1- "At support"
                 Restraint_Condition_2- "At Top"
 
-                At_support -  Either "continous, with lateral restraint to top"
-                              or "continous, with  partial torsional restraint"
-                              or "continous, with lateral and tosional restraint "
+                At_support -  Either "continuous, with lateral restraint to top"
+                              or "continuous, with  partial torsional restraint"
+                              or "continuous, with lateral and torsional restraint "
                               or "Restrained laterally,torsionally and against rotation on plan "
 
                 At_top - Either  "free"
@@ -664,10 +664,10 @@ class IS800_2007(object):
                         or "Torsional restraint"
                         or  "Lateral and torsional restraint"
 
-                Loading_condition - Either "Normal" or  "Destablizing"
+                Loading_condition - Either "Normal" or  "Destabilizing"
 
             Returns:
-                L_LT =  cl_8_3_3_Table_16_Efective_length_for_cantiliver_beam
+                L_LT =  cl_8_3_3_Table_16_Effective_length_for_cantilever_beam
             Note:
                 References:
                 IS800:2007, Table 16 (cl 8.3.3)
@@ -700,7 +700,7 @@ class IS800_2007(object):
                     return 2.0 * L
                 else:
                     return 5.0 * L
-            if Restraint_Condition_2 == "Lateral restraint to top flage":
+            if Restraint_Condition_2 == "Lateral restraint to top flange":
                 if Loading_condition == "Normal":
                     return 1.8 * L
                 else:
@@ -710,17 +710,17 @@ class IS800_2007(object):
                     return 1.6 * L
                 else:
                     return 3.0 * L
-                if Restraint_Condition_2 == " Lateral and Torsional restraint":
-                    if Loading_condition == "Normal":
-                        return 1.4 * L
-                    else:
-                        return 2.4 * L
+            if Restraint_Condition_2 == "Lateral and Torsional restraint":
+                if Loading_condition == "Normal":
+                    return 1.4 * L
+                else:
+                    return 2.4 * L
         if Restraint_Condition_1 == "Continuous,with lateral and torsional restraint":
             if Restraint_Condition_2 == "Free":
                 if Loading_condition == "Normal":
                     return 1.0 * L
                 else:
-                    return 2.5 * l
+                    return 2.5 * L
             if Restraint_Condition_2 == "Lateral restraint to top flage":
                 if Loading_condition == "Normal":
                     return 0.9 * L
@@ -731,7 +731,7 @@ class IS800_2007(object):
                     return 0.8 * L
                 else:
                     return 1.5 * L
-            if Restraint_Condition_2 == " Lateral and Torsional restraint":
+            if Restraint_Condition_2 == "Lateral and Torsional restraint":
                 if Loading_condition == "Normal":
                     return 0.7 * L
                 else:
@@ -762,24 +762,25 @@ class IS800_2007(object):
                                                                       Restraint_Condition_2, Loading_Condition):
         """
             Calculate effective length against lateral torsional buckling for simply supported Beams and girders
-            where no lateral restraint  to the compression falnge is provided as per cl.8.3.1
+            where no lateral restraint  to the compression flange is provided as per cl.8.3.1
 
             Args:
-                L -  Span of simply suppotred beams and girders in mm (float)
+                L -  Span of simply supported beams and girders in mm (float)
                 D -  Overall depth of he beam in mm (float)
 
-                Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
+                Restraint_Condition - Either "Torsional Restraint" or "warping Restraint"
                 Restraint_Condition_1- "Torsional Restraint"
-                Restraint_Condition_2- "Warping_Restraint"
+                Restraint_Condition_2- "Warping Restraint"
 
-                "Torsional Restrained" - Either "Fully_resrtrained" or
-                                        "Partially_restrained_by_bottom_flange_support_condition" or
-                                        "Partially_restrained_by_bottom_flange_support_condition"
+                "Torsional Restrained" - Either "Fully restrained" or
+                                        "Partially restrained by bottom flange support connection" or
+                                        "Partially restrained by bottom flange bearing support"
 
-                "Warping_Restraint" - Either "Both_flange_fully_restrained" or
-                                     "compression_flange_fully_restrained" or
-                                     "Compression_flange_partially_restrained" or
-                                     "Warping_not_restrained_in_both_flange"
+                "Warping_Restraint" - Either "Both flanges fully restrained" or
+                                     "Both flanges partially restrained" or
+                                     "Compression flange fully restrained" or
+                                     "Compression flange partially restrained" or
+                                     "Warping not restrained in both flange"
 
 
                 Loading_Condition  - Either "Normal" or " Destabilizing"
@@ -812,23 +813,23 @@ class IS800_2007(object):
                     return 0.85 * L
                 else:
                     return 1.00 * L
-                    if Restraint_Condition_2 == "Wraping not restrained in both flanges":
-                        if Loading_Condition == "Normal":
-                            return 1.00 * L
-                        else:
-                            return 1.20 * L
-                if Restraint_Condition_1 == "Partially restrained by bottom flange support connection":
-                    if Restraint_Condition_2 == "Wraping not restrained in both flages":
-                        if Loading_Condition == "Normal":
-                            return 1.00 * L + 2 * D
-                        else:
-                            return 1.20 * L + 2 * D
-                if Restraint_Condition_1 == "Partially restrained by bottom flage bearing support":
-                    if Restraint_Condition_2 == "Wraping not restrained in both flages":
-                        if Loading_Condition == "Normal":
-                            return 1.2 * L + 2 * D
-                        else:
-                            return 1.4 * L + 2 * D
+            if Restraint_Condition_2 == "Warping not restrained in both flanges":
+                if Loading_Condition == "Normal":
+                    return 1.00 * L
+                else:
+                    return 1.20 * L
+        if Restraint_Condition_1 == "Partially restrained by bottom flange support connection":
+                if Restraint_Condition_2 == "Warping not restrained in both flanges":
+                    if Loading_Condition == "Normal":
+                        return 1.00 * L + 2 * D
+                    else:
+                        return 1.20 * L + 2 * D
+        if Restraint_Condition_1 == "Partially restrained by bottom flange bearing support":
+                if Restraint_Condition_2 == "Warping not restrained in both flanges":
+                    if Loading_Condition == "Normal":
+                        return 1.2 * L + 2 * D
+                    else:
+                        return 1.4 * L + 2 * D
 
     def cl_8_3_Effective_length_against_torsional_restraint(L, D, Beam_type, Restraint_Condition_1,
                                                             Restraint_Condition_2,

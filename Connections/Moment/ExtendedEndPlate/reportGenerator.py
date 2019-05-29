@@ -229,41 +229,82 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         stiffener_height = str(float(outObj['Stiffener']['Height']))
 
 
+    if uiObj["Member"]["Connectivity"] == "Flush":
+        if float(number_of_bolts) == float(4):
+            pitch_distance = str(float(outObj["Bolt"]["Pitch"]))
+        elif float(number_of_bolts) == float(6):
+            pitch_distance_1_2 = str(float(outObj["Bolt"]["Pitch12"]))
+            pitch_distance_2_3 = str(float(outObj["Bolt"]["Pitch23"]))
 
+    elif uiObj["Member"]["Connectivity"] == "Extended one way":
+        if float(number_of_bolts) == float(6):
+            pitch_distance = str(float(outObj["Bolt"]["Pitch23"]))
+        elif float(number_of_bolts) == float(8):
+            pitch_distance_2_3 = str(float(outObj["Bolt"]["Pitch23"]))
+            pitch_distance_3_4 = str(float(outObj["Bolt"]["Pitch34"]))
+        elif float(number_of_bolts) == float(10):
+            pitch_distance_1_2 = str(float(outObj["Bolt"]["Pitch12"]))
+            pitch_distance_3_4 = str(float(outObj["Bolt"]["Pitch34"]))
+            pitch_distance_4_5 = str(float(outObj["Bolt"]["Pitch45"]))
 
-    # Calling pitch distance values from Output dict of calc file
-    if float(number_of_bolts) == float(8):
-        pitch_distance = str(float(outObj['Bolt']['Pitch']))
-        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
-        prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif float(number_of_bolts) == float(12):
-        pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
-        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
-        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
-        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
-        prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif float(number_of_bolts) == float(16):
-        pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
-        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
-        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
-        pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch56']))
-        pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
-        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
-        prying_force = str(float(outObj['Bolt']['PryingForce']))
-    elif float(number_of_bolts) == float(20):
-        pitch_distance_1_2 = str(float(outObj['Bolt']['Pitch12']))
-        pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
-        pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
-        pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch56']))
-        pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
-        pitch_distance_7_8 = str(float(outObj['Bolt']['Pitch78']))
-        pitch_distance_9_10 = str(float(outObj['Bolt']['Pitch910']))
-        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
-        prying_force = str(float(outObj['Bolt']['PryingForce']))
     else:
-        pitch_distance = str(float(outObj['Bolt']['Pitch']))
-        tension_critical = str(float(outObj['Bolt']['TensionCritical']))
-        prying_force = str(float(outObj['Bolt']['PryingForce']))
+        if float(number_of_bolts) == float(8):
+            pitch_distance = str(float(outObj["Bolt"]["Pitch"]))
+        elif float(number_of_bolts) == float(12):
+            pitch_distance_2_3 = str(float(outObj["Bolt"]["Pitch23"]))
+            pitch_distance_3_4 = str(float(outObj["Bolt"]["Pitch34"]))
+            pitch_distance_4_5 = str(float(outObj["Bolt"]["Pitch45"]))
+        elif float(number_of_bolts) == float(16):
+            pitch_distance_2_3 = str(float(outObj["Bolt"]["Pitch23"]))
+            pitch_distance_3_4 = str(float(outObj["Bolt"]["Pitch34"]))
+            pitch_distance_4_5 = str(float(outObj["Bolt"]["Pitch45"]))
+            pitch_distance_5_6 = str(float(outObj["Bolt"]["Pitch56"]))
+            pitch_distance_6_7 = str(float(outObj["Bolt"]["Pitch67"]))
+        elif float(number_of_bolts) == float(20):
+            pitch_distance_1_2 = str(float(outObj["Bolt"]["Pitch12"]))
+            pitch_distance_3_4 = str(float(outObj["Bolt"]["Pitch34"]))
+            pitch_distance_4_5 = str(float(outObj["Bolt"]["Pitch45"]))
+            pitch_distance_5_6 = str(float(outObj["Bolt"]["Pitch56"]))
+            pitch_distance_6_7 = str(float(outObj["Bolt"]["Pitch67"]))
+            pitch_distance_7_8 = str(float(outObj["Bolt"]["Pitch78"]))
+            pitch_distance_9_10 = str(float(outObj["Bolt"]["Pitch910"]))
+
+    tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    prying_force = str(float(outObj['Bolt']['PryingForce']))
+
+    # # Calling pitch distance values from Output dict of calc file
+    # if float(number_of_bolts) == float(8):
+    #     pitch_distance = str(float(outObj['Bolt']['Pitch']))
+    #     tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    #     prying_force = str(float(outObj['Bolt']['PryingForce']))
+    # elif float(number_of_bolts) == float(12):
+    #     pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
+    #     pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
+    #     pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
+    #     tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    #     prying_force = str(float(outObj['Bolt']['PryingForce']))
+    # elif float(number_of_bolts) == float(16):
+    #     pitch_distance_2_3 = str(float(outObj['Bolt']['Pitch23']))
+    #     pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
+    #     pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
+    #     pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch56']))
+    #     pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
+    #     tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    #     prying_force = str(float(outObj['Bolt']['PryingForce']))
+    # elif float(number_of_bolts) == float(20):
+    #     pitch_distance_1_2 = str(float(outObj['Bolt']['Pitch12']))
+    #     pitch_distance_3_4 = str(float(outObj['Bolt']['Pitch34']))
+    #     pitch_distance_4_5 = str(float(outObj['Bolt']['Pitch45']))
+    #     pitch_distance_5_6 = str(float(outObj['Bolt']['Pitch56']))
+    #     pitch_distance_6_7 = str(float(outObj['Bolt']['Pitch67']))
+    #     pitch_distance_7_8 = str(float(outObj['Bolt']['Pitch78']))
+    #     pitch_distance_9_10 = str(float(outObj['Bolt']['Pitch910']))
+    #     tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    #     prying_force = str(float(outObj['Bolt']['PryingForce']))
+    # else:
+    #     pitch_distance = str(float(outObj['Bolt']['Pitch']))
+    #     tension_critical = str(float(outObj['Bolt']['TensionCritical']))
+    #     prying_force = str(float(outObj['Bolt']['PryingForce']))
 
     # Calls from connection calculations file
     k_h = str(float(ConnectionCalculations.calculate_k_h(bolt_hole_type)))
@@ -612,13 +653,136 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Pitch Distance (p) (mm)", pitch_mini]
+    row = [2, "Cross-centre gauge (<i>g</i><sup>'</sup>) (mm)", cross_centre_gauge]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Cross-centre gauge (<i>g</i><sup>'</sup>) (mm)", cross_centre_gauge]
+
+    row = [1, "Pitch Distance (p) (mm)", ""]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+
+    if uiObj["Member"]["Connectivity"] == "Flush":
+        if float(number_of_bolts) == float(4):
+            row = [2, "Pitch", pitch_distance]
+        elif float(number_of_bolts) == float(4):
+            row = [2, "Pitch-1,2", pitch_distance_1_2]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-2,3", pitch_distance_2_3]
+    elif uiObj["Member"]["Connectivity"] == "Extended one way":
+        if float(number_of_bolts) == float(6):
+            row = [2, "Pitch-2,3", pitch_distance]
+        elif float(number_of_bolts) == float(8):
+            row = [2, "Pitch-2,3", pitch_distance_2_3]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch_distance_3_4]
+        elif float(number_of_bolts) == float(10):
+            row = [2, "Pitch-1,2", pitch_distance_1_2]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch_distance_3_4]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch_distance_4_5]
+    else:
+        if float(number_of_bolts) == float(8):
+            row = [2, "Pitch", pitch_distance]
+        elif float(number_of_bolts) == float(12):
+            row = [2, "Pitch-2,3", pitch_distance_2_3]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch_distance_3_4]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch_distance_4_5]
+        elif float(number_of_bolts) == float(16):
+            row = [2, "Pitch-2,3", pitch_distance_2_3]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch_distance_3_4]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch_distance_4_5]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-5,6", pitch_distance_5_6]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-6,7", pitch_distance_6_7]
+        elif float(number_of_bolts) == float(16):
+            row = [2, "Pitch 12", pitch_distance_1_2]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch_distance_3_4]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch_distance_4_5]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-5,6", pitch_distance_5_6]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-6,7", pitch_distance_6_7]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-7,8", pitch_distance_7_8]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-9,10", pitch_distance_9_10]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -1265,10 +1429,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('tr')
 
     if float(gauge_distance) < float(gauge_mini) or float(gauge_distance) > float(gauge_max):
-        row = [0, "Bolt gauge (mm)"," &#8805; 2.5 * d = " + gauge_mini + ", &#8804; min(32 * t, 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",gauge_distance, " <p align=left style=color:red><b>Fail</b></p> "]
+        row = [0, "Bolt pitch (mm)"," &#8805; 2.5 * d = " + gauge_mini + ", &#8804; min(32 * t, 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",gauge_distance, " <p align=left style=color:red><b>Fail</b></p> "]
 
     else:
-        row = [0, "Bolt gauge (mm)"," &#8805; 2.5 * d = " + gauge_mini + ", &#8804; min(32 * t, 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",gauge_distance, " <p align=left style=color:green><b>Pass</b></p> "]
+        row = [0, "Bolt pitch (mm)"," &#8805; 2.5 * d = " + gauge_mini + ", &#8804; min(32 * t, 300) = " + gauge_max + " <br> [cl. 10.2.2 & cl. 10.2.3]",gauge_distance, " <p align=left style=color:green><b>Pass</b></p> "]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1613,7 +1777,11 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
-    row = [0, "Height (mm)", "", stiffener_height, ""]
+    if uiObj["Member"]["Connectivity"] == "Flush":
+        row = [0, "Height (mm)", "", stiffener_width, ""]
+    else:
+        row = [0, "Height (mm)", "", stiffener_height, ""]
+
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

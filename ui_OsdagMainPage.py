@@ -470,12 +470,12 @@ class Ui_MainWindow(object):
         self.gridLayout_7 = QtWidgets.QGridLayout(self.tab2_momentconnection)
         self.gridLayout_7.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_7.setObjectName("gridLayout_7")
-        spacerItem15 = QtWidgets.QSpacerItem(20, 102, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_7.addItem(spacerItem15, 0, 2, 1, 1)
-        spacerItem16 = QtWidgets.QSpacerItem(20, 102, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_7.addItem(spacerItem16, 0, 6, 1, 1)
-        spacerItem17 = QtWidgets.QSpacerItem(87, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout_7.addItem(spacerItem17, 1, 0, 1, 1)
+        #spacerItem15 = QtWidgets.QSpacerItem(10, 52, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        #self.gridLayout_7.addItem(spacerItem15, 0, 2, 1, 1)
+        #spacerItem16 = QtWidgets.QSpacerItem(10, 52, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        #self.gridLayout_7.addItem(spacerItem16, 0, 6, 1, 1)
+        #spacerItem17 = QtWidgets.QSpacerItem(87, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        #self.gridLayout_7.addItem(spacerItem17, 1, 0, 1, 1)
         # spacerItem18 = QtWidgets.QSpacerItem(349, 25, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         # self.gridLayout_7.addItem(spacerItem18, 3, 2, 1, 1)
 
@@ -596,6 +596,8 @@ class Ui_MainWindow(object):
         self.mytabWidget.addTab(self.tab3_trussconnection, "")
         self.horizontalLayout.addWidget(self.mytabWidget)
         self.myStackedWidget.addWidget(self.Connectionpage)
+
+
         self.beamtobeampage = QtWidgets.QWidget()
         self.beamtobeampage.setObjectName("beamtobeampage")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.beamtobeampage)
@@ -687,18 +689,12 @@ class Ui_MainWindow(object):
         self.gridLayout_5.addItem(spacerItem37, 0, 1, 1, 1)
         self.myStackedWidget.addWidget(self.beamtobeampage)
 
-
         self.beamtocolumnpage = QtWidgets.QWidget()
-
         self.beamtocolumnpage.setObjectName("beamtocolumnpage")
         self.gridLayout_bcpage = QtWidgets.QGridLayout(self.beamtocolumnpage)
-
         self.gridLayout_bcpage.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_bcpage.setObjectName("gridLayout_bcpage")
-        self.gridLayout_bc = QtWidgets.QGridLayout()
-        self.gridLayout_bc.setObjectName("gridLayout_bc")
         self.label_10 = QtWidgets.QLabel(self.beamtocolumnpage)
-
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(12)
@@ -706,8 +702,17 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.label_10.setFont(font)
         self.label_10.setObjectName("label_10")
-        self.gridLayout_bc.addWidget(self.label_10, 0, 0, 1, 1)
-
+        self.gridLayout_bcpage.addWidget(self.label_10, 1, 1, 1, 1)
+        spacerItem38 = QtWidgets.QSpacerItem(143, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_bcpage.addItem(spacerItem38, 2, 2, 1, 1)
+        spacerItem39 = QtWidgets.QSpacerItem(20, 358, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_bcpage.addItem(spacerItem39, 4, 2, 1, 1)
+        spacerItem40 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_bcpage.addItem(spacerItem40, 2, 4, 1, 1)
+        spacerItem41 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_bcpage.addItem(spacerItem41, 3, 1, 1, 1)
+        spacerItem42 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_bcpage.addItem(spacerItem42, 3, 3, 1, 1)
         self.rdbtn_endplate_bc = QtWidgets.QRadioButton(self.beamtocolumnpage)
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -719,10 +724,16 @@ class Ui_MainWindow(object):
         self.rdbtn_endplate_bc.setIcon(icon_endplate_bc)
         self.rdbtn_endplate_bc.setIconSize(QtCore.QSize(300, 300))
         self.rdbtn_endplate_bc.setObjectName("rdbtn_endplate_bc")
+        self.gridLayout_bcpage.addWidget(self.rdbtn_endplate_bc, 2, 1, 1, 1)
+        spacerItem43 = QtWidgets.QSpacerItem(382, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_bcpage.addItem(spacerItem43, 5, 0, 1, 2)
 
-        self.gridLayout_bc.addWidget(self.rdbtn_endplate_bc, 1, 0, 1, 1)
-        self.gridLayout_bcpage.addLayout(self.gridLayout_bc, 1, 3, 1, 3)
-
+        spacerItem44 = QtWidgets.QSpacerItem(364, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_bcpage.addItem(spacerItem44, 5, 3, 1, 2)
+        spacerItem45 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_bcpage.addItem(spacerItem45, 2, 0, 1, 1)
+        spacerItem46 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_bcpage.addItem(spacerItem46, 6, 2, 1, 1)
         self.btn_start_3 = QtWidgets.QPushButton(self.beamtocolumnpage)
         self.btn_start_3.setMinimumSize(QtCore.QSize(190, 30))
         self.btn_start_3.setMaximumSize(QtCore.QSize(190, 30))
@@ -744,14 +755,11 @@ class Ui_MainWindow(object):
                                        "color:#ffffff;\n"
                                        "}")
         self.btn_start_3.setObjectName("btn_start_3")
-        self.gridLayout_bcpage.addWidget(self.btn_start_3, 2, 3, 1, 3)
-        #spacerItem41 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        #self.gridLayout_bcpage.addItem(spacerItem41, 0, 1, 1, 1)
+        self.gridLayout_bcpage.addWidget(self.btn_start_3, 5, 2, 1, 1)
 
+        spacerItem47 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.gridLayout_bcpage.addItem(spacerItem47, 0, 1, 1, 1)
         self.myStackedWidget.addWidget(self.beamtocolumnpage)
-
-
-
 
         self.page = QtWidgets.QWidget()
         self.page.setObjectName("page")
@@ -1061,8 +1069,13 @@ class Ui_MainWindow(object):
         self.label_7.setText(_translate("MainWindow", "End Plate Connection"))
         self.label_10.setText(_translate("MainWindow", "End Plate Connection"))
         self.btn_start_2.setText(_translate("MainWindow", "Start"))
-        self.btn_start_3.setText(_translate("MainWindow", "Start"))
+        self.btn_start_2.setToolTip(_translate("MainWindow", "Enter"))
         self.btn_start_2.setShortcut(_translate("MainWindow", "Return"))
+
+        self.btn_start_3.setText(_translate("MainWindow", "Start"))
+        self.btn_start_3.setToolTip(_translate("MainWindow", "Enter"))
+        self.btn_start_3.setShortcut(_translate("MainWindow", "Return"))
+
         self.label.setText(_translate("MainWindow", "Cover Plate Connection"))
         self.btn_connection.setToolTip(_translate("MainWindow", "Ctrl+Shift+C"))
         self.btn_connection.setText(_translate("MainWindow", "Connection"))

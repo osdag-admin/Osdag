@@ -527,7 +527,7 @@ class CADFillet(object):
                                          self.beamRight.D / 2 - self.loc])
         stiffener1_u2_uDir = numpy.array([-1.0, 0.0, 0.0])
         stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.bbWeldstiff1_l2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+        self.bbWeldstiff1_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
 
     def create_bbWeldstiff1_l1(self):
         gap = self.beamLeft.length
@@ -618,12 +618,12 @@ class CADFillet(object):
         self.bbWeldstiff4_u1.place(stiffenerOrigin1_u1, stiffener1_u1_uDir, stiffener1_u1_wDir)
 
     def create_bbWeldstiff4_u2(self):
-        gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L
-        stiffenerOrigin1_u2 = numpy.array([-self.beamLeft.t / 2, gap,
+        gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L22
+        stiffenerOrigin1_u2 = numpy.array([self.beamLeft.t / 2, gap,
                                            self.beamRight.D / 2 - self.loc])
-        stiffener1_u2_uDir = numpy.array([-1.0, 0.0, 0.0])
+        stiffener1_u2_uDir = numpy.array([0.0, 0.0, 1.0])
         stiffener1_u2_wDir = numpy.array([0.0, 1.0, 0.0])
-        self.bbWeldstiff4_2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
+        self.bbWeldstiff4_u2.place(stiffenerOrigin1_u2, stiffener1_u2_uDir, stiffener1_u2_wDir)
 
     def create_bbWeldstiff4_l1(self):
         gap = self.beamLeft.length
@@ -634,11 +634,11 @@ class CADFillet(object):
         self.bbWeldstiff4_l1.place(stiffenerOrigin1_l1, stiffener1_l1_uDir, stiffener1_l1_wDir)
 
     def create_bbWeldstiff4_l2(self):
-        gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L22
-        stiffenerOrigin1_l2 = numpy.array([-self.beamLeft.t / 2, gap,
-                                           self.beamRight.D / 2 - self.loc])
-        stiffener1_l2_uDir = numpy.array([-1.0, 0.0, 0.0])
-        stiffener1_l2_wDir = numpy.array([0.0, 1.0, 0.0])
+        gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+                                           self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
+        stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
+        stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
         self.bbWeldstiff4_l2.place(stiffenerOrigin1_l2, stiffener1_l2_uDir, stiffener1_l2_wDir)
 
 

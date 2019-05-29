@@ -389,18 +389,18 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     if status == 'True':
         if uiObj["Member"]["Connectivity"] == "Extended both ways":
-            row = [1, "Beam to Beam Extended End Plate Splice", "<p align=left style=color:green><b>Pass</b></p>"]
+            row = [1, "Beam to Beam Extended End Plate Splice Connection", "<p align=center style=color:green><b>Pass</b></p>"]
         elif uiObj["Member"]["Connectivity"] == "Extended one way":
-            row = [1, "Beam to Beam Extended One Way End Plate Splice", "<p align=left style=color:green><b>Pass</b></p>"]
+            row = [1, "Beam to Beam Extended One Way End Plate Splice Connection", "<p align=center style=color:green><b>Pass</b></p>"]
         else:
-            row = [1, "Beam to Beam Extended Flush End Plate Splice", "<p align=left style=color:green><b>Pass</b></p>"]
+            row = [1, "Beam to Beam Extended Flush End Plate Splice Connection", "<p align=center style=color:green><b>Pass</b></p>"]
     else:
         if uiObj["Member"]["Connectivity"] == "Extended both ways":
-            row = [1, "Beam to Beam Extended End Plate Splice", "<p align=left style=color:red><b>Fail</b></p>"]
+            row = [1, "Beam to Beam Extended End Plate Splice Connection", "<p align=center style=color:red><b>Fail</b></p>"]
         elif uiObj["Member"]["Connectivity"] == "Extended one way":
-            row = [1, "Beam to Beam Extended One Way End Plate Splice","<p align=left style=color:red><b>Fail</b></p>"]
+            row = [1, "Beam to Beam Extended One Way End Plate Splice Connection","<p align=center style=color:red><b>Fail</b></p>"]
         else:
-            row = [1, "Beam to Beam Extended Flush End Plate Splice","<p align=left style=color:red><b>Fail</b></p>"]
+            row = [1, "Beam to Beam Extended Flush End Plate Splice Connection","<p align=center style=color:red><b>Fail</b></p>"]
 
 
 
@@ -420,8 +420,8 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     #         row = [1, "Beam to Beam Extended End Plate Splice", "<p align=left style=color:red><b>Fail</b></p>"]
 
     rstr += t('tr')
-    rstr += t('td class="detail1 "') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail1"') + row[2] + t('/td')
+    rstr += t('td class="detail1" align="justify"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail1" align="justify"') + row[2] + t('/td')
     rstr += t('/tr')
 
     row = [0, "Connection Properties", " "]

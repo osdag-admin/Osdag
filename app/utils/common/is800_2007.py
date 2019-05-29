@@ -18,6 +18,27 @@ class IS800_2007(object):
     """    SECTION  2     MATERIALS   """
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
+    # Table 3 Maximum slendernesss ratio
+    """ Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 
+        Slenderness ratio=KL/r
+        KL:effective length of the member
+        r:appropriate radius of gyration based on effective section
+        Member types relating cases:
+        case1:A member carrying compressive loads from dead loads and imposed loads
+        case2:A tension member in which a reversal of direct stress occur dueto loads other than wind or seismic loads
+        case3:A member subjected to compression forces resulting only from combination with wind/earthquake actions,
+              provided deformations does not adversely affect the stress in any part of the structure
+        case4:Compression flange of a beam  against lateral torsional buckling
+        case5:A member normally acting as tie in a roof truss or a bracing system not considered effective when
+              when subjected to possible reversal of stress into compression resulting from action of wind or earthquake 
+               forces
+        case6:Members always under tension(other than pre-tensioned members)"""
+     cl_3.8_Table_3={"case1":180,
+                     "case2":180,
+                     "case3":250,
+                     "case4":300,
+                     "case5":350,
+                     "case6":400 }
     # ==========================================================================
     """    SECTION  4     METHODS OF STRUCTURAL ANALYSIS   """
     # ==========================================================================

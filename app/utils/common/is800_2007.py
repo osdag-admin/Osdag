@@ -38,57 +38,55 @@ class IS800_2007(object):
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """
 
 
-# DESIGN OF TENSION MEMBER
-# 6.1 Tension member
-def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
-    """
+    # DESIGN OF TENSION MEMBER
+    # 6.1 Tension member
+    def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
+        """
         Calculation of Design Strength of the member as per cl.6.1
         Args:
-            T_d:  design strength of the number under axial tension in N (float),
             T_dg: design strength due to yielding of gross section in N (float),
             T_dn: design repture strength of critical section in N (float),
             T_db: design strength due to block shear in N (float)
 
         Return:
-            T_d= min( T_dg, T_dn, T_db)
-
+            T_d:  design strength of the number under axial tension in N (float),
         Note:
             References:
             IS800:2007,cl.6.1
-    """
-    T_d = min(T_dg, T_dn, T_db)
-    return T_d
+        """
+        T_d = min(T_dg, T_dn, T_db)
+        return T_d
 
 
-# cl.6.2 Design Strength due to yielding of Gross Section
+    # cl.6.2 Design Strength due to yielding of Gross Section
 
-def cl_6_2_Design_strength_of_member_due_to_yielding_of_gross_section(A_g, f_y):
-    """
-    Calculate the design strength due to yielding of gross section as per cl.6.2
-    Args:
-        A_g: Gross area of cross section[in sq.mm](float)
-        f_y: Yield stree of the material in Mpa (float)
+    def cl_6_2_Design_strength_of_member_due_to_yielding_of_gross_section(A_g, f_y):
+        """
+        Calculate the design strength due to yielding of gross section as per cl.6.2
+        Args:
+            A_g: Gross area of cross section[in sq.mm](float)
+            f_y: Yield stree of the material in Mpa (float)
 
-    Return:
-        Design strength of member due to yielding of gross section in N(float)
-
-
-    Note:
-        Reference:
-         IS 800:2007, cl.6.2
-    """
-
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    T_dg = A_g * f_y / gamma_m0
-    return T_dg
+        Return:
+            Design strength of member due to yielding of gross section in N(float)
 
 
-# cl.6.3 Design Strength Due to Repture of Critical Section
+        Note:
+            Reference:
+            IS 800:2007, cl.6.2
+        """
 
-# cl.6.3.1 Plates
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        T_dg = A_g * f_y / gamma_m0
+        return T_dg
 
-def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
-    """
+
+    # cl.6.3 Design Strength Due to Repture of Critical Section
+
+    # cl.6.3.1 Plates
+
+    def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
+        """
         Calculate the design strength in tension of a plate as per cl.6.3.1
         Args:
             A_n: net effective area of the member[in sq.mm](float)
@@ -106,22 +104,22 @@ def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
         Note:
             Reference:
             IS 800:2007, cl.6.3.1
-    """
+        """
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    sum_value = 0
-    for i in range(n - 1):
-        sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        sum_value = 0
+        for i in range(n - 1):
+            sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
 
-    A_n = (b - n * d_h + sum_value) * t
-    T_dn = 0.9 * A_n * f_u / gamma_m1
-    return T_dn
+        A_n = (b - n * d_h + sum_value) * t
+        T_dn = 0.9 * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.2 Threaded Rods
+    # cl.6.3.2 Threaded Rods
 
-def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
-    """
+    def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
+        """
         Calculate the design strength of threaded rods in tension as per cl.6.3.2
 
         Args:
@@ -135,17 +133,17 @@ def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
         Note:
             Reference:
             IS800:2007, cl.6.3.2
-    """
+        """
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_dn = 0.9 * A_n * f_u / gamma_m1
-    return T_dn
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = 0.9 * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.3 Single Angles
+    # cl.6.3.3 Single Angles
 
-def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, t, f_y, b_s, L_c, A_go):
-    """
+    def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, t, f_y, b_s, L_c, A_go):
+        """
         Calculation of design strenth of an angle connected through one leg as per cl.6.3.3
 
         Args:
@@ -167,20 +165,20 @@ def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, 
                 Reference:
                 IS800:2007, cl.6.3.3
 
-    """
+        """
 
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
-    X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
-    beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
-    T_dn = (0.9 * A_nc * f_u / gamma_m1) / (beta * A_go * f_y / gamma_m0)
-    return T_dn
+        X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
+        beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
+        T_dn = (0.9 * A_nc * f_u / gamma_m1) / (beta * A_go * f_y / gamma_m0)
+        return T_dn
 
 
-# For preliminary sizing
-def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
-    """
+    # For preliminary sizing
+    def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
+        """
         Calculation of repture strength of net section for preliminary sizing as per cl.6.3.3
 
         Args:
@@ -194,26 +192,26 @@ def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
         Note:
             Reference:
             IS800:2007,cl.6.3.3
-    """
-    if n in [1, 2]:
-        alpha = 0.6
-    else:
-        if n == 3:
-            alpha = 0.7
+        """
+        if n in [1, 2]:
+            alpha = 0.6
         else:
-            alpha = 0.8
+            if n == 3:
+                alpha = 0.7
+            else:
+                alpha = 0.8
 
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_dn = alpha * A_n * f_u / gamma_m1
-    return T_dn
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_dn = alpha * A_n * f_u / gamma_m1
+        return T_dn
 
 
-# cl.6.3.4 Other Section
+    # cl.6.3.4 Other Section
 
-# cl.6.4.1 Block shear strength of bolted connections
+    # cl.6.4.1 Block shear strength of bolted connections
 
-def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
-    """
+    def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
+        """
         Calculation of the block shear strength of bolted connection as per cl.6.4.1
 
         Args:
@@ -232,15 +230,15 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         Note:
             Reference:
             IS800:2007, cl.6.4.1
-    """
-    gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-    gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
-    T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
+        """
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
 
-    T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
-    T_db = min(T_db1, T_db2)
+        T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
+        T_db = min(T_db1, T_db2)
 
-    return T_db
+        return T_db
 
 
 
@@ -250,17 +248,18 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
 
 
     # clause 7.1 Design Strength
-    # cl7.1.2
+    # cl.7.1.2
+    
+    
 
-    def design_copmressive_strength_of_a_member(A_c, f_cd):
+    def cl_7_1_2_design_copmressive_strength_of_a_member(A_c, f_cd):
         """calculation of design compressive strength
-            Arga:
-                P_d - Design  Compressive Strength of a member (in N)
+            Args:
                 A_c - Effective sectional area (in square mm)
                 f_cd - Design Compressive stress(in N)
 
             Return
-                P_d= f_cd*A_c
+                P_d  - Design  Compressive Strength of a member (in N)
 
             Note:
                 References:
@@ -269,213 +268,10 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
 
         P_d = f_cd * A_c
         return P_d
-
-    print (design_copmressive_strength_of_a_member(200, 150))
-
-    # Calculation of buckling class of given cross-section
-    def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f):
-        """ Defining Buckling Class of Cross-Section
-
-            Args:
-                Cross_section - Either Rolled_I_Section or Welded_Section
-                                or Hot_rolled or cold_Formed or Welded_Box_Section
-                                Channel,Angle,T,Solid,Section or Built-up Member,
-
-                h- Depth of the section in mm,
-                b_f - width of flange in mm,
-                t_f - Thickness of flange in mm
-
-            Return:
-                    Buckling axis and Buckling class
-
-            Note:
-                Reference:
-                IS 800:2007, cl.7.1.2.2, Table_10
-            """
-
-        if Cross_section == "Rolled_I_Section":
-            if h / b_f > 1.2:
-                if t_f <= 40:
-                    Buckling_About_Axis_1 = "z_z"
-                    Buckling_Class_1 = "a"
-                    Buckling_About_Axis_2 = "y_y"
-                    Buckling_Class_2 = "b"
-                    return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                            'Buckling_Class_1': Buckling_Class_1,
-                            'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                            'Buckling_Class_2': Buckling_Class_2
-                            }
-
-                    if t_f == range(40, 100):
-                        for i in t_f:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "b"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "c"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
-
-                    if h / b_f <= 1.2:
-                        if t_f <= 100:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "b"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "c"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
-
-                        elif t_f > 100:
-                            Buckling_About_Axis_1 = "z_z"
-                            Buckling_Class_1 = "d"
-                            Buckling_About_Axis_2 = "y_y"
-                            Buckling_Class_2 = "d"
-                            return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                                    'Buckling_Class_1': Buckling_Class_1,
-                                    'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                                    'Buckling_Class_2': Buckling_Class_2
-                                    }
-        if Cross_section == "Welded_Section":
-            if t_f <= 40:
-                Buckling_About_Axis_1 = "z_z"
-                Buckling_Class_1 = "b"
-                Buckling_About_Axis_2 = "y_y"
-                Buckling_Class_2 = "c"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                        'Buckling_Class_1': Buckling_Class_1,
-                        'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                        'Buckling_Class_2': Buckling_Class_2
-                        }
-
-            elif t_f > 40:
-                Buckling_About_Axis_1 = "z_z"
-                Buckling_Class_1 = "c"
-                Buckling_About_Axis_2 = "y_y"
-                Buckling_Class_2 = "d"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis_1,
-                        'Buckling_Class_1': Buckling_Class_1,
-                        'Buckling_About_Axis_2': Buckling_About_Axis_2,
-                        'Buckling_Class_2': Buckling_Class_2
-                        }
-        if Cross_section == "Hot_rolled":
-            Buckling_Class = a
-            return Buckling_Class
-
-        if Cross_section == "cold_Formed":
-            Buckling_Class = b
-            return Buckling_Class
-
-        if Cross_section == "Welded_Box_Section":
-            if h / t_f < 30:
-                Buckling_About_Axis = "z_z"
-                Buckling_Class = "c"
-                return {'Buckling_About_Axis_1': Buckling_About_Axis,
-                        'Buckling_Class_1': Buckling_Class
-                        }
-            if h / t_w < 30:
-                Buckling_About_Axis = "y_y"
-                Buckling_Class = "c"
-                return {'Buckling_About_Axis': Buckling_About_Axis,
-                        'Buckling_Class': Buckling_Class
-
-                        }
-            else:
-                Buckling_Class = b
-                return Buckling_Class
-
-        if Cross_section == "Channel_Angle_T_Solid_Section":
-            Buckling_Class = c
-            return Buckling_Class
-
-        if Cross_section == "Built_up_member":
-            Buckling_Class = c
-            return Buckling_Class
-
-    # Imperfection Factor, alpha
-
-    cl_7_1_1_cl_7_1_2_1_Table_7 = {
-        "Buckling_class_a": {"alpha": 0.21},
-        "Buckling_class_b": {"alpha": 0.34},
-        "Buckling_class_c": {"alpha": 0.49},
-        "Buckling_class_d": {"alpha": 0.76},
-    }
-
-    print (cl_7_1_2_2_Table_10_Buckling_class_of_cross_section("Rolled_I_Section", 100, 50, 22))
-    print(cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_class_a"]["alpha"])
-
-    # Table 11 Effective Length of Prismatic Compression Members
-
-    def cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
-                                                                   At_other_end_Translation, At_other_end_Rotation, L):
-
-        """ Effective length of Prismatic Compression Member
-
-        Args:
-            Boundry Condition at one end - Either Translation and Rotation
-                                           Translation and Rotation- Restrained or free.
-            Boundry Condition at one end - Either Translation and Rotation
-                                           Translation and Rotation- Restrained or free.
-            L - Length of the Compression member in mm
-
-        Return:
-            K_L - Effective length of Compression Member in mm
-
-        Note:
-            Reference:
-            IS 800:2007, cl.7.2.2, Table_11
-        """
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 2.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Free":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 2.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Free":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 1.0 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Free":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 1.2 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Free":
-                        K_L = 0.8 * L
-                        return K_L
-
-        if At_one_end_Translation == "Restrained":
-            if At_one_end_Rotation == "Restrained":
-                if At_other_end_Translation == "Restrained":
-                    if At_other_end_Rotation == "Restrained":
-                        K_L = 0.65 * L
-                        return K_L
-
-
-
+        
+    
     # cl 7.1.2.1 design compressive stress of axially loaded member
-    def calculation_of_design_compressive_stress(f_y, r, gamma_m0, ):
+    def cl_7_1_2_1_design_compressive_stress(K_L,alpha,E,f_y,r,gamma_m0):
 
         """Calculation of design compressive stress
 
@@ -484,7 +280,7 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
                 alpha - Imperfection factor
                 E - Young's Modulus of Elasticity
                 f_y - Yield Stress
-                r - radius of the section
+                r - radius of gyration
 
             Return:
                 f_cd - Design  strength of compression member
@@ -493,32 +289,131 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
                 Reference:
                 IS 800:2007, cl.7.1.2.1
         """
-        Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
-        K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
-                                                                         At_other_end_Translation,
-                                                                         At_other_end_Rotation, L)
-        f_cc = (pi * pi * E) / (K_L / r) ** 2
-        lambda_c = math.sqrt(f_y / f_cc)
-        phi = 0.5 * (1 + (alpha * (lambda_c - 0.2)) + (lambda_c * lamda_c))
-        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_c ** 2))
-        f_cd = min(((f_y / gamma_m0) * srf), f_y / gamma_m0)
+        
+        f_cc = (math.pi ** 2 * E) / (K_L / r) ** 2 #euler buckling stress
+        lambda_ = math.sqrt(f_y / f_cc) #non-dimensional slenderness ratio
+        phi = 0.5 * (1 + alpha * (lambda_ - 0.2) + lambda_ **2)
+        srf = 1 / (phi + math.sqrt(phi ** 2 - lambda_ ** 2)) #stress reduction factor,kai
+        f_cd = min( f_y / gamma_m0 * srf, f_y / gamma_m0)
         return f_cd
 
-    # Design of Column Base
-    def Calculation_of_thickness_of_column_base(P, A, a, b, gamma_m0, f_y):
+
+    # Calculation of buckling class of given cross-section
+    def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section,t_f,t_w,h,b_f):
+        """ Defining Buckling Class of Cross-Section
+
+        Args:
+            Cross_section - Either 'Rolled_I_Section' or 'Welded_I_Section'
+                            or 'Hot_rolled_hollow' or 'cold_Formed_hollow' or 'Welded_Box_Section'
+                            or 'Channel,Angle,T,Solid Section' or 'Built_up_Member'
+
+            h- Depth of the section in mm,
+            b_f - width of flange or width in case of welded box section(mm)
+            t_f - Thickness of flange in mm
+            t_w - Thickness of web in mm
+
+        Return:
+            Dictionary of Buckling axis and Buckling class with Buckling axis as key
+
+        Note:
+            Reference:
+            IS 800:2007, cl.7.1.2.2, Table_10
+        """
+        if Cross_section == "Rolled_I_Section":
+            if h / b_f > 1.2 :
+                if t_f <= 40:
+                    return {'z-z': 'a','y-y': 'b'}
+
+                if t_f>40 and t_f<=100:
+                    return {'z-z': 'b','y-y': 'c'}
+
+            if h / b_f <= 1.2:
+                if t_f <= 100:
+                    return {'z-z': 'b','y-y': 'c'}
+
+                if t_f>100:
+                    return {'z-z': 'd','y-y': 'd'}
+
+                
+                
+        if Cross_section == "Welded_I_Section":
+            if t_f <= 40:return {'z-z': 'b','y-y': 'c'}
+            if t_f>40:return {'z-z': 'c','y-y': 'd'}
+
+        if Cross_section == "Hot_rolled_hollow":
+            return {'z-z': 'a','y-y': 'a'}
+
+        if Cross_section == "cold_Formed_hollow":
+            return {'z-z': 'b','y-y': 'b'}
+
+        if Cross_section == "Welded_Box_Section":
+            Buckling_Class_1 = 'b'
+            Buckling_Class_2 = 'b'
+            
+            if b_f / t_f < 30:        #here bf reffers to width of section
+                Buckling_Class_1 = "c"
+                
+            if h / t_w < 30:
+                Buckling_Class_2 = "c"
+            
+            return {'z-z': Buckling_Class_1,'y-y': Buckling_Class_2}
+            
+        if Cross_section == "Channel_Angle_T_Solid_Section" or Cross_section == "Built_up_Member":
+            return {'z-z': 'c','y-y': 'c'}
+            
+
+    # Imperfection Factor, alpha
+    # gives alpha for a given buckling class,'a','b','c' or 'd'
+    cl_7_1_Table_7_alpha = {
+        'a': 0.21,
+        'b': 0.34,
+        'c': 0.49,
+        'd': 0.76,
+    }
+
+    
+    # Table 11 Effective Length of Prismatic Compression Members
+
+    def cl_7_2_2_table11_effective_length_of_prismatic_compression_members(L,BC=[]):
+
+        """ Effective length of Prismatic Compression Member when the boundary conditions in the plane of buckling
+        can be assessed  
+
+        Args:
+            BC - linked list of Boundary Conditions
+                 =[BC_translation_end1,BC_rotation_end1,BC_translation_end2,BC_rotation_end2]
+            L -  Length of the Compression member
+
+        Return:
+            K_L - Effective length of Compression Member
+
+        Note:
+            Reference:
+            IS 800:2007, cl.7.2.2, Table_11
+        """
+
+        if BC == ['Restrained','Restrained','Free','Free'] or BC == ['Restrained','Free','Free','Restrained']:K_L = 2.0 * L
+        elif BC == ['Restrained','Free','Restrained','Free']:K_L = L            
+        elif BC == ['Restrained','Restrained','Free','Restrained']:K_L = 1.2 * L 
+        elif BC == ['Restrained','Restrained','Restrained','Free']:K_L = 0.8 * L
+        elif BC == ['Restrained','Restrained','Restrained','Restrained']:K_L = 0.65 * L
+        return K_L
+
+
+
+    
+    #cl.7.4.3 thickness of column base
+    def cl_7_4_3_1_Calculation_of_thickness_of_column_base(w,a,b,t_f,f_y):
         """Calculation of thickenss of Column base
         Args:
-            P - Load on column,
-            A- Area of the column base
+            w - uniform pressure from below on the slab base
             a - Larger Projection
             b - Smaller Projection
             f_y - Yield Stress
-            gamma_m0 - cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
             t_f - Thicknedd pf flange of Compression member
 
         Return:
-            t_f - thickness of column base
+            t_f - thickness of rectangular slab column base
 
         Note:
             Reference:
@@ -526,12 +421,14 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
 
 
          """
-
-        t_s = max(t_f, math.sqrt(2.5 * w * (a * a - 0.3 * b * b) * gamma_m0 / f_y))
-        w = P / A
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
-
-    def cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity):
+        ob = IS800_2007()
+        gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
+        t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
+        return t_s
+        
+    #cl.7.5.1.2
+    #Table 12 - evaluation of constants K1,K2,K3 for effective slenderness ratio
+    def cl_7_5_1_2_table12_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity):
 
         """Value of constant K_1,K_2, K_3
         Args:
@@ -539,7 +436,7 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
             Fixity - Either Fixed or Hinged.
 
         Return:
-            {K_1,K_2,K_3}
+            [K_1,K_2,K_3]
 
         Note:
             Reference:
@@ -554,158 +451,176 @@ def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
                 K_1 = 0.20
                 K_2 = 0.35
                 K_3 = 20
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
-
+                
             elif Connecting_member_Fixity == "Hinged":
                 K_1 = 0.70
                 K_2 = 0.60
                 K_3 = 5
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
 
         if No_of_Bolts_at_Each_End_Connection == 1:
             if Connecting_member_Fixity == "Fixed":
                 K_1 = 0.75
                 K_2 = 0.35
                 K_3 = 20
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
 
             if Connecting_member_Fixity == "Hinged":
                 K_1 = 1.25
                 K_2 = 0.50
                 K_3 = 60
-                return {'K_1': K_1, 'K_2': K_2, 'K_3': K_3}
+                
+        return [K_1,K_2,K_3]
 
-    # Design  strength of angle strut loaded through one leg
-    def Calculation_of_design_strength_of_single_angle_strut_loaded_through_one_leg(L, b_1, b_2, f_y, r_vv, t, E):
+    # cl.7.5.1.2.Design strength of angle strut loaded through one leg
+    def cl_7_5_1_2_Calculation_of_design_strength_of_single_angle_strut_loaded_through_one_leg(L, b_1, b_2, f_y, r_vv, t, E,K_list):
         """ Calculation of design strength of single angle strut loaded through one leg
 
         Args:
-            L - Lengrth of Angle section
+            L - Length of Angle section
             b_1,b_2 - width of legs of angle section
             f_y - yield stree
-            r_vv - root radius
-            t - thickenss of the angle section
-            E - Youngs Modulusof elasticity
+            r_vv - radius og gyration about minor axis
+            t - thickenss of the leg
+            E - Youngs Modulus of elasticity
 
         Return:
-            f_cd - Design compressive strength pf the section
+            f_cd - Design compressive strength of the section
 
         Note:
             Reference:
             IS 800:2007, cl.7.5.1.2
 
         """
+        ob = IS800_2007()
+        
+        [K_1,K_2,K_3] = K_list
+        
+        alpha = 0.49 #according to ammendment 1
+        
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        
+        epsilon = math.sqrt(250 / f_y)
 
-        K_1 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
-        K_2 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
-        K_3 = cl_7_5_1_2_Values_of_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity)
+        lambda_vv = (L / r_vv) / (epsilon * math.sqrt(math.pi ** 2 * E / 250))
 
-        apsilon = math.sqrt(250 / f_y)
-        Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
+        lambda_phi = (b_1 + b_2) / (2 * t * epsilon * math.sqrt(math.pi * math.pi * E / 250))
 
-        lambda_vv = (L / r_vv) / (apsilon * math.sqrt(pi * pi * E / 250))
+        lambda_e = math.sqrt(K_1 + (K_2 * lambda_vv ** 2) + (K_3 * lambda_phi ** 2))
 
-        lambda_phi = (b_1 + b_2) / (2 * t * apsilon * math.sqrt(pi * pi * E / 250))
-
-        lambda_e = math.sqrt(k_1 + (K_2 * lambda_vv * lambda_vv) + (K_3 * lambda_phi * lambda_phi))
-
-        phi_1 = 0.5 * (1 + (alpha * (lambda_e - 0.2)) + lambda_e ** 2)
-        f_cd = min(f_y / (gamma_m0 * (phi_1 + math.sqrt(phi_1 ** phi_1 - lambda_e ** 2))), f_y / gamma_m0)
+        phi = 0.5 * (1 + alpha * (lambda_e - 0.2) + lambda_e ** 2)
+        f_cd = min(f_y / (gamma_m0 * (phi + math.sqrt(phi ** phi - lambda_e ** 2))), f_y / gamma_m0)
 
         return f_cd
+        
+    #cl7.6 Laced column
+    #cl 7.6.1.5.Effective slenderness ratiion of lacing member
+    def effective_slenderness_ratio_of_lacing_member(K_L, r_min):
+    """
+    Calculation of Effective slenderness ratiion of lacing member
+    to account for shear deformation
+    Args:
+        K_L -effective length of column
+        r_min - radius of gyration of column member
+        SR_0 - actual maximum slenderness ration of column
+    Returns:
+        SR_eff - effective slenderness ration of lacing
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.1.5
+    """
+        SR_0 = K_L/r_min
+        SR_eff = 1.05*SR_0
 
-    # Calculation of design strength of lacing member
+            return SR_eff
 
-    def Calculation_of_design_strength_of_lacing_system(g, column_type, Type_of_lacing, S, f_y, theta, lacing_section,
-                                                        P, L):
-        """ Calculation of design strength of lacing system
-        Args:
-            Column_type - Either Angle Containing Column or
-                          Channel containing Column (either Channel facing each other or opposite)
-            Type_of_lacing - Either Single lacing or Double lacing
-            S -sapcing between the column
-            f_y - yield stress
-            theta - angle of inclination
-            lacing_section - Either angle section or plate section
-            P - loading on column
-            L - Height of column
-            g - gauge distance
-            L_0 - Spacing between lacings
-            l - lenth of lacing
-            l_e - Effective length of lacing member
-            W_min - width of lacing
-            d - bolt diameter
-            t_min - minimum width of lacing
+    #cl 7.6.2 Width of Lacing  Bars
+    def cl_7_6_2_width_of_lacing_bars(d):
+    """
+    Calculation of min width of Lacing  Bars
+    Args:
+        d - nominal bolt/rivet diameter
+    Returns:
+        w_min - min Width of Lacing  Bars
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.2
+    """
 
-        Return:
-            P_l - load carried by lacing
+        w_min = 3*d
+        return w_min
 
-        Note:
-            Reference:
-            IS 800:2007, cl.7.5.1.2
+    #cl 7.6.3 Thickness of Lacing Bars
+    def cl_7_6_3_minimum_thickness_of_lacing_bars(lacing_type,L_eff):
+    """
+        Calculation of  min Thickness of Lacing Bars
+    Args:
+        Lacing_type - either 'single_lacing' or 'double_lacing'
+        L_eff - effective length of lacing bars
+    Returns:
+        t_min - mininimum thickness of Lacing Bars
+    Note:
+        Reference:
+        IS 800:2007, cl 7.6.3
+    """
 
-        """
-
-        a = 2 * g + S
-        if Type_of_lacing == 'Single_lacing':
-            L_0 = (2 * a) / tan(theta)
-            l_e = l
-            t_min = l / 40
+        if lacing_type == 'single_lacing':
+            t_min = 1/40 *L_eff
 
         else:
-            L_0 = a / tan(theta)
-            l_e = 0.7 * l_e
-            t_min = l / 60
+            t_min = 1 / 60 * L_eff
 
-            l = a / sin(theta)
-            # TODO- CHCEK - L_0/r_c  = min(50 , 0.7*lambda_max)
-            W_min = 3 * d
-            SR_lacing = (min(l_e * math.sqrt12) / t, 145)
+        return t_min
 
-            alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
+    #Cl7.6.6 Design of lacing
+    #7.6.6.1 Transverse shear in the lacing bar
+    def cl_7_6_6_1_transverse_shear_in_the_lacing_bar(P):
+        """
+        Calculation of Transverse shear in the lacing bar
+        Args:
+            P  -  axial load on column
+        Returns:
+            V_t_min - minimum design transverse shear
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.6.1
+        """
+        V_t_min = 2.5/100 * P
+    
+        return V_t_min
 
-            A_l = t_min * W_min
-            P_l = f_cd * A_l
 
-            return P_l
-
+    
     # cl7.7  Batten plate
     # cl7.7.1.4 effective slenderness ratio of batten plate
-    def efective_slenderness_ratio_of_batten_plate(l, r_zz):
+    def efective_slenderness_ratio_of_batten_plate(K_l,r_min):
         """
-            Calculation  of effective slenderness ratio of batten plate
-
-            Args:
-                l - length of column  in mm
-                r_zz- minimin radius of gyration of built-up section
-            Return:
-                lambda_e = effcetive slenderness ration of patten plate
-
-            Note:
-                Reference:
-                IS 800:2007, cl.7.7.1.4
+        Args:
+            K_L -effective length of column
+            r_min - minimum radius of gyration(rx,ry,rz) of column member
+        Returns:
+            SR_eff - effective slenderness ration of lacing
+        Note:
+            Reference:
+        IS 800:2007, cl 7.6.1.5
 
         """
-        lambda_e = 1.1 * (L / r_zz)
+        SR_eff = 1.1 * (K_L / r_min)
 
-        return lambda_e
+        return SR_eff
 
     # Design of Battens
     # Battens
-    def longitudinal_shear_transverse_shear_and_moment_at_connection(P, S, C, N):
+    def cl_7_7_2_1_longitudinal_shear_transverse_shear_and_moment_at_connection(P, S, C, N):
         """
             Calculation of longitudinal shear, transverse shear and moment at connetion
-
             Args:
                 P - total axial force on column
-                S - minimum transverse distnace between  the centroid of the rivet/bolt
+                S - minimum transverse distnace between the centroid of the rivet/bolt
                     group/welding connecting the batten to the main member
                 N  -number of parallel planes of battens
                 C  -  distance between centre -to- centre of battens
             Returns:
                 V_t - transverse shear force
-                V_b - longitudinal shear force
+                V_b - longitudinal shear force along column axis
                 M - moment at connection
             Note:
                 Reference:

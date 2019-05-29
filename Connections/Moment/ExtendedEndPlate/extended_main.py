@@ -1679,6 +1679,26 @@ class Maincontroller(QMainWindow):
 
 		bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, alist)
 
+		bbWeldstiff1_u1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+									 L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchSize'])
+		bbWeldstiff1_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff2_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff2_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff3_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff3_l1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff4_u1 = copy.copy(bbWeldstiff1_u1)
+		bbWeldstiff4_l1 = copy.copy(bbWeldstiff1_u1)
+
+		bbWeldstiff1_u2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+									 L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
+		bbWeldstiff1_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff2_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff2_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff3_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff3_l2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff4_u2 = copy.copy(bbWeldstiff1_u2)
+		bbWeldstiff4_l2 = copy.copy(bbWeldstiff1_u2)
+
 
 		if alist["Weld"]["Type"] == "Fillet Weld":
 
@@ -1741,26 +1761,6 @@ class Maincontroller(QMainWindow):
 			bbWeldStiffLR_3 = copy.copy(bbWeldStiffLR_1)
 			bbWeldStiffLR_4 = copy.copy(bbWeldStiffLR_1)
 
-			bbWeldstiff1_u1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										 L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchSize'])
-			bbWeldstiff1_l1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff2_u1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff2_l1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff3_u1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff3_l1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff4_u1 = copy.copy(bbWeldstiff1_u1)
-			bbWeldstiff4_l1 = copy.copy(bbWeldstiff1_u1)
-
-
-			bbWeldstiff1_u2 = FilletWeld(b= float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-										L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchSize'])
-			bbWeldstiff1_l2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff2_u2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff2_l2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff3_u2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff3_l2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff4_u2 = copy.copy(bbWeldstiff1_u2)
-			bbWeldstiff4_l2 = copy.copy(bbWeldstiff1_u2)
 
 
 
@@ -1818,6 +1818,10 @@ class Maincontroller(QMainWindow):
 									bbWeldFlang_R1, bbWeldFlang_R2, bbWeldWeb_R3,bbWeldFlang_L1, bbWeldFlang_L2, bbWeldWeb_L3,
 									bbWeldStiffH_1, bbWeldStiffH_2, bbWeldStiffH_3, bbWeldStiffH_4,
 									bbWeldStiffL_1, bbWeldStiffL_2, bbWeldStiffL_3, bbWeldStiffL_4,
+									bbWeldstiff1_u1, bbWeldstiff1_u2, bbWeldstiff2_u1, bbWeldstiff2_u2, bbWeldstiff3_u1,
+									bbWeldstiff3_u2, bbWeldstiff4_u1, bbWeldstiff4_u2,
+									bbWeldstiff1_l1, bbWeldstiff1_l2, bbWeldstiff2_l1, bbWeldstiff2_l2, bbWeldstiff3_l1,
+									bbWeldstiff3_l2, bbWeldstiff4_l1, bbWeldstiff4_l2,
 									beam_stiffener_1, beam_stiffener_2,beam_stiffener_3, beam_stiffener_4,
 									beam_stiffener_F1,beam_stiffener_F2,beam_stiffener_F3,beam_stiffener_F4,alist, outputobj)
 			extbothWays.create_3DModel()

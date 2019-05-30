@@ -516,7 +516,7 @@ def bc_endplate_design(uiObj):
         if weld_thickness_flange >= flange_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam flange is more than allowed")
-            logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_throat_max)
+            logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_size_max)
             logger.info(": Decrease the size of weld at beam flanges")
 
         if weld_thickness_web <= web_weld_size_min:
@@ -528,7 +528,7 @@ def bc_endplate_design(uiObj):
         if weld_thickness_web >= web_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam web is more than allowed")
-            logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_throat_max)
+            logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_size_max)
             logger.info(": Decrease the size of weld at beam web")
 
         # Weld lengths - available and effective, long joint reduction factors

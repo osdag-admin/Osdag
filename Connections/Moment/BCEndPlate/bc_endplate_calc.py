@@ -873,7 +873,7 @@ def bc_endplate_design(uiObj):
     # End of SAMPLE Output dictionary
     
     if design_status is True:
-        logger.info(": Overall extended end plate connection design is safe \n")
+        logger.info(": Overall end plate moment connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:
         logger.error(": Design is not safe \n ")

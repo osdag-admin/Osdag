@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Ui_Plate</class>
- <widget class="QDialog" name="Ui_Plate">
+ <class>Plate_Bottom</class>
+ <widget class="QDialog" name="Plate_Bottom">
   <property name="geometry">
    <rect>
     <x>0</x>

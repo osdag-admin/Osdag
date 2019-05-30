@@ -1,5 +1,5 @@
 from ui_bc_endplate import Ui_MainWindow
-from ui_design_preferences import Ui_Dialog
+from ui_design_preferences import Ui_DesignPreferences
 from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_plate_bottom import Ui_Plate_Bottom
@@ -90,7 +90,7 @@ class MyAboutOsdag(QDialog):
 class DesignPreference(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.ui = Ui_Dialog()
+        self.ui = Ui_DesignPreferences()
         self.ui.setupUi(self)
         self.maincontroller = parent
 

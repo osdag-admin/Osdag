@@ -1574,7 +1574,7 @@ class ExtendedEnd2DSide(object):
         self.SD2 = np.array([ptSD2x, ptSD2y])
 
 
-    def call_ExtndBoth_side(self, filename):
+    def call_Oneway_side(self, filename):
         """
 
 		Args:

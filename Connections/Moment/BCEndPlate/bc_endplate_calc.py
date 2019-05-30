@@ -495,6 +495,7 @@ def bc_endplate_design(uiObj):
         flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_flange, fusion_face_angle=90)
         flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tf, end_plate_thickness)
+        flange_weld_size_max = max(beam_tf, end_plate_thickness)
 
         # Web welds
 
@@ -502,6 +503,7 @@ def bc_endplate_design(uiObj):
         web_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_web, fusion_face_angle=90)
         web_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tw, end_plate_thickness)
+        web_weld_size_max = max(beam_tw, end_plate_thickness)
 
         # check min and max weld size
 
@@ -511,7 +513,7 @@ def bc_endplate_design(uiObj):
             logger.warning(": The minimum required weld size at beam flange is %s mm" % flange_weld_size_min)
             logger.info(": Increase the size of weld at beam flanges")
 
-        if flange_weld_throat_size >= flange_weld_throat_max:
+        if weld_thickness_flange >= flange_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam flange is more than allowed")
             logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_throat_max)
@@ -523,7 +525,7 @@ def bc_endplate_design(uiObj):
             logger.warning(": The minimum required weld size at beam web is %s mm" % web_weld_size_min)
             logger.info(": Increase the size of weld at beam web")
 
-        if web_weld_throat_size >= web_weld_throat_max:
+        if weld_thickness_web >= web_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam web is more than allowed")
             logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_throat_max)
@@ -574,21 +576,22 @@ def bc_endplate_design(uiObj):
 
         flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
         flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
 
         web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_throat_size
-
         web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_strength, 3)
+        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
 
         if flange_weld_stress >= flange_weld_strength:
             design_status = False
             logger.error(": The weld size at beam flange is less than required")
-            logger.warning(": The minimum required throat size of weld flanges is %s mm" % flange_weld_throat_reqd)
+            logger.warning(": The minimum required size of weld at flanges is %s mm" % flange_weld_size_reqd)
             logger.info(": Increase the size of weld at beam flanges")
 
         if web_weld_stress >= web_weld_strength:
             design_status = False
             logger.error(": The weld size at beam web is less than required")
-            logger.warning(": The minimum required throat size of weld web is %s mm" % web_weld_throat_reqd)
+            logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
             logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'

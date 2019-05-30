@@ -1701,7 +1701,7 @@ class Oneway2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point2, str(self.data_object.Lv), params)
 
-        point3= ptxx2 + self.data_object.end_dist* np.array([0, -1])
+        point3= ptxx2 + self.data_object.Lv * np.array([0, -1])
         params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                   "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, point3, ptxx2, str(self.data_object.end_dist), params)

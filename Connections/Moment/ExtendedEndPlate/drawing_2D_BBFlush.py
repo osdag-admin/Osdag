@@ -773,7 +773,7 @@ class FlushEnd2DFront(object):
 					[1, 0])
 			elif self.data_object.no_of_bolts == 6:
 				ptx = self.AA1 + (self.data_object.flange_thickness_T2 + self.data_object.Lv) \
-					  * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+					  * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) * np.array(
 					[1, 0]) + i * self.data_object.pitch12 * np.array([0, 1])
 
 			ptx1 = ptx - bolt_r * np.array([0, 1])

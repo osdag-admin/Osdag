@@ -828,7 +828,7 @@ class OnewayEnd2DFront(object):
 					[1, 0])
 			else:
 				ptx = self.AA1 + (self.data_object.flange_thickness_T2 + self.data_object.Lv) \
-					  * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+					  * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) * np.array(
 					[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
 
 			ptx1 = ptx - bolt_r * np.array([0, 1])
@@ -1703,10 +1703,6 @@ class OnewayEnd2DSide(object):
 			pty3 = ptx3 + (self.data_object.beam_width_B2 + 50) * np.array([1, 0])
 			self.data_object.draw_faint_line(ptx3, pty3, dwg)
 
-			# point1 = ptx3 + self.data_object.pitch23 * np.array([0, -1])
-			# params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "right", "endlinedim": 10, "arrowlen": 20}
-			# self.data_object.draw_dimension_outer_arrow(dwg, ptx3, point1, str(self.data_object.pitch23), params)
-
 			point3 = ptx3 + self.data_object.Lv * np.array([0, 1])
 			params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left", "endlinedim": 10,
 					  "arrowlen": 20}
@@ -1754,14 +1750,6 @@ class OnewayEnd2DSide(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Web Welding ----------------------------------------------
-		# point = self.A11 + self.data_object.beam_depth_D1 / 2 * np.array([0, 1])
-		# theta = 60
-		# offset = 50
-		# textup = "     z         " + str(self.data_object.web_thickness_tw1)
-		# textdown = " "
-		# element = "weld"
-		# self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
-		#
 		if self.data_object.weld == "Fillet Weld":
 			point = self.A4 + self.data_object.beam_depth_D2/2 *np.array([0, 1])
 			theta = 60

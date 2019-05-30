@@ -44,15 +44,6 @@ class Ui_DesignPreferences(object):
         font.setFamily("Arial")
         self.tabWidget.setFont(font)
         self.tabWidget.setObjectName("tabWidget")
-
-        self.tab_Beam = QtWidgets.QWidget()
-        self.tab_Beam.setObjectName("tab_Beam")
-        self.tabWidget.addTab(self.tab_Beam, "")
-
-        self.tab_Column = QtWidgets.QWidget()
-        self.tab_Column.setObjectName("tab_Column")
-        self.tabWidget.addTab(self.tab_Column, "")
-
         self.tab_Bolt = QtWidgets.QWidget()
         self.tab_Bolt.setObjectName("tab_Bolt")
         self.gridLayout_22 = QtWidgets.QGridLayout(self.tab_Bolt)
@@ -487,8 +478,6 @@ class Ui_DesignPreferences(object):
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></td></tr></table></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("Dialog", "Bolt"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("Dialog", "Beam"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("Dialog", "Column"))
         self.label_16.setText(_translate("Dialog", "Inputs"))
         self.label_17.setText(_translate("Dialog", "Description"))
         self.textBrowser_weldDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"

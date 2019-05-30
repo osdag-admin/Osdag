@@ -595,7 +595,6 @@ def bbExtendedEndPlateSplice(uiObj):
         n_flange = T_flange / (0.80 * bolt_tension_capacity)  # trial number of bolts near the tension flange
         n = n_flange + 2  # add 2 bolts near the compression flange to complete the trial required number of bolts in the configuration
 
-
     # number_of_bolts = Total number of bolts in the configuration
     number_of_bolts = n
 
@@ -1512,86 +1511,150 @@ def bbExtendedEndPlateSplice(uiObj):
 
         #######################################################################
         # Calculating actual required thickness of End Plate (tp_required) as per bending criteria
+        #######################################################################
+
+        # Calculating Prying force in the bolt
+        # NOte: We have used thick plate approach for the ep design. In this approach it is assumed that there will not be any prying force acting on the bolt since the ep is sufficiently thick
+        # However, we are incorporating the prying force in the bolt check to be more conservative and was also recommended by the Expert committee (Excomm)
+
         b_e = end_plate_width_provided / 2
         if uiObj['bolt']['bolt_type'] == "pre-tensioned":
             beta = float(1)
         else:
             beta = float(2)
         eta = 1.5
-        f_0 = 0.7 * bolt_fu / 1000  # kN/mm**2
+        f_0 = 0.7 * (bolt_fu / 1000)  # kN/mm**2
         l_e = min(float(end_dist_mini), float(1.1 * end_plate_thickness * math.sqrt((beta * f_0 * 10 ** 3) / bolt_fy)))
 
-        if uiObj["Member"]["Connectivity"] == "Flush" or uiObj["Member"]["Connectivity"] == "Extended one way":
+        # Calculating T_e for all the configurations and connectivity types
 
-            T_e = T_flange / 2
-            t_p = end_plate_thickness
-            Q = prying_force(T_e, p_fo, l_e, beta, eta, f_0, b_e, t_p)
-
-            if tension_critical_bolt >= bolt_tension_capacity:
-                design_status = False
-                logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
-                if bolt_type == "Friction Grip Bolt":
-                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
-                else:
-                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
-                logger.info(": Increase bolt diameter/grade")
-                Q_allowable = float(0)
+        if number_of_bolts == 4:
+            T_e = max(T_flange / 2, 0)
+        elif number_of_bolts == 6:
+            T_e = max(T_flange / 4, 0)
+        elif number_of_bolts == 8:
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                T_e = max(T_flange / 6, 0)
             else:
-                Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
-
-            if Q / 2 > Q_allowable:  # prying force in each bolt
-                design_status = False
-                logger.error(": Prying force in the critical bolt exceeds its allowable limit")
-                logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
-                logger.info(": Increase end plate thickness or bolt diameter")
-            else:
-                pass
-
-                # Finding the thickness of end plate
-
-            M_p = round(((T_flange / 2) * p_fo - (Q * l_e)), 3)  # kN-mm
-            tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (beam_fy * b_e))
-            tp_provided = math.ceil(tp_required / 2.) * 2
-
-            if end_plate_thickness < tp_provided:
-                design_status = False
-                logger.error(": Chosen end plate thickness in not sufficient")
-                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-                logger.info(": Increase end plate thickness")
-            else:
-                pass
-
-            T_b = tension_critical_bolt + Q / 2  # tension in the critical bolt due to flange tension plus prying force
+                T_e = max(T_flange / 4, 0)
+        elif number_of_bolts == 10:
+            T_e = max(T_flange / 8, 0)
+        elif number_of_bolts == 12 or 16 or 20:
+            T_e = max((T_flange / (number_of_bolts / 2)), 0)
         else:
-            # M_p = Plastic moment capacity of end plate
-            # TODO check if T_f value is getting assigned correctly
-            tension_flange = T_f
-            M_p = (tension_flange * l_v) / 2  # kN-mm
-            tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
+            pass
 
-            tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
-
-            if end_plate_thickness < tp_provided:
-                design_status = False
-                logger.error(": Chosen end plate thickness in not sufficient")
-                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-                logger.info(": Increase end plate thickness")
-            else:
-                pass
-
-            # Calculation of Prying Force at Tension flange
-            # TODO : add condition of beta depending on bolt type
-
-            T_e = T_f
-            t_p = tp_provided
-            Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
-            Q = round(Q.real, 3)
-
-            # Finding tension in critical bolt (T_b)
-            # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
-            T_b = T1 + Q
+        Q = round(prying_force(T_e, p_fo or l_v, l_e, beta, eta, f_0, b_e, end_plate_thickness), 3)
 
         # Check for tension in the critical bolt
+        if tension_critical_bolt >= bolt_tension_capacity:
+            design_status = False
+            logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
+            if bolt_type == "Friction Grip Bolt":
+                logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
+            else:
+                logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
+            logger.info(": Increase bolt diameter/grade")
+            Q_allowable = float(0)
+        else:
+            Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
+
+        # Check for prying force in each bolt
+        if Q > Q_allowable:
+            design_status = False
+            logger.error(": Prying force in the critical bolt exceeds its allowable limit")
+            logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
+            logger.info(": Increase end plate thickness or bolt diameter")
+        else:
+            pass
+
+        # Finding the end plate thickness (taking moment about toe of weld and equating with the plastic moment capacity of the end plate)
+        M_p = round(((T_e * p_fo) - (Q * l_e)), 3)  # kN-mm
+        tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (end_plate_fy * b_e))
+        tp_provided = math.ceil(tp_required / 2.) * 2
+
+        if end_plate_thickness < tp_provided:
+            design_status = False
+            logger.error(": Chosen end plate thickness in not sufficient")
+            logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+            logger.info(": Increase end plate thickness")
+        else:
+            pass
+
+        # if uiObj["Member"]["Connectivity"] == "Flush" or uiObj["Member"]["Connectivity"] == "Extended one way":
+        #
+        #     # T_e = T_flange / 2
+        #     # t_p = end_plate_thickness
+        #     # Q = prying_force(T_e, p_fo or l_v, l_e, beta, eta, f_0, b_e, t_p)
+        #
+        #     # if tension_critical_bolt >= bolt_tension_capacity:
+        #     #     design_status = False
+        #     #     logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
+        #     #     if bolt_type == "Friction Grip Bolt":
+        #     #         logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
+        #     #     else:
+        #     #         logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
+        #     #     logger.info(": Increase bolt diameter/grade")
+        #     #     Q_allowable = float(0)
+        #     # else:
+        #     #     Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
+        #
+        #     # if Q / 2 > Q_allowable:  # prying force in each bolt
+        #     #     design_status = False
+        #     #     logger.error(": Prying force in the critical bolt exceeds its allowable limit")
+        #     #     logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
+        #     #     logger.info(": Increase end plate thickness or bolt diameter")
+        #     # else:
+        #     #     pass
+        #
+        #         # Finding the thickness of end plate
+        #
+        #     # M_p = round(((T_flange * p_fo) - (Q * l_e)), 3)  # kN-mm
+        #     # tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (end_plate_fy * b_e))
+        #     # tp_provided = math.ceil(tp_required / 2.) * 2
+        #     #
+        #     # if end_plate_thickness < tp_provided:
+        #     #     design_status = False
+        #     #     logger.error(": Chosen end plate thickness in not sufficient")
+        #     #     logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+        #     #     logger.info(": Increase end plate thickness")
+        #     # else:
+        #     #     pass
+        #
+        #     # T_b = tension_critical_bolt + Q / 2  # tension in the critical bolt due to flange tension plus prying force
+        # else:
+        #     # M_p = Plastic moment capacity of end plate
+        #     # TODO check if T_f value is getting assigned correctly
+        #     # tension_flange = T_f
+        #     # M_p = (tension_flange * l_v) / 2  # kN-mm
+        #     # tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
+        #     #
+        #     # tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
+        #     #
+        #     # if end_plate_thickness < tp_provided:
+        #     #     design_status = False
+        #     #     logger.error(": Chosen end plate thickness in not sufficient")
+        #     #     logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+        #     #     logger.info(": Increase end plate thickness")
+        #     # else:
+        #     #     pass
+        #
+        #     # Calculation of Prying Force at Tension flange
+        #     # TODO : add condition of beta depending on bolt type
+        #
+        #     # T_e = T_f
+        #     # t_p = tp_provided
+        #     # Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
+        #     # Q = round(Q.real, 3)
+        #
+        #     # Finding tension in critical bolt (T_b)
+        #     # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
+        #     # T_b = T1 + Q
+
+        # Check for tension in the critical bolt
+
+        # Tension in critical bolt due to external factored moment + prying action
+        T_b = tension_critical_bolt + Q
 
         if bolt_type == "Friction Grip Bolt":
             if T_b >= Tdf:

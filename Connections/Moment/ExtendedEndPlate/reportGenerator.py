@@ -1884,41 +1884,128 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-    row = [0, "Views", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-    png = folder + "/images_html/3D_Model.png"
-    datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+    if status == "True":
 
-    side = folder + "/images_html/extendSide.png"
-    dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
-
-    top = folder + "/images_html/extendTop.png"
-    datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
-
-    front = folder + "/images_html/extendFront.png"
-    datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
-
-    if status == 'True':
-        row = [0, datapng, datatop]
+        row = [0, "Different Views of the Connection", " "]
         rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        rstr += t('td colspan="2" class=" detail" align=center '
+                  '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
+        png = folder + "/images_html/3D_Model.png"
+        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
 
-        row = [0, dataside, datafront]
+        side = folder + "/images_html/extendSide.png"
+        dataside = '<object type="image/PNG" data= %s width ="400" ></object>' % side
+
+        top = folder + "/images_html/extendTop.png"
+        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+
+        front = folder + "/images_html/extendFront.png"
+        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+
+        if status == 'True':
+            row = [0, datapng]
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        if status == 'True':
+            row = [0, datapng]
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [1, datatop]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2 "') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [1, datatop]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2 "') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        else:
+            pass
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
+
+        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+        row = [0, "Different Views of the Connection", " "]
         rstr += t('tr')
-        rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+        rstr += t('td colspan="2" class=" detail" align=center '
+                  '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
+        png = folder + "/images_html/3D_Model.png"
+        datapng = '<object type="image/PNG" data= %s width ="500"></object>' % png
+
+        side = folder + "/images_html/extendSide.png"
+        dataside = '<object type="image/PNG" data= %s width ="700" height="500" ></object>' % side
+
+        top = folder + "/images_html/extendTop.png"
+        datatop = '<object type="image/PNG" data= %s width ="500"  ></object>' % top
+
+        front = folder + "/images_html/extendFront.png"
+        datafront = '<object type="image/PNG" data= %s width ="400"> height = "400"</object>' % front
+
+        if status == 'True':
+            row = [1, dataside]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [1, datafront]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        else:
+            pass
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
 
     else:
-        pass
+        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-    rstr += t('/table')
-    rstr += t('h1 style="page-break-before:always"')  # page break
-    rstr += t('/h1')
+        row = [0, "Views", " "]
+        rstr += t('tr')
+        rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+        png = folder + "/images_html/3D_Model.png"
+        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+
+        side = folder + "/images_html/extendSide.png"
+        dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+
+        top = folder + "/images_html/extendTop.png"
+        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+
+        front = folder + "/images_html/extendFront.png"
+        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+
+        if status == 'True':
+            row = [0, datapng, datatop]
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [0, dataside, datafront]
+            rstr += t('tr')
+            rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+        else:
+            pass
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
 
     # ###########################################################################################
     # Header of the pdf fetched from dialougebox

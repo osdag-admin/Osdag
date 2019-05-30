@@ -260,7 +260,7 @@ def shear_yielding(A_v, plate_fy):
     Returns: (float)- Shear yielding capacity of End Plate in kN
 
     """
-    V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
+    V_d = A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
     return V_d
 
 
@@ -1581,76 +1581,6 @@ def bbExtendedEndPlateSplice(uiObj):
         else:
             pass
 
-        # if uiObj["Member"]["Connectivity"] == "Flush" or uiObj["Member"]["Connectivity"] == "Extended one way":
-        #
-        #     # T_e = T_flange / 2
-        #     # t_p = end_plate_thickness
-        #     # Q = prying_force(T_e, p_fo or l_v, l_e, beta, eta, f_0, b_e, t_p)
-        #
-        #     # if tension_critical_bolt >= bolt_tension_capacity:
-        #     #     design_status = False
-        #     #     logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
-        #     #     if bolt_type == "Friction Grip Bolt":
-        #     #         logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
-        #     #     else:
-        #     #         logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
-        #     #     logger.info(": Increase bolt diameter/grade")
-        #     #     Q_allowable = float(0)
-        #     # else:
-        #     #     Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
-        #
-        #     # if Q / 2 > Q_allowable:  # prying force in each bolt
-        #     #     design_status = False
-        #     #     logger.error(": Prying force in the critical bolt exceeds its allowable limit")
-        #     #     logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
-        #     #     logger.info(": Increase end plate thickness or bolt diameter")
-        #     # else:
-        #     #     pass
-        #
-        #         # Finding the thickness of end plate
-        #
-        #     # M_p = round(((T_flange * p_fo) - (Q * l_e)), 3)  # kN-mm
-        #     # tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (end_plate_fy * b_e))
-        #     # tp_provided = math.ceil(tp_required / 2.) * 2
-        #     #
-        #     # if end_plate_thickness < tp_provided:
-        #     #     design_status = False
-        #     #     logger.error(": Chosen end plate thickness in not sufficient")
-        #     #     logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-        #     #     logger.info(": Increase end plate thickness")
-        #     # else:
-        #     #     pass
-        #
-        #     # T_b = tension_critical_bolt + Q / 2  # tension in the critical bolt due to flange tension plus prying force
-        # else:
-        #     # M_p = Plastic moment capacity of end plate
-        #     # TODO check if T_f value is getting assigned correctly
-        #     # tension_flange = T_f
-        #     # M_p = (tension_flange * l_v) / 2  # kN-mm
-        #     # tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
-        #     #
-        #     # tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
-        #     #
-        #     # if end_plate_thickness < tp_provided:
-        #     #     design_status = False
-        #     #     logger.error(": Chosen end plate thickness in not sufficient")
-        #     #     logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-        #     #     logger.info(": Increase end plate thickness")
-        #     # else:
-        #     #     pass
-        #
-        #     # Calculation of Prying Force at Tension flange
-        #     # TODO : add condition of beta depending on bolt type
-        #
-        #     # T_e = T_f
-        #     # t_p = tp_provided
-        #     # Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
-        #     # Q = round(Q.real, 3)
-        #
-        #     # Finding tension in critical bolt (T_b)
-        #     # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
-        #     # T_b = T1 + Q
-
         # Check for tension in the critical bolt
 
         # Tension in critical bolt due to external factored moment + prying action
@@ -1775,7 +1705,8 @@ def bbExtendedEndPlateSplice(uiObj):
         # Minimum weld size at flange (for drop-down list)
         # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
 
-        t_thicker = max(beam_tf, beam_tw, tp_required)
+        t_thicker = max(beam_tf, beam_tw, tp_provided)
+        t_thinner_weld = min(beam_tf, beam_tw, tp_provided)
 
         if t_thicker <= 10.0:
             tw_minimum = 3
@@ -1785,7 +1716,6 @@ def bbExtendedEndPlateSplice(uiObj):
             tw_minimum = 6
         elif t_thicker > 32.0 and t_thicker <= 50.0:
             tw_minimum = 8
-        # TODO: If tw_minimum is required in calc file?
 
         if weld_thickness_flange < tw_minimum:
             design_status = False
@@ -1803,16 +1733,16 @@ def bbExtendedEndPlateSplice(uiObj):
         # Design of weld at flange
         # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
         k = 0.7  # constant (Table 22, IS 800:2007)
+        t_te = max(3, (0.7 * t_thinner_weld))  # effective throat thickness (Cl. 10.5.3.1, IS 800:2007)
 
         # capacity_unit_flange is the capacity of weld of unit throat thickness
         capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
 
         # Calculating the effective length of weld at the flange
-        L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) + (2 * weld_thickness_flange)  # mm
-        # L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) - (2 * beam_R1)) + (2 * weld_thickness_flange)  # mm
+        L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) - (6 * weld_thickness_flange)  # mm
 
-        # Calculating the area of weld at flange (a_weld_flange) assuming minimum throat thickness i.e. 3mm (Clause 10.5.3, IS 800:2007)
-        a_weld_flange = L_effective_flange * 3  # mm**2
+        # Calculating the area of weld at flange (a_weld_flange)
+        a_weld_flange = L_effective_flange * t_te  # mm**2
 
         # Calculating stresses on weld
         # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
@@ -1825,7 +1755,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
         # 2. Bending Stress (BS)
         # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
-        Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
+        # Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
+        Z = (beam_B + (beam_B - beam_tw - (2 * beam_R1) - (6 * weld_thickness_flange))) * beam_d  # mm **3
         BS_flange = (M_u * 10 ** 3) / Z
 
         # Resultant (R)
@@ -1875,6 +1806,9 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
             logger.info(": Decrease the weld size at web")
 
+        if (weld_thickness_flange or weld_thickness_web) > (2 * tw_minimum):
+            logger.warning(": The required weld size is higher, It is recommended to provide full penetration butt weld")
+
         #######################################################################
         # Weld Checks
         # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
@@ -1882,26 +1816,25 @@ def bbExtendedEndPlateSplice(uiObj):
         # Weld at flange
         # 1. Check for normal stress
 
-        f_a_flange = force_flange * 10 ** 3 / (3 * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+        f_a_flange = (force_flange * 10 ** 3) / (t_te * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
 
         # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
-        f_wd = weld_fu_govern / (math.sqrt(3) * 1.25)
-        # TODO: call appropriate factor of safety for weld from main file
+        f_wd = weld_fu_govern / (math.sqrt(3) * gamma_mw)
 
         if f_a_flange > f_wd:
             design_status = False
-            logger.error(": The stress in weld at flange exceeds the limiting value (Clause 10.5.7.1.1, IS 800:2007)")
-            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
+            logger.error(": The stress in weld at flange exceeds the limiting value")
+            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2 (Clause 10.5.7.1.1, IS 800:2007)" % f_wd)
             logger.info(": Increase the Ultimate strength of weld and/or length of weld")
 
         # Weld at web
-        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) + weld_thickness_web)
+        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) - (2 * weld_thickness_web))
 
         # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
-        f_a_web = factored_axial_load * 10 ** 3 / (3 * L_effective_web)
+        f_a_web = factored_axial_load * 10 ** 3 / (t_te * L_effective_web)
 
         # 2. Check for shear stress
-        q_web = factored_shear_load * 10 ** 3 / (3 * L_effective_web)
+        q_web = factored_shear_load * 10 ** 3 / (t_te * L_effective_web)
 
         # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
 
@@ -1909,8 +1842,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if f_e > f_wd:
             design_status = False
-            logger.error(": The stress in weld at web exceeds the limiting value (Clause 10.5.10.1.1, IS 800:2007)")
-            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
+            logger.error(": The stress in weld due to combination of shear and axial force at web exceeds the limiting value")
+            logger.warning(": Maximum stress due to combination of forces the weld can carry is %2.2f N/mm^2 (Clause 10.5.10.1.1, IS 800:2007)" % f_wd)
             logger.info(": Increase the Ultimate strength of weld and/or length of weld")
 
         #######################################################################
@@ -1933,13 +1866,6 @@ def bbExtendedEndPlateSplice(uiObj):
         # calculating effective length of the stiffener and the weld
         l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
         l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
-
-
-        # if uiObj["Member"]["Connectivity"] == "Flush":
-        #     pass
-        # else:
-        #     l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
-        #     l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
 
         # Height of stiffener (h_st) (mm)
         # TODO: Do calculation for actual height of end plate above
@@ -2026,7 +1952,7 @@ def bbExtendedEndPlateSplice(uiObj):
         else:
             pass
 
-
+        # TODO: Is the below check required?
         # Check of stiffener against local buckling
         # E = 2 * 10 ** 5  # MPa
         # ts_required = 1.79 * h_st * stiffener_fy / E  # mm

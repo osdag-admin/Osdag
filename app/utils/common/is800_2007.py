@@ -654,13 +654,13 @@ class IS800_2007(object):
                 Restraint_Condition_1- "At support"
                 Restraint_Condition_2- "At Top"
 
-                At_support -  Either "continuous, with lateral restraint to top"
-                              or "continuous, with  partial torsional restraint"
-                              or "continuous, with lateral and torsional restraint "
+                At_support -  Either "Continuous, with lateral restraint to top"
+                              or "Continuous, with  partial torsional restraint"
+                              or "Continuous, with lateral and torsional restraint "
                               or "Restrained laterally,torsionally and against rotation on plan "
 
-                At_top - Either  "free"
-                        or "lateral restraint to top flange"
+                At_top - Either  "Free"
+                        or "Lateral restraint to top flange"
                         or "Torsional restraint"
                         or  "Lateral and torsional restraint"
 
@@ -838,17 +838,16 @@ class IS800_2007(object):
             Calculation of effective length for given type of beam type as per cl.8.3
 
         Args:
-            L-  Span of simply suppotred beams and girders in mm (float) for
+            L-  Span of simply supported beams and girders in mm (float) for
                 "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges",
-                 Projecting Length of cantiliver beam in mm (float) for
+                 Projecting Length of cantilever beam in mm (float) for
                  "Cantilever_beam",
-                 Length of relevent segment between the lateral restraint in mm (float) for
+                 Length of relevant segment between the lateral restraint in mm (float) for
                  "Simply_supported_with_intermediate_lateral_restraints",
                  Centre-to-centre distance of the restraint member in mm (float) for
                  "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval"
 
             D -  Overall depth of he beam in mm (float)
-
 
             Beam_type - Either "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
                         or "Simply_supported_with_intermediate_lateral_restraints"
@@ -856,19 +855,19 @@ class IS800_2007(object):
                         or "Cantilever_beam"
 
             FOR "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
-     Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
+            Restraint_Condition - Either "Torsional Restraint" or "warping Restraint"
 
             Restraint_Condition_1- "Torsional Restraint"
-            Restraint_Condition_2- "Warping_Restraint"
+            Restraint_Condition_2- "Warping Restraint"
 
-            "Torsional Restrained" - Either "Fully_resrtrained" or
-                                        "Partially_restrained_by_bottom_flange_support_condition" or
-                                        "Partially_restrained_by_bottom_flange_support_condition"
+            "Torsional Restrained" - Either "Fully restrained" or
+                                        "Partially restrained by bottom flange support connection" or
+                                        "Partially restrained by bottom flange bearing support"
 
-            "Warping_Restraint" - Either "Both_flange_fully_restrained" or
-                                     "compression_flange_fully_restrained" or
-                                     "Compression_flange_partially_restrained" or
-                                     "Warping_not_restrained_in_both_flange"
+            "Warping_Restraint" - Either "Both flange fully restrained" or
+                                     "Compression flange fully restrained" or
+                                     "Compression flange partially restrained" or
+                                     "Warping not restrained in both flange"
 
 
             FOR "Cantilever_beam"
@@ -878,9 +877,9 @@ class IS800_2007(object):
             Restraint_Condition_1- "At support"
             Restraint_Condition_2- "At Top"
 
-            At_support -  Either "continous, with lateral restraint to top"
-                              or "continous, with  partial torsional restraint"
-                              or "continous, with lateral and tosional restraint "
+            At_support -  Either "Continuous, with lateral restraint to top"
+                              or "Continuous, with  partial torsional restraint"
+                              or "Continuous, with lateral and torsional restraint "
                               or "Restrained laterally,torsionally and against rotation on plan "
 
             At_top - Either  "free"
@@ -888,7 +887,7 @@ class IS800_2007(object):
                         or "Torsional restraint"
                         or  "Lateral and torsional restraint"
 
-            Loading_condition - Either "Normal" or  "Destablizing"
+            Loading_condition - Either "Normal" or  "Destabilizing"
 
 
 
@@ -900,7 +899,6 @@ class IS800_2007(object):
                 IS800:2007,  cl 8.3.
 
         """
-
         if Beam_type == "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges":
             L_LT = cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
                                                                                  Restraint_Condition_2,
@@ -908,7 +906,7 @@ class IS800_2007(object):
         elif Beam_type == "Simply_supported_with_intermediate_lateral_restraints":
             L_LT = 1.2 * L
         elif Beam_type == "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval":
-            L_LT = 1.2 * L
+            L_LT = 1.2 * L #TODO:doubt-check
         else:
             L_LT = cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, Restraint_Condition_1,
                                                                          Restraint_Condition_2, Loading_Condition)
@@ -916,7 +914,7 @@ class IS800_2007(object):
         return L_LT
 
     # Design Strenth in Bending(Flexure)
-    def Design_strength_in_bending(M, M_d):
+    def cl_8_2_Design_strength_in_bending(M, M_d):
         """ Calculation of design bending strength
         Args:
              M: Factored design moment in N*mm
@@ -928,63 +926,65 @@ class IS800_2007(object):
                 IS800:2007,  cl 8.2.
         """
 
-        if M <= M_d:
-            return bool(M <= M_d)
+        return bool(M <= M_d)
 
-    def Design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, f_y, V, V_d, M_dv, plastic=False,
+    def cl_8_2_Design_bending_strength_of_laterally_unsupported_beam(z_p, z_e, f_y, v, v_d, m_dv, plastic=False,
                                                               compact=False):
         """Calucation of bending strength of laterally unsupported beam for low shear  and high shear case
             Args:
-                Beta_b - 1 for plastic and compact
+                beta_b - 1 for plastic and compact
                          Z_e/Z_p for semi-compact
-                Z_e - Elastic section modulus of the cross section in mm**3
-                Z_p - Plastic section modulus of the cross section in mm**3
+                z_e - Elastic section modulus of the cross section in mm**3
+                z_p - Plastic section modulus of the cross section in mm**3
                 f_y - yield stress of the material (in N/ mm**2 )
-                V  - Factored design shear strengh in N
-                V_d - Design shear stregth in N
-                M_dv: Design bending strength under high shear as defined in Cl 9.2 in N*m
+                v  - Factored design shear strength in N
+                v_d - Design shear strength in N
+                m_dv - Design bending strength under high shear as defined in Cl 9.2 in N*m
+                plastic - True if beam is plastic else False
+                compact - True for compact section else False
 
             Returns:
-                M_d - Design Bending  strength in N*m
+                m_d - Design Bending  strength in N*m
             Note:
                 References:
                 IS800:2007,  cl 8.2.1.2, cl. 8.2.1.3
 
         """
-        Beta_b = Z_e / Z_p
+        ob = IS800_2007()
+        beta_b = z_e / z_p #semi-compact section
         if plastic is True:
-            Beta_b = 1
+            beta_b = 1
         if compact is True:
-            Beta_b = 1
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['yielding']
-        if V <= 0.6 * V_d:
-            M_d = Beta_b * Z_p * f_y / gamma_m0
+            beta_b = 1
+        gamma_m0 = ob.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        if v <= 0.6 * v_d:
+            m_d = beta_b * z_p * f_y / gamma_m0
 
-        if V > 0.6 * V_d:
-            M_d = M_dv
+        if v > 0.6 * v_d:
+            m_d = m_dv
 
         # TODO : M_dv is referred from cl9.2
 
-        return M_d
+        return m_d
 
     # cl8.2.2 DESIGN BENDING STRENGTH OF LATERALLY UNSUPPORTED BEAMS
     # cl8.2.2.1 Elastic lateral torsional buckling moment
-    def Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
+    def cl_8_2_2_1_Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
                                                   Loading_Condition, section, n, b=[], t=[]):
         """
             Calculation of elastic critical moment or elastic lateral torional buckling moment
             Args:
                 I_t - torsional constant
-                I_w - wraping constant
+                I_w - warping constant
                 I_y - moment of inertia about weaker axis
                 r_y - radius of gyration about weaker axis
                 L_LT - effective length for lateral torsional buckling accordance with cl8.3
                 h_f - centre-to-centre distance between flange
                 t_f - thickness of the flange
-                E - Youngs Modulus of elaticity
+                E - Young's Modulus of Elasticity
                 G - modulus of rigidity
                 b - breadth of the elements in a section
-                t - thickness of the elemnets of the section
+                t - thickness of the elements of the section
                 A_e - Area enclosed by the section
                 section - Either 'open section' or 'hollow section'
 
@@ -1009,7 +1009,7 @@ class IS800_2007(object):
         L_LT = cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
                                                                              Restraint_Condition_2, Loading_Condition)
 
-        M_cr = math.sqrt((pi ** 2 * E * I_y / L_LT ** 2) * (G * I_t + (pi ** 2 * E * I_w / L_LT ** 2)))
+        M_cr = math.sqrt((math.pi ** 2 * E * I_y / L_LT ** 2) * (G * I_t + (math.pi ** 2 * E * I_w / L_LT ** 2)))
 
         return M_cr
 

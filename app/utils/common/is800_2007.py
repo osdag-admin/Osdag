@@ -1041,23 +1041,23 @@ class IS800_2007(object):
         I_t = 4 * a_e ** 2 / summation
             return I_t
 
-    
-    def cl_8_2_2_design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
-                                                              Restraint_Condition_2,
-                                                              Loading_Condition, t, section, n, Z_p, Z_e, f_y, V, V_d,
-                                                              M_dv, plastic=False, compact=False, *b):
+
+    def cl_8_2_2_design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, L_LT, f_y, I_y,  I_t, I_w,  E, G,section,plastic=False, compact=False):
         """
              Calculation of design bending strength of laterally unsupported beam
              Args:
                  Z_p - plastic section modulus with respect to extreme compression fibre
                  Z_e - elastic section modulud with respect to extreme compression fibre
+                 L_LT - effective length for lateral torsional buckling
+                 I_y - moment of inertia about minor axis of c/s
                  f_y - yield stress
-                 beta_b - 1.0 for plastic and compact section
-                          Z_p/Z_e for semi-compact section
-                 X_LT - design bending compressive stress
+                 I_t - torsional constant
+                 I_w - warping constant
+                 E - modulus of elasticity
+                 G - modulus of rigidity
+                 plastic - boolean True if section is plastic
+                 compact - boolean True if section is compact
                  section - Either 'Rolled_steel_section' or "Welded_steel_section'
-                 M_cr - elastic critical moment calculated in accordance with 8.2.2.1
-                 f_cr_b - extreme fibre bending compressive stress corresponding to elastic lateral buckling momnet
 
              Returns:
                  M_d - Design bending strength of laterally unsupported beam
@@ -1075,23 +1075,26 @@ class IS800_2007(object):
 
         if section == 'Rolled_steel_section':
             alpha_LT = 0.21
-        else:
+        elif section == 'Welded_steel_Connection':
             alpha_LT = 0.49
 
-        M_cr = Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1,
-                                                         Restraint_Condition_2, Loading_Condition, t, section, n, *b)
+        M_cr = cl_8_2_2_1_Elastic_lateral_torsional_buckling_moment_doubly_symmetric(I_t, I_w, I_y, E, G, L_LT)
         f_cr_b = M_cr / (beta_b * Z_p)
         Lambda_LT = min(math.sqrt(f_y / f_cr_b), math.sqrt(1.2 * Z_e * f_y / M_cr))
-        phi_LT = 0.5 * (1 + alpha_LT * (lambda_LT - 0.2) + lambda_LT ** 2)
-        X_LT = min(1.0, 1 / (phi_LT + math.sqrt(phi_LT ** 2 - lambda_LT ** 2)))
-        f_bd = X_LT * f_y / gamma_m0
+        phi_LT = 0.5 * (1 + alpha_LT * (Lambda_LT - 0.2) + Lambda_LT ** 2)
+        X_LT = min(1.0, 1 / (phi_LT + math.sqrt(phi_LT ** 2 - Lambda_LT ** 2)))
+
 
         if Lambda_LT < 0.4:
-            M_d = Design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, f_y, V, V_d, M_dv, plastic=False,
-                                                                        compact=False)
+           X_LT = 1
 
-        else:
-            M_d = beta_b * Z_p * f_bd
+        ob = IS800_2007()
+
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5['gamma_m0']['yielding']
+
+        f_bd = X_LT * f_y / gamma_m0
+
+        M_d = beta_b * Z_p * f_bd
 
         return M_d
 

@@ -9,7 +9,7 @@ import numpy
 class CADFillet(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21,
-                 bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
+                 bbWeldSideWeb_22, contPL1Weld_U1,  contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft  # beamLeft represents the column
@@ -41,6 +41,7 @@ class CADFillet(object):
 
         self.bbWeldSideWeb_21 = bbWeldSideWeb_21  # Behind bbWeldSideWeb_11
         self.bbWeldSideWeb_22 = bbWeldSideWeb_22  # Behind bbWeldSideWeb_12
+        self.contPL1Weld_U1 = contPL1Weld_U1
 
     def create_3DModel(self):
         """
@@ -68,6 +69,8 @@ class CADFillet(object):
         self.create_bbWeldSideWeb_21()  # right beam weld behind left beam
         self.create_bbWeldSideWeb_22()  # right beam weld behind left beam
 
+        self.create_contPL1Weld_U1()
+
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
@@ -91,6 +94,8 @@ class CADFillet(object):
 
         self.bbWeldSideWeb_21Model = self.bbWeldSideWeb_21.create_model()
         self.bbWeldSideWeb_22Model = self.bbWeldSideWeb_22.create_model()
+
+        self.contPL1Weld_U1Model = self.contPL1Weld_U1.create_model()
 
 
     #############################################################################################################
@@ -269,6 +274,12 @@ class CADFillet(object):
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
 
+    def create_contPL1Weld_U1(self):
+        contPL1Weld_Origin_U1 = numpy.array([self.beamLeft.t/2 ,-self.beamLeft.D/2 + self.beamLeft.T,self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
+        uDirWeb_U1 = numpy.array([0.0, 1.0, 0])
+        wDirWeb_U1 = numpy.array([1.0, 0, 0.0])
+        self.contPL1Weld_U1.place(contPL1Weld_Origin_U1, uDirWeb_U1, wDirWeb_U1)
+
     #############################################################################################################
     #   Following functions returns the CAD model to the function display_3DModel of main file                  #
     #############################################################################################################
@@ -325,6 +336,9 @@ class CADFillet(object):
 
     def get_bbWeldSideWeb_22Model(self):
         return self.bbWeldSideWeb_22Model
+
+    def get_contPL1Weld_U1Model(self):
+        return self.contPL1Weld_U1Model
 
 class CADColWebFillet(CADFillet):
 

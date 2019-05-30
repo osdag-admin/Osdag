@@ -380,8 +380,8 @@ class OnewayEndPlate(object):
 			text_point_up = p2 + 0.2 * length_B * (-label_vector) + text_offset * offset_vector
 			text_point_down = p2 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
 		elif orientation == "SW":
-			text_point_up = p3 + 0.2 * length_B * (label_vector) + text_offset * offset_vector
-			text_point_down = p3 - 0.2 * length_B * label_vector - (text_offset + 15) * offset_vector
+			text_point_up = p3 + 0.05* length_B * (label_vector) + text_offset * offset_vector
+			text_point_down = p3 - 0.05 * length_B * label_vector - (text_offset + 15) * offset_vector
 
 		line = dwg.add(dwg.polyline(points=[p1, p2, p3], fill="none", stroke='black', stroke_width=2.5))
 
@@ -403,8 +403,11 @@ class OnewayEndPlate(object):
 				else:
 					self.draw_weld_marker4(dwg, 15, 8.5, line)
 
-			if self.stiffener_weld ==1:
-				self.draw_weld_marker1(dwg, 30, 7.5, line)
+			if self.stiffener_weld == 1:
+				if orientation == "NE":
+					self.draw_weld_marker1(dwg, 30, 7.5, line)
+				else:
+					self.draw_weld_marker2(dwg, 30, 7.5, line)
 			else:
 				pass
 
@@ -1781,8 +1784,8 @@ class OnewayEnd2DSide(object):
 		point = self.P6
 		theta = 60
 		offset = 50
-		textup =  "                    z " + str(self.data_object.stiffener_weldsize)
-		textdown = "                    z " + str(self.data_object.stiffener_weldsize)
+		textup =  "           z " + str(self.data_object.stiffener_weldsize)
+		textdown = "           z " + str(self.data_object.stiffener_weldsize)
 		element = "weld"
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 		self.data_object.stiffener_weld = 0

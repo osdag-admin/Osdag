@@ -969,25 +969,17 @@ class IS800_2007(object):
 
     # cl8.2.2 DESIGN BENDING STRENGTH OF LATERALLY UNSUPPORTED BEAMS
     # cl8.2.2.1 Elastic lateral torsional buckling moment
-    def cl_8_2_2_1_Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
-                                                  Loading_Condition, section, n, b=[], t=[]):
+    def cl_8_2_2_1_Elastic_lateral_torsional_buckling_moment_doubly_symmetric(I_t, I_w, I_y, E, G, L_LT):
         """
-            Calculation of elastic critical moment or elastic lateral torional buckling moment
+            Calculation of elastic critical moment of lateral torsional buckling for simply supported, prismatic members
+            with symmetric c/s
             Args:
                 I_t - torsional constant
                 I_w - warping constant
                 I_y - moment of inertia about weaker axis
-                r_y - radius of gyration about weaker axis
-                L_LT - effective length for lateral torsional buckling accordance with cl8.3
-                h_f - centre-to-centre distance between flange
-                t_f - thickness of the flange
                 E - Young's Modulus of Elasticity
                 G - modulus of rigidity
-                b - breadth of the elements in a section
-                t - thickness of the elements of the section
-                A_e - Area enclosed by the section
-                section - Either 'open section' or 'hollow section'
-
+                L_LT - effective length for lateral torsional buckling
             Return:
                 M_cr - Elastic lateral torsional buckling moment
             Notes:
@@ -995,6 +987,8 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.2.2.1.
 
         """
+        """
+        Not required:
         if section == 'open_section':
             sum_value = 0
             for i in range(n):
@@ -1005,15 +999,50 @@ class IS800_2007(object):
             for i in range(n):
                 sum_value += (b[i] / t[i])
                 I_t = 4 * A_e / sum_value
+                b - breadth of the elements in a section
+                t - thickness of the elements of the section
+        """
 
-        L_LT = cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
-                                                                             Restraint_Condition_2, Loading_Condition)
-
-        M_cr = math.sqrt((math.pi ** 2 * E * I_y / L_LT ** 2) * (G * I_t + (math.pi ** 2 * E * I_w / L_LT ** 2)))
+        M_cr = math.sqrt((math.pi ** 2 * E * I_y / L_LT ** 2) * (G * I_t + math.pi ** 2 * E * I_w / L_LT ** 2))
 
         return M_cr
 
-    def design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
+    def I_t_open_section(b,t):
+        """
+            Returns torsional constant for open sections
+            Args:
+                b - list of breadth of elements
+                t - list of thickness of elements (in same order)
+            Returns:
+                I_t - torsional constant
+            Note:
+                E - 1.2
+        """
+        I_t = 0
+        for i in range(len(b)):
+            I_t += (b[i] * t[i] ** 3 / 3)
+            return I_t
+
+    def I_t_hollow_section(a_e,b,t):
+        """
+            Returns torsional constant for hollow sections
+            Args:
+                a_e - area
+                b - list of breadth of elements
+                t - list of thickness of elements (in same order)
+            Returns:
+                I_t - torsional constant
+            Note:
+                E - 1.2
+        """
+        summation = 0
+        for i in range(len(b)):
+            summation += (b[i] / t[i])
+        I_t = 4 * a_e ** 2 / summation
+            return I_t
+
+    
+    def cl_8_2_2_design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
                                                               Restraint_Condition_2,
                                                               Loading_Condition, t, section, n, Z_p, Z_e, f_y, V, V_d,
                                                               M_dv, plastic=False, compact=False, *b):

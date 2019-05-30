@@ -5,6 +5,7 @@ Commenced on 24-04-2019
 """""
 
 import numpy
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 
 class CADFillet(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
@@ -272,7 +273,13 @@ class CADFillet(object):
     #   Following functions returns the CAD model to the function display_3DModel of main file                  #
     #############################################################################################################
     def get_beamLModel(self):
-        return self.beamLModel
+        # return self.beamLModel
+        final_column = self.beamLModel
+        bolt_list = self.nut_bolt_array.get_bolt_list()
+        for bolt in bolt_list[:]:
+            final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
+        return final_column
+
 
     def get_beamRModel(self):
         return self.beamRModel
@@ -360,15 +367,19 @@ class CADColWebFillet(CADFillet):
         #   Following functions returns the CAD model to the function display_3DModel of main file                  #
         #############################################################################################################
 
-    def get_beamLModel(self):
-        return self.beamLModel
-
-
-    def get_contPlate_L1Model(self):
-        return self.contPlate_L1Model
-
-    def get_contPlate_L2Model(self):
-        return self.contPlate_L2Model
+    # def get_beamLModel(self):
+    #     # return self.beamLModel
+    #     final_column = self.beamLModel
+    #     bolt_list = self.nut_bolt_array.get_bolt_list()
+    #     for bolt in bolt_list[:]:
+    #         final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
+    #     return final_column
+    #
+    # def get_contPlate_L1Model(self):
+    #     return self.contPlate_L1Model
+    #
+    # def get_contPlate_L2Model(self):
+    #     return self.contPlate_L2Model
 
 class CADGroove(object):
 
@@ -567,8 +578,12 @@ class CADGroove(object):
 #   Following functions returns the CAD model to the function display_3DModel of main file                  #
 #############################################################################################################
     def get_beamLModel(self):
-        return self.beamLModel
-
+        # return self.beamLModel
+        final_column = self.beamLModel
+        bolt_list = self.nut_bolt_array.get_bolt_list()
+        for bolt in bolt_list[:]:
+            final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
+        return final_column
     def get_beamRModel(self):
         return self.beamRModel
 

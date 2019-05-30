@@ -1844,7 +1844,7 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+                extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt, bbWeldAbvFlang_21,
                                         bbWeldAbvFlang_22,
                                         bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                         bbWeldBelwFlang_24,
@@ -1869,7 +1869,7 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                         bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
@@ -1909,7 +1909,7 @@ class Maincontroller(QMainWindow):
                 # 						contPlate_L1, contPlate_L2, contPlate_R1,
                 # 						contPlate_R2, endplate_type, conn_type)
 
-                col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bbWeldAbvFlang_21,
                                                        bbWeldAbvFlang_22,
                                                        bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
@@ -1938,7 +1938,7 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
@@ -2143,8 +2143,8 @@ class Maincontroller(QMainWindow):
                 if numberOfBolts == 12:
                     osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
                                         color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    # osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+                    #                     color='Blue')
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 
@@ -2206,8 +2206,8 @@ class Maincontroller(QMainWindow):
                 if numberOfBolts == 12:
                     osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
                                         color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    # osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
+                    #                     color='Blue')
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 

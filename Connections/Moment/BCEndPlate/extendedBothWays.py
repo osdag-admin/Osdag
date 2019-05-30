@@ -7,7 +7,7 @@ Commenced on 24-04-2019
 import numpy
 
 class CADFillet(object):
-    def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
+    def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21,
                  bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
 
@@ -16,6 +16,7 @@ class CADFillet(object):
         self.beamRight = beamRight
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
+        self.bolt = bolt
         self.beamRight.length = 1000.0
         self.contPlate_L1 = contPlate_L1
         self.contPlate_L2 = contPlate_L2
@@ -123,7 +124,7 @@ class CADFillet(object):
         if self.endplate_type == "one_way":
             gap = 0.5 * self.plateRight.T + self.beamLeft.D / 2
             plateOriginR = numpy.array([-self.plateRight.W / 2, gap, self.beamLeft.length / 2 + (
-                        self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])  # TODO #Add weld thickness here
+                        self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -141,23 +142,21 @@ class CADFillet(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , + (self.plateRight.L / 2)])  # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T , + (self.plateRight.L / 2)])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamLeft.T, self.plateRight.L / 2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.plateRight.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array(
-                [0.0, self.beamLeft.T, self.beamRight.D/2])  # TODO Add self.Lv instead of 25   #+ 30
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.beamRight.D/2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -373,7 +372,7 @@ class CADColWebFillet(CADFillet):
 
 class CADGroove(object):
 
-    def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+    def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
                  contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj):
 
         # Initializing the arguments
@@ -381,6 +380,7 @@ class CADGroove(object):
         self.beamRight = beamRight
         self.plateRight = plateRight
         self.nut_bolt_array = nut_bolt_array
+        self.bolt = bolt
         self.beamRight.length = 1000.0
         self.contPlate_L1 = contPlate_L1
         self.contPlate_L2 = contPlate_L2
@@ -453,7 +453,7 @@ class CADGroove(object):
         self.beamLeft.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def createBeamRGeometry(self):
-        gap = self.beamLeft.D /2  +  self.plateRight.T +  self.bcWeldWeb_3.b /2
+        gap = self.beamLeft.D /2  +  self.plateRight.T +  self.bcWeldWeb_3.b
         beamOriginR = numpy.array([0.0, gap, self.beamLeft.length /2 ])
         beamR_uDir = numpy.array([1.0, 0.0, 0.0])
         beamR_wDir = numpy.array([0.0, 1.0, 0.0])
@@ -480,21 +480,21 @@ class CADGroove(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.beamLeft.T,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.bolt.T,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T , self.plateRight.L /2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T , self.plateRight.L /2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.beamLeft.T, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -544,19 +544,19 @@ class CADGroove(object):
     ##############################################  creating weld sections ########################################
 
     def create_bcWeldFlang_1(self):
-        weldFlangOrigin_1 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
+        weldFlangOrigin_1 = numpy.array([-self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T+self.bcWeldWeb_3.b/2,
                                              self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T/2])
         uDir_1 = numpy.array([0, 1.0, 0])
         wDir_1 = numpy.array([1.0, 0, 0])
         self.bcWeldFlang_1.place(weldFlangOrigin_1, uDir_1, wDir_1)
     def create_bcWeldFlang_2(self):
-        weldFlangOrigin_2 = numpy.array([self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T,
+        weldFlangOrigin_2 = numpy.array([self.beamRight.B / 2, self.beamLeft.D / 2 + self.plateRight.T+self.bcWeldWeb_3.b/2,
                                              self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T/2])
         uDir_2 = numpy.array([0, 1.0, 0])
         wDir_2 = numpy.array([-1.0, 0, 0])
         self.bcWeldFlang_2.place(weldFlangOrigin_2, uDir_2, wDir_2)
     def create_bcWeldWeb_3(self):
-        weldWebOrigin_3 = numpy.array([0.0, self.beamLeft.D / 2 + self.plateRight.T,
+        weldWebOrigin_3 = numpy.array([0.0, self.beamLeft.D / 2 + self.plateRight.T+self.bcWeldWeb_3.b/2,
                                             self.beamLeft.length / 2 - self.bcWeldWeb_3.L / 2])
         uDirWeb_3 = numpy.array([0, 1.0, 0])
         wDirWeb_3 = numpy.array([0, 0, 1.0])

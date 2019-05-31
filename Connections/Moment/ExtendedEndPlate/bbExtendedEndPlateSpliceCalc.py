@@ -343,7 +343,7 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
-    weld_type = str(uiObj["Weld"]["Type"])
+    weld_type = str(uiObj["Weld"]["Type"])  # This is - Fillet weld or Groove weld
     weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
     weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
@@ -1695,156 +1695,165 @@ def bbExtendedEndPlateSplice(uiObj):
 
         #######################################################################
         # Design of Weld
-        # Assumption: The size of weld at flange will be greater than the size of weld at the web
-        # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
-
-        # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
-        # (Reference: Design of Steel structures by Dr. N. Subramanian)
-
-        # Minimum weld size (mm)
-        # Minimum weld size at flange (for drop-down list)
-        # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
-
-        t_thicker = max(beam_tf, beam_tw, tp_provided)
-        t_thinner_weld = min(beam_tf, beam_tw, tp_provided)
-
-        if t_thicker <= 10.0:
-            tw_minimum = 3
-        elif t_thicker > 10.0 and t_thicker <= 20.0:
-            tw_minimum = 5
-        elif t_thicker > 20.0 and t_thicker <= 32.0:
-            tw_minimum = 6
-        elif t_thicker > 32.0 and t_thicker <= 50.0:
-            tw_minimum = 8
-
-        if weld_thickness_flange < tw_minimum:
-            design_status = False
-            logger.error(": Selected weld size at flange is less than the minimum required value")
-            logger.warning(": Minimum weld size required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld size at flange")
-
-        if weld_thickness_web < tw_minimum:
-            design_status = False
-            logger.error(": Selected weld size at web is less than the minimum required value")
-            logger.warning(": Minimum weld size required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld size at web")
-
-
-        # Design of weld at flange
-        # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
-        k = 0.7  # constant (Table 22, IS 800:2007)
-        t_te = max(3, (0.7 * t_thinner_weld))  # effective throat thickness (Cl. 10.5.3.1, IS 800:2007)
-
-        # capacity_unit_flange is the capacity of weld of unit throat thickness
-        capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
-
-        # Calculating the effective length of weld at the flange
-        L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) - (6 * weld_thickness_flange)  # mm
-
-        # Calculating the area of weld at flange (a_weld_flange)
-        a_weld_flange = L_effective_flange * t_te  # mm**2
-
-        # Calculating stresses on weld
-        # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
-        # whereas, the weld at beam web are designed to resist factored shear force and axial loads
-
-        # 1. Direct stress (DS)
-
-        # Since there is no direct stress (DS_flange) acting on weld at flange, the value of direct stress will be zero
-        DS_flange = 0
-
-        # 2. Bending Stress (BS)
-        # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
-        # Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
-        Z = (beam_B + (beam_B - beam_tw - (2 * beam_R1) - (6 * weld_thickness_flange))) * beam_d  # mm **3
-        BS_flange = (M_u * 10 ** 3) / Z
-
-        # Resultant (R)
-        R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
-
-        # Actual required size of weld
-        t_weld_flange_actual = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
-
-        if t_weld_flange_actual % 2 == 0:
-            t_weld_flange = t_weld_flange_actual
-        else:
-            t_weld_flange = t_weld_flange_actual + 1
-
-        if weld_thickness_flange < t_weld_flange:
-            design_status = False
-            logger.error(": Weld size at the flange is not sufficient")
-            logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
-            logger.info(": Increase the weld size at flange")
-        if weld_thickness_flange > min(beam_tf, tp_provided):
-            design_status = False
-            logger.error(": Weld size at the flange exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
-            logger.info(": Decrease the weld size at flange")
-
-        # Design of weld at web
-
-        t_weld_web = int(min(beam_tw, tp_required))
-
-        if t_weld_web % 2 == 0:
-            t_weld_web = t_weld_web
-        else:
-            t_weld_web -= 1
-
-        if t_weld_web > t_weld_flange:
-            t_weld_web = t_weld_flange
-        else:
-            t_weld_web = t_weld_web
-
-        if weld_thickness_web < t_weld_web:
-            design_status = False
-            logger.error(": Weld size at the web is not sufficient")
-            logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
-            logger.info(": Increase the weld size at web")
-        if weld_thickness_web > int(min(beam_tw, tp_required)):
-            design_status = False
-            logger.error(": Weld size at the web exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
-            logger.info(": Decrease the weld size at web")
-
-        if (weld_thickness_flange or weld_thickness_web) > (2 * tw_minimum):
-            logger.warning(": The required weld size is higher, It is recommended to provide full penetration butt weld")
-
         #######################################################################
-        # Weld Checks
-        # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
 
-        # Weld at flange
-        # 1. Check for normal stress
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
 
-        f_a_flange = (force_flange * 10 ** 3) / (t_te * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+            # Assumption: The size of weld at flange will be greater than the size of weld at the web
+            # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
 
-        # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
-        f_wd = weld_fu_govern / (math.sqrt(3) * gamma_mw)
+            # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
+            # (Reference: Design of Steel structures by Dr. N. Subramanian)
 
-        if f_a_flange > f_wd:
-            design_status = False
-            logger.error(": The stress in weld at flange exceeds the limiting value")
-            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2 (Clause 10.5.7.1.1, IS 800:2007)" % f_wd)
-            logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+            # Minimum weld size (mm)
+            # Minimum weld size at flange (for drop-down list)
+            # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
 
-        # Weld at web
-        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) - (2 * weld_thickness_web))
+            t_thicker = max(beam_tf, beam_tw, tp_provided)
+            t_thinner_weld = min(beam_tf, beam_tw, tp_provided)
 
-        # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
-        f_a_web = factored_axial_load * 10 ** 3 / (t_te * L_effective_web)
+            if t_thicker <= 10.0:
+                tw_minimum = 3
+            elif t_thicker > 10.0 and t_thicker <= 20.0:
+                tw_minimum = 5
+            elif t_thicker > 20.0 and t_thicker <= 32.0:
+                tw_minimum = 6
+            elif t_thicker > 32.0 and t_thicker <= 50.0:
+                tw_minimum = 8
 
-        # 2. Check for shear stress
-        q_web = factored_shear_load * 10 ** 3 / (t_te * L_effective_web)
+            if weld_thickness_flange < tw_minimum:
+                design_status = False
+                logger.error(": Selected weld size at flange is less than the minimum required value")
+                logger.warning(": Minimum weld size required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+                logger.info(": Increase the weld size at flange")
 
-        # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
+            if weld_thickness_web < tw_minimum:
+                design_status = False
+                logger.error(": Selected weld size at web is less than the minimum required value")
+                logger.warning(": Minimum weld size required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+                logger.info(": Increase the weld size at web")
 
-        f_e = math.sqrt(f_a_web ** 2 + (3 * q_web ** 2))
 
-        if f_e > f_wd:
-            design_status = False
-            logger.error(": The stress in weld due to combination of shear and axial force at web exceeds the limiting value")
-            logger.warning(": Maximum stress due to combination of forces the weld can carry is %2.2f N/mm^2 (Clause 10.5.10.1.1, IS 800:2007)" % f_wd)
-            logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+            # Design of weld at flange
+            # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
+            k = 0.7  # constant (Table 22, IS 800:2007)
+            t_te = max(3, (0.7 * t_thinner_weld))  # effective throat thickness (Cl. 10.5.3.1, IS 800:2007)
+
+            # capacity_unit_flange is the capacity of weld of unit throat thickness
+            capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+
+            # Calculating the effective length of weld at the flange
+            L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) - (6 * weld_thickness_flange)  # mm
+
+            # Calculating the area of weld at flange (a_weld_flange)
+            a_weld_flange = L_effective_flange * t_te  # mm**2
+
+            # Calculating stresses on weld
+            # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
+            # whereas, the weld at beam web are designed to resist factored shear force and axial loads
+
+            # 1. Direct stress (DS)
+
+            # Since there is no direct stress (DS_flange) acting on weld at flange, the value of direct stress will be zero
+            DS_flange = 0
+
+            # 2. Bending Stress (BS)
+            # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
+            # Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
+            Z = (beam_B + (beam_B - beam_tw - (2 * beam_R1) - (6 * weld_thickness_flange))) * beam_d  # mm **3
+            BS_flange = (M_u * 10 ** 3) / Z
+
+            # Resultant (R)
+            R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
+
+            # Actual required size of weld
+            t_weld_flange_actual = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
+
+            if t_weld_flange_actual % 2 == 0:
+                t_weld_flange = t_weld_flange_actual
+            else:
+                t_weld_flange = t_weld_flange_actual + 1
+
+            if weld_thickness_flange < t_weld_flange:
+                design_status = False
+                logger.error(": Weld size at the flange is not sufficient")
+                logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
+                logger.info(": Increase the weld size at flange")
+            if weld_thickness_flange > min(beam_tf, tp_provided):
+                design_status = False
+                logger.error(": Weld size at the flange exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
+                logger.info(": Decrease the weld size at flange")
+
+            # Design of weld at web
+
+            t_weld_web = int(min(beam_tw, tp_required))
+
+            if t_weld_web % 2 == 0:
+                t_weld_web = t_weld_web
+            else:
+                t_weld_web -= 1
+
+            if t_weld_web > t_weld_flange:
+                t_weld_web = t_weld_flange
+            else:
+                t_weld_web = t_weld_web
+
+            if weld_thickness_web < t_weld_web:
+                design_status = False
+                logger.error(": Weld size at the web is not sufficient")
+                logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
+                logger.info(": Increase the weld size at web")
+            if weld_thickness_web > int(min(beam_tw, tp_required)):
+                design_status = False
+                logger.error(": Weld size at the web exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
+                logger.info(": Decrease the weld size at web")
+
+            if (weld_thickness_flange or weld_thickness_web) > (2 * tw_minimum):
+                logger.warning(": The required weld size is higher, It is recommended to provide full penetration butt weld")
+
+            #######################################################################
+            # Weld Checks
+            # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
+
+            # Weld at flange
+            # 1. Check for normal stress
+
+            f_a_flange = (force_flange * 10 ** 3) / (t_te * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+
+            # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
+            f_wd = weld_fu_govern / (math.sqrt(3) * gamma_mw)
+
+            if f_a_flange > f_wd:
+                design_status = False
+                logger.error(": The stress in weld at flange exceeds the limiting value")
+                logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2 (Clause 10.5.7.1.1, IS 800:2007)" % f_wd)
+                logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+            # Weld at web
+            L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) - (2 * weld_thickness_web))
+
+            # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
+            f_a_web = factored_axial_load * 10 ** 3 / (t_te * L_effective_web)
+
+            # 2. Check for shear stress
+            q_web = factored_shear_load * 10 ** 3 / (t_te * L_effective_web)
+
+            # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
+
+            f_e = math.sqrt(f_a_web ** 2 + (3 * q_web ** 2))
+
+            if f_e > f_wd:
+                design_status = False
+                logger.error(": The stress in weld due to combination of shear and axial force at web exceeds the limiting value")
+                logger.warning(": Maximum stress due to combination of forces the weld can carry is %2.2f N/mm^2 (Clause 10.5.10.1.1, IS 800:2007)" % f_wd)
+                logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+        else:
+            k = 1
+            weld_size_butt = end_plate_thickness
+
 
         #######################################################################
         # Design of Stiffener
@@ -1861,11 +1870,18 @@ def bbExtendedEndPlateSplice(uiObj):
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
         # size of notch (n_s) in the stiffener
-        n_s = weld_thickness_flange + 5
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            n_s = weld_thickness_flange + 5
+        else:
+            n_s = 5
 
         # calculating effective length of the stiffener and the weld
         l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
-        l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+        else:
+            l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_size_butt * weld_fu_govern))
 
         # Height of stiffener (h_st) (mm)
         # TODO: Do calculation for actual height of end plate above
@@ -1928,7 +1944,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # Check in weld for the combined forces
 
         f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
-        q = v_st / (2 * l_weld_st * k * z_weld_st)
+        q = v_st / (2 * l_weld_st * 0.7 * z_weld_st)
         f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
         if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
@@ -1941,7 +1957,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 z_weld_st = max(weld_thickness_flange, thickness_stiffener_provided)  # updated size of weld for stiffener at flange
 
             f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
-            q = v_st / (2 * l_weld_st * k * z_weld_st)
+            q = v_st / (2 * l_weld_st * 0.7 * z_weld_st)
             f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
             if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
@@ -2088,19 +2104,24 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
             outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                outputobj['Weld'] = {}
+                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
 
-            outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-            outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-            outputobj['Weld']['Resultant'] = float(round(R, 3))
-            outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+                outputobj['Weld']['Resultant'] = float(round(R, 3))
+                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+            else:
+                outputobj['Weld'] = {}
+                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2110,11 +2131,12 @@ def bbExtendedEndPlateSplice(uiObj):
                 outputobj['Stiffener']['Height'] = round(h_st, 3)
 
             outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
+            outputobj['Stiffener']['Thickness'] = float(round(thickness_stiffener_provided, 3))
             outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+            outputobj['Stiffener']['Notch'] = float(n_s)
 
             # ===================  CAD ===================
             # if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2236,18 +2258,24 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Plate']['ThickRequired'] = float(tp_required)
             outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                outputobj['Weld'] = {}
+                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+
+                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+                outputobj['Weld']['Resultant'] = float(round(R, 3))
+                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+            else:
+                outputobj['Weld'] = {}
+                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2258,10 +2286,11 @@ def bbExtendedEndPlateSplice(uiObj):
 
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+            outputobj['Stiffener']['Notch'] = float(n_s)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2382,18 +2411,24 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Plate']['ThickRequired'] = float(tp_required)
             outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                outputobj['Weld'] = {}
+                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+
+                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+                outputobj['Weld']['Resultant'] = float(round(R, 3))
+                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+            else:
+                outputobj['Weld'] = {}
+                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2404,10 +2439,11 @@ def bbExtendedEndPlateSplice(uiObj):
 
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+            outputobj['Stiffener']['Notch'] = float(n_s)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2529,18 +2565,24 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Plate']['ThickRequired'] = float(tp_required)
             outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                outputobj['Weld'] = {}
+                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+
+                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+                outputobj['Weld']['Resultant'] = float(round(R, 3))
+                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+            else:
+                outputobj['Weld'] = {}
+                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
             outputobj['Stiffener'] = {}
             if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2551,10 +2593,11 @@ def bbExtendedEndPlateSplice(uiObj):
 
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+            outputobj['Stiffener']['Notch'] = float(n_s)
 
             # ===================  CAD ===================
             if uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -2624,18 +2667,23 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Plate']['ThickRequired'] = 0
         outputobj['Plate']['Mp'] = 0
 
-        outputobj['Weld'] = {}
-        outputobj['Weld']['CriticalStressflange'] = 0
-        outputobj['Weld']['CriticalStressWeb'] = 0
-        outputobj['Weld']['WeldStrength'] = 0
-        outputobj['Weld']['ForceFlange'] = 0
-        outputobj['Weld']['LeffectiveFlange'] = 0
-        outputobj['Weld']['LeffectiveWeb'] = 0
-        outputobj['Weld']['FaWeb'] = 0
-        outputobj['Weld']['Qweb'] = 0
-        outputobj['Weld']['Resultant'] = 0
-        outputobj['Weld']['UnitCapacity'] = 0
-        outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            outputobj['Weld'] = {}
+            outputobj['Weld']['CriticalStressflange'] = 0
+            outputobj['Weld']['CriticalStressWeb'] = 0
+            outputobj['Weld']['WeldStrength'] = 0
+            outputobj['Weld']['ForceFlange'] = 0
+            outputobj['Weld']['LeffectiveFlange'] = 0
+            outputobj['Weld']['LeffectiveWeb'] = 0
+            outputobj['Weld']['FaWeb'] = 0
+            outputobj['Weld']['Qweb'] = 0
+            outputobj['Weld']['Resultant'] = 0
+            outputobj['Weld']['UnitCapacity'] = 0
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+        else:
+            outputobj['Weld'] = {}
+            outputobj['Weld']['WeldSize'] = 0
 
         outputobj['Stiffener'] = {}
         if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2650,6 +2698,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener']['WeldSize'] = 0
         outputobj['Stiffener']['Moment'] = 0
         outputobj['Stiffener']['MomentCapacity'] = 0
+        outputobj['Stiffener']['Notch'] = 0
 
         # ===================  CAD ===================
         if uiObj["Member"]["Connectivity"] == "Extended one way":

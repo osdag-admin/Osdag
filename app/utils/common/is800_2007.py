@@ -1370,7 +1370,7 @@ class IS800_2007(object):
         if c/d < 1.0:
             return 'error : c/d must be greater than or equal to 1'
 
-        phi = math.atan(d / c)
+        phi = math.atan(d / c) / 1.5
 
         T_cr_c = (k_v * math.pi ** 2 * E) / (12 * (1 - mu ** 2) * (d / t_w) ** 2)
         lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
@@ -1389,7 +1389,7 @@ class IS800_2007(object):
         s_c = s
         s_t = s
 
-        w_tf = d * math.cos(phi) + (c - s_c - s_t) * math.sin(phi)
+        w_tf = d * math.cos(phi) - (c - s_c - s_t) * math.sin(phi)
 
         f_v = math.sqrt(f_yw ** 2 - 3 * T_b ** 2 + psi ** 2) - psi
         V_p = A_v * f_yw / math.sqrt(3)
@@ -1399,13 +1399,11 @@ class IS800_2007(object):
         return V_n
 
 
-# STtiffened web Deisign
+    # Stiffened web Panels
     # End plate Design
     # ..............................................................
     # cl8.5.3 Anchor forces
-    # cl8.5.3 Anchor forces
-    def anchor_forces(d, t, f_y, V, method, nu, c, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                      t_f):
+    def cl_8_5_3_anchor_forces(d, t, f_y, V, V_cr, V_tf):
         """ Calculation of resultant longitudinal shear and moment
             Args:
                 d - web depth
@@ -1413,7 +1411,7 @@ class IS800_2007(object):
                 f_y - yield stress
                 V_cr - critical shear strength as defined in cl8.4.2.2.
                 V_tf - basic shear strength as defined in cl8.4.2.2.
-                V = actual factored shear force
+                V - actual factored shear force
             Return:
                 M_tf - resultant longitudinal moment
                 R_tf - resultant longitudinal shear
@@ -1422,20 +1420,19 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007, cl. 8.4.2.2.
         """
-        V_cr = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
-        V_tf = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
+
         V_p = d * t * f_y / math.sqrt(3)
 
+        H_q = 1.25 * V_p * math.sqrt(1 - V_cr / V_p)
+
         if V < V_tf:
-            H_q = (V - V_cr) / (V_tf - V_p)
-        else:
-            H_q = 1.25 * V_p * math.sqrt(1 - V_cr / V_p)
+            H_q *= (V - V_cr) / (V_tf - V_cr)
+
 
         R_tf = H_q / 2
         M_tf = H_q * d / 10
-        return (R_tf, M_tf)
+
+        return R_tf, M_tf
 
     # cl8.6 Design of Beams and Plate Girders with Solid Webs
     # cl8.6.1Minimum Web Thickness

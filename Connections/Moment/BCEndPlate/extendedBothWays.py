@@ -10,7 +10,9 @@ from OCC.BRepAlgoAPI import BRepAlgoAPI_Cut
 class CADFillet(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt, bbWeldAbvFlang_21, bbWeldAbvFlang_22,
                  bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23, bbWeldBelwFlang_24, bbWeldSideWeb_21,
-                 bbWeldSideWeb_22, contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
+                 bbWeldSideWeb_22, bcWeldStiffHL_1,bcWeldStiffHL_2,bcWeldStiffHR_1,bcWeldStiffHR_2,
+                 bcWeldStiffLL_1,bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
+                 contPlate_L1, contPlate_L2, contPlate_R1, contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, conn_type, outputobj):
 
         # Initializing the arguments
         self.beamLeft = beamLeft  # beamLeft represents the column
@@ -44,6 +46,16 @@ class CADFillet(object):
         self.bbWeldSideWeb_21 = bbWeldSideWeb_21  # Behind bbWeldSideWeb_11
         self.bbWeldSideWeb_22 = bbWeldSideWeb_22  # Behind bbWeldSideWeb_12
 
+        self.bcWeldStiffHL_1 = bcWeldStiffHL_1
+        self.bcWeldStiffHL_2 = bcWeldStiffHL_2
+        self.bcWeldStiffHR_1 = bcWeldStiffHR_1
+        self.bcWeldStiffHR_2 = bcWeldStiffHR_2
+
+        self.bcWeldStiffLL_1 = bcWeldStiffLL_1
+        self.bcWeldStiffLL_2 = bcWeldStiffLL_2
+        self.bcWeldStiffLR_1 = bcWeldStiffLR_1
+        self.bcWeldStiffLR_2 = bcWeldStiffLR_2
+
     def create_3DModel(self):
         """
         :return: CAD model of each entity such as Left beam, right beam, both end plates and so on
@@ -70,6 +82,16 @@ class CADFillet(object):
         self.create_bbWeldSideWeb_21()  # right beam weld behind left beam
         self.create_bbWeldSideWeb_22()  # right beam weld behind left beam
 
+        self.create_bcWeldStiffHL_1()
+        self.create_bcWeldStiffHL_2()
+        self.create_bcWeldStiffHR_1()
+        self.create_bcWeldStiffHR_2()
+
+        self.create_bcWeldStiffLL_1()
+        self.create_bcWeldStiffLL_2()
+        self.create_bcWeldStiffLR_1()
+        self.create_bcWeldStiffLR_2()
+
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
@@ -93,6 +115,16 @@ class CADFillet(object):
 
         self.bbWeldSideWeb_21Model = self.bbWeldSideWeb_21.create_model()
         self.bbWeldSideWeb_22Model = self.bbWeldSideWeb_22.create_model()
+
+        self.bcWeldStiffHL_1Model = self.bcWeldStiffHL_1.create_model()
+        self.bcWeldStiffHL_2Model = self.bcWeldStiffHL_2.create_model()
+        self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
+        self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
+
+        self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
+        self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
+        self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
+        self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
 
     #############################################################################################################
@@ -269,6 +301,16 @@ class CADFillet(object):
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
 
+
+    def create_bcWeldStiffHL_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+
+
     #############################################################################################################
     #   Following functions returns the CAD model to the function display_3DModel of main file                  #
     #############################################################################################################
@@ -332,6 +374,9 @@ class CADFillet(object):
     def get_bbWeldSideWeb_22Model(self):
         return self.bbWeldSideWeb_22Model
 
+    def get_bcWeldStiffHL_1Model(self):
+        return self.bcWeldStiffHL_1Model
+
 class CADColWebFillet(CADFillet):
 
     def createBeamLGeometry(self):
@@ -384,6 +429,8 @@ class CADColWebFillet(CADFillet):
 class CADGroove(object):
 
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+                 bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
+                 bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                  contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj):
 
         # Initializing the arguments

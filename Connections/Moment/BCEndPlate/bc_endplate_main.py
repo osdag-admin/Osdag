@@ -1818,6 +1818,22 @@ class Maincontroller(QMainWindow):
         Following sections are for creating Fillet Welds and Groove Welds
         Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
         '''
+        ############################### Weld for the beam stiffeners ################################################
+
+        # bbWeld for stiffener hight on left side
+        bcWeldStiffHL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                     L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchBottom'])
+        bcWeldStiffHL_2 = copy.copy(bcWeldStiffHL_1)
+        bcWeldStiffHR_1 = copy.copy(bcWeldStiffHL_1)
+        bcWeldStiffHR_2 = copy.copy(bcWeldStiffHL_1)
+
+        bcWeldStiffLL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                     L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchBottom'])
+        bcWeldStiffLL_2 = copy.copy(bcWeldStiffLL_1)
+        bcWeldStiffLR_1 = copy.copy(bcWeldStiffLL_1)
+        bcWeldStiffLR_2 = copy.copy(bcWeldStiffLL_1)
+
+
         if conn_type == 'col_flange_connectivity':
 
             if alist["Weld"]["Method"] == "Fillet Weld":
@@ -1849,6 +1865,8 @@ class Maincontroller(QMainWindow):
                                         bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                         bbWeldBelwFlang_24,
                                         bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                        bcWeldStiffHL_1,bcWeldStiffHL_2,bcWeldStiffHR_1,bcWeldStiffHR_2,
+                                        bcWeldStiffLL_1,bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, conn_type,
                                         outputobj)
@@ -1871,6 +1889,8 @@ class Maincontroller(QMainWindow):
 
                 extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                         bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+                                        bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
+                                        bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
                 extbothWays.create_3DModel()
@@ -1915,6 +1935,10 @@ class Maincontroller(QMainWindow):
                                                        bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                                        bbWeldBelwFlang_24,
                                                        bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                                       bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1,
+                                                       bcWeldStiffHR_2,
+                                                       bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
+                                                       bcWeldStiffLR_2,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
                                                        conn_type, outputobj)
@@ -1940,6 +1964,10 @@ class Maincontroller(QMainWindow):
 
                 col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+                                                       bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1,
+                                                       bcWeldStiffHR_2,
+                                                       bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
+                                                       bcWeldStiffLR_2,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
                                                        outputobj)

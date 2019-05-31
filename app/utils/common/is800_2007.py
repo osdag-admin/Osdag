@@ -1181,7 +1181,33 @@ class IS800_2007(object):
 
         return A_v
 
-    # cl8.4.2 TODO: CHECK RESISTANCE TO SHEAR BUCKLING
+    # cl8.4.2
+    # cl8.4.2.1 Check for resistance to shear buckling
+    def cl_8_4_2_shear_buckling_check(d, t_w, k_v, fy, stiffeners):
+        """
+            Check for resistance against shear buckling
+            Args:
+                d - clear depth of web between flanges
+                t_w - thickness of web
+                k_v -shear buckling coefficient
+                fy - yield stress in N/mm^2
+                stiffeners - True if web has stiffeners else False
+            Return:
+                check - True if check is satisfied else false
+            Note:
+                Reference:
+                IS 800:2007, cl. 8.4.2.1
+        """
+        epsilon = math.sqrt(250/fy)
+        if stiffeners == False:
+            val = 67 * epsilon
+
+        else:
+            val = 67 * epsilon * math.sqrt(k_v/5.35)
+        if d / t_w > val
+            return True
+        else:
+            return False
 
     # cl8.4.2.2 Shear buckling design method
     def nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,

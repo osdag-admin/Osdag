@@ -1183,6 +1183,26 @@ class IS800_2007(object):
 
     # cl8.4.2
     # cl8.4.2.1 Check for resistance to shear buckling
+    def cl_8_4_shear_buckling_coeff_Kv(only_at_support,c=None,d=None):
+        """
+        Args:
+            only_at_support - True if transverse stiffeners are provided only at support
+                              else False
+            c -  spacing of transverse stiffeners
+            d -  depth of web
+        Returns:
+            k_v - shear buckling coefficient
+        Note:
+              Reference - IS800_2007 cl.8.4.2.1 and cl.8.4.2.2
+        """
+        if only_at_support == True:
+            k_v = 5.35
+        elif c/d < 1:
+            k_v = 4 + 5.35 / (c/d)**2
+        else :
+            k_v = 5.35 + 4 / (c / d) ** 2
+        return k_v
+
     def cl_8_4_2_shear_buckling_check(d, t_w, k_v, fy, stiffeners):
         """
             Check for resistance against shear buckling
@@ -1247,10 +1267,10 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.4.2.2.
 
         """
-
-        A_v = shear_area_of_different_section(A, b, d, h, t_f, t_w, Section, Axis_of_Bending, Load_application_axis,
+        ob = IS800_2007()
+        A_v = ob.shear_area_of_different_section(A, b, d, h, t_f, t_w, Section, Axis_of_Bending, Load_application_axis,
                                               Section_type)
-        if method == 'Simple_post_ critical_method':
+        if method == 'Simple_post_critical_method':
             if position_of_transverse_shear == 'At support':
                 K_v = 5.35
             elif c / d < 1.0:

@@ -1205,9 +1205,11 @@ class IS800_2007(object):
         else:
             val = 67 * epsilon * math.sqrt(k_v/5.35)
         if d / t_w > val
-            return True
+            check == True
         else:
-            return False
+            check == False
+
+        return check
 
     # cl8.4.2.2 Shear buckling design method
     def nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,

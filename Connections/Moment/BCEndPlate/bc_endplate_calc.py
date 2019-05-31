@@ -495,6 +495,7 @@ def bc_endplate_design(uiObj):
         flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_flange, fusion_face_angle=90)
         flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tf, end_plate_thickness)
+        flange_weld_size_max = max(beam_tf, end_plate_thickness)
 
         # Web welds
 
@@ -502,6 +503,7 @@ def bc_endplate_design(uiObj):
         web_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_web, fusion_face_angle=90)
         web_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tw, end_plate_thickness)
+        web_weld_size_max = max(beam_tw, end_plate_thickness)
 
         # check min and max weld size
 
@@ -511,10 +513,10 @@ def bc_endplate_design(uiObj):
             logger.warning(": The minimum required weld size at beam flange is %s mm" % flange_weld_size_min)
             logger.info(": Increase the size of weld at beam flanges")
 
-        if flange_weld_throat_size >= flange_weld_throat_max:
+        if weld_thickness_flange >= flange_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam flange is more than allowed")
-            logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_throat_max)
+            logger.warning(": The maximum allowed throat size of weld at flanges is %s mm" % flange_weld_size_max)
             logger.info(": Decrease the size of weld at beam flanges")
 
         if weld_thickness_web <= web_weld_size_min:
@@ -523,10 +525,10 @@ def bc_endplate_design(uiObj):
             logger.warning(": The minimum required weld size at beam web is %s mm" % web_weld_size_min)
             logger.info(": Increase the size of weld at beam web")
 
-        if web_weld_throat_size >= web_weld_throat_max:
+        if weld_thickness_web >= web_weld_size_max:
             design_status = False
             logger.error(": The weld size at beam web is more than allowed")
-            logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_throat_max)
+            logger.warning(": The maximum allowed throat size of weld at webs is %s mm" % web_weld_size_max)
             logger.info(": Decrease the size of weld at beam web")
 
         # Weld lengths - available and effective, long joint reduction factors
@@ -574,40 +576,44 @@ def bc_endplate_design(uiObj):
 
         flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
         flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
 
         web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_throat_size
-
         web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_strength, 3)
+        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
 
         if flange_weld_stress >= flange_weld_strength:
             design_status = False
             logger.error(": The weld size at beam flange is less than required")
-            logger.warning(": The minimum required throat size of weld flanges is %s mm" % flange_weld_throat_reqd)
+            logger.warning(": The minimum required size of weld at flanges is %s mm" % flange_weld_size_reqd)
             logger.info(": Increase the size of weld at beam flanges")
 
         if web_weld_stress >= web_weld_strength:
             design_status = False
             logger.error(": The weld size at beam web is less than required")
-            logger.warning(": The minimum required throat size of weld web is %s mm" % web_weld_throat_reqd)
+            logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
             logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'
         groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
             beam_tf, beam_tw, end_plate_thickness)
 
-    # Continuity Plates on compression side
+    # Continuity Plates
     cont_plate_fu = beam_fu
     cont_plate_fy = beam_fy
     cont_plate_e = math.sqrt(250/cont_plate_fy)
     gamma_m0 = 1.10
     gamma_m1 = 1.10
-    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load   # Compressive force at beam flanges
 
+    # Continuity Plates on compression side
+    p_bf = factored_moment / (beam_d - beam_tf) - factored_axial_load   # Compressive force at beam flanges
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
+    notch_cont_comp = round_up(value=column_R1, multiplier=5, minimum_value=5)
+    eff_cont_comp_width = cont_plate_comp_width - notch_cont_comp
+    eff_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
 
     col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
-
     col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
         1 + 3 * (beam_tf / column_d) * (column_tw / column_tf) ** 1.5) * math.sqrt(column_fy * column_tf / column_tw)
     col_web_capacity_buckling = (10710 * (column_tw ** 3) / column_d) * math.sqrt(column_fy / gamma_m0)
@@ -623,22 +629,36 @@ def bc_endplate_design(uiObj):
             break
         else:
             cont_plate_tk_flange = 0
-    # Continuity Plates on compression side
+    #  Weld design for column web compression continuity plates # TODO:
+    cont_comp_weld_size = 8
+    cont_comp_weld_length = 0
+
+
+
+
+
+
+    # Continuity Plates on tension side
+    t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load  # Tensile force at beam flanges
     cont_plate_tens_length = column_d - 2 * column_tf
     cont_plate_tens_width = (column_B - column_tw) / 2
+    notch_cont_tens = round_up(value=column_R1, multiplier=5, minimum_value=5)
+    eff_cont_tens_width = cont_plate_tens_width - notch_cont_tens
+    eff_cont_tens_length = cont_plate_tens_length - 2 * notch_cont_tens
 
-    t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load   # Tensile force at beam flanges
     col_flange_tens_capacity = (column_tf ** 2) * beam_fy / (0.16 * gamma_m0)
     cont_plate_tens_tk_min = max(cont_plate_tk_flange,
                                  (t_bf - col_flange_tens_capacity) / (cont_plate_tens_width * cont_plate_fy / gamma_m0))
 
-    #  Weld design for column web continuity plates # TODO: Anjali
+    #  Weld design for column web tension continuity plates # TODO:
+    cont_tens_weld_size = 8
+    cont_tens_weld_throat = 8
 
-
-
-
-
-
+    cont_tens_weld_length = 0
+    p_st = max(p_bf, t_bf) / 2  # Force induced in each piece of the column continuity plate
+    m_st = max((p_bf * g_1) / 4, (t_bf * g_1) / 4)  # Moment induced in the column continuity plate
+    eff_cont_tens_weld_length = 2 * (eff_cont_tens_length - 2 * cont_tens_weld_size)
+    capacity_fillet_weld = (eff_cont_tens_weld_length * weld_fu * cont_tens_weld_throat) / (math.sqrt(3) * gamma_m0)
 
 
 
@@ -873,7 +893,7 @@ def bc_endplate_design(uiObj):
     # End of SAMPLE Output dictionary
     
     if design_status is True:
-        logger.info(": Overall extended end plate connection design is safe \n")
+        logger.info(": Overall end plate moment connection design is safe \n")
         logger.debug(" :=========End Of design===========")
     else:
         logger.error(": Design is not safe \n ")

@@ -288,14 +288,14 @@ class CADFillet(object):
         self.bbWeldBelwFlang_24.place(weldBelwFlangOrigin_24, uDirBelw_24, wDirBelw_24)
 
     def create_bbWeldSideWeb_21(self):
-        weldSideWebOrigin_21 = numpy.array([-self.beamLeft.t / 2, self.beamLeft.D / 2 + self.plateRight.T,
+        weldSideWebOrigin_21 = numpy.array([-self.beamRight.t / 2, self.beamLeft.D / 2 + self.plateRight.T,
                                             self.beamLeft.length / 2 - self.bbWeldSideWeb_21.L / 2])
         uDirWeb_21 = numpy.array([0, 1.0, 0])
         wDirWeb_21 = numpy.array([0, 0, 1.0])
         self.bbWeldSideWeb_21.place(weldSideWebOrigin_21, uDirWeb_21, wDirWeb_21)
 
     def create_bbWeldSideWeb_22(self):
-        weldSideWebOrigin_22 = numpy.array([self.beamLeft.t / 2, self.beamLeft.D / 2 + self.plateRight.T,
+        weldSideWebOrigin_22 = numpy.array([self.beamRight.t / 2, self.beamLeft.D / 2 + self.plateRight.T,
                                             self.beamLeft.length / 2 + self.bbWeldSideWeb_21.L / 2])
         uDirWeb_22 = numpy.array([0, 1.0, 0])
         wDirWeb_22 = numpy.array([0, 0, -1.0])
@@ -311,51 +311,51 @@ class CADFillet(object):
 
     def create_bcWeldStiffHL_2(self):
         weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+                                            self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.L22])
         uDirStiffHL_1 = numpy.array([0, 1.0, 0])
         wDirStiffHL_1 = numpy.array([0, 0, -1.0])
         self.bcWeldStiffHL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffHR_1(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
                                             self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
         uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        wDirStiffHL_1 = numpy.array([0, 0, 1.0])
         self.bcWeldStiffHR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffHR_2(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.W])
         uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        wDirStiffHL_1 = numpy.array([0, 0, 1.0])
         self.bcWeldStiffHR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffLL_1(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 ])
+        uDirStiffHL_1 = numpy.array([1, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0, -1.0, 0.0])
         self.bcWeldStiffLL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffLL_2(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L22,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2])
+        uDirStiffHL_1 = numpy.array([1.0, 0.0, 0.0])
+        wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
         self.bcWeldStiffLL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffLR_1(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L22,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 ])
+        uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
         self.bcWeldStiffLR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
     def create_bcWeldStiffLR_2(self):
-        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
-                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
-        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
-        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2])
+        uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0.0, -1.0, 0.0])
         self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
 
 

@@ -679,6 +679,8 @@ class Maincontroller(QMainWindow):
         self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
         self.ui.actionSample_Tutorials.triggered.connect(self.open_tutorials)
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
+        self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
+        #self.ui.combo_weld_method.triggered.connect(self.on_change)
 
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
@@ -720,10 +722,15 @@ class Maincontroller(QMainWindow):
         self.resultObj = None
         self.disable_buttons()
 
+
     def on_change(self, newIndex):
         if newIndex == "Groove Weld (CJP)":
             self.ui.combo_flangeSize.setEnabled(False)
             self.ui.combo_webSize.setEnabled(False)
+        else:
+            self.ui.combo_flangeSize.setEnabled(True)
+            self.ui.combo_webSize.setEnabled(True)
+
 
     def init_display(self, backend_str=None, size=(1024, 768)):
         from OCC.Display.backend import load_backend, get_qt_modules
@@ -1010,7 +1017,6 @@ class Maincontroller(QMainWindow):
         Returns: Design preference inputs
         """
         self.uiObj = self.get_user_inputs()
-        self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
         # if self.designPrefDialog.saved is not True:
         # 	design_pref = self.designPrefDialog.save_default_para()
         # else:
@@ -1302,7 +1308,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_connLoc.setCurrentIndex(0)
         self.ui.combo_columnSec.setCurrentIndex(0)
         self.ui.combo_beamSec.setCurrentIndex(0)
-        self.ui.lbl_connectivity.clear()
+        #self.ui.lbl_connectivity.clear()
         self.ui.txt_Fu.clear()
         self.ui.txt_Fy.clear()
         self.ui.txt_Axial.clear()
@@ -1312,6 +1318,7 @@ class Maincontroller(QMainWindow):
         self.ui.combo_type.setCurrentIndex(0)
         self.ui.combo_grade.setCurrentIndex(0)
         self.ui.combo_plateThick.setCurrentIndex(0)
+        self.ui.combo_weld_method.setCurrentIndex(0)
         self.ui.combo_flangeSize.setCurrentIndex(0)
         self.ui.combo_webSize.setCurrentIndex(0)
 
@@ -1322,18 +1329,17 @@ class Maincontroller(QMainWindow):
         self.ui.txt_boltcapacity.clear()
         self.ui.txt_boltgrpcapacity.clear()
         self.ui.txt_noBolts.clear()
-        self.ui.txt_rowBolts.clear()
-        self.ui.txt_gauge.clear()
+
         self.ui.txt_crossGauge.clear()
         self.ui.txt_endDist.clear()
         self.ui.txt_edgeDist.clear()
-        self.ui.txt_criticalFlange.clear()
-        self.ui.txt_criticalWeb.clear()
+
 
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)
         self.ui.btn_plateDetail_2.setDisabled(True)
         self.ui.btn_stiffnrDetail.setDisabled(True)
+        self.ui.btn_Weld.setDisabled(True)
         self.ui.btnFront.setDisabled(True)
         self.ui.btnTop.setDisabled(True)
         self.ui.btnSide.setDisabled(True)

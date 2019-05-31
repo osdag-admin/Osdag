@@ -514,54 +514,54 @@ class IS800_2007(object):
     #cl7.6 Laced column
     #cl 7.6.1.5.Effective slenderness ratiion of lacing member
     def effective_slenderness_ratio_of_lacing_member(K_L, r_min):
-    """
-    Calculation of Effective slenderness ratiion of lacing member
-    to account for shear deformation
-    Args:
-        K_L -effective length of column
-        r_min - radius of gyration of column member
-        SR_0 - actual maximum slenderness ration of column
-    Returns:
-        SR_eff - effective slenderness ration of lacing
-    Note:
-        Reference:
-        IS 800:2007, cl 7.6.1.5
-    """
+        """
+        Calculation of Effective slenderness ratiion of lacing member
+        to account for shear deformation
+        Args:
+            K_L -effective length of column
+            r_min - radius of gyration of column member
+            SR_0 - actual maximum slenderness ration of column
+        Returns:
+            SR_eff - effective slenderness ration of lacing
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.1.5
+        """
 
         SR_0 = K_L/r_min
         SR_eff = 1.05*SR_0
 
-            return SR_eff
+        return SR_eff
 
     #cl 7.6.2 Width of Lacing  Bars
     def cl_7_6_2_width_of_lacing_bars(d):
-    """
-    Calculation of min width of Lacing  Bars
-    Args:
-        d - nominal bolt/rivet diameter
-    Returns:
-        w_min - min Width of Lacing  Bars
-    Note:
-        Reference:
-        IS 800:2007, cl 7.6.2
-    """
+        """
+        Calculation of min width of Lacing  Bars
+        Args:
+            d - nominal bolt/rivet diameter
+        Returns:
+            w_min - min Width of Lacing  Bars
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.2
+        """
 
         w_min = 3*d
         return w_min
 
     #cl 7.6.3 Thickness of Lacing Bars
     def cl_7_6_3_minimum_thickness_of_lacing_bars(lacing_type,L_eff):
-    """
-        Calculation of  min Thickness of Lacing Bars
-    Args:
-        Lacing_type - either 'single_lacing' or 'double_lacing'
-        L_eff - effective length of lacing bars
-    Returns:
-        t_min - mininimum thickness of Lacing Bars
-    Note:
-        Reference:
-        IS 800:2007, cl 7.6.3
-    """
+        """
+            Calculation of  min Thickness of Lacing Bars
+        Args:
+            Lacing_type - either 'single_lacing' or 'double_lacing'
+            L_eff - effective length of lacing bars
+        Returns:
+            t_min - mininimum thickness of Lacing Bars
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.3
+        """
 
         if lacing_type == 'single_lacing':
             t_min = 1/40 *L_eff
@@ -1039,7 +1039,7 @@ class IS800_2007(object):
         for i in range(len(b)):
             summation += (b[i] / t[i])
         I_t = 4 * a_e ** 2 / summation
-            return I_t
+        return I_t
 
 
     def cl_8_2_2_design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, L_LT, f_y, I_y,  I_t, I_w,  E, G,section,plastic=False, compact=False):
@@ -1224,47 +1224,47 @@ class IS800_2007(object):
 
         else:
             val = 67 * epsilon * math.sqrt(k_v/5.35)
-        if d / t_w > val
-            check == True
+        if d / t_w > val :
+            check = True
         else:
-            check == False
+            check = False
 
         return check
 
     # cl8.4.2.2 Shear buckling design method
+    """
     def nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,
                                Section, Axis_of_Bending, Load_application_axis, Section_type):
         """
-            Calculation of nominal shear strength
-            Args:
-                 method - Either 'Simple_post_ critical_method' or 'Tension_field_method'
-                 A_v - shear area defined in cl8.4.1.1
-                 T_b - shear stress corresponding to web buckling
-                 lambda_w - non-dimensional web slenderness ratio for shear buckling stress
-                 T_cr_c - the elastic critical shear stress of the web
-                 nu - poisson 's ration
-                 c - spacing of transverse stiffners
-                 d - depth of the web
-                 E - youngs modulus of elasticity
-                 t_w - thickness of web
-                 f_yw - yield strenth of  the web
-                 V_cr - shear force corresponding to web buckling
-                 f_v - yield strength of the tension field
-                 phi - inclination of the tension field
-                 w_tf - the width of the tension field
-                 s_c - anchorage lengths of tension field  along the compresssion flange
-                 s_t - anchorage lengths of tension field  along the tension flange
-                 M_fr - reduecd plastic moment capacity of the repective flange plate after accounting for axial force
-                 N_f - reduecd plastic moment capacity in the flange due to overall bending and
-                        any external axial force in the cross section
-                 b_f - width of the relevent flange
-                 t_f - thickness of the relevent flange
-                 f_yt - yield stress of the flange
-            Return:
-                V_n - nominal shear strength
-            Note:
-                Reference:
-                IS 800:2007, cl. 8.4.2.2.
+        # Calculation of nominal shear strength
+        # Args:
+        #      A_v - shear area defined in cl 8.4.1.1
+        #      T_b - shear stress corresponding to web buckling
+        #      lambda_w - non-dimensional web slenderness ratio for shear buckling stress
+        #      T_cr_c - the elastic critical shear stress of the web
+        #      nu - poisson 's ration
+        #      c - spacing of transverse stiffners
+        #      d - depth of the web
+        #      E - youngs modulus of elasticity
+        #      t_w - thickness of web
+        #      f_yw - yield strenth of  the web
+        #      V_cr - shear force corresponding to web buckling
+        #      f_v - yield strength of the tension field
+        #      phi - inclination of the tension field
+        #      w_tf - the width of the tension field
+        #      s_c - anchorage lengths of tension field  along the compresssion flange
+        #      s_t - anchorage lengths of tension field  along the tension flange
+        #      M_fr - reduecd plastic moment capacity of the repective flange plate after accounting for axial force
+        #      N_f - reduecd plastic moment capacity in the flange due to overall bending and
+        #             any external axial force in the cross section
+        #      b_f - width of the relevent flange
+        #      t_f - thickness of the relevent flange
+        #      f_yt - yield stress of the flange
+        # Return:
+        #     V_n - nominal shear strength
+        # Note:
+        #     Reference:
+        #     IS 800:2007, cl. 8.4.2.2.
 
         """
         ob = IS800_2007()
@@ -1280,7 +1280,7 @@ class IS800_2007(object):
 
                 return K_v
 
-            T_cr_c = (K_v * pi ** 2 * E) / (12 * (1 - nu ** 2) * (d / t_w) ** 2)
+            T_cr_c = (K_v * math.pi ** 2 * E) / (12 * (1 - mu ** 2) * (d / t_w) ** 2)
             lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
 
             if lambda_w <= 0.8:
@@ -1317,7 +1317,89 @@ class IS800_2007(object):
 
             return V_n
 
-    # STtiffened web Deisign
+    """
+    def cl_8_4_2_2_nominal_shear_post_critical(A_v,k_v,mu,E,d,t_w,f_yw)
+        """
+        Calculates nominal shear strength as governed by buckling using simple post critical method
+        Args:
+            A_v - shear area defined in cl 8.4.1.1
+            k_v - shear buckling coefficient
+            mu - poisson's ratio
+            E - modulus of elasticity
+            d - depth of web
+            t_w - thickness of web
+            f_yw - characteristic yield stress of web material
+        Return:
+            V_n - nominal shear strength
+        Note:
+             Reference: IS800:2007 cl.8.4.2.2
+        """
+        T_cr_c = (k_v * math.pi ** 2 * E) / (12 * (1 - mu ** 2) * (d / t_w) ** 2)
+        lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
+
+        if lambda_w < 1.2:
+            T_b = (1 - 0.8 * max((lambda_w - 0.8),0)) * (f_yw / math.sqrt(3))
+        else:
+            T_b = f_yw / (math.sqrt(3) * lambda_w ** 2)
+
+        V_n = A_v * T_b # same as Vcr
+
+        return V_n
+
+
+    def cl_8_4_2_2_nominal_shear_tension_field(A_v,k_v,mu,E,d,t_w,t_f,b_f,f_yw,c,f_yf,N_f):
+        """
+        Calculates nominal shear strength as governed by buckling using tension field method
+        Args:
+            A_v - shear area defined in cl 8.4.1.1
+            k_v - shear buckling coefficient
+            mu - poisson's ratio
+            E - modulus of elasticity
+            d - depth of web
+            t_w - thickness of web
+            t_f - thickness of flange
+            b_f - width of flange
+            f_yw - characteristic yield stress of web material
+            c - spacing of stiffeners in web
+            f_yf - characteristic yield stress of flange material
+            N_f - axial force in flange due to to overall bending and external axial force
+        Return:
+            Note: Reference - IS800:2007 cl.8.4.2.2
+        """
+        ob = IS800_2007
+        if c/d < 1.0:
+            return 'error : c/d must be greater than or equal to 1'
+
+        phi = math.atan(d / c)
+
+        T_cr_c = (k_v * math.pi ** 2 * E) / (12 * (1 - mu ** 2) * (d / t_w) ** 2)
+        lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
+
+        if lambda_w < 1.2:
+            T_b = (1 - 0.8 * max((lambda_w - 0.8), 0)) * (f_yw / math.sqrt(3))
+        else:
+            T_b = f_yw / (math.sqrt(3) * lambda_w ** 2)
+
+        psi = 1.5 * T_b * math.sin(2 * phi)
+
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        M_fr = 0.25 * b_f * t_f ** 2 * f_yf * (1 - (N_f / (b_f * t_f * f_yf / gamma_m0)) ** 2)
+
+        s = min(c, (2 / math.sin(phi) * math.sqrt(M_fr / f_yw * t_w)))
+        s_c = s
+        s_t = s
+
+        w_tf = d * math.cos(phi) + (c - s_c - s_t) * math.sin(phi)
+
+        f_v = math.sqrt(f_yw ** 2 - 3 * T_b ** 2 + psi ** 2) - psi
+        V_p = A_v * f_yw / math.sqrt(3)
+
+        V_n = min(V_p, (A_v * T_b + 0.9 * w_tf * t_w * f_v * math.sin(phi)))
+
+        return V_n
+
+
+# STtiffened web Deisign
     # End plate Design
     # ..............................................................
     # cl8.5.3 Anchor forces

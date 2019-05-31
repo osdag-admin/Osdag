@@ -1100,13 +1100,11 @@ class IS800_2007(object):
 
     # --------------------
     # cl8.4 Shear Design
-    def design_shear_strength_of_beam(V_n, V, Safety_factor):
+    def cl_8_4_design_shear_strength_of_beam(V_n):
         """
-            Dsign shear strength
+            Design shear strength
         Args:
             V_n -Nominal  shear strength of a cross-section
-            V - Factored design shear force
-            Safety_factor- Either 'Field' or 'shop'
         Return
             V_d - Design shear strength
         Note:
@@ -1114,31 +1112,27 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.4
 
         """
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0'][safety_factor_parameter]
-        V_d = V_n / gamma_mo
-        if V <= V_d:
-            return V_d
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        V_d = V_n / gamma_m0
+        return V_d
 
-    def nominal_plastic_shear_resistance_under_pure_shear(A_v, f_yw):
+    def cl_8_4_1_nominal_plastic_shear_resistance_under_pure_shear(A_v, f_yw):
         """
             Calculation of nominal plastic shear resistance under pure shear
             Args:
                 A_v - Shear area
                 f_yw - yield shear of the web
-
             Returns:
-                V_n - Nominal plastic shear resistance under pure force
-
-             Note:
+                V_n - Nominal plastic shear resistance under pure shear
+            Note:
                 Reference:
                 IS 800:2007, cl. 8.4
         """
 
-        V_p = A_v * f_yw / math.sqrt(3)
-        V_n = V_p
+        V_n = A_v * f_yw / math.sqrt(3)
         return V_n
 
-    def shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis):
+    def cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, axis_of_bending, load_application_axis):
         """
             Calculation of shear area of different section
 
@@ -1146,15 +1140,14 @@ class IS800_2007(object):
                 A - cross - section area
                 b - overall breadth of tubular section,breadth of I - section flange
                 d - clear depth of the web between flange
-                h- overll depth of teh section
+                h- overall depth of teh section
                 t_f - thickness of the flange
                 t_w - thickness of the web
                 section - Either 'I_Section' or 'Channel_section' or 'Rectangular_hollow_section_of_uniform_depth'
-                          or 'Circular_hollow_tubes_of_uniform_thickness' or 'plates' or 'solid_bars'
-                Load_application_axis - Either 'Loaded_parallel_to_depth(h)' or 'Loaded_parallel_to_width(b)'
-                Axis_of_Bending - Either 'Major_Axis_Bending' or 'Minor_Axis_Bending'
+                          or 'Circular_hollow_tubes_of_uniform_thickness' or 'plates_solid_bars'
+                axis_of_Bending - Either 'Major_Axis' or 'Minor_Axis'
                 cross_section - Either 'Hot_Rolled' or ' Welded'
-
+                load_application_axis - 'loaded_parallel_to depth' or 'loaded_parallel_to_width'
             Return:
                 A_v - Shear area
 
@@ -1163,40 +1156,30 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.4.1.1
 
         """
-        if Axis_of_Bending == 'Major_Axis_Bending':
-            if section == 'I_section_Hot_Rolled':
+        if axis_of_Bending == 'Major_Axis':
+            if section == 'I_Channel_Hot_Rolled':
                 A_v = h * t_w
-                return A_v
-            else:
+            elif section == 'I_Channel_Welded':
                 A_v = d * t_w
-                return A_v
 
-        if Axis_of_Bending == 'Minor_Axis_Bending':
-            if Section == 'I_section_Hot_Rolled':
+        if axis_of_Bending == 'Minor_Axis':
+            if section == 'I_Channel_Hot_Rolled' or section == 'I_Channel_Welded':
                 A_v = 2 * b * t_f
-                return A_v
-            else:
-                A_v = 2 * b * t_f
-                return A_v
 
-            if section == 'Rectangular_hollow_section_of_uniform_depth':
-                if load_application_axis == 'Loaded_parallel_to_depth':
-                    A_v = A * h / (b + h)
-                    return A_v
-                else:
-                    A_v = A * b / (b + h)
-                    return A_v
+        if section == 'Rectangular_hollow_section_of_uniform_depth':
+            if load_application_axis == 'loaded_parallel_to_depth':
+                A_v = A * h / (b + h)
 
-            if section == 'Circular_hollow_tubes_of_uniform_thickness':
-                A_v = A
-                return A_v
+            elif load_application_axis == 'loaded_parallel_to_width':
+                A_v = A * b / (b + h)
 
-            if section == 'plates':
-                A_v = A
-            else:
-                A_v = A
+        if section == 'Circular_hollow_tubes_of_uniform_thickness':
+            A_v = 2 * A / math.pi
 
-            return A_v
+        if section == 'plates_solid_bars':
+            A_v = A
+
+        return A_v
 
     # cl8.4.2 TODO: CHECK RESISTANCE TO SHEAR BUCKLING
 

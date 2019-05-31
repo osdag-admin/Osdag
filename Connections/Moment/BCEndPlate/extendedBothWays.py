@@ -530,6 +530,16 @@ class CADGroove(object):
         self.bcWeldFlang_2 = bcWeldFlang_2
         self.bcWeldWeb_3 = bcWeldWeb_3
 
+        self.bcWeldStiffHL_1 = bcWeldStiffHL_1
+        self.bcWeldStiffHL_2 = bcWeldStiffHL_2
+        self.bcWeldStiffHR_1 = bcWeldStiffHR_1
+        self.bcWeldStiffHR_2 = bcWeldStiffHR_2
+
+        self.bcWeldStiffLL_1 = bcWeldStiffLL_1
+        self.bcWeldStiffLL_2 = bcWeldStiffLL_2
+        self.bcWeldStiffLR_1 = bcWeldStiffLR_1
+        self.bcWeldStiffLR_2 = bcWeldStiffLR_2
+
 
 
 
@@ -553,6 +563,16 @@ class CADGroove(object):
         self.create_bcWeldFlang_2()
         self.create_bcWeldWeb_3()
 
+        self.create_bcWeldStiffHL_1()
+        self.create_bcWeldStiffHL_2()
+        self.create_bcWeldStiffHR_1()
+        self.create_bcWeldStiffHR_2()
+
+        self.create_bcWeldStiffLL_1()
+        self.create_bcWeldStiffLL_2()
+        self.create_bcWeldStiffLR_1()
+        self.create_bcWeldStiffLR_2()
+
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
@@ -569,6 +589,16 @@ class CADGroove(object):
         self.bcWeldFlang_1Model =  self.bcWeldFlang_1.create_model()
         self.bcWeldFlang_2Model = self.bcWeldFlang_2.create_model()
         self.bcWeldWeb_3Model = self.bcWeldWeb_3.create_model()
+
+        self.bcWeldStiffHL_1Model = self.bcWeldStiffHL_1.create_model()
+        self.bcWeldStiffHL_2Model = self.bcWeldStiffHL_2.create_model()
+        self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
+        self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
+
+        self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
+        self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
+        self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
+        self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
 #############################################################################################################
 #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #
@@ -691,6 +721,62 @@ class CADGroove(object):
         wDirWeb_3 = numpy.array([0, 0, 1.0])
         self.bcWeldWeb_3.place(weldWebOrigin_3, uDirWeb_3, wDirWeb_3)
 
+    def create_bcWeldStiffHL_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.W])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHL_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHR_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, 1.0])
+        self.bcWeldStiffHR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHR_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2 - self.beam_stiffener_1.W])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, 1.0])
+        self.bcWeldStiffHR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLL_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T + self.beam_stiffener_1.L,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 ])
+        uDirStiffHL_1 = numpy.array([1, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0, -1.0, 0.0])
+        self.bcWeldStiffLL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLL_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L22,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2])
+        uDirStiffHL_1 = numpy.array([1.0, 0.0, 0.0])
+        wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
+        self.bcWeldStiffLL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLR_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L22,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 ])
+        uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0.0, 1.0, 0.0])
+        self.bcWeldStiffLR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLR_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([-self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T+ self.beam_stiffener_1.L,
+                                            self.beamLeft.length / 2 - self.beamRight.D/2])
+        uDirStiffHL_1 = numpy.array([-1.0, 0.0, 0])
+        wDirStiffHL_1 = numpy.array([0.0, -1.0, 0.0])
+        self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
 
 #############################################################################################################
 #   Following functions returns the CAD model to the function display_3DModel of main file                  #
@@ -737,6 +823,30 @@ class CADGroove(object):
 
     def get_bcWeldWeb_3Model(self):
         return self.bcWeldWeb_3Model
+
+    def get_bcWeldStiffHL_1Model(self):
+        return self.bcWeldStiffHL_1Model
+
+    def get_bcWeldStiffHL_2Model(self):
+        return self.bcWeldStiffHL_2Model
+
+    def get_bcWeldStiffHR_1Model(self):
+        return self.bcWeldStiffHR_1Model
+
+    def get_bcWeldStiffHR_2Model(self):
+        return self.bcWeldStiffHR_2Model
+
+    def get_bcWeldStiffLL_1Model(self):
+        return self.bcWeldStiffLL_1Model
+
+    def get_bcWeldStiffLL_2Model(self):
+        return self.bcWeldStiffLL_2Model
+
+    def get_bcWeldStiffLR_1Model(self):
+        return self.bcWeldStiffLR_1Model
+
+    def get_bcWeldStiffLR_2Model(self):
+        return self.bcWeldStiffLR_2Model
 
 
 class CADcolwebGroove(CADGroove):

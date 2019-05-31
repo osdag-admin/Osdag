@@ -2163,16 +2163,32 @@ class Maincontroller(QMainWindow):
 
             if alist['Member']['EndPlate_type'] == "Extended both ways":
                 if numberOfBolts == 20:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,color='Blue')
+
+                    #weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,olor='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_2Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_2Model(), update=True,color='Red')
+                    #
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_2Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_2Model(), update=True,color='Red')
+
+
+
             elif alist['Member']['EndPlate_type'] == "Extended one way":
                 if numberOfBolts == 12:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    # osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                    #                     color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 
@@ -2226,16 +2242,31 @@ class Maincontroller(QMainWindow):
 
             if alist['Member']['EndPlate_type'] == "Extended both ways":
                 if numberOfBolts == 20:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_2Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_2Model(), update=True,color='Red')
+                    #
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_2Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_2Model(), update=True,color='Red')
+
             elif alist['Member']['EndPlate_type'] == "Extended one way":
                 if numberOfBolts == 12:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    # osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                    #                     color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True, color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    # osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+
+
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 

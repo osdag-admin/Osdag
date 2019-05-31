@@ -301,13 +301,63 @@ class CADFillet(object):
         wDirWeb_22 = numpy.array([0, 0, -1.0])
         self.bbWeldSideWeb_22.place(weldSideWebOrigin_22, uDirWeb_22, wDirWeb_22)
 
-
+    ############### Weld for the beam stiffeners ##################################
     def create_bcWeldStiffHL_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.W])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHL_2(self):
         weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
                                             self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
         uDirStiffHL_1 = numpy.array([0, 1.0, 0])
         wDirStiffHL_1 = numpy.array([0, 0, -1.0])
-        self.bcWeldStiffHL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+        self.bcWeldStiffHL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHR_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffHR_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffHR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLL_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffLL_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLL_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffLL_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLR_1(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffLR_1.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
+    def create_bcWeldStiffLR_2(self):
+        weldStiffWebOriginHL_1 = numpy.array([self.beam_stiffener_1.T / 2, self.beamLeft.D / 2 + self.plateRight.T,
+                                            self.beamLeft.length / 2 + self.beamRight.D/2 + self.beam_stiffener_1.L22])
+        uDirStiffHL_1 = numpy.array([0, 1.0, 0])
+        wDirStiffHL_1 = numpy.array([0, 0, -1.0])
+        self.bcWeldStiffLR_2.place(weldStiffWebOriginHL_1, uDirStiffHL_1, wDirStiffHL_1)
+
 
 
 
@@ -376,6 +426,27 @@ class CADFillet(object):
 
     def get_bcWeldStiffHL_1Model(self):
         return self.bcWeldStiffHL_1Model
+
+    def get_bcWeldStiffHL_2Model(self):
+        return self.bcWeldStiffHL_2Model
+
+    def get_bcWeldStiffHR_1Model(self):
+        return self.bcWeldStiffHR_1Model
+
+    def get_bcWeldStiffHR_2Model(self):
+        return self.bcWeldStiffHR_2Model
+
+    def get_bcWeldStiffLL_1Model(self):
+        return self.bcWeldStiffLL_1Model
+
+    def get_bcWeldStiffLL_2Model(self):
+        return self.bcWeldStiffLL_2Model
+
+    def get_bcWeldStiffLR_1Model(self):
+        return self.bcWeldStiffLR_1Model
+
+    def get_bcWeldStiffLR_2Model(self):
+        return self.bcWeldStiffLR_2Model
 
 class CADColWebFillet(CADFillet):
 

@@ -1322,13 +1322,10 @@ class Maincontroller(QMainWindow):
         self.ui.txt_boltcapacity.clear()
         self.ui.txt_boltgrpcapacity.clear()
         self.ui.txt_noBolts.clear()
-        self.ui.txt_rowBolts.clear()
-        self.ui.txt_gauge.clear()
         self.ui.txt_crossGauge.clear()
         self.ui.txt_endDist.clear()
         self.ui.txt_edgeDist.clear()
-        self.ui.txt_criticalFlange.clear()
-        self.ui.txt_criticalWeb.clear()
+
 
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)

@@ -18,7 +18,7 @@ from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 from reportGenerator import save_html
 from drawing_2D_ExtendedBothways import ExtendedEndPlate
 from drawing_2D_Extendedoneway import OnewayEndPlate
-from drawing_2D_ExtendedFlush import FlushEndPlate
+from drawing_2D_BBFlush import FlushEndPlate
 
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
@@ -276,6 +276,7 @@ class Stiffener(QDialog):
 			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
 			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
+			self.ui.txt_stiffnrThickness_5.setText(str(resultObj_plate['Stiffener']['Notch']))
 
 		else:
 			self.ui.plateHeight.setText("Height (mm)")
@@ -285,6 +286,7 @@ class Stiffener(QDialog):
 			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
 			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
+			self.ui.txt_stiffnrThickness_5.setText(str(resultObj_plate['Stiffener']['Notch']))
 
 
 class Pitch(QDialog):
@@ -310,18 +312,24 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 6:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
@@ -333,16 +341,22 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 
 		elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
@@ -355,18 +369,24 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 8:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
@@ -378,16 +398,22 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 10:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
@@ -400,14 +426,20 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 		else:
 
 			if no_of_bolts == 8:
@@ -419,18 +451,24 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 12:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
@@ -442,14 +480,20 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 16:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
@@ -463,10 +507,16 @@ class Pitch(QDialog):
 				self.ui.lbl_5.setText('Pitch_6_7')
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 20:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
@@ -475,6 +525,8 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
 				self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
 				self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
+				self.ui.lineEdit_pitch8.hide()
+				self.ui.lineEdit_pitch9.hide()
 				self.ui.lbl_1.setText('Pitch_1_2')
 				self.ui.lbl_2.setText('Pitch_3_4')
 				self.ui.lbl_3.setText('Pitch_4_5')
@@ -482,6 +534,10 @@ class Pitch(QDialog):
 				self.ui.lbl_5.setText('Pitch_6_7')
 				self.ui.lbl_6.setText('Pitch_7_8')
 				self.ui.lbl_7.setText('Pitch_9_10')
+				self.ui.lbl_8.hide()
+				self.ui.lbl_9.hide()
+				self.ui.lbl_mem7_2.hide()
+				self.ui.lbl_mem7_3.hide()
 
 
 class DesignReportDialog(QDialog):
@@ -2219,7 +2275,7 @@ def set_osdaglogger():
 	logger.setLevel(logging.DEBUG)
 
 	# create the logging file handler
-	fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='a')
+	fh = logging.FileHandler("Connections/Moment/ExtendedEndPlate/extnd.log", mode='a')
 
 	# ,datefmt='%a, %d %b %Y %H:%M:%S'
 	# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -2241,11 +2297,11 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
 	# file_handler = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode='w')
-	file_handler = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+	file_handler = logging.FileHandler("Connections/Moment/ExtendedEndPlate/extnd.log", mode='w')
 	formatter = logging.Formatter('''%(message)s''')
 	file_handler.setFormatter(formatter)
 	rawLogger.addHandler(file_handler)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href='''+ os.path.join('Connections','Moment','ExtendedEndPlate', 'log.css') +'''/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	module_setup()
 	window = Maincontroller(folder)
@@ -2264,7 +2320,7 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="log.css"/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)

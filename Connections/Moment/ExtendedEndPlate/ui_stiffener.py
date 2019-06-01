@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_stiffener.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Stiffener(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(317, 231)
+        Dialog.resize(427, 268)
         self.txt_stiffnrHeight = QtWidgets.QLineEdit(Dialog)
         self.txt_stiffnrHeight.setGeometry(QtCore.QRect(179, 27, 118, 23))
         font = QtGui.QFont()
@@ -65,7 +65,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness.setReadOnly(True)
         self.txt_stiffnrThickness.setObjectName("txt_stiffnrThickness")
         self.txt_stiffnrThickness_2 = QtWidgets.QLineEdit(Dialog)
-        self.txt_stiffnrThickness_2.setGeometry(QtCore.QRect(180, 150, 118, 23))
+        self.txt_stiffnrThickness_2.setGeometry(QtCore.QRect(180, 190, 118, 23))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -74,7 +74,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_2.setReadOnly(True)
         self.txt_stiffnrThickness_2.setObjectName("txt_stiffnrThickness_2")
         self.label_164 = QtWidgets.QLabel(Dialog)
-        self.label_164.setGeometry(QtCore.QRect(10, 150, 161, 16))
+        self.label_164.setGeometry(QtCore.QRect(10, 190, 161, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -83,7 +83,7 @@ class Ui_Stiffener(object):
         self.label_164.setFocusPolicy(QtCore.Qt.NoFocus)
         self.label_164.setObjectName("label_164")
         self.txt_stiffnrThickness_3 = QtWidgets.QLineEdit(Dialog)
-        self.txt_stiffnrThickness_3.setGeometry(QtCore.QRect(180, 190, 118, 23))
+        self.txt_stiffnrThickness_3.setGeometry(QtCore.QRect(180, 230, 118, 23))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -92,7 +92,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_3.setReadOnly(True)
         self.txt_stiffnrThickness_3.setObjectName("txt_stiffnrThickness_3")
         self.label_165 = QtWidgets.QLabel(Dialog)
-        self.label_165.setGeometry(QtCore.QRect(10, 190, 161, 16))
+        self.label_165.setGeometry(QtCore.QRect(10, 230, 161, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -100,6 +100,24 @@ class Ui_Stiffener(object):
         self.label_165.setFont(font)
         self.label_165.setFocusPolicy(QtCore.Qt.NoFocus)
         self.label_165.setObjectName("label_165")
+        self.txt_stiffnrThickness_5 = QtWidgets.QLineEdit(Dialog)
+        self.txt_stiffnrThickness_5.setGeometry(QtCore.QRect(180, 150, 118, 23))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.txt_stiffnrThickness_5.setFont(font)
+        self.txt_stiffnrThickness_5.setReadOnly(True)
+        self.txt_stiffnrThickness_5.setObjectName("txt_stiffnrThickness_5")
+        self.label_167 = QtWidgets.QLabel(Dialog)
+        self.label_167.setGeometry(QtCore.QRect(10, 150, 161, 16))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.label_167.setFont(font)
+        self.label_167.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.label_167.setObjectName("label_167")
         self.txt_stiffnrHeight.raise_()
         self.plateHeight.raise_()
         self.label_2.raise_()
@@ -110,6 +128,8 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_3.raise_()
         self.label_165.raise_()
         self.label_164.raise_()
+        self.txt_stiffnrThickness_5.raise_()
+        self.label_167.raise_()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -122,6 +142,7 @@ class Ui_Stiffener(object):
         self.label_163.setText(_translate("Dialog", "<html><head/><body><p>Thickness (mm)</p></body></html>"))
         self.label_164.setText(_translate("Dialog", "<html><head/><body><p>Moment demand (kNm)</p></body></html>"))
         self.label_165.setText(_translate("Dialog", "<html><head/><body><p>Moment capacity (kNm)</p></body></html>"))
+        self.label_167.setText(_translate("Dialog", "<html><head/><body><p>Notch size [n] (mm)</p></body></html>"))
 
 
 if __name__ == "__main__":

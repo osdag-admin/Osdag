@@ -679,3 +679,12 @@ class NutBoltArray(object):
 
     def get_models(self):
         return self.models
+
+    def get_bolt_list(self):
+        boltlist = []
+        for bolt in self.bolts:
+            boltlist.append(bolt.create_model())
+            dbg = self.dbgSphere(self.origin)
+            self.models.append(dbg)
+
+        return boltlist

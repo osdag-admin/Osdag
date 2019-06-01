@@ -1839,6 +1839,22 @@ class Maincontroller(QMainWindow):
         Following sections are for creating Fillet Welds and Groove Welds
         Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
         '''
+        ############################### Weld for the beam stiffeners ################################################
+
+        # bbWeld for stiffener hight on left side
+        bcWeldStiffHL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                     L=outputobj['Stiffener']['Height'] - outputobj['Stiffener']['NotchBottom'])
+        bcWeldStiffHL_2 = copy.copy(bcWeldStiffHL_1)
+        bcWeldStiffHR_1 = copy.copy(bcWeldStiffHL_1)
+        bcWeldStiffHR_2 = copy.copy(bcWeldStiffHL_1)
+
+        bcWeldStiffLL_1 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                     L=outputobj['Stiffener']['Length'] - outputobj['Stiffener']['NotchBottom'])
+        bcWeldStiffLL_2 = copy.copy(bcWeldStiffLL_1)
+        bcWeldStiffLR_1 = copy.copy(bcWeldStiffLL_1)
+        bcWeldStiffLR_2 = copy.copy(bcWeldStiffLL_1)
+
+
         if conn_type == 'col_flange_connectivity':
 
             if alist["Weld"]["Method"] == "Fillet Weld":
@@ -1865,11 +1881,13 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
+                extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt, bbWeldAbvFlang_21,
                                         bbWeldAbvFlang_22,
                                         bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                         bbWeldBelwFlang_24,
                                         bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                        bcWeldStiffHL_1,bcWeldStiffHL_2,bcWeldStiffHR_1,bcWeldStiffHR_2,
+                                        bcWeldStiffLL_1,bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, conn_type,
                                         outputobj)
@@ -1890,8 +1908,10 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                extbothWays = CADGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                         bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+                                        bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
+                                        bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
                 extbothWays.create_3DModel()
@@ -1930,12 +1950,16 @@ class Maincontroller(QMainWindow):
                 # 						contPlate_L1, contPlate_L2, contPlate_R1,
                 # 						contPlate_R2, endplate_type, conn_type)
 
-                col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bbWeldAbvFlang_21,
                                                        bbWeldAbvFlang_22,
                                                        bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                                        bbWeldBelwFlang_24,
                                                        bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                                       bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1,
+                                                       bcWeldStiffHR_2,
+                                                       bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
+                                                       bcWeldStiffLR_2,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
                                                        conn_type, outputobj)
@@ -1959,8 +1983,12 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,
+                col_web_connectivity = CADcolwebGroove(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
+                                                       bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1,
+                                                       bcWeldStiffHR_2,
+                                                       bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
+                                                       bcWeldStiffLR_2,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
                                                        outputobj)
@@ -2156,16 +2184,32 @@ class Maincontroller(QMainWindow):
 
             if alist['Member']['EndPlate_type'] == "Extended both ways":
                 if numberOfBolts == 20:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True, color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,color='Blue')
+
+                    #weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,olor='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_2Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_2Model(), update=True,color='Red')
+
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_2Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_2Model(), update=True,color='Red')
+
+
+
             elif alist['Member']['EndPlate_type'] == "Extended one way":
                 if numberOfBolts == 12:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 
@@ -2219,16 +2263,31 @@ class Maincontroller(QMainWindow):
 
             if alist['Member']['EndPlate_type'] == "Extended both ways":
                 if numberOfBolts == 20:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_2Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_2Model(), update=True,color='Red')
+
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_2Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_2Model(), update=True,color='Red')
+
             elif alist['Member']['EndPlate_type'] == "Extended one way":
                 if numberOfBolts == 12:
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,
-                                        color='Blue')
-                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,
-                                        color='Blue')
+                    osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_1Model(), update=True,color='Blue')
+
+                    # weld section for the above stiffeners
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True, color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLL_1Model(), update=True,color='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffLR_1Model(), update=True,color='Red')
+
+
             else:  # alist['Member']['EndPlate_type'] == "Flush end plate":
                 pass
 

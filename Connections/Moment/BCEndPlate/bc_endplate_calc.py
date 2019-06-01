@@ -495,7 +495,7 @@ def bc_endplate_design(uiObj):
         flange_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_flange, fusion_face_angle=90)
         flange_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tf, end_plate_thickness)
-        flange_weld_size_max = max(beam_tf, end_plate_thickness)
+        flange_weld_size_max = min(beam_tf, end_plate_thickness)
 
         # Web welds
 
@@ -503,7 +503,7 @@ def bc_endplate_design(uiObj):
         web_weld_throat_size = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
             fillet_size=weld_thickness_web, fusion_face_angle=90)
         web_weld_throat_max = IS800_2007.cl_10_5_3_1_max_weld_throat_thickness(beam_tw, end_plate_thickness)
-        web_weld_size_max = max(beam_tw, end_plate_thickness)
+        web_weld_size_max = min(beam_tw, end_plate_thickness)
 
         # check min and max weld size
 
@@ -560,7 +560,7 @@ def bc_endplate_design(uiObj):
         web_weld_strength = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
             ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
 
-        #  Design forces at welds due to loads
+        #  Design forces per unit length of welds due to applied loads
 
         weld_force_axial = factored_axial_load / (
                 2 * (flange_weld_effective_length_top * flange_weld_long_joint_top +
@@ -585,8 +585,12 @@ def bc_endplate_design(uiObj):
         if flange_weld_stress >= flange_weld_strength:
             design_status = False
             logger.error(": The weld size at beam flange is less than required")
-            logger.warning(": The minimum required size of weld at flanges is %s mm" % flange_weld_size_reqd)
-            logger.info(": Increase the size of weld at beam flanges")
+            if flange_weld_size_reqd > flange_weld_size_max:
+                logger.warning(": The connection can not be possible with fillet weld")
+                logger.info(": Use groove welds to connect beam and end plate")
+            else:
+                logger.warning(": The minimum required size of weld at flanges is %s mm" % flange_weld_size_reqd)
+                logger.info(": Increase the size of weld at beam flanges")
 
         if web_weld_stress >= web_weld_strength:
             design_status = False
@@ -891,7 +895,7 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
 
     # End of SAMPLE Output dictionary
-    
+
     if design_status is True:
         logger.info(": Overall end plate moment connection design is safe \n")
         logger.debug(" :=========End Of design===========")

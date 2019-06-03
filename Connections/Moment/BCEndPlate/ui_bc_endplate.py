@@ -1200,6 +1200,7 @@ class Ui_MainWindow(object):
         self.combo_connect.addItem("")
         self.combo_connect.addItem("")
         self.combo_weld_method = QtWidgets.QComboBox(self.dockWidgetContents)
+        self.combo_weld_method.setEnabled(True)
         self.combo_weld_method.setGeometry(QtCore.QRect(150, 550, 160, 27))
         font = QtGui.QFont()
         font.setPointSize(11)

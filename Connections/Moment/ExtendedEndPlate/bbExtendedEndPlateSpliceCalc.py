@@ -365,6 +365,19 @@ def bbExtendedEndPlateSplice(uiObj):
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
+    beam_Zz = float(dictbeamdata["Zz"])
+
+    #######################################################################
+    # Validation of minimum input moment (Cl. 10.7- 6 and Cl. 8.2.1, IS 800:2007)
+
+    M_d = (1.2 * beam_Zz * 1000 * beam_fy) / 1.10
+    moment_minimum = 0.3 * (M_d / 1000000)
+
+    if float(factored_moment) < float(moment_minimum):
+        logger.warning(": The input factored moment (%2.2f kN-m) is less that the minimum design action on the connection (Cl. 10.7-6, IS 800:2007)" % factored_moment)
+        logger.info(": The connection is designed for %2.2f kN-m" % float(moment_minimum))
+
+    factored_moment = round(moment_minimum, 3)
 
     #######################################################################
     # Calculation of Bolt strength in MPa

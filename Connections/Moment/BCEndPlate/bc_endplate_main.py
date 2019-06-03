@@ -296,20 +296,22 @@ class Pitch(QDialog):
         no_of_bolts = resultObj_plate['Bolt']['NumberOfBolts']
         if self.maincontroller.endplate_type == 'both_way':
             if no_of_bolts == 8:
-                self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
-                self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch12']))
-                self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch23']))
-                self.ui.lineEdit_pitch4.setText(str(resultObj_plate['Bolt']['Pitch34']))
+                self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
+                self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+                self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch34']))
+                self.ui.lbl_mem4.hide()
                 self.ui.lbl_mem5.hide()
                 self.ui.lbl_mem6.hide()
                 self.ui.lbl_mem7.hide()
                 self.ui.lbl_mem7_2.hide()
                 self.ui.lbl_mem7_3.hide()
+                self.ui.lbl_4.hide()
                 self.ui.lbl_5.hide()
                 self.ui.lbl_6.hide()
                 self.ui.lbl_7.hide()
                 self.ui.lbl_8.hide()
                 self.ui.lbl_9.hide()
+                self.ui.lineEdit_pitch4.hide()
                 self.ui.lineEdit_pitch5.hide()
                 self.ui.lineEdit_pitch6.hide()
                 self.ui.lineEdit_pitch7.hide()
@@ -1211,17 +1213,6 @@ class Maincontroller(QMainWindow):
         bolts_required = resultObj["Bolt"]["NumberOfBolts"]
         self.ui.txt_noBolts.setText(str(bolts_required))
 
-        # bolts_in_rows = resultObj["Bolt"]["NumberOfRows"]
-        bolts_in_rows = 1
-        #self.ui.txt_rowBolts.setText(str(bolts_in_rows))
-
-        # pitch = resultObj["Bolt"]["Pitch"]
-        # self.ui.txt_pitch.setText(str(pitch))
-
-        # gauge = resultObj["Bolt"]["Gauge"]
-        gauge = 0.0
-        #self.ui.txt_gauge.setText(str(gauge))
-
         cross_centre_gauge = resultObj["Bolt"]["CrossCentreGauge"]
         self.ui.txt_crossGauge.setText(str(cross_centre_gauge))
 
@@ -1231,13 +1222,8 @@ class Maincontroller(QMainWindow):
         edge_distance = resultObj["Bolt"]["Edge"]
         self.ui.txt_edgeDist.setText(str(edge_distance))
 
-        # weld_stress_flange = resultObj["Weld"]["FlangeStress"]
-        weld_stress_flange = 0.0
-        #self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
-
-        # weld_stress_web = resultObj["Weld"]["WebStress"]
-        weld_stress_web = 0.0
-        #self.ui.txt_criticalWeb.setText(str(weld_stress_web))
+        self.ui.plate_lineEdit_2.setText(str(resultObj["Plate"]["Height"]))
+        self.ui.plate_lineEdit_1.setText(str(resultObj["Plate"]["Width"]))
 
     def display_log_to_textedit(self):
         file = QFile(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'))

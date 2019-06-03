@@ -2004,620 +2004,159 @@ def bbExtendedEndPlateSplice(uiObj):
     # Output dictionary for different cases
     if number_of_bolts <= 20:
 
-        # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
+        outputobj = {}
+        outputobj['Bolt'] = {}
+        outputobj['Bolt']['status'] = design_status
+        outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
+        outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
+        outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
+        outputobj['Bolt']['kb'] = float(round(k_b, 3))
+        outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+        if bolt_type == "Friction Grip Bolt":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
+        outputobj['Bolt']['PitchMini'] = pitch_dist_min
+        outputobj['Bolt']['PitchMax'] = pitch_dist_max
+        outputobj['Bolt']['EndMax'] = end_dist_max
+        outputobj['Bolt']['EndMini'] = end_dist_mini
+        outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            if number_of_bolts == 4:
+                outputobj['Bolt']['Pitch'] = float(pitch_distance)
+            elif number_of_bolts == 6:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
 
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['PryingForce'] = Q
+
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if number_of_bolts == 6:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+            elif number_of_bolts == 8:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            elif number_of_bolts == 10:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+            outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['PryingForce'] = Q
+
+        else:
+            if number_of_bolts == 8:
+                outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 12:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 16:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 20:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
 
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+        outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
+        outputobj['Bolt']['End'] = float(end_dist_mini)
+        outputobj['Bolt']['Edge'] = float(edge_dist_mini)
+        # ===================  CAD ===================
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+            outputobj['Bolt']['Lv'] = float(l_v)
+        else:
+            l_v = p_fi
+            outputobj['Bolt']['Lv'] = float(l_v)
+        # ===================  CAD ===================
 
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
+        outputobj['Plate'] = {}
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
+        # ===================  CAD ===================
+        outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
+        # ===================  CAD ===================
+        outputobj['Plate']['MomentDemand'] = round(M_d, 3)
+        outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
 
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
+        outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
+        outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            outputobj['Weld'] = {}
+            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
+            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
+            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
+            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
+            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
+            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
 
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
+            outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
+            outputobj['Weld']['Qweb'] = float(round(q_web, 3))
+            outputobj['Weld']['Resultant'] = float(round(R, 3))
+            outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
-            outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
+        else:
+            outputobj['Weld'] = {}
+            outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
-            if uiObj["Weld"]["Type"] == "Fillet Weld":
-                outputobj['Weld'] = {}
-                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
+        outputobj['Stiffener'] = {}
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            outputobj['Stiffener']['Height'] = round(w_st, 3)
+            outputobj['Stiffener']['Location'] = int(s)
+        else:
+            outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-                outputobj['Weld']['Resultant'] = float(round(R, 3))
-                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+        outputobj['Stiffener']['Length'] = round(l_st, 3)
+        outputobj['Stiffener']['Thickness'] = float(round(thickness_stiffener_provided, 3))
+        outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+        outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+        outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+        outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+        outputobj['Stiffener']['Notch'] = float(n_s)
 
-            else:
-                outputobj['Weld'] = {}
-                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
+        # ===================  CAD ===================
+        # if uiObj["Member"]["Connectivity"] == "Extended one way":
+        if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush":  # TOdo added by darshan
+            outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+        else:
+            pass
+        # ===================  CAD ===================
 
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = float(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-            outputobj['Stiffener']['Notch'] = float(n_s)
-
-            # ===================  CAD ===================
-            # if uiObj["Member"]["Connectivity"] == "Extended one way":
-            if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush": #TOdo added by darshan
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
-
-        # Case 2: When the height of end plate is specified but the width is not specified by the user
-        elif end_plate_height != 0 and end_plate_width == 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-            if uiObj["Weld"]["Type"] == "Fillet Weld":
-                outputobj['Weld'] = {}
-                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-
-                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-                outputobj['Weld']['Resultant'] = float(round(R, 3))
-                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-            else:
-                outputobj['Weld'] = {}
-                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
-
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-            outputobj['Stiffener']['Notch'] = float(n_s)
-
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
-
-        # Case 3: When the height of end plate is not specified but the width is specified by the user
-        elif end_plate_height == 0 and end_plate_width != 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-            if uiObj["Weld"]["Type"] == "Fillet Weld":
-                outputobj['Weld'] = {}
-                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-
-                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-                outputobj['Weld']['Resultant'] = float(round(R, 3))
-                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-            else:
-                outputobj['Weld'] = {}
-                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
-
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-            outputobj['Stiffener']['Notch'] = float(n_s)
-
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
-
-        # Case 4: When the height and the width of End Plate is specified by the user
-        elif end_plate_height != 0 and end_plate_width != 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-            if uiObj["Weld"]["Type"] == "Fillet Weld":
-                outputobj['Weld'] = {}
-                outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-                outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-                outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-                outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-                outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-                outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-
-                outputobj['Weld']['FaWeb'] = float(round(f_a_web, 3))
-                outputobj['Weld']['Qweb'] = float(round(q_web, 3))
-                outputobj['Weld']['Resultant'] = float(round(R, 3))
-                outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
-                outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-            else:
-                outputobj['Weld'] = {}
-                outputobj['Weld']['WeldSize'] = int(weld_size_butt)
-
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-            outputobj['Stiffener']['Notch'] = float(n_s)
-
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
     else:
         outputobj = {}
         outputobj['Bolt'] = {}

@@ -270,16 +270,16 @@ class WeldDetails(QDialog):
 			self.ui.label_note_1.setText("All dimensions are in mm.")
   			if db_value.beam_tf <= 12:
   				self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_flange.png"))
-				self.ui.label_note_2.setText("As flange thickness, tf (%.2f) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % db_value.beam_tf)
+				self.ui.label_note_2.setText("As flange thickness, tf (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
 			else:
 				self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_flange.png"))
-				self.ui.label_note_2.setText("As flange thickness, tf (%.2f) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % db_value.beam_tf)
+				self.ui.label_note_2.setText("As flange thickness, tf (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
 			if db_value.beam_tw <= 12:
 				self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_web.png"))
-				self.ui.label_note_3.setText("As web thickness, tw (%.2f) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % db_value.beam_tw)
+				self.ui.label_note_3.setText("As web thickness, tw (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
 			else:
   				self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
-				self.ui.label_note_3.setText("As web thickness, tw (%.2f) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % db_value.beam_tw)
+				self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
 		else:
   			pass 
 

@@ -1521,16 +1521,16 @@ class IS800_2007(object):
             return K_L
 
     # Cl 8.7.2.4 Minimum stiffeners
-    def I_s_for_transverse_web_stiffeners_not_subjected_to_external_load(c, d, t_w):
+    def cl_8_7_2_4_I_s_for_transverse_web_stiffeners_not_subjected_to_external_load(c, d, t_w):
         """
         Calculation of second moment of area when transverse web stiffener
-                not subjected to external load
+        not subjected to external load
         Args:
             d - depth of thw web
             t_w - minimum required web thickness foe spacing using tension filed action ,as given in cl8.4.2.1
             c - actual stiffener spacing
         Return:
-            I_s_min - second momonet of area
+            I_s_min - second moment of area
         Note:
             Reference:
             IS 800:2007,  cl 8.7.2.4
@@ -1538,43 +1538,50 @@ class IS800_2007(object):
         if c / d >= math.sqrt(2):
             I_s_min = 0.75 * d * t_w ** 3
         else:
-            I_s_min = (1.5 * d ** 2 * t_w ** 3) / c ** 2
+            I_s_min = 1.5 * d ** 2 * t_w ** 3 / c ** 2
 
         return I_s_min
 
     # cl 8.7.2.5 Buckling check on intermediate transverse web stiffeners
-    def buckling_check_on_intermediate_transverse_web_stiffener(V, F_qd, F_x, F_xd, M_q, M_yq):
+    def cl_8_7_2_5_buckling_check_on_intermediate_transverse_web_stiffener(V, V_cr,F_qd,F_x,F_xd,M_q,M_yq):
         """
             Buckling check on intermediate transverse web stiffeners
         Args:
-                F_qd - design resistance of the intermediate stiffeners
-                V -factored shear force adjacent to the stiffener
-                F_qd - deign resistance of an intermediate web stiffener
-                        to buckling corresponding to buckling about at
-                         axis parallel to the web as in cl 8.7.1.5
-                F_x - external load or reaction at the stiffener
-                F_xd - design resistance of a load carrying stiffener
-                        corresponding to buckling about axis parallel
-                        to the web as in cl 8.7.1.5
-                M_q - moment on the stiffener due to eccentrically
-                        applied load anf transverse load, if any
-                M_yq - yield moment capacity og the stiffener based
-                        on its elastic modulus about its centriodal
-                        axis parallel to the web
-        Retrun:
-            F_q - stiffener force
+            For stiffeners not subjected to external loads or moments:
 
+            F_qd - design resistance of the intermediate stiffeners
+            V -factored shear force adjacent to the stiffener
+            Vcr - shear buckling resistance of the web panel designed without using
+                  tension field action(8.4.2.2.a)
+
+            For stiffeners subjected to external loads or moments:
+
+            F_qd - design resistance of the web intermediate stiffener corresponding to
+                   buckling about an axis parallel to the web(8.7.1.5)
+            F_x - external load or reaction at the stiffener
+            F_xd - design resistance of a load carrying stiffener
+                   corresponding to buckling about axis parallel
+                   to the web as in cl 8.7.1.5
+            M_q - moment on the stiffener due to eccentrically
+                  applied load and transverse load, if any
+            M_yq - yield moment capacity og the stiffener based
+                   on its elastic modulus about its centroidal
+                   axis parallel to the web
+        Retrun:
+            F
         Note:
             Reference:
-            IS 800:2007,  cl 8.7.2.5
+            IS 800:2007,  cl 8.7.2.5, cl.8.7.3
 
         """
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
-        V_cr = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
-        F_q = min(V - (V_cr / gamma_m0), F_qd)
+        ob = IS800_2007()
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        F_q = min(V - V_cr / gamma_m0, F_qd)
         if (F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq <= 1:
-            return bool((F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq)
+            return F_q
+        else:
+            return 'cl.8.7.2.5.warning:buckling check on intermediate transverse web stiffener not satisfied'
+
 
     # cl 8.7.2.6 Connection of intermediate stiffeners to web
     def shear_between_each_component_of_stiffener_and_web(t_w, b_s):

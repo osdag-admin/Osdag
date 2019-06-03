@@ -1500,21 +1500,20 @@ class IS800_2007(object):
 
     # cl8.7.1.5 Buckling resistance of stiffeners
     # Effective length for load carrying web stiffeners
-    def effective_length_for_load_carrying_web_stiffeners(L, restrained_condition):
+    def cl_8_7_1_5_effective_length_for_load_carrying_web_stiffeners(L, restrained):
         """
-        Calculation of Effective length for load carrying web stiffeners for calculating
-            buckling resistance F_xd
+        Calculation of Effective length for load carrying web stiffeners, used for calculating
+        buckling resistance F_xd
         Args:
             L - length of stiffener
-            restrained_condition - Either 'flange_restrained_against_rotation' or
-                                    'flange_not_restrained_against_rotation'
+            restrained - True if restrained against rotation else False
         Returns:
             K_L - effective length for load carrying web stiffeners
         Note:
             Reference:
             IS 800:2007,   cl 8.7.1.5
         """
-        if restrained_condition == 'flange_restrained_against_rotation':
+        if restrained:
             K_L = 0.7 * L
             return K_L
         else:

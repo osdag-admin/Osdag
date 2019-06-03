@@ -247,66 +247,60 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         groove_weld_size = str(float(outObj["Weld"]["Size"]))
 
 # Calling pitch distance values from Output dict of calc file
-    if endplate_type == 'flush':
-        if number_of_bolts == 4:
+    if endplate_type == 'Flush end plate':
+        if float(number_of_bolts) == float(4):
             pitch12 = str(float(outObj['Bolt']['Pitch12']))
 
-        elif number_of_bolts == 8:
-            pitch12 = str(float(outObj['Bolt']['Pitch12']))
-            pitch23 = str(float(outObj['Bolt']['Pitch23']))
-            pitch34 = str(float(outObj['Bolt']['Pitch34']))
-
-        elif number_of_bolts == 12:
-            pitch12 = str(float(outObj['Bolt']['Pitch12']))
-            pitch23 = str(float(outObj['Bolt']['Pitch23']))
-            pitch34 = str(float(outObj['Bolt']['Pitch34']))
-            pitch45 = str(float(outObj['Bolt']['Pitch45']))
-            pitch56 = str(float(outObj['Bolt']['Pitch56']))
-
-        else:
-            pass
-
-    elif endplate_type == 'one_way':
-
-        if number_of_bolts == 6:
-            pitch12 = str(float(outObj['Bolt']['Pitch12']))
-            pitch23 = str(float(outObj['Bolt']['Pitch23']))
-
-        elif number_of_bolts == 8:
+        elif float(number_of_bolts) == float(8):
             pitch12 = str(float(outObj['Bolt']['Pitch12']))
             pitch23 = str(float(outObj['Bolt']['Pitch23']))
             pitch34 = str(float(outObj['Bolt']['Pitch34']))
 
-        elif number_of_bolts == 10:
-            pitch12 = str(float(outObj['Bolt']['Pitch12']))
-            pitch23 = str(float(outObj['Bolt']['Pitch23']))
-            pitch34 = str(float(outObj['Bolt']['Pitch34']))
-            pitch45 = str(float(outObj['Bolt']['Pitch45']))
-
-        elif number_of_bolts == 12:
+        elif float(number_of_bolts) == float(12):
             pitch12 = str(float(outObj['Bolt']['Pitch12']))
             pitch23 = str(float(outObj['Bolt']['Pitch23']))
             pitch34 = str(float(outObj['Bolt']['Pitch34']))
             pitch45 = str(float(outObj['Bolt']['Pitch45']))
             pitch56 = str(float(outObj['Bolt']['Pitch56']))
 
-        else:
-            pass
+    elif endplate_type == 'Extended one way':
+
+        if float(number_of_bolts) == float(6):
+            pitch12 = str(float(outObj['Bolt']['Pitch12']))
+            pitch23 = str(float(outObj['Bolt']['Pitch23']))
+
+        elif float(number_of_bolts) == float(8):
+            pitch12 = str(float(outObj['Bolt']['Pitch12']))
+            pitch23 = str(float(outObj['Bolt']['Pitch23']))
+            pitch34 = str(float(outObj['Bolt']['Pitch34']))
+
+        elif float(number_of_bolts) == float(10):
+            pitch12 = str(float(outObj['Bolt']['Pitch12']))
+            pitch23 = str(float(outObj['Bolt']['Pitch23']))
+            pitch34 = str(float(outObj['Bolt']['Pitch34']))
+            pitch45 = str(float(outObj['Bolt']['Pitch45']))
+
+        elif float(number_of_bolts) == float(12):
+            pitch12 = str(float(outObj['Bolt']['Pitch12']))
+            pitch23 = str(float(outObj['Bolt']['Pitch23']))
+            pitch34 = str(float(outObj['Bolt']['Pitch34']))
+            pitch45 = str(float(outObj['Bolt']['Pitch45']))
+            pitch56 = str(float(outObj['Bolt']['Pitch56']))
 
     else:  # endplate_type == 'both_way':
-        if number_of_bolts == 8:
+        if float(number_of_bolts) == float(8):
             pitch = str(float(outObj['Bolt']['Pitch']))
-        elif number_of_bolts == 12:
+        elif float(number_of_bolts) == float(12):
             pitch23 = str(float(outObj['Bolt']['Pitch23']))
             pitch34 = str(float(outObj['Bolt']['Pitch34']))
             pitch45 = str(float(outObj['Bolt']['Pitch45']))
-        elif number_of_bolts == 16:
+        elif float(number_of_bolts) == float(16):
             pitch23 = str(float(outObj['Bolt']['Pitch23']))
             pitch34 = str(float(outObj['Bolt']['Pitch34']))
             pitch45 = str(float(outObj['Bolt']['Pitch45']))
             pitch56 = str(float(outObj['Bolt']['Pitch56']))
             pitch67 = str(float(outObj['Bolt']['Pitch67']))
-        elif number_of_bolts == 20:
+        elif float(number_of_bolts) == float(20):
             pitch12 = str(float(outObj['Bolt']['Pitch12']))
             pitch34 = str(float(outObj['Bolt']['Pitch34']))
             pitch45 = str(float(outObj['Bolt']['Pitch45']))
@@ -314,8 +308,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             pitch67 = str(float(outObj['Bolt']['Pitch67']))
             pitch78 = str(float(outObj['Bolt']['Pitch78']))
             pitch910 = str(float(outObj['Bolt']['Pitch910']))
-        else:
-            pass
+
     # Calls from connection calculations file
     k_h = str(float(ConnectionCalculations.calculate_k_h(bolt_hole_type)))
     F_0 = str(float(ConnectionCalculations.proof_load_F_0(bolt_dia, bolt_fu)))
@@ -641,117 +634,226 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Pitch Distance (p) (mm)", pitch_mini]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
     row = [2, "Cross-centre gauge (<i>g</i><sup>'</sup>) (mm)", cross_centre_gauge]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    # TODO: Create a table for pitch distance values
-    if number_of_bolts == 8:
-        row = [2, "Pitch (mm)", pitch]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
-    elif number_of_bolts == 12:
-        row = [2, "Pitch_2_3 (mm)", pitch23]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
 
-        row = [2, "Pitch_3_4 (mm)", pitch34]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+    row = [2, "Pitch Distance (p) (mm)",""]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
 
-        row = [2, "Pitch_4_5 (mm)", pitch45]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
-    elif number_of_bolts == 16:
-        row = [2, "Pitch_2_3 (mm)", pitch23]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+    if endplate_type == "Flush end plate":
+        if float(number_of_bolts) == (4):
+            row = [2, "Pitch-1,2", pitch12]
+        elif float(number_of_bolts) == float(8):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_3_4 (mm)", pitch34]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_4_5 (mm)", pitch45]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-3,4", pitch34]
 
-        row = [2, "Pitch_5_6 (mm)", pitch56]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+        elif float(number_of_bolts) == float(12):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_6_7 (mm)", pitch67]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
-    elif number_of_bolts == 20:
-        row = [2, "Pitch_1_2 (mm)", pitch12]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_3_4 (mm)", pitch34]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_4_5 (mm)", pitch45]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-4,5", pitch45]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_5_6 (mm)", pitch56]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-5,6", pitch56]
 
-        row = [2, "Pitch_6_7 (mm)", pitch67]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+    elif endplate_type == "Extended one way":
+        if float(number_of_bolts) == float(6):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
 
-        row = [2, "Pitch_7_8 (mm)", pitch78]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+            row = [2, "Pitch-2,3", pitch23]
 
-        row = [2, "Pitch_9_10 (mm)", pitch910]
-        rstr += t('tr')
-        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('td class="detail2 "') + row[2] + t('/td')
-        rstr += t('/tr')
+        elif float(number_of_bolts) == float(8):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+
+        elif float(number_of_bolts) == float(10):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch45]
+
+        elif float(number_of_bolts) == float(12):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch45]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-5,6", pitch56]
+
     else:
-        pass
+        if float(number_of_bolts) == float(8):
+            row = [2, "Pitch", pitch]
+
+        elif float(number_of_bolts) == float(12):
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch45]
+
+        elif float(number_of_bolts) == float(16):
+            row = [2, "Pitch-2,3", pitch23]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch45]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-5,6", pitch56]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-6,7", pitch67]
+
+        elif float(number_of_bolts) == float(20):
+            row = [2, "Pitch-1,2", pitch12]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-3,4", pitch34]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-4,5", pitch45]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-5,6", pitch56]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-6,7", pitch67]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-7,8", pitch78]
+            rstr += t('tr')
+            rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('td class="detail2 "') + row[2] + t('/td')
+            rstr += t('/tr')
+
+            row = [2, "Pitch-9,10", pitch910]
+
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
 
     row = [0, "Assembly ", " "]
     rstr += t('tr')

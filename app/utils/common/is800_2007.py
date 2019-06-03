@@ -987,21 +987,7 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.2.2.1.
 
         """
-        """
-        Not required:
-        if section == 'open_section':
-            sum_value = 0
-            for i in range(n):
-                sum_value += ((b[i] * t[i] ** 3) / 3)
-                I_t = sum_value
-        else:
-            sum_value = 0
-            for i in range(n):
-                sum_value += (b[i] / t[i])
-                I_t = 4 * A_e / sum_value
-                b - breadth of the elements in a section
-                t - thickness of the elements of the section
-        """
+
 
         M_cr = math.sqrt((math.pi ** 2 * E * I_y / L_LT ** 2) * (G * I_t + math.pi ** 2 * E * I_w / L_LT ** 2))
 
@@ -1243,7 +1229,7 @@ class IS800_2007(object):
         #      lambda_w - non-dimensional web slenderness ratio for shear buckling stress
         #      T_cr_c - the elastic critical shear stress of the web
         #      nu - poisson 's ration
-        #      c - spacing of transverse stiffners
+        #      c - spacing of transverse stiffeners
         #      d - depth of the web
         #      E - youngs modulus of elasticity
         #      t_w - thickness of web
@@ -1439,94 +1425,88 @@ class IS800_2007(object):
     # cl8.6.1.1 Serviceability requirement
     def cl_8_6_1_1_minimum_web_thickness(d, t_w, c, f_yw, serviceability_requirement, web_connection_to_flange):
         """
-            Checking the serviceability requirment of  minimum thickness of web
+            Checking the serviceability requirement of  minimum thickness of web
             Args:
                 d - web depth
                 t_w - thickness of web
-                c - spacing of transverse stiffner
-                apsilon_w - yield stress ratio of web
+                c - spacing of transverse stiffener
+                serviceability_requirement - 'transverse_stiffener_not_provided',
+                                             'only_transverse_stiffeners_provided_in_web_flange_connection_along_both_longitudinal_edges'
+                                             'transverse_and_longitudinal_stiffener_at_one_level_as_cl_8_7_13'
+                                             'second_longitudinal_stiffener_provided_at_NA'
+                web_connection_to_flange - 'along_both_longitudinal_edges'
+                                           'along_one_longitudinal_edge'
                 f_yw - yield stress of the web
             Return:
-                True or false
-
+                True, if safety condition is satisfied else False
             Note:
                 Reference:
                 IS 800:2007, cl. 8.6.1.1
 
         """
-        apsilon_w = math.sqrt(250 / f_yw)
-        if serviceability_requirement == 'transverse_stiffner_not_provided':
+        epsilon_w = math.sqrt(250 / f_yw)
+        if serviceability_requirement == 'transverse_stiffener_not_provided':
             if web_connection_to_flange == 'along_both_longitudinal_edges':
-                d / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
-            else:
-                d / t_w <= 90 * apsilon_w
-                return bool(d / t_w)
-
-        elif serviceability_requirement == 'transverse_stiffner_not_provided':
-            if d < c <= 3 * d:
-                d / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
+                return d/t_w <= 200 * epsilon_w
+            elif web_connection_to_flange == 'along_one_longitudinal_edge':
+                return d/t_w <= 90 * epsilon_w
+        elif serviceability_requirement == 'only_transverse_stiffeners_provided_in_web_flange_connection_along_both_longitudinal_edges':
+            if 3 * d >= c >= d:
+                return d / t_w <= 200 * epsilon_w
             elif 0.74 * d <= c < d:
-                c / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
+                return c / t_w <= 200 * epsilon_w
             elif c < 0.74 * d:
-                d / t_w <= 270 * apsilon_w
-                return bool(d / t_w)
+                return d / t_w <= 270 * epsilon_w
             else:
-                return 'web_is_considered_unstiffened'
+                return 'web_is_unstiffened'
 
-        elif serviceability_requirement == 'transverse_and_longitudinal_stiffner_at_one_level_as_cl_8_7_13':
-            if d < c <= 2.4 * d:
-                d / t_w <= 250 * apsilon_w
-                return bool(d / t_w)
-            elif 0.74 * d <= c < d:
-                c / t_w <= 250 * apsilon_w
-                return bool(d / t_w)
-            else:
-                d / t_w <= 340 * apsilon_w
-                return bool(d / t_w)
+        elif serviceability_requirement == 'transverse_and_longitudinal_stiffener_at_one_level_as_cl_8_7_13':
+            if d <= c <= 2.4 * d:
+                return d / t_w <= 250 * epsilon_w
+            elif 0.74 * d <= c <= d:
+                return c / t_w <= 250 * epsilon_w
+            elif c < 0.74 * d:
+                return d / t_w <= 340 * epsilon_w
 
-        else:
-            d / t_w <= 400 * apsilon_w
-            return bool(d / t_w)
+        elif serviceability_requirement == 'second_longitudinal_stiffener_provided_at_NA':
+            return d / t_w <= 400 * epsilon_w
 
     # Compression flange buckling requirement
-    def web_thickness_to_aviod_buckling_of_compression_flange(d, t_w, c, f_yf, Transverse_stiffner=True):
+    def web_thickness_to_aviod_buckling_of_compression_flange(d, t_w, c, f_yf, Transverse_stiffener=True):
         """
             Check for minimum web thickness to avoid bucklng of compression flange
             Args:
                 d - depth of the web
                 t_w - thickness of the web
-                c - spacing of transverse stiffner
-                apsilon_f - yield stress ratio of flange
+                c - spacing of transverse stiffener
+                epsilon_f - yield stress ratio of flange
                 f_yw - yield stress of compression flange
             Return:
 
         """
-        apsilon_f = math.sqrt(250 / f_yf)
-        d / t_w <= 345 * apsilon_f ** 2
+        epsilon_f = math.sqrt(250 / f_yf)
+        d / t_w <= 345 * epsilon_f ** 2
 
-        if Transverse_stiffner is False:
+        if Transverse_stiffener is False:
             if c >= 1.5 * d:
-                d / t_w <= 345 * apsilon_f ** 2
+                d / t_w <= 345 * epsilon_f ** 2
                 return bool(d / t_w)
             else:
-                d / t_w <= 345 * apsilon_f
+                d / t_w <= 345 * epsilon_f
                 return bool(d / t_w)
 
     # cl8.7.1.5 Buckling resistance of stiffeners
-    # Effective length for load carrying web stiffners
-    def effective_length_for_load_carrying_web_stiffners(L, restrained_condition):
+    # Effective length for load carrying web stiffeners
+    def effective_length_for_load_carrying_web_stiffeners(L, restrained_condition):
         """
-        Calculation of Effective length for load carrying web stiffners for calculating
+        Calculation of Effective length for load carrying web stiffeners for calculating
             buckling resistance F_xd
         Args:
-            L - length of stiffner
+            L - length of stiffener
             restrained_condition - Either 'flange_restrained_against_rotation' or
                                     'flange_not_restrained_against_rotation'
         Returns:
-            K_L - effective length for load carrying web stiffners
+            K_L - effective length for load carrying web stiffeners
         Note:
             Reference:
             IS 800:2007,   cl 8.7.1.5
@@ -1539,10 +1519,10 @@ class IS800_2007(object):
             return K_L
 
     # Cl 8.7.2.4 Minimum stiffeners
-    def I_s_for_transverse_web_Stiffners_not_subjected_to_external_load(c, d, t_w):
+    def I_s_for_transverse_web_stiffeners_not_subjected_to_external_load(c, d, t_w):
         """
-        Calculation of second moment of area when transverse web stiffner
-                not subjected to external laod
+        Calculation of second moment of area when transverse web stiffener
+                not subjected to external load
         Args:
             d - depth of thw web
             t_w - minimum required web thickness foe spacing using tension filed action ,as given in cl8.4.2.1
@@ -1560,23 +1540,23 @@ class IS800_2007(object):
 
         return I_s_min
 
-    # cl 8.7.2.5 Buckling check on intermediate transverse web stiffners
+    # cl 8.7.2.5 Buckling check on intermediate transverse web stiffeners
     def buckling_check_on_intermediate_transverse_web_stiffener(V, F_qd, F_x, F_xd, M_q, M_yq):
         """
-            Buckling check on intermediate transverse web stiffners
+            Buckling check on intermediate transverse web stiffeners
         Args:
-                F_qd - design resistance of the intermediate stiffners
-                V -factored shear force adjacent to the stiffner
-                F_qd - deign resistance of an intermediate web stiffner
+                F_qd - design resistance of the intermediate stiffeners
+                V -factored shear force adjacent to the stiffener
+                F_qd - deign resistance of an intermediate web stiffener
                         to buckling corresponding to buckling about at
                          axis parallel to the web as in cl 8.7.1.5
-                F_x - external load or reaction at the stiffner
+                F_x - external load or reaction at the stiffener
                 F_xd - design resistance of a load carrying stiffener
                         corresponding to buckling about axis parallel
                         to the web as in cl 8.7.1.5
-                M_q - moment on the stiffner due to eccentrically
+                M_q - moment on the stiffener due to eccentrically
                         applied load anf transverse load, if any
-                M_yq - yield moment capacity og the stiffner based
+                M_yq - yield moment capacity og the stiffener based
                         on its elastic modulus about its centriodal
                         axis parallel to the web
         Retrun:

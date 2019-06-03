@@ -1471,29 +1471,32 @@ class IS800_2007(object):
         elif serviceability_requirement == 'second_longitudinal_stiffener_provided_at_NA':
             return d / t_w <= 400 * epsilon_w
 
-    # Compression flange buckling requirement
-    def web_thickness_to_aviod_buckling_of_compression_flange(d, t_w, c, f_yf, Transverse_stiffener=True):
+    # cl.8.6.1.2.Compression flange buckling requirement
+    def cl_8_6_1_2_web_thickness_check(d, t_w, c, f_yf, transverse_stiffener=False):
         """
-            Check for minimum web thickness to avoid bucklng of compression flange
+            Check for minimum web thickness to avoid buckling of compression flange
             Args:
                 d - depth of the web
                 t_w - thickness of the web
                 c - spacing of transverse stiffener
-                epsilon_f - yield stress ratio of flange
                 f_yw - yield stress of compression flange
+                transverse_stiffener - boolean variable which is True if stiffener is provided
+                                       else false
             Return:
+                True, if safety condition is satisfied else False
+            Note:
+                Reference:
+                IS 800:2007, cl. 8.6.1.2
 
         """
         epsilon_f = math.sqrt(250 / f_yf)
-        d / t_w <= 345 * epsilon_f ** 2
-
-        if Transverse_stiffener is False:
+        if transverse_stiffener:
+            return d / t_w <= 345 * epsilon_f ** 2
+        if not transverse_stiffener:
             if c >= 1.5 * d:
-                d / t_w <= 345 * epsilon_f ** 2
-                return bool(d / t_w)
+                return d / t_w <= 345 * epsilon_f ** 2
             else:
-                d / t_w <= 345 * epsilon_f
-                return bool(d / t_w)
+                return d / t_w <= 345 * epsilon_f
 
     # cl8.7.1.5 Buckling resistance of stiffeners
     # Effective length for load carrying web stiffeners

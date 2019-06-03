@@ -27,8 +27,12 @@ class IS800_2007(object):
 					 tf - thickness of flange (float)
 					 tw - thickness of web (float)
 					 D - outer diameter of element (float)
-					 f_y: Yield stress of the plate material in MPa (float)
-					 e= sqrt(250/f_y)"""
+					 r1 - actual average stress/design compressive stress of web alone (float) 
+					 r2 - actual average stress/design compressive stress of overall section (float)
+					 f_y - Yield stress of the plate material in MPa (float)
+					 e = sqrt(250/f_y)
+					 """
+					 
 		
      cl_3_7_Table_2={
 				Compression_elements:
@@ -41,9 +45,27 @@ class IS800_2007(object):
 					 "outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component":d/t
 					 "stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section":D/tf
 					 "circular_hollow_tube_including_welded_tube_subjected_to":{"moment":D/t,"axial_compression" :D/t}
+					 "web_of_an_I_or_H_section":{"general":d/tw,"axial_compression":d/tw}
 					 }
 					 }
 	 def_cl_3_7_3_class(cl_3_7_Table_2):
+		""" Gives class of crossections using table 2 
+			Args:
+				 b - width of element (float)
+				 d - depth of web (float)
+				 t - thickness of element (float)
+				 tf - thickness of flange (float)
+				 tw - thickness of web (float)
+				 D - outer diameter of element (float)
+				 r1 - actual average stress/design compressive stress of web alone (float) 
+				 r2 - actual average stress/design compressive stress of overall section (float)
+				 f_y - Yield stress of the plate material in MPa (float)
+				 e = sqrt(250/f_y) 
+			Return: 
+				Class - type of the cross section (string)
+			Note:
+				Reference: IS 800:2007, cl 3.7.2
+		"""					
 				if cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=9.4*e:
 					return "class1"
 				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]>9.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=10.5*e:
@@ -99,6 +121,16 @@ class IS800_2007(object):
 					return "class3"
 				elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][1]<=88*e*e:
 					return"class3"
+				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=84*e/(1+r1)
+					return "class1"
+				elif r1<0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
+					return "class2"
+				elif r1>0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+1.5*r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
+					return "class2"
+				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=126*e/(1+2*r1) and cl_3_7_Table_2 [0][web_of_an_I_or_H_section][general]>105*e/(1+r1)
+					return "class3"
+				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][axial_compression]<=42*e
+					return "class3"
 					
     # Table 3 Maximum slendernesss ratio
      """ Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 

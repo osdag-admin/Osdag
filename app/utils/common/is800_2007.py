@@ -17,6 +17,171 @@ class IS800_2007(object):
     """    SECTION  2     MATERIALS   """
     # ==========================================================================
     """    SECTION  3     GENERAL DESIGN REQUIREMENTS   """
+    # -------------------------------------------------------------
+    # Table 2 Limiting width to thickness ratio
+    """ calculating class using Limiting width to thickness ratio
+            Args:
+                 b - width of element (float)
+                 d - depth of web (float)
+                 t - thickness of element (float)
+                 tf - thickness of flange (float)
+                 tw - thickness of web (float)
+                 D - outer diameter of element (float)
+                 r1 - actual average stress/design compressive stress of web alone (float) 
+                 r2 - actual average stress/design compressive stress of overall section (float)
+                 f_y - Yield stress of the plate material in MPa (float)
+                 e = sqrt(250/f_y)
+                 """
+
+
+    cl_3_7_Table_2 = {
+        Compression_elements:
+            {"outsanding_elements_compression_flange": {"rolled": b / tf, "welded": b / tf}
+             "internal_elements_compression_flange": {compression_due_to_bending: b / tf, "axial_compression": b / tf}
+             "web_of_a_channel": d / tw
+             "angle_compression_due_to_bending": {b / t, d / t}
+             "single_angles_or_double_angles_with_seperated_elements_axial_compression": {b / t, d / t, (b + d) / t}
+             "outstanding_leg_in_back_to_back_in_a_double_angle_member": d / t
+             "outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component": d / t
+             "stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section": D / tf
+             "circular_hollow_tube_including_welded_tube_subjected_to": {"moment": D / t, "axial_compression": D / t}
+             "web_of_an_I_or_H_section": {"general": d / tw, "axial_compression": d / tw}
+             }
+    }
+    def_cl_3_7_3_class(cl_3_7_Table_2):
+    """ Gives class of crossections using table 2 
+        Args:
+             b - width of element (float)
+             d - depth of web (float)
+             t - thickness of element (float)
+             tf - thickness of flange (float)
+             tw - thickness of web (float)
+             D - outer diameter of element (float)
+             r1 - actual average stress/design compressive stress of web alone (float) 
+             r2 - actual average stress/design compressive stress of overall section (float)
+             f_y - Yield stress of the plate material in MPa (float)
+             e = sqrt(250/f_y) 
+        Return: 
+            Class - type of the cross section (string)
+        Note:
+            Reference: IS 800:2007, cl 3.7.2
+    """
+    if cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] <= 9.4 * e:
+        return "class1"
+    elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] > 9.4 * e and
+            cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] <= 10.5 * e:
+        return "class2"
+    elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] > 10.5 * e and
+            cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] < 15 * e:
+        return "class3"
+    elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded] <= 8.4 * e:
+        return "class1"
+    elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded] > 8.4 * e and
+            cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded] <= 9.4 * e:
+        return "class2"
+    elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded] > 9.4 * e and
+            cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded] >= 13.6 * e:
+        return "class3"
+    elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending] <= 29.3 * e:
+        return "class1"
+    elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending] > 29.3 * e and
+            cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending] <= 33.5 * e:
+        return "class2"
+    elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending] > 33.5 * e and
+            cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending] <= 42 * e:
+        return "class3"
+    elif cl_3_7_Table_2[0][internal_elements_compression_flange][axial_compression] >= 42 * e:
+        return "class3"
+    elif cl_3_7_Table_2[0][web_of_a_channel] <= 42 * e:
+        return "class1 or class2 or class3"
+    elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0] <= 9.4 * e and
+         cl_3_7_Table_2[1][angle_compression_due_to_bending][0] <= 9.4 * e:
+    return "class1"
+    elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0] > 9.4 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][0] <= 10.5 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][1] > 9.4 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][1] <= 10.5 * e:
+    return "class2"
+    elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0] > 10.5 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][0] <= 15.7 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][1] > 10.5 * e and
+         cl_3_7_Table_2[0][angle_compression_due_to_bending][1] <= 15.7 * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][0] <= 15.7 * e and
+         cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][1] <= 15.7 * e and
+         cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][2] <= 25 * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member] <= 9.4 * e:
+    return "class1"
+    elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member] > 9.4 * e and cl_3_7_Table_2[0][
+        outstanding_leg_in_back_to_back_in_a_double_angle_member] <= 10.5 * e:
+    return "class2"
+    elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member] > 10.5 * e and cl_3_7_Table_2[0][
+        outstanding_leg_in_back_to_back_in_a_double_angle_member] <= 15.7 * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component] <= 9.4 * e:
+    return "class1"
+    elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component] > 9.4 * e and
+         cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component] <= 10.5 * e:
+    return "class2"
+    elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component] > 10.5 * e and
+         cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component] <= 15.7 * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section] <= 8.4 * e:
+    return "class1"
+    elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section] > 8.4 * e and cl_3_7_Table_2[0][
+        stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section] <= 9.4 * e:
+    return "class2"
+    elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section] > 9.4 * e and cl_3_7_Table_2[0][
+        stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section] <= 18.9 * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0] <= 42 * e * e:
+    return "class1"
+    elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0] > 42 * e * e and
+         cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0] <= 52 * e * e:
+    return "class2"
+    elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0] > 52 * e * e and
+         cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0] <= 146 * e * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][1] <= 88 * e * e:
+    return "class3"
+    elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <= 84 * e / (1 + r1)
+    return "class1"
+    elif r1 < 0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <= 105 * e / (1 + r1) and \
+         cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] > 84 * e / (1 + r1)
+    return "class2"
+    elif r1 > 0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <= 105 * e / (1 + 1.5 * r1) and \
+         cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] > 84 * e / (1 + r1)
+    return "class2"
+    elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <= 126 * e / (1 + 2 * r1) and \
+         cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] > 105 * e / (1 + r1)
+    return "class3"
+    elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][axial_compression] <= 42 * e
+    return "class3"
+
+    # Table 3 Maximum slendernesss ratio
+    """ Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 
+       Slenderness ratio=KL/r
+       KL:effective length of the member
+       r:appropriate radius of gyration based on effective section
+       Member types relating cases:
+       case1:A member carrying compressive loads from dead loads and imposed loads
+       case2:A tension member in which a reversal of direct stress occur dueto loads other than wind or seismic loads
+       case3:A member subjected to compression forces resulting only from combination with wind/earthquake actions,
+             provided deformations does not adversely affect the stress in any part of the structure
+       case4:Compression flange of a beam  against lateral torsional buckling
+       case5:A member normally acting as tie in a roof truss or a bracing system not considered effective when
+             when subjected to possible reversal of stress into compression resulting from action of wind or earthquake 
+              forces
+       case6:Members always under tension(other than pre-tensioned members)"""
+    cl_3
+    .8
+    _Table_3 = {"case1": 180,
+                "case2": 180,
+                "case3": 250,
+                "case4": 300,
+                "case5": 350,
+                "case6": 400}
     # ==========================================================================
     """    SECTION  4     METHODS OF STRUCTURAL ANALYSIS   """
     # ==========================================================================

@@ -10,13 +10,11 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
-from ui_weld_details import Ui_Weld_Details
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
-import bbExtendedEndPlateSpliceCalc as db_value
 from reportGenerator import save_html
 from drawing_2D_ExtendedBothways import ExtendedEndPlate
 from drawing_2D_Extendedoneway import OnewayEndPlate
@@ -36,6 +34,7 @@ import ConfigParser
 import cairosvg
 import shutil
 import subprocess
+
 from Connections.Component.ISection import ISection
 from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
@@ -255,33 +254,6 @@ class PlateDetails(QDialog):
 		self.ui.txt_plateHeight.setText(str(resultObj_plate["Plate"]["Height"]))
 		self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
 		self.ui.txt_plateCapacity.setText(str(resultObj_plate["Plate"]["MomentCapacity"]))
-
-class WeldDetails(QDialog):
-	def __init__(self, parent=None):
-		QDialog.__init__(self, parent)
-		self.ui = Ui_Weld_Details()
-		self.ui.setupUi(self)
-		self.maincontroller = parent
-
-		uiObj = self.maincontroller.designParameters()
-		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
-
-		if self.maincontroller.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
-			self.ui.label_note_1.setText("All dimensions are in mm.")
-  			if db_value.beam_tf <= 12:
-  				self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_flange.png"))
-				self.ui.label_note_2.setText("As flange thickness, tf (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
-			else:
-				self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_flange.png"))
-				self.ui.label_note_2.setText("As flange thickness, tf (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
-			if db_value.beam_tw <= 12:
-				self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_web.png"))
-				self.ui.label_note_3.setText("As web thickness, tw (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
-			else:
-  				self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
-				self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
-		else:
-  			pass 
 
 
 class Stiffener(QDialog):
@@ -655,7 +627,6 @@ class Maincontroller(QMainWindow):
 		QMainWindow.__init__(self)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
-		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
 		self.folder = folder
 		self.connection = "Extended"
 		self.get_beamdata()
@@ -728,7 +699,6 @@ class Maincontroller(QMainWindow):
 
 		self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
-		self.ui.btn_WeldDetails.clicked.connect(self.weld_details)
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 
@@ -927,18 +897,6 @@ class Maincontroller(QMainWindow):
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
 		uiObj["Connection"] = self.connection
 		return uiObj
-	
-	def on_change(self):
-  		if self.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
-  			self.ui.combo_webSize.setCurrentIndex(1)
-			self.ui.combo_flangeSize.setCurrentIndex(1)
-			self.ui.combo_flangeSize.setEnabled(False)
-			self.ui.combo_webSize.setEnabled(False)
-		else:
-  			self.ui.combo_webSize.setCurrentIndex(0)
-			self.ui.combo_flangeSize.setCurrentIndex(0)
-			self.ui.combo_flangeSize.setEnabled(True)
-			self.ui.combo_webSize.setEnabled(True)
 
 	def osdag_header(self):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
@@ -1218,21 +1176,6 @@ class Maincontroller(QMainWindow):
 			# 	self.ui.chkBx_connector.setDisabled(True)
 			# 	self.ui.chkBx_beamSec.setDisabled(True)
 			# 	self.ui.btn3D.setDisabled(True)
-		if self.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
-			self.ui.label_163.hide()
-			self.ui.label_164.hide()
-			self.ui.txt_criticalFlange.hide()
-			self.ui.txt_criticalWeb.hide()
-			self.ui.btn_WeldDetails.show()
-		elif self.ui.combo_weld_method.currentText() == "Fillet Weld":
-			self.ui.btn_WeldDetails.hide()
-			self.ui.label_163.show()
-			self.ui.label_164.show()
-			self.ui.txt_criticalFlange.show()
-			self.ui.txt_criticalWeb.show()
-		else:
-			pass
-
 
 	def display_output(self, outputObj):
 		for k in outputObj.keys():
@@ -1287,7 +1230,6 @@ class Maincontroller(QMainWindow):
 
 		weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
 		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
-
 
 	def display_log_to_textedit(self):
 		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
@@ -1609,10 +1551,6 @@ class Maincontroller(QMainWindow):
 
 	def plate_details(self):
 		section = PlateDetails(self)
-		section.show()
-	
-	def weld_details(self):
-		section = WeldDetails(self)
 		section.show()
 
 	def stiffener_details(self):

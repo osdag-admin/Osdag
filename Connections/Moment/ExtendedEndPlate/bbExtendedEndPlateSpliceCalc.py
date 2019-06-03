@@ -25,6 +25,7 @@ import logging
 flag = 1
 logger = None
 
+
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.bbExtendedEndPlateSpliceCalc")
@@ -358,9 +359,8 @@ def bbExtendedEndPlateSplice(uiObj):
     # Read input values from Beam database
 
     dictbeamdata = get_beamdata(beam_sec)
-    global beam_tw
+
     beam_tw = float(dictbeamdata["tw"])
-    global beam_tf
     beam_tf = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])

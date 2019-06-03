@@ -386,7 +386,7 @@
      <x>0</x>
      <y>0</y>
      <width>1422</width>
-     <height>22</height>
+     <height>19</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -3498,12 +3498,12 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Fillet Weld</string>
+       <string>Groove Weld (CJP)</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Groove Weld (CJP)</string>
+       <string>Fillet Weld</string>
       </property>
      </item>
     </widget>
@@ -4291,6 +4291,28 @@ QMenu::item:selected {
       <bool>true</bool>
      </property>
     </widget>
+    <widget class="QLineEdit" name="txt_boltcapacity">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>140</y>
+       <width>100</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
     <widget class="QPushButton" name="btn_pitchDetail">
      <property name="geometry">
       <rect>
@@ -4309,26 +4331,6 @@ QMenu::item:selected {
      </property>
      <property name="text">
       <string>Pitch details</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_WeldDetails">
-     <property name="geometry">
-      <rect>
-       <x>200</x>
-       <y>490</y>
-       <width>101</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Weld Details</string>
      </property>
     </widget>
     <zorder>txt_boltcapacity</zorder>
@@ -4363,13 +4365,13 @@ QMenu::item:selected {
     <zorder>txt_shearCapacity</zorder>
     <zorder>label_167</zorder>
     <zorder>label_11</zorder>
+    <zorder>txt_boltcapacity</zorder>
     <zorder>btn_plateDetail</zorder>
     <zorder>label_162</zorder>
     <zorder>btn_stiffnrDetail</zorder>
     <zorder>label_160</zorder>
     <zorder>txt_edgeDist</zorder>
     <zorder>btn_pitchDetail</zorder>
-    <zorder>btn_WeldDetails</zorder>
    </widget>
   </widget>
   <action name="actionInput">

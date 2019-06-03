@@ -66,71 +66,72 @@ class IS800_2007(object):
 			Note:
 				Reference: IS 800:2007, cl 3.7.2
 		"""					
-				if cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=9.4*e:
-					return "class1"
-				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]>9.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=10.5*e:
-					return"class2"
-				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]>10.5*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<15*e:
-					return "class3"
-				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]<=8.4*e:
-					return"class1"
-				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>8.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]<=9.4*e:
-					return"class2"
-				elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>9.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>=13.6*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=29.3*e:
-					return"class1"
-				elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]>29.3*e and cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=33.5*e	:
-					return"class2"
-				elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]>33.5*e and cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=42*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][internal_elements_compression_flange][axial_compression]>=42*e:
-					return "class3"
-				elif cl_3_7_Table_2[0][web_of_a_channel]<=42*e
-					return"class1 or class2 or class3"
-				elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=9.4*e and cl_3_7_Table_2[1][angle_compression_due_to_bending][0]<=9.4*e:	return "class1"
-				elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]>9.4*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]>9.4*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]<=10.5*e:
-				   return "class2"
-				elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]>10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=15.7*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]>10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]<=15.7*e:
-					return "class3"
-				elif cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][0]<=15.7*e	and cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][1]<=15.7*e and cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][2]<=25*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=9.4*e:
-					return "class1"
-				elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]>9.4*e and cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=10.5*e:
-					return "class2"
-				elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]>10.5*e and cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=15.7*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=9.4*e:
-					return "class1"
-				elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]>9.4*e and cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=10.5*e:
-					return "class2"
-				elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]>10.5*e and cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=15.7*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=8.4*e:
-					return "class1"
-				elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]>8.4*e and cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=9.4*e:
-					return "class2"
-				elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]>9.4*e and cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=18.9*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=42*e*e:
-					return"class1"
-				elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]>42*e*e and cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=52*e*e:
-					return"class2"	
-				elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]>52*e*e and cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=146*e*e:
-					return "class3"
-				elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][1]<=88*e*e:
-					return"class3"
-				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=84*e/(1+r1)
-					return "class1"
-				elif r1<0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
-					return "class2"
-				elif r1>0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+1.5*r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
-					return "class2"
-				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=126*e/(1+2*r1) and cl_3_7_Table_2 [0][web_of_an_I_or_H_section][general]>105*e/(1+r1)
-					return "class3"
-				elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][axial_compression]<=42*e
-					return "class3"
+		if cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=9.4*e:
+		    return "class1"
+		elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]>9.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<=10.5*e:
+			return "class2"
+		elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]>10.5*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled]<15*e:
+			return "class3"
+		elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]<=8.4*e:
+			return"class1"
+		elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>8.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]<=9.4*e:
+			return"class2"
+		elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>9.4*e and cl_3_7_Table_2[0][outstanding_elements_compression_flange][welded]>=13.6*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=29.3*e:
+			return"class1"
+		elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]>29.3*e and cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=33.5*e	:
+			return"class2"
+		elif cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]>33.5*e and cl_3_7_Table_2[0][internal_elements_compression_flange][compression_due_to_bending]<=42*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][internal_elements_compression_flange][axial_compression]>=42*e:
+			return "class3"
+        elif cl_3_7_Table_2[0][web_of_a_channel]<=42*e:
+			return"class1 or class2 or class3"
+		elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=9.4*e and cl_3_7_Table_2[1][angle_compression_due_to_bending][0]<=9.4*e:
+            return "class1"
+		elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]>9.4*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]>9.4*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]<=10.5*e:
+			 return "class2"
+		elif cl_3_7_Table_2[0][angle_compression_due_to_bending][0]>10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][0]<=15.7*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]>10.5*e and cl_3_7_Table_2[0][angle_compression_due_to_bending][1]<=15.7*e:
+			return "class3"
+		elif cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][0]<=15.7*e	and cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][1]<=15.7*e and cl_3_7_Table_2[0][single_angles_or_double_angles_with_seperated_elements_axial_compression][2]<=25*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=9.4*e:
+			return "class1"
+		elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]>9.4*e and cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=10.5*e:
+			return "class2"
+		elif cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]>10.5*e and cl_3_7_Table_2[0][outstanding_leg_in_back_to_back_in_a_double_angle_member]<=15.7*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=9.4*e:
+			return "class1"
+		elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]>9.4*e and cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=10.5*e:
+			return "class2"
+		elif cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]>10.5*e and cl_3_7_Table_2[0][outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component]<=15.7*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=8.4*e:
+			return "class1"
+		elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]>8.4*e and cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=9.4*e:
+			return "class2"
+		elif cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]>9.4*e and cl_3_7_Table_2[0][stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section]<=18.9*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=42*e*e:
+			return"class1"
+		elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]>42*e*e and cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=52*e*e:
+			return"class2"
+		elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]>52*e*e and cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][0]<=146*e*e:
+			return "class3"
+		elif cl_3_7_Table_2[0][circular_hollow_tube_including_welded_tube_subjected_to][1]<=88*e*e:
+			return"class3"
+		elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=84*e/(1+r1)
+			return "class1"
+		elif r1<0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
+			return "class2"
+		elif r1>0 and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general] <=105*e/(1+1.5*r1) and cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]> 84*e/(1+r1)
+			return "class2"
+		elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][general]<=126*e/(1+2*r1) and cl_3_7_Table_2 [0][web_of_an_I_or_H_section][general]>105*e/(1+r1)
+			return "class3"
+		elif cl_3_7_Table_2[0][web_of_an_I_or_H_section][axial_compression]<=42*e
+			return "class3"
 					
     # Table 3 Maximum slendernesss ratio
      """ Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 

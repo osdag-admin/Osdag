@@ -1584,35 +1584,33 @@ class IS800_2007(object):
 
 
     # cl 8.7.2.6 Connection of intermediate stiffeners to web
-    def shear_between_each_component_of_stiffener_and_web(t_w, b_s):
+    def cl_8_7_2_6_shear_resistance_of_intermediate_stiffener_and_web(t_w, b_s,s_e):
         """
-            Calculation of minimum shear between each component of stiffener and web
-
+            Calculation of minimum allowable shear between each component of stiffener and web
             Args:
                 t_w - web thickness in mm
                 b_s - outstand width of the stiffeners in mm
-
+                s_e - shear due to external loading
             Returns:
-                V_is_min - minimum shear between each component of stiffener and web in kN/mm
-
+                V - minimum shear the stiffener should be able to withstand
             Notes:
                 Reference:
                 IS 800:2007,  cl 8.7.2.6
 
         """
-        V_is_min = t_w ** 2 / 5 * b_s
-        return V_is_min
+        V = t_w ** 2 / 5 * b_s + s_e
+        return V
 
-    # cl 8.7.2.6 Load Carrying stiffeners
-    def area_of_cross_section_of_web(b_1, n_1, t_w):
+    # cl 8.7.3 Load Carrying stiffeners
+    # cl 8.7.3.1 Load Carrying
+    def cl_8_7_3_1_area_of_cross_section_of__web(b_1, n_1, t_w):
         """
             Calculation of area of cross section of the web
-
             Args:
                 b_1 - width of stiff bearing on the flange
                 n_1 - dispersion of the load through the web
-                     45 degree, to the level of half the depth
-                     of the cross section
+                      45 degrees, to the level of half the depth
+                      of the cross section
                 t_w - web thickness
             Returns:
                 A_w - area of cross section of the web
@@ -1624,14 +1622,14 @@ class IS800_2007(object):
         return A_w
 
     # cl 8.7.4 Bearing Stiffeners
-    def force_applied_through_flange_by_loads_(b_1, n_2, t_w, f_yw):
+    def cl_8_7_4_force_applied_through_flange_by_loads_(b_1, n_2, t_w, f_yw):
         """
             Calculation of force applied through a flange by load or reaction
             exceeding the local capacity of the web at its connection
 
             Args:
                 b_1 - stiff bearing length
-                n_2 - length obatined by dipersion through the flange to the web
+                n_2 - length obtained by dispersion through the flange to the web
                         junction at a slope of 1:2.5 to the plane of the flange
                 t_w - thickness of the web
                 f_yw - yield stress of the web
@@ -1644,7 +1642,8 @@ class IS800_2007(object):
                 IS 800:2007,  cl 8.7.4
 
         """
-        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        ob = IS800_2007()
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_w = (b_1 + n_2) * t_w * f_yw / gamma_m0
 
         return F_w
@@ -1653,7 +1652,7 @@ class IS800_2007(object):
     # cl 8.7.5.1 Buckling check
     # cl 8.7.5.2 Bearing check
 
-    def bearing_strength_of_stiffeners(F_x, A_q, f_yq):
+    def cl_8_7_5_2_bearing_strength_of_stiffeners(F_x, A_q, f_yq):
         """
             Calculation of bearing strength of stiffeners
         Args:
@@ -1668,37 +1667,37 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007,  cl 8.7.4
         """
-
-        F_psd = min(A_q * f_yq / (0.8 * gamma_m0), F_x)
+        ob = IS800_2007()
+        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        F_psd = max(A_q * f_yq / (0.8 * gamma_m0), F_x)
         return F_psd
 
     # cl 8.7.9 Torsional Stiffeners
-    def Second_moment_of_area_of_the_stiffener_Section(D, T_cf, L_LT, r_y):
+    def cl_8_7_9_minimum_second_moment_of_area_of_the_stiffener_section(D, T_cf, L_LT, r_y):
         """
             calculation of  minimum second moment of area of the stiffener
 
             Args:
-                D = overall depth of beam at support
-                T_cf = maximum thickness of compression flange in the span under consideration
-                K_L=  laterally unsupported effcetive length of the compression flange of the beam
-                r_y = radius of gyration of the beam about the minor axis
+                D - overall depth of beam at support
+                T_cf - maximum thickness of compression flange in the span under consideration
+                L_LT - effective length for lateral torsional buckling
+                r_y - radius of gyration of the beam about the minor axis
 
             Returns:
-                I_s_min = calculation of  minimum second moment of area of the stiffener
+                I_s_min - calculation of minimum second moment of area of the stiffener
 
             Notes:
                 Reference:
                 IS 800:2007,  cl 8.7.4
-
         """
         if L_LT / r_y <= 50:
             alpha_s = 0.006
         elif 50 < L_LT / r_y <= 100:
             alpha_s = 0.3 / (L_LT / r_y)
         else:
-            alpha_s = 30 / (L_LT / r_y)
+            alpha_s = 30 / (L_LT / r_y) ** 2
 
-        I_s_min = 0.3 * alpha_s * D ** 3 * T_cf
+        I_s_min = 0.34 * alpha_s * D ** 3 * T_cf
 
         return I_s_min
 

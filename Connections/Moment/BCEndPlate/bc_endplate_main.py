@@ -652,7 +652,10 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Design.clicked.connect(self.osdag_header)
-
+        self.ui.btn_Design.clicked.connect(self.image1)
+        self.ui.btn_Design.clicked.connect(self.image2)
+        self.ui.btn_Design.clicked.connect(self.image3)
+        self.ui.btn_Design.clicked.connect(self.image4)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -898,6 +901,22 @@ class Maincontroller(QMainWindow):
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+
+    def image1(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_flange.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_flange.png"))
+
+    def image2(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_web.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_web.png"))
+
+    def image3(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_web.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_web.png"))
+
+    def image4(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_flange.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_flange.png"))
 
     def design_prefer(self):
         self.designPrefDialog.show()
@@ -1318,6 +1337,7 @@ class Maincontroller(QMainWindow):
         self.ui.txt_crossGauge.clear()
         self.ui.txt_endDist.clear()
         self.ui.txt_edgeDist.clear()
+
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)
         self.ui.btn_plateDetail_2.setDisabled(True)

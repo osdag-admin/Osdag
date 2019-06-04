@@ -771,18 +771,21 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
+    outputobj['ContPlateComp']['Number'] = 2
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
     outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
+    outputobj['ContPlateTens']['Number'] = 2
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
+    outputobj['Stiffener']['Number'] = 2
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values

@@ -601,7 +601,6 @@ class IS800_2007(object):
 
 
         """
-        ob = IS800_2007()
         gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
         t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
         return t_s
@@ -671,13 +670,12 @@ class IS800_2007(object):
             IS 800:2007  cl.7.5.1.2
 
         """
-        ob = IS800_2007()
         
         [K_1,K_2,K_3] = K_list
         
         alpha = 0.49 #according to ammendment 1
         
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         
         epsilon = math.sqrt(250 / f_y)
 
@@ -1132,13 +1130,12 @@ class IS800_2007(object):
                 IS800:2007,  cl 8.2.1.2, cl. 8.2.1.3
 
         """
-        ob = IS800_2007()
         beta_b = z_e / z_p #semi-compact section
         if plastic is True:
             beta_b = 1
         if compact is True:
             beta_b = 1
-        gamma_m0 = ob.cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         if v <= 0.6 * v_d:
             m_d = beta_b * z_p * f_y / gamma_m0
 
@@ -1258,9 +1255,8 @@ class IS800_2007(object):
         if Lambda_LT < 0.4:
            X_LT = 1
 
-        ob = IS800_2007()
 
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
         f_bd = X_LT * f_y / gamma_m0
 
@@ -1474,7 +1470,7 @@ class IS800_2007(object):
 
         psi = 1.5 * T_b * math.sin(2 * phi)
 
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         M_fr = 0.25 * b_f * t_f ** 2 * f_yf * (1 - (N_f / (b_f * t_f * f_yf / gamma_m0)) ** 2)
 
         s = min(c, (2 / math.sin(phi) * math.sqrt(M_fr / f_yw * t_w)))
@@ -1684,8 +1680,7 @@ class IS800_2007(object):
             IS 800:2007,  cl 8.7.2.5, cl.8.7.3
 
         """
-        ob = IS800_2007()
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_q = min(V - V_cr / gamma_m0, F_qd)
         if (F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq <= 1:
             return F_q
@@ -1752,8 +1747,7 @@ class IS800_2007(object):
                 IS 800:2007,  cl 8.7.4
 
         """
-        ob = IS800_2007()
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_w = (b_1 + n_2) * t_w * f_yw / gamma_m0
 
         return F_w
@@ -1777,8 +1771,7 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007,  cl 8.7.4
         """
-        ob = IS800_2007()
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_psd = max(A_q * f_yq / (0.8 * gamma_m0), F_x)
         return F_psd
 

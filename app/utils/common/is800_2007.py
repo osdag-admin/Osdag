@@ -240,7 +240,7 @@ class IS800_2007(object):
             IS 800:2007, cl.6.2
         """
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = A_g * f_y / gamma_m0
         return T_dg
 
@@ -268,7 +268,7 @@ class IS800_2007(object):
             IS 800:2007, cl.6.3.1
         """
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         sum_value = 0
         for i in range(n - 1):
             sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
@@ -295,7 +295,7 @@ class IS800_2007(object):
             IS800:2007, cl.6.3.2
         """
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_dn = 0.9 * A_n * f_u / gamma_m1
         return T_dn
 
@@ -325,8 +325,8 @@ class IS800_2007(object):
 
         """
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
         X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
         beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
@@ -359,7 +359,7 @@ class IS800_2007(object):
             else:
                 alpha = 0.8
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_dn = alpha * A_n * f_u / gamma_m1
         return T_dn
 
@@ -388,8 +388,8 @@ class IS800_2007(object):
             Reference:
             IS800:2007, cl.6.4.1
         """
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
 
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
@@ -566,7 +566,7 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007, cl.7.1.2.1
         """
-        Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
+        Buckling_Class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
         alpha = cl_7_1_Table_7_alpha["Buckling_Class"]["alpha"]
         K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
                                                                          At_other_end_Translation,
@@ -601,8 +601,8 @@ class IS800_2007(object):
 
 
         """
-        ob = IS800_2007()
-        gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
+
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
         return t_s
         
@@ -671,13 +671,13 @@ class IS800_2007(object):
             IS 800:2007  cl.7.5.1.2
 
         """
-        ob = IS800_2007()
+
         
         [K_1,K_2,K_3] = K_list
         
         alpha = 0.49 #according to ammendment 1
         
-        gamma_m0 = ob.IS800_2007_cl_5_4_1_Table_5["gamma_m0"]['yielding']
+         gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         
         epsilon = math.sqrt(250 / f_y)
 
@@ -694,7 +694,7 @@ class IS800_2007(object):
         
     #cl7.6 Laced column
     #cl 7.6.1.5.Effective slenderness ratiion of lacing member
-	def effective_slenderness_ratio_of_lacing_member(K_L, r_min):
+	def cl_7_6_1_5_effective_slenderness_ratio_of_lacing_member(K_L, r_min):
 
 		"""
 		    Calculation of Effective slenderness ratio of lacing member
@@ -771,7 +771,7 @@ class IS800_2007(object):
 
     # cl7.7  Batten plate
     # cl7.7.1.4 effective slenderness ratio of batten plate
-    def effective_slenderness_ratio_of_batten_plate(K_l,r_min):
+    def CL_7_7_1_4_effective_slenderness_ratio_of_batten_plate(K_L,r_min):
         """
         Args:
             K_L -effective length of column in mm
@@ -1127,7 +1127,7 @@ class IS800_2007(object):
             Beta_b = 1
         if compact is True:
             Beta_b = 1
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         if V <= 0.6 * V_d:
             M_d = Beta_b * Z_p * f_y / gamma_m0
 
@@ -1184,8 +1184,8 @@ class IS800_2007(object):
 
     def cl_8_2_2_design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
                                                               Restraint_Condition_2,
-                                                              Loading_Condition, t, section, n, Z_p, Z_e, f_y, V, V_d,
-                                                              M_dv, plastic=False, compact=False, *b):
+                                                              Loading_Condition,section, n, Z_p, Z_e, f_y, V, V_d,
+                                                              M_dv, plastic=False, compact=False, b=[],t =[]):
         """
             Calculation of design bending strength of laterally unsupported beam
             Args:
@@ -1252,7 +1252,7 @@ class IS800_2007(object):
             IS 800:2007, cl. 8.4
 
         """
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['shop']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['shop']
         V_d = V_n / gamma_m0
         if V <= V_d:
             return V_d
@@ -1277,7 +1277,9 @@ class IS800_2007(object):
         V_n = V_p
         return V_n
 
-    def cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis, cross_Section):
+
+    def cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis,
+                                               cross_section):
         """
             Calculation of shear area of different section
 
@@ -1289,7 +1291,7 @@ class IS800_2007(object):
                 t_f - thickness of the flange in mm
                 t_w - thickness of the web in mm
                 section - Either 'I section ' and 'Channel Section' or 'Rectangular hollow section of uniform depth'
-                          or 'Circular hollow tubes of uniform thickness' or 'plates' or 'solid bars'
+                        or 'Circular hollow tubes of uniform thickness' or 'plates' or 'solid bars'
                 Load_application_axis - Either 'Loaded parallel to depth' or 'Loaded parallel to width(b)'
                 Axis_of_Bending - Either 'Major Axis Bending' or 'Minor Axis Bending'
                 cross_section - Either 'Hot Rolled' or ' Welded'
@@ -1301,18 +1303,18 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007, cl. 8.4.1.1
 
-        """
+    """
 
-        if section == 'I section ' and 'Channel Section':
+        if section == 'I section' or section == 'Channel Section':
             if Axis_of_Bending == 'Major Axis Bending':
-                if cross_Section == 'Hot -Rolled':
+                if cross_section == 'Hot-Rolled':
                     A_v = h * t_w
                 else:
                     A_v = d * t_w
                 return A_v
 
         if Axis_of_Bending == 'Minor Axis Bending':
-            if cross_Section == 'Hot -Rolled' or 'Welded':
+            if cross_section == 'Hot-Rolled' or cross_section == 'Welded':
                 A_v = 2 * b * t_f
                 return A_v
 
@@ -1327,15 +1329,30 @@ class IS800_2007(object):
             A_v = A
             return A_v
 
-        if section == 'plates'and 'solid bars':
+        if section == 'plates' or section == 'solid' :
             A_v = A
             return A_v
 
-    # cl8.4.2 TODO: CHECK RESISTANCE TO SHEAR BUCKLING
+        if section == 'Rectangular hollow section of uniform depth':
+            if load_application_axis == 'Loaded parallel to depth':
+                A_v = A * h / (b + h)
+            else:
+                A_v = A * b / (b + h)
+            return A_v
 
+        if section == 'Circular hollow tubes of uniform thickness':
+            A_v = A
+            return A_v
+
+        if section == 'plates' or section == 'solid':
+            A_v = A
+            return A_v
+
+
+    # cl8.4.2 TODO: CHECK RESISTANCE TO SHEAR BUCKLING
     # cl8.4.2.2 Shear buckling design method
-    def cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,
-                               section, Axis_of_Bending, load_application_axis):
+    def cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h,
+                                         t_f, section, Axis_of_Bending, load_application_axis):
         """
             Calculation of nominal shear strength
             Args:
@@ -1370,7 +1387,9 @@ class IS800_2007(object):
 
         """
 
-        A_v = cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis, cross_Section)
+        A_v = cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending,
+                                                         load_application_axis, cross_Section)
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         if method == 'Simple_post_ critical_method':
             if position_of_transverse_shear == 'At support':
                 K_v = 5.35
@@ -1378,8 +1397,6 @@ class IS800_2007(object):
                 K_v = 4.0 + (5.35 / (c / d) ** 2)
             elif c / d > 1.0:
                 K_v = 5.35 + (4.0 / (c / d) ** 2)
-
-            return K_v
 
             T_cr_c = (K_v * pi ** 2 * E) / (12 * (1 - nu ** 2) * (d / t_w) ** 2)
             lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
@@ -1391,29 +1408,23 @@ class IS800_2007(object):
             else:
                 T_b = f_yw / (math.sqrt(3) * lambda_w ** 2)
 
-        V_cr = A_v *T_b
-        V_n = V_cr
-        return (V_n, T_b,T_cr_c)
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['yielding']
+            V_cr = A_v * T_b
+            V_n = V_cr
+            return V_n
+
 
         if method == 'Tension_field_method':
             phi = math.atan(d / c)
             shi = 1.5 * T_b * sin(2 * phi)
             M_fr = 0.25 * b_f * t_f ** 2 * f_yf * (1 - (N_f / (b_f * t_f * f_yf / gamma_m0)) ** 2)
-
             s = min(c, (2 / sinphi) * math.sqrt(M_fr / f_yw * t_w))
             s_c = s
             s_t = s
-
             w_tf = d * cos(phi) + (c - s_c - s_t) * sin(phi)
-
             f_v = math.sqrt(f_yw ** 2 - 3 * T_b ** 2 + shi ** 2) - shi
             V_p = A_v * f_yw / math.sqrt(3)
-
             V_tf = min(V_p, (A_v * T_b + 0.9 * w_tf * t_w * f_v * sin(phi)))
-
             V_n = V_tf
-
             return V_n
 
     # Stiffened web Design
@@ -1439,10 +1450,10 @@ class IS800_2007(object):
                 Reference:
                 IS 800:2007, cl. 8.5.3
         """
-        V_cr = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
-        V_tf = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
+        V_cr = cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h,
+                                         t_f, section, Axis_of_Bending, load_application_axis)
+        V_tf = cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h,
+                                         t_f, section, Axis_of_Bending, load_application_axis)
         V_p = d * t * f_y / math.sqrt(3)
 
         if V < V_tf:
@@ -1459,13 +1470,13 @@ class IS800_2007(object):
     # cl8.6.1.1 Serviceability requirement
     def cl_8_6_1_1_minimum_web_thickness(d, t_w, c, f_yw, serviceability_requirement, web_connection_to_flange):
         """
-            Checking the serviceability requirment of  minimum thickness of web
+            Checking the serviceability requirement of  minimum thickness of web
             Args:
-                d - web depth
-                t_w - thickness of web
-                c - spacing of transverse stiffner
-                apsilon_w - yield stress ratio of web
-                f_yw - yield stress of the web
+                d - web depth in mm
+                t_w - thickness of web in mm
+                c - spacing of transverse stiffener in mm
+                epsilon_w - yield stress ratio of web
+                f_yw - yield stress of the web in N/mm**2
             Return:
                 True or false
 
@@ -1474,82 +1485,76 @@ class IS800_2007(object):
                 IS 800:2007, cl. 8.6.1.1
 
         """
-        apsilon_w = math.sqrt(250 / f_yw)
-        if serviceability_requirement == 'transverse_stiffner_not_provided':
+        epsilon_w = math.sqrt(250 / f_yw)
+        if serviceability_requirement == 'transverse_stiffeners_not_provided':
             if web_connection_to_flange == 'along_both_longitudinal_edges':
-                d / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
+                return bool(d / t_w <= 200 * epsilon_w)
             else:
-                d / t_w <= 90 * apsilon_w
-                return bool(d / t_w)
+                return bool(d / t_w <= 90 * epsilon_w)
 
-        elif serviceability_requirement == 'transverse_stiffner_not_provided':
-            if d < c <= 3 * d:
-                d / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
+        elif serviceability_requirement == 'transverse_stiffener_not_provided':
+            if 3*d >= c > d:
+                return bool(d / t_w <= 200 * epsilon_w)
             elif 0.74 * d <= c < d:
-                c / t_w <= 200 * apsilon_w
-                return bool(d / t_w)
+                return bool(c / t_w <= 200 * epsilon_w)
             elif c < 0.74 * d:
-                d / t_w <= 270 * apsilon_w
-                return bool(d / t_w)
+                return bool(d / t_w <= 270 * epsilon_w)
             else:
                 return 'web_is_considered_unstiffened'
 
-        elif serviceability_requirement == 'transverse_and_longitudinal_stiffner_at_one_level_as_cl_8_7_13':
+        elif serviceability_requirement == 'transverse_and_longitudinal_stiffener_at_one_level_as_cl_8_7_13':
             if d < c <= 2.4 * d:
-                d / t_w <= 250 * apsilon_w
-                return bool(d / t_w)
+                return bool(d / t_w <= 250 * epsilon_w)
             elif 0.74 * d <= c < d:
-                c / t_w <= 250 * apsilon_w
-                return bool(d / t_w)
+                return bool(c / t_w <= 250 * epsilon_w)
             else:
-                d / t_w <= 340 * apsilon_w
-                return bool(d / t_w)
+                return bool(d / t_w <= 340 * epsilon_w)
 
         else:
-            d / t_w <= 400 * apsilon_w
-            return bool(d / t_w)
+            return bool( d / t_w <= 400 * epsilon_w)
 
-    # Compression flange buckling requirement
-    def web_thickness_to_aviod_buckling_of_compression_flange(d, t_w, c, f_yf, Transverse_stiffner=True):
+    # cl 8.6.1.2 Compression flange buckling requirement
+    def cl_8_6_1_2_web_thickness_to_avoid_buckling_of_compression_flange(d, t_w, c, f_yf, Transverse_stiffener):
         """
-            Check for minimum web thickness to avoid bucklng of compression flange
+            Check for minimum web thickness to avoid buckling of compression flange
             Args:
-                d - depth of the web
-                t_w - thickness of the web
-                c - spacing of transverse stiffner
-                apsilon_f - yield stress ratio of flange
-                f_yw - yield stress of compression flange
+                d - depth of the web in mm
+                t_w - thickness of the web in mm
+                c - spacing of transverse stiffener in mm
+                epsilon_f - yield stress ratio of flange
+                f_yw - yield stress of compression flange in N/mm**2
+                Transverse_stiffener - either 'provided' or 'not provided'
             Return:
+                True or False
+            Note:
+                Reference:
+                IS 800:2007, cl. 8.6.1.1
 
         """
-        apsilon_f = math.sqrt(250 / f_yf)
-        d / t_w <= 345 * apsilon_f ** 2
-
-        if Transverse_stiffner is False:
+        epsilon_f = math.sqrt(250 / f_yf)
+        if Transverse_stiffener == 'not provided':
+           return bool( d / t_w <= 345 * epsilon_f ** 2)
+        else:
             if c >= 1.5 * d:
-                d / t_w <= 345 * apsilon_f ** 2
-                return bool(d / t_w)
+                return bool(d / t_w <= 345 * epsilon_f ** 2)
             else:
-                d / t_w <= 345 * apsilon_f
-                return bool(d / t_w)
+                return bool(d / t_w <= 345 * epsilon_f)
 
     # cl8.7.1.5 Buckling resistance of stiffeners
-    # Effective length for load carrying web stiffners
-    def effective_length_for_load_carrying_web_stiffners(L, restrained_condition):
+    # Effective length for load carrying web stiffeners
+    def effective_length_for_load_carrying_web_stiffeners(L, restrained_condition):
         """
-        Calculation of Effective length for load carrying web stiffners for calculating
+            Calculation of Effective length for load carrying web stiffeners for calculating
             buckling resistance F_xd
-        Args:
-            L - length of stiffner
-            restrained_condition - Either 'flange_restrained_against_rotation' or
+            Args:
+                L - length of stiffener in mm
+                restrained_condition - Either 'flange_restrained_against_rotation' or
                                     'flange_not_restrained_against_rotation'
-        Returns:
-            K_L - effective length for load carrying web stiffners
-        Note:
-            Reference:
-            IS 800:2007,   cl 8.7.1.5
+            Returns:
+                K_L - effective length for load carrying web stiffeners in mm
+            Note:
+                Reference:
+                IS 800:2007,   cl 8.7.1.5
         """
         if restrained_condition == 'flange_restrained_against_rotation':
             K_L = 0.7 * L
@@ -1559,19 +1564,19 @@ class IS800_2007(object):
             return K_L
 
     # Cl 8.7.2.4 Minimum stiffeners
-    def I_s_for_transverse_web_Stiffners_not_subjected_to_external_load(c, d, t_w):
+    def cl_8_7_2_4_I_s_for_transverse_web_Stiffeners_not_subjected_to_external_load(c, d, t_w):
         """
-        Calculation of second moment of area when transverse web stiffner
-                not subjected to external laod
-        Args:
-            d - depth of thw web
-            t_w - minimum required web thickness foe spacing using tension filed action ,as given in cl8.4.2.1
-            c - actual stiffener spacing
-        Return:
-            I_s_min - second momonet of area
-        Note:
-            Reference:
-            IS 800:2007,  cl 8.7.2.4
+            Calculation of second moment of area when transverse web stiffener
+                not subjected to external load
+            Args:
+                d - depth of thw web in mm
+                t_w - minimum required web thickness foe spacing using tension filed action ,as given in cl8.4.2.1 in mm
+                c - actual stiffener spacing in mm
+            Return:
+                I_s_min - second moment of area in mm**4
+            Note:
+                Reference:
+                IS 800:2007,  cl 8.7.2.4
         """
         if c / d >= math.sqrt(2):
             I_s_min = 0.75 * d * t_w ** 3
@@ -1580,27 +1585,27 @@ class IS800_2007(object):
 
         return I_s_min
 
-    # cl 8.7.2.5 Buckling check on intermediate transverse web stiffners
-    def buckling_check_on_intermediate_transverse_web_stiffener(V, F_qd, F_x, F_xd, M_q, M_yq):
+    # cl 8.7.2.5 Buckling check on intermediate transverse web stiffeners
+    def cl_8_7_2_5_buckling_check_on_intermediate_transverse_web_stiffener(V, F_qd, F_x, F_xd, M_q, M_yq):
         """
-            Buckling check on intermediate transverse web stiffners
+            Buckling check on intermediate transverse web stiffeners
         Args:
-                F_qd - design resistance of the intermediate stiffners
-                V -factored shear force adjacent to the stiffner
-                F_qd - deign resistance of an intermediate web stiffner
+                F_qd - design resistance of the intermediate stiffeners in N
+                V -factored shear force adjacent to the stiffener in N
+                F_qd - deign resistance of an intermediate web stiffener
                         to buckling corresponding to buckling about at
-                         axis parallel to the web as in cl 8.7.1.5
-                F_x - external load or reaction at the stiffner
+                         axis parallel to the web as in cl 8.7.1.5 in N
+                F_x - external load or reaction at the stiffener in N
                 F_xd - design resistance of a load carrying stiffener
                         corresponding to buckling about axis parallel
-                        to the web as in cl 8.7.1.5
-                M_q - moment on the stiffner due to eccentrically
-                        applied load anf transverse load, if any
-                M_yq - yield moment capacity og the stiffner based
-                        on its elastic modulus about its centriodal
-                        axis parallel to the web
-        Retrun:
-            F_q - stiffener force
+                        to the web as in cl 8.7.1.5 in N
+                M_q - moment on the stiffener due to eccentrically
+                        applied load anf transverse load, if any in N*mm
+                M_yq - yield moment capacity og the stiffener based
+                        on its elastic modulus about its centroidal
+                        axis parallel to the web in N*mm
+        Return:
+            F_q - stiffener force in N
 
         Note:
             Reference:
@@ -1608,23 +1613,23 @@ class IS800_2007(object):
 
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
-        V_cr = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                                      t_f)
+        V_cr = cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h,
+                                         t_f, section, Axis_of_Bending, load_application_axis)
         F_q = min(V - (V_cr / gamma_m0), F_qd)
         if (F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq <= 1:
             return bool((F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq)
 
     # cl 8.7.2.6 Connection of intermediate stiffeners to web
-    def shear_between_each_component_of_stiffener_and_web(t_w, b_s):
+    def cl_8_7_2_6_shear_between_each_component_of_stiffener_and_web(t_w, b_s):
         """
             Calculation of minimum shear between each component of stiffener and web
 
             Args:
                 t_w - web thickness in mm
-                b_s - outstand width of the stiffeners in mm
+                b_s - outstanding  width of the stiffeners in mm
 
             Returns:
-                V_is_min - minimum shear between each component of stiffener and web in kN/mm
+                V_is_min - minimum shear between each component of stiffener and web in N/mm
 
             Notes:
                 Reference:
@@ -1635,7 +1640,7 @@ class IS800_2007(object):
         return V_is_min
 
     # cl 8.7.2.6 Load Carrying stiffeners
-    def area_of_cross_section_of_web(b_1, n_1, t_w):
+    def cl_8_7_2_6_area_of_cross_section_of_web(b_1, n_1, t_w):
         """
             Calculation of area of cross section of the web
 
@@ -1644,9 +1649,9 @@ class IS800_2007(object):
                 n_1 - dispersion of the load through the web
                      45 degree, to the level of half the depth
                      of the cross section
-                t_w - web thickness
+                t_w - web thickness in mm
             Returns:
-                A_w - area of cross section of the web
+                A_w - area of cross section of the web in mm**2
             Notes:
                 Reference:
                 IS 800:2007,  cl 8.7.3.1
@@ -1655,20 +1660,20 @@ class IS800_2007(object):
         return A_w
 
     # cl 8.7.4 Bearing Stiffeners
-    def force_applied_through_flange_by_loads_(b_1, n_2, t_w, f_yw):
+    def cl_8_7_4_force_applied_through_flange_by_loads_(b_1, n_2, t_w, f_yw):
         """
             Calculation of force applied through a flange by load or reaction
             exceeding the local capacity of the web at its connection
 
             Args:
-                b_1 - stiff bearing length
-                n_2 - length obatined by dipersion through the flange to the web
-                        junction at a slope of 1:2.5 to the plane of the flange
-                t_w - thickness of the web
-                f_yw - yield stress of the web
+                b_1 - stiff bearing length in mm
+                n_2 - length obtained by dispersion through the flange to the web
+                        junction at a slope of 1:2.5 to the plane of the flange  in mm
+                t_w - thickness of the web in mm
+                f_yw - yield stress of the web in N/mm**2
 
             Returns:
-                F_w - force applied through flange by loads
+                F_w - force applied through flange by loads  in N
 
             Notes:
                 Reference:
@@ -1677,25 +1682,24 @@ class IS800_2007(object):
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         F_w = (b_1 + n_2) * t_w * f_yw / gamma_m0
-
         return F_w
 
     # cl 8.7.5 Design of load carrying stiffeners
     # cl 8.7.5.1 Buckling check
     # cl 8.7.5.2 Bearing check
-
-    def bearing_strength_of_stiffeners(F_x, A_q, f_yq):
+    def cl_8_7_5_2_bearing_strength_of_stiffeners(F_x, A_q, f_yq):
         """
             Calculation of bearing strength of stiffeners
-        Args:
-            F_x - external load or reaction
-            A_q - area of the stiffeners in contact with the flange
-            f_yq - yield stress of the stiffeners
 
-        Return:
-            F_psd - bearing strength of stiffeners
+            Args:
+                F_x - external load or reaction in N
+                A_q - area of the stiffeners in contact with the flange in mm
+                f_yq - yield stress of the stiffeners in N/mm**2
 
-        Notes:
+            Return:
+                F_psd - bearing strength of stiffeners in N
+
+            Notes:
                 Reference:
                 IS 800:2007,  cl 8.7.4
         """
@@ -1704,18 +1708,18 @@ class IS800_2007(object):
         return F_psd
 
     # cl 8.7.9 Torsional Stiffeners
-    def Second_moment_of_area_of_the_stiffener_Section(D, T_cf, L_LT, r_y):
+    def cl_7_9_Second_moment_of_area_of_the_stiffener_Section(D, T_cf, L_LT, r_y):
         """
             calculation of  minimum second moment of area of the stiffener
 
             Args:
-                D = overall depth of beam at support
-                T_cf = maximum thickness of compression flange in the span under consideration
-                K_L=  laterally unsupported effcetive length of the compression flange of the beam
-                r_y = radius of gyration of the beam about the minor axis
+                D = overall depth of beam at support in mm
+                T_cf = maximum thickness of compression flange in the span under consideration in mm
+                K_L=  laterally unsupported effective length of the compression flange of the beam in mm
+                r_y = radius of gyration of the beam about the minor axis in mm
 
             Returns:
-                I_s_min = calculation of  minimum second moment of area of the stiffener
+                I_s_min = calculation of  minimum second moment of area of the stiffener in mm**4
 
             Notes:
                 Reference:
@@ -1737,54 +1741,56 @@ class IS800_2007(object):
     """    SECTION  9     MEMBER SUBJECTED TO COMBINED FORCES   """
     # --------------------------------------------------------------------------
 
-# cl 9.2 Combined Shear and Bending
-    def cl_9_2_2_moment_capacity_for_high_shear(Md, V, Vd, Mfd, Ze, section_type, fy):
-        """To calculate change in Moment Carrying Capacity due to shear force
-        Args:
-            Md - plastic design moment of whole section disregarding shear force
-                 effect considering web buckling effects
-            V - factored applied shear force
-            Vd - design shear strength
-            Mfd - plastic design strength of c/s excluding shear area considering
-                  gamma_m0
-            Ze - elastic section modulus
-            section_type - 'plastic','compact' or 'semi_compact'
-            fy - yeild strength
-            gamma_m0 - partial safety factor
-        Returns:
-            Mdv - Moment Carrying Capacity under action of high shear force
+    # cl 9.2 Combined Shear and Bending
+    def cl_9_2_2_moment_capacity_for_high_shear(M_d, V, V_d, M_fd, Z_e, section_type, f_y):
+        """
+            To calculate change in Moment Carrying Capacity due to shear force
+            Args:
+                M_d - plastic design moment of whole section disregarding shear force
+                 effect considering web buckling effects in N*mm
+                V - factored applied shear force in N
+                V_d - design shear strength in N
+                M_fd - plastic design strength of c/s excluding shear area considering
+                        gamma_m0 in N*mm
+                Ze - elastic section modulus in mm**3
+                section_type - 'plastic','compact' or 'semi_compact'
+                f_y - yield strength in N/mm**2
+                gamma_m0 - partial safety factor
+            Returns:
+                M_dv - Moment Carrying Capacity under action of high shear force in N*mm
 
-        Note:
-            Reference:
+            Note:
+                Reference:
                 IS 800:2007, cl.9.2
         """
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
-        if (V > 0.6 * Vd):  # cl.9.2.2
-            if (section_type == 'plastic' or section_type == 'compact'):
-                beta = (2 * V / Vd - 1) ** 2
-                Mdv = min(Md - beta * (Md - Mfd), 1.2 * Ze * fy / gamma_m0)
-            elif (section_type == 'semi_compact'):
-                Mdv = Ze * fy / gamma_m0
+        if V > 0.6 * V_d:  # cl.9.2.2
+            if section_type == 'plastic' or section_type == 'compact':
+                beta = (2 * V / V_d - 1) ** 2
+                M_dv = min(M_d - beta * (M_d - M_fd), 1.2 * Z_e * f_y / gamma_m0)
+            elif section_type == 'semi_compact':
+                M_dv = Z_e * f_y / gamma_m0
             else:
                 return 'enter section type in valid format'
         else:
-            Mdv = Md
-        return Mdv
+            M_dv = M_d
+        return M_dv
 
-# cl.9.3 Combined Axial Force and Bending Moment
-# Section Strength
-# cl.9.3.1.1  Plastic and Compact Sections
+    #cl.9.3 Combined Axial Force and Bending Moment
+    #Section Strength
+    #cl.9.3.1.1  Plastic and Compact Sections
 
     def cl_9_3_1_1_criteria_for_combines_shear_and_bending(My, Mz, Mndy, Mndz, N, Nd, section_type):
-        """Safety check for reduced flexural strength under combined axial force and
-        respective uniaxial bending moment acting alone
+        """
+            Safety check for reduced flexural strength under combined axial force and
+            respective uniaxial bending moment acting alone
         Args:
-            My - factored applied moments about minor axis of c/s
-            Mz - factored applied moments about major axis of c/s
-            Mndy - reduced flexural strength along minor axis
-            Mndz - reduced flexural strength along major axis
-            N - factored applied axial force
-            Nd - design strength in compression or tension
+            My - factored applied moments about minor axis of c/s in N*mm
+            Mz - factored applied moments about major axis of c/s N*mm
+            Mndy - reduced flexural strength along minor axis N*mm
+            Mndz - reduced flexural strength along major axis in N*mm
+            N - factored applied axial force in N
+            Nd - design strength in compression or tension in N
             section_type - 'plates' , 'Welded_I' or 'H_section' , 'standard_I'  or H_section' , 'rectangular hollow
                             section and welded box section'
         Returns:
@@ -1809,35 +1815,34 @@ class IS800_2007(object):
         else:
             return 'Warning : Reduced flexural strength not sufficient cl.9.3.1.1'
 
-        # conservative criteria for section under combines axial force and bending moment
-        @staticmethod
-        def cl_9_3_1_1_cons(My, Mz, Mdy, Mdz, N, Nd):
-            """Safety check for reduced flexural strength under combined axial force and
+    #conservative criteria for section under combines axial force and bending moment
+    @staticmethod
+    def cl_9_3_1_1_cons(My, Mz, Mdy, Mdz, N, Nd):
+        """Safety check for reduced flexural strength under combined axial force and
             respective uniaxial bending moment acting alone
             using a more conservative formula
             Args:
-                My - factored applied moments about minor axis of c/s
-                Mz - factored applied moments about major axis of c/s
-                Mndy - reduced flexural strength along minor axis
-                Mndz - reduced flexural strength along major axis
-                N - factored applied axial force
-                Nd - design strength in compression or tension
+                My - factored applied moments about minor axis of c/s in N*mm
+                Mz - factored applied moments about major axis of c/s in N*mm
+                Mndy - reduced flexural strength along minor axis in N*mm
+                Mndz - reduced flexural strength along major axis in N*mm
+                N - factored applied axial force in N
+                Nd - design strength in compression or tension in N
             Returns:
                 'OK' - If condition is satisfied
                 else 'Warning : Reduced flexural strength does not satisfy cl.9.3.1.1'
             Note:
                 Reference:
                     IS 800:2007, cl.9.3.1.1
-            """
-            if ((N / Nd + My / Mdy + Mz / Mdz) <= 1):
-                return 'OK'
-            else:
-                return 'Warning : Design reduced flexural strength not sufficient cl.9.3.1.1'
+        """
+        if (N / Nd + My / Mdy + Mz / Mdz) <= 1:
+            return 'OK'
+        else:
+            return 'Warning : Design reduced flexural strength not sufficient cl.9.3.1.1'
 
     # cl.9.3.1.2 Combined Axial Force and Bending - Approximate Section Strength Calculation- Plastic and Compact Sections
     # without bolt holes
-
-        def cl9_3_1_2_design_reduced_flexure_strength(M_d, N, N_d, A, b, t_f, M_dy, M_dz, t_w, section):
+    def cl9_3_1_2_design_reduced_flexure_strength(M_d, N, N_d, A, b, t_f, M_dy, M_dz, t_w, section):
             n = N / N_d
             if section == 'Plates':
                 M_nd = M_d * (1 - n ** 2)
@@ -1872,41 +1877,41 @@ class IS800_2007(object):
                 M_nd = min(1.04 * M_d * (1 - n ** 1.7), M_d)
                 return M_nd
 
-# 9.3.1.3 Semi - compact section
-    def criteria_for_absence_of_high_shear_in_semi_compact_section(f_y, f_x, N, N_d, M_y, M_dy, M_z, M_dz,
+    # 9.3.1.3 Semi - compact section
+    def cl_9_3_1_3_criteria_for_absence_of_high_shear_in_semi_compact_section(f_y, f_x, N, Nd, My, Mdy, Mz, Mdz,
                                                                    compact_section):
 
-        gamma_m0 = IS800_2007_cl_5_4_1_Table_5['gamma_m0']['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5['gamma_m0']['yielding']
         if compact_section == 'with_hole':
-            f_x <= f_y / gamma_m0
             return bool(f_x <= f_y / gamma_m0)
         else:
-            N / N_d + M_y / M_dy + M_z / M_dz <= 1
             return bool(N / Nd + My / Mdy + Mz / Mdz <= 1)
 
-# cl 9.3.2 Overall Member Strength - Check for overall buckling failure for combined axial force and bending moment
-# cl 9.3.2.1 Bending and axial tension
-    def reduecd_effective_moment_under_tension_and_banding(M_d, M, T, Z_ec, A, T_and_M_vary_independently=True):
-        """Calculates and checks if reduced effective moment under tension and bending exceeds bending strength
+    # cl 9.3.2 Overall Member Strength - Check for overall buckling failure for combined axial force and bending moment
+    # cl 9.3.2.1 Bending and axial tension
+    def cl_9_3_2_1_reduced_effective_moment_under_tension_and_banding(M_d, M, T, Z_ec, A, T_and_M_vary_independently=True):
+        """
+            Calculates and checks if reduced effective moment under tension and bending exceeds bending strength
                 due to lateral torsional buckling.
                 Args:
-                    Md - Strength due to lateral torsional buckling
-                    M,T - factored applied moment and tension respectively
-                    Z_ec - elastic section modulus w.r.t extreme compression fibre
-                    A - area of c/s
-                    N - factored applied axial force
-                    Nd - design strength in compression or tension
+                    M_d - Strength due to lateral torsional buckling in  N*mm
+                    M,T - factored applied moment in N*mm
+                    T = factored applied tension in N
+                    Z_ec - elastic section modulus w.r.t extreme compression fibre in mm**3
+                    A - area of c/s in mm**2
+                    N - factored applied axial force in N
+                    N_d - design strength in compression or tension in N
                     psi_check - 'True' if T & M are independent else 'False'
                 Returns:
                     If (criteria is satisfied):
-                        Meff - reduced effective moment under tenion and bucling
+                        M_eff - reduced effective moment under tenion and bucling
                     else:
                         'Warning : reduced effective moment under tension and bending exceeds bending strength
                          due to lateral torsional buckling'
                 Note:
                     Reference:
                         IS 800:2007, cl.9.3.2.1
-                """
+            """
 
         psi = 0.8
         if T_and_M_vary_independently is False:
@@ -1914,69 +1919,75 @@ class IS800_2007(object):
         M_eff = min(M - psi * T * Z_ec / A, M_d)
 
         return M_eff
-#cl 9.3.2.2 Bending and axial compression
-        def cl_9_3_2_2_table18_Equivalent_Uniform_Moment_Factor(loading_type, psi, M_h, M_s=None):
-            """Evaluates and returns equivalent moment factor
+    #cl 9.3.2.2 Bending and axial compression
+    def cl_9_3_2_2_table18_Equivalent_Uniform_Moment_Factor(loading_type, psi, M_h, M_s=None):
+        """
+            Evaluates and returns equivalent moment factor
             Args:
-                loading_type - True if loading is unifrorm, False if load is concentrated
+                loading_type - True if loading is uniform, False if load is concentrated
                 psi - ratio of BM at the end with higher BM to that of the other end
                 M_h - BM at end with greater BM
                 M_s - BM at point of zero shear, takes a default value of None (if Load is linearly varying)
-            Returns:
+            Return:
                 C_m - equivalent uniform moment factor
             Note:
                 Reference:
                     IS 800:2007, Table 18 (cl9.3.2.2)
-            """
-            if abs(psi) > 1: return 'warning: psi must be between -1 and 1'
-            if M_s == None:
-                C_m = max(0.6 + 0.4 * psi, 0.4)
-            elif abs(M_s) < abs(M_h):
-                alpha_s = M_s / M_h
-                if alpha_s >= 0:
-                    C_m = max(0.2 + 0.8 * alpha_s, 0.4)
-                else:
-                    if loading_type == True:
-                        C_m = max((0.1 * max(1 - psi, 1) - 0.8 * alpha_s), 0.4)
-                    else:
-                        C_m = max((0.2 * max(-psi, 0) - 0.8 * alpha_s), 0.4)
-            elif abs(M_s) > abs(M_h):
-                alpha_h = M_h / Ms
-                if alpha_h >= 0:
-                    if loading_type == True:
-                        C_m = 0.95 - 0.05 * alpha_h
-                    else:
-                        C_m = 0.90 + 0.10 * alpha_h
-                else:
-                    if loading_type == True:
-                        C_m = 0.95 + 0.05 * alpha_h * min(1 + 2 * psi, 1)
-                    else:
-                        C_m = 0.90 + 0.1 * alpha_h * min(1 + 2 * psi, 1)
+        """
+        if abs(psi) > 1: return 'warning: psi must be between -1 and 1'
+        if M_s is None:
+            C_m = max(0.6 + 0.4 * psi, 0.4)
+        elif abs(M_s) < abs(M_h):
+            alpha_s = M_s / M_h
+            if alpha_s >= 0:
+                C_m = max(0.2 + 0.8 * alpha_s, 0.4)
             else:
-                return 'Warning:Ms cannot be equal to Mh,but can be NULL'
+                if loading_type == True:
+                    C_m = max((0.1 * max(1 - psi, 1) - 0.8 * alpha_s), 0.4)
+                else:
+                    C_m = max((0.2 * max(-psi, 0) - 0.8 * alpha_s), 0.4)
+        elif abs(M_s) > abs(M_h):
+            alpha_h = M_h / M_s
+            if alpha_h >= 0:
+                if loading_type == True:
+                    C_m = 0.95 - 0.05 * alpha_h
+                else:
+                    C_m = 0.90 + 0.10 * alpha_h
+            else:
+                if loading_type == True:
+                    C_m = 0.95 + 0.05 * alpha_h * min(1 + 2 * psi, 1)
+                else:
+                    C_m = 0.90 + 0.1 * alpha_h * min(1 + 2 * psi, 1)
+        else:
+            return 'Warning:Ms cannot be equal to Mh,but can be NULL'
 
-            return C_m
+        return C_m
 
-        @staticmethod
-#cl9.3.2.2 Bending and axial compression
-        def cl_9_3_2_2_main(P, P_d=[], M=[], M_h=[], M_d=[], N=[], N_d=[], loading_type=[], psi=[], lambda_=[],
+    @staticmethod
+    #cl9.3.2.2 Bending and axial compression
+    def cl_9_3_2_2_main(P, P_d=[], M=[], M_h=[], M_d=[], N=[], N_d=[], loading_type=[], psi=[], lambda_=[],
                             M_s=[None, None, None]):
-            """Checks safety criteria for members subjected to combined axial compresssion and biaxial bending
+        """
+            Checks safety criteria for members subjected to combined axial compresssion and biaxial bending
             Args:
-                P - applied axial compression under factored load
+                P - applied axial compression under factored load in N
                 loading_type[0],loading_type[1],loading_type[2] - loading type(True if uniform,False if concentrated)
                                                                   for y,z axes and lateral torsion
-                psi[0],psi[1],psi[2] - psi values for y/Z aand lateral torsion
-                M[0]=M_y,M[1]=M_z - max factored applied bending moments about y and z axes of member
-                M[2]=Mmlt - max factored applied bending moment for lateral torsion
-                M_h[0]=M_hy,M_h[1]=Mhz - factored applied bending moments about y and z axes of member at point of zero shear
-                M_h[2]=Mhmlt - factored applied bending moment for lateral torsion at point of zero shear
-                P_d[0]=P_dy,P_d[1]=P_dz - design strength under axial compression as governed by buckling about y and z axes resp
-                M_d[0]=M_dy,M_d[1]=M_dz - design bending strength about y and z axes considering laterally unsupported length of c/s
+                psi[0],psi[1],psi[2] - psi values for y/Z and lateral torsion
+                M[0]=M_y,M[1]=M_z - max factored applied bending moments about y and z axes of member in N*mm
+                M[2]=Mmlt - max factored applied bending moment for lateral torsion in N*mm
+                M_h[0]=M_hy,M_h[1]=Mhz - factored applied bending moments about y and z axes
+                                            of member at point of zero shear in N*mm
+                M_h[2]=Mhmlt - factored applied bending moment for lateral torsion at point of zero shear in N*mm
+                P_d[0]=P_dy,P_d[1]=P_dz - design strength under axial compression as governed by
+                                            buckling about y and z axes resp in N
+                M_d[0]=M_dy,M_d[1]=M_dz - design bending strength about y and z axes considering
+                                            laterally unsupported length of c/s in N*mm
                 N[0]=N_y,N[1]=N_z - factored applied axial force about y/z axes resp.
                 N_d[0]=N_dy,N_d[1]=N_dz - design strength in compression about y/z axes resp.
-                lambda[0]=lambda_y,lambda[1]=lambda_z,lambda[3]=lambda_Lt - slenderness ratio about y/z axes and that for lateral torsion
-                M_s[] - BM @ point of zero shear
+                lambda[0]=lambda_y,lambda[1]=lambda_z,lambda[3]=lambda_Lt - slenderness ratio about y/z axes
+                                                                                and that for lateral torsion
+                M_s[] - BM @ point of zero shear in N*mm
             Returns:
                 'OK' - If criteria is satisfied
                 else -'Warning : Member does not satisfy safety criteria of cl.9.3.2.2'
@@ -1984,23 +1995,24 @@ class IS800_2007(object):
                 Reference:
                     IS 800:2007, cl.9.3.2.2
             """
-            C_my = IS800_2007()
-            C_mz = IS800_2007()
-            C_mLt = IS800_2007()
-            C_m = [C_my.cl_9_3_2_2_table18(loading_type[0], psi[0], M_h[0], M_s[0]),
-                   C_mz.cl_9_3_2_2_table18(loading_type[1], psi[1], M_h[1], M_s[1]),
-                   C_mLt.cl_9_3_2_2_table18(loading_type[2], psi[2], M_h[2], M_s[2])]
+        C_my = IS800_2007()
+        C_mz = IS800_2007()
+        C_mLt = IS800_2007()
+        C_m = [C_my.cl_9_3_2_2_table18(loading_type[0], psi[0], M_h[0], M_s[0]),
+               C_mz.cl_9_3_2_2_table18(loading_type[1], psi[1], M_h[1], M_s[1]),
+               C_mLt.cl_9_3_2_2_table18(loading_type[2], psi[2], M_h[2], M_s[2])]
 
-            K_y = min(1 + (lambda_[0] - 0.2) * N[0] / N_d[0], 1 + 0.8 * N[0] / N_d[0])
-            K_z = min(1 + (lambda_[1] - 0.2) * N[1] / N_d[1], 1 + 0.8 * N[1] / N_d[1])
-            K_LT = max(1 - (0.1 * lambda_[3] * (N[0] / N_d[0])) / (C_m[3] - 0.25),
+        K_y = min(1 + (lambda_[0] - 0.2) * N[0] / N_d[0], 1 + 0.8 * N[0] / N_d[0])
+        K_z = min(1 + (lambda_[1] - 0.2) * N[1] / N_d[1], 1 + 0.8 * N[1] / N_d[1])
+        K_LT = max(1 - (0.1 * lambda_[3] * (N[0] / N_d[0])) / (C_m[3] - 0.25),
                        1 - (0.1 * N[0] / N_d[0]) / (C_m[3] - 0.25))
 
-            if ((P / P_d[0] + (K_y * C_m[0] * M[0]) / M_d[0] + (K_LT * M[1]) / M_d[1] <= 1) and (
-                    P / P_d[1] + (0.6 * K_y * C_m[0] * M[0]) / M_d[0] + (K_z * C_m[1] * M[1]) / M_d[1] <= 1)):
-                return 'OK'
-            else:
-                return 'warning: member does not satisfy safety criteria of cl.9.3.2.2'
+        if ((P / P_d[0] + (K_y * C_m[0] * M[0]) / M_d[0] + (K_LT * M[1]) / M_d[1] <= 1) and (
+                P / P_d[1] + (0.6 * K_y * C_m[0] * M[0]) / M_d[0] + (K_z * C_m[1] * M[1]) / M_d[1] <= 1)):
+            return 'OK'
+
+        else:
+            return 'warning: member does not satisfy safety criteria of cl.9.3.2.2'
 
     # ==========================================================================
     """   SECTION  10    CONNECTIONS    """

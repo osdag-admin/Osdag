@@ -169,29 +169,29 @@ class IS800_2007(object):
             return "class3"
 
 
-# Table 3 Maximum slendernesss ratio
-""" Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 
-       Slenderness ratio=KL/r
-       KL:effective length of the member
-       r:appropriate radius of gyration based on effective section
-       Member types relating cases:
-       case1:A member carrying compressive loads from dead loads and imposed loads
-       case2:A tension member in which a reversal of direct stress occur dueto loads other than wind or seismic loads
-       case3:A member subjected to compression forces resulting only from combination with wind/earthquake actions,
-             provided deformations does not adversely affect the stress in any part of the structure
-       case4:Compression flange of a beam  against lateral torsional buckling
-       case5:A member normally acting as tie in a roof truss or a bracing system not considered effective when
-             when subjected to possible reversal of stress into compression resulting from action of wind or earthquake 
-              forces
-       case6:Members always under tension(other than pre-tensioned members)"""
+    # Table 3 Maximum slendernesss ratio
+    """ Table 5 gives the maximum effective slenderness ratio (KL/r) according to member type 
+           Slenderness ratio=KL/r
+           KL:effective length of the member
+           r:appropriate radius of gyration based on effective section
+           Member types relating cases:
+           case1:A member carrying compressive loads from dead loads and imposed loads
+           case2:A tension member in which a reversal of direct stress occur dueto loads other than wind or seismic loads
+           case3:A member subjected to compression forces resulting only from combination with wind/earthquake actions,
+                 provided deformations does not adversely affect the stress in any part of the structure
+           case4:Compression flange of a beam  against lateral torsional buckling
+           case5:A member normally acting as tie in a roof truss or a bracing system not considered effective when
+                 when subjected to possible reversal of stress into compression resulting from action of wind or earthquake 
+                  forces
+           case6:Members always under tension(other than pre-tensioned members)"""
 
-cl_3_8_Table_3 = {"case1": 180,
-                  "case2": 180,
-                  "case3": 250,
-                  "case4": 300,
-                  "case5": 350,
-                  "case6": 400}
-# ==========================================================================
+    cl_3_8_Table_3 = {"case1": 180,
+                      "case2": 180,
+                      "case3": 250,
+                      "case4": 300,
+                      "case5": 350,
+                      "case6": 400}
+    # ==========================================================================
     """    SECTION  4     METHODS OF STRUCTURAL ANALYSIS   """
     # ==========================================================================
     """    SECTION  5     LIMIT STATE DESIGN   """
@@ -250,7 +250,7 @@ cl_3_8_Table_3 = {"case1": 180,
             IS 800:2007, cl.6.2
         """
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         T_dg = A_g * f_y / gamma_m0
         return T_dg
 
@@ -278,7 +278,7 @@ cl_3_8_Table_3 = {"case1": 180,
             IS 800:2007, cl.6.3.1
         """
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         sum_value = 0
         for i in range(n - 1):
             sum_value += (p_s[i] * p_s[i]) / (4 * g[i])
@@ -305,7 +305,7 @@ cl_3_8_Table_3 = {"case1": 180,
             IS800:2007, cl.6.3.2
         """
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_dn = 0.9 * A_n * f_u / gamma_m1
         return T_dn
 
@@ -335,8 +335,8 @@ cl_3_8_Table_3 = {"case1": 180,
 
         """
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
 
         X = max(0.7, f_u * gamma_m0 / f_y * gamma_m1)
         beta = min(X, 1.4 - 0.076 * (w / t) * (f_y / f_u) * (b_s / L_c))
@@ -369,7 +369,7 @@ cl_3_8_Table_3 = {"case1": 180,
             else:
                 alpha = 0.8
 
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_dn = alpha * A_n * f_u / gamma_m1
         return T_dn
 
@@ -398,8 +398,8 @@ cl_3_8_Table_3 = {"case1": 180,
             Reference:
             IS800:2007, cl.6.4.1
         """
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
-        gamma_m1 = cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
         T_db1 = A_vg * f_y / (math.sqrt(3) * gamma_m0) + 0.9 * A_tn * f_u / gamma_m1
 
         T_db2 = 0.9 * A_vn * f_u / (math.sqrt(3) * gamma_m1) + A_tg * f_y / gamma_m0
@@ -611,7 +611,7 @@ cl_3_8_Table_3 = {"case1": 180,
 
 
         """
-        gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
         t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
         return t_s
         
@@ -685,7 +685,7 @@ cl_3_8_Table_3 = {"case1": 180,
         
         alpha = 0.49 #according to ammendment 1
         
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         
         epsilon = math.sqrt(250 / f_y)
 
@@ -1145,7 +1145,7 @@ cl_3_8_Table_3 = {"case1": 180,
             beta_b = 1
         if compact is True:
             beta_b = 1
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         if v <= 0.6 * v_d:
             m_d = beta_b * z_p * f_y / gamma_m0
 
@@ -1266,7 +1266,7 @@ cl_3_8_Table_3 = {"case1": 180,
            X_LT = 1
 
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
 
         f_bd = X_LT * f_y / gamma_m0
 
@@ -1290,7 +1290,7 @@ cl_3_8_Table_3 = {"case1": 180,
 
         """
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         V_d = V_n / gamma_m0
         return V_d
 
@@ -1480,7 +1480,7 @@ cl_3_8_Table_3 = {"case1": 180,
 
         psi = 1.5 * T_b * math.sin(2 * phi)
 
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         M_fr = 0.25 * b_f * t_f ** 2 * f_yf * (1 - (N_f / (b_f * t_f * f_yf / gamma_m0)) ** 2)
 
         s = min(c, (2 / math.sin(phi) * math.sqrt(M_fr / f_yw * t_w)))
@@ -1690,7 +1690,7 @@ cl_3_8_Table_3 = {"case1": 180,
             IS 800:2007,  cl 8.7.2.5, cl.8.7.3
 
         """
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_q = min(V - V_cr / gamma_m0, F_qd)
         if (F_q - F_x) / F_qd + F_x / F_xd + M_q / M_yq <= 1:
             return F_q
@@ -1757,7 +1757,7 @@ cl_3_8_Table_3 = {"case1": 180,
                 IS 800:2007,  cl 8.7.4
 
         """
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_w = (b_1 + n_2) * t_w * f_yw / gamma_m0
 
         return F_w
@@ -1781,7 +1781,7 @@ cl_3_8_Table_3 = {"case1": 180,
                 Reference:
                 IS 800:2007,  cl 8.7.4
         """
-        gamma_m0 = cl_5_4_1_Table_5["gamma_m0"]['yielding']
+        gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         F_psd = max(A_q * f_yq / (0.8 * gamma_m0), F_x)
         return F_psd
 

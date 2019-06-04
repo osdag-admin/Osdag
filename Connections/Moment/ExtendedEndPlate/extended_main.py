@@ -262,7 +262,7 @@ class Stiffener(QDialog):
 		self.ui = Ui_Stiffener()
 		self.ui.setupUi(self)
 		self.maincontroller = parent
-
+		self.ui.widget.setPixmap(QtGui.QPixmap(":/newPrefix/images/Ui_stiffener.png"))
 		uiObj = self.maincontroller.designParameters()
 		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
 
@@ -302,6 +302,10 @@ class Pitch(QDialog):
 		if uiObj["Member"]["Connectivity"] == "Flush":
 
 			if no_of_bolts == 4:
+				pixmap = QPixmap(":/newPrefix/images/Flush/Flush_4.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
 				self.ui.lbl_1.setText('Pitch')
 				self.ui.lbl_mem2.hide()
@@ -323,9 +327,16 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
 
+
+
 			elif no_of_bolts == 6:
+				pixmap = QPixmap(":/newPrefix/images/Flush/Flush_6.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.label_3.setPixmap(QtGui.QPixmap("../../../ResourceFiles/images/cleatAngle.png"))
 				self.ui.lbl_1.setText('Pitch12')
 				self.ui.lbl_2.setText('Pitch23')
 				self.ui.lbl_mem3.hide()
@@ -344,9 +355,14 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
 
+
 		elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
 			if no_of_bolts == 6:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_6.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lbl_1.setText('Pitch23')
 				self.ui.lbl_mem2.hide()
@@ -369,6 +385,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch7.hide()
 
 			elif no_of_bolts == 8:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_8.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lbl_1.setText('Pitch23')
@@ -390,6 +410,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch7.hide()
 
 			elif no_of_bolts == 10:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_10.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -412,6 +436,10 @@ class Pitch(QDialog):
 
 			if no_of_bolts == 8:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_8.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lbl_1.setText('Pitch')
 				self.ui.lbl_mem2.hide()
 				self.ui.lbl_mem3.hide()
@@ -432,6 +460,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
 			elif no_of_bolts == 12:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_10.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -451,6 +483,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
 			elif no_of_bolts == 16:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_16.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -468,6 +504,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
 			elif no_of_bolts == 20:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_20.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -675,6 +715,10 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
+
+
+
+
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
 
@@ -865,6 +909,7 @@ class Maincontroller(QMainWindow):
 		"""
 		uiInput = self.designParameters()
 		self.save_inputs_totext(uiInput)
+
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
 			self.closed.emit()
@@ -964,6 +1009,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		self.uiObj = self.get_user_inputs()
+
 		# if self.designPrefDialog.saved is not True:
 		# 	design_pref = self.designPrefDialog.save_default_para()
 		# else:
@@ -1052,10 +1098,10 @@ class Maincontroller(QMainWindow):
 		if self.ui.combo_plateThick.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
-		if self.ui.combo_webSize.currentIndex() == 0:
+		if self.ui.combo_webSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Web weld thickness")
 
-		if self.ui.combo_flangeSize.currentIndex() == 0:
+		if self.ui.combo_flangeSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Flange weld thickness")
 
 		if len(incomplete_list) > 0:

@@ -1902,7 +1902,7 @@ class Maincontroller(QMainWindow):
                                         bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
                                         bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
-                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
+                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj,conn_type)
                 extbothWays.create_3DModel()
 
                 return extbothWays
@@ -1980,7 +1980,7 @@ class Maincontroller(QMainWindow):
                                                        bcWeldStiffLR_2,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
-                                                       outputobj)
+                                                       outputobj,conn_type)
 
                 col_web_connectivity.create_3DModel()
 

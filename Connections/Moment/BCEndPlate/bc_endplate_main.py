@@ -1337,6 +1337,7 @@ class Maincontroller(QMainWindow):
         self.ui.txt_crossGauge.clear()
         self.ui.txt_endDist.clear()
         self.ui.txt_edgeDist.clear()
+
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)
         self.ui.btn_plateDetail_2.setDisabled(True)

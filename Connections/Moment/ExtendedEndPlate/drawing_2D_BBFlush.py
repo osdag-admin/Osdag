@@ -451,24 +451,24 @@ class FlushEndPlate(object):
 		extnd_Flush_end_2d_front = FlushEnd2DFront(self)
 		extnd_Flush_end_2d_top = FlushEnd2DTop(self)
 		extnd_Flush_end_2d_side = FlushEnd2DSide(self)
-		if view == "Front":
-			extnd_Flush_end_2d_front.call_Flush_front(filename)
-		elif view == "Top":
-			extnd_Flush_end_2d_top.call_Flush_top(filename)
-		elif view == "Side":
-			extnd_Flush_end_2d_side.call_Flush_side(filename)
-		else:
-			filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
-			extnd_Flush_end_2d_front.call_Flush_front(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
+		# if view == "Front":
+		# 	extnd_Flush_end_2d_front.call_Flush_front(filename)
+		# elif view == "Top":
+		# 	extnd_Flush_end_2d_top.call_Flush_top(filename)
+		# elif view == "Side":
+		# 	extnd_Flush_end_2d_side.call_Flush_side(filename)
+		# else:
+		filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
+		extnd_Flush_end_2d_front.call_Flush_front(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
-			extnd_Flush_end_2d_top.call_Flush_top(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
+		filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
+		extnd_Flush_end_2d_top.call_Flush_top(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
-			extnd_Flush_end_2d_side.call_Flush_side(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
+		filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
+		extnd_Flush_end_2d_side.call_Flush_side(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
 
 
 

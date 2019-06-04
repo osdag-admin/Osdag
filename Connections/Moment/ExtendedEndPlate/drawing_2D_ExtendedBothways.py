@@ -471,24 +471,24 @@ class ExtendedEndPlate(object):
 		extnd_bothway_end_2d_front = ExtendedEnd2DFront(self)
 		extnd_bothway_end_2d_top = ExtendedEnd2DTop(self)
 		extnd_bothway_end_2d_side = ExtendedEnd2DSide(self)
-		if view == "Front":
-			extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
-		elif view == "Top":
-			extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
-		elif view == "Side":
-			extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
-		else:
-			filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
-			extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
+		# if view == "Front":
+		# 	extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
+		# elif view == "Top":
+		# 	extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
+		# elif view == "Side":
+		# 	extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
+		# else:
+		filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
+		extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join("/home/anjalijatav/Downloads/Workspace/Osdag", "images_html", "extendFront.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
-			extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
+		filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
+		extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join("/home/anjalijatav/Downloads/Workspace/Osdag", "images_html", "extendTop.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
-			extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
+		filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
+		extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join("/home/anjalijatav/Downloads/Workspace/Osdag", "images_html", "extendSide.png"))
 
 
 

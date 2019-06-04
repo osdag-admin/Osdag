@@ -2081,41 +2081,85 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     else:
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-        row = [0, "Views", " "]
+        row = [0, "Fabrication Detailing", " "]
         rstr += t('tr')
         rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
-        png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
 
-        side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+        row = [0, "The fabrication drawings are not been generated due to the failure of the connection.", " "]
+        rstr += t('tr')
+        rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
 
-        top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+        # png = folder + "/images_html/3D_Model.png"
+        # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+        #
+        # side = folder + "/images_html/extendSide.png"
+        # dataside = '<object type="image/PNG" data= %s width ="400"></object>' % side
+        #
+        # top = folder + "/images_html/extendTop.png"
+        # datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+        #
+        # front = folder + "/images_html/extendFront.png"
+        # datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+        #
+        # if status == 'True':
+        #     row = [0, datapng, datatop]
+        #     rstr += t('tr')
+        #     rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        #     rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
+        #     rstr += t('/tr')
+        #
+        #     row = [0, dataside, datafront]
+        #     rstr += t('tr')
+        #     rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        #     rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
+        #     rstr += t('/tr')
+        #
+        # else:
+        #     pass
 
-        front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+    rstr += t('/table')
+    rstr += t('hr')
+    rstr += t('/hr')
 
-        if status == 'True':
-            row = [0, datapng, datatop]
-            rstr += t('tr')
-            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('td  align="center" class=" header2"') + row[2] + t('/td')
-            rstr += t('/tr')
+    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-            row = [0, dataside, datafront]
-            rstr += t('tr')
-            rstr += t('td align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('td align="center" class=" header2 "') + row[2] + t('/td')
-            rstr += t('/tr')
+    row = [0, "Weld Detailing", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
 
-        else:
-            pass
+    if float(beam_tf) <= float(12):
+        row = [0, '<object type= "image/PNG" data= "Butt_single_flange.png"  ></object>']
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+    else:
+        row = [0, '<object type= "image/PNG" data= "Butt_double_flange.png"  ></object>']
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
 
-        rstr += t('/table')
-        rstr += t('h1 style="page-break-before:always"')  # page break
-        rstr += t('/h1')
+    if float(beam_tw) <= float(12):
+        row = [0, '<object type= "image/PNG" data= "Butt_single_web.png"  ></object>']
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+    else:
+        row = [0, '<object type= "image/PNG" data= "Butt_double_web.png"  ></object>']
+        rstr += t('tr')
+        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('/tr')
+
+    row = [0, "Note :- All dimensions are in mm  ", " "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
+
+    rstr += t('/table')
+    rstr += t('h1 style="page-break-before:always"')  # page break
+    rstr += t('/h1')
 
     # ###########################################################################################
     # Header of the pdf fetched from dialougebox

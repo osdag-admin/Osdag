@@ -31,25 +31,25 @@ class IS800_2007(object):
                  r2 - actual average stress/design compressive stress of overall section (float)
                  f_y - Yield stress of the plate material in MPa (float)
                  e = sqrt(250/f_y)
-                 """
+    """
 
 
     cl_3_7_Table_2 = {
         Compression_elements:
-            {"outsanding_elements_compression_flange": {"rolled": b / tf, "welded": b / tf}
-             "internal_elements_compression_flange": {compression_due_to_bending: b / tf, "axial_compression": b / tf}
-             "web_of_a_channel": d / tw
-             "angle_compression_due_to_bending": {b / t, d / t}
-             "single_angles_or_double_angles_with_seperated_elements_axial_compression": {b / t, d / t, (b + d) / t}
-             "outstanding_leg_in_back_to_back_in_a_double_angle_member": d / t
-             "outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component": d / t
-             "stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section": D / tf
-             "circular_hollow_tube_including_welded_tube_subjected_to": {"moment": D / t, "axial_compression": D / t}
+            {"outsanding_elements_compression_flange": {"rolled": b / tf, "welded": b / tf},
+             "internal_elements_compression_flange": {compression_due_to_bending: b / tf, "axial_compression": b / tf},
+             "web_of_a_channel": d / tw,
+             "angle_compression_due_to_bending": {b / t, d / t},
+             "single_angles_or_double_angles_with_seperated_elements_axial_compression": {b / t, d / t, (b + d) / t},
+             "outstanding_leg_in_back_to_back_in_a_double_angle_member": d / t,
+             "outstanding_leg_of_an_angle_with_its_back_in_cont_contact_with_another_component": d / t,
+             "stem_of_tsection_rolled_or_cut_from_a_rolled_IorH_section": D / tf,
+             "circular_hollow_tube_including_welded_tube_subjected_to": {"moment": D / t, "axial_compression": D / t},
              "web_of_an_I_or_H_section": {"general": d / tw, "axial_compression": d / tw}
              }
     }
-    def_cl_3_7_3_class(cl_3_7_Table_2):
-    """ Gives class of crossections using table 2 
+    def cl_3_7_3_class(cl_3_7_Table_2):
+    """ Gives class of cross_sections using table 2
         Args:
              b - width of element (float)
              d - depth of web (float)
@@ -67,7 +67,7 @@ class IS800_2007(object):
             Reference: IS 800:2007, cl 3.7.2
     """
     if cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] <= 9.4 * e:
-        return "class1"
+        return  "class1"
     elif cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] > 9.4 * e and
             cl_3_7_Table_2[0][outstanding_elements_compression_flange][rolled] <= 10.5 * e:
         return "class2"
@@ -174,8 +174,7 @@ class IS800_2007(object):
              when subjected to possible reversal of stress into compression resulting from action of wind or earthquake 
               forces
        case6:Members always under tension(other than pre-tensioned members)"""
-    cl_3
-    .8
+    cl_3_8
     _Table_3 = {"case1": 180,
                 "case2": 180,
                 "case3": 250,
@@ -204,17 +203,17 @@ class IS800_2007(object):
 
 
     # DESIGN OF TENSION MEMBER
-    # 6.1 Tension member
+    # cl 6.1 Tension member
     def cl_6_1_Design_strength_of_tesion_member(T_dg, T_dn, T_db):
         """
-        Calculation of Design Strength of the member as per cl.6.1
+            Calculation of Design Strength of the member as per cl.6.1
         Args:
-            T_dg: design strength due to yielding of gross section in N (float),
-            T_dn: design repture strength of critical section in N (float),
-            T_db: design strength due to block shear in N (float)
+            T_dg - design strength due to yielding of gross section in N (float),
+            T_dn - design repture strength of critical section in N (float),
+            T_db - design strength due to block shear in N (float)
 
         Return:
-            T_d:  design strength of the number under axial tension in N (float),
+            T_d -   design strength of the number under axial tension in N (float),
         Note:
             References:
             IS800:2007,cl.6.1
@@ -223,17 +222,17 @@ class IS800_2007(object):
         return T_d
 
 
-    # cl.6.2 Design Strength due to yielding of Gross Section
+    #cl.6.2 Design Strength due to yielding of Gross Section
 
     def cl_6_2_Design_strength_of_member_due_to_yielding_of_gross_section(A_g, f_y):
         """
-        Calculate the design strength due to yielding of gross section as per cl.6.2
+            Calculate the design strength due to yielding of gross section as per cl.6.2
         Args:
             A_g: Gross area of cross section[in sq.mm](float)
             f_y: Yield stree of the material in Mpa (float)
 
         Return:
-            Design strength of member due to yielding of gross section in N(float)
+            T_dg - Design strength of member due to yielding of gross section in N(float)
 
 
         Note:
@@ -247,12 +246,10 @@ class IS800_2007(object):
 
 
     # cl.6.3 Design Strength Due to Repture of Critical Section
-
     # cl.6.3.1 Plates
-
     def cl_6_3_1_design_strength_in_tension(b, n, d_h, p_s, g, f_u, t):
         """
-        Calculate the design strength in tension of a plate as per cl.6.3.1
+            Calculate the design strength in tension of a plate as per cl.6.3.1
         Args:
             A_n: net effective area of the member[in sq.mm](float)
             f_u: ultimate stress of the material in Mpa(float)
@@ -264,7 +261,7 @@ class IS800_2007(object):
             n: number of bolt holes in the critical section (int)
 
         Return:
-            design strength in tension of a plate in N(float)
+            T_dn - design strength in tension of a plate in N(float)
 
         Note:
             Reference:
@@ -282,18 +279,16 @@ class IS800_2007(object):
 
 
     # cl.6.3.2 Threaded Rods
-
     def cl_6_3_2_design_strength_of_threaded_rods_in_tension(A_n, f_u):
         """
-        Calculate the design strength of threaded rods in tension as per cl.6.3.2
+            Calculate the design strength of threaded rods in tension as per cl.6.3.2
 
         Args:
             A_n: net root area at the threaded section [in sq.mm](float)
             f_u: ultimate stress of the material in Mpa(float)
 
         Return:
-                design strength of threaded rods in tension in N(float)
-
+               T_dn - design strength of threaded rods in tension in N(float)
 
         Note:
             Reference:
@@ -306,29 +301,27 @@ class IS800_2007(object):
 
 
     # cl.6.3.3 Single Angles
-
     def cl_6_3_3_design_strenth_of_an_angle_connected_through_one_leg(A_nc, f_u, w, t, f_y, b_s, L_c, A_go):
         """
-        Calculation of design strenth of an angle connected through one leg as per cl.6.3.3
+            Calculation of design strenth of an angle connected through one leg as per cl.6.3.3
 
         Args:
-            w:   outstand leg width in mm(float)
-            b_s: shear lag width in mm(float)
-            L_c: length of the end connection, that is the distance between the outermost
+            w -   outstanding leg width in mm(float)
+            b_s -  shear lag width in mm(float)
+            L_c - length of the end connection, that is the distance between the outermost
                     bolts in the end joint measured along the load direction or length of the weld
                     along the load direction in mm(float)
-            A_nc: net area of ythe connected leg[in sq. mm](float)
-            A_go: gross area of the outstanding leg[in sq. mm](float)
-            t:    thickness of the leg in mm(float)
-            f_u:  ultimate strength of material in Mpa(float)
+            A_nc - net area of ythe connected leg[in sq. mm](float)
+            A_go - gross area of the outstanding leg[in sq. mm](float)
+            t -    thickness of the leg in mm(float)
+            f_u-  ultimate strength of material in Mpa(float)
 
-            Return:
-                design strenth of an angle connected through onw leg in N(float)
+        Return:
+            T_dn - design strength of an angle connected through onw leg in N(float)
 
-
-            Note:
-                Reference:
-                IS800:2007, cl.6.3.3
+        Note:
+            Reference:
+            IS800:2007, cl.6.3.3
 
         """
 
@@ -341,22 +334,22 @@ class IS800_2007(object):
         return T_dn
 
 
-    # For preliminary sizing
+    # cl 6.3.3 For preliminary sizing
     def cl_6_3_3_1_design_strength_of_net_section(n, A_n, f_u):
         """
         Calculation of repture strength of net section for preliminary sizing as per cl.6.3.3
 
         Args:
-            A_n: net area of the total cross-section[in sq.mm](float)
-            f_u: ultimate tensile strength pf material in Mpa(float)
-            n :  number of bolts (int)
+            A_n - net area of the total cross-section[in sq.mm](float)
+            f_u - ultimate tensile strength pf material in Mpa(float)
+            n  -  number of bolts (int)
 
         Return:
-            design strength of net section for preliminary sizing in N(float)
+            T_dn - design strength of net section for preliminary sizing in N(float)
 
         Note:
             Reference:
-            IS800:2007,cl.6.3.3
+            IS800:2007 cl.6.3.3
         """
         if n in [1, 2]:
             alpha = 0.6
@@ -371,26 +364,25 @@ class IS800_2007(object):
         return T_dn
 
 
-    # cl.6.3.4 Other Section
-
-    # cl.6.4.1 Block shear strength of bolted connections
+    #cl.6.3.4 Other Section
+    #cl.6.4.1 Block shear strength of bolted connections
 
     def cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, f_u, f_y):
         """
-        Calculation of the block shear strength of bolted connection as per cl.6.4.1
+            Calculation of the block shear strength of bolted connection as per cl.6.4.1
 
         Args:
-            A_vg: Minimum gross in shear along bolt line parallel to external force [in sq.mm](float)
-            A_vn: Minimum net area in shear along bolt line parallel to external force[in sq.mm](float)
-            A_tg: Minimum gross area in tension from the bolt hole to the toe of the angle,
+            A_vg - Minimum gross in shear along bolt line parallel to external force [in sq.mm](float)
+            A_vn - Minimum net area in shear along bolt line parallel to external force[in sq.mm](float)
+            A_tg - Minimum gross area in tension from the bolt hole to the toe of the angle,
                     end bolt line, perpendicukar to the line of force, respectively [ in sq.mm](float)
-            A_tn: Minimum net area in tension from the bolt hole to the toe of the angle,
+            A_tn - Minimum net area in tension from the bolt hole to the toe of the angle,
                     end bolt line, perpendicular to the line of force, respectively [in sq.mm]
-            f_u:  Ultimate stress of the plate ,material in Mpa(float)
-            f_y:  Yield stress of the plate material in Mpa(float)
+            f_u -  Ultimate stress of the plate ,material in Mpa(float)
+            f_y -  Yield stress of the plate material in Mpa(float)
 
         Return:
-            block shear strenth of bolted connection in N (float)
+            T_db - block shear strength of bolted connection in N (float)
 
         Note:
             Reference:
@@ -405,30 +397,24 @@ class IS800_2007(object):
 
         return T_db
 
-
-
     # ==========================================================================
     """    SECTION  7     DESIGN OF COMPRESS1ON MEMBERS   """
 
-
-
-    # clause 7.1 Design Strength
+    # cl 7.1 Design Strength
     # cl.7.1.2
-    
-    
-
     def cl_7_1_2_design_copmressive_strength_of_a_member(A_c, f_cd):
-        """calculation of design compressive strength
-            Args:
-                A_c - Effective sectional area (in square mm)
-                f_cd - Design Compressive stress(in N)
+        """
+            Calculation of design compressive strength
+        Args:
+            A_c - Effective sectional area (in square mm)
+            f_cd - Design Compressive stress(in N)
 
-            Return
-                P_d  - Design  Compressive Strength of a member (in N)
+        Return:
+            P_d - Design  Compressive Strength of a member (in N)
 
-            Note:
-                References:
-                IS800:2007,cl.7.2
+        Note:
+            References:
+            IS800:2007 cl.7.2
         """
 
         P_d = f_cd * A_c
@@ -437,18 +423,17 @@ class IS800_2007(object):
     
     # cl 7.1.2.1 design compressive stress of axially loaded member
     def cl_7_1_2_1_design_compressive_stress(K_L,alpha,E,f_y,r,gamma_m0):
-
-        """Calculation of design compressive stress
-
-            Args:
-                K_L  - Effective length of compression member
+        """
+            Calculation of design compressive stress
+        Args:
+                K_L  - Effective length of compression member in mm
                 alpha - Imperfection factor
-                E - Young's Modulus of Elasticity
-                f_y - Yield Stress
-                r - radius of gyration
+                E - Young's Modulus of Elasticity in N/mm**2
+                f_y - Yield Stress in N/mm**2
+                r - radius of gyration in mm
 
             Return:
-                f_cd - Design  strength of compression member
+                f_cd - Design  strength of compression member in N/mm**2
 
             Note:
                 Reference:
@@ -463,17 +448,17 @@ class IS800_2007(object):
         return f_cd
 
 
-    # Calculation of buckling class of given cross-section
+    # cl 7.1.2.2 Calculation of buckling class of given cross-section
     def cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section,t_f,t_w,h,b_f):
-        """ Defining Buckling Class of Cross-Section
-
+        """
+            Defining Buckling Class of Cross-Section
         Args:
             Cross_section - Either 'Rolled_I_Section' or 'Welded_I_Section'
                             or 'Hot_rolled_hollow' or 'cold_Formed_hollow' or 'Welded_Box_Section'
                             or 'Channel,Angle,T,Solid Section' or 'Built_up_Member'
 
-            h- Depth of the section in mm,
-            b_f - width of flange or width in case of welded box section(mm)
+            h- Depth of the section in mm
+            b_f - width of flange or width of section in case of welded box section(mm)
             t_f - Thickness of flange in mm
             t_w - Thickness of web in mm
 
@@ -499,8 +484,6 @@ class IS800_2007(object):
                 if t_f>100:
                     return {'z-z': 'd','y-y': 'd'}
 
-                
-                
         if Cross_section == "Welded_I_Section":
             if t_f <= 40:return {'z-z': 'b','y-y': 'c'}
             if t_f>40:return {'z-z': 'c','y-y': 'd'}
@@ -515,7 +498,7 @@ class IS800_2007(object):
             Buckling_Class_1 = 'b'
             Buckling_Class_2 = 'b'
             
-            if b_f / t_f < 30:        #here bf reffers to width of section
+            if b_f / t_f < 30:
                 Buckling_Class_1 = "c"
                 
             if h / t_w < 30:
@@ -527,8 +510,8 @@ class IS800_2007(object):
             return {'z-z': 'c','y-y': 'c'}
             
 
-    # Imperfection Factor, alpha
-    # gives alpha for a given buckling class,'a','b','c' or 'd'
+    #Imperfection Factor, alpha
+    # alpha for a given buckling class,'a','b','c' or 'd'
     cl_7_1_Table_7_alpha = {
         'a': 0.21,
         'b': 0.34,
@@ -536,20 +519,20 @@ class IS800_2007(object):
         'd': 0.76,
     }
 
-    # Table 11 Effective Length of Prismatic Compression Members
-
+    #Table 11 Effective Length of Prismatic Compression Members
     def cl_7_2_2_table11_effective_length_of_prismatic_compression_members(L,BC=[]):
 
-        """ Effective length of Prismatic Compression Member when the boundary conditions in the plane of buckling
-        can be assessed  
+        """
+            Effective length of Prismatic Compression Member when the boundary conditions in the plane of buckling
+            can be assessed
 
         Args:
             BC - linked list of Boundary Conditions
                  =[BC_translation_end1,BC_rotation_end1,BC_translation_end2,BC_rotation_end2]
-            L -  Length of the Compression member
+            L -  Length of the Compression member in mm
 
         Return:
-            K_L - Effective length of Compression Member
+            K_L - Effective length of Compression Member in mm
 
         Note:
             Reference:
@@ -565,27 +548,26 @@ class IS800_2007(object):
 
 
     # cl 7.1.2.1 design compressive stress of axially loaded member
-
     def design_compressive_stress(f_y, r ):
 
-        """Calculation of design compressive stress
-
+        """
+            Calculation of design compressive stress
             Args:
-                K_L  - Effective length of compression member
+                K_L  - Effective length of compression member in mm
                 alpha - Imperfection factor
-                E - Young's Modulus of Elasticity
-                f_y - Yield Stress
-                r - radius of gyration of the section
+                E - Young's Modulus of Elasticity in N/mm**2
+                f_y - Yield Stress in N/mm**2
+                r - radius of gyration of the section in mm
 
             Return:
-                f_cd - Design  strength of compression member
+                f_cd - Design  strength of compression member in N/mm**2
 
             Note:
                 Reference:
                 IS 800:2007, cl.7.1.2.1
         """
         Buckling_class = cl_7_1_2_2_Table_10_Buckling_class_of_cross_section(Cross_section, h, b_f, t_f)
-        alpha = cl_7_1_1_cl_7_1_2_1_Table_7["Buckling_Class"]["alpha"]
+        alpha = cl_7_1_Table_7_alpha["Buckling_Class"]["alpha"]
         K_L = cl_7_2_2_effective_length_of_prismatic_Compression_members(At_one_end_Translation, At_one_end_Rotation,
                                                                          At_other_end_Translation,
                                                                          At_other_end_Rotation, L)
@@ -598,33 +580,33 @@ class IS800_2007(object):
 
 
     # Design of Column Base
-
     #cl.7.4.3 thickness of column base
     def cl_7_4_3_1_Calculation_of_thickness_of_column_base(w,a,b,t_f,f_y):
 
-        """Calculation of thickenss of Column base
+        """
+            Calculation of thickenss of Column base
         Args:
-            w - uniform pressure from below on the slab base
-            a - Larger Projection
-            b - Smaller Projection
-            f_y - Yield Stress
-            t_f - Thicknedd pf flange of Compression member
+            w - uniform pressure from below on the slab base in mm
+            a - Larger Projection in mm
+            b - Smaller Projection in mm
+            f_y - Yield Stress in N/mm**2
+            t_f - Thickness of flange of Compression member in mm
 
         Return:
-            t_f - thickness of rectangular slab column base
+            t_f - thickness of rectangular slab column base in mm
 
         Note:
             Reference:
-            IS 800:2007, cl.7.4.3.1,
+            IS 800:2007  cl.7.4.3.1,
 
 
-         """
+        """
         ob = IS800_2007()
         gamma_m0 = ob.cl_5_4_1_Table_5["gamma_m0"]['yield_stress']
         t_s = max(t_f, math.sqrt(2.5 * w * (a ** 2 - 0.3 * b ** 2) * gamma_m0 / f_y))
         return t_s
         
-    #cl.7.5.1.2
+    #cl.7.5.1.2 Loaded through one angle
     #Table 12 - evaluation of constants K1,K2,K3 for effective slenderness ratio
     def cl_7_5_1_2_table12_constant_K_1_K_2_K_3(No_of_Bolts_at_Each_End_Connection, Connecting_member_Fixity):
 
@@ -638,13 +620,12 @@ class IS800_2007(object):
 
         Note:
             Reference:
-            IS 800:2007, cl.7.5.1.2
+            IS 800:2007 cl.7.5.1.2
 
 
         """
 
         if No_of_Bolts_at_Each_End_Connection >= 2:
-
             if Connecting_member_Fixity == "Fixed":
                 K_1 = 0.20
                 K_2 = 0.35
@@ -668,24 +649,26 @@ class IS800_2007(object):
                 
         return [K_1,K_2,K_3]
 
-    # cl.7.5.1.2.Design strength of angle strut loaded through one leg
+    #cl.7.5.1.2.Design strength of angle strut loaded through one leg
     def cl_7_5_1_2_Calculation_of_design_strength_of_single_angle_strut_loaded_through_one_leg(L, b_1, b_2, f_y, r_vv, t, E,K_list):
-        """ Calculation of design strength of single angle strut loaded through one leg
+        """
+            Calculation of design strength of single angle strut loaded through one leg
 
         Args:
-            L - Length of Angle section
-            b_1,b_2 - width of legs of angle section
-            f_y - yield stree
-            r_vv - radius og gyration about minor axis
-            t - thickenss of the leg
-            E - Youngs Modulus of elasticity
+            L - Length of Angle section in mm
+            b_1,b_2 - width of legs of angle section in mm
+            f_y - yield stress in N/mm**2
+            r_vv - radius of gyration about minor axis in mm
+            t - thickness of the leg in mm
+            E - Young's Modulus of elasticity in N/mm***2
+            epsilon  -  yield stress ratio
 
         Return:
             f_cd - Design compressive strength of the section
 
         Note:
             Reference:
-            IS 800:2007, cl.7.5.1.2
+            IS 800:2007  cl.7.5.1.2
 
         """
         ob = IS800_2007()
@@ -714,17 +697,17 @@ class IS800_2007(object):
 	def effective_slenderness_ratio_of_lacing_member(K_L, r_min):
 
 		"""
-		Calculation of Effective slenderness ratiion of lacing member
-		to account for shear deformation
+		    Calculation of Effective slenderness ratio of lacing member
+		    to account for shear deformation
 		Args:
-			K_L -effective length of column
-			r_min - radius of gyration of column member
+			K_L -effective length of column in mm
+			r_min - radius of gyration of column member in mm
 			SR_0 - actual maximum slenderness ration of column
 		Returns:
-			SR_eff - effective slenderness ration of lacing
+			SR_eff - effective slenderness ratio of lacing
 		Note:
 			Reference:
-			IS 800:2007, cl 7.6.1.5
+			IS 800:2007  cl 7.6.1.5
 		"""
 		SR_0 = K_L/r_min
 		SR_eff = 1.05*SR_0
@@ -732,32 +715,32 @@ class IS800_2007(object):
 
     #cl 7.6.2 Width of Lacing  Bars
     def cl_7_6_2_width_of_lacing_bars(d):
-    """
-    Calculation of min width of Lacing  Bars
-    Args:
-        d - nominal bolt/rivet diameter
-    Returns:
-        w_min - min Width of Lacing  Bars
-    Note:
-        Reference:
-        IS 800:2007, cl 7.6.2
-    """
+        """
+            Calculation of min width of Lacing  Bars
+        Args:
+            d - nominal bolt/rivet diameter in mm
+        Returns:
+            w_min - min Width of Lacing  Bars in mm
+        Note:
+            Reference:
+            IS 800:2007, cl 7.6.2
+        """
 
         w_min = 3*d
         return w_min
 
     #cl 7.6.3 Thickness of Lacing Bars
     def cl_7_6_3_minimum_thickness_of_lacing_bars(lacing_type,L_eff):
-    """
-        Calculation of  min Thickness of Lacing Bars
-    Args:
-        Lacing_type - either 'single_lacing' or 'double_lacing'
-        L_eff - effective length of lacing bars
-    Returns:
-        t_min - mininimum thickness of Lacing Bars
+        """
+            Calculation of  minimum thickness of Lacing Bars
+        Args:
+            Lacing_type - either 'single_lacing' or 'double_lacing'
+            L_eff - effective length of lacing bars in mm
+        Returns:
+            t_min - minimum thickness of Lacing Bars in mm
     Note:
         Reference:
-        IS 800:2007, cl 7.6.3
+        IS 800:2007  cl 7.6.3
     """
 
         if lacing_type == 'single_lacing':
@@ -772,37 +755,35 @@ class IS800_2007(object):
     #7.6.6.1 Transverse shear in the lacing bar
     def cl_7_6_6_1_transverse_shear_in_the_lacing_bar(P):
         """
-        Calculation of Transverse shear in the lacing bar
+            Calculation of Transverse shear in the lacing bar
         Args:
-            P  -  axial load on column
+            P  -  axial load on column in N
         Returns:
-            V_t_min - minimum design transverse shear
+            V_t_min - minimum design transverse shear in N
         Note:
             Reference:
-            IS 800:2007, cl 7.6.6.1
+            IS 800:2007 cl 7.6.6.1
         """
         V_t_min = 2.5/100 * P
     
         return V_t_min
 
 
-    
     # cl7.7  Batten plate
     # cl7.7.1.4 effective slenderness ratio of batten plate
-    def efective_slenderness_ratio_of_batten_plate(K_l,r_min):
+    def effective_slenderness_ratio_of_batten_plate(K_l,r_min):
         """
         Args:
-            K_L -effective length of column
-            r_min - minimum radius of gyration(rx,ry,rz) of column member
+            K_L -effective length of column in mm
+            r_min - minimum radius of gyration(r_x,r_y,r_z) of column member in mm
         Returns:
-            SR_eff - effective slenderness ration of lacing
+            SR_eff - effective slenderness ratio of lacing
         Note:
             Reference:
-        IS 800:2007, cl 7.6.1.5
+            IS 800:2007, cl 7.6.1.5
 
         """
         SR_eff = 1.1 * (K_L / r_min)
-
         return SR_eff
 
     # Design of Battens
@@ -811,15 +792,15 @@ class IS800_2007(object):
         """
             Calculation of longitudinal shear, transverse shear and moment at connetion
             Args:
-                P - total axial force on column
-                S - minimum transverse distnace between the centroid of the rivet/bolt
-                    group/welding connecting the batten to the main member
+                P - total axial force on column in N
+                S - minimum transverse distance between the centroid of the rivet/bolt
+                    group/welding connecting the batten to the main member in mm
                 N  -number of parallel planes of battens
-                C  -  distance between centre -to- centre of battens
+                C  -  distance between centre -to- centre of battens in mm
             Returns:
-                V_t - transverse shear force
-                V_b - longitudinal shear force along column axis
-                M - moment at connection
+                V_t - transverse shear force in N
+                V_b - longitudinal shear force along column axis in N
+                M - moment at connection in N*mm
             Note:
                 Reference:
                 IS 800:2007, cl.7.7.2.1
@@ -828,7 +809,6 @@ class IS800_2007(object):
         V_t = 2.5 / 100 * P
         V_b = V_t * C / (N * S)
         M = V_t * C / (N * 2)
-
         return (V_t, V_b, M)
 
     # ==========================================================================
@@ -836,39 +816,37 @@ class IS800_2007(object):
     # -------------------------------------------------------------
     # DESIGN OF MEMBER SUBJECTED TO BENDING
 
-    # Effective length for cantilever Beam
-
-    def cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, Restraint_Condition_1, Restraint_Condition_2,
+    # cl 8.3.3 Effective length for cantilever Beam
+    def cl_8_3_3_Table_16_Effective_length_for_cantilever_beam(L, Restraint_Condition_1, Restraint_Condition_2,
                                                               Loading_condition):
         """
-            Calculate effective length for catiliver beam of projecting length L as per cl.8.3.3
+            Calculate effective length for catilever beam of projecting length L as per cl.8.3.3
 
-            Args:
-                L - Projecting Length of cantiliver beam in mm (float)
-                D -  Overall depth of he beam in mm (float)
+        Args:
+            L - Projecting Length of cantilever beam in mm (float)
+            D -  Overall depth of he beam in mm (float)
 
-                Restrained_condition - Either "At support" or "At Top"
+            Restrained_condition - Either "At support" or "At Top"
+            Restraint_Condition_1- "At support"
+            Restraint_Condition_2- "At Top"
 
-                Restraint_Condition_1- "At support"
-                Restraint_Condition_2- "At Top"
-
-                At_support -  Either "continous, with lateral restraint to top"
-                              or "continous, with  partial torsional restraint"
-                              or "continous, with lateral and tosional restraint "
+            At_support -  Either "continuous, with lateral restraint to top"
+                              or "continuous, with  partial torsional restraint"
+                              or "continuous, with lateral and torsional restraint "
                               or "Restrained laterally,torsionally and against rotation on plan "
 
-                At_top - Either  "free"
+            At_top - Either  "free"
                         or "lateral restraint to top flange"
                         or "Torsional restraint"
                         or  "Lateral and torsional restraint"
 
-                Loading_condition - Either "Normal" or  "Destablizing"
+            Loading_condition - Either "Normal" or  "Destabilizing"
 
-            Returns:
-                L_LT =  cl_8_3_3_Table_16_Efective_length_for_cantiliver_beam
-            Note:
-                References:
-                IS800:2007, Table 16 (cl 8.3.3)
+        Returns:
+            L_LT =  effective_length_for_cantilever_beam
+        Note:
+            References:
+            IS800:2007, Table 16 (cl 8.3.3)
         """
 
         if Restraint_Condition_1 == "Continuous, with lateral restraint to top flage":
@@ -956,38 +934,34 @@ class IS800_2007(object):
                 else:
                     return 0.5 * L
 
-    def cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
+    def cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L,D, Restraint_Condition_1,
                                                                       Restraint_Condition_2, Loading_Condition):
         """
             Calculate effective length against lateral torsional buckling for simply supported Beams and girders
             where no lateral restraint  to the compression falnge is provided as per cl.8.3.1
 
-            Args:
-                L -  Span of simply suppotred beams and girders in mm (float)
-                D -  Overall depth of he beam in mm (float)
+        Args:
+            L -  Span of simply supported beams and girders in mm (float)
+            D -  Overall depth of he beam in mm (float)
+            Restraint_Condition - Either "Torsional Restraint" or "warping Restraint"
+            Restraint_Condition_1- "Torsional Restraint"
+            Restraint_Condition_2- "Warping_Restraint"
+            "Torsional Restrained" - Either "Fully Restrained" or
+                                        "Partially restrained by bottom flange support connection" or
+                                        "Partially restrained by bottom flage bearing support"
+            "Warping_Restraint" - Either "Both flanges partially restrained" or
+                                     "Compression flange fully Restrained" or
+                                     "Both flanges fully restrained" or
+                                     "Compression flange partially Restrained" or
+                                     "Warping not restrained in both flanges"
+            Loading_Condition  - Either "Normal" or " Destabilizing"
+        Return:
+            L_LT  - cl_8_3_1_Effective length for simply supported Beams in mm (float)
+        Note:
+            References:
+            IS800:2007  Table 15 (cl 8.3.1)
 
-                Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
-                Restraint_Condition_1- "Torsional Restraint"
-                Restraint_Condition_2- "Warping_Restraint"
-
-                "Torsional Restrained" - Either "Fully_resrtrained" or
-                                        "Partially_restrained_by_bottom_flange_support_condition" or
-                                        "Partially_restrained_by_bottom_flange_support_condition"
-
-                "Warping_Restraint" - Either "Both_flange_fully_restrained" or
-                                     "compression_flange_fully_restrained" or
-                                     "Compression_flange_partially_restrained" or
-                                     "Warping_not_restrained_in_both_flange"
-
-
-                Loading_Condition  - Either "Normal" or " Destabilizing"
-                Returns:
-                L_LT  - cl_8_3_1_Effective length for simply supported Beams in mm (float)
-            Note:
-                    References:
-                    IS800:2007, Table 15 (cl 8.3.1)
-
-            """
+        """
 
         if Restraint_Condition_1 == "Fully Restrained":
             if Restraint_Condition_2 == "Both flanges partially restrained":
@@ -1010,19 +984,19 @@ class IS800_2007(object):
                     return 0.85 * L
                 else:
                     return 1.00 * L
-                    if Restraint_Condition_2 == "Wraping not restrained in both flanges":
+                    if Restraint_Condition_2 == "Warping not restrained in both flanges":
                         if Loading_Condition == "Normal":
                             return 1.00 * L
                         else:
                             return 1.20 * L
                 if Restraint_Condition_1 == "Partially restrained by bottom flange support connection":
-                    if Restraint_Condition_2 == "Wraping not restrained in both flages":
+                    if Restraint_Condition_2 == "Warping not restrained in both flages":
                         if Loading_Condition == "Normal":
                             return 1.00 * L + 2 * D
                         else:
                             return 1.20 * L + 2 * D
                 if Restraint_Condition_1 == "Partially restrained by bottom flage bearing support":
-                    if Restraint_Condition_2 == "Wraping not restrained in both flages":
+                    if Restraint_Condition_2 == "Warping not restrained in both flages":
                         if Loading_Condition == "Normal":
                             return 1.2 * L + 2 * D
                         else:
@@ -1035,76 +1009,74 @@ class IS800_2007(object):
             Calculation of effective length for given type of beam type as per cl.8.3
 
         Args:
-            L-  Span of simply suppotred beams and girders in mm (float) for
-                "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges",
-                 Projecting Length of cantiliver beam in mm (float) for
-                 "Cantilever_beam",
+            L -  Span of simply supported beams and girders in mm (float) for
+                'Simply supported with no lateral restrained to the compression flanges',
+                 Projecting Length of cantilever beam in mm (float) for
+                 'Cantilever beam',
                  Length of relevent segment between the lateral restraint in mm (float) for
-                 "Simply_supported_with_intermediate_lateral_restraints",
+                 'Simply supported with intermediate lateral restraints',
                  Centre-to-centre distance of the restraint member in mm (float) for
-                 "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval"
+                 'Beam provided with members to give effective lateral restraint to compression flange at interval'
 
-            D -  Overall depth of he beam in mm (float)
+            D -  Overall depth of the beam in mm (float)
 
+            Beam_type - Either'Simply supported with no lateral restrained to the compression flanges'
+                        or 'Simply supported with intermediate lateral restraints'
+                        or 'Beam provided with members to give effective lateral restraint to compression flange at interval'
+                        or 'Cantilever beam'
 
-            Beam_type - Either "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
-                        or "Simply_supported_with_intermediate_lateral_restraints"
-                        or "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval"
-                        or "Cantilever_beam"
+            FOR 'Simply supported with no lateral restrained to the compression flanges':
 
-            FOR "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges"
-     Restraint_Condition - Either "Torsional Restraint" or "wraping Restraint"
-
+            Restraint_Condition - Either "Torsional Restraint" or "Warping Restraint"
             Restraint_Condition_1- "Torsional Restraint"
             Restraint_Condition_2- "Warping_Restraint"
 
-            "Torsional Restrained" - Either "Fully_resrtrained" or
-                                        "Partially_restrained_by_bottom_flange_support_condition" or
-                                        "Partially_restrained_by_bottom_flange_support_condition"
+            "Torsional Restrained" - Either "Fully Restrained" or
+                                        "Partially restrained by bottom flange support connection" or
+                                        "Partially restrained by bottom flage bearing support"
+            "Warping_Restraint" - Either "Both flanges partially restrained" or
+                                     "Compression flange fully Restrained" or
+                                     "Both flanges fully restrained" or
+                                     "Compression flange partially Restrained" or
+                                     "Warping not restrained in both flanges"
 
-            "Warping_Restraint" - Either "Both_flange_fully_restrained" or
-                                     "compression_flange_fully_restrained" or
-                                     "Compression_flange_partially_restrained" or
-                                     "Warping_not_restrained_in_both_flange"
-
-
-            FOR "Cantilever_beam"
+            FOR "Cantilever_beam":
 
             Restrained_condition - Either "At support" or "At Top" for "Cantilever_beam"
 
             Restraint_Condition_1- "At support"
             Restraint_Condition_2- "At Top"
 
-            At_support -  Either "continous, with lateral restraint to top"
-                              or "continous, with  partial torsional restraint"
-                              or "continous, with lateral and tosional restraint "
+            At_support -  Either "continuous, with lateral restraint to top"
+                              or "continuous, with  partial torsional restraint"
+                              or "continuous, with lateral and torsional restraint "
                               or "Restrained laterally,torsionally and against rotation on plan "
 
-            At_top - Either  "free"
+            At_top - Either "free"
                         or "lateral restraint to top flange"
                         or "Torsional restraint"
                         or  "Lateral and torsional restraint"
 
-            Loading_condition - Either "Normal" or  "Destablizing"
+            Loading_condition - Either "Normal" or  "Destabilizing"
 
 
 
         Returns :
-            L_LT - Effective_length_of_beam in m (float)
+            L_LT - effective_length_of_beam in mm (float)
 
         Note:
-                References:
-                IS800:2007,  cl 8.3.
+            References:
+            IS800:2007,  cl 8.3.
 
         """
 
-        if Beam_type == "Simply_supported_with_no_lateral_restrained_to_the_compression_flanges":
+        if Beam_type == 'Simply supported with no lateral restrained to the compression flanges':
             L_LT = cl_8_3_1_Table_15_Effective_length_for_simply_supported_beams(L, D, Restraint_Condition_1,
                                                                                  Restraint_Condition_2,
                                                                                  Loading_Condition)
-        elif Beam_type == "Simply_supported_with_intermediate_lateral_restraints":
+        elif Beam_type == 'Simply supported with intermediate lateral restraints':
             L_LT = 1.2 * L
-        elif Beam_type == "Beam_provided_with_members_to_give_effective_lateral_restrain_to_compression_flange_at_interval":
+        elif Beam_type == 'Beam provided with members to give effective lateral restraint to compression flange at interval':
             L_LT = 1.2 * L
         else:
             L_LT = cl_8_3_3_Table_16_Efective_length_for_cantilever_beam(L, Restraint_Condition_1,
@@ -1112,8 +1084,8 @@ class IS800_2007(object):
 
         return L_LT
 
-    # Design Strenth in Bending(Flexure)
-    def Design_strength_in_bending(M, M_d):
+    #cl 8.2 Design Strength in Bending(Flexure)
+    def cl_8_2_Design_strength_in_bending(M, M_d):
         """ Calculation of design bending strength
         Args:
              M: Factored design moment in N*mm
@@ -1127,25 +1099,27 @@ class IS800_2007(object):
 
         if M <= M_d:
             return bool(M <= M_d)
-
-    def Design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, f_y, V, V_d, M_dv, plastic=False,
+    #cl 8.2.1 Laterally Supported Beam
+    def cl_8_2_1_design_bending_strength_of_laterally_unsupported_beam(Z_p, Z_e, f_y, V, V_d, M_dv, plastic=False,
                                                               compact=False):
-        """Calucation of bending strength of laterally unsupported beam for low shear  and high shear case
-            Args:
-                Beta_b - 1 for plastic and compact
-                         Z_e/Z_p for semi-compact
-                Z_e - Elastic section modulus of the cross section in mm**3
-                Z_p - Plastic section modulus of the cross section in mm**3
-                f_y - yield stress of the material (in N/ mm**2 )
-                V  - Factored design shear strengh in N
-                V_d - Design shear stregth in N
-                M_dv: Design bending strength under high shear as defined in Cl 9.2 in N*m
+        """
+            Calculation of bending strength of laterally unsupported beam for low shear  and high shear case
+        Args:
+            Beta_b - 1 for plastic and compact
+                    Z_e/Z_p for semi-compact
+            Z_e - Elastic section modulus of the cross section in mm**3
+            Z_p - Plastic section modulus of the cross section in mm**3
+            f_y - yield stress of the material (in N/ mm**2 )
+            V  - Factored design shear strengh in N
+            V_d - Design shear stregth in N
+            M_dv: Design bending strength under high shear as defined in Cl 9.2 in N*m
 
-            Returns:
-                M_d - Design Bending  strength in N*m
-            Note:
-                References:
-                IS800:2007,  cl 8.2.1.2, cl. 8.2.1.3
+        Returns:
+            M_d - Design Bending  strength in N*m
+
+        Note:
+            References:
+            IS800:2007,  cl 8.2.1.2, cl. 8.2.1.3
 
         """
         Beta_b = Z_e / Z_p
@@ -1159,36 +1133,34 @@ class IS800_2007(object):
 
         if V > 0.6 * V_d:
             M_d = M_dv
-
         # TODO : M_dv is referred from cl9.2
-
         return M_d
 
     # cl8.2.2 DESIGN BENDING STRENGTH OF LATERALLY UNSUPPORTED BEAMS
     # cl8.2.2.1 Elastic lateral torsional buckling moment
-    def Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
+    def cl_8_2_2_1_elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
                                                   Loading_Condition, section, n, b=[], t=[]):
         """
             Calculation of elastic critical moment or elastic lateral torional buckling moment
             Args:
-                I_t - torsional constant
-                I_w - wraping constant
-                I_y - moment of inertia about weaker axis
-                r_y - radius of gyration about weaker axis
+                I_t - torsional constant (in mm**4)
+                I_w - warping constant
+                I_y - moment of inertia about weaker axis (in mm**4)
+                r_y - radius of gyration about weaker axis (in mm**4)
                 L_LT - effective length for lateral torsional buckling accordance with cl8.3
-                h_f - centre-to-centre distance between flange
-                t_f - thickness of the flange
-                E - Youngs Modulus of elaticity
-                G - modulus of rigidity
-                b - breadth of the elements in a section
-                t - thickness of the elemnets of the section
-                A_e - Area enclosed by the section
+                h_f - centre-to-centre distance between flange in mm
+                t_f - thickness of the flange in mm
+                E - Young's Modulus of elasticity in mm
+                G - modulus of rigidity N/mm**2
+                b - breadth of the elements in a section in mm
+                t - thickness of the elements of the section in mm
+                A_e - Area enclosed by the section in mm**2
                 section - Either 'open section' or 'hollow section'
 
             Return:
-                M_cr - Elastic lateral torsional buckling moment
+                M_cr - Elastic lateral torsional buckling moment in N*mm
             Notes:
-                 Reference:
+                Reference:
                 IS 800:2007, cl. 8.2.2.1.
 
         """
@@ -1210,27 +1182,27 @@ class IS800_2007(object):
 
         return M_cr
 
-    def design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
+    def cl_8_2_2_design_bending_Strength_of_laterally_unsupported_beam(I_y, E, A_e, G, L, D, Restraint_Condition_1,
                                                               Restraint_Condition_2,
                                                               Loading_Condition, t, section, n, Z_p, Z_e, f_y, V, V_d,
                                                               M_dv, plastic=False, compact=False, *b):
         """
-             Calculation of design bending strength of laterally unsupported beam
-             Args:
-                 Z_p - plastic section modulus with respect to extreme compression fibre
-                 Z_e - elastic section modulud with respect to extreme compression fibre
-                 f_y - yield stress
-                 beta_b - 1.0 for plastic and compact section
+            Calculation of design bending strength of laterally unsupported beam
+            Args:
+                Z_p - plastic section modulus with respect to extreme compression fibre (in mm**3)
+                Z_e - elastic section modulus with respect to extreme compression fibre (in mm**3)
+                f_y - yield stress in N/mm**2
+                beta_b - 1.0 for plastic and compact section
                           Z_p/Z_e for semi-compact section
-                 X_LT - design bending compressive stress
-                 section - Either 'Rolled_steel_section' or "Welded_steel_section'
-                 M_cr - elastic critical moment calculated in accordance with 8.2.2.1
-                 f_cr_b - extreme fibre bending compressive stress corresponding to elastic lateral buckling momnet
+                X_LT - design bending compressive stress N/mm**2
+                section - Either 'Rolled_steel_section' or "Welded_steel_section'
+                M_cr - elastic critical moment calculated in accordance with 8.2.2.1
+                f_cr_b - extreme fibre bending compressive stress corresponding to elastic lateral buckling moment N/mm**2
 
-             Returns:
-                 M_d - Design bending strength of laterally unsupported beam
+            Returns:
+                M_d - Design bending strength of laterally unsupported beam in N*mm
 
-             Note:
+            Note:
                 Reference:
                 IS 800:2007, cl. 8.2.2.
 
@@ -1246,8 +1218,8 @@ class IS800_2007(object):
         else:
             alpha_LT = 0.49
 
-        M_cr = Elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1,
-                                                         Restraint_Condition_2, Loading_Condition, t, section, n, *b)
+        M_cr = cl_8_2_2_1_elastic_lateral_torsional_buckling_moment(I_y, E, A_e, G, L, D, Restraint_Condition_1, Restraint_Condition_2,
+                                                  Loading_Condition, section, n, b=[], t=[])
         f_cr_b = M_cr / (beta_b * Z_p)
         Lambda_LT = min(math.sqrt(f_y / f_cr_b), math.sqrt(1.2 * Z_e * f_y / M_cr))
         phi_LT = 0.5 * (1 + alpha_LT * (lambda_LT - 0.2) + lambda_LT ** 2)
@@ -1263,147 +1235,142 @@ class IS800_2007(object):
 
         return M_d
 
-    # --------------------
+
     # cl8.4 Shear Design
-    def design_shear_strength_of_beam(V_n, V, Safety_factor):
-        """
-            Dsign shear strength
-        Args:
-            V_n -Nominal  shear strength of a cross-section
-            V - Factored design shear force
-            Safety_factor- Either 'Field' or 'shop'
-        Return
-            V_d - Design shear strength
-        Note:
-                Reference:
-                IS 800:2007, cl. 8.4
+    def cl_8_4_design_shear_strength_of_beam(V_n, V):
 
         """
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0'][safety_factor_parameter]
-        V_d = V_n / gamma_mo
+            Design shear strength
+        Args:
+            V_n -Nominal  shear strength of a cross-section in N
+            V - Factored design shear force in N
+            Safety_factor- Either 'Field' or 'shop'
+        Return
+            V_d - Design shear strength in N
+        Note:
+            Reference:
+            IS 800:2007, cl. 8.4
+
+        """
+        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['shop']
+        V_d = V_n / gamma_m0
         if V <= V_d:
             return V_d
 
-    def nominal_plastic_shear_resistance_under_pure_shear(A_v, f_yw):
+    def cl_8_4_1_nominal_plastic_shear_resistance_under_pure_shear(A_v, f_yw):
         """
             Calculation of nominal plastic shear resistance under pure shear
+
             Args:
-                A_v - Shear area
-                f_yw - yield shear of the web
+                A_v - Shear area in mm**2
+                f_yw - yield shear of the web in N/mm**2
 
             Returns:
-                V_n - Nominal plastic shear resistance under pure force
+                V_n - Nominal plastic shear resistance under pure force in N
 
-             Note:
+            Note:
                 Reference:
-                IS 800:2007, cl. 8.4
+                IS 800:2007, cl. 8.4.1
         """
 
         V_p = A_v * f_yw / math.sqrt(3)
         V_n = V_p
         return V_n
 
-    def shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis):
+    def cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis, cross_Section):
         """
             Calculation of shear area of different section
 
             Args:
-                A - cross - section area
-                b - overall breadth of tubular section,breadth of I - section flange
-                d - clear depth of the web between flange
-                h- overll depth of teh section
-                t_f - thickness of the flange
-                t_w - thickness of the web
-                section - Either 'I_Section' or 'Channel_section' or 'Rectangular_hollow_section_of_uniform_depth'
-                          or 'Circular_hollow_tubes_of_uniform_thickness' or 'plates' or 'solid_bars'
-                Load_application_axis - Either 'Loaded_parallel_to_depth(h)' or 'Loaded_parallel_to_width(b)'
-                Axis_of_Bending - Either 'Major_Axis_Bending' or 'Minor_Axis_Bending'
-                cross_section - Either 'Hot_Rolled' or ' Welded'
+                A - cross section area in mm**2
+                b - overall breadth of tubular section,breadth of I - section flange in mm
+                d - clear depth of the web between flange in mm
+                h- overall depth of the section in mm
+                t_f - thickness of the flange in mm
+                t_w - thickness of the web in mm
+                section - Either 'I section ' and 'Channel Section' or 'Rectangular hollow section of uniform depth'
+                          or 'Circular hollow tubes of uniform thickness' or 'plates' or 'solid bars'
+                Load_application_axis - Either 'Loaded parallel to depth' or 'Loaded parallel to width(b)'
+                Axis_of_Bending - Either 'Major Axis Bending' or 'Minor Axis Bending'
+                cross_section - Either 'Hot Rolled' or ' Welded'
 
             Return:
-                A_v - Shear area
+                A_v - Shear area in mm*mm
 
             Note:
                 Reference:
                 IS 800:2007, cl. 8.4.1.1
 
         """
-        if Axis_of_Bending == 'Major_Axis_Bending':
-            if section == 'I_section_Hot_Rolled':
-                A_v = h * t_w
-                return A_v
-            else:
-                A_v = d * t_w
-                return A_v
 
-        if Axis_of_Bending == 'Minor_Axis_Bending':
-            if Section == 'I_section_Hot_Rolled':
-                A_v = 2 * b * t_f
-                return A_v
-            else:
-                A_v = 2 * b * t_f
-                return A_v
-
-            if section == 'Rectangular_hollow_section_of_uniform_depth':
-                if load_application_axis == 'Loaded_parallel_to_depth':
-                    A_v = A * h / (b + h)
-                    return A_v
+        if section == 'I section ' and 'Channel Section':
+            if Axis_of_Bending == 'Major Axis Bending':
+                if cross_Section == 'Hot -Rolled':
+                    A_v = h * t_w
                 else:
-                    A_v = A * b / (b + h)
-                    return A_v
-
-            if section == 'Circular_hollow_tubes_of_uniform_thickness':
-                A_v = A
+                    A_v = d * t_w
                 return A_v
 
-            if section == 'plates':
-                A_v = A
-            else:
-                A_v = A
+        if Axis_of_Bending == 'Minor Axis Bending':
+            if cross_Section == 'Hot -Rolled' or 'Welded':
+                A_v = 2 * b * t_f
+                return A_v
 
+        if section == 'Rectangular hollow section of uniform depth':
+            if load_application_axis == 'Loaded parallel to depth':
+                A_v = A * h / (b + h)
+            else:
+                A_v = A * b / (b + h)
+            return A_v
+
+        if section == 'Circular hollow tubes of uniform thickness':
+            A_v = A
+            return A_v
+
+        if section == 'plates'and 'solid bars':
+            A_v = A
             return A_v
 
     # cl8.4.2 TODO: CHECK RESISTANCE TO SHEAR BUCKLING
 
     # cl8.4.2.2 Shear buckling design method
-    def nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,
-                               Section, Axis_of_Bending, Load_application_axis, Section_type):
+    def cl8_4_2_2_nominal_shear_strength(method, nu, c, E, f_yw, f_yf, position_of_transverse_shear, b_f, A, b, d, h, t_f, t_w,
+                               section, Axis_of_Bending, load_application_axis):
         """
             Calculation of nominal shear strength
             Args:
                  method - Either 'Simple_post_ critical_method' or 'Tension_field_method'
                  A_v - shear area defined in cl8.4.1.1
-                 T_b - shear stress corresponding to web buckling
+                 T_b - shear stress corresponding to web buckling in N/mm**2
                  lambda_w - non-dimensional web slenderness ratio for shear buckling stress
-                 T_cr_c - the elastic critical shear stress of the web
+                 T_cr_c - the elastic critical shear stress of the web in N
                  nu - poisson 's ration
-                 c - spacing of transverse stiffners
-                 d - depth of the web
-                 E - youngs modulus of elasticity
-                 t_w - thickness of web
-                 f_yw - yield strenth of  the web
-                 V_cr - shear force corresponding to web buckling
-                 f_v - yield strength of the tension field
+                 c - spacing of transverse stiffners in mm
+                 d - depth of the web in mm
+                 E - young's modulus of elasticity in N/mm**2
+                 t_w - thickness of web in mm
+                 f_yw - yield strength of  the web  in N/mm**2
+                 V_cr - shear force corresponding to web buckling in N
+                 f_v - yield strength of the tension field  in N/mm**2
                  phi - inclination of the tension field
-                 w_tf - the width of the tension field
-                 s_c - anchorage lengths of tension field  along the compresssion flange
-                 s_t - anchorage lengths of tension field  along the tension flange
-                 M_fr - reduecd plastic moment capacity of the repective flange plate after accounting for axial force
-                 N_f - reduecd plastic moment capacity in the flange due to overall bending and
-                        any external axial force in the cross section
-                 b_f - width of the relevent flange
-                 t_f - thickness of the relevent flange
-                 f_yt - yield stress of the flange
+                 w_tf - the width of the tension field in mm
+                 s_c - anchorage lengths of tension field  along the compression flange in mm
+                 s_t - anchorage lengths of tension field  along the tension flange in mm
+                 M_fr - reduced plastic moment capacity of the respective flange plate after accounting for axial force in N*mm
+                 N_f - reduced plastic moment capacity in the flange due to overall bending and
+                        any external axial force in the cross section in N*mm
+                 b_f - width of the relevant flange in mm
+                 t_f - thickness of the relevant flange in mm
+                 f_yt - yield stress of the flange in N/mm**2
             Return:
-                V_n - nominal shear strength
+                V_n - nominal shear strength in N
             Note:
                 Reference:
                 IS 800:2007, cl. 8.4.2.2.
 
         """
 
-        A_v = shear_area_of_different_section(A, b, d, h, t_f, t_w, Section, Axis_of_Bending, Load_application_axis,
-                                              Section_type)
+        A_v = cl_8_4_1_1_shear_area_of_different_section(A, b, d, h, t_f, t_w, section, Axis_of_Bending, load_application_axis, cross_Section)
         if method == 'Simple_post_ critical_method':
             if position_of_transverse_shear == 'At support':
                 K_v = 5.35
@@ -1412,27 +1379,25 @@ class IS800_2007(object):
             elif c / d > 1.0:
                 K_v = 5.35 + (4.0 / (c / d) ** 2)
 
-                return K_v
+            return K_v
 
             T_cr_c = (K_v * pi ** 2 * E) / (12 * (1 - nu ** 2) * (d / t_w) ** 2)
             lambda_w = math.sqrt(f_yw / (math.sqrt(3) * T_cr_c))
 
             if lambda_w <= 0.8:
                 T_b = f_yw / math.sqrt(3)
-
             for lambda_w in range(0.8, 1.2):
                 T_b = (1 - 0.8 * (lambda_w - 0.8)) * (f_yw / math.sqrt(3))
             else:
                 T_b = f_yw / (math.sqrt(3) * lambda_w ** 2)
 
-            V_cr = A_v * T_b
-            V_n = V_cr
-
-            return (V_n, T_b)
-        gamma_m0 = cl_5_4_1_Table_5['gamma_m0'][fabrication]
+        V_cr = A_v *T_b
+        V_n = V_cr
+        return (V_n, T_b,T_cr_c)
+        gamma_m0 = cl_5_4_1_Table_5['gamma_m0']['yielding']
 
         if method == 'Tension_field_method':
-            phi = arctan(d / c)
+            phi = math.atan(d / c)
             shi = 1.5 * T_b * sin(2 * phi)
             M_fr = 0.25 * b_f * t_f ** 2 * f_yf * (1 - (N_f / (b_f * t_f * f_yf / gamma_m0)) ** 2)
 
@@ -1451,28 +1416,28 @@ class IS800_2007(object):
 
             return V_n
 
-    # STtiffened web Deisign
+    # Stiffened web Design
     # End plate Design
     # ..............................................................
+
     # cl8.5.3 Anchor forces
-    # cl8.5.3 Anchor forces
-    def anchor_forces(d, t, f_y, V, method, nu, c, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
-                      t_f):
+    def cl_8_5_3_anchor_forces(d, t, f_y, V, method, nu, c, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
+                                                    t_f):
         """ Calculation of resultant longitudinal shear and moment
             Args:
-                d - web depth
-                t - thickness of the section
-                f_y - yield stress
+                d - web depth in mm
+                t - thickness of the section in mm
+                f_y - yield stress in N/mm**2
                 V_cr - critical shear strength as defined in cl8.4.2.2.
                 V_tf - basic shear strength as defined in cl8.4.2.2.
-                V = actual factored shear force
+                V = actual factored shear force in N
             Return:
-                M_tf - resultant longitudinal moment
-                R_tf - resultant longitudinal shear
+                M_tf - resultant longitudinal moment in N*mm
+                R_tf - resultant longitudinal shear in N*mm
 
             Note:
                 Reference:
-                IS 800:2007, cl. 8.4.2.2.
+                IS 800:2007, cl. 8.5.3
         """
         V_cr = nominal_shear_strength(method, nu, c, d, E, t_w, f_yw, f_yf, position_of_transverse_shear, s_c, s_t, b_f,
                                       t_f)

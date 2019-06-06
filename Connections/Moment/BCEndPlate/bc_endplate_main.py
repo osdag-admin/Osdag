@@ -11,6 +11,9 @@ from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
+import bc_endplate_calc as db_value
+from ui_weld_details_1 import Ui_Weld_Details_1
+from ui_weld_details_2 import Ui_Weld_Details_2
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
@@ -538,6 +541,48 @@ class Pitch(QDialog):
         else:
             pass
 
+class WeldDetails(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.maincontroller = parent
+        if self.maincontroller.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+            self.ui = Ui_Weld_Details_1()
+            self.ui.setupUi(self)
+        elif self.maincontroller.ui.combo_weld_method.currentText() == "Fillet Weld":
+            self.ui = Ui_Weld_Details_2()
+            self.ui.setupUi(self)
+        else:
+            pass
+
+        
+
+        uiObj = self.maincontroller.designParameters()
+        self.resultObj_plate = bc_endplate_design(uiObj)
+
+        if self.maincontroller.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+            self.groovewelddetails()
+        else:
+            self.filletwelddetials()
+
+    def groovewelddetails(self):
+        self.ui.label_note_1.setText("All dimensions are in mm.")
+        if db_value.beam_tf <= 12:
+            self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_flange.png"))
+            self.ui.label_note_2.setText("As flange thickness, tf (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+        else:
+            self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_flange.png"))
+            self.ui.label_note_2.setText("As flange thickness, tf (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+        if db_value.beam_tw <= 12:
+            self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_web.png"))
+            self.ui.label_note_3.setText("As web thickness, tw (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+        else:
+            self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
+            self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+    def filletwelddetials(self):
+        self.ui.lineEdit_flange_critical_stress.setText(str(self.resultObj_plate["Weld"]["FlangeStress"]))
+        self.ui.lineEdit_flange_strength.setText(str(self.resultObj_plate["Weld"]["FlangeStrength"]))
+        self.ui.lineEdit_web_critical_stress.setText(str(self.resultObj_plate["Weld"]["WebStress"]))
+        self.ui.lineEdit_web_strength.setText(str(self.resultObj_plate["Weld"]["WebStrength"]))
 
 class DesignReportDialog(QDialog):
     def __init__(self, parent=None):
@@ -701,7 +746,7 @@ class Maincontroller(QMainWindow):
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
         self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
         #self.ui.combo_weld_method.triggered.connect(self.on_change)
-
+        self.ui.btn_Weld.clicked.connect(self.weld_details)
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_plateDetail_2.clicked.connect(self.plate_details_bottom)
@@ -1597,6 +1642,10 @@ class Maincontroller(QMainWindow):
 
     def pitch_details(self):
         section = Pitch(self)
+        section.show()
+    
+    def weld_details(self):
+        section = WeldDetails(self)
         section.show()
 
     def plate_details(self):

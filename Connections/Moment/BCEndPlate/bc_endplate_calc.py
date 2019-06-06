@@ -140,8 +140,9 @@ def bc_endplate_design(uiObj):
     #    beam_R1 - Radius of beam at root
 
     dictbeamdata = get_beamdata(beam_sec)
-
+    global beam_tw
     beam_tw = float(dictbeamdata["tw"])
+    global beam_tf
     beam_tf = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])

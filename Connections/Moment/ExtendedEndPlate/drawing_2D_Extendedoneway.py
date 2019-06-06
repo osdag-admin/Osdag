@@ -459,25 +459,24 @@ class OnewayEndPlate(object):
 		extnd_oneway_end_2d_front = OnewayEnd2DFront(self)
 		extnd_oneway_end_2d_top = OnewayEnd2DTop(self)
 		extnd_oneway_end_2d_side = OnewayEnd2DSide(self)
-		if view == "Front":
-			extnd_oneway_end_2d_front.call_Oneway_front(filename)
-		elif view == "Top":
-			extnd_oneway_end_2d_top.call_Oneway_top(filename)
-		elif view == "Side":
-			extnd_oneway_end_2d_side.call_Oneway_side(filename)
-		else:
-			filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
-			extnd_oneway_end_2d_front.call_Oneway_front(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
+		# if view == "Front":
+		# 	extnd_oneway_end_2d_front.call_Oneway_front(filename)
+		# elif view == "Top":
+		# 	extnd_oneway_end_2d_top.call_Oneway_top(filename)
+		# elif view == "Side":
+		# 	extnd_oneway_end_2d_side.call_Oneway_side(filename)
+		# else:
+		filename = os.path.join(str(self.folder), 'images_html', 'extendFront.svg')
+		extnd_oneway_end_2d_front.call_Oneway_front(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendFront.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
-			extnd_oneway_end_2d_top.call_Oneway_top(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
+		filename = os.path.join(str(self.folder), 'images_html', 'extendTop.svg')
+		extnd_oneway_end_2d_top.call_Oneway_top(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
 
-			filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
-			extnd_oneway_end_2d_side.call_Oneway_side(filename)
-			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
-
+		filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
+		extnd_oneway_end_2d_side.call_Oneway_side(filename)
+		cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
 
 
 class OnewayEnd2DFront(object):

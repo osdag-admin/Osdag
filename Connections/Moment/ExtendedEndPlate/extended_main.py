@@ -1507,17 +1507,17 @@ class Maincontroller(QMainWindow):
 		if status is True:
 			if view != "All":
 				if view == "Front":
-					filename = os.path.join(self.folder, "images_html", "extendFront.svg")
+					filename = os.path.join(str(self.folder), "images_html", "extendFront.svg")
 
 				elif view == "Side":
-					filename = os.path.join(self.folder, "images_html", "extendSide.svg")
+					filename = os.path.join(str(self.folder), "images_html", "extendSide.svg")
 
 				else:
-					filename = os.path.join(self.folder, "images_html", "extendTop.svg")
+					filename = os.path.join(str(self.folder), "images_html", "extendTop.svg")
 
 				beam_beam.save_to_svg(filename, view)
 				svg_file = SvgWindow()
-				svg_file.call_svgwindow(filename, view, self.folder)
+				svg_file.call_svgwindow(filename, view, str(self.folder))
 			else:
 				fname = ''
 				beam_beam.save_to_svg(fname, view)
@@ -2346,7 +2346,7 @@ if __name__ == "__main__":
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/reshma/Osdag_workspace/Extended"
+	folder_path = "/home/anjalijatav/Downloads/Workspace/Osdag"
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

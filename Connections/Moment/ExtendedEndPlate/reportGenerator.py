@@ -1902,16 +1902,16 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
                   '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s ></object>' % png
+        datapng = '<object type="image/PNG" data= %s  width ="450" height = "450"></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s ></object>' % side
+        dataside = '<object type="image/PNG" data= %s  width ="450"></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s ></object>' % top
+        datatop = '<object type="image/PNG" data= %s  width ="450"></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s ></object>' % front
+        datafront = '<object type="image/PNG" data= %s  width ="450"></object>' % front
 
         if status == 'True':
             row = [1, datapng]
@@ -1933,16 +1933,16 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s ></object>' % png
+        datapng = '<object type="image/PNG" data= %s  width ="450"></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s ></object>' % side
+        dataside = '<object type="image/PNG" data= %s  width ="500"></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s ></object>' % top
+        datatop = '<object type="image/PNG" data= %s  width ="450"></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s ></object>' % front
+        datafront = '<object type="image/PNG" data= %s  width ="500"></object>' % front
 
         if status == 'True':
             row = [1, dataside]

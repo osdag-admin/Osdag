@@ -249,8 +249,13 @@ class PlateDetails(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
-        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
-        self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
+
+        self.ui.txt_plateno.setText(str(resultObj_plate['ContPlateTens']['Number']))
+        self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateTens']['Width']))
+        self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateTens']['Length']))
+        self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateTens']['Thickness']))
+        self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['ThicknessMin']))#Notch Size ??
+        self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateTens']['Weld']))
 
 class PlateDetailsBottom(QDialog):
     def __init__(self, parent=None):
@@ -261,8 +266,13 @@ class PlateDetailsBottom(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
-        #self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
-        #self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
+
+        self.ui.txt_plateno.setText(str(resultObj_plate['ContPlateComp']['Number']))
+        self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateComp']['Width']))
+        self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateComp']['Length']))
+        self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateComp']['Thickness']))
+        self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['ThicknessMin']))
+        self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateComp']['Weld']))
 
 
 # self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
@@ -278,9 +288,14 @@ class Stiffener(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
+
+        self.ui.txt_stiffnrNo.setText(str(resultObj_plate['Stiffener']['Number']))
         self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
         self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
         self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+        self.ui.txt_stiffnrNotchAtTop.setText(str(resultObj_plate['Stiffener']['NotchTop']))
+        self.ui.txt_stiffnrNotchAtBottom.setText(str(resultObj_plate['Stiffener']['NotchBottom']))
+        self.ui.txt_stiffnrWeldSize.setText(str(resultObj_plate['Stiffener']['Weld']))
 
 
 class Pitch(QDialog):

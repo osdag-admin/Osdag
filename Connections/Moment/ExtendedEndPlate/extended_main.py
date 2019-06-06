@@ -1028,6 +1028,16 @@ class Maincontroller(QMainWindow):
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended one way":
+			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush":
+			pixmap = QPixmap(":/newPrefix/images/finwindow.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
 		else:
 			pass
 

@@ -561,7 +561,7 @@ def bc_endplate_design(uiObj):
             ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
 
         #  Design forces per unit length of welds due to applied loads
-
+        """
         weld_force_axial = factored_axial_load / (
                 2 * (flange_weld_effective_length_top * flange_weld_long_joint_top +
                     2 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
@@ -571,7 +571,7 @@ def bc_endplate_design(uiObj):
         weld_force_moment = flange_tension_moment / (flange_weld_effective_length_top +
                                                              2 * flange_weld_effective_length_bottom)
         weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
-
+        
         # check for weld strength
 
         flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
@@ -580,6 +580,38 @@ def bc_endplate_design(uiObj):
 
         web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_throat_size
         web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_strength, 3)
+        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
+
+        """
+        """
+        axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
+        shear force is taken by web welds only = V/(2*lw)
+        moment is taken by both flange and web welds = M/Z 
+        z = ltf*lw/2 + lbf*lw/2 + d^2/3 
+        """
+
+        weld_force_axial = factored_axial_load / (
+                    flange_weld_effective_length_top * flange_weld_long_joint_top +
+                    flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *
+                    web_weld_effective_length * web_weld_long_joint)
+
+        flange_tension_moment = factored_moment / (beam_d - beam_tf)
+        weld_force_moment = flange_tension_moment / (
+                flange_weld_effective_length_top * flange_weld_long_joint_top * web_weld_effective_length / 2 +
+                flange_weld_effective_length_bottom * flange_weld_long_joint_bottom * web_weld_effective_length / 2 +
+                web_weld_effective_length**2/3)
+        weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
+
+        # check for weld strength
+
+        flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
+        flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
+
+        web_weld_stress = math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) / \
+                          web_weld_throat_size
+        web_weld_throat_reqd = round(math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) /
+                                     web_weld_strength, 3)
         web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
 
         if flange_weld_stress >= flange_weld_strength:

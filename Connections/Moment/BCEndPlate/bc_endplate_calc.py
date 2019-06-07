@@ -641,8 +641,12 @@ def bc_endplate_design(uiObj):
         if web_weld_stress >= web_weld_strength:
             design_status = False
             logger.error(": The weld size at beam web is less than required")
-            logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
-            logger.info(": Increase the size of weld at beam web")
+            if web_weld_size_reqd > web_weld_size_max and flange_weld_size_reqd < flange_weld_size_max:
+                logger.warning(": The connection can not be possible with fillet weld")
+                logger.info(": Use groove welds to connect beam and end plate")
+            else:
+                logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
+                logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'
         groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(

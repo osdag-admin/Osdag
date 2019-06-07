@@ -930,6 +930,7 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["WebStrength"] = float(round(web_weld_strength, 3))
 
     else:  # weld_method == 'groove':
+        outputobj["Weld"]["Size"] = 3
         outputobj["Weld"]["FlangeSize"] = float(round(groove_weld_size_flange, 3))
         outputobj["Weld"]["WebSize"] = float(round(groove_weld_size_web, 3))
 

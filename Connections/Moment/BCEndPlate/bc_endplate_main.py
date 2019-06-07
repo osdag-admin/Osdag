@@ -1863,34 +1863,6 @@ class Maincontroller(QMainWindow):
         contPlate_R1 = copy.copy(contPlate_L1)
         contPlate_R2 = copy.copy(contPlate_L2)
 
-        contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
-        contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
-        contWeldL1_L2 = copy.copy(contWeldL2_U2)
-        contWeldL2_L2 = copy.copy(contWeldL2_U2)
-        contWeldR1_U2 = copy.copy(contWeldL2_U2)
-        contWeldR2_U2 = copy.copy(contWeldL2_U2)
-        contWeldR1_L2 = copy.copy(contWeldL2_U2)
-        contWeldR2_L2 = copy.copy(contWeldL2_U2)
-        contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                   L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
-        contWeldL1_L3 = copy.copy(contWeldL1_U3)
-        contWeldL2_U3 = copy.copy(contWeldL1_U3)
-        contWeldL2_L3 = copy.copy(contWeldL1_U3)
-        contWeldR1_U3 = copy.copy(contWeldL1_U3)
-        contWeldR1_L3 = copy.copy(contWeldL1_U3)
-        contWeldR2_U3 = copy.copy(contWeldL1_U3)
-        contWeldR2_L3 = copy.copy(contWeldL1_U3)
-        contWeldL1_U1 = copy.copy(contWeldL1_U3)
-        contWeldL1_L1 = copy.copy(contWeldL1_U3)
-        contWeldL2_U1 = copy.copy(contWeldL1_U3)
-        contWeldL2_L1 = copy.copy(contWeldL1_U3)
-        contWeldR1_U1 = copy.copy(contWeldL1_U3)
-        contWeldR1_L1 = copy.copy(contWeldL1_U3)
-        contWeldR2_U1 = copy.copy(contWeldL1_U3)
-        contWeldR2_L1 = copy.copy(contWeldL1_U3)
-
         beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
                                           T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['NotchTop'],
                                           R12=outputobj['Stiffener']['NotchTop'],
@@ -1899,14 +1871,6 @@ class Maincontroller(QMainWindow):
 
         beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
-        # contPlate_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
 
         bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
         bolt_r = bolt_d / 2
@@ -1982,6 +1946,7 @@ class Maincontroller(QMainWindow):
         contWeldR1_L1 = copy.copy(contWeldL1_U3)
         contWeldR2_U1 = copy.copy(contWeldL1_U3)
         contWeldR2_L1 = copy.copy(contWeldL1_U3)
+
 
 
         if conn_type == 'col_flange_connectivity':

@@ -390,14 +390,14 @@ class CADFillet(object):
 
     def create_contWeldL2_U2(self):
         contWeldL2_U2OriginL = numpy.array([self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D / 2  + self.contPlate_L1.T ])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
         contWeldL1_L2OriginL = numpy.array([self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T  ])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldL1_L2_uDir = numpy.array([1.0, 0.0, 0.0])
         contWeldL1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
@@ -417,40 +417,40 @@ class CADFillet(object):
 
     def create_contWeldR2_U2(self):
         contWeldR2_U2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D/2 + self.contPlate_L1.T ])
+                                            - self.beamRight.D/2 + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         contWeldR2_U2_uDir = numpy.array([-1.0, 0.0, 0.0])
         contWeldR2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR2_U2.place(contWeldR2_U2OriginL, contWeldR2_U2_uDir, contWeldR2_U2_wDir)
 
     def create_contWeldR1_L2(self):
         contWeldR1_L2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T  ])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldR1_L2_uDir = numpy.array([0.0, 0.0, -1.0])
         contWeldR1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR1_L2.place(contWeldR1_L2OriginL, contWeldR1_L2_uDir, contWeldR1_L2_wDir)
 
     def create_contWeldR2_L2(self):
         contWeldR2_L2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D / 2  + self.beamLeft.t/2- self.beamRight.T/2 ])
+                                            - self.beamRight.D / 2  + self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldR2_L2_uDir = numpy.array([0.0, 0.0, -1.0])
         contWeldR2_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR2_L2.place(contWeldR2_L2OriginL, contWeldR2_L2_uDir, contWeldR2_L2_wDir)
 
     def create_contWeldL1_U3(self):
         contWeldL1_U3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldL1_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([1.0, 0, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
     def create_contWeldL1_L3(self):
         contWeldL1_L3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldL1_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldL1_L3 = numpy.array([1.0, 0, 0])
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
     def create_contWeldR2_U3(self):
         contWeldR2_U3OriginL = numpy.array([ -self.beamLeft.B/ 2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])   #TODO: shuffel it with R2_U3
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2)+ self.beamRight.T / 2 + self.contPlate_L1.T/2])   #TODO: shuffel it with R2_U3
         uDircontWeldR2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldR2_U3 = numpy.array([1.0, 0, 0])
         self.contWeldR2_U3.place(contWeldR2_U3OriginL, uDircontWeldR2_U3, wDircontWeldR2_U3)
@@ -464,7 +464,7 @@ class CADFillet(object):
 
     def create_contWeldL2_L3(self):
         contWeldL2_L3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL2_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([1.0, 0, 0])
         self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
@@ -472,19 +472,19 @@ class CADFillet(object):
 
     def create_contWeldR1_U3(self):
         contWeldR1_U3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR1_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldR1_U3 = numpy.array([1.0, 0, 0])
         self.contWeldR1_U3.place(contWeldR1_U3OriginL, uDircontWeldR1_U3, wDircontWeldR1_U3)
     def create_contWeldR1_L3(self):
         contWeldR1_L3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldR1_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldR1_L3 = numpy.array([1.0, 0, 0])
         self.contWeldR1_L3.place(contWeldR1_L3OriginL, uDircontWeldR1_L3, wDircontWeldR1_L3)
     def create_contWeldL2_U3(self):
         contWeldL2_U3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([1.0, 0, 0])
         self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
@@ -497,55 +497,55 @@ class CADFillet(object):
 
     def create_contWeldR2_L3(self):
         contWeldR2_L3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldR2_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldR2_L3 = numpy.array([1.0, 0, 0])
         self.contWeldR2_L3.place(contWeldR2_L3OriginL, uDircontWeldR2_L3, wDircontWeldR2_L3)
     def create_contWeldL1_U1(self):
         contWeldL1_U1OriginL = numpy.array([self.beamLeft.t/2 , -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         uDircontWeldL1_U1 = numpy.array([0, 1.0, 0.0])
         wDircontWeldL1_U1 = numpy.array([1.0, 0, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
     def create_contWeldL1_L1(self):
         contWeldL1_L1OriginL = numpy.array([ self.beamLeft.t/2,-self.contPlate_L1.L/2,
-                                             self.beamLeft.length / 2 + self.beamRight.D / 2 -self.contPlate_L1.T])
+                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldL1_L1 = numpy.array([1.0, 0, 0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
     def create_contWeldL2_U1(self):
         contWeldL2_U1OriginL = numpy.array([self.beamLeft.t / 2, -self.contPlate_L1.L / 2,
-                                       self.beamLeft.length / 2 + (self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D ])
+                                       self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         uDircontWeldL2_U1 = numpy.array([0, 1.0, 0.0])
         wDircontWeldL2_U1 = numpy.array([1.0, 0, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
     def create_contWeldR2_L1(self):
         contWeldR2_L1OriginL = numpy.array([ -self.beamLeft.B / 2,-self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldR2_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldR2_L1 = numpy.array([1.0, 0, 0])
         self.contWeldR2_L1.place(contWeldR2_L1OriginL, uDircontWeldR2_L1, wDircontWeldR2_L1)
     def create_contWeldR1_U1(self):
         contWeldR1_U1OriginL = numpy.array([ - self.beamLeft.B/2, -self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR1_U1 = numpy.array([0, 1.0, 0])
         wDircontWeldR1_U1 = numpy.array([1.0, 0, 0])
         self.contWeldR1_U1.place(contWeldR1_U1OriginL, uDircontWeldR1_U1, wDircontWeldR1_U1)
     def create_contWeldR1_L1(self):
         contWeldR1_L1OriginL = numpy.array([ -self.beamLeft.B/2, -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldR1_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldR1_L1 = numpy.array([1.0, 0, 0])
         self.contWeldR1_L1.place(contWeldR1_L1OriginL, uDircontWeldR1_L1, wDircontWeldR1_L1)
     def create_contWeldR2_U1(self):
         contWeldR2_U1OriginL = numpy.array([ -self.beamLeft.B/2, -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR2_U1 = numpy.array([0, 1.0, 0])
         wDircontWeldR2_U1 = numpy.array([1.0, 0, 0])
         self.contWeldR2_U1.place(contWeldR2_U1OriginL, uDircontWeldR2_U1, wDircontWeldR2_U1)
     def create_contWeldL2_L1(self):
         contWeldL2_L1OriginL = numpy.array([ self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldL2_L1 = numpy.array([1.0, 0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
@@ -784,21 +784,21 @@ class CADColWebFillet(CADFillet):
 
     def create_contWeldL2_U2(self):
         contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W, self.beamLeft.length / 2
-                                            - self.beamRight.D / 2 + self.contPlate_L1.T])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
         contWeldL1_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T])
+                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         contWeldL1_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL1_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
 
     def create_contWeldL2_L2(self):
         contWeldL2_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2, self.beamLeft.length / 2
-                                            - self.beamRight.D / 2 - self.contPlate_L1.T / 2 + self.beamRight.T / 2])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         contWeldL2_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL2_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
@@ -807,7 +807,7 @@ class CADColWebFillet(CADFillet):
 
     def create_contWeldL1_U3(self):
         contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)])
+                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U3 = numpy.array([0.0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([0.0, -1, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
@@ -815,15 +815,14 @@ class CADColWebFillet(CADFillet):
     def create_contWeldL1_L3(self):
         contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
                                             self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) - self.contPlate_L1.T])
+                                                        self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L3 = numpy.array([-1, 0, 0.0])
         wDircontWeldL1_L3 = numpy.array([0.0, -1.0, 0])
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
 
     def create_contWeldL2_U3(self):
         contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([0, -1, 0])
         self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
@@ -831,7 +830,7 @@ class CADColWebFillet(CADFillet):
     def create_contWeldL2_L3(self):
 
         contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L3 = numpy.array([-1, 0.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([0.0, -1, 0])
         self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
@@ -840,29 +839,28 @@ class CADColWebFillet(CADFillet):
 
     def create_contWeldL1_U1(self):
         contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)])
+                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL1_U1 = numpy.array([0.0, 1, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
 
     def create_contWeldL1_L1(self):
         contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
-                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.contPlate_L1.T])
+                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
 
     def create_contWeldL2_U1(self):
         contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
-                                            self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL2_U1 = numpy.array([0, 1, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
 
     def create_contWeldL2_L1(self):
         contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldL2_L1 = numpy.array([0, 1, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
@@ -1258,14 +1256,14 @@ class CADGroove(object):
 
     def create_contWeldL2_U2(self):
         contWeldL2_U2OriginL = numpy.array([self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D / 2  + self.contPlate_L1.T ])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
         contWeldL1_L2OriginL = numpy.array([self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T  ])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldL1_L2_uDir = numpy.array([1.0, 0.0, 0.0])
         contWeldL1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
@@ -1285,40 +1283,40 @@ class CADGroove(object):
 
     def create_contWeldR2_U2(self):
         contWeldR2_U2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D/2 + self.contPlate_L1.T ])
+                                            - self.beamRight.D/2 + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         contWeldR2_U2_uDir = numpy.array([-1.0, 0.0, 0.0])
         contWeldR2_U2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR2_U2.place(contWeldR2_U2OriginL, contWeldR2_U2_uDir, contWeldR2_U2_wDir)
 
     def create_contWeldR1_L2(self):
         contWeldR1_L2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T  ])
+                                   self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldR1_L2_uDir = numpy.array([0.0, 0.0, -1.0])
         contWeldR1_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR1_L2.place(contWeldR1_L2OriginL, contWeldR1_L2_uDir, contWeldR1_L2_wDir)
 
     def create_contWeldR2_L2(self):
         contWeldR2_L2OriginL = numpy.array([-self.beamLeft.t/2, -self.contPlate_L1.L/2,self.beamLeft.length / 2
-                                            - self.beamRight.D / 2  + self.beamLeft.t/2- self.beamRight.T/2 ])
+                                            - self.beamRight.D / 2  + self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         contWeldR2_L2_uDir = numpy.array([0.0, 0.0, -1.0])
         contWeldR2_L2_wDir = numpy.array([0.0, 1.0, 0.0])
         self.contWeldR2_L2.place(contWeldR2_L2OriginL, contWeldR2_L2_uDir, contWeldR2_L2_wDir)
 
     def create_contWeldL1_U3(self):
         contWeldL1_U3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldL1_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([1.0, 0, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
     def create_contWeldL1_L3(self):
         contWeldL1_L3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldL1_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldL1_L3 = numpy.array([1.0, 0, 0])
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
     def create_contWeldR2_U3(self):
         contWeldR2_U3OriginL = numpy.array([ -self.beamLeft.B/ 2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])   #TODO: shuffel it with R2_U3
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2)+ self.beamRight.T / 2 + self.contPlate_L1.T/2])   #TODO: shuffel it with R2_U3
         uDircontWeldR2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldR2_U3 = numpy.array([1.0, 0, 0])
         self.contWeldR2_U3.place(contWeldR2_U3OriginL, uDircontWeldR2_U3, wDircontWeldR2_U3)
@@ -1332,7 +1330,7 @@ class CADGroove(object):
 
     def create_contWeldL2_L3(self):
         contWeldL2_L3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL2_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([1.0, 0, 0])
         self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
@@ -1340,19 +1338,19 @@ class CADGroove(object):
 
     def create_contWeldR1_U3(self):
         contWeldR1_U3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR1_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldR1_U3 = numpy.array([1.0, 0, 0])
         self.contWeldR1_U3.place(contWeldR1_U3OriginL, uDircontWeldR1_U3, wDircontWeldR1_U3)
     def create_contWeldR1_L3(self):
         contWeldR1_L3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldR1_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldR1_L3 = numpy.array([1.0, 0, 0])
         self.contWeldR1_L3.place(contWeldR1_L3OriginL, uDircontWeldR1_L3, wDircontWeldR1_L3)
     def create_contWeldL2_U3(self):
         contWeldL2_U3OriginL = numpy.array([ self.beamLeft.t/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([1.0, 0, 0])
         self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
@@ -1365,59 +1363,58 @@ class CADGroove(object):
 
     def create_contWeldR2_L3(self):
         contWeldR2_L3OriginL = numpy.array([ -self.beamLeft.B/2, self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldR2_L3 = numpy.array([0, -1.0, 0.0])
         wDircontWeldR2_L3 = numpy.array([1.0, 0, 0])
         self.contWeldR2_L3.place(contWeldR2_L3OriginL, uDircontWeldR2_L3, wDircontWeldR2_L3)
     def create_contWeldL1_U1(self):
         contWeldL1_U1OriginL = numpy.array([self.beamLeft.t/2 , -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         uDircontWeldL1_U1 = numpy.array([0, 1.0, 0.0])
         wDircontWeldL1_U1 = numpy.array([1.0, 0, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
     def create_contWeldL1_L1(self):
         contWeldL1_L1OriginL = numpy.array([ self.beamLeft.t/2,-self.contPlate_L1.L/2,
-                                             self.beamLeft.length / 2 + self.beamRight.D / 2 -self.contPlate_L1.T])
+                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldL1_L1 = numpy.array([1.0, 0, 0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
     def create_contWeldL2_U1(self):
         contWeldL2_U1OriginL = numpy.array([self.beamLeft.t / 2, -self.contPlate_L1.L / 2,
-                                       self.beamLeft.length / 2 + (self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D ])
+                                       self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2 ])
         uDircontWeldL2_U1 = numpy.array([0, 1.0, 0.0])
         wDircontWeldL2_U1 = numpy.array([1.0, 0, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
     def create_contWeldR2_L1(self):
         contWeldR2_L1OriginL = numpy.array([ -self.beamLeft.B / 2,-self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldR2_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldR2_L1 = numpy.array([1.0, 0, 0])
         self.contWeldR2_L1.place(contWeldR2_L1OriginL, uDircontWeldR2_L1, wDircontWeldR2_L1)
     def create_contWeldR1_U1(self):
         contWeldR1_U1OriginL = numpy.array([ - self.beamLeft.B/2, -self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR1_U1 = numpy.array([0, 1.0, 0])
         wDircontWeldR1_U1 = numpy.array([1.0, 0, 0])
         self.contWeldR1_U1.place(contWeldR1_U1OriginL, uDircontWeldR1_U1, wDircontWeldR1_U1)
     def create_contWeldR1_L1(self):
         contWeldR1_L1OriginL = numpy.array([ -self.beamLeft.B/2, -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2)-self.contPlate_L1.T ])
+                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.T / 2 - self.contPlate_L1.T/2 ])
         uDircontWeldR1_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldR1_L1 = numpy.array([1.0, 0, 0])
         self.contWeldR1_L1.place(contWeldR1_L1OriginL, uDircontWeldR1_L1, wDircontWeldR1_L1)
     def create_contWeldR2_U1(self):
         contWeldR2_U1OriginL = numpy.array([ -self.beamLeft.B/2, -self.contPlate_L1.L/2 ,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) +self.contPlate_L1.T-self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T/2])
         uDircontWeldR2_U1 = numpy.array([0, 1.0, 0])
         wDircontWeldR2_U1 = numpy.array([1.0, 0, 0])
         self.contWeldR2_U1.place(contWeldR2_U1OriginL, uDircontWeldR2_U1, wDircontWeldR2_U1)
     def create_contWeldL2_L1(self):
         contWeldL2_L1OriginL = numpy.array([ self.beamLeft.t/2, -self.contPlate_L1.L/2,
-                                              self.beamLeft.length / 2 + (self.beamRight.D / 2) -self.beamRight.D])
+                                              self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T/2])
         uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldL2_L1 = numpy.array([1.0, 0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
-
 
 #############################################################################################################
 #   Following functions returns the CAD model to the function display_3DModel of main file                  #
@@ -1574,21 +1571,21 @@ class CADcolwebGroove(CADGroove):
 
     def create_contWeldL2_U2(self):
         contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W, self.beamLeft.length / 2
-                                            - self.beamRight.D / 2 + self.contPlate_L1.T])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
         contWeldL1_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T])
+                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         contWeldL1_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL1_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
 
     def create_contWeldL2_L2(self):
         contWeldL2_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2, self.beamLeft.length / 2
-                                            - self.beamRight.D / 2 - self.contPlate_L1.T / 2 + self.beamRight.T / 2])
+                                            - self.beamRight.D / 2 + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         contWeldL2_L2_uDir = numpy.array([0.0, 1.0, 0.0])
         contWeldL2_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
         self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
@@ -1597,7 +1594,7 @@ class CADcolwebGroove(CADGroove):
 
     def create_contWeldL1_U3(self):
         contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)])
+                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U3 = numpy.array([0.0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([0.0, -1, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
@@ -1605,15 +1602,14 @@ class CADcolwebGroove(CADGroove):
     def create_contWeldL1_L3(self):
         contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
                                             self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) - self.contPlate_L1.T])
+                                                        self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L3 = numpy.array([-1, 0, 0.0])
         wDircontWeldL1_L3 = numpy.array([0.0, -1.0, 0])
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
 
     def create_contWeldL2_U3(self):
         contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([0, -1, 0])
         self.contWeldL2_U3.place(contWeldL2_U3OriginL, uDircontWeldL2_U3, wDircontWeldL2_U3)
@@ -1621,7 +1617,7 @@ class CADcolwebGroove(CADGroove):
     def create_contWeldL2_L3(self):
 
         contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L3 = numpy.array([-1, 0.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([0.0, -1, 0])
         self.contWeldL2_L3.place(contWeldL2_L3OriginL, uDircontWeldL2_L3, wDircontWeldL2_L3)
@@ -1630,29 +1626,28 @@ class CADcolwebGroove(CADGroove):
 
     def create_contWeldL1_U1(self):
         contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)])
+                                            self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL1_U1 = numpy.array([0.0, 1, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
 
     def create_contWeldL1_L1(self):
         contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
-                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.contPlate_L1.T])
+                                            self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
         wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
 
     def create_contWeldL2_U1(self):
         contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
-                                            self.beamLeft.length / 2 + (
-                                                        self.beamRight.D / 2) + self.contPlate_L1.T - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL2_U1 = numpy.array([0, 1, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
 
     def create_contWeldL2_L1(self):
         contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
-                                            self.beamLeft.length / 2 + (self.beamRight.D / 2) - self.beamRight.D])
+                                            self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
         wDircontWeldL2_L1 = numpy.array([0, 1, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)

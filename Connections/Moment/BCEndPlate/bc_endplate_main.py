@@ -1955,6 +1955,34 @@ class Maincontroller(QMainWindow):
         bcWeldStiffLR_1 = copy.copy(bcWeldStiffLL_1)
         bcWeldStiffLR_2 = copy.copy(bcWeldStiffLL_1)
 
+        contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
+        contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
+        contWeldL1_L2 = copy.copy(contWeldL2_U2)
+        contWeldL2_L2 = copy.copy(contWeldL2_U2)
+        contWeldR1_U2 = copy.copy(contWeldL2_U2)
+        contWeldR2_U2 = copy.copy(contWeldL2_U2)
+        contWeldR1_L2 = copy.copy(contWeldL2_U2)
+        contWeldR2_L2 = copy.copy(contWeldL2_U2)
+        contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
+        contWeldL1_L3 = copy.copy(contWeldL1_U3)
+        contWeldL2_U3 = copy.copy(contWeldL1_U3)
+        contWeldL2_L3 = copy.copy(contWeldL1_U3)
+        contWeldR1_U3 = copy.copy(contWeldL1_U3)
+        contWeldR1_L3 = copy.copy(contWeldL1_U3)
+        contWeldR2_U3 = copy.copy(contWeldL1_U3)
+        contWeldR2_L3 = copy.copy(contWeldL1_U3)
+        contWeldL1_U1 = copy.copy(contWeldL1_U3)
+        contWeldL1_L1 = copy.copy(contWeldL1_U3)
+        contWeldL2_U1 = copy.copy(contWeldL1_U3)
+        contWeldL2_L1 = copy.copy(contWeldL1_U3)
+        contWeldR1_U1 = copy.copy(contWeldL1_U3)
+        contWeldR1_L1 = copy.copy(contWeldL1_U3)
+        contWeldR2_U1 = copy.copy(contWeldL1_U3)
+        contWeldR2_L1 = copy.copy(contWeldL1_U3)
+
 
         if conn_type == 'col_flange_connectivity':
 
@@ -1977,33 +2005,6 @@ class Maincontroller(QMainWindow):
                 bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
                                               L=beam_d - 2 * beam_T - 40)
                 bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
-                contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                           L=float(column_data["D"]) - 2 * float(column_data["T"]))
-                contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                           L=float(column_data["D"]) - 2 * float(column_data["T"]))
-                contWeldL1_L2 = copy.copy(contWeldL2_U2)
-                contWeldL2_L2 = copy.copy(contWeldL2_U2)
-                contWeldR1_U2 = copy.copy(contWeldL2_U2)
-                contWeldR2_U2 = copy.copy(contWeldL2_U2)
-                contWeldR1_L2 = copy.copy(contWeldL2_U2)
-                contWeldR2_L2 = copy.copy(contWeldL2_U2)
-                contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
-                                           L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
-                contWeldL1_L3 = copy.copy(contWeldL1_U3)
-                contWeldL2_U3 = copy.copy(contWeldL1_U3)
-                contWeldL2_L3 = copy.copy(contWeldL1_U3)
-                contWeldR1_U3 = copy.copy(contWeldL1_U3)
-                contWeldR1_L3 = copy.copy(contWeldL1_U3)
-                contWeldR2_U3 = copy.copy(contWeldL1_U3)
-                contWeldR2_L3 = copy.copy(contWeldL1_U3)
-                contWeldL1_U1 = copy.copy(contWeldL1_U3)
-                contWeldL1_L1 = copy.copy(contWeldL1_U3)
-                contWeldL2_U1 = copy.copy(contWeldL1_U3)
-                contWeldL2_L1 = copy.copy(contWeldL1_U3)
-                contWeldR1_U1 = copy.copy(contWeldL1_U3)
-                contWeldR1_L1 = copy.copy(contWeldL1_U3)
-                contWeldR2_U1 = copy.copy(contWeldL1_U3)
-                contWeldR2_L1 = copy.copy(contWeldL1_U3)
                 #######################################
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
@@ -2012,12 +2013,13 @@ class Maincontroller(QMainWindow):
                                         bbWeldAbvFlang_22,
                                         bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                         bbWeldBelwFlang_24,
-                                        bbWeldSideWeb_21, bbWeldSideWeb_22,contWeldL1_U2 ,contWeldL2_U2,contWeldL1_L2 ,contWeldL2_L2,
-                 contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,contWeldL1_U3,contWeldL1_L3,contWeldL2_U3,contWeldL2_L3,
-                 contWeldR1_U3, contWeldR1_L3, contWeldR2_U3,
-                 contWeldR2_L3,contWeldL1_U1,contWeldL1_L1,contWeldL2_U1,contWeldL2_L1,
-                 contWeldR1_U1, contWeldR1_L1, contWeldR2_U1,
-                 contWeldR2_L1,
+                                        bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                        contWeldL1_U2 ,contWeldL2_U2,contWeldL1_L2 ,contWeldL2_L2,
+                                        contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,
+                                        contWeldL1_U3,contWeldL1_L3,contWeldL2_U3,contWeldL2_L3,
+                                        contWeldR1_U3, contWeldR1_L3, contWeldR2_U3,contWeldR2_L3,
+                                        contWeldL1_U1,contWeldL1_L1,contWeldL2_U1,contWeldL2_L1,
+                                        contWeldR1_U1, contWeldR1_L1, contWeldR2_U1,contWeldR2_L1,
                                         bcWeldStiffHL_1,bcWeldStiffHL_2,bcWeldStiffHR_1,bcWeldStiffHR_2,
                                         bcWeldStiffLL_1,bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
@@ -2042,6 +2044,12 @@ class Maincontroller(QMainWindow):
                                         bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
                                         bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
                                         bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
+                                        contWeldL1_U2, contWeldL2_U2, contWeldL1_L2, contWeldL2_L2,
+                                        contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,
+                                        contWeldL1_U3, contWeldL1_L3, contWeldL2_U3, contWeldL2_L3,
+                                        contWeldR1_U3, contWeldR1_L3, contWeldR2_U3, contWeldR2_L3,
+                                        contWeldL1_U1, contWeldL1_L1, contWeldL2_U1, contWeldL2_L1,
+                                        contWeldR1_U1, contWeldR1_L1, contWeldR2_U1, contWeldR2_L1,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
                                         contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type, outputobj)
                 extbothWays.create_3DModel()
@@ -2126,6 +2134,12 @@ class Maincontroller(QMainWindow):
                                                        bcWeldStiffHR_2,
                                                        bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
                                                        bcWeldStiffLR_2,
+                                                       contWeldL1_U2, contWeldL2_U2, contWeldL1_L2, contWeldL2_L2,
+                                                       contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,
+                                                       contWeldL1_U3, contWeldL1_L3, contWeldL2_U3, contWeldL2_L3,
+                                                       contWeldR1_U3, contWeldR1_L3, contWeldR2_U3, contWeldR2_L3,
+                                                       contWeldL1_U1, contWeldL1_L1, contWeldL2_U1, contWeldL2_L1,
+                                                       contWeldR1_U1, contWeldR1_L1, contWeldR2_U1, contWeldR2_L1,
                                                        contPlate_L1, contPlate_L2, contPlate_R1,
                                                        contPlate_R2, beam_stiffener_1, beam_stiffener_2, endplate_type,
                                                        outputobj)

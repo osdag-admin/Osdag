@@ -1734,8 +1734,6 @@ class Maincontroller(QMainWindow):
         column_data = self.fetchColumnPara()
         beam_data = self.fetchBeamPara()
 
-        # TODO check if column data is working
-
         column_tw = float(column_data["tw"])
         column_T = float(column_data["T"])
         column_d = float(column_data["D"])
@@ -1772,10 +1770,6 @@ class Maincontroller(QMainWindow):
 
         alist = self.designParameters()  # An object to save all input values entered by user
 
-        # TODO make dictionary for the contPlates
-        # TODO adding enpplate type and check if code is working
-        # TODO added connectivity type here
-
         if alist['Member']['Connectivity'] == "Column web-Beam web":
             conn_type = 'col_web_connectivity'
         else:  # "Column flange-Beam web"
@@ -1807,15 +1801,6 @@ class Maincontroller(QMainWindow):
 
         beam_stiffener_2 = copy.copy(beam_stiffener_1)
 
-        # contPlate_L1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_L2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_R1 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-        # contPlate_R2 = Plate(W=(float(column_data["B"]) - float(column_data["tw"])) / 2,
-        # 					 L=float(column_data["D"]) - 2 * float(column_data["T"]), T=float(column_data["T"]))
-
         bolt_d = float(alist["Bolt"]["Diameter (mm)"])  # Bolt diameter, entered by user
         bolt_r = bolt_d / 2
         bolt_T = self.bolt_head_thick_calculation(bolt_d)
@@ -1829,7 +1814,6 @@ class Maincontroller(QMainWindow):
 
         numberOfBolts = int(outputobj["Bolt"]["NumberOfBolts"])
 
-        # TODO remove all the clutter later
 
         # nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
         if conn_type == 'col_flange_connectivity':
@@ -1951,14 +1935,6 @@ class Maincontroller(QMainWindow):
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
 
-                # extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-                # 						bbWeldAbvFlang_22,
-                # 						bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-                # 						bbWeldBelwFlang_24,
-                # 						bbWeldSideWeb_21, bbWeldSideWeb_22,
-                # 						contPlate_L1, contPlate_L2, contPlate_R1,
-                # 						contPlate_R2, endplate_type, conn_type)
-
                 col_web_connectivity = CADColWebFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray,bolt,
                                                        bbWeldAbvFlang_21,
                                                        bbWeldAbvFlang_22,
@@ -2006,21 +1982,6 @@ class Maincontroller(QMainWindow):
 
                 return col_web_connectivity
 
-    #######################################
-    #       WELD SECTIONS QUARTER CONE    #
-    #######################################
-
-    # # Following weld cones are placed for Left beam
-
-    # extbothWays = CADFillet(beam_Left, beam_Right, plate_Right, bbNutBoltArray, bbWeldAbvFlang_21,
-    # 							   bbWeldAbvFlang_22,
-    # 							   bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
-    # 							   bbWeldBelwFlang_24,
-    # 							   bbWeldSideWeb_21, bbWeldSideWeb_22, bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3, contPlate_L1, contPlate_L2, contPlate_R1,
-    # 							   contPlate_R2, endplate_type, weld_method)
-    # extbothWays.create_3DModel()
-    #
-    # return extbothWays
 
     def bolt_head_thick_calculation(self, bolt_diameter):
         '''
@@ -2164,12 +2125,11 @@ class Maincontroller(QMainWindow):
         if component == "Column":
             self.display.View_Iso()
             osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-        # osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
 
         elif component == "Beam":
             self.display.View_Iso()
-            # osdag_display_shape(self.display, self.ExtObj.get_beamLModel(), update=True)
-            osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True)  # , color = 'Dark Gray'
+
+            osdag_display_shape(self.display, self.ExtObj.get_beamRModel(), update=True,material=Graphic3d_NOT_2D_ALUMINUM)
 
         elif component == "Connector":
             self.display.View_Iso()
@@ -2197,7 +2157,7 @@ class Maincontroller(QMainWindow):
                     osdag_display_shape(self.display, self.ExtObj.get_beam_stiffener_2Model(), update=True,color='Blue')
 
                     #weld section for the above stiffeners
-                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,olor='Red')
+                    osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_1Model(), update=True,color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHL_2Model(), update=True,color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_1Model(), update=True,color='Red')
                     osdag_display_shape(self.display, self.ExtObj.get_bcWeldStiffHR_2Model(), update=True,color='Red')

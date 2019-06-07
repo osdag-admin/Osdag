@@ -11,6 +11,9 @@ from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bc_endplate_calc import bc_endplate_design
+import bc_endplate_calc as db_value
+from ui_weld_details_1 import Ui_Weld_Details_1
+from ui_weld_details_2 import Ui_Weld_Details_2
 from reportGenerator import save_html
 from drawing_2D import ExtendedEndPlate
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
@@ -249,8 +252,13 @@ class PlateDetails(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
-        self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
-        self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
+
+        self.ui.txt_plateno.setText(str(resultObj_plate['ContPlateTens']['Number']))
+        self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateTens']['Width']))
+        self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateTens']['Length']))
+        self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateTens']['Thickness']))
+        self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['ThicknessMin']))#Notch Size ??
+        self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateTens']['Weld']))
 
 class PlateDetailsBottom(QDialog):
     def __init__(self, parent=None):
@@ -261,8 +269,13 @@ class PlateDetailsBottom(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
-        #self.ui.txt_plateWidth.setText(str(resultObj_plate["Plate"]["Width"]))
-        #self.ui.txt_plateLength.setText(str(resultObj_plate["Plate"]["Height"]))
+
+        self.ui.txt_plateno.setText(str(resultObj_plate['ContPlateComp']['Number']))
+        self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateComp']['Width']))
+        self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateComp']['Length']))
+        self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateComp']['Thickness']))
+        self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['ThicknessMin']))
+        self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateComp']['Weld']))
 
 
 # self.ui.txt_plateDemand.setText(str(resultObj_plate["Plate"]["MomentDemand"]))
@@ -278,9 +291,14 @@ class Stiffener(QDialog):
 
         uiObj = self.maincontroller.designParameters()
         resultObj_plate = bc_endplate_design(uiObj)
+
+        self.ui.txt_stiffnrNo.setText(str(resultObj_plate['Stiffener']['Number']))
         self.ui.txt_stiffnrHeight.setText(str(resultObj_plate["Stiffener"]["Height"]))
         self.ui.txt_stiffnrLength.setText(str(resultObj_plate["Stiffener"]["Length"]))
         self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
+        self.ui.txt_stiffnrNotchAtTop.setText(str(resultObj_plate['Stiffener']['NotchTop']))
+        self.ui.txt_stiffnrNotchAtBottom.setText(str(resultObj_plate['Stiffener']['NotchBottom']))
+        self.ui.txt_stiffnrWeldSize.setText(str(resultObj_plate['Stiffener']['Weld']))
 
 
 class Pitch(QDialog):
@@ -523,6 +541,48 @@ class Pitch(QDialog):
         else:
             pass
 
+class WeldDetails(QDialog):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        self.maincontroller = parent
+        if self.maincontroller.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+            self.ui = Ui_Weld_Details_1()
+            self.ui.setupUi(self)
+        elif self.maincontroller.ui.combo_weld_method.currentText() == "Fillet Weld":
+            self.ui = Ui_Weld_Details_2()
+            self.ui.setupUi(self)
+        else:
+            pass
+
+        
+
+        uiObj = self.maincontroller.designParameters()
+        self.resultObj_plate = bc_endplate_design(uiObj)
+
+        if self.maincontroller.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+            self.groovewelddetails()
+        else:
+            self.filletwelddetials()
+
+    def groovewelddetails(self):
+        self.ui.label_note_1.setText("All dimensions are in mm.")
+        if db_value.beam_tf <= 12:
+            self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_flange.png"))
+            self.ui.label_note_2.setText("As flange thickness, tf (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+        else:
+            self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_flange.png"))
+            self.ui.label_note_2.setText("As flange thickness, tf (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+        if db_value.beam_tw <= 12:
+            self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_web.png"))
+            self.ui.label_note_3.setText("As web thickness, tw (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+        else:
+            self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
+            self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+    def filletwelddetials(self):
+        self.ui.lineEdit_flange_critical_stress.setText(str(self.resultObj_plate["Weld"]["FlangeStress"]))
+        self.ui.lineEdit_flange_strength.setText(str(self.resultObj_plate["Weld"]["FlangeStrength"]))
+        self.ui.lineEdit_web_critical_stress.setText(str(self.resultObj_plate["Weld"]["WebStress"]))
+        self.ui.lineEdit_web_strength.setText(str(self.resultObj_plate["Weld"]["WebStrength"]))
 
 class DesignReportDialog(QDialog):
     def __init__(self, parent=None):
@@ -652,7 +712,10 @@ class Maincontroller(QMainWindow):
 
         self.ui.btn_Design.clicked.connect(self.design_btnclicked)
         self.ui.btn_Design.clicked.connect(self.osdag_header)
-
+        self.ui.btn_Design.clicked.connect(self.image1)
+        self.ui.btn_Design.clicked.connect(self.image2)
+        self.ui.btn_Design.clicked.connect(self.image3)
+        self.ui.btn_Design.clicked.connect(self.image4)
         self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
         self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
         self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -683,7 +746,7 @@ class Maincontroller(QMainWindow):
         self.ui.actionDesign_examples.triggered.connect(self.design_examples)
         self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
         #self.ui.combo_weld_method.triggered.connect(self.on_change)
-
+        self.ui.btn_Weld.clicked.connect(self.weld_details)
         self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
         self.ui.btn_plateDetail.clicked.connect(self.plate_details)
         self.ui.btn_plateDetail_2.clicked.connect(self.plate_details_bottom)
@@ -898,6 +961,22 @@ class Maincontroller(QMainWindow):
     def osdag_header(self):
         image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
         shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
+
+    def image1(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_flange.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_flange.png"))
+
+    def image2(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_web.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_web.png"))
+
+    def image3(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_web.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_web.png"))
+
+    def image4(self):
+        image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_flange.png")))
+        shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_flange.png"))
 
     def design_prefer(self):
         self.designPrefDialog.show()
@@ -1318,6 +1397,7 @@ class Maincontroller(QMainWindow):
         self.ui.txt_crossGauge.clear()
         self.ui.txt_endDist.clear()
         self.ui.txt_edgeDist.clear()
+
         self.ui.btn_pitchDetail.setDisabled(True)
         self.ui.btn_plateDetail.setDisabled(True)
         self.ui.btn_plateDetail_2.setDisabled(True)
@@ -1562,6 +1642,10 @@ class Maincontroller(QMainWindow):
 
     def pitch_details(self):
         section = Pitch(self)
+        section.show()
+    
+    def weld_details(self):
+        section = WeldDetails(self)
         section.show()
 
     def plate_details(self):

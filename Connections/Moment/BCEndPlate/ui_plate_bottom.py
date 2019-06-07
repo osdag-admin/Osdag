@@ -90,7 +90,7 @@ class Ui_Plate_Bottom(object):
 
     def retranslateUi(self, Plate_Bottom):
         _translate = QtCore.QCoreApplication.translate
-        Plate_Bottom.setWindowTitle(_translate("Plate_Bottom", "Plate"))
+        Plate_Bottom.setWindowTitle(_translate("Plate_Bottom", "Bottom Continuity Plate"))
         self.plateHeight.setText(_translate("Plate_Bottom", "Length (mm)"))
         self.label.setText(_translate("Plate_Bottom", "Number"))
         self.label_2.setText(_translate("Plate_Bottom", "Width (mm)"))

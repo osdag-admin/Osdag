@@ -140,8 +140,9 @@ def bc_endplate_design(uiObj):
     #    beam_R1 - Radius of beam at root
 
     dictbeamdata = get_beamdata(beam_sec)
-
+    global beam_tw
     beam_tw = float(dictbeamdata["tw"])
+    global beam_tf
     beam_tf = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
@@ -561,7 +562,7 @@ def bc_endplate_design(uiObj):
             ultimate_stresses=[beam_fu, weld_fu], fabrication=weld_fabrication)
 
         #  Design forces per unit length of welds due to applied loads
-
+        """
         weld_force_axial = factored_axial_load / (
                 2 * (flange_weld_effective_length_top * flange_weld_long_joint_top +
                     2 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
@@ -571,7 +572,7 @@ def bc_endplate_design(uiObj):
         weld_force_moment = flange_tension_moment / (flange_weld_effective_length_top +
                                                              2 * flange_weld_effective_length_bottom)
         weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
-
+        
         # check for weld strength
 
         flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
@@ -580,6 +581,38 @@ def bc_endplate_design(uiObj):
 
         web_weld_stress = math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_throat_size
         web_weld_throat_reqd = round(math.sqrt(weld_force_axial ** 2 + weld_force_shear ** 2) / web_weld_strength, 3)
+        web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
+
+        """
+        """
+        axial force is taken by flange and web welds = P/(2*lw+ltf+lbf)
+        shear force is taken by web welds only = V/(2*lw)
+        moment is taken by both flange and web welds = M/Z 
+        z = ltf*lw/2 + lbf*lw/2 + d^2/3 
+        """
+
+        weld_force_axial = factored_axial_load / (
+                    flange_weld_effective_length_top * flange_weld_long_joint_top +
+                    flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *
+                    web_weld_effective_length * web_weld_long_joint)
+
+        flange_tension_moment = factored_moment / (beam_d - beam_tf)
+        weld_force_moment = flange_tension_moment / (
+                flange_weld_effective_length_top * flange_weld_long_joint_top * web_weld_effective_length / 2 +
+                flange_weld_effective_length_bottom * flange_weld_long_joint_bottom * web_weld_effective_length / 2 +
+                web_weld_effective_length**2/3)
+        weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
+
+        # check for weld strength
+
+        flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
+        flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+        flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
+
+        web_weld_stress = math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) / \
+                          web_weld_throat_size
+        web_weld_throat_reqd = round(math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) /
+                                     web_weld_strength, 3)
         web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
 
         if flange_weld_stress >= flange_weld_strength:
@@ -599,8 +632,10 @@ def bc_endplate_design(uiObj):
             logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'
-        groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            beam_tf, beam_tw, end_plate_thickness)
+        groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            beam_tf, end_plate_thickness)
+        groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            beam_tw, end_plate_thickness)
 
     # Continuity Plates
     cont_plate_fu = beam_fu
@@ -771,18 +806,21 @@ def bc_endplate_design(uiObj):
     outputobj['Plate']['ThickRequired'] = float(round(end_plate_thickness_min, 3))
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
+    outputobj['ContPlateComp']['Number'] = 2
     outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
     outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
     outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
     outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
+    outputobj['ContPlateTens']['Number'] = 2
     outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
     outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
     outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
+    outputobj['Stiffener']['Number'] = 2
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
@@ -875,7 +913,7 @@ def bc_endplate_design(uiObj):
 
     if weld_method == 'fillet':
         outputobj["Weld"]["FlangeSizeMin"] = float(round(flange_weld_size_min, 3))
-        outputobj["Weld"]["FlangeSizeMax"] = float(round(flange_weld_throat_max, 3))
+        outputobj["Weld"]["FlangeSizeMax"] = float(round(flange_weld_size_max, 3))
         outputobj["Weld"]["FlangeLengthTop"] = float(round(flange_weld_effective_length_top, 3))
         outputobj["Weld"]["FlangeLengthBottom"] = float(round(flange_weld_effective_length_bottom, 3))
         outputobj["Weld"]["FlangeThroat"] = float(round(flange_weld_throat_size, 3))
@@ -884,7 +922,7 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["FlangeStrength"] = float(round(flange_weld_strength, 3))
 
         outputobj["Weld"]["WebSizeMin"] = float(round(web_weld_size_min, 3))
-        outputobj["Weld"]["WebSizeMax"] = float(round(web_weld_throat_max, 3))
+        outputobj["Weld"]["WebSizeMax"] = float(round(web_weld_size_max, 3))
         outputobj["Weld"]["WebLength"] = float(round(web_weld_effective_length, 3))
         outputobj["Weld"]["WebThroat"] = float(round(web_weld_throat_size, 3))
         outputobj["Weld"]["WebThroatMin"] = float(round(web_weld_throat_reqd, 3))
@@ -892,7 +930,9 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["WebStrength"] = float(round(web_weld_strength, 3))
 
     else:  # weld_method == 'groove':
-        outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
+        outputobj["Weld"]["FlangeSize"] = float(round(groove_weld_size_flange, 3))
+        outputobj["Weld"]["WebSize"] = float(round(groove_weld_size_web, 3))
+
 
     # End of SAMPLE Output dictionary
 

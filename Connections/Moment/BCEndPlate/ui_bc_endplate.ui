@@ -3525,12 +3525,12 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Groove Weld (CJP)</string>
+       <string>Fillet Weld</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Fillet Weld</string>
+       <string>Groove Weld (CJP)</string>
       </property>
      </item>
     </widget>

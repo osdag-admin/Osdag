@@ -246,6 +246,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
 
     else:
+        weld_size = str(float(outObj["Weld"]["Size"]))
         groove_weld_size_flange = str(float(outObj["Weld"]["FlangeSize"]))
         groove_weld_size_web = str(float(outObj["Weld"]["WebSize"]))
 
@@ -867,25 +868,25 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('/tr')
 
 
-    row = [0, "Assembly ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    if connectivity == "Column flange-Beam web":
-        row = [1, "Beam-Column flange Clearance (mm)", plate_thk]
-    else:
-        row = [1, "Beam-Column web Clearance (mm)", plate_thk]
-
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
-    row = [1,"Note :- Here clearance is the thickness of the plate which lies between beam and column. "," "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    # row = [0, "Assembly ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # if connectivity == "Column flange-Beam web":
+    #     row = [1, "Beam-Column flange Clearance (mm)", plate_thk]
+    # else:
+    #     row = [1, "Beam-Column web Clearance (mm)", plate_thk]
+    #
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
+    # row = [1,"Note :- Here clearance is the thickness of the plate which lies between beam and column. "," "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # page break
     rstr += t('/table')
@@ -1633,6 +1634,18 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
     rstr += t('tr')
 
+    if weld_method == "Groove Weld (CJP)":
+        row = [0, "Gap between beam and plate","Refernce: IS 9595:1996, Annex B",weld_size,""]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+    else:
+        rstr += t('/tr')
+        # row = [0,"","","",""]
+
+
   # flange web checks
     row = [0, "Flange", " "]
     rstr += t('tr')
@@ -1687,7 +1700,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                        "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
-        row = [0,"Weld Size at Flange (mm)","min(beam flange thickness, end plate thickness) = min(" +beam_tf+ " , "+plate_thk+")" ,groove_weld_size_flange,""]
+        row = [0,"Weld Size at Flange (mm)","min(beam flange thickness, end plate thickness) = min(" +str(float(beam_tf)) + " , "+str(float(plate_thk))+")" ,groove_weld_size_flange,""]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1763,7 +1776,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                        " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
-        row = [0, "Weld Size at Web (mm)","min(beam web thickness, plate thickness) = min("+beam_tw+" , "+plate_thk+")", groove_weld_size_web, ""]
+        row = [0, "Weld Size at Web (mm)","min(beam web thickness, plate thickness) = min("+ str(float(beam_tw)) +" , "+ str(float(plate_thk)) + ")", groove_weld_size_web, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

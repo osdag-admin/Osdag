@@ -2026,13 +2026,11 @@ class Maincontroller(QMainWindow):
                 return extbothWays
 
             else:  # Groove Weld
-                bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),
-                                           L=beam_B)
+                bcWeldFlang_1 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["T"]),L=beam_B)
                 bcWeldFlang_2 = copy.copy(bcWeldFlang_1)
 
                 # Followings welds are welds placed aside of beam web, Qty = 4 			# edited length value by Anand Swaroop
-                bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]),
-                                         L=beam_d - 2 * beam_T)
+                bcWeldWeb_3 = GrooveWeld(b=outputobj["Weld"]["Size"], h=float(beam_data["tw"]), L=beam_d - 2 * beam_T)
 
                 #######################################
                 #       WELD SECTIONS QUARTER CONE    #

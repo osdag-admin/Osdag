@@ -632,8 +632,10 @@ def bc_endplate_design(uiObj):
             logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'
-        groove_weld_size = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
-            beam_tf, beam_tw, end_plate_thickness)
+        groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            beam_tf, end_plate_thickness)
+        groove_weld_size_web = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
+            beam_tw, end_plate_thickness)
 
     # Continuity Plates
     cont_plate_fu = beam_fu
@@ -911,7 +913,7 @@ def bc_endplate_design(uiObj):
 
     if weld_method == 'fillet':
         outputobj["Weld"]["FlangeSizeMin"] = float(round(flange_weld_size_min, 3))
-        outputobj["Weld"]["FlangeSizeMax"] = float(round(flange_weld_throat_max, 3))
+        outputobj["Weld"]["FlangeSizeMax"] = float(round(flange_weld_size_max, 3))
         outputobj["Weld"]["FlangeLengthTop"] = float(round(flange_weld_effective_length_top, 3))
         outputobj["Weld"]["FlangeLengthBottom"] = float(round(flange_weld_effective_length_bottom, 3))
         outputobj["Weld"]["FlangeThroat"] = float(round(flange_weld_throat_size, 3))
@@ -920,7 +922,7 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["FlangeStrength"] = float(round(flange_weld_strength, 3))
 
         outputobj["Weld"]["WebSizeMin"] = float(round(web_weld_size_min, 3))
-        outputobj["Weld"]["WebSizeMax"] = float(round(web_weld_throat_max, 3))
+        outputobj["Weld"]["WebSizeMax"] = float(round(web_weld_size_max, 3))
         outputobj["Weld"]["WebLength"] = float(round(web_weld_effective_length, 3))
         outputobj["Weld"]["WebThroat"] = float(round(web_weld_throat_size, 3))
         outputobj["Weld"]["WebThroatMin"] = float(round(web_weld_throat_reqd, 3))
@@ -928,7 +930,9 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["WebStrength"] = float(round(web_weld_strength, 3))
 
     else:  # weld_method == 'groove':
-        outputobj["Weld"]["Size"] = float(round(groove_weld_size, 3))
+        outputobj["Weld"]["FlangeSize"] = float(round(groove_weld_size_flange, 3))
+        outputobj["Weld"]["WebSize"] = float(round(groove_weld_size_web, 3))
+
 
     # End of SAMPLE Output dictionary
 

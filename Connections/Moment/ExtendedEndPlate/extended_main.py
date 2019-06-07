@@ -105,6 +105,7 @@ class DesignPreference(QDialog):
 		self.ui.btn_close.clicked.connect(self.close_designPref)
 		self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
+
 	def save_designPref_para(self):
 		uiObj = self.maincontroller.get_user_inputs()
 		self.saved_designPref = {}
@@ -643,6 +644,10 @@ class Maincontroller(QMainWindow):
 		self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
 		self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
+		self.ui.actionfinPlate_quit.setShortcut('Ctrl+Q')
+		self.ui.actionfinPlate_quit.setStatusTip('Exit application')
+		self.ui.actionfinPlate_quit.triggered.connect(qApp.quit)
+
 		self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
 		self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 		self.ui.txt_Fu.textChanged.connect(self.call_weld_fu)
@@ -681,6 +686,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
+		self.ui.btn_SaveMessages.clicked.connect(self.save_log_messages)
 
 		self.ui.btn3D.clicked.connect(lambda : self.call_3DModel("gradient_bg"))
 		self.ui.chkBx_beamSec.clicked.connect(lambda : self.call_3DBeam("gradient_bg"))
@@ -1558,28 +1564,28 @@ class Maincontroller(QMainWindow):
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-	# def create_2D_CAD(self):
-	# 	'''
-	#
-	# 	Returns: The 3D model of extendedplate depending upon component selected
-	#
-	# 	'''
-	# 	self.ExtObj = self.create_extended_both_ways()
-	# 	if self.component == "Beam":
-	# 		final_model = self.ExtObj.get_beam_models()
-	#
-	# 	elif self.component == "Connector":
-	# 		cadlist = self.ExtObj.get_connector_models()
-	# 		final_model = cadlist[0]
-	# 		for model in cadlist[1:]:
-	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-	# 	else:
-	# 		cadlist = self.ExtObj.get_models()
-	# 		final_model = cadlist[0]
-	# 		for model in cadlist[1:]:
-	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-	#
-	# 	return final_model
+	def create_2D_CAD(self):
+		'''
+
+		Returns: The 3D model of extendedplate depending upon component selected
+
+		'''
+		self.ExtObj = self.create_extended_both_ways()
+		if self.component == "Beam":
+			final_model = self.ExtObj.get_beam_models()
+
+		elif self.component == "Connector":
+			cadlist = self.ExtObj.get_connector_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+		else:
+			cadlist = self.ExtObj.get_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+		return final_model
 
 	def save_3D_cad_images(self):
 		'''
@@ -2126,6 +2132,7 @@ class Maincontroller(QMainWindow):
 		dialog.show()
 
 	def design_examples(self):
+
 		root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
 		for html_file in os.listdir(root_path):
 			if html_file.startswith('index'):
@@ -2185,10 +2192,11 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 
 if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
+	set_osdaglogger()
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
 	# fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
-	fh = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+	fh = logging.FileHandler("Connections/Moment/ExtendedEndPlate/extnd.log", mode='w')
 
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)

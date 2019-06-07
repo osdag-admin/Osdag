@@ -222,8 +222,9 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         if float(number_of_bolts) <= 20:
 
             flange_weld_size_min = str(float(outObj["Weld"]["FlangeSizeMin"]))
-            flange_weld_throat_max = str(float(outObj["Weld"]["FlangeSizeMax"]))
+            flange_weld_size_max = str(float(outObj["Weld"]["FlangeSizeMax"]))
             flange_weld_throat_size = str(float(outObj["Weld"]["FlangeThroat"]))
+            flange_weld_size_provd = str(float(uiObj["Weld"]["Flange (mm)"]))
 
             flange_weld_stress = str(float(outObj["Weld"]["FlangeStress"]))
             flange_weld_strength = str(float(outObj["Weld"]["FlangeStrength"]))
@@ -236,15 +237,18 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             web_weld_strength = str(float(outObj["Weld"]["WebStrength"]))
 
             web_weld_size_min = str(float(outObj["Weld"]["WebSizeMin"]))
-            web_weld_throat_max = str(float(outObj["Weld"]["WebSizeMax"]))
+            web_weld_size_max = str(float(outObj["Weld"]["WebSizeMax"]))
             web_weld_throat_size = str(float(outObj["Weld"]["WebThroat"]))
+            web_weld_size_provd = str(float(uiObj["Weld"]["Web (mm)"]))
 
             web_weld_effective_length = str(float(outObj["Weld"]["WebLength"]))
 
 
 
     else:
-        groove_weld_size = str(float(outObj["Weld"]["Size"]))
+        groove_weld_size_flange = str(float(outObj["Weld"]["FlangeSize"]))
+        groove_weld_size_web = str(float(outObj["Weld"]["WebSize"]))
+
 
 # Calling pitch distance values from Output dict of calc file
     if endplate_type == 'Flush end plate':
@@ -1655,8 +1659,8 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
             rstr += t('/tr')
 
-            if float(flange_weld_throat_size) < float(flange_weld_size_min) or float(flange_weld_throat_size) > (flange_weld_throat_max):
-                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_throat_max) + ",""&#62; " + str(flange_weld_throat_max) , str(float(flange_weld_throat_size)), " <p align=left style=color:red><b>Fail</b></p>"]
+            if float(flange_weld_size_provd) < float(flange_weld_size_min) or float(flange_weld_size_provd) > (flange_weld_size_max):
+                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_size_max) + ",""&#62; " + str(flange_weld_size_min) , str(float(flange_weld_size_provd)), " <p align=left style=color:red><b>Fail</b></p>"]
                 rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1664,7 +1668,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                 rstr += t('/tr')
 
             else:
-                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_throat_max) + ",""&#62; " + str(flange_weld_throat_max) , str(float(flange_weld_throat_size)), " <p align=left style=color:red><b>Pass</b></p>"]
+                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_size_max) + ",""&#62; " + str(flange_weld_size_min) , str(float(flange_weld_size_provd)), " <p align=left style=color:green><b>Pass</b></p>"]
                 rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1674,16 +1678,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             if float(flange_weld_stress) > float(flange_weld_strength):
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
                        "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-                       flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
+                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
 
 
             else:
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
                        "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-                       flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
+                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
-        row = [0,"Weld Size at Flange (mm)","",groove_weld_size,""]
+        row = [0,"Weld Size at Flange (mm)","min(beam flange thickness, end plate thickness) = min(" +beam_tf+ " , "+plate_thk+")" ,groove_weld_size_flange,""]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1730,8 +1734,8 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
             rstr += t('/tr')
 
-            if float(web_weld_throat_size) < float(web_weld_size_min) or float(web_weld_throat_size) > (web_weld_throat_max):
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Fail</b></p>"]
+            if float(web_weld_size_provd) < float(web_weld_size_min) or float(web_weld_size_provd) > (web_weld_size_max):
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_max)+ ",""&#62; " + str(web_weld_size_min) , web_weld_size_provd, " <p align=left style=color:red><b>Fail</b></p>"]
                 rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1739,7 +1743,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                 rstr += t('/tr')
 
             else:
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Pass</b></p>"]
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_max)+ ",""&#62; " + str(web_weld_size_min) , web_weld_size_provd, " <p align=left style=color:green><b>Pass</b></p>"]
                 rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
                 rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
@@ -1759,7 +1763,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                        " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
-        row = [0, "Weld Size at Web (mm)","", groove_weld_size, ""]
+        row = [0, "Weld Size at Web (mm)","min(beam web thickness, plate thickness) = min("+beam_tw+" , "+plate_thk+")", groove_weld_size_web, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')

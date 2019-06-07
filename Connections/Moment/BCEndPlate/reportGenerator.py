@@ -503,7 +503,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Material", "Fe " + beam_fu]
+    row = [2, "Grade of Steel", "Fe " + beam_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -515,7 +515,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Material", "Fe " + column_fu]
+    row = [2, "Grade of Steel", "Fe " + column_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -552,7 +552,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Hole", bolt_hole_type]
+    row = [2, "Clearance hole for fasteners", bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -592,7 +592,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Grade", bolt_grade]
+    row = [2, "Property Class", bolt_grade]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -606,7 +606,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
     bolt_hole_dia = float(bolt_dia) + float(bolt_hole_clrnce)
     bolt_hole_dia_str = str(float(bolt_hole_dia))
-    row = [1, "Hole diameter (<i>d</i><sub>o</sub>) (mm)", bolt_hole_dia_str]
+    row = [2, "Hole diameter (<i>d</i><sub>o</sub>) (mm)", bolt_hole_dia_str]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -878,6 +878,10 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
+    row = [1,"Note :- Here clearance is the thickness of the plate which lies between beam and column. "," "]
+    rstr += t('tr')
+    rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('/tr')
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # page break
     rstr += t('/table')
@@ -2044,16 +2048,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                   '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="400" height = "400"></object>' % png
+        datapng = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="400" ></object>' % side
+        dataside = '<object type="image/PNG" data= %s height = "480px" width = "auto" ></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+        datatop = '<object type="image/PNG" data= %s height = "360px" width = "560px" ></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+        datafront = '<object type="image/PNG" data= %s height = "480px" width = "auto" ></object>' % front
 
         if status == 'True':
             row = [0, datapng]
@@ -2084,16 +2088,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                   '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="500"></object>' % png
+        datapng = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="700" height="500" ></object>' % side
+        dataside = '<object type="image/PNG" data= %s height = "450px" width = "560px" ></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="500"  ></object>' % top
+        datatop = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="400"> height = "400"</object>' % front
+        datafront = '<object type="image/PNG" data= %s height = "450px" width = "560px" </object>' % front
 
         if status == 'True':
             row = [1, dataside]

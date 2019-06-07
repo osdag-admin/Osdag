@@ -96,10 +96,6 @@ class CADFillet(object):
         self.create_nut_bolt_array()
         self.create_contPlate_L1Geometry()
         self.create_contPlate_L2Geometry()
-        self.create_contPlate_R1Geometry()
-        self.create_contPlate_R2Geometry()
-        self.create_beam_stiffener_1Geometry()
-        self.create_beam_stiffener_2Geometry()
 
         self.create_bbWeldAbvFlang_21()  # left beam above flange weld
         self.create_bbWeldAbvFlang_22()  # left beam above 2nd (lower) flange
@@ -111,6 +107,7 @@ class CADFillet(object):
 
         self.create_bbWeldSideWeb_21()  # right beam weld behind left beam
         self.create_bbWeldSideWeb_22()  # right beam weld behind left beam
+
 
         self.create_contWeldL1_U2()
         self.create_contWeldL2_U2()
@@ -148,6 +145,7 @@ class CADFillet(object):
         self.create_bcWeldStiffLR_2()
 
 
+
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
         self.beamRModel = self.beamRight.create_model()
@@ -155,10 +153,6 @@ class CADFillet(object):
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
         self.contPlate_L1Model = self.contPlate_L1.create_model()
         self.contPlate_L2Model = self.contPlate_L2.create_model()
-        self.contPlate_R1Model = self.contPlate_R1.create_model()
-        self.contPlate_R2Model = self.contPlate_R2.create_model()
-        self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
-        self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
 
         self.bbWeldAbvFlang_21Model = self.bbWeldAbvFlang_21.create_model()
         self.bbWeldAbvFlang_22Model = self.bbWeldAbvFlang_22.create_model()
@@ -170,6 +164,7 @@ class CADFillet(object):
 
         self.bbWeldSideWeb_21Model = self.bbWeldSideWeb_21.create_model()
         self.bbWeldSideWeb_22Model = self.bbWeldSideWeb_22.create_model()
+
 
         self.contWeldL1_U2Model = self.contWeldL1_U2.create_model()
         self.contWeldL2_U2Model = self.contWeldL2_U2.create_model()
@@ -201,10 +196,45 @@ class CADFillet(object):
         self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
         self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
 
-        self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
-        self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
-        self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
-        self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
+
+
+        if self.conn_type == 'col_flange_connectivity':
+            self.create_contPlate_R1Geometry()
+            self.create_contPlate_R2Geometry()
+
+            self.contPlate_R1Model = self.contPlate_R1.create_model()
+            self.contPlate_R2Model = self.contPlate_R2.create_model()
+
+
+        if self.endplate_type == "one_way" or self.endplate_type == "both_way":
+
+            self.create_beam_stiffener_1Geometry()
+
+            self.create_bcWeldStiffHL_1()
+            self.create_bcWeldStiffHR_1()
+            self.create_bcWeldStiffLL_1()
+            self.create_bcWeldStiffLR_1()
+
+            self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
+
+            self.bcWeldStiffHL_1Model = self.bcWeldStiffHL_1.create_model()
+            self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
+            self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
+            self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
+
+        if self.endplate_type == "both_way":
+            self.create_beam_stiffener_2Geometry()
+
+            self.create_bcWeldStiffHL_2()
+            self.create_bcWeldStiffHR_2()
+            self.create_bcWeldStiffLL_2()
+            self.create_bcWeldStiffLR_2()
+
+            self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
+            self.bcWeldStiffHL_2Model = self.bcWeldStiffHL_2.create_model()
+            self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
+            self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
+            self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
 
     #############################################################################################################
@@ -262,7 +292,8 @@ class CADFillet(object):
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.plateRight.L / 2])
+            # nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.plateRight.L / 2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, 0.5 * self.plateRight.T, self.plateRight.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -621,7 +652,6 @@ class CADFillet(object):
             final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
         return final_column
 
-
     def get_beamRModel(self):
         return self.beamRModel
 
@@ -891,7 +921,7 @@ class CADGroove(object):
     def __init__(self, beamLeft, beamRight, plateRight, nut_bolt_array,bolt,  bcWeldFlang_1, bcWeldFlang_2, bcWeldWeb_3,
                  bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1, bcWeldStiffHR_2,
                  bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
-                 contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj):
+                 contPlate_L1,contPlate_L2,contPlate_R1,contPlate_R2,beam_stiffener_1,beam_stiffener_2, endplate_type, outputobj,conn_type):
 
         # Initializing the arguments
         self.beamLeft = beamLeft                            # beamLeft represents the column
@@ -908,6 +938,7 @@ class CADGroove(object):
         self.beam_stiffener_2 = beam_stiffener_2
         self.endplate_type = endplate_type
         self.outputobj = outputobj
+        self.conn_type = conn_type
         self.boltProjection = float(outputobj["Bolt"]['projection'])  # gives the bolt projection
         # self.Lv = float(outputobj["Bolt"]["Lv"])
 
@@ -929,9 +960,6 @@ class CADGroove(object):
         self.bcWeldStiffLR_1 = bcWeldStiffLR_1
         self.bcWeldStiffLR_2 = bcWeldStiffLR_2
 
-
-
-
     def create_3DModel(self):
         """
         :return: CAD model of each entity such as Left beam, right beam, both end plates and so on
@@ -942,26 +970,10 @@ class CADGroove(object):
         self.create_nut_bolt_array()
         self.create_contPlate_L1Geometry()
         self.create_contPlate_L2Geometry()
-        self.create_contPlate_R1Geometry()
-        self.create_contPlate_R2Geometry()
-        self.create_beam_stiffener_1Geometry()
-        self.create_beam_stiffener_2Geometry()
-
 
         self.create_bcWeldFlang_1()
         self.create_bcWeldFlang_2()
         self.create_bcWeldWeb_3()
-
-        self.create_bcWeldStiffHL_1()
-        self.create_bcWeldStiffHL_2()
-        self.create_bcWeldStiffHR_1()
-        self.create_bcWeldStiffHR_2()
-
-        self.create_bcWeldStiffLL_1()
-        self.create_bcWeldStiffLL_2()
-        self.create_bcWeldStiffLR_1()
-        self.create_bcWeldStiffLR_2()
-
 
         # call for create_model of filletweld from Components directory
         self.beamLModel = self.beamLeft.create_model()
@@ -970,24 +982,48 @@ class CADGroove(object):
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
         self.contPlate_L1Model = self.contPlate_L1.create_model()
         self.contPlate_L2Model = self.contPlate_L2.create_model()
-        self.contPlate_R1Model = self.contPlate_R1.create_model()
-        self.contPlate_R2Model = self.contPlate_R2.create_model()
-        self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
-        self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
 
         self.bcWeldFlang_1Model =  self.bcWeldFlang_1.create_model()
         self.bcWeldFlang_2Model = self.bcWeldFlang_2.create_model()
         self.bcWeldWeb_3Model = self.bcWeldWeb_3.create_model()
 
-        self.bcWeldStiffHL_1Model = self.bcWeldStiffHL_1.create_model()
-        self.bcWeldStiffHL_2Model = self.bcWeldStiffHL_2.create_model()
-        self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
-        self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
 
-        self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
-        self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
-        self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
-        self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
+        if self.conn_type == 'col_flange_connectivity':
+            self.create_contPlate_R1Geometry()
+            self.create_contPlate_R2Geometry()
+
+            self.contPlate_R1Model = self.contPlate_R1.create_model()
+            self.contPlate_R2Model = self.contPlate_R2.create_model()
+
+        if self.endplate_type == "one_way" or self.endplate_type == "both_way":
+            self.create_beam_stiffener_1Geometry()
+
+            self.create_bcWeldStiffHL_1()
+            self.create_bcWeldStiffHR_1()
+            self.create_bcWeldStiffLL_1()
+            self.create_bcWeldStiffLR_1()
+
+            self.beam_stiffener_1Model = self.beam_stiffener_1.create_model()
+
+            self.bcWeldStiffHL_1Model = self.bcWeldStiffHL_1.create_model()
+            self.bcWeldStiffHR_1Model = self.bcWeldStiffHR_1.create_model()
+            self.bcWeldStiffLL_1Model = self.bcWeldStiffLL_1.create_model()
+            self.bcWeldStiffLR_1Model = self.bcWeldStiffLR_1.create_model()
+
+        if self.endplate_type == "both_way":
+            self.create_beam_stiffener_2Geometry()
+
+            self.create_bcWeldStiffHL_2()
+            self.create_bcWeldStiffHR_2()
+            self.create_bcWeldStiffLL_2()
+            self.create_bcWeldStiffLR_2()
+
+            self.beam_stiffener_2Model = self.beam_stiffener_2.create_model()
+
+            self.bcWeldStiffHL_2Model = self.bcWeldStiffHL_2.create_model()
+            self.bcWeldStiffHR_2Model = self.bcWeldStiffHR_2.create_model()
+            self.bcWeldStiffLL_2Model = self.bcWeldStiffLL_2.create_model()
+            self.bcWeldStiffLR_2Model = self.bcWeldStiffLR_2.create_model()
 
 #############################################################################################################
 #   Following functions takes inputs as origin, u direction and w direction of concerned component to place #

@@ -1863,6 +1863,34 @@ class Maincontroller(QMainWindow):
         contPlate_R1 = copy.copy(contPlate_L1)
         contPlate_R2 = copy.copy(contPlate_L2)
 
+        contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
+        contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["D"]) - 2 * float(column_data["T"]))
+        contWeldL1_L2 = copy.copy(contWeldL2_U2)
+        contWeldL2_L2 = copy.copy(contWeldL2_U2)
+        contWeldR1_U2 = copy.copy(contWeldL2_U2)
+        contWeldR2_U2 = copy.copy(contWeldL2_U2)
+        contWeldR1_L2 = copy.copy(contWeldL2_U2)
+        contWeldR2_L2 = copy.copy(contWeldL2_U2)
+        contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                   L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
+        contWeldL1_L3 = copy.copy(contWeldL1_U3)
+        contWeldL2_U3 = copy.copy(contWeldL1_U3)
+        contWeldL2_L3 = copy.copy(contWeldL1_U3)
+        contWeldR1_U3 = copy.copy(contWeldL1_U3)
+        contWeldR1_L3 = copy.copy(contWeldL1_U3)
+        contWeldR2_U3 = copy.copy(contWeldL1_U3)
+        contWeldR2_L3 = copy.copy(contWeldL1_U3)
+        contWeldL1_U1 = copy.copy(contWeldL1_U3)
+        contWeldL1_L1 = copy.copy(contWeldL1_U3)
+        contWeldL2_U1 = copy.copy(contWeldL1_U3)
+        contWeldL2_L1 = copy.copy(contWeldL1_U3)
+        contWeldR1_U1 = copy.copy(contWeldL1_U3)
+        contWeldR1_L1 = copy.copy(contWeldL1_U3)
+        contWeldR2_U1 = copy.copy(contWeldL1_U3)
+        contWeldR2_L1 = copy.copy(contWeldL1_U3)
+
         beam_stiffener_1 = StiffenerPlate(W=outputobj['Stiffener']['Height'], L=outputobj['Stiffener']['Length'],
                                           T=outputobj['Stiffener']['Thickness'], R11=outputobj['Stiffener']['NotchTop'],
                                           R12=outputobj['Stiffener']['NotchTop'],
@@ -1947,7 +1975,33 @@ class Maincontroller(QMainWindow):
                 bbWeldSideWeb_21 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
                                               L=beam_d - 2 * beam_T - 40)
                 bbWeldSideWeb_22 = copy.copy(bbWeldSideWeb_21)
-
+                contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                           L=float(column_data["D"]) - 2 * float(column_data["T"]))
+                contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                           L=float(column_data["D"]) - 2 * float(column_data["T"]))
+                contWeldL1_L2 = copy.copy(contWeldL2_U2)
+                contWeldL2_L2 = copy.copy(contWeldL2_U2)
+                contWeldR1_U2 = copy.copy(contWeldL2_U2)
+                contWeldR2_U2 = copy.copy(contWeldL2_U2)
+                contWeldR1_L2 = copy.copy(contWeldL2_U2)
+                contWeldR2_L2 = copy.copy(contWeldL2_U2)
+                contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+                                           L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
+                contWeldL1_L3 = copy.copy(contWeldL1_U3)
+                contWeldL2_U3 = copy.copy(contWeldL1_U3)
+                contWeldL2_L3 = copy.copy(contWeldL1_U3)
+                contWeldR1_U3 = copy.copy(contWeldL1_U3)
+                contWeldR1_L3 = copy.copy(contWeldL1_U3)
+                contWeldR2_U3 = copy.copy(contWeldL1_U3)
+                contWeldR2_L3 = copy.copy(contWeldL1_U3)
+                contWeldL1_U1 = copy.copy(contWeldL1_U3)
+                contWeldL1_L1 = copy.copy(contWeldL1_U3)
+                contWeldL2_U1 = copy.copy(contWeldL1_U3)
+                contWeldL2_L1 = copy.copy(contWeldL1_U3)
+                contWeldR1_U1 = copy.copy(contWeldL1_U3)
+                contWeldR1_L1 = copy.copy(contWeldL1_U3)
+                contWeldR2_U1 = copy.copy(contWeldL1_U3)
+                contWeldR2_L1 = copy.copy(contWeldL1_U3)
                 #######################################
                 #       WELD SECTIONS QUARTER CONE    #
                 #######################################
@@ -1956,7 +2010,12 @@ class Maincontroller(QMainWindow):
                                         bbWeldAbvFlang_22,
                                         bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                         bbWeldBelwFlang_24,
-                                        bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                        bbWeldSideWeb_21, bbWeldSideWeb_22,contWeldL1_U2 ,contWeldL2_U2,contWeldL1_L2 ,contWeldL2_L2,
+                 contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,contWeldL1_U3,contWeldL1_L3,contWeldL2_U3,contWeldL2_L3,
+                 contWeldR1_U3, contWeldR1_L3, contWeldR2_U3,
+                 contWeldR2_L3,contWeldL1_U1,contWeldL1_L1,contWeldL2_U1,contWeldL2_L1,
+                 contWeldR1_U1, contWeldR1_L1, contWeldR2_U1,
+                 contWeldR2_L1,
                                         bcWeldStiffHL_1,bcWeldStiffHL_2,bcWeldStiffHR_1,bcWeldStiffHR_2,
                                         bcWeldStiffLL_1,bcWeldStiffLL_2, bcWeldStiffLR_1, bcWeldStiffLR_2,
                                         contPlate_L1, contPlate_L2, contPlate_R1,
@@ -2027,6 +2086,13 @@ class Maincontroller(QMainWindow):
                                                        bbWeldBelwFlang_21, bbWeldBelwFlang_22, bbWeldBelwFlang_23,
                                                        bbWeldBelwFlang_24,
                                                        bbWeldSideWeb_21, bbWeldSideWeb_22,
+                                                       contWeldL1_U2, contWeldL2_U2, contWeldL1_L2, contWeldL2_L2,
+                                                       contWeldR1_U2, contWeldR2_U2, contWeldR1_L2, contWeldR2_L2,
+                                                       contWeldL1_U3, contWeldL1_L3, contWeldL2_U3,
+                                                       contWeldL2_L3, contWeldR1_U3, contWeldR1_L3, contWeldR2_U3,
+                                                       contWeldR2_L3, contWeldL1_U1, contWeldL1_L1, contWeldL2_U1,
+                                                       contWeldL2_L1, contWeldR1_U1, contWeldR1_L1, contWeldR2_U1,
+                                                       contWeldR2_L1,
                                                        bcWeldStiffHL_1, bcWeldStiffHL_2, bcWeldStiffHR_1,
                                                        bcWeldStiffHR_2,
                                                        bcWeldStiffLL_1, bcWeldStiffLL_2, bcWeldStiffLR_1,
@@ -2245,11 +2311,47 @@ class Maincontroller(QMainWindow):
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
 
-
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L1Model(), update=True, color='Red')
 
             else:  # col_web_connectivity"
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L1Model(), update=True, color='Red')
 
             # TODO: add if else statement for the type of endplate and also the number of bolts
 
@@ -2302,6 +2404,7 @@ class Maincontroller(QMainWindow):
                 osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
                 osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
 
+
             else:  # Groove weld
 
                 osdag_display_shape(self.display, self.ExtObj.get_bcWeldFlang_1Model(), update=True, color='Red')
@@ -2324,11 +2427,48 @@ class Maincontroller(QMainWindow):
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_R1Model(), update=True, color='Blue')
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_R2Model(), update=True, color='Blue')
 
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldR2_L1Model(), update=True, color='Red')
 
 
             else:
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_L1Model(), update=True, color='Blue')
                 osdag_display_shape(self.display, self.ExtObj.get_contPlate_L2Model(), update=True, color='Blue')
+
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L2Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L3Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL1_L1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_U1Model(), update=True, color='Red')
+                osdag_display_shape(self.display, self.ExtObj.get_contWeldL2_L1Model(), update=True, color='Red')
 
             # TODO: add if else statement for the type of endplate and also the number of bolts
 
@@ -2381,6 +2521,7 @@ class Maincontroller(QMainWindow):
 
                 osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_21Model(), update=True, color='Red')
                 osdag_display_shape(self.display, self.ExtObj.get_bbWeldSideWeb_22Model(), update=True, color='Red')
+
 
             else:  # Groove weld
 

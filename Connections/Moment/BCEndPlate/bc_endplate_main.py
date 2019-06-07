@@ -1890,10 +1890,10 @@ class Maincontroller(QMainWindow):
         # nutSpace = 2 * float(outputobj["Plate"]["Thickness"]) + nut_T   # Space between bolt head and nut
         if conn_type == 'col_flange_connectivity':
             nutSpace = float(column_data["T"]) + float(
-                outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+                outputobj["Plate"]["Thickness"]) + nut_T# / 2 + bolt_T / 2  # Space between bolt head and nut
         else:
             nutSpace = float(column_data["tw"]) + float(
-                outputobj["Plate"]["Thickness"]) + nut_T / 2 + bolt_T / 2  # Space between bolt head and nut
+                outputobj["Plate"]["Thickness"]) + nut_T# / 2 + bolt_T / 2  # Space between bolt head and nut
 
         bbNutBoltArray = NutBoltArray(alist, beam_data, outputobj, nut, bolt, numberOfBolts, nutSpace, endplate_type)
 
@@ -1919,9 +1919,9 @@ class Maincontroller(QMainWindow):
         bcWeldStiffLR_1 = copy.copy(bcWeldStiffLL_1)
         bcWeldStiffLR_2 = copy.copy(bcWeldStiffLL_1)
 
-        contWeldL1_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+        contWeldL1_U2 = FilletWeld(b=float(outputobj['ContPlateTens']['Weld']), h=float(outputobj['ContPlateTens']['Weld']),
                                    L=float(column_data["D"]) - 2 * float(column_data["T"]))
-        contWeldL2_U2 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+        contWeldL2_U2 = FilletWeld(b=float(outputobj['ContPlateTens']['Weld']), h=float(outputobj['ContPlateTens']['Weld']),
                                    L=float(column_data["D"]) - 2 * float(column_data["T"]))
         contWeldL1_L2 = copy.copy(contWeldL2_U2)
         contWeldL2_L2 = copy.copy(contWeldL2_U2)
@@ -1929,7 +1929,7 @@ class Maincontroller(QMainWindow):
         contWeldR2_U2 = copy.copy(contWeldL2_U2)
         contWeldR1_L2 = copy.copy(contWeldL2_U2)
         contWeldR2_L2 = copy.copy(contWeldL2_U2)
-        contWeldL1_U3 = FilletWeld(b=float(alist["Weld"]["Web (mm)"]), h=float(alist["Weld"]["Web (mm)"]),
+        contWeldL1_U3 = FilletWeld(b=float(outputobj['ContPlateTens']['Weld']), h=float(outputobj['ContPlateTens']['Weld']),
                                    L=float(column_data["B"]) / 2 - float(column_data["tw"]) / 2)
         contWeldL1_L3 = copy.copy(contWeldL1_U3)
         contWeldL2_U3 = copy.copy(contWeldL1_U3)

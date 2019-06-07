@@ -255,21 +255,21 @@ class CADFillet(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T , + (self.plateRight.L / 2)])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.plateRight.T/2 , + (self.plateRight.L / 2)])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.plateRight.L / 2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.plateRight.T/2, self.plateRight.L / 2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.beamRight.D/2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.plateRight.T/2, self.beamRight.D/2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -776,44 +776,44 @@ class CADColWebFillet(CADFillet):
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contWeldL1_U2(self):
-        contWeldL1_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W,
+        contWeldL1_U2OriginL = numpy.array([-self.contPlate_L1.L/2,  self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL1_U2_wDir = numpy.array([1.0, 0, 0.0])
         self.contWeldL1_U2.place(contWeldL1_U2OriginL, contWeldL1_U2_uDir, contWeldL1_U2_wDir)
 
     def create_contWeldL2_U2(self):
-        contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W, self.beamLeft.length / 2
+        contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.beamLeft.D/2-self.beamLeft.t, self.beamLeft.length / 2
                                             - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
-        contWeldL1_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL1_L2OriginL = numpy.array([-self.contPlate_L1.L / 2,  self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        contWeldL1_L2_uDir = numpy.array([0.0, 1.0, 0.0])
-        contWeldL1_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
+        contWeldL1_L2_uDir = numpy.array([0.0, -1.0, 0.0])
+        contWeldL1_L2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
 
     def create_contWeldL2_L2(self):
-        contWeldL2_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2, self.beamLeft.length / 2
+        contWeldL2_L2OriginL = numpy.array([-self.contPlate_L1.L / 2,  self.beamLeft.D/2-self.beamLeft.t, self.beamLeft.length / 2
                                             - self.beamRight.D / 2 + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        contWeldL2_L2_uDir = numpy.array([0.0, 1.0, 0.0])
-        contWeldL2_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
+        contWeldL2_L2_uDir = numpy.array([0.0, -1.0, 0.0])
+        contWeldL2_L2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
 
 
 
     def create_contWeldL1_U3(self):
-        contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
+        contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U3 = numpy.array([0.0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([0.0, -1, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
 
     def create_contWeldL1_L3(self):
-        contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + (
                                                         self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L3 = numpy.array([-1, 0, 0.0])
@@ -821,7 +821,7 @@ class CADColWebFillet(CADFillet):
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
 
     def create_contWeldL2_U3(self):
-        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
+        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([0, -1, 0])
@@ -829,7 +829,7 @@ class CADColWebFillet(CADFillet):
 
     def create_contWeldL2_L3(self):
 
-        contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L3 = numpy.array([-1, 0.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([0.0, -1, 0])
@@ -838,31 +838,31 @@ class CADColWebFillet(CADFillet):
 
 
     def create_contWeldL1_U1(self):
-        contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
+        contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL1_U1 = numpy.array([0.0, 1, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
 
     def create_contWeldL1_L1(self):
-        contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
+        contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
-        wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0])
+        uDircontWeldL1_L1 = numpy.array([1.0, 0.0, 0.0])
+        wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
 
     def create_contWeldL2_U1(self):
-        contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
+        contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL2_U1 = numpy.array([0, 1, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
 
     def create_contWeldL2_L1(self):
-        contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
+        contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
-        wDircontWeldL2_L1 = numpy.array([0, 1, 0])
+        uDircontWeldL2_L1 = numpy.array([1.0, 0.0,0.0])
+        wDircontWeldL2_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
 
 
@@ -1107,21 +1107,21 @@ class CADGroove(object):
     def create_nut_bolt_array(self):
 
         if self.endplate_type == "one_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.bolt.T,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0,  self.plateRight.T/2,  + (self.plateRight.L/2 )])       # self.plateRight.L/2+ (self.plateRight.L/2 - (10) - self.beamRight.D /2) - 40#TODO add end distance here #self.plateRight.L/2 + (self.plateRight.L/2 - (10 + 8) - self.beamRight.D /2)
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "both_way":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T , self.plateRight.L /2])
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.plateRight.T/2 , self.plateRight.L /2])
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
             self.nut_bolt_array.place(nutboltArrayOrigin, gaugeDir, pitchDir, boltDir)
 
         elif self.endplate_type == "flush":
-            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.bolt.T, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
+            nutboltArrayOrigin = self.plateRight.sec_origin + numpy.array([0.0, self.plateRight.T/2, self.beamRight.D/2])       #TODO Add self.Lv instead of 25
             gaugeDir = numpy.array([1.0, 0, 0])
             pitchDir = numpy.array([0, 0, -1.0])
             boltDir = numpy.array([0, -1.0, 0])
@@ -1550,57 +1550,59 @@ class CADcolwebGroove(CADGroove):
 
     def create_contPlate_L1Geometry(self):
         beamOriginL = numpy.array(
-            [0.0, self.beamLeft.D/2 - self.beamLeft.t - self.contPlate_L1.W/2, self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t  - self.contPlate_L1.W / 2,
+             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L1.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contPlate_L2Geometry(self):
         beamOriginL = numpy.array(
-            [0.0,  self.beamLeft.D/2 - self.beamLeft.t - self.contPlate_L2.W/2, self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L2.T/2])
+            [0.0, self.beamLeft.D / 2 - self.beamLeft.t - self.contPlate_L2.W / 2,
+             self.beamLeft.length / 2 - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L2.T/2])
         beamL_uDir = numpy.array([1.0, 0.0, 0.0])
         beamL_wDir = numpy.array([0.0, 0.0, -1.0])
         self.contPlate_L2.place(beamOriginL, beamL_uDir, beamL_wDir)
 
     def create_contWeldL1_U2(self):
-        contWeldL1_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W,
+        contWeldL1_U2OriginL = numpy.array([-self.contPlate_L1.L/2,  self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL1_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL1_U2_wDir = numpy.array([1.0, 0, 0.0])
         self.contWeldL1_U2.place(contWeldL1_U2OriginL, contWeldL1_U2_uDir, contWeldL1_U2_wDir)
 
     def create_contWeldL2_U2(self):
-        contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.contPlate_L1.W, self.beamLeft.length / 2
+        contWeldL2_U2OriginL = numpy.array([-self.contPlate_L1.L/2, self.beamLeft.D/2-self.beamLeft.t, self.beamLeft.length / 2
                                             - self.beamRight.D / 2 + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         contWeldL2_U2_uDir = numpy.array([0.0, 0.0, 1.0])
         contWeldL2_U2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_U2.place(contWeldL2_U2OriginL, contWeldL2_U2_uDir, contWeldL2_U2_wDir)
 
     def create_contWeldL1_L2(self):
-        contWeldL1_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL1_L2OriginL = numpy.array([-self.contPlate_L1.L / 2,  self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        contWeldL1_L2_uDir = numpy.array([0.0, 1.0, 0.0])
-        contWeldL1_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
+        contWeldL1_L2_uDir = numpy.array([0.0, -1.0, 0.0])
+        contWeldL1_L2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL1_L2.place(contWeldL1_L2OriginL, contWeldL1_L2_uDir, contWeldL1_L2_wDir)
 
     def create_contWeldL2_L2(self):
-        contWeldL2_L2OriginL = numpy.array([self.beamLeft.t / 2+self.contPlate_L1.L / 2, self.contPlate_L1.L / 2, self.beamLeft.length / 2
+        contWeldL2_L2OriginL = numpy.array([-self.contPlate_L1.L / 2,  self.beamLeft.D/2-self.beamLeft.t, self.beamLeft.length / 2
                                             - self.beamRight.D / 2 + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        contWeldL2_L2_uDir = numpy.array([0.0, 1.0, 0.0])
-        contWeldL2_L2_wDir = numpy.array([-1.0, 0.0, 0.0])
+        contWeldL2_L2_uDir = numpy.array([0.0, -1.0, 0.0])
+        contWeldL2_L2_wDir = numpy.array([1.0, 0.0, 0.0])
         self.contWeldL2_L2.place(contWeldL2_L2OriginL, contWeldL2_L2_uDir, contWeldL2_L2_wDir)
 
 
 
     def create_contWeldL1_U3(self):
-        contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
+        contWeldL1_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U3 = numpy.array([0.0, 0.0, 1.0])
         wDircontWeldL1_U3 = numpy.array([0.0, -1, 0])
         self.contWeldL1_U3.place(contWeldL1_U3OriginL, uDircontWeldL1_U3, wDircontWeldL1_U3)
 
     def create_contWeldL1_L3(self):
-        contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL1_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 + (
                                                         self.beamRight.D / 2)- self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL1_L3 = numpy.array([-1, 0, 0.0])
@@ -1608,7 +1610,7 @@ class CADcolwebGroove(CADGroove):
         self.contWeldL1_L3.place(contWeldL1_L3OriginL, uDircontWeldL1_L3, wDircontWeldL1_L3)
 
     def create_contWeldL2_U3(self):
-        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.t / 2+self.contPlate_L1.L / 2,
+        contWeldL2_U3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U3 = numpy.array([0, 0.0, 1.0])
         wDircontWeldL2_U3 = numpy.array([0, -1, 0])
@@ -1616,7 +1618,7 @@ class CADcolwebGroove(CADGroove):
 
     def create_contWeldL2_L3(self):
 
-        contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.contPlate_L1.L / 2,
+        contWeldL2_L3OriginL = numpy.array([self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.t,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
         uDircontWeldL2_L3 = numpy.array([-1, 0.0, 0.0])
         wDircontWeldL2_L3 = numpy.array([0.0, -1, 0])
@@ -1625,29 +1627,29 @@ class CADcolwebGroove(CADGroove):
 
 
     def create_contWeldL1_U1(self):
-        contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
+        contWeldL1_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 + (self.beamRight.D / 2)- self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL1_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL1_U1 = numpy.array([0.0, 1, 0])
         self.contWeldL1_U1.place(contWeldL1_U1OriginL, uDircontWeldL1_U1, wDircontWeldL1_U1)
 
     def create_contWeldL1_L1(self):
-        contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
+        contWeldL1_L1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 + self.beamRight.D / 2 - self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        uDircontWeldL1_L1 = numpy.array([0, 0.0, -1.0])
-        wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0])
+        uDircontWeldL1_L1 = numpy.array([1.0, 0.0, 0.0])
+        wDircontWeldL1_L1 = numpy.array([0.0, 1.0, 0.0])
         self.contWeldL1_L1.place(contWeldL1_L1OriginL, uDircontWeldL1_L1, wDircontWeldL1_L1)
 
     def create_contWeldL2_U1(self):
-        contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, 0,
+        contWeldL2_U1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 + self.contPlate_L1.T / 2])
         uDircontWeldL2_U1 = numpy.array([0, 0, 1.0])
         wDircontWeldL2_U1 = numpy.array([0, 1, 0])
         self.contWeldL2_U1.place(contWeldL2_U1OriginL, uDircontWeldL2_U1, wDircontWeldL2_U1)
 
     def create_contWeldL2_L1(self):
-        contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2+self.beamLeft.t/2, 0,
+        contWeldL2_L1OriginL = numpy.array([-self.contPlate_L1.L / 2, self.beamLeft.D/2-self.beamLeft.B/2-self.beamLeft.t/2,
                                             self.beamLeft.length / 2 - (self.beamRight.D / 2) + self.beamRight.T / 2 - self.contPlate_L1.T / 2])
-        uDircontWeldL2_L1 = numpy.array([0, 0, -1.0])
-        wDircontWeldL2_L1 = numpy.array([0, 1, 0])
+        uDircontWeldL2_L1 = numpy.array([1.0, 0.0,0.0])
+        wDircontWeldL2_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)

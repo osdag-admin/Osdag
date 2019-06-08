@@ -1312,6 +1312,11 @@ class Maincontroller(QMainWindow):
 		self.ui.plate_lineEdit_2.setText(str(resultObj["Plate"]["Height"]))
 		self.ui.plate_lineEdit_1.setText(str(resultObj["Plate"]["Width"]))
 
+		if resultObj['Stiffener']['Status'] == False:
+			self.ui.btn_stiffnrDetail.setEnabled(False)
+		else:
+			pass
+
 	def display_log_to_textedit(self):
 		file = QFile(os.path.join('Connections', 'Moment', 'BCEndPlate', 'extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
@@ -1337,6 +1342,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_plateDetail.setEnabled(False)
 		self.ui.btn_plateDetail_2.setEnabled(False)
 		self.ui.btn_stiffnrDetail.setEnabled(False)
+		self.ui.btn_Weld.setEnabled(False)
 
 		self.ui.action_save_input.setEnabled(False)
 		self.ui.actionCreate_design_report.setEnabled(False)
@@ -1362,6 +1368,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_plateDetail.setEnabled(True)
 		self.ui.btn_plateDetail_2.setEnabled(True)
 		self.ui.btn_stiffnrDetail.setEnabled(True)
+		self.ui.btn_Weld.setEnabled(True)
 
 		self.ui.action_save_input.setEnabled(True)
 		self.ui.actionCreate_design_report.setEnabled(True)
@@ -1398,6 +1405,7 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_tensionCritical.clear()
 		self.ui.txt_tensionCapacity.clear()
 		self.ui.txt_shearCapacity.clear()
+		self.ui.txt_shearinbolts.clear()
 		self.ui.txt_bearCapacity.clear()
 		self.ui.txt_boltcapacity.clear()
 		self.ui.txt_boltgrpcapacity.clear()
@@ -1405,6 +1413,8 @@ class Maincontroller(QMainWindow):
 		self.ui.txt_crossGauge.clear()
 		self.ui.txt_endDist.clear()
 		self.ui.txt_edgeDist.clear()
+		self.ui.plate_lineEdit_1.clear()
+		self.ui.plate_lineEdit_2.clear()
 
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)

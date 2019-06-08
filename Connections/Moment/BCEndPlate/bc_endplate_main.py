@@ -1277,6 +1277,9 @@ class Maincontroller(QMainWindow):
 		tension_capacity = resultObj["Bolt"]["TensionCapacity"]
 		self.ui.txt_tensionCapacity.setText(str(tension_capacity))
 
+		bolt_shear = resultObj["Bolt"]["ShearBolt"]
+		self.ui.txt_shearinbolts.setText(str(bolt_shear))
+
 		shear_capacity = resultObj["Bolt"]["ShearCapacity"]
 		if shear_capacity == 0:
 			shear_capacity = resultObj["Bolt"]["SlipCapacity"]

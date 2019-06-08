@@ -596,22 +596,35 @@ def bc_endplate_design(uiObj):
                     flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *
                     web_weld_effective_length * web_weld_long_joint)
 
-        flange_tension_moment = factored_moment / (beam_d - beam_tf)
-        weld_force_moment = flange_tension_moment / (
-                flange_weld_effective_length_top * flange_weld_long_joint_top * web_weld_effective_length / 2 +
-                flange_weld_effective_length_bottom * flange_weld_long_joint_bottom * web_weld_effective_length / 2 +
-                web_weld_effective_length**2/3)
+        # flange_tension_moment = factored_moment / (beam_d - beam_tf)
+        # weld_force_moment = flange_tension_moment / (
+        #         flange_weld_effective_length_top * flange_weld_long_joint_top * web_weld_effective_length / 2 +
+        #         flange_weld_effective_length_bottom * flange_weld_long_joint_bottom * web_weld_effective_length / 2 +
+        #         web_weld_effective_length**2/3)
+
+        # Stresses in extreme weld (top flange) due to applied moment
+
+        weld_Iz = (2 * (web_weld_effective_length ** 3) / 12) * web_weld_throat_size + \
+                   (2 * flange_weld_effective_length_top * (beam_d / 2 ) ** 2 + \
+                   2 * flange_weld_effective_length_bottom * (beam_d / 2 - beam_tf) ** 2) * flange_weld_throat_size
+
+        flange_weld_Z = weld_Iz / (beam_d / 2)
+        web_weld_Z = weld_Iz / (beam_d / 2 - beam_tf - beam_R1)
+
+        flange_weld_stress = factored_moment / flange_weld_Z + weld_force_axial / flange_weld_throat_size
+
         weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
 
         # check for weld strength
 
-        flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
-        flange_weld_throat_reqd = round((weld_force_moment + weld_force_axial) / flange_weld_strength, 3)
+        # flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
+        flange_weld_throat_reqd = round(flange_weld_stress * flange_weld_throat_size / flange_weld_strength, 3)
         flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
 
-        web_weld_stress = math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) / \
-                          web_weld_throat_size
-        web_weld_throat_reqd = round(math.sqrt((weld_force_axial+ weld_force_moment) ** 2 + weld_force_shear ** 2) /
+        web_weld_stress = math.sqrt((factored_moment / web_weld_Z + weld_force_axial / web_weld_throat_size) ** 2 + \
+                          (weld_force_shear /web_weld_throat_size) ** 2)
+
+        web_weld_throat_reqd = round(web_weld_stress * web_weld_throat_size /
                                      web_weld_strength, 3)
         web_weld_size_reqd = round(web_weld_throat_reqd / 0.7, 3)
 
@@ -628,8 +641,12 @@ def bc_endplate_design(uiObj):
         if web_weld_stress >= web_weld_strength:
             design_status = False
             logger.error(": The weld size at beam web is less than required")
-            logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
-            logger.info(": Increase the size of weld at beam web")
+            if web_weld_size_reqd > web_weld_size_max and flange_weld_size_reqd < flange_weld_size_max:
+                logger.warning(": The connection can not be possible with fillet weld")
+                logger.info(": Use groove welds to connect beam and end plate")
+            else:
+                logger.warning(": The minimum required size of weld at web is %s mm" % web_weld_size_reqd)
+                logger.info(": Increase the size of weld at beam web")
 
     else:   # weld_method == 'groove'
         groove_weld_size_flange = IS800_2007.cl_10_5_3_3_groove_weld_effective_throat_thickness(
@@ -930,7 +947,7 @@ def bc_endplate_design(uiObj):
         outputobj["Weld"]["WebStrength"] = float(round(web_weld_strength, 3))
 
     else:  # weld_method == 'groove':
-        outputobj["Weld"]["Size"] = 10
+        outputobj["Weld"]["Size"] = 3
         outputobj["Weld"]["FlangeSize"] = float(round(groove_weld_size_flange, 3))
         outputobj["Weld"]["WebSize"] = float(round(groove_weld_size_web, 3))
 

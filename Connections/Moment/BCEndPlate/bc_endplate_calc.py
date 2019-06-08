@@ -836,26 +836,26 @@ def bc_endplate_design(uiObj):
     outputobj['Bolt']['projection'] = float(round(flange_projection, 3))
 
     outputobj['ContPlateComp']['Number'] = 2
-    outputobj['ContPlateComp']['Length'] = cont_plate_comp_length
-    outputobj['ContPlateComp']['Width'] = cont_plate_comp_width
-    outputobj['ContPlateComp']['Thickness'] = cont_plate_tk_flange  #TODO bottom continuity plate thickness Anand
-    outputobj['ContPlateComp']['ThicknessMin'] = cont_plate_comp_tk_min
+    outputobj['ContPlateComp']['Length'] = float(round(cont_plate_comp_length, 3))
+    outputobj['ContPlateComp']['Width'] = float(round(cont_plate_comp_width, 3))
+    outputobj['ContPlateComp']['Thickness'] = float(round(cont_plate_tk_flange, 3))  #TODO bottom continuity plate thickness Anand
+    outputobj['ContPlateComp']['ThicknessMin'] = float(round(cont_plate_comp_tk_min, 3))
     outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Number'] = 2
-    outputobj['ContPlateTens']['Length'] = cont_plate_tens_length
-    outputobj['ContPlateTens']['Width'] = cont_plate_tens_width
-    outputobj['ContPlateTens']['Thickness'] = cont_plate_tk_flange          #TODO uper continuity plate thickness Anand
-    outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
+    outputobj['ContPlateTens']['Length'] = float(round(cont_plate_tens_length, 3))
+    outputobj['ContPlateTens']['Width'] = float(round(cont_plate_tens_width, 3))
+    outputobj['ContPlateTens']['Thickness'] = float(round(cont_plate_tk_flange, 3))          #TODO uper continuity plate thickness Anand
+    outputobj['ContPlateTens']['ThicknessMin'] = float(round(cont_plate_tens_tk_min, 3))
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
     outputobj['Stiffener']['Status'] = st_status
     outputobj['Stiffener']['Number'] = int(st_number)
-    outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
-    outputobj['Stiffener']['Height'] = st_height
+    outputobj['Stiffener']['Length'] = float(round(st_eff_length, 3))     # TODO:
+    outputobj['Stiffener']['Height'] = float(round(st_height, 3))
     outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values
-    outputobj['Stiffener']['NotchBottom'] = st_notch_bottom
-    outputobj['Stiffener']['NotchTop'] = st_notch_top
+    outputobj['Stiffener']['NotchBottom'] = float(round(st_notch_bottom, 3))
+    outputobj['Stiffener']['NotchTop'] = float(round(st_notch_top, 3))
     outputobj['Stiffener']['Weld'] = 8.0    # TODO: Sourabh give calculated values
 
     # Detailing

@@ -719,6 +719,18 @@ def bc_endplate_design(uiObj):
 
 
     # Beam stiffeners
+    st_status = False
+    if endplate_type == 'flush' :
+        st_number = 0
+    elif endplate_type == 'one_way':
+        st_number = 1
+        if number_of_bolts >= 12:
+            st_status = True
+    else:
+        st_number = 2
+        if number_of_bolts >= 20:
+            st_status = True
+
     st_fu = beam_fu
     st_fy = beam_fy
     st_height = l_v + pitch_dist + end_dist
@@ -837,7 +849,8 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['ThicknessMin'] = cont_plate_tens_tk_min
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
-    outputobj['Stiffener']['Number'] = 2
+    outputobj['Stiffener']['Status'] = st_status
+    outputobj['Stiffener']['Number'] = int(st_number)
     outputobj['Stiffener']['Length'] = st_eff_length     # TODO:
     outputobj['Stiffener']['Height'] = st_height
     outputobj['Stiffener']['Thickness'] = 10.0  # TODO: Sourabh give calculated values

@@ -1812,7 +1812,7 @@ class Maincontroller(QMainWindow):
 		column_R1 = float(column_data["R1"])
 		column_R2 = float(column_data["R2"])
 		column_alpha = float(column_data["FlangeSlope"])
-		column_length = 1600.0
+		column_length = 1200.0
 
 		beam_tw = float(beam_data["tw"])
 		beam_T = float(beam_data["T"])
@@ -1821,7 +1821,7 @@ class Maincontroller(QMainWindow):
 		beam_R1 = float(beam_data["R1"])
 		beam_R2 = float(beam_data["R2"])
 		beam_alpha = float(beam_data["FlangeSlope"])
-		beam_length = 1600.0
+		beam_length = 650
 
 
 

@@ -169,7 +169,7 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
-    ccolumn_clear_d = column_d - 2 * (column_tf + column_R1)
+    column_clear_d = column_d - 2 * (column_tf + column_R1)
 
     # Minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
     beam_moment = 1.2 * beam_Zz * beam_fy / 1.10
@@ -181,6 +181,7 @@ def bc_endplate_design(uiObj):
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
+        plate_width_max = column_clear_d
 
         if beam_B > column_clear_d:
             design_status = False
@@ -190,6 +191,7 @@ def bc_endplate_design(uiObj):
 
     else:
         bolt_plates_tk = [column_tf, end_plate_thickness]
+        plate_width_max = column_B
 
         if beam_B > column_B:
             design_status = False
@@ -469,12 +471,11 @@ def bc_endplate_design(uiObj):
                 plate_width = g_1 + 2 * edge_dist
                 # TODO: Apply max limit for g_1, design fails
 
-        if plate_width > column_B:
+        if plate_width > plate_width_max:
             design_status = False
-            logger.error(": Plate is wider than column flange width")
-            logger.warning(": Width of Plate should be less than %s mm" % column_B)
+            logger.error(": Required plate width is more than the available width")
+            logger.warning(": Width of plate should be less than %s mm" % plate_width_max)
             logger.info(": Currently, Osdag doesn't design such connections")
-
 
         # Tension in bolts
         axial_tension = factored_axial_load / number_of_bolts
@@ -617,7 +618,10 @@ def bc_endplate_design(uiObj):
         # Total length for web weld = 2* web_weld_effective_length
         # Weld throat thickness for flange = web_weld_throat_size
 
-        # weld_force_axial = factored_axial_load / (flange_weld_effective_length_top * flange_weld_long_joint_top + flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *web_weld_effective_length * web_weld_long_joint)
+        # weld_force_axial = factored_axial_load /
+        # (flange_weld_effective_length_top * flange_weld_long_joint_top +
+        # flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
+        # 2 *web_weld_effective_length * web_weld_long_joint)
 
         weld_force_axial_stress = factored_axial_load / ( \
                     2 * flange_weld_effective_length_top * flange_weld_long_joint_top * flange_weld_throat_size + \
@@ -766,7 +770,7 @@ def bc_endplate_design(uiObj):
 
     # Beam stiffeners
     st_status = False
-    if endplate_type == 'flush' :
+    if endplate_type == 'flush':
         st_number = 0
     elif endplate_type == 'one_way':
         st_number = 1

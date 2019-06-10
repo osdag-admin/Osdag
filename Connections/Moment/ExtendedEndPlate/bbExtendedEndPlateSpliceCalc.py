@@ -344,8 +344,13 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
     weld_type = str(uiObj["Weld"]["Type"])  # This is - Fillet weld or Groove weld
-    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+
+    if uiObj["Weld"]["Type"] == "Fillet Weld":
+        weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
+        weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+    else:
+        weld_thickness_flange = 0
+        weld_thickness_web = 0
 
     old_beam_section = get_oldbeamcombolist()
 
@@ -1956,10 +1961,18 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if uiObj["Member"]["Connectivity"] == "Flush":
             w_weld_st = w_st  # length of weld to be provided along the width of the stiffener
-            z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
+
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
+            else:
+                z_weld_st = thickness_stiffener_provided
         else:
             h_weld_st = h_st  # length of weld provided along the height of the stiffener
-            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
+
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
+            else:
+                z_weld_st = thickness_stiffener_provided
 
         # Check for Moment in stiffener
 

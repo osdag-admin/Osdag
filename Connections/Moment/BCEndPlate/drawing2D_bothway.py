@@ -1057,7 +1057,7 @@ class ExtendedEnd2DFront(object):
         point = self.A1
         theta = 60
         offset = 50
-        textup = "Beam " + str(self.data_object.beam_designation)
+        textup = "Beam " + str(self.data_object.column_designation)
         textdown = " "
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
@@ -2199,7 +2199,7 @@ class ExtendedEnd2DSide(object):
         theta = 1
         offset = 1
         textup = " "
-        textdown = "Beam " + str(self.data_object.beam_designation)
+        textdown = "Beam " + str(self.data_object.column_designation)
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
@@ -2207,7 +2207,7 @@ class ExtendedEnd2DSide(object):
         theta = 1
         offset = 1
         textup = " "
-        textdown = "Beam " + str(self.data_object.column_designation)
+        textdown = "Beam " + str(self.data_object.beam_designation)
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 

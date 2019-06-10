@@ -169,7 +169,7 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
-    column_clear_d = column_d - 2 * (column_tf + column_R1)
+    ccolumn_clear_d = column_d - 2 * (column_tf + column_R1)
 
     # Minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
     beam_moment = 1.2 * beam_Zz * beam_fy / 1.10
@@ -468,6 +468,13 @@ def bc_endplate_design(uiObj):
                 g_1 += 5
                 plate_width = g_1 + 2 * edge_dist
                 # TODO: Apply max limit for g_1, design fails
+
+        if plate_width > column_B:
+            design_status = False
+            logger.error(": Plate is wider than column flange width")
+            logger.warning(": Width of Plate should be less than %s mm" % column_B)
+            logger.info(": Currently, Osdag doesn't design such connections")
+
 
         # Tension in bolts
         axial_tension = factored_axial_load / number_of_bolts

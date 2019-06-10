@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1265</width>
+    <width>1472</width>
     <height>909</height>
    </rect>
   </property>
@@ -489,7 +489,7 @@ background-color: #abc250 ;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -654,7 +654,7 @@ QTabBar::tab::hover{
 QTabBar::tab{
 height: 40px;
 width: 200px;
-background-color: #925a5b;
+background-color: #5b1c1d;
 color:#ffffff;
 }
 
@@ -1142,9 +1142,194 @@ color:#ffffff;
            <attribute name="whatsThis">
             <string>This connection is under development</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <item row="1" column="1">
-             <widget class="QRadioButton" name="rdbtn_beamcolumn">
+           <widget class="QTabWidget" name="mytabWidget_2">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>10</y>
+              <width>1131</width>
+              <height>781</height>
+             </rect>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>Liberation Sans</family>
+              <pointsize>10</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LeftToRight</enum>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QTabBar::tab {
+    margin-right: 10;
+ }
+
+QTabBar::tab::selected{
+	background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QTabBar::tab::hover{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QTabBar::tab{
+height: 35px;
+width: 150px;
+background-color: #9e6869;
+color:#ffffff;
+}
+
+QTabBar::tab{
+border-top-left-radius: 2px ;
+border-top-right-radius: 2px ;
+border-bottom-left-radius: 0px ;
+border-bottom-right-radius: 0px ;
+}
+ </string>
+            </property>
+            <property name="tabShape">
+             <enum>QTabWidget::Triangular</enum>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <property name="documentMode">
+             <bool>true</bool>
+            </property>
+            <property name="tabsClosable">
+             <bool>false</bool>
+            </property>
+            <property name="movable">
+             <bool>false</bool>
+            </property>
+            <widget class="QWidget" name="tab_beamtobeam">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <attribute name="title">
+              <string>Beam To Beam</string>
+             </attribute>
+             <widget class="QPushButton" name="btn_start_2">
+              <property name="geometry">
+               <rect>
+                <x>460</x>
+                <y>670</y>
+                <width>190</width>
+                <height>30</height>
+               </rect>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>190</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>190</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>11</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Enter</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QPushButton
+{
+background-color: #925a5b;
+color:#ffffff;
+}</string>
+              </property>
+              <property name="text">
+               <string>Start</string>
+              </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="rdbtn_endplate_ext">
+              <property name="geometry">
+               <rect>
+                <x>617</x>
+                <y>84</y>
+                <width>321</width>
+                <height>311</height>
+               </rect>
+              </property>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+                <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>300</width>
+                <height>300</height>
+               </size>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_7">
+              <property name="geometry">
+               <rect>
+                <x>625</x>
+                <y>40</y>
+                <width>171</width>
+                <height>31</height>
+               </rect>
+              </property>
               <property name="font">
                <font>
                 <family>Arial</family>
@@ -1153,68 +1338,147 @@ color:#ffffff;
                 <bold>true</bold>
                </font>
               </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
               <property name="text">
-               <string>Beam-Column</string>
+               <string>End Plate Connection</string>
               </property>
              </widget>
-            </item>
-            <item row="2" column="1">
-             <spacer name="verticalSpacer_8">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+             <widget class="QLabel" name="label">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>30</y>
+                <width>181</width>
+                <height>51</height>
+               </rect>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>156</width>
-                <height>152</height>
-               </size>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
-             </spacer>
-            </item>
-            <item row="2" column="3">
-             <spacer name="verticalSpacer_9">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
+              <property name="text">
+               <string>Cover Plate Connection</string>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
+             </widget>
+             <widget class="QRadioButton" name="rdbtn_coverplate">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>104</y>
                 <width>328</width>
-                <height>152</height>
-               </size>
+                <height>271</height>
+               </rect>
               </property>
-             </spacer>
-            </item>
-            <item row="1" column="2">
-             <spacer name="horizontalSpacer_10">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+               </font>
               </property>
-              <property name="sizeHint" stdset="0">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
+                <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
+              </property>
+              <property name="iconSize">
                <size>
-                <width>349</width>
-                <height>301</height>
+                <width>300</width>
+                <height>300</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item row="3" column="2">
-             <spacer name="horizontalSpacer_11">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_beamtocolumn">
+             <property name="layoutDirection">
+              <enum>Qt::RightToLeft</enum>
+             </property>
+             <attribute name="title">
+              <string>Beam To Column</string>
+             </attribute>
+             <attribute name="whatsThis">
+              <string>This connection is under development</string>
+             </attribute>
+             <widget class="QPushButton" name="btn_start_3">
+              <property name="geometry">
+               <rect>
+                <x>460</x>
+                <y>670</y>
+                <width>190</width>
+                <height>30</height>
+               </rect>
               </property>
-              <property name="sizeHint" stdset="0">
+              <property name="minimumSize">
                <size>
-                <width>349</width>
-                <height>25</height>
+                <width>190</width>
+                <height>30</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item row="3" column="1">
-             <widget class="QRadioButton" name="rdbtn_peb">
+              <property name="maximumSize">
+               <size>
+                <width>190</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>11</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::TabFocus</enum>
+              </property>
+              <property name="toolTip">
+               <string>Enter</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton::hover
+{
+   background-color: #d97f7f;
+   color:#000000 ;
+}
+
+QPushButton
+{
+background-color: #925a5b;
+color:#ffffff;
+}</string>
+              </property>
+              <property name="text">
+               <string>Start</string>
+              </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
+              <property name="autoDefault">
+               <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_8">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>20</y>
+                <width>181</width>
+                <height>71</height>
+               </rect>
+              </property>
               <property name="font">
                <font>
                 <family>Arial</family>
@@ -1223,143 +1487,114 @@ color:#ffffff;
                 <bold>true</bold>
                </font>
               </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
               <property name="text">
-               <string>PEB</string>
+               <string>End Plate Connection</string>
               </property>
              </widget>
-            </item>
-            <item row="4" column="1">
-             <spacer name="verticalSpacer_10">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>156</width>
-                <height>163</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="3" column="3">
-             <widget class="QRadioButton" name="rdbtn_colcol">
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string>Coulmn-Column</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="3">
-             <spacer name="verticalSpacer_11">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
+             <widget class="QRadioButton" name="rdbtn_endplate_bc">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>94</y>
                 <width>328</width>
-                <height>163</height>
-               </size>
+                <height>281</height>
+               </rect>
               </property>
-             </spacer>
-            </item>
-            <item row="1" column="4">
-             <spacer name="horizontalSpacer_13">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+               </font>
               </property>
-              <property name="sizeHint" stdset="0">
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>ResourceFiles/images/beam_column_endplate.png</normaloff>ResourceFiles/images/beam_column_endplate.png</iconset>
+              </property>
+              <property name="iconSize">
                <size>
-                <width>40</width>
-                <height>20</height>
+                <width>300</width>
+                <height>300</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item row="1" column="0">
-             <spacer name="horizontalSpacer_14">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_columntocolumn">
+             <attribute name="title">
+              <string>Column To Column</string>
+             </attribute>
+             <widget class="QLabel" name="label_13">
+              <property name="geometry">
+               <rect>
+                <x>388</x>
+                <y>9</y>
+                <width>356</width>
+                <height>723</height>
+               </rect>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
+              <property name="font">
+               <font>
+                <family>Arial</family>
+                <pointsize>12</pointsize>
+               </font>
               </property>
-             </spacer>
-            </item>
-            <item row="1" column="3">
-             <layout class="QGridLayout" name="gridLayout_4">
+              <property name="text">
+               <string>This module is not available in the current version.</string>
+              </property>
+             </widget>
+            </widget>
+            <widget class="QWidget" name="tab_PEB">
+             <attribute name="title">
+              <string>PEB</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="0">
-               <widget class="QLabel" name="label_8">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>12</pointsize>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
+               <spacer name="horizontalSpacer_25">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="text">
-                 <string>Beam-Beam</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="rdbtn_beamtobeam">
-                <property name="font">
-                 <font>
-                  <family>Arial</family>
-                  <pointsize>12</pointsize>
-                 </font>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="icon">
-                 <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-                  <normaloff>:/newPrefix/images/1.png</normaloff>:/newPrefix/images/1.png</iconset>
-                </property>
-                <property name="iconSize">
+                <property name="sizeHint" stdset="0">
                  <size>
-                  <width>300</width>
-                  <height>300</height>
+                  <width>218</width>
+                  <height>20</height>
                  </size>
                 </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_12">
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>This module is not available in the current version.</string>
+                </property>
                </widget>
               </item>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_26">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>218</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
-            </item>
-            <item row="0" column="3">
-             <spacer name="verticalSpacer_16">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+            </widget>
+           </widget>
           </widget>
           <widget class="QWidget" name="tab3_trussconnection">
            <attribute name="title">
@@ -1411,259 +1646,7 @@ color:#ffffff;
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="beamtobeampage">
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="1" column="3">
-         <widget class="QLabel" name="label_7">
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>End Plate Connection</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <spacer name="horizontalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>143</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="2">
-         <spacer name="verticalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>358</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="4">
-         <spacer name="horizontalSpacer_16">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="1">
-         <spacer name="verticalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="3" column="3">
-         <spacer name="verticalSpacer_13">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="1">
-         <widget class="QRadioButton" name="rdbtn_coverplate">
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-            <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>300</width>
-            <height>300</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="2">
-         <spacer name="horizontalSpacer_17">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>382</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="3">
-         <widget class="QRadioButton" name="rdbtn_endplate_ext">
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
-            <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>300</width>
-            <height>300</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3" colspan="2">
-         <spacer name="horizontalSpacer_18">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>364</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="0">
-         <spacer name="horizontalSpacer_15">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="6" column="2">
-         <spacer name="verticalSpacer_14">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="5" column="2">
-         <widget class="QPushButton" name="btn_start_2">
-          <property name="minimumSize">
-           <size>
-            <width>190</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>190</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>11</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton::hover
-{
-   background-color: #d97f7f;
-   color:#000000 ;
-}
-
-QPushButton
-{
-background-color: #925a5b;
-color:#ffffff;
-}</string>
-          </property>
-          <property name="text">
-           <string>Start</string>
-          </property>
-          <property name="shortcut">
-           <string>Ctrl+S</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLabel" name="label">
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>12</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Cover Plate Connection</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <spacer name="verticalSpacer_15">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
+      <widget class="QWidget" name="beamtobeampage"/>
       <widget class="QWidget" name="page"/>
      </widget>
     </item>
@@ -2125,7 +2108,6 @@ color:#ffffff;
     <layout class="QFormLayout" name="formLayout_2"/>
    </widget>
    <zorder>layoutWidget</zorder>
-   <zorder>myStackedWidget</zorder>
    <zorder>btn_beamCol</zorder>
    <zorder>btn_compression</zorder>
    <zorder>btn_truss</zorder>
@@ -2136,14 +2118,15 @@ color:#ffffff;
    <zorder>btn_tension</zorder>
    <zorder>btn_connection</zorder>
    <zorder>btn_flexural</zorder>
+   <zorder>myStackedWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1265</width>
-     <height>26</height>
+     <width>1472</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

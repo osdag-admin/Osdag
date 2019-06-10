@@ -666,8 +666,8 @@ def bc_endplate_design(uiObj):
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
     notch_cont_comp = round_up(value=column_R1, multiplier=5, minimum_value=5)
-    eff_cont_comp_width = cont_plate_comp_width - notch_cont_comp
-    eff_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
+    availabe_cont_comp_width = cont_plate_comp_width - notch_cont_comp
+    available_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
 
     col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
     col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
@@ -685,15 +685,34 @@ def bc_endplate_design(uiObj):
             break
         else:
             cont_plate_tk_flange = 0
-    #  Weld design for column web compression continuity plates # TODO:
-    cont_comp_weld_size = 8
+    #  Weld design for column  continuity plates # TODO:
+
+    cont_web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tw)
+    available_welds = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+    cont_web_weld_status = False
+    while cont_web_weld_status is False:
+        cont_web_weld_size = cont_web_weld_size_min
+        cont_web_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=cont_web_weld_size, fusion_face_angle= 90)
+        cont_web_weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_web_weld_size, available_length=available_cont_comp_length)
+        cont_web_weld_status = max(p_bf, 0) / (4 * cont_web_weld_eff_length * cont_web_weld_throat) <= \
+                               IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                                   ultimate_stresses=(weld_fu, column_fu, cont_plate_fu))
+    cont_flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tf)
+    cont_flange_weld_status = False
+    while cont_flange_weld_status is False:
+        cont_flange_weld_size = cont_flange_weld_size_min
+        cont_flange_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size= cont_flange_weld_size, fusion_face_angle= 90)
+        cont_flange_Weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_flange_weld_size, available_length=availabe_cont_comp_width)
+        cont_axial_stress = max(p_bf,0)/(cont_flange_Weld_eff_length*cont_flange_weld_throat )
+        cont_moment_stress = max(p_bf,0)*((g - beam_tw)/2)**2/ (cont_plate_comp_length *cont_flange_weld_throat*cont_flange_Weld_eff_length)
+        cont_flange_weld_status = math.sqrt(cont_axial_stress**2 + cont_moment_stress**2)<=IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                                   ultimate_stresses=(weld_fu, column_fu, cont_plate_fu))
+
     cont_comp_weld_length = 0
-
-
-
-
-
-
     # Continuity Plates on tension side
     t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load  # Tensile force at beam flanges
     cont_plate_tens_length = column_d - 2 * column_tf
@@ -709,14 +728,35 @@ def bc_endplate_design(uiObj):
     #  Weld design for column web tension continuity plates # TODO:
     cont_tens_weld_size = 8
     cont_tens_weld_throat = 8
+    
+    #  Weld design for column  continuity plates # TODO:
 
-    cont_tens_weld_length = 0
-    p_st = max(p_bf, t_bf) / 2  # Force induced in each piece of the column continuity plate
-    m_st = max((p_bf * g_1) / 4, (t_bf * g_1) / 4)  # Moment induced in the column continuity plate
-    eff_cont_tens_weld_length = 2 * (eff_cont_tens_length - 2 * cont_tens_weld_size)
-    capacity_fillet_weld = (eff_cont_tens_weld_length * weld_fu * cont_tens_weld_throat) / (math.sqrt(3) * gamma_m0)
-
-
+    cont_web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tw)
+    available_welds = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+    cont_web_weld_status = False
+    while cont_web_weld_status is False:
+        cont_web_weld_size = cont_web_weld_size_min
+        cont_web_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=cont_web_weld_size, fusion_face_angle=90)
+        cont_web_weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_web_weld_size, available_length=available_cont_comp_length)
+        cont_web_weld_status = max(p_bf, t_bf) / (4 * cont_web_weld_eff_length * cont_web_weld_throat) <= \
+                               IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                                   ultimate_stresses=(weld_fu, column_fu, cont_plate_fu))
+    cont_flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tf)
+    cont_flange_weld_status = False
+    while cont_flange_weld_status is False:
+        cont_flange_weld_size = cont_flange_weld_size_min
+        cont_flange_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=cont_flange_weld_size, fusion_face_angle=90)
+        cont_flange_Weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_flange_weld_size, available_length=availabe_cont_comp_width)
+        cont_axial_stress = max(p_bf, t_bf) / (cont_flange_Weld_eff_length * cont_flange_weld_throat)
+        cont_moment_stress = max(p_bf,t_bf) * ((g_1 - beam_tw) / 2) ** 2 / (
+                    cont_plate_comp_length * cont_flange_weld_throat * cont_flange_Weld_eff_length)
+        cont_flange_weld_status = math.sqrt(
+            cont_axial_stress ** 2 + cont_moment_stress ** 2) <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=(weld_fu, column_fu, cont_plate_fu))
 
     # Beam stiffeners
     st_fu = beam_fu
@@ -892,7 +932,7 @@ def bc_endplate_design(uiObj):
         else:
             pass
 
-    else:   # endplate_type == 'both_way':
+    else:   #endplate_type == 'both_way':
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(round(beam_d - 2 * (beam_tf + l_v), 3))
             outputobj['Bolt']['Pitch12'] = float(round((2 * l_v + beam_tf), 3))

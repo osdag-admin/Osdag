@@ -1984,7 +1984,15 @@ class Oneway2DSide(object):
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
         # ------------------------------------------  Primary Beam 1 -------------------------------------------
-        point = self.A1 + 5 * np.array([0, 1])
+        point = self.A1
+        theta = 1
+        offset = 1
+        textup = " "
+        textdown = "Beam " + str(self.data_object.column_designation)
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
+        point = self.AA1
         theta = 1
         offset = 1
         textup = " "

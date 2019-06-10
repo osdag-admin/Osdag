@@ -963,20 +963,20 @@ class Maincontroller(QMainWindow):
 		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def image1(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_double_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_flange.png"))
 
 	def image2(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_double_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_web.png"))
 
 	def image3(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_single_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_web.png"))
 
 	def image4(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_single_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_flange.png"))
 
 	def design_prefer(self):
 		self.designPrefDialog.show()

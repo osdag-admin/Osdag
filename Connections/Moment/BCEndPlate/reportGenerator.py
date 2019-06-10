@@ -1030,7 +1030,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('/tr')
 
     if typeof_edge == "a - Sheared or hand flame cut":
-        row = [1, "Type of Edges", "Sheared or hand flange cut"]
+        row = [1, "Type of Edges", "Sheared or hand flame cut"]
     else:
         row = [1, "Type of Edges", "Rolled, machine-flame cut, sawn and planed"]
 
@@ -1689,15 +1689,11 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                 rstr += t('/tr')
 
             if float(flange_weld_stress) > float(flange_weld_strength):
-                row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
+                row = [0, "Critical stress in weld at flange (N/mm^2)","&#8805; ((M/<i>Z</i><sub>weld,flange</sub>) + (P/<i>A</i><sub>weld</sub>)) ="+ flange_weld_stress,"(<i>f</i><sub>u</sub> / &#8730;3 * <i>&#120574;</i><sub>mb</sub>) = "+ flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
 
 
             else:
-                row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
+                row = [0, "Critical stress in weld at flange (N/mm^2)","&#8805; ((M/<i>Z</i><sub>weld,flange</sub>) + (P/<i>A</i><sub>weld</sub>)) ="+ flange_weld_stress,"(<i>f</i><sub>u</sub> / &#8730;3 * <i>&#120574;</i><sub>mb</sub>) = "+ flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
         row = [0,"Weld Size at Flange (mm)","min(beam flange thickness, end plate thickness) = min(" +str(float(beam_tf)) + " , "+str(float(plate_thk))+")" ,groove_weld_size_flange,""]
@@ -1764,15 +1760,15 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                 rstr += t('/tr')
 
             if float(web_weld_stress) > float(web_weld_strength):
-                row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
-                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
+                row = [0, "Critical stress in weld at web (N/mm^2)",
+                       "&#8805; &#8730; ((M/<i>Z</i><sub>weld,web</sub> + P/<i>A</i><sub>weld</sub>)<i></i><sup>2</sup>)) + (V/<i>A</i><sub>weld,web</sub>)<i></i><sup>2</sup> =" + web_weld_stress,
+                       "(<i>f</i><sub>u</sub> / &#8730;3 * <i>&#120574;</i><sub>mb</sub>) = " + web_weld_strength,
                        " <p align=left style=color:red><b>Fail</b></p>"]
 
             else:
-                row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
-                       "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
+                row = [0, "Critical stress in weld at web (N/mm^2)",
+                       "&#8805; &#8730; ((M/<i>Z</i><sub>weld,web</sub> + P/<i>A</i><sub>weld</sub>)<i></i><sup>2</sup>)) + (V/<i>A</i><sub>weld,web</sub>)<i></i><sup>2</sup> =" + web_weld_stress,
+                       "(<i>f</i><sub>u</sub> / &#8730;3 * <i>&#120574;</i><sub>mb</sub>) = " + web_weld_strength,
                        " <p align=left style=color:green><b>Pass</b></p>"]
 
     else:
@@ -2175,47 +2171,77 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         # else:
         #     pass
 
-    rstr += t('/table')
-    rstr += t('hr')
-    rstr += t('/hr')
+
 
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-    row = [0, "Weld Detailing", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
+    if weld_method == "Groove Weld (CJP)":
 
-    if float(beam_tf) <= float(12):
-        row = [0, '<object type= "image/PNG" data= "Butt_single_flange.png"  ></object>']
+        # rstr += t('/table')
+        # rstr += t('hr')
+        # rstr += t('/hr')
+
+        row = [0, "Weld Detailing", " "]
         rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
+
+        if float(beam_tf) <= float(12):
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_flange.png"  ></object>']
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )", " "]
+            rstr += t('tr')
+            rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        else:
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_flange.png"  ></object>']
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [0,
+                   "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   " "]
+            rstr += t('tr')
+            rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        if float(beam_tw) <= float(12):
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_web.png"  ></object>']
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [0,
+                   "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   " "]
+            rstr += t('tr')
+            rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        else:
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_web.png"  ></object>']
+            rstr += t('tr')
+            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            row = [0,
+                   "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   " "]
+            rstr += t('tr')
+            rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
+
     else:
-        row = [0, '<object type= "image/PNG" data= "Butt_double_flange.png"  ></object>']
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
-
-    if float(beam_tw) <= float(12):
-        row = [0, '<object type= "image/PNG" data= "Butt_single_web.png"  ></object>']
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('/tr')
-    else:
-        row = [0, '<object type= "image/PNG" data= "Butt_double_web.png"  ></object>']
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('/tr')
-
-    row = [0, "Note :- All dimensions are in mm  ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('/table')
-    rstr += t('h1 style="page-break-before:always"')  # page break
-    rstr += t('/h1')
 
     # ###########################################################################################
     # Header of the pdf fetched from dialougebox

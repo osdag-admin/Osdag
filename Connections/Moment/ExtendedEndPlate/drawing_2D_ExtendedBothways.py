@@ -471,6 +471,7 @@ class ExtendedEndPlate(object):
 		extnd_bothway_end_2d_front = ExtendedEnd2DFront(self)
 		extnd_bothway_end_2d_top = ExtendedEnd2DTop(self)
 		extnd_bothway_end_2d_side = ExtendedEnd2DSide(self)
+
 		if view == "Front":
 			extnd_bothway_end_2d_front.call_ExtndBoth_front(filename)
 		elif view == "Top":

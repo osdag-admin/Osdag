@@ -297,6 +297,9 @@ def bc_endplate_design(uiObj):
             if no_tension_side == 2:
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 1,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
+                if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    detailing_status = False
+
 
             elif no_tension_side == 4:
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 2,
@@ -399,6 +402,8 @@ def bc_endplate_design(uiObj):
                 number_of_bolts = 2 * no_tension_side
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 1, 'in_compression_flange': 1}
+                if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    detailing_status = False
 
             elif no_tension_side == 6:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,

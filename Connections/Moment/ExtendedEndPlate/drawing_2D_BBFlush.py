@@ -27,8 +27,8 @@ class FlushEndPlate(object):
 		"""
 		print "calculation", input_dict
 		self.folder = folder
-		self.beam_length_L1 = 750
-		self.beam_length_L2 = 750
+		self.beam_length_L1 = 700
+		self.beam_length_L2 = 700
 
 		self.beam_depth_D1 = int(beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
@@ -90,7 +90,7 @@ class FlushEndPlate(object):
 			self.bolts_outside_bottom_flange_row = 0
 		elif self.no_of_bolts == 6:
 			self.pitch12 = float(output_dict['Bolt']['Pitch12'])
-			self.pitch12 = float(output_dict['Bolt']['Pitch23'])
+			self.pitch23 = float(output_dict['Bolt']['Pitch23'])
 			self.bolts_outside_top_flange_row = 0
 			self.bolts_inside_top_flange_row = 2
 			self.bolts_inside_bottom_flange_row = 1
@@ -699,7 +699,7 @@ class FlushEnd2DFront(object):
 		vb_width = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
 		vb_ht = (int(3 * self.data_object.plate_length_L1))
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-			'-200 -600 1900 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+			'-350 -600 2000 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A8, self.A7).stroke('blue', width=2.5, linecap='square'))
@@ -843,7 +843,7 @@ class FlushEnd2DFront(object):
 		if self.data_object.weld == "Fillet Weld":
 			point = self.B2
 			theta = 60
-			offset = 150
+			offset = 100
 			textup = "          z " + str(self.data_object.flange_weld_thickness)
 			textdown = "          z " + str(self.data_object.flange_weld_thickness)
 			element = "weld"
@@ -923,7 +923,7 @@ class FlushEnd2DFront(object):
 		self.data_object.stiffener_weld = 0
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 100) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
 		text = "A"
@@ -1690,11 +1690,11 @@ class FlushEnd2DSide(object):
 
 		# ---------------------------------------------  Web Welding ----------------------------------------------
 		if self.data_object.weld == "Fillet Weld":
-			point = self.A4 + self.data_object.beam_depth_D2 / 2 * np.array([0, 1])
+			point = self.A4 + (self.data_object.beam_depth_D2 / 2 + self.data_object.beam_depth_D2 /4) * np.array([0, 1])
 			theta = 60
 			offset = 50
-			textup = "                    z " + str(self.data_object.web_thickness_tw1)
-			textdown = "                    z " + str(self.data_object.web_thickness_tw1)
+			textup = "                    z " + str(self.data_object.web_weld_thickness)
+			textdown = "                    z " + str(self.data_object.web_weld_thickness)
 			element = "weld"
 			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 		else:

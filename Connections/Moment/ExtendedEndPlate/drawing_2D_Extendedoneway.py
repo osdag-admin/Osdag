@@ -27,8 +27,8 @@ class OnewayEndPlate(object):
 		"""
 		print "calculation", input_dict
 		self.folder = folder
-		self.beam_length_L1 = 750
-		self.beam_length_L2 = 750
+		self.beam_length_L1 = 700
+		self.beam_length_L2 = 700
 
 		self.beam_depth_D1 = int(beam_data["D"])
 		self.beam_depth_D2 = self.beam_depth_D1
@@ -479,7 +479,6 @@ class OnewayEndPlate(object):
 			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
 
 
-
 class OnewayEnd2DFront(object):
 	"""
 	Contains functions for generating the front view of the Extended bothway endplate connection.
@@ -722,7 +721,7 @@ class OnewayEnd2DFront(object):
 		vb_width = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
 		vb_ht = (int(3 * self.data_object.plate_length_L1))
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-			'-200 -600 1800 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+			'-350 -600 2000 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A8, self.A7).stroke('blue', width=2.5, linecap='square'))
@@ -892,7 +891,7 @@ class OnewayEnd2DFront(object):
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
 		element = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Inside bottom bolt of flange -------------------------------------------
 		no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
@@ -903,7 +902,7 @@ class OnewayEnd2DFront(object):
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
 		element = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Weld of flange -------------------------------------------
 		if self.data_object.weld == "Fillet Weld":
@@ -978,7 +977,7 @@ class OnewayEnd2DFront(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 200) * np.array([0, -1])
+		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 100) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
 		text = "A"
@@ -1754,8 +1753,8 @@ class OnewayEnd2DSide(object):
 			point = self.A4 + self.data_object.beam_depth_D2/2 *np.array([0, 1])
 			theta = 60
 			offset = 50
-			textup = "                    z " + str(self.data_object.web_thickness_tw1)
-			textdown = "                    z " + str(self.data_object.web_thickness_tw1)
+			textup = "                    z " + str(self.data_object.web_weld_thickness)
+			textdown = "                    z " + str(self.data_object.web_weld_thickness)
 			element = "weld"
 			self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 		else:

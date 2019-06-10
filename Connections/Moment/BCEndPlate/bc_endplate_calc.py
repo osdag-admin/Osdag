@@ -590,11 +590,18 @@ def bc_endplate_design(uiObj):
         moment is taken by both flange and web welds = M/Z 
         z = ltf*lw/2 + lbf*lw/2 + d^2/3 
         """
+        # Stress for axial load in beam=Axial load/sum of (individual weld length *corresponding weld throat thickness)
+        # Total length for flange weld = 2* flange_weld_effective_length_top + 4* flange_weld_effective_length_bottom
+        # Weld throat thickness for flange = flange_weld_throat_size
+        # Total length for web weld = 2* web_weld_effective_length
+        # Weld throat thickness for flange = web_weld_throat_size
 
-        weld_force_axial = factored_axial_load / (
-                    flange_weld_effective_length_top * flange_weld_long_joint_top +
-                    flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *
-                    web_weld_effective_length * web_weld_long_joint)
+        # weld_force_axial = factored_axial_load / (flange_weld_effective_length_top * flange_weld_long_joint_top + flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *web_weld_effective_length * web_weld_long_joint)
+
+        weld_force_axial_stress = factored_axial_load / ( \
+                    2 * flange_weld_effective_length_top * flange_weld_long_joint_top * flange_weld_throat_size + \
+                    4 * flange_weld_effective_length_bottom * flange_weld_long_joint_bottom * flange_weld_throat_size + \
+                    2 * web_weld_effective_length * web_weld_long_joint * web_weld_throat_size)
 
         # flange_tension_moment = factored_moment / (beam_d - beam_tf)
         # weld_force_moment = flange_tension_moment / (
@@ -606,12 +613,12 @@ def bc_endplate_design(uiObj):
 
         weld_Iz = (2 * (web_weld_effective_length ** 3) / 12) * web_weld_throat_size + \
                    (2 * flange_weld_effective_length_top * (beam_d / 2 ) ** 2 + \
-                   2 * flange_weld_effective_length_bottom * (beam_d / 2 - beam_tf) ** 2) * flange_weld_throat_size
+                   4 * flange_weld_effective_length_bottom * (beam_d / 2 - beam_tf) ** 2) * flange_weld_throat_size
 
         flange_weld_Z = weld_Iz / (beam_d / 2)
         web_weld_Z = weld_Iz / (beam_d / 2 - beam_tf - beam_R1)
 
-        flange_weld_stress = factored_moment / flange_weld_Z + weld_force_axial / flange_weld_throat_size
+        flange_weld_stress = factored_moment / flange_weld_Z + weld_force_axial_stress
 
         weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
 
@@ -621,7 +628,7 @@ def bc_endplate_design(uiObj):
         flange_weld_throat_reqd = round(flange_weld_stress * flange_weld_throat_size / flange_weld_strength, 3)
         flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
 
-        web_weld_stress = math.sqrt((factored_moment / web_weld_Z + weld_force_axial / web_weld_throat_size) ** 2 + \
+        web_weld_stress = math.sqrt((factored_moment / web_weld_Z + weld_force_axial_stress) ** 2 + \
                           (weld_force_shear /web_weld_throat_size) ** 2)
 
         web_weld_throat_reqd = round(web_weld_stress * web_weld_throat_size /

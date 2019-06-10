@@ -1939,8 +1939,7 @@ class Ui_MainWindow(object):
 
     def on_change(self, newIndex):
         if newIndex == "Groove Weld (CJP)":
-            self.combo_webSize.setCurrentIndex(1)
-            self.combo_flangeSize.setCurrentIndex(1)
+
             self.combo_flangeSize.setEnabled(False)
             self.combo_webSize.setEnabled(False)
 
@@ -1950,16 +1949,7 @@ class Ui_MainWindow(object):
 
 
 
-    def on_change(self, newIndex):
-            if newIndex == "Groove Weld (CJP)":
-                self.combo_webSize.setCurrentIndex(1)
-                self.combo_flangeSize.setCurrentIndex(1)
-                self.combo_flangeSize.setEnabled(False)
-                self.combo_webSize.setEnabled(False)
 
-            else:
-                self.combo_flangeSize.setEnabled(True)
-                self.combo_webSize.setEnabled(True)
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Beam to Column End Plate Moment Connection"))

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_pitch.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -15,10 +15,10 @@ class Ui_Pitch(object):
         Dialog.setMinimumSize(QtCore.QSize(300, 200))
         font = QtGui.QFont()
         font.setFamily("Arial")
-        Dialog.setFont(font)
-        self.gridLayout = QtWidgets.QGridLayout(Dialog)
+        Pitch.setFont(font)
+        self.gridLayout = QtWidgets.QGridLayout(Pitch)
         self.gridLayout.setObjectName("gridLayout")
-        self.scrollArea = QtWidgets.QScrollArea(Dialog)
+        self.scrollArea = QtWidgets.QScrollArea(Pitch)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
@@ -233,10 +233,10 @@ class Ui_Pitch(object):
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 1, 0, 1, 1)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(Pitch)
+        QtCore.QMetaObject.connectSlotsByName(Pitch)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, Pitch):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Pitch Details"))
         self.label.setText(_translate("Dialog", "Sr. No."))
@@ -262,9 +262,9 @@ import icons_rc
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
+    Pitch = QtWidgets.QDialog()
     ui = Ui_Pitch()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    ui.setupUi(Pitch)
+    Pitch.show()
     sys.exit(app.exec_())
 

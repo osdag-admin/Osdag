@@ -65,7 +65,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness.setReadOnly(True)
         self.txt_stiffnrThickness.setObjectName("txt_stiffnrThickness")
         self.txt_stiffnrThickness_2 = QtWidgets.QLineEdit(Dialog)
-        self.txt_stiffnrThickness_2.setGeometry(QtCore.QRect(180, 150, 118, 23))
+        self.txt_stiffnrThickness_2.setGeometry(QtCore.QRect(180, 190, 118, 23))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -74,7 +74,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_2.setReadOnly(True)
         self.txt_stiffnrThickness_2.setObjectName("txt_stiffnrThickness_2")
         self.label_164 = QtWidgets.QLabel(Dialog)
-        self.label_164.setGeometry(QtCore.QRect(10, 150, 161, 16))
+        self.label_164.setGeometry(QtCore.QRect(10, 190, 161, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -83,7 +83,7 @@ class Ui_Stiffener(object):
         self.label_164.setFocusPolicy(QtCore.Qt.NoFocus)
         self.label_164.setObjectName("label_164")
         self.txt_stiffnrThickness_3 = QtWidgets.QLineEdit(Dialog)
-        self.txt_stiffnrThickness_3.setGeometry(QtCore.QRect(180, 190, 118, 23))
+        self.txt_stiffnrThickness_3.setGeometry(QtCore.QRect(180, 230, 118, 23))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -92,7 +92,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_3.setReadOnly(True)
         self.txt_stiffnrThickness_3.setObjectName("txt_stiffnrThickness_3")
         self.label_165 = QtWidgets.QLabel(Dialog)
-        self.label_165.setGeometry(QtCore.QRect(10, 190, 161, 16))
+        self.label_165.setGeometry(QtCore.QRect(10, 230, 161, 16))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(False)
@@ -114,7 +114,6 @@ class Ui_Stiffener(object):
         self.label_165.raise_()
         self.label_164.raise_()
         self.widget.raise_()
-
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
@@ -126,6 +125,7 @@ class Ui_Stiffener(object):
         self.label_163.setText(_translate("Dialog", "<html><head/><body><p>Thickness (mm)</p></body></html>"))
         self.label_164.setText(_translate("Dialog", "<html><head/><body><p>Moment demand (kNm)</p></body></html>"))
         self.label_165.setText(_translate("Dialog", "<html><head/><body><p>Moment capacity (kNm)</p></body></html>"))
+        self.label_167.setText(_translate("Dialog", "<html><head/><body><p>Notch size [n] (mm)</p></body></html>"))
 
 
 if __name__ == "__main__":

@@ -389,6 +389,16 @@ def bbExtendedEndPlateSplice(uiObj):
     gauge_dist_min = pitch_dist_min
     gauge_dist_max = pitch_dist_max
 
+    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
+    # TODO validate g_1 after excomm review
+
+    if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+        end_distance = edge_distance = int(math.ceil(1.7 * dia_hole))
+    else:
+        end_distance = edge_distance = int(float(1.5 * dia_hole))
+
+    g_1 = max(float(90), float(((2 * edge_distance) + beam_tw)))
+
     # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
 
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
@@ -421,11 +431,6 @@ def bbExtendedEndPlateSplice(uiObj):
         l_v = p_fi = p_fo = 50
     else:
         l_v = p_fi = p_fo = 60
-
-    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
-    # TODO validate g_1 after excomm review
-
-    g_1 = max(float(90), float(((2 * min_edge_distance) + beam_tw)))
 
     #######################################################################
     # Validation of Input Dock
@@ -495,6 +500,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
     end_plate_width_mini = max(g_1 + (2 * edge_dist_mini), beam_B)
     end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
+
+
 
     if end_plate_width != 0:
         if end_plate_width < end_plate_width_mini:
@@ -801,8 +808,14 @@ def bbExtendedEndPlateSplice(uiObj):
                     end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1)/2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini  = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini  = min_edge_distance = int(float(1.5 * dia_hole))
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
 
@@ -950,8 +963,15 @@ def bbExtendedEndPlateSplice(uiObj):
 
             end_plate_height_provided = height_available
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))?
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -1104,8 +1124,16 @@ def bbExtendedEndPlateSplice(uiObj):
                     end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             end_plate_width_provided = end_plate_width
+            # end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -1256,10 +1284,18 @@ def bbExtendedEndPlateSplice(uiObj):
                         logger.info(": Re-design the connection using bolt of higher diameter")
 
             end_plate_height_provided = height_available
-
             end_plate_width_provided = end_plate_width
-
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+
+            # end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))
+            cross_centre_gauge = max(float(90), g_1)
 
         #######################################################################
         # Validation of calculated Height and Width of End Plate
@@ -2593,7 +2629,7 @@ def bbExtendedEndPlateSplice(uiObj):
 
             outputobj['Stiffener']['Length'] = round(l_st, 3)
             outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = float(n_s, 3)
+            outputobj['Stiffener']['NotchSize'] = float(n_s)
             outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
             outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
             outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)

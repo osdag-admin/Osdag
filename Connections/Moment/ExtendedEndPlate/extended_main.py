@@ -902,21 +902,21 @@ class Maincontroller(QMainWindow):
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "Osdag_header.png")))
 		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
-	def osdag_image1(self):  # This function is created for calling the single butt weld image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_single_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_flange.png"))
+	def osdag_image1(self):  # This function is created for calling the single butt weld (flange) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_flange.png"))
 
-	def osdag_image2(self):  # This function is created for calling the single butt weld image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_double_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_flange.png"))
+	def osdag_image2(self):  # This function is created for calling the double butt weld (flange) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_flange.png"))
 
-	def osdag_image3(self):  # This function is created for calling the single butt weld image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_single_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_web.png"))
+	def osdag_image3(self):  # This function is created for calling the single butt weld (web) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_web.png"))
 
-	def osdag_image4(self):  # This function is created for calling the single butt weld image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_double_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_web.png"))
+	def osdag_image4(self):  # This function is created for calling the single butt weld (web) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_web.png"))
 
 
 	def design_prefer(self):
@@ -1167,15 +1167,15 @@ class Maincontroller(QMainWindow):
 		if isempty[0] == True:
 			status = self.resultObj['Bolt']['status']
 			self.call_3DModel("gradient_bg")
-			# if status is True:
-			# 	self.call_2D_drawing("All")
-			# else:
-			# 	self.ui.btn_pitchDetail.setDisabled(False)
-			# 	self.ui.btn_plateDetail.setDisabled(False)
-			# 	self.ui.btn_stiffnrDetail.setDisabled(False)
-			# 	self.ui.chkBx_connector.setDisabled(True)
-			# 	self.ui.chkBx_beamSec.setDisabled(True)
-			# 	self.ui.btn3D.setDisabled(True)
+			if status is True:
+				self.call_2D_drawing("All")
+			else:
+				self.ui.btn_pitchDetail.setDisabled(False)
+				self.ui.btn_plateDetail.setDisabled(False)
+				self.ui.btn_stiffnrDetail.setDisabled(False)
+				self.ui.chkBx_connector.setDisabled(True)
+				self.ui.chkBx_beamSec.setDisabled(True)
+				self.ui.btn3D.setDisabled(True)
 
 	def display_output(self, outputObj):
 		for k in outputObj.keys():
@@ -2341,12 +2341,12 @@ if __name__ == "__main__":
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)
 	rawLogger.addHandler(fh)
-	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/BCEndPlate/log.css"/>''')
+	rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Moment/ExtendedEndPlate/log.css"/>''')
 	# ----------------------------------------------------------------------------
 	# folder_path = "D:\Osdag_Workspace\extendedendplate"
 	app = QApplication(sys.argv)
 	module_setup()
-	folder_path = "/home/anjalijatav/Downloads/Workspace/Osdag"
+	folder_path = ""
 	if not os.path.exists(folder_path):
 		os.mkdir(folder_path, 0755)
 	image_folder_path = os.path.join(folder_path, 'images_html')

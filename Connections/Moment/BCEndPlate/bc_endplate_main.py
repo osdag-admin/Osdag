@@ -716,15 +716,7 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
-	def on_change(self, newIndex):
-		if newIndex == "Groove Weld (CJP)":
 
-			self.combo_flangeSize.setEnabled(False)
-			self.combo_webSize.setEnabled(False)
-
-		else:
-			self.combo_flangeSize.setEnabled(True)
-			self.combo_webSize.setEnabled(True)
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -919,7 +911,7 @@ class Maincontroller(QMainWindow):
 		"""
 		uiInput = self.designParameters()
 		self.save_inputs_totext(uiInput)
-		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
+
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
 			self.closed.emit()
@@ -1032,7 +1024,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		self.uiObj = self.get_user_inputs()
-		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
+
 		# if self.designPrefDialog.saved is not True:
 		# 	design_pref = self.designPrefDialog.save_default_para()
 		# else:
@@ -1152,11 +1144,11 @@ class Maincontroller(QMainWindow):
 		if self.ui.combo_plateThick.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
-		if self.ui.combo_webSize.currentIndex() == 0:
+		if self.ui.combo_webSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Web weld thickness")
 
 
-		if self.ui.combo_flangeSize.currentIndex() == 0:
+		if self.ui.combo_flangeSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Flange weld thickness")
 
 		if len(incomplete_list) > 0:

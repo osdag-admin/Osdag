@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>427</width>
-    <height>268</height>
+    <width>620</width>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -222,47 +222,14 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moment capacity (kNm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="txt_stiffnrThickness_5">
+  <widget class="QWidget" name="widget" native="true">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>150</y>
-     <width>118</width>
-     <height>23</height>
+     <x>320</x>
+     <y>20</y>
+     <width>291</width>
+     <height>191</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_167">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>150</y>
-     <width>161</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="focusPolicy">
-    <enum>Qt::NoFocus</enum>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Notch size [n] (mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <zorder>txt_stiffnrHeight</zorder>
@@ -275,8 +242,7 @@
   <zorder>txt_stiffnrThickness_3</zorder>
   <zorder>label_165</zorder>
   <zorder>label_164</zorder>
-  <zorder>txt_stiffnrThickness_5</zorder>
-  <zorder>label_167</zorder>
+  <zorder>widget</zorder>
  </widget>
  <resources/>
  <connections/>

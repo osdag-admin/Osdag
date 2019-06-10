@@ -488,7 +488,7 @@ class ExtendedEndPlate(object):
 			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendTop.png"))
 
 			filename = os.path.join(str(self.folder), 'images_html', 'extendSide.svg')
-			extnd_bothway_end_2d_top.call_ExtndBoth_top(filename)
+			extnd_bothway_end_2d_side.call_ExtndBoth_side(filename)
 			cairosvg.svg2png(file_obj=filename, write_to=os.path.join(str(self.folder), "images_html", "extendSide.png"))
 
 

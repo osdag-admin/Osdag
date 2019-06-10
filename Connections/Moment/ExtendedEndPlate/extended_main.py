@@ -105,6 +105,7 @@ class DesignPreference(QDialog):
 		self.ui.btn_close.clicked.connect(self.close_designPref)
 		self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
 
+
 	def save_designPref_para(self):
 		uiObj = self.maincontroller.get_user_inputs()
 		self.saved_designPref = {}
@@ -262,7 +263,7 @@ class Stiffener(QDialog):
 		self.ui = Ui_Stiffener()
 		self.ui.setupUi(self)
 		self.maincontroller = parent
-
+		self.ui.widget.setPixmap(QtGui.QPixmap(":/newPrefix/images/Ui_stiffener.png"))
 		uiObj = self.maincontroller.designParameters()
 		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
 
@@ -304,6 +305,10 @@ class Pitch(QDialog):
 		if uiObj["Member"]["Connectivity"] == "Flush":
 
 			if no_of_bolts == 4:
+				pixmap = QPixmap(":/newPrefix/images/Flush/Flush_4.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
 				self.ui.lbl_1.setText('Pitch')
 				self.ui.lbl_mem2.hide()
@@ -331,9 +336,16 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch8.hide()
 				self.ui.lineEdit_pitch9.hide()
 
+
+
 			elif no_of_bolts == 6:
+				pixmap = QPixmap(":/newPrefix/images/Flush/Flush_6.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch23']))
+				self.ui.label_3.setPixmap(QtGui.QPixmap("../../../ResourceFiles/images/cleatAngle.png"))
 				self.ui.lbl_1.setText('Pitch12')
 				self.ui.lbl_2.setText('Pitch23')
 				self.ui.lbl_mem3.hide()
@@ -358,9 +370,14 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch8.hide()
 				self.ui.lineEdit_pitch9.hide()
 
+
 		elif uiObj["Member"]["Connectivity"] == "Extended one way":
 
 			if no_of_bolts == 6:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_6.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lbl_1.setText('Pitch23')
 				self.ui.lbl_mem2.hide()
@@ -389,6 +406,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 8:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_8.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lbl_1.setText('Pitch23')
@@ -416,6 +437,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 10:
+				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_10.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -444,6 +469,10 @@ class Pitch(QDialog):
 
 			if no_of_bolts == 8:
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch']))
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_8.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lbl_1.setText('Pitch')
 				self.ui.lbl_mem2.hide()
 				self.ui.lbl_mem3.hide()
@@ -470,6 +499,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch8.hide()
 				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 12:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_10.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -495,6 +528,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch8.hide()
 				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 16:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_16.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch23']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -518,6 +555,10 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch8.hide()
 				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 20:
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_20.png")
+				pixmap.scaledToHeight(60)
+				pixmap.scaledToWidth(50)
+				self.ui.label_3.setPixmap(pixmap)
 				self.ui.lineEdit_pitch.setText(str(resultObj_plate['Bolt']['Pitch12']))
 				self.ui.lineEdit_pitch2.setText(str(resultObj_plate['Bolt']['Pitch34']))
 				self.ui.lineEdit_pitch3.setText(str(resultObj_plate['Bolt']['Pitch45']))
@@ -659,6 +700,10 @@ class Maincontroller(QMainWindow):
 		self.ui.btnFront.clicked.connect(lambda : self.call_2D_drawing("Front"))
 		self.ui.btnTop.clicked.connect(lambda : self.call_2D_drawing("Top"))
 		self.ui.btnSide.clicked.connect(lambda : self.call_2D_drawing("Side"))
+		self.ui.actionfinPlate_quit.setShortcut('Ctrl+Q')
+		self.ui.actionfinPlate_quit.setStatusTip('Exit application')
+		self.ui.actionfinPlate_quit.triggered.connect(qApp.quit)
+
 		self.ui.combo_diameter.currentIndexChanged[str].connect(self.bolt_hole_clearance)
 		self.ui.combo_grade.currentIndexChanged[str].connect(self.call_bolt_fu)
 		self.ui.txt_Fu.textChanged.connect(self.call_weld_fu)
@@ -701,6 +746,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
+		self.ui.btn_SaveMessages.clicked.connect(self.save_log_messages)
 
 		self.ui.btn3D.clicked.connect(lambda : self.call_3DModel("gradient_bg"))
 		self.ui.chkBx_beamSec.clicked.connect(lambda : self.call_3DBeam("gradient_bg"))
@@ -734,6 +780,10 @@ class Maincontroller(QMainWindow):
 		self.fuse_model = None
 		self.resultObj = None
 		self.disable_buttons()
+
+
+
+
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -942,6 +992,7 @@ class Maincontroller(QMainWindow):
 		"""
 		uiInput = self.designParameters()
 		self.save_inputs_totext(uiInput)
+
 		action = QMessageBox.question(self, "Message", "Are you sure to quit?", QMessageBox.Yes, QMessageBox.No)
 		if action == QMessageBox.Yes:
 			self.closed.emit()
@@ -1041,6 +1092,7 @@ class Maincontroller(QMainWindow):
 
 		"""
 		self.uiObj = self.get_user_inputs()
+
 		# if self.designPrefDialog.saved is not True:
 		# 	design_pref = self.designPrefDialog.save_default_para()
 		# else:
@@ -1056,6 +1108,16 @@ class Maincontroller(QMainWindow):
 		loc = self.ui.combo_connLoc.currentText()
 		if loc == "Extended both ways":
 			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Extended one way":
+			pixmap = QPixmap(":/newPrefix/images/extendedbothways.png")
+			pixmap.scaledToHeight(60)
+			pixmap.scaledToWidth(50)
+			self.ui.lbl_connectivity.setPixmap(pixmap)
+		elif loc == "Flush":
+			pixmap = QPixmap(":/newPrefix/images/finwindow.png")
 			pixmap.scaledToHeight(60)
 			pixmap.scaledToWidth(50)
 			self.ui.lbl_connectivity.setPixmap(pixmap)
@@ -1129,10 +1191,10 @@ class Maincontroller(QMainWindow):
 		if self.ui.combo_plateThick.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
-		if self.ui.combo_webSize.currentIndex() == 0:
+		if self.ui.combo_webSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Web weld thickness")
 
-		if self.ui.combo_flangeSize.currentIndex() == 0:
+		if self.ui.combo_flangeSize.currentIndex() == 0 and self.ui.combo_weld_method.currentIndex() == 1:
 			incomplete_list.append("Flange weld thickness")
 
 		if len(incomplete_list) > 0:
@@ -1579,28 +1641,28 @@ class Maincontroller(QMainWindow):
 		b = colorTup[2]
 		self.display.set_bg_gradient_color(r, g, b, 255, 255, 255)
 
-	# def create_2D_CAD(self):
-	# 	'''
-	#
-	# 	Returns: The 3D model of extendedplate depending upon component selected
-	#
-	# 	'''
-	# 	self.ExtObj = self.create_extended_both_ways()
-	# 	if self.component == "Beam":
-	# 		final_model = self.ExtObj.get_beam_models()
-	#
-	# 	elif self.component == "Connector":
-	# 		cadlist = self.ExtObj.get_connector_models()
-	# 		final_model = cadlist[0]
-	# 		for model in cadlist[1:]:
-	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-	# 	else:
-	# 		cadlist = self.ExtObj.get_models()
-	# 		final_model = cadlist[0]
-	# 		for model in cadlist[1:]:
-	# 			final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-	#
-	# 	return final_model
+	def create_2D_CAD(self):
+		'''
+
+		Returns: The 3D model of extendedplate depending upon component selected
+
+		'''
+		self.ExtObj = self.create_extended_both_ways()
+		if self.component == "Beam":
+			final_model = self.ExtObj.get_beam_models()
+
+		elif self.component == "Connector":
+			cadlist = self.ExtObj.get_connector_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+		else:
+			cadlist = self.ExtObj.get_models()
+			final_model = cadlist[0]
+			for model in cadlist[1:]:
+				final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
+		return final_model
 
 	def save_3D_cad_images(self):
 		'''
@@ -2274,6 +2336,7 @@ class Maincontroller(QMainWindow):
 		dialog.show()
 
 	def design_examples(self):
+
 		root_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'ResourceFiles', 'design_example', '_build', 'html')
 		for html_file in os.listdir(root_path):
 			if html_file.startswith('index'):
@@ -2333,10 +2396,11 @@ def launch_extendedendplate_controller(osdagMainWindow, folder):
 
 if __name__ == "__main__":
 	# --------------- To display log messages in different colors ---------------
+	set_osdaglogger()
 	rawLogger = logging.getLogger("raw")
 	rawLogger.setLevel(logging.INFO)
 	# fh = logging.FileHandler(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'), mode="w")
-	fh = logging.FileHandler(os.path.join('..', 'extnd.log'), mode='w')
+	fh = logging.FileHandler("Connections/Moment/ExtendedEndPlate/extnd.log", mode='w')
 
 	formatter = logging.Formatter('''%(message)s''')
 	fh.setFormatter(formatter)

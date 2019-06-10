@@ -222,8 +222,9 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         if float(number_of_bolts) <= 20:
 
             flange_weld_size_min = str(float(outObj["Weld"]["FlangeSizeMin"]))
-            flange_weld_throat_max = str(float(outObj["Weld"]["FlangeSizeMax"]))
+            flange_weld_size_max = str(float(outObj["Weld"]["FlangeSizeMax"]))
             flange_weld_throat_size = str(float(outObj["Weld"]["FlangeThroat"]))
+            flange_weld_size_provd = str(float(uiObj["Weld"]["Flange (mm)"]))
 
             flange_weld_stress = str(float(outObj["Weld"]["FlangeStress"]))
             flange_weld_strength = str(float(outObj["Weld"]["FlangeStrength"]))
@@ -236,15 +237,19 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             web_weld_strength = str(float(outObj["Weld"]["WebStrength"]))
 
             web_weld_size_min = str(float(outObj["Weld"]["WebSizeMin"]))
-            web_weld_throat_max = str(float(outObj["Weld"]["WebSizeMax"]))
+            web_weld_size_max = str(float(outObj["Weld"]["WebSizeMax"]))
             web_weld_throat_size = str(float(outObj["Weld"]["WebThroat"]))
+            web_weld_size_provd = str(float(uiObj["Weld"]["Web (mm)"]))
 
             web_weld_effective_length = str(float(outObj["Weld"]["WebLength"]))
 
 
 
     else:
-        groove_weld_size = str(float(outObj["Weld"]["Size"]))
+        weld_size = str(float(outObj["Weld"]["Size"]))
+        groove_weld_size_flange = str(float(outObj["Weld"]["FlangeSize"]))
+        groove_weld_size_web = str(float(outObj["Weld"]["WebSize"]))
+
 
 # Calling pitch distance values from Output dict of calc file
     if endplate_type == 'Flush end plate':
@@ -503,7 +508,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Material", "Fe " + beam_fu]
+    row = [2, "Grade of Steel", "Fe " + beam_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -515,7 +520,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Material", "Fe " + column_fu]
+    row = [2, "Grade of Steel", "Fe " + column_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -552,7 +557,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Hole", bolt_hole_type]
+    row = [2, "Clearance hole for fasteners", bolt_hole_type]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -592,7 +597,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [2, "Grade", bolt_grade]
+    row = [2, "Property Class", bolt_grade]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
@@ -602,6 +607,14 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
+    rstr += t('/tr')
+
+    bolt_hole_dia = float(bolt_dia) + float(bolt_hole_clrnce)
+    bolt_hole_dia_str = str(float(bolt_hole_dia))
+    row = [2, "Hole diameter (<i>d</i><sub>o</sub>) (mm)", bolt_hole_dia_str]
+    rstr += t('tr')
+    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+    rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
     row = [2, "Number of Bolts (n)", number_of_bolts]
@@ -855,21 +868,25 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('/tr')
 
 
-    row = [0, "Assembly ", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    if connectivity == "Column flange-Beam web":
-        row = [1, "Beam-Column flange Clearance (mm)", plate_thk]
-    else:
-        row = [1, "Beam-Column web Clearance (mm)", plate_thk]
-
-    rstr += t('tr')
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
-
+    # row = [0, "Assembly ", " "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
+    #
+    # if connectivity == "Column flange-Beam web":
+    #     row = [1, "Beam-Column flange Clearance (mm)", plate_thk]
+    # else:
+    #     row = [1, "Beam-Column web Clearance (mm)", plate_thk]
+    #
+    # rstr += t('tr')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2 "') + row[2] + t('/td')
+    # rstr += t('/tr')
+    #
+    # row = [1,"Note :- Here clearance is the thickness of the plate which lies between beam and column. "," "]
+    # rstr += t('tr')
+    # rstr += t('td colspan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('/tr')
     # &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     # page break
     rstr += t('/table')
@@ -964,14 +981,6 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    bolt_hole_dia = float(bolt_dia) + float(bolt_hole_clrnce)
-    bolt_hole_dia_str = str(float(bolt_hole_dia))
-    row = [1, "Hole diameter (<i>d</i><sub>o</sub>) (mm)", bolt_hole_dia_str]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + row[2] + t('/td')
-    rstr += t('/tr')
-
     row = [1, "Material Grade (MPa) (overwrite)", bolt_grade_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
@@ -1020,7 +1029,11 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Type of Edges", typeof_edge]
+    if typeof_edge == "a - Sheared or hand flame cut":
+        row = [1, "Type of Edges", "Sheared or hand flange cut"]
+    else:
+        row = [1, "Type of Edges", "Rolled, machine-flame cut, sawn and planed"]
+
     rstr += t('tr')
     rstr += t('td clospan="2" class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -1621,6 +1634,18 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
     rstr += t('tr')
 
+    if weld_method == "Groove Weld (CJP)":
+        row = [0, "Gap between beam and plate","Refernce: IS 9595:1996, Annex B",weld_size,""]
+        rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+        rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+        rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+        rstr += t('/tr')
+    else:
+        rstr += t('/tr')
+        # row = [0,"","","",""]
+
+
   # flange web checks
     row = [0, "Flange", " "]
     rstr += t('tr')
@@ -1647,53 +1672,62 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
             rstr += t('/tr')
 
-            if float(flange_weld_throat_size) < float(flange_weld_size_min) or float(flange_weld_throat_size) > (flange_weld_throat_max):
-                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_throat_max) + ",""&#62; " + str(flange_weld_throat_max) , str(float(flange_weld_throat_size)), " <p align=left style=color:red><b>Fail</b></p>"]
+            if float(flange_weld_size_provd) < float(flange_weld_size_min) or float(flange_weld_size_provd) > (flange_weld_size_max):
+                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_size_max) + ",""&#62; " + str(flange_weld_size_min) , str(float(flange_weld_size_provd)), " <p align=left style=color:red><b>Fail</b></p>"]
+                rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+                rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+                rstr += t('/tr')
 
             else:
-                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_throat_max) + ",""&#62; " + str(flange_weld_throat_max) , str(float(flange_weld_throat_size)), " <p align=left style=color:red><b>Pass</b></p>"]
-
-
-            # if float(flange_weld_stress) > float(flange_weld_strength):
-            #     row = [0, "Critical stress in weld at flange (N/mm^2)",
-            #            "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-            #            flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
-            # else:
-            #     row = [0, "Critical stress in weld at flange (N/mm^2)",
-            #            "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
-            #            flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
-
-
-
-    else:
-        row = [0,"Weld Size at Flange (mm)","",groove_weld_size,""]
-
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    if weld_method == "Fillet Weld":
-        if float(number_of_bolts) <= 20:
-
+                row = [0, "Weld throat thickness at flange (mm)", "&#60; " + str(flange_weld_size_max) + ",""&#62; " + str(flange_weld_size_min) , str(float(flange_weld_size_provd)), " <p align=left style=color:green><b>Pass</b></p>"]
+                rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+                rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+                rstr += t('/tr')
 
             if float(flange_weld_stress) > float(flange_weld_strength):
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + flange_weld_stress,
+                       "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
                        "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
+
+
             else:
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
-                       "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + flange_weld_stress,
+                       "&#8805; (<i>f</i><sub>u</sub> / <i>&#120574;</i><sub>mb</sub> * &#8730;3) =" + flange_weld_stress,
                        "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
+
     else:
-        pass
+        row = [0,"Weld Size at Flange (mm)","min(beam flange thickness, end plate thickness) = min(" +str(float(beam_tf)) + " , "+str(float(plate_thk))+")" ,groove_weld_size_flange,""]
+
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
+
+    # rstr += t('tr')
+    # if weld_method == "Fillet Weld":
+    #     if float(number_of_bolts) <= 20:
+    #
+    #
+    #         if float(flange_weld_stress) > float(flange_weld_strength):
+    #             row = [0, "Critical stress in weld at flange (N/mm^2)",
+    #                    "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + flange_weld_stress,
+    #                    "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:red><b>Fail</b></p>"]
+    #         else:
+    #             row = [0, "Critical stress in weld at flange (N/mm^2)",
+    #                    "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + flange_weld_stress,
+    #                    "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + flange_weld_strength, " <p align=left style=color:green><b>Pass</b></p>"]
+    # else:
+    #     pass
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
 
 # web checks
@@ -1706,47 +1740,69 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
     rstr += t('tr')
     if weld_method == "Fillet Weld":
         if float(number_of_bolts) <= 20:
-            row = [0, "Effective weld length on flange (each side) (mm)", "", web_weld_effective_length, ""]
+            row = [0, "Effective weld length at web (each side) (mm)", "", web_weld_effective_length, ""]
             rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
             rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
             rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
             rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
             rstr += t('/tr')
 
-            if float(web_weld_throat_size) < float(web_weld_size_min) or float(web_weld_throat_size) > (web_weld_throat_max):
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Fail</b></p>"]
+            if float(web_weld_size_provd) < float(web_weld_size_min) or float(web_weld_size_provd) > (web_weld_size_max):
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_max)+ ",""&#62; " + str(web_weld_size_min) , web_weld_size_provd, " <p align=left style=color:red><b>Fail</b></p>"]
+                rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+                rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+                rstr += t('/tr')
 
             else:
-                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_min)+ ",""&#62; " + str(web_weld_throat_max) , web_weld_throat_size, " <p align=left style=color:red><b>Pass</b></p>"]
+                row = [0, "Weld throat thickness at web (mm)", "&#60; " + str(web_weld_size_max)+ ",""&#62; " + str(web_weld_size_min) , web_weld_size_provd, " <p align=left style=color:green><b>Pass</b></p>"]
+                rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+                rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+                rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+                rstr += t('/tr')
 
-    else:
-        row = [0, "Weld Size at Web (mm)","", groove_weld_size, ""]
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
-
-    rstr += t('tr')
-    if weld_method == "Fillet Weld":
-        if float(number_of_bolts) <= 20:
             if float(web_weld_stress) > float(web_weld_strength):
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
                        "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
                        "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
                        " <p align=left style=color:red><b>Fail</b></p>"]
+
             else:
                 row = [0, "Critical stress in weld at flange (N/mm^2)",
                        "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
                        "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
                        " <p align=left style=color:green><b>Pass</b></p>"]
+
     else:
-        pass
+        row = [0, "Weld Size at Web (mm)","min(beam web thickness, plate thickness) = min("+ str(float(beam_tw)) +" , "+ str(float(plate_thk)) + ")", groove_weld_size_web, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
+
+    # rstr += t('tr')
+    # if weld_method == "Fillet Weld":
+    #     if float(number_of_bolts) <= 20:
+    #         if float(web_weld_stress) > float(web_weld_strength):
+    #             row = [0, "Critical stress in weld at flange (N/mm^2)",
+    #                    "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
+    #                    "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
+    #                    " <p align=left style=color:red><b>Fail</b></p>"]
+    #         else:
+    #             row = [0, "Critical stress in weld at flange (N/mm^2)",
+    #                    "&#8805; (<i>f</i><sub>u</sub> / (<i>&#120574;</i><sub>mb</sub> * &#8730;3)) =" + web_weld_stress,
+    #                    "(<i>f</i><sub>u</sub> * <i>l</i><sub>w</sub> * <i>t</i><sub>e</sub>) / (<i>&#120574;</i><sub>mw</sub> * &#8730;3) = " + web_weld_strength,
+    #                    " <p align=left style=color:green><b>Pass</b></p>"]
+    # else:
+    #     pass
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
 
 
@@ -2009,16 +2065,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                   '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
+        datapng = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="400" ></object>' % side
+        dataside = '<object type="image/PNG" data= %s height = "480px" width = "auto" ></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="400"></object>' % top
+        datatop = '<object type="image/PNG" data= %s height = "360px" width = "560px" ></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="450"></object>' % front
+        datafront = '<object type="image/PNG" data= %s height = "480px" width = "auto" ></object>' % front
 
         if status == 'True':
             row = [0, datapng]
@@ -2049,16 +2105,16 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
                   '') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s width ="500"></object>' % png
+        datapng = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % png
 
         side = folder + "/images_html/extendSide.png"
-        dataside = '<object type="image/PNG" data= %s width ="700" height="500" ></object>' % side
+        dataside = '<object type="image/PNG" data= %s height = "450px" width = "560px" ></object>' % side
 
         top = folder + "/images_html/extendTop.png"
-        datatop = '<object type="image/PNG" data= %s width ="500"  ></object>' % top
+        datatop = '<object type="image/PNG" data= %s height = "360px" width = "auto" ></object>' % top
 
         front = folder + "/images_html/extendFront.png"
-        datafront = '<object type="image/PNG" data= %s width ="400"> height = "400"</object>' % front
+        datafront = '<object type="image/PNG" data= %s height = "450px" width = "560px" </object>' % front
 
         if status == 'True':
             row = [1, dataside]

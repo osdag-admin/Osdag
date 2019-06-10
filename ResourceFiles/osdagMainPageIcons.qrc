@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="newPrefix">
-    <file>images/1.png</file>
     <file>images/extended.png</file>
     <file>images/coverplate.png</file>
     <file>images/click_image.png</file>
@@ -24,6 +23,5 @@
     <file>images/webextnone.png</file>
     <file>images/webextnboth.png</file>
     <file>images/beam_column_endplate.png</file>
-    <file>images/beam_column.png</file>
   </qresource>
 </RCC>

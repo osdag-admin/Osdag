@@ -1326,6 +1326,8 @@ class Maincontroller(QMainWindow):
 
 		if self.ui.combo_weld_method.currentText() == "Fillet Weld":
 			self.ui.btn_weldDetails.setDisabled(True)
+			self.ui.txt_criticalFlange.setEnabled(True)
+			self.ui.txt_criticalWeb.setEnabled(True)
 			weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
 			self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 			weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]

@@ -102,13 +102,16 @@ def bc_endplate_design(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
+    weld_thickness_flange = 0
+    weld_thickness_web = 0
     if uiObj["Weld"]["Method"] == "Fillet Weld":
         weld_method = 'fillet'
+
+        weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
+        weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+
     else:   # "Groove Weld (CJP)"
         weld_method = 'groove'
-
-    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         edge_type = 'hand_flame_cut'
@@ -790,7 +793,7 @@ def bc_endplate_design(uiObj):
             break
     st_width = st_height + 100.0
     st_notch_top = 50.0
-    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5)
+    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5, minimum_value=5)
     st_beam_weld = 1.0
     st_plate_weld = 10.0
 

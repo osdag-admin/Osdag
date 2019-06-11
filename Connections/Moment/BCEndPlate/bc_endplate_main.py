@@ -1214,11 +1214,13 @@ class Maincontroller(QMainWindow):
 		if self.ui.combo_plateThick.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
-		if self.ui.combo_webSize.currentIndex() == 0:
-			incomplete_list.append("Web weld thickness")
+		if self.ui.combo_weld_method.currentIndex() == 1:
 
-		if self.ui.combo_flangeSize.currentIndex() == 0:
-			incomplete_list.append("Flange weld thickness")
+			if self.ui.combo_webSize.currentIndex() == 0:
+				incomplete_list.append("Web weld thickness")
+
+			if self.ui.combo_flangeSize.currentIndex() == 0:
+				incomplete_list.append("Flange weld thickness")
 
 		if len(incomplete_list) > 0:
 			flag = False

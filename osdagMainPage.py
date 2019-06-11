@@ -59,6 +59,7 @@ class OsdagMainWindow(QMainWindow):
         #show_msg = pyqtSignal()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.showMaximized()
         list_of_items = {'Osdagpage': 0, 'connectionpage': 1, 'beamtobeampage': 2, 'beamtocolumnpage': 3,'compressionpage': 4, 'flexuralpage': 5}
 
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
@@ -80,12 +81,12 @@ class OsdagMainWindow(QMainWindow):
         self.ui.btn_plate.clicked.connect(self.unavailable)
         self.ui.comboBox_help.setCurrentIndex(0)
         self.ui.comboBox_help.currentIndexChanged.connect(self.selection_change)
-        self.ui.rdbtn_beamtobeam.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtobeampage'], list_of_items['Osdagpage']))
+        #self.ui.rdbtn_beamtobeam.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtobeampage'], list_of_items['Osdagpage']))
 
 
-        self.ui.rdbtn_beamcolumn.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtocolumnpage'], list_of_items['Osdagpage']))
-        self.ui.rdbtn_peb.setDisabled(True)
-        self.ui.rdbtn_colcol.setDisabled(True)
+        #self.ui.rdbtn_beamcolumn.clicked.connect(lambda: self.change_desgin_page(list_of_items['beamtocolumnpage'], list_of_items['Osdagpage']))
+        #self.ui.rdbtn_peb.setDisabled(True)
+        #self.ui.rdbtn_colcol.setDisabled(True)
 
     def selection_change(self):
         loc = self.ui.comboBox_help.currentText()
@@ -223,8 +224,7 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_coverplate.isChecked():
-            # launch_coverplate_controller(self, folder)
-            launch_bc_endplate_controller(self, folder)
+            launch_coverplate_controller(self, folder)
             self.ui.myStackedWidget.setCurrentIndex(0)
 
         elif self.ui.rdbtn_endplate_ext.isChecked():

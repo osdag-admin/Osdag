@@ -1326,16 +1326,20 @@ class Maincontroller(QMainWindow):
 
 		if self.ui.combo_weld_method.currentText() == "Fillet Weld":
 			self.ui.btn_weldDetails.setDisabled(True)
-			self.ui.txt_criticalFlange.setEnabled(True)
-			self.ui.txt_criticalWeb.setEnabled(True)
+			self.ui.label_163.show()
+			self.ui.label_164.show()
+			self.ui.txt_criticalFlange.show()
+			self.ui.txt_criticalWeb.show()
 			weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
 			self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 			weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
 			self.ui.txt_criticalWeb.setText(str(weld_stress_web))
 		elif self.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
 			self.ui.btn_weldDetails.setEnabled(True)
-			self.ui.txt_criticalFlange.setDisabled(True)
-			self.ui.txt_criticalWeb.setDisabled(True)
+			self.ui.txt_criticalFlange.hide()
+			self.ui.txt_criticalWeb.hide()
+			self.ui.label_163.hide()
+			self.ui.label_164.hide()
 		else:
 			pass
 

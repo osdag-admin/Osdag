@@ -169,7 +169,7 @@ def bc_endplate_design(uiObj):
     column_d = float(dictcolumndata["D"])
     column_B = float(dictcolumndata["B"])
     column_R1 = float(dictcolumndata["R1"])
-    ccolumn_clear_d = column_d - 2 * (column_tf + column_R1)
+    column_clear_d = column_d - 2 * (column_tf + column_R1)
 
     # Minimum Design Action (Cl. 10.7, IS 800:2007) #TODO:  Correction for plastic moment capacity
     beam_moment = 1.2 * beam_Zz * beam_fy / 1.10

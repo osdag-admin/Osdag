@@ -1344,7 +1344,7 @@ class ExtendedEnd2DTop(object):
         if nofc >= 1:
             for i in range(nofc):
                 ptx = self.P2 + self.data_object.edge_dist * np.array([0, 1]) - \
-                      (self.data_object.flange_thickness_T1 + self.data_object.web_thickness_tw1) * np.array([1, 0]) + \
+                      (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array([1, 0]) + \
                       i * self.data_object.cross_centre_gauge_dist * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
                 rect_width = self.data_object.bolt_diameter
@@ -1460,7 +1460,7 @@ class ExtendedEnd2DTop(object):
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-        pt_a3 = self.A2 + (self.data_object.beam_length_L2) * np.array([1, 0])
+        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 150) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
         txt_3 = pt_b3 + (-20 * np.array([0, 1])) + (40 * np.array([1, 0]))
         text = "B"
@@ -2220,15 +2220,15 @@ class ExtendedEnd2DSide(object):
         theta = 1
         offset = 1
         textup = " "
-        textdown = "Beam " + str(self.data_object.column_designation)
+        textdown = "Beam " + str(self.data_object.beam_designation)
         element = " "
-        self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
         point = self.AA1
         theta = 1
         offset = 1
         textup = " "
-        textdown = "Beam " + str(self.data_object.beam_designation)
+        textdown = "Beam " + str(self.data_object.column_designation)
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 

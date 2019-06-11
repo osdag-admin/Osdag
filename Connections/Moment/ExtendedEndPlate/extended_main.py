@@ -1324,17 +1324,19 @@ class Maincontroller(QMainWindow):
 		edge_distance = resultObj["Bolt"]["Edge"]
 		self.ui.txt_edgeDist.setText(str(edge_distance))
 
-		if self.ui.combo_weld_method.currentText == "Fillet Weld":
-			self.ui.btn_weldDetails.setEnabled(False)
+		if self.ui.combo_weld_method.currentText() == "Fillet Weld":
+			self.ui.btn_weldDetails.setDisabled(True)
 			weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
 			self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
 			weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
 			self.ui.txt_criticalWeb.setText(str(weld_stress_web))
+		elif self.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+			self.ui.btn_weldDetails.setEnabled(True)
+			self.ui.txt_criticalFlange.setDisabled(True)
+			self.ui.txt_criticalWeb.setDisabled(True)
 		else:
-			self.ui.label_163.hide()
-			self.ui.label_164.hide()
-			self.ui.txt_criticalFlange.hide()
-			self.ui.txt_criticalWeb.hide()
+			pass
+
 	def display_log_to_textedit(self):
 		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):

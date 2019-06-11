@@ -893,6 +893,7 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = float(round(cont_plate_comp_width, 3))
     outputobj['ContPlateComp']['Thickness'] = float(round(cont_plate_tk_flange, 3))  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = float(round(cont_plate_comp_tk_min, 3))
+    outputobj['ContPlateComp']['NotchSize'] = float(round(notch_cont_comp, 3))
     outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Number'] = 2
@@ -900,6 +901,7 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['Width'] = float(round(cont_plate_tens_width, 3))
     outputobj['ContPlateTens']['Thickness'] = float(round(cont_plate_tk_flange, 3))          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = float(round(cont_plate_tens_tk_min, 3))
+    outputobj['ContPlateTens']['NotchSize'] = float(round(notch_cont_tens, 3))
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
     outputobj['Stiffener']['Status'] = st_status

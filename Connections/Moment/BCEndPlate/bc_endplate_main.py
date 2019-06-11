@@ -257,7 +257,7 @@ class PlateDetails(QDialog):
 		self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateTens']['Width']))
 		self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateTens']['Length']))
 		self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateTens']['Thickness']))
-		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['ThicknessMin']))#Notch Size ??
+		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['NotchSize']))
 		self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateTens']['Weld']))
 
 class PlateDetailsBottom(QDialog):
@@ -274,7 +274,7 @@ class PlateDetailsBottom(QDialog):
 		self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateComp']['Width']))
 		self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateComp']['Length']))
 		self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateComp']['Thickness']))
-		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['ThicknessMin']))
+		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['NotchSize']))
 		self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateComp']['Weld']))
 
 
@@ -673,6 +673,7 @@ class Maincontroller(QMainWindow):
 		QMainWindow.__init__(self)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+		self.showMaximized()
 		self.folder = folder
 		self.connection = "BCEndPlate"
 		self.get_columndata()
@@ -963,20 +964,20 @@ class Maincontroller(QMainWindow):
 		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def image1(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_double_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_flange.png"))
 
 	def image2(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_double_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_double_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_double_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_web.png"))
 
 	def image3(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_single_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_web.png"))
 
 	def image4(self):
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_single_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_single_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/BCEndPlate/ResourceFiles/images", "Butt_weld_single_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_flange.png"))
 
 	def design_prefer(self):
 		self.designPrefDialog.show()
@@ -1214,11 +1215,13 @@ class Maincontroller(QMainWindow):
 		if self.ui.combo_plateThick.currentIndex() == 0:
 			incomplete_list.append("Flange splice plate thickness")
 
-		if self.ui.combo_webSize.currentIndex() == 0:
-			incomplete_list.append("Web weld thickness")
+		if self.ui.combo_weld_method.currentIndex() == 1:
 
-		if self.ui.combo_flangeSize.currentIndex() == 0:
-			incomplete_list.append("Flange weld thickness")
+			if self.ui.combo_webSize.currentIndex() == 0:
+				incomplete_list.append("Web weld thickness")
+
+			if self.ui.combo_flangeSize.currentIndex() == 0:
+				incomplete_list.append("Flange weld thickness")
 
 		if len(incomplete_list) > 0:
 			flag = False

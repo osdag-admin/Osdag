@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_bc_endplate.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -150,7 +150,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1344, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1344, 25))
         self.menubar.setStyleSheet("")
         self.menubar.setNativeMenuBar(False)
         self.menubar.setObjectName("menubar")
@@ -2100,8 +2100,8 @@ class Ui_MainWindow(object):
         self.combo_connect.setItemText(0, _translate("MainWindow", "Select Connectivity"))
         self.combo_connect.setItemText(1, _translate("MainWindow", "Column flange-Beam web"))
         self.combo_connect.setItemText(2, _translate("MainWindow", "Column web-Beam web"))
-        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Fillet Weld"))
-        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Groove Weld (CJP)"))
+        self.combo_weld_method.setItemText(0, _translate("MainWindow", "Groove Weld (CJP)"))
+        self.combo_weld_method.setItemText(1, _translate("MainWindow", "Fillet Weld"))
         self.label_12.setText(_translate("MainWindow", "Type *"))
         self.outputDock.setWindowTitle(_translate("MainWindow", "Output dock"))
         self.t_7.setText(_translate("MainWindow", "No. of bolts required"))

@@ -331,16 +331,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -413,7 +404,7 @@
      <x>0</x>
      <y>0</y>
      <width>1344</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -3525,12 +3516,12 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Fillet Weld</string>
+       <string>Groove Weld (CJP)</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Groove Weld (CJP)</string>
+       <string>Fillet Weld</string>
       </property>
      </item>
     </widget>

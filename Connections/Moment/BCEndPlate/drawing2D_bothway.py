@@ -1057,7 +1057,7 @@ class ExtendedEnd2DFront(object):
         point = self.A1
         theta = 60
         offset = 50
-        textup = "Beam " + str(self.data_object.beam_designation)
+        textup = "Beam " + str(self.data_object.column_designation)
         textdown = " "
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
@@ -1414,7 +1414,7 @@ class ExtendedEnd2DTop(object):
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 600) * np.array([1, 0])
+        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 750) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
         txt_3 = pt_b3 + (-20 * np.array([0, 1])) + (40 * np.array([1, 0]))
         text = "B"

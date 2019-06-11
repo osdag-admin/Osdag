@@ -102,13 +102,16 @@ def bc_endplate_design(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
+    weld_thickness_flange = 0
+    weld_thickness_web = 0
     if uiObj["Weld"]["Method"] == "Fillet Weld":
         weld_method = 'fillet'
+
+        weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
+        weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+
     else:   # "Groove Weld (CJP)"
         weld_method = 'groove'
-
-    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
 
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
         edge_type = 'hand_flame_cut'
@@ -181,6 +184,7 @@ def bc_endplate_design(uiObj):
 
     if conn_type == 'col_web_connectivity':
         bolt_plates_tk = [column_tw, end_plate_thickness]
+        plate_width_max = column_clear_d
 
         if beam_B > column_clear_d:
             design_status = False
@@ -190,6 +194,7 @@ def bc_endplate_design(uiObj):
 
     else:
         bolt_plates_tk = [column_tf, end_plate_thickness]
+        plate_width_max = column_B
 
         if beam_B > column_B:
             design_status = False
@@ -297,6 +302,9 @@ def bc_endplate_design(uiObj):
             if no_tension_side == 2:
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 1,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
+                if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    detailing_status = False
+
 
             elif no_tension_side == 4:
                 no_rows = {'out_tension_flange': 0, 'in_tension_flange': 2,
@@ -340,6 +348,15 @@ def bc_endplate_design(uiObj):
                 number_of_bolts = no_tension_side + 2
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
+                if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    detailing_status = False
+                    # logger.error("Large number of bolts are required for the connection")
+                    # # logger.warning()
+                    # logger.info(": Re-design the connection using bolt of higher grade or diameter")
+
+                    #  Re-detail the connection
+                    # no_rows = {'out_tension_flange': 2, 'in_tension_flange': 1,
+                    #            'out_compression_flange': 0, 'in_compression_flange': 1}
 
             elif no_tension_side == 6:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
@@ -390,6 +407,8 @@ def bc_endplate_design(uiObj):
                 number_of_bolts = 2 * no_tension_side
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 1, 'in_compression_flange': 1}
+                if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:
+                    detailing_status = False
 
             elif no_tension_side == 6:
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 2,
@@ -454,6 +473,12 @@ def bc_endplate_design(uiObj):
                 g_1 += 5
                 plate_width = g_1 + 2 * edge_dist
                 # TODO: Apply max limit for g_1, design fails
+
+        if plate_width > plate_width_max:
+            design_status = False
+            logger.error(": Required plate width is more than the available width")
+            logger.warning(": Width of plate should be less than %s mm" % plate_width_max)
+            logger.info(": Currently, Osdag doesn't design such connections")
 
         # Tension in bolts
         axial_tension = factored_axial_load / number_of_bolts
@@ -596,7 +621,10 @@ def bc_endplate_design(uiObj):
         # Total length for web weld = 2* web_weld_effective_length
         # Weld throat thickness for flange = web_weld_throat_size
 
-        # weld_force_axial = factored_axial_load / (flange_weld_effective_length_top * flange_weld_long_joint_top + flange_weld_effective_length_bottom * flange_weld_long_joint_bottom + 2 *web_weld_effective_length * web_weld_long_joint)
+        # weld_force_axial = factored_axial_load /
+        # (flange_weld_effective_length_top * flange_weld_long_joint_top +
+        # flange_weld_effective_length_bottom * flange_weld_long_joint_bottom +
+        # 2 *web_weld_effective_length * web_weld_long_joint)
 
         weld_force_axial_stress = factored_axial_load / ( \
                     2 * flange_weld_effective_length_top * flange_weld_long_joint_top * flange_weld_throat_size + \
@@ -673,8 +701,8 @@ def bc_endplate_design(uiObj):
     cont_plate_comp_length = column_d - 2 * column_tf
     cont_plate_comp_width = (column_B - column_tw) / 2
     notch_cont_comp = round_up(value=column_R1, multiplier=5, minimum_value=5)
-    eff_cont_comp_width = cont_plate_comp_width - notch_cont_comp
-    eff_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
+    availabe_cont_comp_width = cont_plate_comp_width - notch_cont_comp
+    available_cont_comp_length = cont_plate_comp_length - 2 * notch_cont_comp
 
     col_web_capacity_yielding = column_tw * (5 * column_tf + 5 * column_R1 + beam_tf) * column_fy / gamma_m0
     col_web_capacity_crippling = ((300 * column_tw ** 2) / gamma_m1) * (
@@ -692,15 +720,6 @@ def bc_endplate_design(uiObj):
             break
         else:
             cont_plate_tk_flange = 0
-    #  Weld design for column web compression continuity plates # TODO:
-    cont_comp_weld_size = 8
-    cont_comp_weld_length = 0
-
-
-
-
-
-
     # Continuity Plates on tension side
     t_bf = factored_moment / (beam_d - beam_tf) + factored_axial_load  # Tensile force at beam flanges
     cont_plate_tens_length = column_d - 2 * column_tf
@@ -717,17 +736,44 @@ def bc_endplate_design(uiObj):
     cont_tens_weld_size = 8
     cont_tens_weld_throat = 8
 
-    cont_tens_weld_length = 0
-    p_st = max(p_bf, t_bf) / 2  # Force induced in each piece of the column continuity plate
-    m_st = max((p_bf * g_1) / 4, (t_bf * g_1) / 4)  # Moment induced in the column continuity plate
-    eff_cont_tens_weld_length = 2 * (eff_cont_tens_length - 2 * cont_tens_weld_size)
-    capacity_fillet_weld = (eff_cont_tens_weld_length * weld_fu * cont_tens_weld_throat) / (math.sqrt(3) * gamma_m0)
+    #  Weld design for column  continuity plates # TODO:
+    cont_comp_weld_length = 0
+    cont_web_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tw)
+    available_welds = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+    for cont_web_weld_size in available_welds:
+        cont_web_weld_size = cont_web_weld_size_min
+        cont_web_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=cont_web_weld_size, fusion_face_angle=90)
+        cont_web_weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_web_weld_size, available_length=available_cont_comp_length)
+        if max(p_bf, t_bf) / (4 * cont_web_weld_eff_length * cont_web_weld_throat) <= \
+                           IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                               ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+            cont_web_weld_size = available_welds
+            break
 
+    cont_flange_weld_size_min = IS800_2007.cl_10_5_2_3_min_weld_size(cont_plate_tk_flange, column_tf)
+    available_welds = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+    for cont_flange_weld_size in available_welds:
+        cont_flange_weld_size = cont_flange_weld_size_min
+        cont_flange_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+            fillet_size=cont_flange_weld_size, fusion_face_angle=90)
+        cont_flange_Weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+            fillet_size=cont_flange_weld_size, available_length=availabe_cont_comp_width)
+        cont_axial_stress = max(p_bf, t_bf) / (2*cont_flange_Weld_eff_length * cont_flange_weld_throat)
+        cont_moment_stress = max(p_bf, t_bf) * ((g_1 - beam_tw) / 2) ** 2 / (
+                cont_plate_comp_length * cont_flange_weld_throat * 2*cont_flange_Weld_eff_length)
+        if math.sqrt(
+            cont_axial_stress ** 2 + cont_moment_stress ** 2) <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+            ultimate_stresses=(weld_fu, column_fu, cont_plate_fu)):
+            cont_flange_weld_size = available_welds
+            break
 
+    #Note: for more number of iteration more numbers of  available size should be provided
 
     # Beam stiffeners
     st_status = False
-    if endplate_type == 'flush' :
+    if endplate_type == 'flush':
         st_number = 0
     elif endplate_type == 'one_way':
         st_number = 1
@@ -747,7 +793,7 @@ def bc_endplate_design(uiObj):
             break
     st_width = st_height + 100.0
     st_notch_top = 50.0
-    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5)
+    st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5, minimum_value=5)
     st_beam_weld = 1.0
     st_plate_weld = 10.0
 
@@ -847,6 +893,7 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateComp']['Width'] = float(round(cont_plate_comp_width, 3))
     outputobj['ContPlateComp']['Thickness'] = float(round(cont_plate_tk_flange, 3))  #TODO bottom continuity plate thickness Anand
     outputobj['ContPlateComp']['ThicknessMin'] = float(round(cont_plate_comp_tk_min, 3))
+    outputobj['ContPlateComp']['NotchSize'] = float(round(notch_cont_comp, 3))
     outputobj['ContPlateComp']['Weld'] = 8  # TODO: Sourabh give calculated values
 
     outputobj['ContPlateTens']['Number'] = 2
@@ -854,6 +901,7 @@ def bc_endplate_design(uiObj):
     outputobj['ContPlateTens']['Width'] = float(round(cont_plate_tens_width, 3))
     outputobj['ContPlateTens']['Thickness'] = float(round(cont_plate_tk_flange, 3))          #TODO uper continuity plate thickness Anand
     outputobj['ContPlateTens']['ThicknessMin'] = float(round(cont_plate_tens_tk_min, 3))
+    outputobj['ContPlateTens']['NotchSize'] = float(round(notch_cont_tens, 3))
     outputobj['ContPlateTens']['Weld'] = 8   # TODO: Sourabh give calculated values
 
     outputobj['Stiffener']['Status'] = st_status
@@ -912,7 +960,7 @@ def bc_endplate_design(uiObj):
         else:
             pass
 
-    else:   # endplate_type == 'both_way':
+    else:   #endplate_type == 'both_way':
         if number_of_bolts == 8:
             outputobj['Bolt']['Pitch'] = float(round(beam_d - 2 * (beam_tf + l_v), 3))
             outputobj['Bolt']['Pitch12'] = float(round((2 * l_v + beam_tf), 3))

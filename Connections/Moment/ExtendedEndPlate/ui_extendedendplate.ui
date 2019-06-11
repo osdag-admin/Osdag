@@ -386,7 +386,7 @@
      <x>0</x>
      <y>0</y>
      <width>1422</width>
-     <height>19</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -3498,12 +3498,12 @@ QMenu::item:selected {
      </property>
      <item>
       <property name="text">
-       <string>Groove Weld (CJP)</string>
+       <string>Fillet Weld</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Fillet Weld</string>
+       <string>Groove Weld (CJP)</string>
       </property>
      </item>
     </widget>
@@ -4172,32 +4172,10 @@ QMenu::item:selected {
       <string>Bolt capacity</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_boltcapacity">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>150</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QPushButton" name="btn_plateDetail">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>202</x>
        <y>430</y>
        <width>101</width>
        <height>25</height>
@@ -4235,7 +4213,7 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_stiffnrDetail">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>202</x>
        <y>460</y>
        <width>101</width>
        <height>25</height>
@@ -4295,7 +4273,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>202</x>
-       <y>140</y>
+       <y>150</y>
        <width>100</width>
        <height>25</height>
       </rect>
@@ -4316,7 +4294,7 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_pitchDetail">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>202</x>
        <y>270</y>
        <width>101</width>
        <height>25</height>
@@ -4333,7 +4311,26 @@ QMenu::item:selected {
       <string>Pitch details</string>
      </property>
     </widget>
-    <zorder>txt_boltcapacity</zorder>
+    <widget class="QPushButton" name="btn_weldDetails">
+     <property name="geometry">
+      <rect>
+       <x>202</x>
+       <y>490</y>
+       <width>101</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Details</string>
+     </property>
+    </widget>
     <zorder>txt_noBolts</zorder>
     <zorder>t_7</zorder>
     <zorder>txt_tensionCapacity</zorder>
@@ -4372,6 +4369,7 @@ QMenu::item:selected {
     <zorder>label_160</zorder>
     <zorder>txt_edgeDist</zorder>
     <zorder>btn_pitchDetail</zorder>
+    <zorder>btn_weldDetails</zorder>
    </widget>
   </widget>
   <action name="actionInput">

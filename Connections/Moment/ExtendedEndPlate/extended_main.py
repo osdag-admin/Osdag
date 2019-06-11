@@ -10,11 +10,13 @@ from ui_design_summary import Ui_DesignReport
 from ui_plate import Ui_Plate
 from ui_stiffener import Ui_Stiffener
 from ui_pitch import Ui_Pitch
+from ui_weld_details import Ui_Weld_Details
 from svg_window import SvgWindow
 from ui_tutorial import Ui_Tutorial
 from ui_aboutosdag import Ui_AboutOsdag
 from ui_ask_question import Ui_AskQuestion
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
+import bbExtendedEndPlateSpliceCalc as db_value
 from reportGenerator import save_html
 from drawing_2D_ExtendedBothways import ExtendedEndPlate
 from drawing_2D_Extendedoneway import OnewayEndPlate
@@ -288,6 +290,30 @@ class Stiffener(QDialog):
 			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
 			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
 			self.ui.txt_stiffnrThickness_5.setText(str(resultObj_plate['Stiffener']['Notch']))
+
+class Weld_Details(QDialog):
+	def __init__(self, parent=None):
+		QDialog.__init__(self, parent)
+		self.ui = Ui_Weld_Details()
+		self.ui.setupUi(self)
+		self.maincontroller = parent
+
+		uiObj = self.maincontroller.designParameters()
+		resultObj_plate = bbExtendedEndPlateSplice(uiObj)
+		self.ui.label_note_1.setText("All dimensions are in mm")
+		if db_value.beam_tf <= 12:
+			self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_flange.png"))
+			self.ui.label_note_2.setText("As flange thickness, tf (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+		else:
+			self.ui.label_picture_1.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_flange.png"))
+			self.ui.label_note_2.setText("As flange thickness, tf (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tf))
+		if db_value.beam_tw <= 12:
+			self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_single_bevel_web.png"))
+			self.ui.label_note_3.setText("As web thickness, tw (%d mm) <= 12 mm, single bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+		else:
+			self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
+			self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
+		
 
 
 class Pitch(QDialog):
@@ -672,6 +698,7 @@ class Maincontroller(QMainWindow):
 		self.connection = "Extended"
 		self.get_beamdata()
 		self.result_obj = None
+		self.ui.combo_weld_method.currentTextChanged.connect(self.on_change)
 
 		self.designPrefDialog = DesignPreference(self)
 		# self.ui.combo_connLoc.model().item(1).setEnabled(False)
@@ -741,10 +768,12 @@ class Maincontroller(QMainWindow):
 		self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
 		self.ui.actionSample_Tutorials.triggered.connect(self.open_tutorials)
 		self.ui.actionDesign_examples.triggered.connect(self.design_examples)
+		
 
 		self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)
 		self.ui.btn_stiffnrDetail.clicked.connect(self.stiffener_details)
+		self.ui.btn_weldDetails.clicked.connect(self.weld_details)
 		self.ui.btn_CreateDesign.clicked.connect(self.design_report)
 		self.ui.btn_SaveMessages.clicked.connect(self.save_log_messages)
 
@@ -781,9 +810,17 @@ class Maincontroller(QMainWindow):
 		self.resultObj = None
 		self.disable_buttons()
 
-
-
-
+	def on_change(self):
+		if self.ui.combo_weld_method.currentText() == "Groove Weld (CJP)":
+			self.ui.combo_webSize.setCurrentIndex(1)
+			self.ui.combo_flangeSize.setCurrentIndex(1)
+			self.ui.combo_flangeSize.setDisabled(True)
+			self.ui.combo_webSize.setDisabled(True)
+		else:
+			self.ui.combo_webSize.setCurrentIndex(0)
+			self.ui.combo_flangeSize.setCurrentIndex(0)
+			self.ui.combo_flangeSize.setEnabled(True)
+			self.ui.combo_webSize.setEnabled(True)
 
 	def init_display(self, backend_str=None, size=(1024, 768)):
 		from OCC.Display.backend import load_backend, get_qt_modules
@@ -953,20 +990,20 @@ class Maincontroller(QMainWindow):
 		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Osdag_header.png"))
 
 	def osdag_image1(self):  # This function is created for calling the single butt weld (flange) image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_bevel_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_bevel_flange.png"))
 
 	def osdag_image2(self):  # This function is created for calling the double butt weld (flange) image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_flange.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_flange.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_bevel_flange.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_bevel_flange.png"))
 
 	def osdag_image3(self):  # This function is created for calling the single butt weld (web) image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_single_bevel_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_single_bevel_web.png"))
 
 	def osdag_image4(self):  # This function is created for calling the single butt weld (web) image in design report
-		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_web.png")))
-		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_web.png"))
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_bevel_web.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_bevel_web.png"))
 
 
 	def design_prefer(self):
@@ -1287,12 +1324,17 @@ class Maincontroller(QMainWindow):
 		edge_distance = resultObj["Bolt"]["Edge"]
 		self.ui.txt_edgeDist.setText(str(edge_distance))
 
-		weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
-		self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
-
-		weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
-		self.ui.txt_criticalWeb.setText(str(weld_stress_web))
-
+		if self.ui.combo_weld_method.currentText == "Fillet Weld":
+			self.ui.btn_weldDetails.setEnabled(False)
+			weld_stress_flange = resultObj["Weld"]["CriticalStressflange"]
+			self.ui.txt_criticalFlange.setText(str(weld_stress_flange))
+			weld_stress_web = resultObj["Weld"]["CriticalStressWeb"]
+			self.ui.txt_criticalWeb.setText(str(weld_stress_web))
+		else:
+			self.ui.label_163.hide()
+			self.ui.label_164.hide()
+			self.ui.txt_criticalFlange.hide()
+			self.ui.txt_criticalWeb.hide()
 	def display_log_to_textedit(self):
 		file = QFile(os.path.join('Connections','Moment','ExtendedEndPlate','extnd.log'))
 		if not file.open(QtCore.QIODevice.ReadOnly):
@@ -1316,6 +1358,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setEnabled(False)
 		self.ui.btn_plateDetail.setEnabled(False)
 		self.ui.btn_stiffnrDetail.setEnabled(False)
+		self.ui.btn_weldDetails.setEnabled(False)
 
 		self.ui.action_save_input.setEnabled(False)
 		self.ui.actionCreate_design_report.setEnabled(False)
@@ -1339,6 +1382,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setEnabled(True)
 		self.ui.btn_plateDetail.setEnabled(True)
 		self.ui.btn_stiffnrDetail.setEnabled(True)
+		self.ui.btn_weldDetails.setEnabled(True)
 
 		self.ui.action_save_input.setEnabled(True)
 		self.ui.actionCreate_design_report.setEnabled(True)
@@ -1391,6 +1435,7 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_pitchDetail.setDisabled(True)
 		self.ui.btn_plateDetail.setDisabled(True)
 		self.ui.btn_stiffnrDetail.setDisabled(True)
+		self.ui.btn_weldDetails.setDisabled(True)
 
 		self.display.EraseAll()
 		self.designPrefDialog.save_default_para()
@@ -1617,6 +1662,10 @@ class Maincontroller(QMainWindow):
 
 	def stiffener_details(self):
 		section = Stiffener(self)
+		section.show()
+
+	def weld_details(self):
+		section = Weld_Details(self)
 		section.show()
 
 	def design_report(self):

@@ -257,7 +257,7 @@ class PlateDetails(QDialog):
 		self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateTens']['Width']))
 		self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateTens']['Length']))
 		self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateTens']['Thickness']))
-		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['ThicknessMin']))#Notch Size ??
+		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateTens']['NotchSize']))
 		self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateTens']['Weld']))
 
 class PlateDetailsBottom(QDialog):
@@ -274,7 +274,7 @@ class PlateDetailsBottom(QDialog):
 		self.ui.txt_plateWidth.setText(str(resultObj_plate['ContPlateComp']['Width']))
 		self.ui.txt_plateLength.setText(str(resultObj_plate['ContPlateComp']['Length']))
 		self.ui.txt_plateThickness.setText(str(resultObj_plate['ContPlateComp']['Thickness']))
-		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['ThicknessMin']))
+		self.ui.txt_NotchSize.setText(str(resultObj_plate['ContPlateComp']['NotchSize']))
 		self.ui.txt_WeldSize.setText(str(resultObj_plate['ContPlateComp']['Weld']))
 
 

@@ -1990,15 +1990,15 @@ class Maincontroller(QMainWindow):
 			bbWeldWeb_L3 = copy.copy(bbWeldWeb_R3)
 
 			#Following welds are to join beam stiffeners to the beam
-			bbWeldStiffH_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Height']-outputobj['Stiffener']['NotchSize'])		#outputobj['Stiffener']['Length'] - 25
-			bbWeldStiffH_2 = copy.copy(bbWeldStiffH_1)
-			bbWeldStiffH_3 = copy.copy(bbWeldStiffH_1)
-			bbWeldStiffH_4 = copy.copy(bbWeldStiffH_1)
-
-			bbWeldStiffL_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length']-outputobj['Stiffener']['NotchSize'])
-			bbWeldStiffL_2 = copy.copy(bbWeldStiffL_1)
-			bbWeldStiffL_3 = copy.copy(bbWeldStiffL_1)
-			bbWeldStiffL_4 = copy.copy(bbWeldStiffL_1)
+			# bbWeldStiffH_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Height']-outputobj['Stiffener']['NotchSize'])		#outputobj['Stiffener']['Length'] - 25
+			# bbWeldStiffH_2 = copy.copy(bbWeldStiffH_1)
+			# bbWeldStiffH_3 = copy.copy(bbWeldStiffH_1)
+			# bbWeldStiffH_4 = copy.copy(bbWeldStiffH_1)
+			#
+			# bbWeldStiffL_1 = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h= outputobj['Stiffener']['Thickness'], L= outputobj['Stiffener']['Length']-outputobj['Stiffener']['NotchSize'])
+			# bbWeldStiffL_2 = copy.copy(bbWeldStiffL_1)
+			# bbWeldStiffL_3 = copy.copy(bbWeldStiffL_1)
+			# bbWeldStiffL_4 = copy.copy(bbWeldStiffL_1)
 
 
 			#######################################

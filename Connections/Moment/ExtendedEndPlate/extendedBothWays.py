@@ -571,7 +571,7 @@ class CADFillet(object):
 
     def create_bbWeldstiff2_l2(self):
         gap = self.beamLeft.length - self.beam_stiffener_F1.L22
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t , gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2 , gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -635,7 +635,7 @@ class CADFillet(object):
 
     def create_bbWeldstiff4_l2(self):
         gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -1631,7 +1631,7 @@ class CADGroove(object):
 
     def create_bbWeldstiff2_l2(self):
         gap = self.beamLeft.length - self.beam_stiffener_F1.L22 + self.bbWeldWeb_L3.b
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -1695,7 +1695,7 @@ class CADGroove(object):
 
     def create_bbWeldstiff4_l2(self):
         gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L+ self.bbWeldWeb_L3.b
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])

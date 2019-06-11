@@ -673,6 +673,7 @@ class Maincontroller(QMainWindow):
 		QMainWindow.__init__(self)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+		self.showMaximized()
 		self.folder = folder
 		self.connection = "BCEndPlate"
 		self.get_columndata()

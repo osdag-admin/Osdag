@@ -1031,6 +1031,59 @@ def bc_endplate_design(uiObj):
 
     return outputobj
 
+class I_sectional_Properties(object):
+
+    def calc_Area(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.A = (2 * B * t_f) + ((D - 2 * t_f) * t_w)
+        return self.A
+
+    def calc_MomentOfAreaZ(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.I_zz = (D - 2 * t_f) ** 3 * t_w / 12 + (B * t_f ** 3) / 6 + (B / 2 * t_f * (D - t_f) ** 2)
+        return self.I_zz
+
+    def calc_MomentOfAreaY(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.I_yy = (D - 2 * t_f) * t_w ** 3 / 12 + 2 * (B ** 3 * t_f / 12)
+        return self.I_yy
+
+    def calc_RogZ(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.A = (2 * B * t_f) + ((D - 2 * t_f) * t_w)
+        self.I_zz = (D - 2 * t_f) ** 3 * t_w / 12 + (B * t_f ** 3) / 6 + (B / 2 * t_f * (D - t_f) ** 2)
+        self.r_z = math.sqrt(self.I_zz / self.A)
+        return self.r_z
+
+    def calc_RogY(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.A = (2 * B * t_f) + ((D - 2 * t_f) * t_w)
+        self.I_yy = (D - 2 * t_f) * t_w ** 3 / 12 + 2 * (B ** 3 * t_f / 12)
+        self.r_y = math.sqrt(self.I_yy / self.A)
+        return self.r_y
+
+    def calc_ElasticModulusZz(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.I_zz = (D - 2 * t_f) ** 3 * t_w / 12 + (B * t_f ** 3) / 6 + (B / 2 * t_f * (D - t_f) ** 2)
+        self.Z_ez = (self.I_zz * 2) / D
+        return self.Z_ez
+
+    def calc_ElasticModulusZy(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.I_yy = (D - 2 * t_f) * t_w ** 3 / 12 + 2 * (B ** 3 * t_f / 12)
+        self.Z_ey = (self.I_yy * 2) / B
+        return self.Z_ey
+
+    def calc_PlasticModulusZpz(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.A = (2 * B * t_f) + ((D - 2 * t_f) * t_w)
+        self.z_p = ((D - 2 * t_f) ** 2 * t_w / 8 + B * t_f * (D - t_f) / 2) / ((D - t_f) / 2 * t_w + B * t_f)
+        self.Z_pz = 2 * (self.A / 2 * self.z_p)
+        return self.Z_pz
+
+    def calc_PlasticModulusZpy(self,D,B,t_w,t_f,alpha=90,r_1=0,r_2=0):
+        self.A = (2 * B * t_f) + ((D - 2 * t_f) * t_w)
+        self.y_p = (((D - 2 * t_f) * t_w ** 2) / 8 + (B * t_f * B) / 4) / ((D - 2 * t_f) * t_w / 2 + (B * t_f))
+        self.Z_py = 2 * (self.A / 2 * self.y_p)
+        return self.Z_py
+
+
+
+
+
+
 
 
 

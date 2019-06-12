@@ -223,10 +223,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     stiffener_weld = str(float(outObj['Stiffener']['WeldSize']))
     stiffener_moment = str(float(outObj['Stiffener']['Moment']))
     stiffener_moment_capacity = str(float(outObj['Stiffener']['MomentCapacity']))
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        stiffener_width = str(float(outObj['Stiffener']['Width']))
-    else:
-        stiffener_height = str(float(outObj['Stiffener']['Height']))
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     stiffener_width = str(float(outObj['Stiffener']['Width']))
+    # else:
+    stiffener_height = str(float(outObj['Stiffener']['Height']))
 
 
     if uiObj["Member"]["Connectivity"] == "Flush":
@@ -1788,27 +1788,29 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        row = [0, "Width (mm)", "", stiffener_width, ""]
-    else:
-        row = [0, "Length (mm)", "", stiffener_length, ""]
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     row = [0, "Width (mm)", "", stiffener_height, ""]
+    # else:
+    #     row = [0, "Length (mm)", "", stiffener_length, ""]
+    row = [0, "Height (mm)", "", stiffener_height, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    rstr += t('tr')
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        row = [0, "Height (mm)", "", stiffener_width, ""]
-    else:
-        row = [0, "Height (mm)", "", stiffener_height, ""]
-
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+    # rstr += t('tr')
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     row = [0, "Height (mm)", "", stiffener_height, ""]
+    # else:
+    #     row = [0, "Height (mm)", "", stiffener_height, ""]
+    # row = [0, "Height (mm)", "", stiffener_height, ""]
+    #
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
     rstr += t('tr')
     row = [0, "Thickness (mm)", "", stiffener_thickness, ""]

@@ -2185,6 +2185,8 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld'] = {}
             outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
+        outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
         outputobj['Stiffener'] = {}
         if uiObj["Member"]["Connectivity"] == "Flush":
             outputobj['Stiffener']['Height'] = round(w_st, 3)

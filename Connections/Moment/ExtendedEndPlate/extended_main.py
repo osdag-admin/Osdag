@@ -685,6 +685,8 @@ class Maincontroller(QMainWindow):
 		self.ui.btn_Design.clicked.connect(self.osdag_image2)
 		self.ui.btn_Design.clicked.connect(self.osdag_image3)
 		self.ui.btn_Design.clicked.connect(self.osdag_image4)
+		self.ui.btn_Design.clicked.connect(self.osdag_image5)
+		self.ui.btn_Design.clicked.connect(self.osdag_image6)
 		self.ui.btn_Reset.clicked.connect(self.reset_btnclicked)
 		self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
 		self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
@@ -948,6 +950,15 @@ class Maincontroller(QMainWindow):
 	def osdag_image4(self):  # This function is created for calling the single butt weld (web) image in design report
 		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "Butt_weld_double_bevel_web.png")))
 		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "Butt_weld_double_bevel_web.png"))
+
+	def osdag_image5(self):  # This function is created for calling the single butt weld (web) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "eep_stiffener.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "eep_stiffener.png"))
+
+	def osdag_image6(self):  # This function is created for calling the single butt weld (web) image in design report
+		image_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("Connections/Moment/ExtendedEndPlate/ResourceFiles/images", "flush_stiffener.png")))
+		shutil.copyfile(image_path, os.path.join(str(self.folder), "images_html", "flush_stiffener.png"))
+
 
 
 	def design_prefer(self):

@@ -46,6 +46,7 @@ class CADFillet(object):
         self.beam_stiffener_F4 = beam_stiffener_F4
         self.alist = alist
         self.outputobj = outputobj
+        self.boltProjection = float(outputobj['Plate']['Projection'])
         if alist["Member"]["Connectivity"] == "Flush":
             self.loc = float(outputobj['Stiffener']['Location'])
 
@@ -314,7 +315,7 @@ class CADFillet(object):
     def createPlateLGeometry(self):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
-            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])    #TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
@@ -329,7 +330,7 @@ class CADFillet(object):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             gap = 1.5 * self.plateRight.T + self.beamLeft.length
-            plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -571,7 +572,7 @@ class CADFillet(object):
 
     def create_bbWeldstiff2_l2(self):
         gap = self.beamLeft.length - self.beam_stiffener_F1.L22
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t , gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2 , gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -635,7 +636,7 @@ class CADFillet(object):
 
     def create_bbWeldstiff4_l2(self):
         gap = self.beamLeft.length + self.plateLeft.T+self.plateRight.T + self.beam_stiffener_F3.L
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -1010,6 +1011,7 @@ class CADGroove(object):
         self.beam_stiffener_F4 = beam_stiffener_F4
         self.alist = alist
         self.outputobj = outputobj
+        self.boltProjection = float(outputobj['Plate']['Projection'])
         if alist["Member"]["Connectivity"] == "Flush":
             self.loc = float(outputobj['Stiffener']['Location'])
 
@@ -1260,7 +1262,7 @@ class CADGroove(object):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b,
-                                        (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+                                        (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
@@ -1276,7 +1278,7 @@ class CADGroove(object):
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array(
-                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -1631,7 +1633,7 @@ class CADGroove(object):
 
     def create_bbWeldstiff2_l2(self):
         gap = self.beamLeft.length - self.beam_stiffener_F1.L22 + self.bbWeldWeb_L3.b
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])
@@ -1695,7 +1697,7 @@ class CADGroove(object):
 
     def create_bbWeldstiff4_l2(self):
         gap = self.beamLeft.length + self.plateLeft.T + self.plateRight.T + self.beam_stiffener_F3.L+ self.bbWeldWeb_L3.b
-        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t, gap,
+        stiffenerOrigin1_l2 = numpy.array([self.beamLeft.t/2, gap,
                                            self.beamRight.D / 2 - self.loc - self.beam_stiffener_F1.T])
         stiffener1_l2_uDir = numpy.array([0.0, 0.0, -1.0])
         stiffener1_l2_wDir = numpy.array([0.0, -1.0, 0.0])

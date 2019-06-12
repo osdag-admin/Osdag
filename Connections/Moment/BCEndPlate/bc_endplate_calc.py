@@ -281,6 +281,8 @@ def bc_endplate_design(uiObj):
         T_e=flange_tension/4, l_v=l_v, f_o=0.7*bolt_fu, b_e=b_e, t=end_plate_thickness, f_y=end_plate_fy,
         end_dist=end_dist, pre_tensioned=False)
     toe_of_weld_moment = abs(flange_tension/4 * l_v - prying_force * end_dist)
+    print(end_plate_fy, b_e)
+    print(flange_tension, l_v, prying_force, end_dist, toe_of_weld_moment)
     end_plate_thickness_min = math.sqrt(toe_of_weld_moment * 1.10 * 4 / (end_plate_fy * b_e))
 
     # End Plate Thickness
@@ -648,16 +650,15 @@ def bc_endplate_design(uiObj):
 
         flange_weld_stress = factored_moment / flange_weld_Z + weld_force_axial_stress
 
-        weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_long_joint)
+        weld_force_shear = factored_shear_load / (2 * web_weld_effective_length * web_weld_throat_size * web_weld_long_joint)
 
-        # check for weld strength
-
-        # flange_weld_stress = (weld_force_moment + weld_force_axial) / flange_weld_throat_size
+        # calculation of required weld size is not accurate since Iz has different web and flange sizes
+        # but to get required throat thickness either flange or weld size is multiplied
         flange_weld_throat_reqd = round(flange_weld_stress * flange_weld_throat_size / flange_weld_strength, 3)
         flange_weld_size_reqd = round(flange_weld_throat_reqd / 0.7, 3)
 
         web_weld_stress = math.sqrt((factored_moment / web_weld_Z + weld_force_axial_stress) ** 2 + \
-                          (weld_force_shear /web_weld_throat_size) ** 2)
+                          weld_force_shear ** 2)
 
         web_weld_throat_reqd = round(web_weld_stress * web_weld_throat_size /
                                      web_weld_strength, 3)
@@ -791,32 +792,45 @@ def bc_endplate_design(uiObj):
         if plate_tk >= beam_tw:
             st_thickness = plate_tk
             break
-    st_width = st_height + 100.0
+    st_length = st_height + 100.0
     st_notch_top = 50.0
     st_notch_bottom = round_up(value=weld_thickness_flange, multiplier=5, minimum_value=5)
+    st_eff_length = st_length - st_notch_bottom
+    st_beam_weld_min = IS800_2007.cl_10_5_2_3_min_weld_size(st_thickness, beam_tf)
     st_beam_weld = 1.0
     st_plate_weld = 10.0
 
-    st_force = 4 * tension_in_bolt
-    st_moment = st_force * (l_v + pitch_dist / 2)
-    st_eff_length = st_width - st_notch_bottom
-
-    st_shear_capacity = st_eff_length * st_thickness * st_fy / (math.sqrt(3) * gamma_m0)
-    st_moment_capacity = st_eff_length ** 2 * st_thickness * st_fy / (4 * gamma_m0)
-
-    st_weld_eff = st_eff_length - 2 * st_beam_weld
-    st_weld_shear_capacity = 2 * st_weld_eff * 0.7 * st_beam_weld * st_fu / (math.sqrt(3) * gamma_mw)
-
-    st_shear_stress = st_force / (2 * st_weld_eff * 0.7 * st_beam_weld)
-
-    st_moment_stress = st_moment / (2 * st_beam_weld ** 2 / 4)
-
-    st_eq_weld_stress = math.sqrt(st_shear_stress ** 2 + st_moment_stress ** 2)
-
-    st_weld_fu_gov = min(st_fu, beam_fu, weld_fu)
-
-    st_weld_status = st_eq_weld_stress <= st_weld_fu_gov / (math.sqrt(3) * gamma_mw)
-
+    while st_length <= 1000:
+        st_eff_length = st_length - st_notch_bottom
+        st_force = 4 * tension_in_bolt
+        st_moment = st_force * (l_v + pitch_dist / 2)
+        st_shear_capacity = st_eff_length * st_thickness * st_fy / (math.sqrt(3) * gamma_m0)
+        st_moment_capacity = st_eff_length ** 2 * st_thickness * st_fy / (4 * gamma_m0)
+        available_welds = [3, 4, 5, 6, 8, 10, 12, 14, 16]
+        for st_beam_weld in available_welds:
+            print(st_beam_weld)
+            if st_beam_weld <= st_beam_weld_min:
+                st_beam_weld = st_beam_weld_min
+            st_beam_weld_throat = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(
+                fillet_size=st_beam_weld, fusion_face_angle=90)
+            st_beam_weld_eff_length = IS800_2007.cl_10_5_4_1_fillet_weld_effective_length(
+                fillet_size=st_beam_weld, available_length=st_eff_length)
+            st_weld_shear_stress = st_force / (2 * st_beam_weld_eff_length * st_beam_weld_throat)
+            st_weld_moment_stress = st_moment / (2 * st_beam_weld * st_beam_weld_eff_length ** 2 / 4)
+            st_eq_weld_stress = math.sqrt(st_weld_shear_stress ** 2 + st_weld_moment_stress ** 2)
+            if st_eq_weld_stress <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                    ultimate_stresses=(weld_fu, beam_fu, st_fu)):
+                break
+        if st_moment <= st_moment_capacity and st_force <= st_shear_capacity and \
+                st_eq_weld_stress <= IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                ultimate_stresses=(weld_fu, beam_fu, st_fu)):
+            break
+        else:
+            st_length += 20
+            logger.warning("stiffener capacity is insufficient, current length is %2.2f" %st_length)
+    print(st_shear_capacity, st_moment_capacity, st_moment, st_force)
+    print(st_beam_weld, st_weld_shear_stress, st_weld_moment_stress, st_eq_weld_stress, IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(
+                    ultimate_stresses=(weld_fu, beam_fu, st_fu)))
     # Strength of flange under compression or tension TODO: Get function from IS 800
 
     A_f = beam_B * beam_tf  # area of beam flange

@@ -117,14 +117,18 @@ class DesignPreference(QDialog):
 		self.ui.btn_save.hide()
 		self.ui.btn_close.clicked.connect(self.close_designPref)
 		self.ui.combo_boltHoleType.currentIndexChanged[str].connect(self.get_clearance)
+		self.ui.pushButton_Import_Column.setDisabled(True)
+		self.ui.pushButton_Import_Beam.setDisabled(True)
 		self.ui.pushButton_Add_Column.clicked.connect(self.add_ColumnPref)
 		self.ui.pushButton_Add_Beam.clicked.connect(self.add_BeamPref)
 		self.ui.pushButton_Clear_Column.clicked.connect(self.clear_ColumnPref)
 		self.ui.pushButton_Clear_Beam.clicked.connect(self.clear_BeamPref)
-		self.ui.pushButton_Download_Column.clicked.connect(self.download_Database)
-		self.ui.pushButton_Download_Beam.clicked.connect(self.download_Database)
-		self.ui.pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
+		self.ui.pushButton_Download_Column.clicked.connect(self.download_Database_Column)
+		self.ui.pushButton_Download_Beam.clicked.connect(self.download_Database_Beam)
+
 		self.ui.pushButton_Import_Column.clicked.connect(self.import_ColumnPref)
+		self.ui.pushButton_Import_Beam.clicked.connect(self.import_BeamPref)
+
 
 	def save_designPref_para(self):
 		uiObj = self.maincontroller.get_user_inputs()
@@ -280,6 +284,7 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Column.setText(str(dictcolumndata["Zy"]))
 		self.ui.lineEdit_ElasticModPZ_Column.setText(str(dictcolumndata["Zpz"]))
 		self.ui.lineEdit_ElasticModPY_Column.setText(str(dictcolumndata["Zpy"]))
+		self.ui.pushButton_Add_Column.setEnabled(True)
 
 		if (
 				self.ui.lineEdit_Depth_Column.text() != "" and self.ui.lineEdit_FlangeWidth_Column.text() != "" and self.ui.lineEdit_FlangeThickness_Column.text() != ""
@@ -320,6 +325,7 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Beam.setText(str(dictbeamdata["Zy"]))
 		self.ui.lineEdit_ElasticModPZ_Beam.setText(str(dictbeamdata["Zpz"]))
 		self.ui.lineEdit_ElasticModPY_Beam.setText(str(dictbeamdata["Zpy"]))
+		self.ui.pushButton_Add_Beam.setEnabled(True)
 
 		if (
 				self.ui.lineEdit_Depth_Beam.text() != "" and self.ui.lineEdit_FlangeWidth_Beam.text() != "" and self.ui.lineEdit_FlangeThickness_Beam.text() != ""
@@ -351,6 +357,7 @@ class DesignPreference(QDialog):
 			t_f = float(self.ui.lineEdit_WeBThickness_Column.text())
 
 		self.sectionalprop = I_sectional_Properties()
+		self.ui.lineEdit_Mass_Column.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
 		self.ui.lineEdit_SectionalArea_Column.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
 		self.ui.lineEdit_MomentOfAreaZ_Column.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
 		self.ui.lineEdit_MomentOfAreaY_Column.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
@@ -360,6 +367,8 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Column.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
 		self.ui.lineEdit_ElasticModPZ_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
 		self.ui.lineEdit_ElasticModPY_Column.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+
+		self.ui.pushButton_Add_Column.setEnabled(True)
 
 	def new_sectionalprop_Beam(self):
 		if self.ui.lineEdit_Depth_Beam.text() == "":
@@ -383,6 +392,7 @@ class DesignPreference(QDialog):
 			t_f = float(self.ui.lineEdit_WeBThickness_Beam.text())
 
 		self.sectionalprop = I_sectional_Properties()
+		self.ui.lineEdit_Mass_Beam.setText(str(self.sectionalprop.calc_Mass(D, B, t_w, t_f)))
 		self.ui.lineEdit_SectionalArea_Beam.setText(str(self.sectionalprop.calc_Area(D, B, t_w, t_f)))
 		self.ui.lineEdit_MomentOfAreaZ_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaZ(D, B, t_w, t_f)))
 		self.ui.lineEdit_MomentOfAreaY_Beam.setText(str(self.sectionalprop.calc_MomentOfAreaY(D, B, t_w, t_f)))
@@ -392,6 +402,7 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Beam.setText(str(self.sectionalprop.calc_ElasticModulusZy(D, B, t_w, t_f)))
 		self.ui.lineEdit_ElasticModPZ_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpz(D, B, t_w, t_f)))
 		self.ui.lineEdit_ElasticModPY_Beam.setText(str(self.sectionalprop.calc_PlasticModulusZpy(D, B, t_w, t_f)))
+		self.ui.pushButton_Add_Beam.setEnabled(True)
 
 	def add_ColumnPref(self):
 
@@ -402,9 +413,11 @@ class DesignPreference(QDialog):
 				or self.ui.lineEdit_RogZ_Column.text() == "" or self.ui.lineEdit_RogY_Column.text() == "" or self.ui.lineEdit_ElasticModZ_Column.text() == "" or self.ui.lineEdit_ElasticModY_Column.text() == ""
 				or self.ui.lineEdit_Source_Column.text() == ""):
 			QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+			self.ui.pushButton_Add_Column.setDisabled(True)
 
 
 		else:
+			self.ui.pushButton_Add_Column.setEnabled(True)
 			Designation_c = self.ui.lineEdit_Designation_Column.text()
 			Mass_c = float(self.ui.lineEdit_Mass_Column.text())
 			Area_c = float(self.ui.lineEdit_SectionalArea_Column.text())
@@ -431,17 +444,26 @@ class DesignPreference(QDialog):
 			conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
 
 			c = conn.cursor()
-			c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-	                                               Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-					  (Designation_c, Mass_c, Area_c,
-					   D_c, B_c, tw_c, T_c,
-					   R1_c, R2_c, Iz_c, Iy_c, rz_c,
-					   ry_c, Zz_c, Zy_c,
-					   Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
-			conn.commit()
-			c.close()
-			conn.close()
-			QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+			c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (Designation_c,))
+			data = c.fetchone()[0]
+			if data == 0:
+				c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+					                                               Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+						  (Designation_c, Mass_c, Area_c,
+						   D_c, B_c, tw_c, T_c,
+						   R1_c, R2_c, Iz_c, Iy_c, rz_c,
+						   ry_c, Zz_c, Zy_c,
+						   Zpz_c, Zpy_c, FlangeSlope_c, Source_c))
+				conn.commit()
+				c.close()
+				conn.close()
+				QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database!')
+			else:
+				QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+				self.clear_ColumnPref()
+
+
+
 
 	def add_BeamPref(self):
 
@@ -452,8 +474,10 @@ class DesignPreference(QDialog):
 				or self.ui.lineEdit_RogZ_Beam.text() == "" or self.ui.lineEdit_RogY_Beam.text() == "" or self.ui.lineEdit_ElasticModZ_Beam.text() == "" or self.ui.lineEdit_ElasticModY_Beam.text() == ""
 				or self.ui.lineEdit_Source_Beam.text() == ""):
 			QMessageBox.information(QMessageBox(), 'Warning', 'Please Fill all missing parameters!')
+			self.ui.pushButton_Add_Beam.setDisabled(True)
 
 		else:
+			self.ui.pushButton_Add_Beam.setEnabled(True)
 			Designation_b = self.ui.lineEdit_Designation_Beam.text()
 			Mass_b = float(self.ui.lineEdit_Mass_Beam.text())
 			Area_b = float(self.ui.lineEdit_SectionalArea_Beam.text())
@@ -480,17 +504,25 @@ class DesignPreference(QDialog):
 			conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
 
 			c = conn.cursor()
-			c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
-	                                                Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-					  (Designation_b, Mass_b, Area_b,
-					   D_b, B_b, tw_b, T_b, FlangeSlope_b,
-					   R1_b, R2_b, Iz_b, Iy_b, rz_b,
-					   ry_b, Zz_b, Zy_b,
-					   Zpz_b, Zpy_b, Source_b))
-			conn.commit()
-			c.close()
-			conn.close()
-			QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+			c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
+			data = c.fetchone()[0]
+			if data == 0:
+				c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+					                                                Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+						  (Designation_b, Mass_b, Area_b,
+						   D_b, B_b, tw_b, T_b, FlangeSlope_b,
+						   R1_b, R2_b, Iz_b, Iy_b, rz_b,
+						   ry_b, Zz_b, Zy_b,
+						   Zpz_b, Zpy_b, Source_b))
+				conn.commit()
+				c.close()
+				conn.close()
+				QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+			else:
+				QMessageBox.information(QMessageBox(), 'Warning', 'Designation is already exist in Database!')
+				self.clear_BeamPref()
+
+
 
 	def clear_ColumnPref(self):
 		self.ui.lineEdit_Designation_Column.clear()
@@ -514,6 +546,7 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Column.clear()
 		self.ui.lineEdit_ElasticModPZ_Column.clear()
 		self.ui.lineEdit_ElasticModPY_Column.clear()
+		self.ui.pushButton_Add_Column.setDisabled(True)
 
 	def clear_BeamPref(self):
 		self.ui.lineEdit_Designation_Beam.clear()
@@ -537,11 +570,66 @@ class DesignPreference(QDialog):
 		self.ui.lineEdit_ElasticModY_Beam.clear()
 		self.ui.lineEdit_ElasticModPZ_Beam.clear()
 		self.ui.lineEdit_ElasticModPY_Beam.clear()
+		self.ui.pushButton_Add_Beam.setDisabled(True)
 
-	def download_Database(self):
+	def download_Database_Column(self):
 		file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
 		shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
 		QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+		self.ui.pushButton_Import_Column.setEnabled(True)
+
+
+
+	def download_Database_Beam(self):
+		file_path = os.path.abspath(os.path.join(os.getcwd(), os.path.join("ResourceFiles", "add_sections.xlsx")))
+		shutil.copyfile(file_path, os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+		QMessageBox.information(QMessageBox(), 'Information', 'Your File is Downloaded in your selected workspace')
+		self.ui.pushButton_Import_Beam.setEnabled(True)
+
+
+	def import_ColumnPref(self):
+		wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
+		sheet = wb['First Sheet']
+		conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
+
+		for rowNum in range(2, sheet.max_row + 1):
+			designation = sheet.cell(row=rowNum, column=2).value
+			mass = sheet.cell(row=rowNum, column=3).value
+			area = sheet.cell(row=rowNum, column=4).value
+			d = sheet.cell(row=rowNum, column=5).value
+			b = sheet.cell(row=rowNum, column=6).value
+			tw = sheet.cell(row=rowNum, column=7).value
+			t = sheet.cell(row=rowNum, column=8).value
+			flangeSlope = sheet.cell(row=rowNum, column=9).value
+			r1 = sheet.cell(row=rowNum, column=10).value
+			r2 = sheet.cell(row=rowNum, column=11).value
+			iz = sheet.cell(row=rowNum, column=12).value
+			iy = sheet.cell(row=rowNum, column=13).value
+			rz = sheet.cell(row=rowNum, column=14).value
+			ry = sheet.cell(row=rowNum, column=15).value
+			zz = sheet.cell(row=rowNum, column=16).value
+			zy = sheet.cell(row=rowNum, column=17).value
+			zpz = sheet.cell(row=rowNum, column=18).value
+			zpy = sheet.cell(row=rowNum, column=19).value
+			source = sheet.cell(row=rowNum, column=20).value
+			c = conn.cursor()
+			c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (designation,))
+			data = c.fetchone()[0]
+			if data == 0:
+				c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
+					                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+						  (designation, mass, area,
+						   d, b, tw, t,
+						   r1, r2, iz, iy, rz, ry,
+						   zz, zy
+						   ,
+						   zpz, zpy, flangeSlope, source))
+				conn.commit()
+				c.close()
+
+		conn.close()
+		QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+		self.ui.pushButton_Import_Column.setDisabled(True)
 
 	def import_BeamPref(self):
 		wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
@@ -570,59 +658,25 @@ class DesignPreference(QDialog):
 			source = sheet.cell(row=rowNum, column=20).value
 
 			c = conn.cursor()
-			c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
-	                           Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-					  (designation, mass, area,
-					   d, b, tw, t,
-					   flangeSlope, r1
-					   ,
-					   r2, iz, iy, rz, ry,
-					   zz, zy
-					   ,
-					   zpz, zpy, source))
-			conn.commit()
-			c.close()
+			c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (designation,))
+			data = c.fetchone()[0]
+			if data == 0:
+				c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Iz,Iy,rz,ry,
+	        				                           Zz,zy,Zpz,Zpy,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+						  (designation, mass, area,
+						   d, b, tw, t,
+						   flangeSlope, r1
+						   ,
+						   r2, iz, iy, rz, ry,
+						   zz, zy
+						   ,
+						   zpz, zpy, source))
+				conn.commit()
+				c.close()
+
 		conn.close()
 		QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
-
-	def import_ColumnPref(self):
-		wb = openpyxl.load_workbook(os.path.join(str(self.folder), "images_html", "add_sections.xlsx"))
-		sheet = wb['First Sheet']
-		conn = sqlite3.connect('ResourceFiles/Database/Intg_osdag.sqlite')
-
-		for rowNum in range(2, sheet.max_row + 1):
-			designation = sheet.cell(row=rowNum, column=2).value
-			mass = sheet.cell(row=rowNum, column=3).value
-			area = sheet.cell(row=rowNum, column=4).value
-			d = sheet.cell(row=rowNum, column=5).value
-			b = sheet.cell(row=rowNum, column=6).value
-			tw = sheet.cell(row=rowNum, column=7).value
-			t = sheet.cell(row=rowNum, column=8).value
-			flangeSlope = sheet.cell(row=rowNum, column=9).value
-			r1 = sheet.cell(row=rowNum, column=10).value
-			r2 = sheet.cell(row=rowNum, column=11).value
-			iz = sheet.cell(row=rowNum, column=12).value
-			iy = sheet.cell(row=rowNum, column=13).value
-			rz = sheet.cell(row=rowNum, column=14).value
-			ry = sheet.cell(row=rowNum, column=15).value
-			zz = sheet.cell(row=rowNum, column=16).value
-			zy = sheet.cell(row=rowNum, column=17).value
-			zpz = sheet.cell(row=rowNum, column=18).value
-			zpy = sheet.cell(row=rowNum, column=19).value
-			source = sheet.cell(row=rowNum, column=20).value
-			c = conn.cursor()
-			c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,R1,R2,Iz,Iy,rz,ry,
-	                           Zz,zy,Zpz,Zpy,FlangeSlope,Source) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-					  (designation, mass, area,
-					   d, b, tw, t,
-					   r1, r2, iz, iy, rz, ry,
-					   zz, zy
-					   ,
-					   zpz, zpy, flangeSlope, source))
-			conn.commit()
-			c.close()
-		conn.close()
-		QMessageBox.information(QMessageBox(), 'Successful', ' File data is imported successfully to the database.')
+		self.ui.pushButton_Import_Beam.setDisabled(True)
 
 	def close_designPref(self):
 		self.close()

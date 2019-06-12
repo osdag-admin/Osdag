@@ -88,7 +88,7 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_Column">
       <attribute name="title">
@@ -906,7 +906,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="lineEdit_Mass_Column">
@@ -999,9 +999,9 @@
        <property name="geometry">
         <rect>
          <x>700</x>
-         <y>150</y>
+         <y>160</y>
          <width>241</width>
-         <height>351</height>
+         <height>341</height>
         </rect>
        </property>
        <property name="text">
@@ -1723,9 +1723,9 @@
        <property name="geometry">
         <rect>
          <x>700</x>
-         <y>120</y>
+         <y>170</y>
          <width>241</width>
-         <height>411</height>
+         <height>321</height>
         </rect>
        </property>
        <property name="text">
@@ -1822,7 +1822,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_148">

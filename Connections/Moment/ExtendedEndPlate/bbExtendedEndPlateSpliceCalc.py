@@ -828,10 +828,11 @@ def bbExtendedEndPlateSplice(uiObj):
 
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
             edge_dist_mini = (end_plate_width_provided - g_1)/2
+
             if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
-                end_dist_mini  = int(math.ceil(1.7 * dia_hole))
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
             else:
-                end_dist_mini  = min_edge_distance = int(float(1.5 * dia_hole))
+                end_dist_mini = min_edge_distance = int(math.ceil(1.5 * dia_hole))
 
             # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
             cross_centre_gauge = max(float(90), g_1)
@@ -2202,7 +2203,10 @@ def bbExtendedEndPlateSplice(uiObj):
         # ===================  CAD ===================
         # if uiObj["Member"]["Connectivity"] == "Extended one way":
         if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush":  # TOdo added by darshan
-            outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
+            else:
+                outputobj['Plate']['Projection'] = 10
         else:
             pass
         # ===================  CAD ===================

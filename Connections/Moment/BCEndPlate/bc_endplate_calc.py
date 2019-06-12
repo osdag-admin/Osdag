@@ -342,7 +342,6 @@ def bc_endplate_design(uiObj):
 
         elif endplate_type == 'one_way':
             number_of_bolts = no_tension_side + 2
-
             if no_tension_side <= 4:
                 no_tension_side = 4
                 number_of_bolts = no_tension_side + 2

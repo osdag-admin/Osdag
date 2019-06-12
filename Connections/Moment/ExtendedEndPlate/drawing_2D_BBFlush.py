@@ -777,8 +777,8 @@ class FlushEnd2DFront(object):
 					[1, 0]) + i * self.data_object.pitch12 * np.array([0, 1])
 
 			ptx1 = ptx - bolt_r * np.array([0, 1])
-			rect_width = self.data_object.bolt_diameter
-			rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+			rect_width = float(self.data_object.bolt_diameter)
+			rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 			pt_Cx = ptx + np.array([1, 0])
@@ -803,8 +803,8 @@ class FlushEnd2DFront(object):
 				[1, 0])
 
 		ptx1 = ptx - bolt_r * np.array([0, 1])
-		rect_width = self.data_object.bolt_diameter
-		rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+		rect_width = float(self.data_object.bolt_diameter)
+		rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 		dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 		pt_Cx = ptx + np.array([1, 0])
@@ -910,6 +910,17 @@ class FlushEnd2DFront(object):
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
+		# ------------------------------------------ Stiffener -------------------------------------------------
+		point = self.S3
+		theta = 60
+		offset = 50
+		textup = "Stiffener " + str(self.data_object.stiffener_height) + "x" + str(
+			self.data_object.stiffener_length) + "x" + str(
+			self.data_object.stiffener_thickness)
+		textdown = " "
+		element = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
 
 		# ---------------------------------------------  Stiffener Welding ----------------------------------------------
 		self.data_object.stiffener_weld = 1
@@ -1085,33 +1096,41 @@ class FlushEnd2DTop(object):
 		ptS1y = ptAA6y - self.data_object.stiffener_height
 		self.S1 = np.array([ptS1x, ptS1y])
 
-		ptS2x = ptS1x + 25
+		ptS2x = ptS1x  + self.data_object.stiffener_length
 		ptS2y = ptS1y
 		self.S2 = np.array([ptS2x, ptS2y])
+
+		ptAS2x = ptS2x
+		ptAS2y = ptS2y + self.data_object. stiffener_height - self.data_object.beam_width_B2/2 + self.data_object.web_thickness_tw2/2
+		self.AS2 = np.array([ptAS2x, ptAS2y])
 
 		ptS3x = ptAA6x + self.data_object.stiffener_length
 		ptS3y = ptAA6y
 		self.S3 = np.array([ptS3x, ptS3y])
 
-		ptSA3x = ptAA6x + self.data_object.stiffener_length
-		ptSA3y = ptAA6y - 25
-		self.SA3 = np.array([ptSA3x, ptSA3y])
+		# ptSA3x = ptAA6x + self.data_object.stiffener_length
+		# ptSA3y = ptAA6y - 25
+		# self.SA3 = np.array([ptSA3x, ptSA3y])
 
 		ptS4x = ptAA5x + self.data_object.stiffener_length
 		ptS4y = ptAA5y
 		self.S4 = np.array([ptS4x, ptS4y])
 
-		ptSA4x = ptAA5x + self.data_object.stiffener_length
-		ptSA4y = ptAA5y + 25
-		self.SA4 = np.array([ptSA4x, ptSA4y])
+		# ptSA4x = ptAA5x + self.data_object.stiffener_length
+		# ptSA4y = ptAA5y + 25
+		# self.SA4 = np.array([ptSA4x, ptSA4y])
 
 		ptS6x = ptAA5x
 		ptS6y = ptAA5y + self.data_object.stiffener_height
 		self.S6 = np.array([ptS6x, ptS6y])
 
-		ptS5x = ptS6x + 25
+		ptS5x = ptS6x + self.data_object.stiffener_length
 		ptS5y = ptS6y
 		self.S5 = np.array([ptS5x, ptS5y])
+
+		ptAS5x = ptS5x
+		ptAS5y = ptS5y - self.data_object. stiffener_height + self.data_object.beam_width_B2/2 - self.data_object.web_thickness_tw2/2
+		self.AS5 = np.array([ptAS5x, ptAS5y])
 
 		# # ========================= Stiffener Left =========================
 
@@ -1119,33 +1138,41 @@ class FlushEnd2DTop(object):
 		ptSS1y = ptA7y - self.data_object.stiffener_height
 		self.SS1 = np.array([ptSS1x, ptSS1y])
 
-		ptSS2x = ptSS1x - 25
+		ptSS2x = ptSS1x - self.data_object.stiffener_length
 		ptSS2y = ptSS1y
 		self.SS2 = np.array([ptSS2x, ptSS2y])
+
+		ptASS2x = ptSS2x
+		ptASS2y = ptSS1y + self.data_object.stiffener_height - self.data_object.beam_width_B2/2 + self.data_object.web_thickness_tw2/2
+		self.ASS2 = np.array([ptASS2x, ptASS2y])
 
 		ptSS3x = ptA7x - self.data_object.stiffener_length
 		ptSS3y = ptA7y
 		self.SS3 = np.array([ptSS3x, ptSS3y])
 
-		ptSSA3x = ptA7x - self.data_object.stiffener_length
-		ptSSA3y = ptA7y - 25
-		self.SSA3 = np.array([ptSSA3x, ptSSA3y])
+		# ptSSA3x = ptA7x - self.data_object.stiffener_length
+		# ptSSA3y = ptA7y - 25
+		# self.SSA3 = np.array([ptSSA3x, ptSSA3y])
 
 		ptSS4x = ptA8x - self.data_object.stiffener_length
 		ptSS4y = ptA8y
 		self.SS4 = np.array([ptSS4x, ptSS4y])
 
-		ptSSA4x = ptA8x - self.data_object.stiffener_length
-		ptSSA4y = ptA8y + 25
-		self.SSA4 = np.array([ptSSA4x, ptSSA4y])
+		# ptSSA4x = ptA8x - self.data_object.stiffener_length
+		# ptSSA4y = ptA8y + 25
+		# self.SSA4 = np.array([ptSSA4x, ptSSA4y])
 
 		ptSS6x = ptA8x
 		ptSS6y = ptA8y + self.data_object.stiffener_height
 		self.SS6 = np.array([ptSS6x, ptSS6y])
 
-		ptSS5x = ptSS6x - 25
+		ptSS5x = ptSS6x - self.data_object.stiffener_length
 		ptSS5y = ptSS6y
 		self.SS5 = np.array([ptSS5x, ptSS5y])
+
+		ptASS5x = ptSS5x
+		ptASS5y = ptSS5y  - self.data_object. stiffener_height + self.data_object.beam_width_B2/2 - self.data_object.web_thickness_tw2/2
+		self.ASS5 = np.array([ptASS5x, ptASS5y])
 		#
 
 
@@ -1168,21 +1195,25 @@ class FlushEnd2DTop(object):
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))
 		dwg.add(dwg.polyline(points=[self.PP1, self.PP2, self.PP3, self.PP4, self.PP1], stroke='blue', fill='none', stroke_width=2.5))
 
-		dwg.add(dwg.line(self.S1, self.S2).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.S2, self.SA3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.S3, self.SA3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.S4, self.SA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SA4, self.S5).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.S5, self.S6).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.S1, self.S2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S2, self.AS2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.AS2, self.S3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.line(self.S3, self.SA3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.line(self.S4, self.SA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.S6, self.S5).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.S5, self.AS5).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.AS5, self.S4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 
-		dwg.add(dwg.line(self.SS1, self.SS2).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SS2, self.SSA3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SSA3, self.SS3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SS4, self.SSA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SSA4, self.SS5).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-		dwg.add(dwg.line(self.SS5, self.SS6).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.SS1, self.SS2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS2, self.ASS2).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.ASS2, self.SS3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.line(self.SSA3, self.SS3).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		# dwg.add(dwg.line(self.SS4, self.SSA4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+		dwg.add(dwg.line(self.SS6, self.SS5).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.SS5, self.ASS5).stroke('blue', width=2.5, linecap='square'))
+		dwg.add(dwg.line(self.ASS5, self.SS4).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
+
 		dwg.add(dwg.line(self.AA5, self.AA8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
-
 		dwg.add(dwg.line(self.AA6, self.AA7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.polyline(points=[self.AA1, self.AA2, self.AA3, self.AA4, self.AA1], stroke='blue', fill='none', stroke_width=2.5))
 
@@ -1212,8 +1243,8 @@ class FlushEnd2DTop(object):
 					  (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + \
 					  i * self.data_object.cross_centre_gauge_dist * np.array([0, 1])
 				ptx1 = ptx - bolt_r * np.array([0, 1])
-				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+				rect_width = float(self.data_object.bolt_diameter)
+				rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 				pt_Cx = ptx + 10 * np.array([1, 0])
@@ -1275,6 +1306,17 @@ class FlushEnd2DTop(object):
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
+		# ------------------------------------------ Stiffener -------------------------------------------------
+		point = self.S5
+		theta = 60
+		offset = 50
+		textup = "Stiffener " + str(self.data_object.stiffener_height) + "x" + str(
+			self.data_object.stiffener_length) + "x" + str(
+			self.data_object.stiffener_thickness)
+		textdown = " "
+		element = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Weld label --------------------------------------------------
 

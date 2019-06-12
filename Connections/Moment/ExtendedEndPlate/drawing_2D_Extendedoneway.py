@@ -794,16 +794,16 @@ class OnewayEnd2DFront(object):
 							self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) \
 					  * np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1])
 				ptx1 = ptx - bolt_r * np.array([0, 1])
-				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+				rect_width = float(self.data_object.bolt_diameter)
+				rect_length = float (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
 								 stroke_width=2.5))
 			else:
 				ptx = self.PP2 + (self.data_object.end_dist) * np.array([0, 1]) - \
 					  (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2) * np.array([1, 0])
 				ptx1 = ptx - bolt_r * np.array([0, 1])
-				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+				rect_width = float(self.data_object.bolt_diameter)
+				rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
 								 stroke_width=2.5))
 
@@ -831,8 +831,8 @@ class OnewayEnd2DFront(object):
 					[1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
 
 			ptx1 = ptx - bolt_r * np.array([0, 1])
-			rect_width = self.data_object.bolt_diameter
-			rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+			rect_width = float(self.data_object.bolt_diameter)
+			rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 			dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 			pt_Cx = ptx + np.array([1, 0])
@@ -857,8 +857,8 @@ class OnewayEnd2DFront(object):
 				[1, 0])
 
 		ptx1 = ptx - bolt_r * np.array([0, 1])
-		rect_width = self.data_object.bolt_diameter
-		rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+		rect_width = float(self.data_object.bolt_diameter)
+		rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 		dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 		pt_Cx = ptx + np.array([1, 0])
@@ -951,7 +951,7 @@ class OnewayEnd2DFront(object):
 
 		point = self.AA2 - 300 * np.array([1, 0])
 		theta = 60
-		offset = 50
+		offset = 30
 		textup = "Beam " + str(self.data_object.beam_designation)
 		textdown = " "
 		element = " "
@@ -972,6 +972,17 @@ class OnewayEnd2DFront(object):
 		offset = 100
 		textup = "End Plate " + str(self.data_object.plate_length_L2) + "x" + str(self.data_object.plate_width_B2) + "x" + str(
 			self.data_object.plate_thickness_p2)
+		textdown = " "
+		element = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
+		# ------------------------------------------ Stiffener -------------------------------------------------
+		point = self.S3
+		theta = 60
+		offset = 50
+		textup = "Stiffener " + str(self.data_object.stiffener_height) + "x" + str(
+			self.data_object.stiffener_length) + "x" + str(
+			self.data_object.stiffener_thickness)
 		textdown = " "
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
@@ -1223,8 +1234,8 @@ class OnewayEnd2DTop(object):
 					  (self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + \
 					  i * self.data_object.cross_centre_gauge_dist * np.array([0, 1])
 				ptx1 = ptx - bolt_r * np.array([0, 1])
-				rect_width = self.data_object.bolt_diameter
-				rect_length = self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2
+				rect_width = float(self.data_object.bolt_diameter)
+				rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.plate_thickness_p2)
 				dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
 				pt_Cx = ptx + 10 * np.array([1, 0])
@@ -1287,9 +1298,20 @@ class OnewayEnd2DTop(object):
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
+		# ------------------------------------------ Stiffener -------------------------------------------------
+		point = self.AAS5
+		theta = 60
+		offset = 50
+		textup = "Stiffener " + str(self.data_object.stiffener_height) + "x" + str(
+			self.data_object.stiffener_length) + "x" + str(
+			self.data_object.stiffener_thickness)
+		textdown = " "
+		element = " "
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SE", offset, textup, textdown, element)
+
 		# ------------------------------------------  Weld label --------------------------------------------------
 		self.data_object.stiffener_weld = 1
-		point = self.AAS5
+		point = self.AAS6
 		theta = 60
 		offset = 50
 		textup =  "          z " + str(self.data_object.stiffener_weldsize)

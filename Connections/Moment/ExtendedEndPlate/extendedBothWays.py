@@ -46,6 +46,7 @@ class CADFillet(object):
         self.beam_stiffener_F4 = beam_stiffener_F4
         self.alist = alist
         self.outputobj = outputobj
+        self.boltProjection = float(outputobj['Plate']['Projection'])
         if alist["Member"]["Connectivity"] == "Flush":
             self.loc = float(outputobj['Stiffener']['Location'])
 
@@ -314,7 +315,7 @@ class CADFillet(object):
     def createPlateLGeometry(self):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
-            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateOriginL = numpy.array([-self.plateLeft.W/2, self.beamRight.length + 0.5 * self.plateLeft.T, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])    #TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
@@ -329,7 +330,7 @@ class CADFillet(object):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             gap = 1.5 * self.plateRight.T + self.beamLeft.length
-            plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+            plateOriginR = numpy.array([-self.plateRight.W/2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)
@@ -1010,6 +1011,7 @@ class CADGroove(object):
         self.beam_stiffener_F4 = beam_stiffener_F4
         self.alist = alist
         self.outputobj = outputobj
+        self.boltProjection = float(outputobj['Plate']['Projection'])
         if alist["Member"]["Connectivity"] == "Flush":
             self.loc = float(outputobj['Stiffener']['Location'])
 
@@ -1260,7 +1262,7 @@ class CADGroove(object):
 
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             plateOriginL = numpy.array([-self.plateLeft.W / 2, self.beamRight.length + 0.5 * self.plateLeft.T + self.bbWeldWeb_L3.b,
-                                        (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+                                        (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateL_uDir = numpy.array([0.0, 1.0, 0.0])  # TODO: self.boltProjection
             plateL_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateLeft.place(plateOriginL, plateL_uDir, plateL_wDir)
@@ -1276,7 +1278,7 @@ class CADGroove(object):
         if self.alist["Member"]["Connectivity"] == "Extended one way":
             gap = 1.5 * self.plateRight.T + self.beamLeft.length + self.bbWeldWeb_L3.b
             plateOriginR = numpy.array(
-                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - 15 - self.beamRight.D / 2)])
+                [-self.plateRight.W / 2, gap, (self.plateRight.L / 2 - self.boltProjection - self.beamRight.D / 2)])
             plateR_uDir = numpy.array([0.0, 1.0, 0.0])
             plateR_wDir = numpy.array([1.0, 0.0, 0.0])
             self.plateRight.place(plateOriginR, plateR_uDir, plateR_wDir)

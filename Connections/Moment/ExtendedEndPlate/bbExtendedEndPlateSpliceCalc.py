@@ -476,8 +476,8 @@ def bbExtendedEndPlateSplice(uiObj):
         end_plate_height_max = beam_d + (2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_max)
 
     elif uiObj["Member"]["Connectivity"] == "Extended one way":
-        end_plate_height_mini = beam_d + p_fo + end_dist_mini + 10  # TODO 10 mm is the cover provided beyond flange which does not protrude that much (update after review)
-        end_plate_height_max = beam_d + p_fo + end_dist_max + 10    # mini and max heights for 6 and 8 bolt configuration
+        end_plate_height_mini = beam_d + p_fo + end_dist_mini + weld_thickness_flange + 10  # TODO 10 mm is the cover provided beyond flange which does not protrude that much (update after review)
+        end_plate_height_max = beam_d + p_fo + end_dist_max + weld_thickness_flange + 10    # mini and max heights for 6 and 8 bolt configuration
 
     elif uiObj["Member"]["Connectivity"] == "Flush":
         end_plate_height_mini = end_plate_height_max = beam_d + 2 * (weld_thickness_flange + 10)  # TODO 10 mm is the cover provided beyond flange on either sides
@@ -2205,10 +2205,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # ===================  CAD ===================
         # if uiObj["Member"]["Connectivity"] == "Extended one way":
         if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush":  # TOdo added by darshan
-            if uiObj["Weld"]["Type"] == "Fillet Weld":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                outputobj['Plate']['Projection'] = 10
+            outputobj['Plate']['Projection'] = weld_thickness_flange + 10
         else:
             pass
         # ===================  CAD ===================
@@ -2309,7 +2306,8 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener']['Notch'] = 0
 
         # ===================  CAD ===================
-        if uiObj["Member"]["Connectivity"] == "Extended one way":
+        # if uiObj["Member"]["Connectivity"] == "Extended one way":
+        if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush":  # TOdo added by darshan
             outputobj['Plate']['Projection'] = 0
         else:
             pass

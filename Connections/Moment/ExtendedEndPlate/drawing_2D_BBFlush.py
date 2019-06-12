@@ -826,7 +826,7 @@ class FlushEnd2DFront(object):
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
 		element = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Inside bottom bolt of flange -------------------------------------------
 		no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
@@ -837,7 +837,7 @@ class FlushEnd2DFront(object):
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
 		element = " "
-		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+		self.data_object.draw_oriented_arrow(dwg, point, theta, "SW", offset, textup, textdown, element)
 
 		# ------------------------------------------  Labeling Weld of flange -------------------------------------------
 		if self.data_object.weld == "Fillet Weld":
@@ -934,7 +934,7 @@ class FlushEnd2DFront(object):
 		self.data_object.stiffener_weld = 0
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A1 + (self.data_object.plate_length_L1 - 100) * np.array([0, -1])
+		pt_a1 = self.A1 + (500) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
 		text = "A"
@@ -1337,7 +1337,7 @@ class FlushEnd2DTop(object):
 			element = "weld"
 			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 	# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A4 - (self.data_object.plate_length_L1/3) * np.array([0, -1])
+		pt_a1 = self.A4 - (200) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
 		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
 		text = "C"
@@ -1350,7 +1350,7 @@ class FlushEnd2DTop(object):
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-		pt_a3 = self.AA2 + (self.data_object.plate_length_L1 / 3) * np.array([1, 0])
+		pt_a3 = self.AA2 + (200) * np.array([1, 0])
 		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
 		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
 		text = "B"
@@ -1714,8 +1714,8 @@ class FlushEnd2DSide(object):
 		point = self.A1 +5* np.array([0, 1])
 		theta = 1
 		offset = 1
-		textup = " "
-		textdown = "Beam " + str(self.data_object.beam_designation)
+		textdown = " "
+		textup = "Beam " + str(self.data_object.beam_designation)
 		element = " "
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 

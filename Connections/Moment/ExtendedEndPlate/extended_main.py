@@ -279,7 +279,6 @@ class Stiffener(QDialog):
 			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
 			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
-			self.ui.txt_stiffnrThickness_5.setText(str(resultObj_plate['Stiffener']['Notch']))
 
 		else:
 			self.ui.plateHeight.setText("Height (mm)")
@@ -289,7 +288,6 @@ class Stiffener(QDialog):
 			self.ui.txt_stiffnrThickness.setText(str(resultObj_plate["Stiffener"]["Thickness"]))
 			self.ui.txt_stiffnrThickness_2.setText(str(resultObj_plate['Stiffener']['Moment']))
 			self.ui.txt_stiffnrThickness_3.setText(str(resultObj_plate['Stiffener']['MomentCapacity']))
-			self.ui.txt_stiffnrThickness_5.setText(str(resultObj_plate['Stiffener']['Notch']))
 
 class Weld_Details(QDialog):
 	def __init__(self, parent=None):
@@ -313,7 +311,7 @@ class Weld_Details(QDialog):
 		else:
 			self.ui.label_picture_2.setPixmap(QtGui.QPixmap(":/newPrefix/images/Butt_weld_double_bevel_web.png"))
 			self.ui.label_note_3.setText("As web thickness, tw (%d mm) > 12 mm, double bevel butt welding is provided [Reference: IS 9595:1996]." % int(db_value.beam_tw))
-		
+
 
 
 class Pitch(QDialog):
@@ -343,24 +341,18 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 
 
 
@@ -379,22 +371,16 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 
 
 		elif uiObj["Member"]["Connectivity"] == "Extended one way":
@@ -412,24 +398,18 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 8:
 				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_8.png")
@@ -445,22 +425,16 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 
 			elif no_of_bolts == 10:
 				pixmap = QPixmap(":/newPrefix/images/One_way/OWE_10.png")
@@ -477,20 +451,14 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 		else:
 
 			if no_of_bolts == 8:
@@ -506,26 +474,20 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_2.hide()
 				self.ui.lbl_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch2.hide()
 				self.ui.lineEdit_pitch3.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 12:
-				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_10.png")
+				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_12.png")
 				pixmap.scaledToHeight(60)
 				pixmap.scaledToWidth(50)
 				self.ui.label_3.setPixmap(pixmap)
@@ -539,20 +501,14 @@ class Pitch(QDialog):
 				self.ui.lbl_mem5.hide()
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_4.hide()
 				self.ui.lbl_5.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch4.hide()
 				self.ui.lineEdit_pitch5.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 16:
 				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_16.png")
 				pixmap.scaledToHeight(60)
@@ -570,16 +526,10 @@ class Pitch(QDialog):
 				self.ui.lbl_5.setText('Pitch_6_7')
 				self.ui.lbl_mem6.hide()
 				self.ui.lbl_mem7.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 				self.ui.lbl_6.hide()
 				self.ui.lbl_7.hide()
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
 				self.ui.lineEdit_pitch6.hide()
 				self.ui.lineEdit_pitch7.hide()
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 			elif no_of_bolts == 20:
 				pixmap = QPixmap(":/newPrefix/images/Both_way/BW_20.png")
 				pixmap.scaledToHeight(60)
@@ -592,8 +542,6 @@ class Pitch(QDialog):
 				self.ui.lineEdit_pitch5.setText(str(resultObj_plate['Bolt']['Pitch67']))
 				self.ui.lineEdit_pitch6.setText(str(resultObj_plate['Bolt']['Pitch78']))
 				self.ui.lineEdit_pitch7.setText(str(resultObj_plate['Bolt']['Pitch910']))
-				self.ui.lineEdit_pitch8.hide()
-				self.ui.lineEdit_pitch9.hide()
 				self.ui.lbl_1.setText('Pitch_1_2')
 				self.ui.lbl_2.setText('Pitch_3_4')
 				self.ui.lbl_3.setText('Pitch_4_5')
@@ -601,10 +549,6 @@ class Pitch(QDialog):
 				self.ui.lbl_5.setText('Pitch_6_7')
 				self.ui.lbl_6.setText('Pitch_7_8')
 				self.ui.lbl_7.setText('Pitch_9_10')
-				self.ui.lbl_8.hide()
-				self.ui.lbl_9.hide()
-				self.ui.lbl_mem7_2.hide()
-				self.ui.lbl_mem7_3.hide()
 
 
 class DesignReportDialog(QDialog):
@@ -768,7 +712,7 @@ class Maincontroller(QMainWindow):
 		self.ui.actionAsk_Us_a_Question.triggered.connect(self.open_ask_question)
 		self.ui.actionSample_Tutorials.triggered.connect(self.open_tutorials)
 		self.ui.actionDesign_examples.triggered.connect(self.design_examples)
-		
+
 
 		self.ui.btn_pitchDetail.clicked.connect(self.pitch_details)
 		self.ui.btn_plateDetail.clicked.connect(self.plate_details)

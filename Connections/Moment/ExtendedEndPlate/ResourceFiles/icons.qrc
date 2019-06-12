@@ -29,5 +29,8 @@
    <file>images/One_way/OWE_8.png</file>
    <file>images/One_way/OWE_10.png</file>
     <file>images/Ui_stiffener.png</file>
+    <file>images/owe_ep.png</file>
+    <file>images/ebw_ep.png</file>
+    <file>images/flush_ep.png</file>
   </qresource>
 </RCC>

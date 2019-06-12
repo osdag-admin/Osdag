@@ -2090,7 +2090,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
 
 
         rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-        row = [0, "Different Views of the Connection", " "]
+        row = [0, "Fabrication Drawings", " "]
         rstr += t('tr')
         rstr += t('td colspan="2" class=" detail" align=center '
                   '') + space(row[0]) + row[1] + t('/td')

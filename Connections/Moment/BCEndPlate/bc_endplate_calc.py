@@ -341,11 +341,12 @@ def bc_endplate_design(uiObj):
             # #######################################################################
 
         elif endplate_type == 'one_way':
-            number_of_bolts = no_tension_side + 2
-
+            # number_of_bolts = no_tension_side + 2
+            number_of_bolts = 2 * no_tension_side
             if no_tension_side <= 4:
                 no_tension_side = 4
-                number_of_bolts = no_tension_side + 2
+                # number_of_bolts = no_tension_side + 2
+                number_of_bolts = 2 * no_tension_side
                 no_rows = {'out_tension_flange': 1, 'in_tension_flange': 1,
                            'out_compression_flange': 0, 'in_compression_flange': 1}
                 if beam_d - 2 * beam_tf - 2 * l_v < pitch_dist:

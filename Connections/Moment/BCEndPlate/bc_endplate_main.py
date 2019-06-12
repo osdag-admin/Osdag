@@ -421,6 +421,9 @@ class DesignPreference(QDialog):
 			ry_c = float(self.ui.lineEdit_RogY_Column.text())
 			Zz_c = float(self.ui.lineEdit_ElasticModZ_Column.text())
 			Zy_c = float(self.ui.lineEdit_ElasticModY_Column.text())
+			if (self.ui.lineEdit_ElasticModPZ_Column.text()=="" or self.ui.lineEdit_ElasticModPY_Column.text()==""):
+				self.ui.lineEdit_ElasticModPZ_Column.setText("0")
+				self.ui.lineEdit_ElasticModPY_Column.setText("0")
 			Zpz_c = float(self.ui.lineEdit_ElasticModPZ_Column.text())
 			Zpy_c = float(self.ui.lineEdit_ElasticModPY_Column.text())
 			Source_c = self.ui.lineEdit_Source_Column.text()
@@ -467,6 +470,9 @@ class DesignPreference(QDialog):
 			ry_b = float(self.ui.lineEdit_RogY_Beam.text())
 			Zz_b = float(self.ui.lineEdit_ElasticModZ_Beam.text())
 			Zy_b = float(self.ui.lineEdit_ElasticModY_Beam.text())
+			if (self.ui.lineEdit_ElasticModPZ_Beam.text()=="" or self.ui.lineEdit_ElasticModPY_Beam.text()==""):
+				self.ui.lineEdit_ElasticModPZ_Beam.setText("0")
+				self.ui.lineEdit_ElasticModPY_Beam.setText("0")
 			Zpz_b = float(self.ui.lineEdit_ElasticModPZ_Beam.text())
 			Zpy_b = float(self.ui.lineEdit_ElasticModPY_Beam.text())
 			Source_b = self.ui.lineEdit_Source_Beam.text()

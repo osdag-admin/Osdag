@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>200</height>
+    <width>563</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,7 +25,7 @@
    <string>Pitch Details</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -35,13 +35,56 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>262</width>
-        <height>271</height>
+        <width>543</width>
+        <height>380</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>290</x>
+         <y>20</y>
+         <width>241</width>
+         <height>341</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap>../../../ResourceFiles/images/cleatAngle.png</pixmap>
+       </property>
+      </widget>
+      <widget class="QScrollArea" name="scrollArea_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>271</width>
+         <height>251</height>
+        </rect>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>269</width>
+          <height>249</height>
+         </rect>
+        </property>
         <widget class="QLabel" name="label">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>36</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -52,16 +95,15 @@
           <string>Sr. No.</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="1" rowspan="8">
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
         <widget class="QLabel" name="label_2">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>10</y>
+           <width>67</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -72,16 +114,15 @@
           <string>Designation</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="3" rowspan="8">
-        <widget class="Line" name="line_6">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
         <widget class="QLabel" name="label_5">
+         <property name="geometry">
+          <rect>
+           <x>180</x>
+           <y>10</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -92,9 +133,262 @@
           <string>Pitch (mm)</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="0">
+        <widget class="QLineEdit" name="lineEdit_pitch2">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>70</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_pitch3">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>100</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_pitch4">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>130</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_pitch">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>40</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_pitch5">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>160</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="lineEdit_pitch6">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>190</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_1">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>40</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Pitch 12-20</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_2">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>70</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>er</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_3">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>100</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>ty</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_4">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>130</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>we</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_5">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>190</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>rt</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_6">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>160</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>yt</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="lbl_7">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>220</y>
+           <width>71</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>9</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>yt</string>
+         </property>
+        </widget>
         <widget class="QLabel" name="lbl_mem">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>40</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -108,48 +402,15 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="lbl_1">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>yu</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="5">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="0">
         <widget class="QLabel" name="lbl_mem2">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>70</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -163,50 +424,17 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="2" column="2">
-        <widget class="QLabel" name="lbl_2">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>er</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch2">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="5">
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="0">
         <widget class="QLabel" name="lbl_mem3">
          <property name="enabled">
           <bool>true</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>100</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
          </property>
          <property name="font">
           <font>
@@ -221,48 +449,15 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QLabel" name="lbl_3">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>ty</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch3">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="5">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0">
         <widget class="QLabel" name="lbl_mem4">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>130</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -276,48 +471,15 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QLabel" name="lbl_4">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>we</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch4">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="5">
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="0">
         <widget class="QLabel" name="lbl_mem5">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>160</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -331,48 +493,15 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="QLabel" name="lbl_5">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>rt</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch5">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="5">
-        <spacer name="horizontalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="6" column="0">
         <widget class="QLabel" name="lbl_mem6">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>190</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -386,48 +515,15 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="6" column="2">
-        <widget class="QLabel" name="lbl_6">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>yt</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="4">
-        <widget class="QLineEdit" name="lineEdit_pitch6">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="5">
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="7" column="0">
         <widget class="QLabel" name="lbl_mem7">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>220</y>
+           <width>16</width>
+           <height>16</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -441,22 +537,41 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
-       </item>
-       <item row="7" column="2">
-        <widget class="QLabel" name="lbl_7">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>9</pointsize>
-          </font>
+        <widget class="Line" name="line">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>3</y>
+           <width>20</width>
+           <height>241</height>
+          </rect>
          </property>
-         <property name="text">
-          <string>yt</string>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
         </widget>
-       </item>
-       <item row="7" column="4">
+        <widget class="Line" name="line_7">
+         <property name="geometry">
+          <rect>
+           <x>130</x>
+           <y>0</y>
+           <width>20</width>
+           <height>251</height>
+          </rect>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
         <widget class="QLineEdit" name="lineEdit_pitch7">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>220</y>
+           <width>116</width>
+           <height>21</height>
+          </rect>
+         </property>
          <property name="font">
           <font>
            <family>Arial</family>
@@ -467,21 +582,8 @@
           <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item row="7" column="5">
-        <spacer name="horizontalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
+       </widget>
+      </widget>
      </widget>
     </widget>
    </item>

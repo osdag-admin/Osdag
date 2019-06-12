@@ -19,5 +19,19 @@
     <file>images/Z-X.png</file>
     <file>images/Z-Y.eps</file>
     <file>images/Z-Y.png</file>
+    <file>images/Both_way/BW_8.png</file>
+    <file>images/Both_way/BW_12.png</file>
+    <file>images/Both_way/BW_16.png</file>
+   <file>images/Both_way/BW_20.png</file>
+   <file>images/Flush/Flush_4.png</file>
+   <file>images/Flush/Flush_6.png</file>
+   <file>images/One_way/OWE_6.png</file>
+   <file>images/One_way/OWE_8.png</file>
+   <file>images/One_way/OWE_10.png</file>
+   <file>images/Ui_stiffener.png</file>
+   <file>images/Butt_weld_double_bevel_flange.png</file>
+   <file>images/Butt_weld_double_bevel_web.png</file>
+   <file>images/Butt_weld_single_bevel_flange.png</file>
+   <file>images/Butt_weld_single_bevel_web.png</file>
   </qresource>
 </RCC>

@@ -978,6 +978,28 @@ class CADFillet(object):
     def get_bbWeldstiff4_l2Model(self):
         return self.bbWeldstiff4_l2Model
 
+    def get_models(self):
+        '''Returning 3D models
+        '''
+        return [self.beamLModel, self.beamRModel, self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+     self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+     self.beam_stiffener_4Model, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model, self.beam_stiffener_F3Model,
+     self.beam_stiffener_F4Model, self.bbWeldAbvFlang_11Model, self.bbWeldAbvFlang_12Model, self.bbWeldAbvFlang_21Model,
+     self.bbWeldAbvFlang_22Model,
+     self.bbWeldBelwFlang_11Model, self.bbWeldBelwFlang_12Model, self.bbWeldBelwFlang_13Model,
+     self.bbWeldBelwFlang_14Model, self.bbWeldBelwFlang_21Model,
+     self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+     self.bbWeldSideWeb_11Model, self.bbWeldSideWeb_12Model,self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, self.bbWeldStiffHL_1Model,
+     self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model, self.bbWeldStiffHL_2Model, self.bbWeldStiffLL_2Model,
+     self.bbWeldStiffHL_4Model, self.bbWeldStiffLL_4Model, self.bbWeldStiffHR_1Model, self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
+     self.bbWeldStiffLR_3Model, self.bbWeldStiffHR_2Model, self.bbWeldStiffLR_2Model, self.bbWeldStiffHR_4Model, self.bbWeldStiffLR_4Model,
+     self.bbWeldstiff1_u1Model, self.bbWeldstiff1_u2Model, self.bbWeldstiff1_l1Model, self.bbWeldstiff1_l2Model, self.bbWeldstiff2_u1Model,
+     self.bbWeldstiff2_u2Model, self.bbWeldstiff2_l1Model, self.bbWeldstiff2_l2Model, self.bbWeldstiff3_u1Model, self.bbWeldstiff3_u2Model,
+     self.bbWeldstiff3_l1Model, self.bbWeldstiff3_l2Model, self.bbWeldstiff4_u1Model, self.bbWeldstiff4_u2Model, self.bbWeldstiff4_l1Model,
+     self.bbWeldstiff4_l2Model,] + self.nut_bolt_array.get_models()
+
+
+
 class CADGroove(object):
     def __init__(self,beamLeft,beamRight, plateLeft, plateRight, nut_bolt_array,
 									bbWeldFlang_R1, bbWeldFlang_R2, bbWeldWeb_R3,bbWeldFlang_L1, bbWeldFlang_L2, bbWeldWeb_L3,
@@ -1916,3 +1938,20 @@ class CADGroove(object):
 
     def get_bbWeldstiff4_l2Model(self):
         return self.bbWeldstiff4_l2Model
+
+
+    def get_models(self):
+        '''Returning 3D models
+        '''
+        return [self.beamLModel, self.beamRModel, self.plateLModel, self.plateRModel, self.beam_stiffener_1Model,
+     self.beam_stiffener_2Model, self.beam_stiffener_3Model,
+     self.beam_stiffener_4Model, self.beam_stiffener_F1Model, self.beam_stiffener_F2Model, self.beam_stiffener_F3Model,
+     self.beam_stiffener_F4Model, self.bbWeldStiffHL_1Model, self.bbWeldFlang_R1Model, self.bbWeldFlang_R2Model, self.bbWeldFlang_L1Model,
+                self.bbWeldFlang_L2Model, self.bbWeldWeb_R3Model, self.bbWeldWeb_L3Model,
+     self.bbWeldStiffLL_1Model, self.bbWeldStiffHL_3Model, self.bbWeldStiffLL_3Model, self.bbWeldStiffHL_2Model, self.bbWeldStiffLL_2Model,
+     self.bbWeldStiffHL_4Model, self.bbWeldStiffLL_4Model, self.bbWeldStiffHR_1Model, self.bbWeldStiffLR_1Model, self.bbWeldStiffHR_3Model,
+     self.bbWeldStiffLR_3Model, self.bbWeldStiffHR_2Model, self.bbWeldStiffLR_2Model, self.bbWeldStiffHR_4Model, self.bbWeldStiffLR_4Model,
+     self.bbWeldstiff1_u1Model, self.bbWeldstiff1_u2Model, self.bbWeldstiff1_l1Model, self.bbWeldstiff1_l2Model, self.bbWeldstiff2_u1Model,
+     self.bbWeldstiff2_u2Model, self.bbWeldstiff2_l1Model, self.bbWeldstiff2_l2Model, self.bbWeldstiff3_u1Model, self.bbWeldstiff3_u2Model,
+     self.bbWeldstiff3_l1Model, self.bbWeldstiff3_l2Model, self.bbWeldstiff4_u1Model, self.bbWeldstiff4_u2Model, self.bbWeldstiff4_l1Model,
+     self.bbWeldstiff4_l2Model,] + self.nut_bolt_array.get_models()

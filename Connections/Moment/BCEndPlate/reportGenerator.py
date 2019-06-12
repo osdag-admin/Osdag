@@ -2138,6 +2138,10 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
         rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
 
+        rstr += t('/table')
+        rstr += t('h1 style="page-break-before:always"')  # page break
+        rstr += t('/h1')
+
         # png = folder + "/images_html/3D_Model.png"
         # datapng = '<object type="image/PNG" data= %s width ="450"></object>' % png
         #

@@ -747,6 +747,33 @@ class CADFillet(object):
     def get_bcWeldStiffLR_2Model(self):
         return self.bcWeldStiffLR_2Model
 
+
+    def get_models(self):
+        '''Returning 3D models
+        '''
+
+        if self.endplate_type == "one_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()        #self.beam_stiffener_1Model,
+        elif self.endplate_type == "both_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()        #self.beam_stiffener_1Model,self.beam_stiffener_2Model,
+
+        elif self.endplate_type == "flush":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()
+
+
+
 class CADColWebFillet(CADFillet):
 
     def createBeamLGeometry(self):
@@ -869,6 +896,34 @@ class CADColWebFillet(CADFillet):
         #############################################################################################################
         #   Following functions returns the CAD model to the function display_3DModel of main file                  #
         #############################################################################################################
+
+
+    def get_models(self):
+        '''Returning 3D models
+        '''
+
+        if self.endplate_type == "one_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()        #self.beam_stiffener_1Model,
+
+        elif self.endplate_type == "both_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()        #self.beam_stiffener_1Model,self.beam_stiffener_2Model,
+
+        elif self.endplate_type == "flush":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bbWeldAbvFlang_21Model, self.bbWeldAbvFlang_22Model, self.bbWeldBelwFlang_21Model,
+                    self.bbWeldBelwFlang_22Model, self.bbWeldBelwFlang_23Model, self.bbWeldBelwFlang_24Model,
+                    self.bbWeldSideWeb_21Model, self.bbWeldSideWeb_22Model, ] + self.nut_bolt_array.get_models()
 
     # def get_beamLModel(self):
     #     # return self.beamLModel
@@ -1534,6 +1589,26 @@ class CADGroove(object):
     def get_contWeldR2_L1Model(self):
         return self.contWeldR2_L1Model
 
+    def get_models(self):
+        '''Returning 3D models
+        '''
+
+        if self.endplate_type == "one_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()       #self.beam_stiffener_1Model,
+        elif self.endplate_type == "both_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()       # self.beam_stiffener_1Model,self.beam_stiffener_2Model,
+        elif self.endplate_type == "flush":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()
+
 
 
 class CADcolwebGroove(CADGroove):
@@ -1652,3 +1727,27 @@ class CADcolwebGroove(CADGroove):
         uDircontWeldL2_L1 = numpy.array([1.0, 0.0,0.0])
         wDircontWeldL2_L1 = numpy.array([0.0, 1.0, 0])
         self.contWeldL2_L1.place(contWeldL2_L1OriginL, uDircontWeldL2_L1, wDircontWeldL2_L1)
+
+
+    def get_models(self):
+        '''Returning 3D models
+        '''
+
+        if self.endplate_type == "one_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()       #self.beam_stiffener_1Model,
+        elif self.endplate_type == "both_way":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()       #self.beam_stiffener_1Model,self.beam_stiffener_2Model,
+        elif self.endplate_type == "flush":
+            return [self.beamLModel, self.beamRModel, self.plateRModel,
+                    self.contPlate_L1Model, self.contPlate_L2Model,
+                    self.bcWeldFlang_1Model, self.bcWeldFlang_2Model,
+                    self.bcWeldWeb_3Model] + self.nut_bolt_array.get_models()
+
+

@@ -775,8 +775,8 @@ class FlushEnd2DFront(object):
                 ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.Lv) * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array([1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
 
             ptx1 = ptx - bolt_r * np.array([0, 1])
-            rect_width = self.data_object.bolt_diameter
-            rect_length = self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1
+            rect_width = float(self.data_object.bolt_diameter)
+            rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
             dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
             pt_Cx = ptx + np.array([1, 0])
@@ -809,8 +809,8 @@ class FlushEnd2DFront(object):
                     [1, 0]) + i * self.data_object.pitch23 * np.array([0, -1])
 
             ptx1 = ptx - bolt_r * np.array([0, 1])
-            rect_width = self.data_object.bolt_diameter
-            rect_length = self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1
+            rect_width = float(self.data_object.bolt_diameter)
+            rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
             dwg.add(
                 dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
@@ -1131,8 +1131,8 @@ class FlushEnd2DTop(object):
                       (self.data_object.web_thickness_tw1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + \
                       i * self.data_object.cross_centre_gauge_dist * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_diameter
-                rect_length = self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1
+                rect_width = float(self.data_object.bolt_diameter)
+                rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
                 dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
                                  stroke_width=2.5))
 

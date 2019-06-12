@@ -28,6 +28,10 @@
    <file>images/One_way/OWE_6.png</file>
    <file>images/One_way/OWE_8.png</file>
    <file>images/One_way/OWE_10.png</file>
-    <file>images/Ui_stiffener.png</file>
+   <file>images/Ui_stiffener.png</file>
+   <file>images/Butt_weld_double_bevel_flange.png</file>
+   <file>images/Butt_weld_double_bevel_web.png</file>
+   <file>images/Butt_weld_single_bevel_flange.png</file>
+   <file>images/Butt_weld_single_bevel_web.png</file>
   </qresource>
 </RCC>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'ui_stiffener.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Stiffener(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(317, 231)
+        Dialog.resize(620, 227)
         self.txt_stiffnrHeight = QtWidgets.QLineEdit(Dialog)
         self.txt_stiffnrHeight.setGeometry(QtCore.QRect(179, 27, 118, 23))
         font = QtGui.QFont()
@@ -100,6 +100,9 @@ class Ui_Stiffener(object):
         self.label_165.setFont(font)
         self.label_165.setFocusPolicy(QtCore.Qt.NoFocus)
         self.label_165.setObjectName("label_165")
+        self.widget = QtWidgets.QLabel(Dialog)
+        self.widget.setGeometry(QtCore.QRect(320, 20, 291, 191))
+        self.widget.setObjectName("widget")
         self.txt_stiffnrHeight.raise_()
         self.plateHeight.raise_()
         self.label_2.raise_()
@@ -110,6 +113,7 @@ class Ui_Stiffener(object):
         self.txt_stiffnrThickness_3.raise_()
         self.label_165.raise_()
         self.label_164.raise_()
+        self.widget.raise_()
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -128,7 +132,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = Ui_Stiffener()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())

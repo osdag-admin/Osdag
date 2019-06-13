@@ -480,7 +480,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [0, "Loading (Factored Load) ", " "]
+    row = [0, "Loading (Factored Loads) ", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
@@ -1004,7 +1004,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td class="detail2"') + row[2] + t('/td')
     rstr += t('/tr')
 
-    row = [1, "Ultimate Strength (<i>f</i><sub>u</sub>) (MPa) (overwrite)", bolt_grade_fu]
+    row = [1, "Ultimate Strength (<i>f</i><sub>u</sub>) (MPa)", bolt_grade_fu]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + row[2] + t('/td')
@@ -2047,90 +2047,94 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/tr')
 
     else:
+        if status == "True":
 
 
         # rstr += t('/table')
         # rstr += t('hr')
         # rstr += t('/hr')
 
-        row = [0, "Weld Detailing", " "]
+            row = [0, "Weld Detailing", " "]
+            rstr += t('tr')
+            rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
+            rstr += t('/tr')
+
+            if float(beam_tf) <= float(12):
+                row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_flange.png"  scale="2" ></object>']
+                rstr += t('tr')
+                rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+                row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(
+                    beam_tf)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                       " "]
+                rstr += t('tr')
+                rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+            else:
+                row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_flange.png" scale="2" ></object>']
+                rstr += t('tr')
+                rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+                row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                       " "]
+                rstr += t('tr')
+                rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+            if float(beam_tw) <= float(12):
+                row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_web.png" scale="2" ></object>']
+                rstr += t('tr')
+                rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+                row = [0, "Note :- As web thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                       " "]
+                rstr += t('tr')
+                rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+            else:
+                row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_web.png" scale="2" ></object>']
+                rstr += t('tr')
+                rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+                row = [0,  "Note :- As web thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                       " "]
+                rstr += t('tr')
+                rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
+                rstr += t('/tr')
+
+            rstr += t('/table')
+            rstr += t('h1 style="page-break-before:always"')  # page break
+            rstr += t('/h1')
+
+        else:
+            rstr += t('/tr')
+
+    # stiffener images
+    if status == "True":
+        rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
+        row = [0, "Stiffener Details", " "]
         rstr += t('tr')
         rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
 
-        if float(beam_tf) <= float(12):
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_flange.png"  ></object>']
+        if uiObj["Member"]["Connectivity"] == "Flush end plate":
+            row = [0, '<object type= "image/PNG" data= "flush_stiffener.png" scale="0.5" ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-            row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(
-                beam_tf)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
-                   " "]
-            rstr += t('tr')
-            rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
 
         else:
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_flange.png"  ></object>']
+            row = [0, '<object type= "image/PNG" data= "eep_stiffener.png" scale="0.5" ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
 
-            row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
-                   " "]
-            rstr += t('tr')
-            rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-        if float(beam_tw) <= float(12):
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_web.png"  ></object>']
-            rstr += t('tr')
-            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-            row = [0, "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
-                   " "]
-            rstr += t('tr')
-            rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-        else:
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_web.png"  ></object>']
-            rstr += t('tr')
-            rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-            row = [0,  "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
-                   " "]
-            rstr += t('tr')
-            rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
-            rstr += t('/tr')
-
-        rstr += t('/table')
-        rstr += t('h1 style="page-break-before:always"')  # page break
-        rstr += t('/h1')
-
-
-
-    # stiffener images
-    rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    row = [0, "Stiffener Details", " "]
-    rstr += t('tr')
-    rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('/tr')
-
-    if uiObj["Member"]["Connectivity"] == "Flush end plate":
-        row = [0, '<object type= "image/PNG" data= "flush_stiffener.png" height = "430px" width = "auto" ></object>']
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('/tr')
-
-    else:
-        row = [0, '<object type= "image/PNG" data= "eep_stiffener.png" height = "430px" width = "auto" ></object>']
-        rstr += t('tr')
-        rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
-        rstr += t('/tr')
 
     rstr += t('/table')
     rstr += t('h1 style="page-break-before:always"')  # page break

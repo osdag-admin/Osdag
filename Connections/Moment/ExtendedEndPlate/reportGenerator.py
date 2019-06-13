@@ -215,10 +215,10 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     stiffener_weld = str(float(outObj['Stiffener']['WeldSize']))
     stiffener_moment = str(float(outObj['Stiffener']['Moment']))
     stiffener_moment_capacity = str(float(outObj['Stiffener']['MomentCapacity']))
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        stiffener_width = str(float(outObj['Stiffener']['Width']))
-    else:
-        stiffener_height = str(float(outObj['Stiffener']['Height']))
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     stiffener_width = str(float(outObj['Stiffener']['Width']))
+    # else:
+    stiffener_height = str(float(outObj['Stiffener']['Height']))
 
 
     if uiObj["Member"]["Connectivity"] == "Flush":
@@ -1536,35 +1536,38 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     # Plate Height
 
-    if number_of_bolts == 20:
-        plate_height_mini = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_mini)))  # for 20 number of bolts
-        plate_height_max = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_max)))  # for 20 number of bolts
-    else:
-        plate_height_mini = str(float(beam_d) + float(50) + float(2 * float(end_mini)))  # for bolts less than 20
-        plate_height_max = str(float(beam_d) + float(50) + float(2 * float(end_max)))  # for bolts less than 20
-
     rstr += t('tr')
+    row = [0, "Plate height (mm)","Based on detailing requirements", plate_height,""]
 
-    if float(number_of_bolts) <= float(20):
-
-        if number_of_bolts == 20:
-            if float(plate_height) < float(plate_height_mini) or float(plate_height) > float(plate_height_max):
-                row = [0, "Plate height (mm)", "&#8805; (" + beam_d + "+ 50.0 + (2*" + pitch_mini + ") + (2* " + end_mini+ ") , &#8804; (" + beam_d + "+ 50.0 + (2*" + pitch_mini +
-                          ") + (2*" + end_max + ") <br> [based on detailing requirements]", plate_height, " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
-            else:
-                row = [0, "Plate height (mm)","&#8805; (" + beam_d + "+ 50.0 + (2*" + pitch_mini + ") + (2* " + end_mini + ") , &#8804; (" + beam_d + "+ 50.0 + (2*" + pitch_mini +
-                       ") + (2*" + end_max + ") <br> [based on detailing requirements]", plate_height, " <p align=left style=color:green><b>Pass</b></p>","300", ""]
-
-        else:
-            if float(plate_height) < float(plate_height_mini) or float(plate_height) > float(plate_height_max):
-                row = [0, "Plate height (mm)","&#8805; (" + str(beam_d) + "+ 50.0 +" " (2*" + str(float(end_mini)) + ")) = " + plate_height_mini + ", &#8804; (" + str(beam_d) + "+ 50.0 + (" "2*" + end_max +
-                       ")) = " + plate_height_max + " <br> [based on detailing requirements]", plate_height," <p align=left style=color:red><b>Fail</b></p>", "300", ""]
-            else:
-                row = [0, "Plate height (mm)","&#8805; (" + str(beam_d) + "+ 50.0 +" " (2*" + str(float(end_mini)) + ")) = " + plate_height_mini + ", &#8804; (" + str(beam_d) + "+ 50.0 + (" "2*" + end_max +
-                       ")) = " + plate_height_max + " <br> [based on detailing requirements]", plate_height," <p align=left style=color:green><b>Pass</b></p>", "300", ""]
-
-    else:
-        row = [0, "Plate height (mm)", " Cannot compute ", " Cannot compute", " <p align=left style=color:red><b>Fail</b></p>", "300",""]
+    # if number_of_bolts == 20:
+    #     plate_height_mini = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_mini)))  # for 20 number of bolts
+    #     plate_height_max = str(float(beam_d) + float(50) + float(2 * float(pitch_mini)) + float(2 * float(end_max)))  # for 20 number of bolts
+    # else:
+    #     plate_height_mini = str(float(beam_d) + float(50) + float(2 * float(end_mini)))  # for bolts less than 20
+    #     plate_height_max = str(float(beam_d) + float(50) + float(2 * float(end_max)))  # for bolts less than 20
+    #
+    # rstr += t('tr')
+    #
+    # if float(number_of_bolts) <= float(20):
+    #
+    #     if number_of_bolts == 20:
+    #         if float(plate_height) < float(plate_height_mini) or float(plate_height) > float(plate_height_max):
+    #             row = [0, "Plate height (mm)", "&#8805; (" + beam_d + "+ 50.0 + (2*" + pitch_mini + ") + (2* " + end_mini+ ") , &#8804; (" + beam_d + "+ 50.0 + (2*" + pitch_mini +
+    #                       ") + (2*" + end_max + ") <br> [based on detailing requirements]", plate_height, " <p align=left style=color:red><b>Fail</b></p>", "300", ""]
+    #         else:
+    #             row = [0, "Plate height (mm)","&#8805; (" + beam_d + "+ 50.0 + (2*" + pitch_mini + ") + (2* " + end_mini + ") , &#8804; (" + beam_d + "+ 50.0 + (2*" + pitch_mini +
+    #                    ") + (2*" + end_max + ") <br> [based on detailing requirements]", plate_height, " <p align=left style=color:green><b>Pass</b></p>","300", ""]
+    #
+    #     else:
+    #         if float(plate_height) < float(plate_height_mini) or float(plate_height) > float(plate_height_max):
+    #             row = [0, "Plate height (mm)","&#8805; (" + str(beam_d) + "+ 50.0 +" " (2*" + str(float(end_mini)) + ")) = " + plate_height_mini + ", &#8804; (" + str(beam_d) + "+ 50.0 + (" "2*" + end_max +
+    #                    ")) = " + plate_height_max + " <br> [based on detailing requirements]", plate_height," <p align=left style=color:red><b>Fail</b></p>", "300", ""]
+    #         else:
+    #             row = [0, "Plate height (mm)","&#8805; (" + str(beam_d) + "+ 50.0 +" " (2*" + str(float(end_mini)) + ")) = " + plate_height_mini + ", &#8804; (" + str(beam_d) + "+ 50.0 + (" "2*" + end_max +
+    #                    ")) = " + plate_height_max + " <br> [based on detailing requirements]", plate_height," <p align=left style=color:green><b>Pass</b></p>", "300", ""]
+    #
+    # else:
+    #     row = [0, "Plate height (mm)", " Cannot compute ", " Cannot compute", " <p align=left style=color:red><b>Fail</b></p>", "300",""]
 
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
@@ -1638,7 +1641,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td colspan="4" class="detail" align="center"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-    if typeof_weld == "Fillet Weld":
+    if uiObj["Weld"]["Type"] == "Fillet Weld":
 
         # Flange checks
         row = [0, "Flange", " "]
@@ -1755,7 +1758,6 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
         # Weld at web
         rstr += t('tr')
-
         if float(number_of_bolts) <= 20:
             if float(critical_stress_web) > float(weld_strength):
                 row = [0, "Critical stress in weld at web (N/mm ^ 2)",
@@ -1789,27 +1791,29 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('/tr')
 
     rstr += t('tr')
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        row = [0, "Width (mm)", "", stiffener_width, ""]
-    else:
-        row = [0, "Length (mm)", "", stiffener_length, ""]
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     row = [0, "Width (mm)", "", stiffener_height, ""]
+    # else:
+    #     row = [0, "Length (mm)", "", stiffener_length, ""]
+    row = [0, "Height (mm)", "", stiffener_height, ""]
     rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
     rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
     rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
     rstr += t('/tr')
 
-    rstr += t('tr')
-    if uiObj["Member"]["Connectivity"] == "Flush":
-        row = [0, "Height (mm)", "", stiffener_width, ""]
-    else:
-        row = [0, "Height (mm)", "", stiffener_height, ""]
-
-    rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
-    rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
-    rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
-    rstr += t('/tr')
+    # rstr += t('tr')
+    # if uiObj["Member"]["Connectivity"] == "Flush":
+    #     row = [0, "Height (mm)", "", stiffener_height, ""]
+    # else:
+    #     row = [0, "Height (mm)", "", stiffener_height, ""]
+    # row = [0, "Height (mm)", "", stiffener_height, ""]
+    #
+    # rstr += t('td class="detail1"') + space(row[0]) + row[1] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[2] + t('/td')
+    # rstr += t('td class="detail2"') + space(row[0]) + row[3] + t('/td')
+    # rstr += t('td class="detail1"') + space(row[0]) + row[4] + t('/td')
+    # rstr += t('/tr')
 
     rstr += t('tr')
     row = [0, "Thickness (mm)", "", stiffener_thickness, ""]
@@ -1916,7 +1920,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/tr')
 
         png = folder + "/images_html/3D_Model.png"
-        datapng = '<object type="image/PNG" data= %s  height = "430px" width = "450px" ></object>' % png
+        datapng = '<object type="image/PNG" data= %s  height = "440px" ></object>' % png
 
         side = folder + "/images_html/extendSide.png"
         dataside = '<object type="image/PNG" data= %s  height = "560px" width = "auto" ></object>' % side
@@ -2039,7 +2043,11 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
 
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
 
-    if typeof_weld == "Groove Weld (CJP)":
+    if uiObj["Weld"]["Type"] == "Fillet Weld":
+        rstr += t('/tr')
+
+    else:
+
 
         # rstr += t('/table')
         # rstr += t('hr')
@@ -2051,7 +2059,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/tr')
 
         if float(beam_tf) <= float(12):
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_flange.png"  ></object>']
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_flange.png"  ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
@@ -2064,7 +2072,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
             rstr += t('/tr')
 
         else:
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_flange.png"  ></object>']
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_flange.png"  ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
@@ -2076,7 +2084,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
             rstr += t('/tr')
 
         if float(beam_tw) <= float(12):
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_web.png"  ></object>']
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_single_bevel_web.png"  ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
@@ -2088,7 +2096,7 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
             rstr += t('/tr')
 
         else:
-            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_web.png"  ></object>']
+            row = [0, '<object type= "image/PNG" data= "Butt_weld_double_bevel_web.png"  ></object>']
             rstr += t('tr')
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
@@ -2104,25 +2112,22 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
         rstr += t('/h1')
 
 
-    else:
-        rstr += t('/tr')
-
 
     # stiffener images
     rstr += t('table width = 100% border-collapse= "collapse" border="1px solid black"')
-    row = [0, "Weld Detailing", " "]
+    row = [0, "Stiffener Details", " "]
     rstr += t('tr')
     rstr += t('td colspan="2" class=" detail"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
     if uiObj["Member"]["Connectivity"] == "Flush end plate":
-        row = [0, '<object type= "image/PNG" data= "flush_stiffener.png"  ></object>']
+        row = [0, '<object type= "image/PNG" data= "flush_stiffener.png" height = "430px" width = "auto" ></object>']
         rstr += t('tr')
         rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')
 
     else:
-        row = [0, '<object type= "image/PNG" data= "eep_stiffener.png"  ></object>']
+        row = [0, '<object type= "image/PNG" data= "eep_stiffener.png" height = "430px" width = "auto" ></object>']
         rstr += t('tr')
         rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
         rstr += t('/tr')

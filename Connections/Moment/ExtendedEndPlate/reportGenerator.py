@@ -568,24 +568,32 @@ def save_html(outObj, uiObj, dictbeamdata, filename, reportsummary, folder):
     rstr += t('td colspan="2" class="detail1"') + space(row[0]) + row[1] + t('/td')
     rstr += t('/tr')
 
-
     row = [2, "Type", uiObj["Weld"]["Type"]]
     rstr += t('tr')
     rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
     rstr += t('td class="detail2 "') + row[2] + t('/td')
     rstr += t('/tr')
+    if uiObj["Weld"]["Type"] == "Fillet Weld":
 
-    row = [2, "Size of Weld at Flange (mm)", uiObj['Weld']['Flange (mm)']]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+        row = [2, "Size of Weld at Flange (mm)", uiObj['Weld']['Flange (mm)']]
+        rstr += t('tr')
+        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2 "') + row[2] + t('/td')
+        rstr += t('/tr')
 
-    row = [2, "Size of Weld at Web (mm)", uiObj['Weld']['Web (mm)']]
-    rstr += t('tr')
-    rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
-    rstr += t('td class="detail2 "') + row[2] + t('/td')
-    rstr += t('/tr')
+        row = [2, "Size of Weld at Web (mm)", uiObj['Weld']['Web (mm)']]
+        rstr += t('tr')
+        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2 "') + row[2] + t('/td')
+        rstr += t('/tr')
+
+    else:
+        row = [2, "Size of Weld (mm)", butt_weld_size]
+        rstr += t('tr')
+        rstr += t('td class="detail2"') + space(row[0]) + row[1] + t('/td')
+        rstr += t('td class="detail2 "') + row[2] + t('/td')
+        rstr += t('/tr')
+
 
     row = [1, "Bolts ", " "]
     rstr += t('tr')

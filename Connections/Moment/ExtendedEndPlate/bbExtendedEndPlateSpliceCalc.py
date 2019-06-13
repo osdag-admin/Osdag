@@ -19,6 +19,7 @@ Reference:
 
 from model import *
 from Connections.connection_calculations import ConnectionCalculations
+from utilities.is800_2007 import IS800_2007
 import math
 import logging
 flag = 1
@@ -259,7 +260,7 @@ def shear_yielding(A_v, plate_fy):
     Returns: (float)- Shear yielding capacity of End Plate in kN
 
     """
-    V_d = 0.6 * A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
+    V_d = A_v * plate_fy / (math.sqrt(3) * 1.10 * 1000)
     return V_d
 
 
@@ -342,9 +343,14 @@ def bbExtendedEndPlateSplice(uiObj):
     end_plate_fu = float(uiObj['Member']['fu (MPa)'])
     end_plate_fy = float(uiObj['Member']['fy (MPa)'])
 
-    weld_type = str(uiObj["Weld"]["Type"])
-    weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
-    weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+    weld_type = str(uiObj["Weld"]["Type"])  # This is - Fillet weld or Groove weld
+
+    if uiObj["Weld"]["Type"] == "Fillet Weld":
+        weld_thickness_flange = float(uiObj['Weld']['Flange (mm)'])
+        weld_thickness_web = float(uiObj['Weld']['Web (mm)'])
+    else:
+        weld_thickness_flange = 0
+        weld_thickness_web = 0
 
     old_beam_section = get_oldbeamcombolist()
 
@@ -358,12 +364,26 @@ def bbExtendedEndPlateSplice(uiObj):
     # Read input values from Beam database
 
     dictbeamdata = get_beamdata(beam_sec)
-
+    global beam_tw
     beam_tw = float(dictbeamdata["tw"])
+    global beam_tf
     beam_tf = float(dictbeamdata["T"])
     beam_d = float(dictbeamdata["D"])
     beam_B = float(dictbeamdata["B"])
     beam_R1 = float(dictbeamdata["R1"])
+    beam_Zz = float(dictbeamdata["Zz"])
+
+    #######################################################################
+    # Validation of minimum input moment (Cl. 10.7- 6 and Cl. 8.2.1, IS 800:2007)
+
+    M_d = (1.2 * beam_Zz * 1000 * beam_fy) / 1.10
+    moment_minimum = 0.3 * (M_d / 1000000)
+
+    if float(factored_moment) < float(moment_minimum):
+        logger.warning(": The input factored moment (%2.2f kN-m) is less that the minimum design action on the connection (Cl. 10.7-6, IS 800:2007)" % factored_moment)
+        logger.info(": The connection is designed for %2.2f kN-m" % float(moment_minimum))
+
+    factored_moment = round(moment_minimum, 3)
 
     #######################################################################
     # Calculation of Bolt strength in MPa
@@ -388,12 +408,22 @@ def bbExtendedEndPlateSplice(uiObj):
     gauge_dist_min = pitch_dist_min
     gauge_dist_max = pitch_dist_max
 
+    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
+    # TODO validate g_1 after excomm review
+
+    if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+        end_distance = edge_distance = int(math.ceil(1.7 * dia_hole))
+    else:
+        end_distance = edge_distance = int(float(1.5 * dia_hole))
+
+    g_1 = max(float(90), float(((2 * edge_distance) + beam_tw)))
+
     # min_end_distance & max_end_distance = Minimum and Maximum end distance (mm) [Cl. 10.2.4.2 & Cl. 10.2.4.3, IS 800:2007]
 
     if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
-        min_end_distance = int(math.ceil(1.7 * dia_hole))
+        min_end_distance = min_edge_distance = int(math.ceil(1.7 * dia_hole))
     else:
-        min_end_distance = int(float(1.5 * dia_hole))
+        min_end_distance = min_edge_distance = int(float(1.5 * dia_hole))
 
     end_dist_mini = min_end_distance + (5 - min_end_distance) % 5  # round off to nearest greater multiple of five
 
@@ -408,25 +438,26 @@ def bbExtendedEndPlateSplice(uiObj):
 
     #######################################################################
     # Distance between the toe of weld or the edge of flange to the centre of the nearer bolt (mm) [AISC design guide 16]
-    # TODO: Implement l_v depending on excomm review
-    l_v = float(50)  # for extended end plate
+    # TODO: Improvise l_v, p_fi and p_fo after excomm review
+    # l_v = float(50)  # for extended end plate
+    # l_v = 2.5 * bolt_dia  # for extended end plate
 
-    # for extended one way and flushed end plate
-    if bolt_dia <= 24:
-        p_fi = p_fo = bolt_dia + 12
+    # for extended both ways, extended one way and flushed end plate
+
+    if bolt_dia <= 16:
+        l_v = p_fi = p_fo = 40
+    elif 16 < bolt_dia <= 24:
+        l_v = p_fi = p_fo = 50
     else:
-        p_fi = p_fo = bolt_dia + 25
+        l_v = p_fi = p_fo = 60
 
-    # g_1 = Gauge 1 distance (mm) (also known as cross-centre gauge) (Steel designers manual, page 733, 6th edition - 2003)
-    # TODO validate g_1 with correct value
-    # g_1 = max(90, (l_v + edge_dist_mini))
-    g_1 = 90
     #######################################################################
     # Validation of Input Dock
 
     # End Plate Thickness
 
-    # TODO : Is this condition for the main file? EP thickness depends on the plastic capacity of plate
+    # TODO : Is this condition for the main file?
+    # Validating the user input value of end plate thickness based on the detailing criteria
     if end_plate_thickness < max(beam_tf, beam_tw):
         end_plate_thickness = math.ceil(max(beam_tf, beam_tw))
         design_status = False
@@ -437,9 +468,8 @@ def bbExtendedEndPlateSplice(uiObj):
     # End Plate Height [Ref: Based on reasoning]
 
     # Minimum and Maximum Plate Height
-    # TODO: Validate end_plate_height_mini after excomm review (currently used value of l_v is 50mm)
+    # TODO: Validate end_plate_height_mini after excomm review
     # TODO: Validate end_plate_height_max after excomm review
-    # Note: The distance between the toe of weld or the flange edge to the centre of the nearer bolt is 62.5mm (assumed to be maximum)
 
     if uiObj["Member"]["Connectivity"] == "Extended both ways":
         end_plate_height_mini = beam_d + (2 * weld_thickness_flange) + (2 * l_v) + (2 * end_dist_mini)
@@ -489,6 +519,8 @@ def bbExtendedEndPlateSplice(uiObj):
 
     end_plate_width_mini = max(g_1 + (2 * edge_dist_mini), beam_B)
     end_plate_width_max = max((beam_B + 25), end_plate_width_mini)
+
+
 
     if end_plate_width != 0:
         if end_plate_width < end_plate_width_mini:
@@ -572,21 +604,24 @@ def bbExtendedEndPlateSplice(uiObj):
     #######################################################################
 
     # M_u = Total bending moment in kNm i.e. (External factored moment + Moment due to axial force )
-    M_u = factored_moment + ((factored_axial_load * (beam_d / 2 - beam_tf / 2)) / 1000)  # kN-m
+    M_u = factored_moment + ((factored_axial_load * (beam_d / 2 - beam_tf / 2)) / 1000)  # kN-m (TODO: Here the axial load is accounted in calculating the bending moment, make corrections after review)
     T_flange = (factored_moment * 1000) / ((beam_d - beam_tf) + (factored_axial_load / 2))  # (kN) calculating axial force (tension) in flange due to the moment
 
     if uiObj["Member"]["Connectivity"] == "Extended both ways":  # calculating trial number of bolts for extended both way end plate
 
-        # Number of bolts
+        # Number of bolts (N. Subramanian, page 377, equation 5.59)
         # TODO : Here 2 is the number of columns of bolt (Check for implementation with excomm)
         n = math.sqrt((6 * M_u * 10 ** 3) / (2 * pitch_dist_min * bolt_tension_capacity))
         n = math.ceil(n)
-    else:  # calculating trial number of bolts for extended one way and flushed end plate
-        n_flange = T_flange / bolt_tension_capacity  # trial number of bolts near the tension flange
+
+    else:
+        # calculating trial number of bolts for extended one way and flushed end plate
+        # TODO: reducing the bolt capacity by 20% conservatively, check and update the design after the excomm review
+
+        n_flange = T_flange / (0.80 * bolt_tension_capacity)  # trial number of bolts near the tension flange
         n = n_flange + 2  # add 2 bolts near the compression flange to complete the trial required number of bolts in the configuration
 
     # number_of_bolts = Total number of bolts in the configuration
-    # TODO: Update number of bolts after review
     number_of_bolts = n
 
     if number_of_bolts <= 20:
@@ -792,8 +827,15 @@ def bbExtendedEndPlateSplice(uiObj):
                     end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1)/2
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(math.ceil(1.5 * dia_hole))
+
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 2: When the height of end plate is specified but the width is not specified by the user
 
@@ -941,8 +983,15 @@ def bbExtendedEndPlateSplice(uiObj):
 
             end_plate_height_provided = height_available
             end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))?
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 3: When the height of end plate is not specified but the width is specified by the user
         elif end_plate_height == 0 and end_plate_width != 0:
@@ -1095,8 +1144,16 @@ def bbExtendedEndPlateSplice(uiObj):
                     end_plate_height_provided = beam_d + ((2 * weld_thickness_flange) + (2 * l_v) + (2 * pitch_dist_min) + (2 * end_dist_mini))
 
             end_plate_width_provided = end_plate_width
+            # end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
 
-            cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))
+            cross_centre_gauge = max(float(90), g_1)
 
         # Case 4: When the height and the width of End Plate is specified by the user
         elif end_plate_height != 0 and end_plate_width != 0:
@@ -1247,10 +1304,18 @@ def bbExtendedEndPlateSplice(uiObj):
                         logger.info(": Re-design the connection using bolt of higher diameter")
 
             end_plate_height_provided = height_available
-
             end_plate_width_provided = end_plate_width
-
             cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+
+            # end_plate_width_provided = max(beam_B + 25, g_1 + (2 * edge_dist_mini))
+            edge_dist_mini = (end_plate_width_provided - g_1) / 2
+            if uiObj["detailing"]["typeof_edge"] == "a - Sheared or hand flame cut":
+                end_dist_mini = int(math.ceil(1.7 * dia_hole))
+            else:
+                end_dist_mini = min_edge_distance = int(float(1.5 * dia_hole))
+            # cross_centre_gauge = end_plate_width_provided - (2 * edge_dist_mini)
+            # cross_centre_gauge = max(float(90), float(((2 * min_edge_distance) + beam_tw)))
+            cross_centre_gauge = max(float(90), g_1)
 
         #######################################################################
         # Validation of calculated Height and Width of End Plate
@@ -1329,7 +1394,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.warning(": Maximum allowed width of End Plate is %2.2f mm" % end_plate_width_max)
             logger.info(": Decrease the width of End Plate")
 
-        # TODO: Add reference for the below g_1 values
+        # TODO: Check the range and add reference for the below g_1 values
         #######################################################################
         # Validation of calculated cross-centre gauge distance
         if cross_centre_gauge < 90:
@@ -1337,7 +1402,7 @@ def bbExtendedEndPlateSplice(uiObj):
             logger.error(": The cross-centre gauge is less than the minimum required value (Steel designers manual, page 733, 6th edition - 2003) ")
             logger.warning(": The minimum required value of cross centre gauge is %2.2f mm" % g_1)
             logger.info(": Increase the width of the End Plate or decrease the diameter of the bolt")
-        if cross_centre_gauge > 140:
+        if cross_centre_gauge > 160:
             design_status = False
             logger.error(": The cross-centre gauge is greater than the maximum allowed value (Steel designers manual, page 733, 6th edition - 2003) ")
             logger.warning(": The maximum allowed value of cross centre gauge is 140 mm")
@@ -1347,439 +1412,235 @@ def bbExtendedEndPlateSplice(uiObj):
         # Calculation of Tension in bolts
         # Assuming the Neutral axis to pass through the centre of the bottom flange
         # T1, T2, ..., Tn are the Tension in the bolts starting from top of the end plate and y1, y2, ..., yn are its corresponding distances from N.A
-        # TODO : check the working of the below loop
 
-        if uiObj["Member"]["Connectivity"] == "Flush":
-            if number_of_bolts == 4:
-                T1 = ((beam_d - beam_tf - beam_tf / 2 - p_fi) * T_flange) / (2 * (beam_d - beam_tf))
-                # T1 is the tension in each bolt in the 1st row (T indicates tension and 1 indicates row number) [T1 is the tension in critical bolt in the first row from top or
-                # bottom, depending on the direction of the moment. Since we are interested in finding the tension in the critical bolt for bolt design we shall ignore he
-                # calculation of bolt force in other bolts as it will be lesser than the critical bolt]
-                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
-            elif number_of_bolts == 6:
-                T1 = ((beam_d - beam_tf - beam_tf / 2 - p_fi) * T_flange) / (2 * (beam_d - beam_tf))
-                T2 = ((beam_d - beam_tf - beam_tf / 2 - p_fi - pitch_distance_1_2) * T_flange) / (2 * (beam_d - beam_tf))
-                v_st = 2 * (T1 + T2)
+        if number_of_bolts == 4:  # flush ep
+            y1 = beam_d - (beam_tf / 2) - beam_tf - p_fi
+            y2 = (beam_tf / 2) + p_fi
+            y = (y1 ** 2 + y2 ** 2)
 
+            T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+            v_st = 2 * T1
             tension_critical_bolt = T1
 
-        elif uiObj["Member"]["Connectivity"] == "Extended one way":
-            if number_of_bolts == 6:
-                T1 = (0.50 * T_flange) / 2
-                T2 = (T_flange - T1) / 2
-                v_st = 2 * T1  # v_st is the shear (kN) transferred by the bolt to the stiffener
-            elif number_of_bolts == 8:
-                T1 = (0.40 * T_flange) / 2
-                T2 = T1
-                T3 = (T_flange - (T1 + T2)) / 2
-                v_st = 2 * T1
-            elif number_of_bolts == 10:
-                T1 = T4 = (0.10 * T_flange) / 2
-                T2 = T3 = ((T_flange - (T1 + T4)) / 2) / 2
-                v_st = 2 * (T1 + T2)
+        elif number_of_bolts == 6:
 
-            tension_critical_bolt = T2
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                y1 = (beam_d - beam_tf / 2) + p_fo
+                y2 = y1 - (p_fo + beam_tf + p_fi)
+                y3 = (beam_tf / 2) + p_fi
+                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+
+                T_f = (T1 * (beam_d - beam_tf)) / y1
+                v_st = 2 * T1
+                tension_critical_bolt = T1
+
+            elif uiObj["Member"]["Connectivity"] == "Flush":
+                y1 = beam_d - (beam_tf / 2) - beam_tf - p_fi
+                y2 = y1 - pitch_distance_1_2
+                y3 = (beam_tf / 2) + p_fi
+                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+
+                T_f = (T1 * (beam_d - beam_tf)) / y1
+                v_st = 2 * (T1 + T2)
+                tension_critical_bolt = T1
+
+        elif number_of_bolts == 8:
+
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                y1 = (beam_d - beam_tf / 2) + p_fo
+                y2 = y1 - (p_fo + beam_tf + p_fi)
+                y3 = y2 - pitch_distance_2_3
+                y4 = (beam_tf / 2) + p_fi
+                y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2)
+
+                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+
+                T_f = (T1 * (beam_d - beam_tf)) / y1
+                v_st = 2 * T1
+                tension_critical_bolt = T1
+
+            elif uiObj["Member"]["Connectivity"] == "Extended both ways":
+                y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+                y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+                y3 = weld_thickness_flange + l_v + (beam_tf / 2)
+                y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
+
+                # Tension in bolt is divided by 2 because there is two columns of bolt
+                T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+                T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+                T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+
+                T_f = (T1 * (beam_d - beam_tf)) / y1
+                v_st = 2 * T1
+                tension_critical_bolt = T1
+            else:
+                pass
+
+        elif number_of_bolts == 10:  # extended one way
+            y1 = (beam_d - beam_tf / 2) + p_fo + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - p_fo - beam_tf - p_fi
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf / 2) + p_fi
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
+            T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+            v_st = 2 * (T1 + T2)
+            tension_critical_bolt = T1
+
+        elif number_of_bolts == 12:  # extended both ways
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
+            y5 = y4 - pitch_distance_4_5
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
+
+            T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+            T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+            T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+            T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+            T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+            v_st = 2 * T1
+            tension_critical_bolt = T1
+
+        elif number_of_bolts == 16:  # extended both ways
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
+            y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
+            y3 = y2 - pitch_distance_2_3
+            y4 = y3 - pitch_distance_3_4
+            y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
+
+            T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+            T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+            T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+            T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+            T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+            T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+            T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+            v_st = 2 * T1
+            tension_critical_bolt = T1
+
+        elif number_of_bolts == 20:  # extended both ways
+            y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
+            y2 = y1 - pitch_distance_1_2
+            y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
+            y4 = y3 - pitch_distance_3_4
+            y5 = y4 - pitch_distance_4_5
+            y6 = y5 - pitch_distance_5_6
+            y7 = y6 - pitch_distance_6_7
+            y8 = y7 - pitch_distance_7_8
+            y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
+
+            T1 = (M_u * 10 ** 3 * y1) / (2 * y)
+            T2 = (M_u * 10 ** 3 * y2) / (2 * y)
+            T3 = (M_u * 10 ** 3 * y3) / (2 * y)
+            T4 = (M_u * 10 ** 3 * y4) / (2 * y)
+            T5 = (M_u * 10 ** 3 * y5) / (2 * y)
+            T6 = (M_u * 10 ** 3 * y6) / (2 * y)
+            T7 = (M_u * 10 ** 3 * y7) / (2 * y)
+            T8 = (M_u * 10 ** 3 * y8) / (2 * y)
+
+            T_f = (T1 * (beam_d - beam_tf)) / y1
+            v_st = 2 * (T1 + T2)
+            tension_critical_bolt = T1
 
         else:
-            # Case 1: When the height and the width of end plate is not specified by user
-            if end_plate_height == 0 and end_plate_width == 0:
-                if number_of_bolts == 8:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
-
-                    # Tension in bolt is divided by 2 because there is two columns of bolt
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 12:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
-                    y5 = y4 - pitch_distance_4_5
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 16:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 20:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                    y2 = y1 - pitch_distance_1_2
-                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = y4 - pitch_distance_4_5
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y8 = y7 - pitch_distance_7_8
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * (T1 + T2)
-
-                else:
-                    design_status = False
-
-            # Case 2: When the height of end plate is specified but the width is not specified by the user
-            elif end_plate_height != 0 and end_plate_width == 0:
-                if number_of_bolts == 8:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 12:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
-                    y5 = y4 - pitch_distance_4_5
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 16:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 20:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                    y2 = y1 - pitch_distance_1_2
-                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = y4 - pitch_distance_4_5
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y8 = y7 - pitch_distance_7_8
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * (T1 + T2)
-
-                else:
-                    design_status = False
-
-            # Case 3: When the height of end plate is not specified but the width is specified by the user
-            elif end_plate_height == 0 and end_plate_width != 0:
-                if number_of_bolts == 8:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 12:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
-                    y5 = y4 - pitch_distance_4_5
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 16:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 20:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                    y2 = y1 - pitch_distance_1_2
-                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = y4 - pitch_distance_4_5
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y8 = y7 - pitch_distance_7_8
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * (T1 + T2)
-
-                else:
-                    design_status = False
-
-            # Case 4: When the height and the width of End Plate is specified by the user
-            elif end_plate_height != 0 and end_plate_width != 0:
-                if number_of_bolts == 8:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = weld_thickness_flange + l_v + (beam_tf / 2)
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)  # Here, T1 is the tension in the topmost bolt (i.e. critical bolt) starting from the tension flange
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 12:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = (beam_tf / 2) + weld_thickness_flange + l_v + pitch_dist_min
-                    y5 = y4 - pitch_distance_4_5
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 16:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v
-                    y2 = y1 - ((2 * l_v) + (2 * weld_thickness_flange) + beam_tf)
-                    y3 = y2 - pitch_distance_2_3
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = (beam_tf / 2) + weld_thickness_flange + l_v + (2 * pitch_dist_min)
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * T1
-
-                elif number_of_bolts == 20:
-                    y1 = (beam_d - beam_tf / 2) + weld_thickness_flange + l_v + pitch_distance_1_2
-                    y2 = y1 - pitch_distance_1_2
-                    y3 = y2 - (beam_tf + (2 * l_v) + (2 * weld_thickness_flange))
-                    y4 = y3 - pitch_distance_3_4
-                    y5 = y4 - pitch_distance_4_5
-                    y6 = y5 - pitch_distance_5_6
-                    y7 = y6 - pitch_distance_6_7
-                    y8 = y7 - pitch_distance_7_8
-                    y = (y1 ** 2 + y2 ** 2 + y3 ** 2 + y4 ** 2 + y5 ** 2 + y6 ** 2 + y7 ** 2 + y8 ** 2)
-
-                    T1 = (M_u * 10 ** 3 * y1) / (2 * y)
-                    T2 = (M_u * 10 ** 3 * y2) / (2 * y)
-                    T3 = (M_u * 10 ** 3 * y3) / (2 * y)
-                    T4 = (M_u * 10 ** 3 * y4) / (2 * y)
-                    T5 = (M_u * 10 ** 3 * y5) / (2 * y)
-                    T6 = (M_u * 10 ** 3 * y6) / (2 * y)
-                    T7 = (M_u * 10 ** 3 * y7) / (2 * y)
-                    T8 = (M_u * 10 ** 3 * y8) / (2 * y)
-
-                    T_f = (T1 * (beam_d - beam_tf)) / y1
-                    v_st = 2 * (T1 + T2)
-
-                else:
-                    design_status = False
+            design_status = False
 
         #######################################################################
         # Calculating actual required thickness of End Plate (tp_required) as per bending criteria
+        #######################################################################
+
+        # Calculating Prying force in the bolt
+        # NOte: We have used thick plate approach for the ep design. In this approach it is assumed that there will not be any prying force acting on the bolt since the ep is sufficiently thick
+        # However, we are incorporating the prying force in the bolt check to be more conservative and was also recommended by the Expert committee (Excomm)
+
         b_e = end_plate_width_provided / 2
         if uiObj['bolt']['bolt_type'] == "pre-tensioned":
             beta = float(1)
         else:
             beta = float(2)
         eta = 1.5
-        f_0 = 0.7 * bolt_fu / 1000  # kN/mm**2
+        f_0 = 0.7 * (bolt_fu / 1000)  # kN/mm**2
         l_e = min(float(end_dist_mini), float(1.1 * end_plate_thickness * math.sqrt((beta * f_0 * 10 ** 3) / bolt_fy)))
 
-        if uiObj["Member"]["Connectivity"] == "Flush" or uiObj["Member"]["Connectivity"] == "Extended one way":
+        # Calculating T_e for all the configurations and connectivity types
 
-            T_e = T_flange / 2
-            t_p = end_plate_thickness
-            Q = prying_force(T_e, p_fo, l_e, beta, eta, f_0, b_e, t_p)
-
-            if tension_critical_bolt >= bolt_tension_capacity:
-                design_status = False
-                logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
-                if bolt_type == "Friction Grip Bolt":
-                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
-                else:
-                    logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
-                logger.info(": Increase bolt diameter/grade")
-                Q_allowable = float(0)
+        if number_of_bolts == 4:
+            T_e = max(T_flange / 2, 0)
+        elif number_of_bolts == 6:
+            T_e = max(T_flange / 4, 0)
+        elif number_of_bolts == 8:
+            if uiObj["Member"]["Connectivity"] == "Extended one way":
+                T_e = max(T_flange / 6, 0)
             else:
-                Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
-
-            if Q / 2 > Q_allowable:  # prying force in each bolt
-                design_status = False
-                logger.error(": Prying force in the critical bolt exceeds its allowable limit")
-                logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
-                logger.info(": Increase end plate thickness or bolt diameter")
-            else:
-                pass
-
-                # Finding the thickness of end plate
-
-            M_p = round(((T_flange / 2) * p_fo - (Q * l_e)), 3)  # kN-mm
-            tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (beam_fy * b_e))
-            tp_provided = math.ceil(tp_required / 2.) * 2
-
-            if end_plate_thickness < tp_provided:
-                design_status = False
-                logger.error(": Chosen end plate thickness in not sufficient")
-                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-                logger.info(": Increase end plate thickness")
-            else:
-                pass
-
-            T_b = tension_critical_bolt + Q / 2  # tension in the critical bolt due to flange tension plus prying force
+                T_e = max(T_flange / 4, 0)
+        elif number_of_bolts == 10:
+            T_e = max(T_flange / 8, 0)
+        elif number_of_bolts == 12 or 16 or 20:
+            T_e = max((T_flange / (number_of_bolts / 2)), 0)
         else:
-            # M_p = Plastic moment capacity of end plate
-            # TODO check if T_f value is getting assigned correctly
-            tension_flange = T_f
-            M_p = (tension_flange * l_v) / 2  # kN-mm
-            tp_required = math.sqrt((4 * 1.10 * M_p * 10 ** 3) / (end_plate_fy * b_e))
+            pass
 
-            tp_provided = math.ceil(tp_required / 2.) * 2  # rounding off to nearest (higher) even number
-
-            if end_plate_thickness < tp_provided:
-                design_status = False
-                logger.error(": Chosen end plate thickness in not sufficient")
-                logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
-                logger.info(": Increase end plate thickness")
-            else:
-                pass
-
-            # Calculation of Prying Force at Tension flange
-            # TODO : add condition of beta depending on bolt type
-
-            T_e = T_f
-            t_p = tp_provided
-            Q = prying_force(T_e, l_v, l_e, beta, eta, f_0, b_e, t_p)
-            Q = round(Q.real, 3)
-
-            # Finding tension in critical bolt (T_b)
-            # Here, the critical bolt is the bolt which will be farthest from the top/bottom flange
-            T_b = T1 + Q
+        Q = round(prying_force(T_e, p_fo or l_v, l_e, beta, eta, f_0, b_e, end_plate_thickness), 3)
 
         # Check for tension in the critical bolt
+        if tension_critical_bolt >= bolt_tension_capacity:
+            design_status = False
+            logger.error(": Tension in the critical bolt exceeds its tension carrying capacity")
+            if bolt_type == "Friction Grip Bolt":
+                logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.4.5, IS 800:2007)" % bolt_tension_capacity)
+            else:
+                logger.warning(": Maximum allowed tension in the critical bolt of selected diameter is %2.2f mm (Clause 10.3.5, IS 800:2007)" % bolt_tension_capacity)
+            logger.info(": Increase bolt diameter/grade")
+            Q_allowable = float(0)
+        else:
+            Q_allowable = round(bolt_tension_capacity - tension_critical_bolt, 3)  # check for allowable prying force in each of the critical bolt of the configuration
+
+        # Check for prying force in each bolt
+        if Q > Q_allowable:
+            design_status = False
+            logger.error(": Prying force in the critical bolt exceeds its allowable limit")
+            logger.warning(": Maximum allowed prying force in the critical bolt is %2.2f kN" % Q_allowable)
+            logger.info(": Increase end plate thickness or bolt diameter")
+        else:
+            pass
+
+        # Finding the end plate thickness (taking moment about toe of weld and equating with the plastic moment capacity of the end plate)
+        M_p = round(((T_e * p_fo) - (Q * l_e)), 3)  # kN-mm
+        tp_required = math.sqrt((M_p * 10 ** 3 * 1.10 * 4) / (end_plate_fy * b_e))
+        tp_provided = math.ceil(tp_required / 2.) * 2
+
+        if end_plate_thickness < tp_provided:
+            design_status = False
+            logger.error(": Chosen end plate thickness in not sufficient")
+            logger.warning(": Minimum required thickness of end plate is %2.2f mm" % math.ceil(tp_required))
+            logger.info(": Increase end plate thickness")
+        else:
+            pass
+
+        # Check for tension in the critical bolt
+
+        # Tension in critical bolt due to external factored moment + prying action
+        T_b = tension_critical_bolt + Q
 
         if bolt_type == "Friction Grip Bolt":
             if T_b >= Tdf:
@@ -1890,153 +1751,165 @@ def bbExtendedEndPlateSplice(uiObj):
 
         #######################################################################
         # Design of Weld
-        # Assumption: The size of weld at flange will be greater than the size of weld at the web
-        # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
-
-        # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
-        # (Reference: Design of Steel structures by Dr. N. Subramanian)
-
-        # Minimum weld size (mm)
-        # Minimum weld size at flange (for drop-down list)
-        # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
-
-        t_thicker = max(beam_tf, beam_tw, tp_required)
-
-        if t_thicker <= 10.0:
-            tw_minimum = 3
-        elif t_thicker > 10.0 and t_thicker <= 20.0:
-            tw_minimum = 5
-        elif t_thicker > 20.0 and t_thicker <= 32.0:
-            tw_minimum = 6
-        elif t_thicker > 32.0 and t_thicker <= 50.0:
-            tw_minimum = 8
-        # TODO: If tw_minimum is required in calc file?
-
-        if weld_thickness_flange < tw_minimum:
-            design_status = False
-            logger.error(": Selected weld size at flange is less than the minimum required value")
-            logger.warning(": Minimum weld size required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld size at flange")
-
-        if weld_thickness_web < tw_minimum:
-            design_status = False
-            logger.error(": Selected weld size at web is less than the minimum required value")
-            logger.warning(": Minimum weld size required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
-            logger.info(": Increase the weld size at web")
-
-
-        # Design of weld at flange
-        # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
-        k = 0.7  # constant (Table 22, IS 800:2007)
-
-        # capacity_unit_flange is the capacity of weld of unit throat thickness
-        capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
-
-        # Calculating the effective length of weld at the flange
-        L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) + (2 * weld_thickness_flange)  # mm
-        # L_effective_flange = 2 * ((2 * beam_B) + (2 * (beam_B - beam_tw)) - (2 * beam_R1)) + (2 * weld_thickness_flange)  # mm
-
-        # Calculating the area of weld at flange (a_weld_flange) assuming minimum throat thickness i.e. 3mm (Clause 10.5.3, IS 800:2007)
-        a_weld_flange = L_effective_flange * 3  # mm**2
-
-        # Calculating stresses on weld
-        # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
-        # whereas, the weld at beam web are designed to resist factored shear force and axial loads
-
-        # 1. Direct stress (DS)
-
-        # Since there is no direct stress (DS_flange) acting on weld at flange, the value of direct stress will be zero
-        DS_flange = 0
-
-        # 2. Bending Stress (BS)
-        # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
-        Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
-        BS_flange = (M_u * 10 ** 3) / Z
-
-        # Resultant (R)
-        R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
-
-        # Actual required size of weld
-        t_weld_flange_actual = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
-
-        if t_weld_flange_actual % 2 == 0:
-            t_weld_flange = t_weld_flange_actual
-        else:
-            t_weld_flange = t_weld_flange_actual + 1
-
-        if weld_thickness_flange < t_weld_flange:
-            design_status = False
-            logger.error(": Weld size at the flange is not sufficient")
-            logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
-            logger.info(": Increase the weld size at flange")
-        if weld_thickness_flange > min(beam_tf, tp_provided):
-            design_status = False
-            logger.error(": Weld size at the flange exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
-            logger.info(": Decrease the weld size at flange")
-
-        # Design of weld at web
-
-        t_weld_web = int(min(beam_tw, tp_required))
-
-        if t_weld_web % 2 == 0:
-            t_weld_web = t_weld_web
-        else:
-            t_weld_web -= 1
-
-        if t_weld_web > t_weld_flange:
-            t_weld_web = t_weld_flange
-        else:
-            t_weld_web = t_weld_web
-
-        if weld_thickness_web < t_weld_web:
-            design_status = False
-            logger.error(": Weld size at the web is not sufficient")
-            logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
-            logger.info(": Increase the weld size at web")
-        if weld_thickness_web > int(min(beam_tw, tp_required)):
-            design_status = False
-            logger.error(": Weld size at the web exceeds the maximum allowed value")
-            logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
-            logger.info(": Decrease the weld size at web")
-
         #######################################################################
-        # Weld Checks
-        # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
 
-        # Weld at flange
-        # 1. Check for normal stress
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
 
-        f_a_flange = force_flange * 10 ** 3 / (3 * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+            # Assumption: The size of weld at flange will be greater than the size of weld at the web
+            # Weld at flange resists bending moment whereas the weld at web resists shear + axial load
 
-        # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
-        f_wd = weld_fu_govern / (math.sqrt(3) * 1.25)
-        # TODO: call appropriate factor of safety for weld from main file
+            # Ultimate and yield strength of welding material is assumed as Fe410 (E41 electrode)
+            # (Reference: Design of Steel structures by Dr. N. Subramanian)
 
-        if f_a_flange > f_wd:
-            design_status = False
-            logger.error(": The stress in weld at flange exceeds the limiting value (Clause 10.5.7.1.1, IS 800:2007)")
-            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
-            logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+            # Minimum weld size (mm)
+            # Minimum weld size at flange (for drop-down list)
+            # Minimum weld size (tw_minimum) depends on the thickness of the thicker part (Table 21, IS 800:2007)
 
-        # Weld at web
-        L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) + weld_thickness_web)
+            t_thicker = max(beam_tf, beam_tw, tp_provided)
+            t_thinner_weld = min(beam_tf, beam_tw, tp_provided)
 
-        # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
-        f_a_web = factored_axial_load * 10 ** 3 / (3 * L_effective_web)
+            if t_thicker <= 10.0:
+                tw_minimum = 3
+            elif t_thicker > 10.0 and t_thicker <= 20.0:
+                tw_minimum = 5
+            elif t_thicker > 20.0 and t_thicker <= 32.0:
+                tw_minimum = 6
+            elif t_thicker > 32.0 and t_thicker <= 50.0:
+                tw_minimum = 8
 
-        # 2. Check for shear stress
-        q_web = factored_shear_load * 10 ** 3 / (3 * L_effective_web)
+            if weld_thickness_flange < tw_minimum:
+                design_status = False
+                logger.error(": Selected weld size at flange is less than the minimum required value")
+                logger.warning(": Minimum weld size required at flange (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+                logger.info(": Increase the weld size at flange")
 
-        # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
+            if weld_thickness_web < tw_minimum:
+                design_status = False
+                logger.error(": Selected weld size at web is less than the minimum required value")
+                logger.warning(": Minimum weld size required at web (as per Table 21, IS 800:2007) is %2.2f mm " % tw_minimum)
+                logger.info(": Increase the weld size at web")
 
-        f_e = math.sqrt(f_a_web ** 2 + (3 * q_web ** 2))
 
-        if f_e > f_wd:
-            design_status = False
-            logger.error(": The stress in weld at web exceeds the limiting value (Clause 10.5.10.1.1, IS 800:2007)")
-            logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2" % f_wd)
-            logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+            # Design of weld at flange
+            # Capacity of unit weld (Clause 10.5.7, IS 800:2007)
+            k = 0.7  # constant (Table 22, IS 800:2007)
+            t_te = max(3, (0.7 * t_thinner_weld))  # effective throat thickness (Cl. 10.5.3.1, IS 800:2007)
+
+            # capacity_unit_flange is the capacity of weld of unit throat thickness
+            capacity_unit_flange = (k * weld_fu_govern) / (math.sqrt(3) * gamma_mw)  # N/mm**2 or MPa
+
+            # Calculating the effective length of weld at the flange
+            L_effective_flange = ((2 * beam_B) + (2 * (beam_B - beam_tw - beam_R1))) - (6 * weld_thickness_flange)  # mm
+
+            # Calculating the area of weld at flange (a_weld_flange)
+            a_weld_flange = L_effective_flange * t_te  # mm**2
+
+            # Calculating stresses on weld
+            # Assumption: The weld at flanges are designed to carry Factored external moment and moment due to axial load,
+            # whereas, the weld at beam web are designed to resist factored shear force and axial loads
+
+            # 1. Direct stress (DS)
+
+            # Since there is no direct stress (DS_flange) acting on weld at flange, the value of direct stress will be zero
+            DS_flange = 0
+
+            # 2. Bending Stress (BS)
+            # Finding section modulus i.e. Z = Izz / y (Reference: Table 6.7, Design of Steel structures by Dr. N. Subramanian)
+            # Z = (beam_B * beam_d) + (beam_d ** 2 / 3)  # mm **3
+            Z = (beam_B + (beam_B - beam_tw - (2 * beam_R1) - (6 * weld_thickness_flange))) * beam_d  # mm **3
+            BS_flange = (M_u * 10 ** 3) / Z
+
+            # Resultant (R)
+            R = math.sqrt(DS_flange ** 2 + BS_flange ** 2)
+
+            # Actual required size of weld
+            t_weld_flange_actual = math.ceil((R * 10 ** 3) / capacity_unit_flange)  # mm
+
+            if t_weld_flange_actual % 2 == 0:
+                t_weld_flange = t_weld_flange_actual
+            else:
+                t_weld_flange = t_weld_flange_actual + 1
+
+            if weld_thickness_flange < t_weld_flange:
+                design_status = False
+                logger.error(": Weld size at the flange is not sufficient")
+                logger.warning(": Minimum weld size required is %2.2f mm " % t_weld_flange_actual)
+                logger.info(": Increase the weld size at flange")
+            if weld_thickness_flange > min(beam_tf, tp_provided):
+                design_status = False
+                logger.error(": Weld size at the flange exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed weld size at the flange is %2.2f mm" % min(beam_tf, tp_provided))
+                logger.info(": Decrease the weld size at flange")
+
+            # Design of weld at web
+
+            t_weld_web = int(min(beam_tw, tp_required))
+
+            if t_weld_web % 2 == 0:
+                t_weld_web = t_weld_web
+            else:
+                t_weld_web -= 1
+
+            if t_weld_web > t_weld_flange:
+                t_weld_web = t_weld_flange
+            else:
+                t_weld_web = t_weld_web
+
+            if weld_thickness_web < t_weld_web:
+                design_status = False
+                logger.error(": Weld size at the web is not sufficient")
+                logger.warning(": Minimum weld size required is %2.2f mm" % t_weld_web)
+                logger.info(": Increase the weld size at web")
+            if weld_thickness_web > int(min(beam_tw, tp_required)):
+                design_status = False
+                logger.error(": Weld size at the web exceeds the maximum allowed value")
+                logger.warning(": Maximum allowed weld size at the web is %2.2f mm" % int(min(beam_tw, tp_required)))
+                logger.info(": Decrease the weld size at web")
+
+            if (weld_thickness_flange or weld_thickness_web) > (2 * tw_minimum):
+                logger.warning(": The required weld size is higher, It is recommended to provide full penetration butt weld")
+
+            #######################################################################
+            # Weld Checks
+            # Check for stresses in weld due to individual force (Clause 10.5.9, IS 800:2007)
+
+            # Weld at flange
+            # 1. Check for normal stress
+
+            f_a_flange = (force_flange * 10 ** 3) / (t_te * L_effective_flange)  # Here, 3 mm is the effective minimum throat thickness
+
+            # Design strength of fillet weld (Clause 10.5.7.1.1, IS 800:2007)
+            f_wd = weld_fu_govern / (math.sqrt(3) * gamma_mw)
+
+            if f_a_flange > f_wd:
+                design_status = False
+                logger.error(": The stress in weld at flange exceeds the limiting value")
+                logger.warning(": Maximum stress weld can carry is %2.2f N/mm^2 (Clause 10.5.7.1.1, IS 800:2007)" % f_wd)
+                logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+            # Weld at web
+            L_effective_web = 2 * ((beam_d - (2 * beam_tf) - (2 * beam_R1)) - (2 * weld_thickness_web))
+
+            # 1. Check for normal stress (Clause 10.5.9, IS 800:2007)
+            f_a_web = factored_axial_load * 10 ** 3 / (t_te * L_effective_web)
+
+            # 2. Check for shear stress
+            q_web = factored_shear_load * 10 ** 3 / (t_te * L_effective_web)
+
+            # 3. Combination of stress (Clause 10.5.10.1.1, IS 800:2007)
+
+            f_e = math.sqrt(f_a_web ** 2 + (3 * q_web ** 2))
+
+            if f_e > f_wd:
+                design_status = False
+                logger.error(": The stress in weld due to combination of shear and axial force at web exceeds the limiting value")
+                logger.warning(": Maximum stress due to combination of forces the weld can carry is %2.2f N/mm^2 (Clause 10.5.10.1.1, IS 800:2007)" % f_wd)
+                logger.info(": Increase the Ultimate strength of weld and/or length of weld")
+
+        else:
+            k = 1
+            weld_size_butt = end_plate_thickness
+
 
         #######################################################################
         # Design of Stiffener
@@ -2053,18 +1926,18 @@ def bbExtendedEndPlateSplice(uiObj):
         thickness_stiffener_provided = math.ceil(thickness_stiffener / 2.) * 2  # round off to the nearest higher multiple of two
 
         # size of notch (n_s) in the stiffener
-        n_s = weld_thickness_flange + 5
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            n_s = weld_thickness_flange + 5
+        else:
+            n_s = 5
 
         # calculating effective length of the stiffener and the weld
         l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
-        l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
 
-
-        # if uiObj["Member"]["Connectivity"] == "Flush":
-        #     pass
-        # else:
-        #     l_st_effective = ((v_st * 10 ** 3 * math.sqrt(3) * 1.10) / (thickness_stiffener_provided * stiffener_fy)) + n_s  # calculating effective length of the stiffener as per shear criteria
-        #     l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_thickness_flange * weld_fu_govern)) - (2 * weld_thickness_flange)  # effective required length of weld (either sides) as per weld criteria
+        else:
+            l_weld_effective = ((v_st * 10 ** 3 * math.sqrt(3) * gamma_mw) / (2 * k * weld_size_butt * weld_fu_govern))
 
         # Height of stiffener (h_st) (mm)
         # TODO: Do calculation for actual height of end plate above
@@ -2090,10 +1963,18 @@ def bbExtendedEndPlateSplice(uiObj):
 
         if uiObj["Member"]["Connectivity"] == "Flush":
             w_weld_st = w_st  # length of weld to be provided along the width of the stiffener
-            z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
+
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                z_weld_st = min(weld_thickness_web, thickness_stiffener_provided)  # size of weld for stiffener at web
+            else:
+                z_weld_st = thickness_stiffener_provided
         else:
             h_weld_st = h_st  # length of weld provided along the height of the stiffener
-            z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
+
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
+                z_weld_st = min(weld_thickness_flange, thickness_stiffener_provided)  # size of weld for stiffener at flange
+            else:
+                z_weld_st = thickness_stiffener_provided
 
         # Check for Moment in stiffener
 
@@ -2127,7 +2008,7 @@ def bbExtendedEndPlateSplice(uiObj):
         # Check in weld for the combined forces
 
         f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
-        q = v_st / (2 * l_weld_st * k * z_weld_st)
+        q = v_st / (2 * l_weld_st * 0.7 * z_weld_st)
         f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
         if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
@@ -2140,7 +2021,7 @@ def bbExtendedEndPlateSplice(uiObj):
                 z_weld_st = max(weld_thickness_flange, thickness_stiffener_provided)  # updated size of weld for stiffener at flange
 
             f_a = M_st / (2 * ((k * z_weld_st * l_weld_st ** 2) / 4))
-            q = v_st / (2 * l_weld_st * k * z_weld_st)
+            q = v_st / (2 * l_weld_st * 0.7 * z_weld_st)
             f_e = (math.sqrt(f_a ** 2 + (3 * q ** 2))) * 10 ** 3
 
             if f_e > (weld_fu / (math.sqrt(3) * gamma_mw)):
@@ -2151,7 +2032,7 @@ def bbExtendedEndPlateSplice(uiObj):
         else:
             pass
 
-
+        # TODO: Is the below check required?
         # Check of stiffener against local buckling
         # E = 2 * 10 ** 5  # MPa
         # ts_required = 1.79 * h_st * stiffener_fy / E  # mm
@@ -2174,119 +2055,118 @@ def bbExtendedEndPlateSplice(uiObj):
     # Output dictionary for different cases
     if number_of_bolts <= 20:
 
-        # Case 1: When the height and the width of end plate is not specified by user
-        if end_plate_height == 0 and end_plate_width == 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
+        outputobj = {}
+        outputobj['Bolt'] = {}
+        outputobj['Bolt']['status'] = design_status
+        outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
+        outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
+        outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
+        outputobj['Bolt']['BearingCapacity'] = bearing_capacity
+        outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
+        outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
+        outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
+        outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
+        outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
+        outputobj['Bolt']['kb'] = float(round(k_b, 3))
+        outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
+        outputobj['Bolt']['BoltFy'] = bolt_fy
 
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
+        if bolt_type == "Friction Grip Bolt":
+            outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
+            outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
+            outputobj['Bolt']['Tf'] = float(round(Tf, 3))
+            outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
+        else:
+            outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
+            outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
+            outputobj['Bolt']['Tb'] = float(round(Tb, 3))
+            outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
 
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
+        outputobj['Bolt']['PitchMini'] = pitch_dist_min
+        outputobj['Bolt']['PitchMax'] = pitch_dist_max
+        outputobj['Bolt']['EndMax'] = end_dist_max
+        outputobj['Bolt']['EndMini'] = end_dist_mini
+        outputobj['Bolt']['DiaHole'] = int(dia_hole)
 
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            if number_of_bolts == 4:
+                outputobj['Bolt']['Pitch'] = float(pitch_distance)
+            elif number_of_bolts == 6:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
 
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['PryingForce'] = Q
+
+        elif uiObj["Member"]["Connectivity"] == "Extended one way":
+            if number_of_bolts == 6:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance)
+            elif number_of_bolts == 8:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+            elif number_of_bolts == 10:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+
+            outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
+            outputobj['Bolt']['PryingForce'] = Q
+
+        else:
+            if number_of_bolts == 8:
+                outputobj['Bolt']['Pitch'] = float(pitch_distance)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 12:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 16:
+                outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
+                outputobj['Bolt']['PryingForce'] = Q
+            elif number_of_bolts == 20:
+                outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
+                outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
+                outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+                outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
+                outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
+                outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
+                outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
+                outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
                 outputobj['Bolt']['PryingForce'] = Q
 
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
+        outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
+        outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
+        outputobj['Bolt']['End'] = float(end_dist_mini)
+        outputobj['Bolt']['Edge'] = float(edge_dist_mini)
+        # ===================  CAD ===================
+        if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
+            outputobj['Bolt']['Lv'] = float(l_v)
+        else:
+            l_v = p_fi
+            outputobj['Bolt']['Lv'] = float(l_v)
+        # ===================  CAD ===================
 
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
+        outputobj['Plate'] = {}
+        outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
+        outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
+        # ===================  CAD ===================
+        outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
+        # ===================  CAD ===================
+        outputobj['Plate']['MomentDemand'] = round(M_d, 3)
+        outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
 
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
+        outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
+        outputobj['Plate']['Mp'] = float(round(M_p, 3))
 
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-
-            outputobj['Plate']['ThickRequired'] = float(round(tp_required, 3))
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
             outputobj['Weld'] = {}
             outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
             outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
@@ -2301,466 +2181,36 @@ def bbExtendedEndPlateSplice(uiObj):
             outputobj['Weld']['UnitCapacity'] = float(round(capacity_unit_flange, 3))
             outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
 
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-
-            # ===================  CAD ===================
-            # if uiObj["Member"]["Connectivity"] == "Extended one way":
-            if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush": #TOdo added by darshan
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
-
-        # Case 2: When the height of end plate is specified but the width is not specified by the user
-        elif end_plate_height != 0 and end_plate_width == 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
+        else:
             outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+            outputobj['Weld']['WeldSize'] = int(weld_size_butt)
 
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
+        outputobj['Stiffener'] = {}
+        if uiObj["Member"]["Connectivity"] == "Flush":
+            outputobj['Stiffener']['Height'] = round(w_st, 3)
+            outputobj['Stiffener']['Location'] = int(s)
+        else:
+            outputobj['Stiffener']['Height'] = round(h_st, 3)
 
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+        outputobj['Stiffener']['Length'] = round(l_st, 3)
+        outputobj['Stiffener']['Thickness'] = float(round(thickness_stiffener_provided, 3))
+        outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
+        outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
+        outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
+        outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
+        outputobj['Stiffener']['Notch'] = float(n_s)
 
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
+        # ===================  CAD ===================
+        # if uiObj["Member"]["Connectivity"] == "Extended one way":
+        if uiObj["Member"]["Connectivity"] == "Extended one way" or "Flush":  # TOdo added by darshan
+            if uiObj["Weld"]["Type"] == "Fillet Weld":
                 outputobj['Plate']['Projection'] = weld_thickness_flange + 10
             else:
-                pass
-            # ===================  CAD ===================
+                outputobj['Plate']['Projection'] = 10
+        else:
+            pass
+        # ===================  CAD ===================
 
-        # Case 3: When the height of end plate is not specified but the width is specified by the user
-        elif end_plate_height == 0 and end_plate_width != 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
-
-        # Case 4: When the height and the width of End Plate is specified by the user
-        elif end_plate_height != 0 and end_plate_width != 0:
-            outputobj = {}
-            outputobj['Bolt'] = {}
-            outputobj['Bolt']['status'] = design_status
-            outputobj['Bolt']['CriticalTension'] = round(T_b, 3)
-            outputobj['Bolt']['TensionCapacity'] = round(bolt_tension_capacity, 3)
-            outputobj['Bolt']['ShearCapacity'] = round(bolt_shear_capacity, 3)
-            outputobj['Bolt']['BearingCapacity'] = bearing_capacity
-            outputobj['Bolt']['BoltCapacity'] = round(bolt_capacity, 3)
-            outputobj['Bolt']['CombinedCapacity'] = round(combined_capacity, 3)
-            outputobj['Bolt']['NumberOfBolts'] = int(number_of_bolts)
-            outputobj['Bolt']['NumberOfRows'] = int(round(number_rows, 3))
-            outputobj['Bolt']['BoltsPerColumn'] = int(n_c)
-            outputobj['Bolt']['kb'] = float(round(k_b, 3))
-            outputobj['Bolt']['SumPlateThick'] = float(round(sum_plate_thickness, 3))
-            outputobj['Bolt']['BoltFy'] = bolt_fy
-
-            if bolt_type == "Friction Grip Bolt":
-                outputobj['Bolt']['Vsf'] = float(round(Vsf, 3))
-                outputobj['Bolt']['Vdf'] = float(round(Vdf, 3))
-                outputobj['Bolt']['Tf'] = float(round(Tf, 3))
-                outputobj['Bolt']['Tdf'] = float(round(Tdf, 3))
-            else:
-                outputobj['Bolt']['Vsb'] = float(round(Vsb, 3))
-                outputobj['Bolt']['Vdb'] = float(round(Vdb, 3))
-                outputobj['Bolt']['Tb'] = float(round(Tb, 3))
-                outputobj['Bolt']['Tdb'] = float(round(Tdb, 3))
-
-            outputobj['Bolt']['PitchMini'] = pitch_dist_min
-            outputobj['Bolt']['PitchMax'] = pitch_dist_max
-            outputobj['Bolt']['EndMax'] = end_dist_max
-            outputobj['Bolt']['EndMini'] = end_dist_mini
-            outputobj['Bolt']['DiaHole'] = int(dia_hole)
-
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                if number_of_bolts == 4:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                elif number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            elif uiObj["Member"]["Connectivity"] == "Extended one way":
-                if number_of_bolts == 6:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance)
-                elif number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                elif number_of_bolts == 10:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-
-                outputobj['Bolt']['TensionCritical'] = round(tension_critical_bolt, 3)  # Tension in critical bolt required for report generator
-                outputobj['Bolt']['PryingForce'] = Q
-
-            else:
-                if number_of_bolts == 8:
-                    outputobj['Bolt']['Pitch'] = float(pitch_distance)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 12:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 16:
-                    outputobj['Bolt']['Pitch23'] = float(pitch_distance_2_3)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-                elif number_of_bolts == 20:
-                    outputobj['Bolt']['Pitch12'] = float(pitch_distance_1_2)
-                    outputobj['Bolt']['Pitch34'] = float(pitch_distance_3_4)
-                    outputobj['Bolt']['Pitch45'] = float(pitch_distance_4_5)
-                    outputobj['Bolt']['Pitch56'] = float(pitch_distance_5_6)
-                    outputobj['Bolt']['Pitch67'] = float(pitch_distance_6_7)
-                    outputobj['Bolt']['Pitch78'] = float(pitch_distance_7_8)
-                    outputobj['Bolt']['Pitch910'] = float(pitch_distance_9_10)
-                    outputobj['Bolt']['TensionCritical'] = round(T1, 3)  # Tension in critical bolt required for report generator
-                    outputobj['Bolt']['PryingForce'] = Q
-
-            outputobj['Bolt']['Gauge'] = float(gauge_dist_min)
-            outputobj['Bolt']['CrossCentreGauge'] = float(cross_centre_gauge)
-            outputobj['Bolt']['End'] = float(end_dist_mini)
-            outputobj['Bolt']['Edge'] = float(edge_dist_mini)
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended both ways":  # TODO: Here we are assigning p_fi to l_v for Extended one way and Flush EP for CAD
-                outputobj['Bolt']['Lv'] = float(l_v)
-            else:
-                l_v = p_fi
-                outputobj['Bolt']['Lv'] = float(l_v)
-            # ===================  CAD ===================
-
-            outputobj['Plate'] = {}
-            outputobj['Plate']['Height'] = float(round(end_plate_height_provided, 3))
-            outputobj['Plate']['Width'] = float(round(end_plate_width_provided, 3))
-            # ===================  CAD ===================
-            outputobj['Plate']['Thickness'] = float(round(end_plate_thickness, 3))
-            # ===================  CAD ===================
-
-            outputobj['Plate']['MomentDemand'] = round(M_d, 3)
-            outputobj['Plate']['MomentCapacity'] = round(M_c, 3)
-            outputobj['Plate']['ThickRequired'] = float(tp_required)
-            outputobj['Plate']['Mp'] = float(round(M_p, 3))
-
-            outputobj['Weld'] = {}
-            outputobj['Weld']['CriticalStressflange'] = round(f_a_flange, 3)
-            outputobj['Weld']['CriticalStressWeb'] = round(f_e, 3)
-            outputobj['Weld']['WeldStrength'] = round(f_wd, 3)
-            outputobj['Weld']['ForceFlange'] = float(round(force_flange, 3))
-            outputobj['Weld']['LeffectiveFlange'] = float(L_effective_flange)
-            outputobj['Weld']['LeffectiveWeb'] = float(L_effective_web)
-            outputobj['Weld']['FaWeb'] = float(f_a_web)
-            outputobj['Weld']['Qweb'] = float(q_web)
-            outputobj['Weld']['Resultant'] = float(R)
-            outputobj['Weld']['UnitCapacity'] = float(capacity_unit_flange)
-            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
-
-            outputobj['Stiffener'] = {}
-            if uiObj["Member"]["Connectivity"] == "Flush":
-                outputobj['Stiffener']['Height'] = round(w_st, 3)
-                outputobj['Stiffener']['Location'] = int(s)
-            else:
-                outputobj['Stiffener']['Height'] = round(h_st, 3)
-
-            outputobj['Stiffener']['Length'] = round(l_st, 3)
-            outputobj['Stiffener']['Thickness'] = int(round(thickness_stiffener_provided, 3))
-            outputobj['Stiffener']['NotchSize'] = round(n_s, 3)
-            outputobj['Stiffener']['WeldSize'] = int(z_weld_st)
-            outputobj['Stiffener']['Moment'] = round((M_st * 10 ** -3), 3)
-            outputobj['Stiffener']['MomentCapacity'] = round((M_capacity_st * 10 ** -3), 3)
-
-            # ===================  CAD ===================
-            if uiObj["Member"]["Connectivity"] == "Extended one way":
-                outputobj['Plate']['Projection'] = weld_thickness_flange + 10
-            else:
-                pass
-            # ===================  CAD ===================
     else:
         outputobj = {}
         outputobj['Bolt'] = {}
@@ -2823,18 +2273,23 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Plate']['ThickRequired'] = 0
         outputobj['Plate']['Mp'] = 0
 
-        outputobj['Weld'] = {}
-        outputobj['Weld']['CriticalStressflange'] = 0
-        outputobj['Weld']['CriticalStressWeb'] = 0
-        outputobj['Weld']['WeldStrength'] = 0
-        outputobj['Weld']['ForceFlange'] = 0
-        outputobj['Weld']['LeffectiveFlange'] = 0
-        outputobj['Weld']['LeffectiveWeb'] = 0
-        outputobj['Weld']['FaWeb'] = 0
-        outputobj['Weld']['Qweb'] = 0
-        outputobj['Weld']['Resultant'] = 0
-        outputobj['Weld']['UnitCapacity'] = 0
-        outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+        if uiObj["Weld"]["Type"] == "Fillet Weld":
+            outputobj['Weld'] = {}
+            outputobj['Weld']['CriticalStressflange'] = 0
+            outputobj['Weld']['CriticalStressWeb'] = 0
+            outputobj['Weld']['WeldStrength'] = 0
+            outputobj['Weld']['ForceFlange'] = 0
+            outputobj['Weld']['LeffectiveFlange'] = 0
+            outputobj['Weld']['LeffectiveWeb'] = 0
+            outputobj['Weld']['FaWeb'] = 0
+            outputobj['Weld']['Qweb'] = 0
+            outputobj['Weld']['Resultant'] = 0
+            outputobj['Weld']['UnitCapacity'] = 0
+            outputobj['Weld']['WeldFuGovern'] = float(weld_fu_govern)
+
+        else:
+            outputobj['Weld'] = {}
+            outputobj['Weld']['WeldSize'] = 0
 
         outputobj['Stiffener'] = {}
         if uiObj["Member"]["Connectivity"] == "Flush":
@@ -2849,6 +2304,7 @@ def bbExtendedEndPlateSplice(uiObj):
         outputobj['Stiffener']['WeldSize'] = 0
         outputobj['Stiffener']['Moment'] = 0
         outputobj['Stiffener']['MomentCapacity'] = 0
+        outputobj['Stiffener']['Notch'] = 0
 
         # ===================  CAD ===================
         if uiObj["Member"]["Connectivity"] == "Extended one way":

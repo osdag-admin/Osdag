@@ -954,6 +954,11 @@ class Maincontroller(QMainWindow):
 		uiObj["Weld"]["Method"] = str(self.ui.combo_weld_method.currentText())
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
+		if uiObj["Weld"]["Web (mm)"] == "Select weld thickness":
+			uiObj["Weld"]["Web (mm)"] = 3
+		if uiObj["Weld"]["Flange (mm)"] == "Select weld thickness":
+			uiObj["Weld"]["Flange (mm)"] = 3
+
 
 		uiObj["Connection"] = self.connection
 
@@ -1856,6 +1861,11 @@ class Maincontroller(QMainWindow):
 							T=outputobj["Plate"]["Thickness"])
 
 		alist = self.designParameters()  # An object to save all input values entered by user
+
+		if alist["Weld"]["Web (mm)"] == "Select weld thickness":
+			alist["Weld"]["Web (mm)"] = 3
+		if alist["Weld"]["Flange (mm)"] == "Select weld thickness":
+			alist["Weld"]["Flange (mm)"] = 3
 
 		# TODO make dictionary for the contPlates
 		# TODO adding enpplate type and check if code is working

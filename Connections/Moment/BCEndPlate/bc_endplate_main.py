@@ -1076,8 +1076,8 @@ class Maincontroller(QMainWindow):
 					self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
 				self.ui.combo_weld_method.setCurrentIndex(self.ui.combo_weld_method.findText(uiObj["Weld"]["Method"]))
 				self.ui.combo_flangeSize.setCurrentIndex(
-					self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
-				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
+					self.ui.combo_flangeSize.findText(str(uiObj["Weld"]["Flange (mm)"])))
+				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(str(uiObj["Weld"]["Web (mm)"])))
 
 				self.designPrefDialog.ui.combo_boltType.setCurrentIndex(
 					self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))

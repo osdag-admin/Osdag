@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1310</width>
-    <height>800</height>
+    <height>799</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -333,16 +333,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -415,7 +406,7 @@
      <x>0</x>
      <y>0</y>
      <width>1310</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -1141,11 +1132,6 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>20</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>22</string>
       </property>
      </item>
      <item>
@@ -3180,21 +3166,6 @@ QMenu::item:selected {
      </item>
      <item>
       <property name="text">
-       <string>3</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>4</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>5</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
        <string>6</string>
       </property>
      </item>
@@ -3251,6 +3222,11 @@ QMenu::item:selected {
      <item>
       <property name="text">
        <string>28</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>30</string>
       </property>
      </item>
     </widget>

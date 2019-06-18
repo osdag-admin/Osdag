@@ -1403,6 +1403,11 @@ class Maincontroller(QMainWindow):
 		uiObj["Weld"]["Method"] = str(self.ui.combo_weld_method.currentText())
 		uiObj["Weld"]["Flange (mm)"] = str(self.ui.combo_flangeSize.currentText())
 		uiObj["Weld"]["Web (mm)"] = str(self.ui.combo_webSize.currentText())
+		if uiObj["Weld"]["Web (mm)"] == "Select weld thickness":
+			uiObj["Weld"]["Web (mm)"] = 3
+		if uiObj["Weld"]["Flange (mm)"] == "Select weld thickness":
+			uiObj["Weld"]["Flange (mm)"] = 3
+
 
 		uiObj["Connection"] = self.connection
 
@@ -1534,8 +1539,8 @@ class Maincontroller(QMainWindow):
 					self.ui.combo_plateThick.findText(uiObj["Plate"]["Thickness (mm)"]))
 				self.ui.combo_weld_method.setCurrentIndex(self.ui.combo_weld_method.findText(uiObj["Weld"]["Method"]))
 				self.ui.combo_flangeSize.setCurrentIndex(
-					self.ui.combo_flangeSize.findText(uiObj["Weld"]["Flange (mm)"]))
-				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(uiObj["Weld"]["Web (mm)"]))
+					self.ui.combo_flangeSize.findText(str(uiObj["Weld"]["Flange (mm)"])))
+				self.ui.combo_webSize.setCurrentIndex(self.ui.combo_webSize.findText(str(uiObj["Weld"]["Web (mm)"])))
 
 				self.designPrefDialog.ui.combo_boltType.setCurrentIndex(
 					self.designPrefDialog.ui.combo_boltType.findText(uiObj["bolt"]["bolt_type"]))
@@ -2319,6 +2324,11 @@ class Maincontroller(QMainWindow):
 							T=outputobj["Plate"]["Thickness"])
 
 		alist = self.designParameters()  # An object to save all input values entered by user
+
+		if alist["Weld"]["Web (mm)"] == "Select weld thickness":
+			alist["Weld"]["Web (mm)"] = 3
+		if alist["Weld"]["Flange (mm)"] == "Select weld thickness":
+			alist["Weld"]["Flange (mm)"] = 3
 
 		# TODO make dictionary for the contPlates
 		# TODO adding enpplate type and check if code is working

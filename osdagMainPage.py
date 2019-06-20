@@ -54,6 +54,7 @@ class MyAskQuestion(QDialog):
 
 class OsdagMainWindow(QMainWindow):
 
+
     def __init__(self):
         QMainWindow.__init__(self)
         #show_msg = pyqtSignal()
@@ -144,6 +145,7 @@ class OsdagMainWindow(QMainWindow):
         # while ' ' in folder:
         # 	"""
         # 	The workspace folder shouldn't have any spaces
+
         #
         # 	As long as the user enters spaces in the name of the workspace folder,
         # 	this while loops prompts the user not to use spaces and prompts the user again

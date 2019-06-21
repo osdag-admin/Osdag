@@ -1027,6 +1027,19 @@ class Oneway2DFront(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
+        # ------------------------------------------ Stiffener -------------------------------------------
+        if self.data_object.no_of_bolts == 12:
+            point = self.SU2
+            theta = 60
+            offset = 50
+            textup = "Stiffener " + str(self.data_object.stiffener_length) + "x" + str(
+                self.data_object.stiffener_height) + "x" + str(self.data_object.stiffener_thickness)
+            textdown = " "
+            element = " "
+            self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+        else:
+            pass
+
         # ------------------------------------------  Sectional arrow -------------------------------------------
         pt_a1 = self.A1 + (300) * np.array([0, -1])
         pt_b1 = pt_a1 + (50 * np.array([0, 1]))
@@ -1202,7 +1215,7 @@ class Oneway2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -500 1750 1500'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1500'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
@@ -1366,14 +1379,15 @@ class Oneway2DTop(object):
         # textdown = " "
         # element = "weld"
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
-
+        self.data_object.stiffener_weld = 1
         point = self.A3 - self.data_object.column_width_B1 / 4 * np.array([0, 1])
         theta = 1
         offset = 1
         textup = "          z " + str(self.data_object.weld_plate_thickness_p2)
         textdown = "          z " + str(self.data_object.weld_plate_thickness_p2)
-        element = " "
+        element = "weld"
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+        self.data_object.stiffener_weld = 0
 
         if self.data_object.no_of_bolts == 12:
             self.data_object.stiffener_weld = 1

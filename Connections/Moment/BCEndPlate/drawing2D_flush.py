@@ -76,6 +76,7 @@ class FlushEndPlate(object):
         self.grade = float(input_dict["Bolt"]["Grade"])  # 8.8
         self.Lv = float(output_dict['Bolt']['Lv'])
         self.weld = input_dict["Weld"]["Method"]
+        self.stiffener_weld = 0
 
         self.no_of_columns = 2
         self.no_of_bolts = output_dict['Bolt']['NumberOfBolts']
@@ -402,6 +403,14 @@ class FlushEndPlate(object):
                     self.draw_weld_marker3(dwg, 15, -8.5, line)
                 else:
                     self.draw_weld_marker4(dwg, 15, 8.5, line)
+
+            if self.stiffener_weld == 1:
+                if orientation == "NE":
+                    self.draw_weld_marker1(dwg, 30, 7.5, line)
+                else:
+                    self.draw_weld_marker2(dwg, 30, 7.5, line)
+            else:
+                pass
 
         print "successful"
 
@@ -1084,7 +1093,7 @@ class FlushEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -500 2000 1500'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1500'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
@@ -1230,14 +1239,15 @@ class FlushEnd2DTop(object):
         # textdown = " "
         # element = "weld"
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
-
-        point = self.A3 - self.data_object.column_width_B1 / 4* np.array([0, 1])
+        self.data_object.stiffener_weld = 1
+        point = self.A3 - self.data_object.column_width_B1 / 4 * np.array([0, 1])
         theta = 1
         offset = 1
         textup = "          z " + str(self.data_object.weld_plate_thickness_p2)
         textdown = "          z " + str(self.data_object.weld_plate_thickness_p2)
-        element = " "
+        element = "weld"
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+        self.data_object.stiffener_weld = 0
 
         if self.data_object.weld == "Fillet Weld":
             point = self.AA1

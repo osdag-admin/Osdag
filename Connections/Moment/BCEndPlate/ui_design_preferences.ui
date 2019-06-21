@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>969</width>
-    <height>633</height>
+    <height>624</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,19 +52,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="4">
-      <spacer name="horizontalSpacer_6">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item row="0" column="0">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
@@ -73,6 +60,19 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>28</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="4">
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
          <height>20</height>
         </size>
        </property>
@@ -88,1864 +88,1071 @@
       </font>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_Column">
       <attribute name="title">
        <string>Column</string>
       </attribute>
-      <widget class="QLabel" name="label_31">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>90</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Modulus of elasticity, E (GPa)</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_28">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>231</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Flange width, B (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_43">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>439</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;pz&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModPZ_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>440</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_48">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>261</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Flange thickness, T (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_53">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>199</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Mass, M (kg/m)</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RogY_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>350</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="Line" name="line_7">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>170</y>
-         <width>31</width>
-         <height>331</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Add_Column">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>510</y>
-         <width>89</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeThickness_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>261</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_41">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>11</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Type</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_30">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>11</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Designation</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_YieldStrength_Column">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>130</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_42">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>379</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Designation_Column">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>10</y>
-         <width>241</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Import_Column">
-       <property name="geometry">
-        <rect>
-         <x>800</x>
-         <y>510</y>
-         <width>121</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Import xlsx file</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_37">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>130</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Modulus of rigidity, G (GPa)</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_34">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>259</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area, I&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt;(cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_44">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>409</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_49">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>291</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Web thickness, t (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Depth_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>201</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_51">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>319</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_29">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>289</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area,I&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Clear_Column">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>510</y>
-         <width>89</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Clear</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ModElasticity_Column">
-       <property name="geometry">
-        <rect>
-         <x>550</x>
-         <y>90</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Download_Column">
-       <property name="geometry">
-        <rect>
-         <x>590</x>
-         <y>510</y>
-         <width>171</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Download xlsx format</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeWidth_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>231</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_MomentOfAreaY_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>290</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ToeRadius_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>381</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RogZ_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>320</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_47">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>321</y>
-         <width>181</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flange Slope, &lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(deg.)*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_WeBThickness_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>291</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModPY_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>470</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_50">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>351</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Root radius, R1 (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_35">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>11</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Source</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_52">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>160</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Sectional Properties</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_UltimateStrength_Column">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>90</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeSlope_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>321</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_33">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>349</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModZ_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>380</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_45">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>161</y>
-         <width>71</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Dimensions</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_36">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>381</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Toe radius, R2 (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_46">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Ultimate strength, fu (MPa)</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_MomentOfAreaZ_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>260</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_54">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>201</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Depth, D (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModY_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>410</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Source_Column">
-       <property name="geometry">
-        <rect>
-         <x>700</x>
-         <y>10</y>
-         <width>221</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_32">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>51</y>
-         <width>131</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Mechanical Properties</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ModulusOfRigidity_Column">
-       <property name="geometry">
-        <rect>
-         <x>550</x>
-         <y>130</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_55">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>130</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Yield Strength , fy (MPa)</string>
-       </property>
-      </widget>
-      <widget class="Line" name="line_9">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>171</y>
-         <width>31</width>
-         <height>331</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_SectionalArea_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>230</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_56">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>469</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;py&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="Line" name="line_10">
-       <property name="geometry">
-        <rect>
-         <x>-10</x>
-         <y>491</y>
-         <width>971</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RootRadius_Column">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>351</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_57">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>229</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Mass_Column">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>199</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_Column">
-       <property name="geometry">
-        <rect>
-         <x>380</x>
-         <y>10</y>
-         <width>261</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <item>
-        <property name="text">
-         <string>Rolled</string>
-        </property>
+      <layout class="QGridLayout" name="gridLayout_24">
+       <item row="16" column="1">
+        <widget class="QLineEdit" name="lineEdit_FlangeWidth_Column"/>
        </item>
-       <item>
-        <property name="text">
-         <string>Welded</string>
-        </property>
+       <item row="18" column="0">
+        <widget class="QLabel" name="label_49">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Web thickness, t (mm)*</string>
+         </property>
+        </widget>
        </item>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_PoissionsRatio_Column">
-       <property name="geometry">
-        <rect>
-         <x>810</x>
-         <y>90</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_85">
-       <property name="geometry">
-        <rect>
-         <x>670</x>
-         <y>90</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Poissons ratio, v</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ThermalExpansion_Column">
-       <property name="geometry">
-        <rect>
-         <x>810</x>
-         <y>130</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_86">
-       <property name="geometry">
-        <rect>
-         <x>670</x>
-         <y>120</y>
-         <width>161</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thermal expansion &lt;/p&gt;&lt;p&gt;coeff.&lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(x10&lt;span style=&quot; vertical-align:super;&quot;&gt;-6&lt;/span&gt;/&lt;span style=&quot; vertical-align:super;&quot;&gt;0&lt;/span&gt;C)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_13">
-       <property name="geometry">
-        <rect>
-         <x>700</x>
-         <y>150</y>
-         <width>241</width>
-         <height>351</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>../../../ResourceFiles/images/user_section1.png</pixmap>
-       </property>
-      </widget>
+       <item row="20" column="0">
+        <widget class="QLabel" name="label_50">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Root radius, R1 (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="1">
+        <widget class="QLineEdit" name="lineEdit_RootRadius_Column"/>
+       </item>
+       <item row="17" column="1">
+        <widget class="QLineEdit" name="lineEdit_FlangeThickness_Column"/>
+       </item>
+       <item row="21" column="1">
+        <widget class="QLineEdit" name="lineEdit_ToeRadius_Column"/>
+       </item>
+       <item row="18" column="1">
+        <widget class="QLineEdit" name="lineEdit_WeBThickness_Column"/>
+       </item>
+       <item row="19" column="1">
+        <widget class="QLineEdit" name="lineEdit_FlangeSlope_Column"/>
+       </item>
+       <item row="15" column="1">
+        <widget class="QLineEdit" name="lineEdit_Depth_Column"/>
+       </item>
+       <item row="21" column="0">
+        <widget class="QLabel" name="label_36">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Toe radius, R2 (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_45">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Dimensions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="0">
+        <widget class="QLabel" name="label_28">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Flange width, B (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0">
+        <widget class="QLabel" name="label_48">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Flange thickness, T (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="0">
+        <widget class="QLabel" name="label_47">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flange Slope, &lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(deg.)*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="label_54">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Depth, D (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="10">
+        <widget class="QLabel" name="label_85">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Poissons ratio, v</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="7" colspan="2">
+        <widget class="QComboBox" name="comboBox_Column">
+         <item>
+          <property name="text">
+           <string>Rolled</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Welded</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_Designation_Column"/>
+       </item>
+       <item row="23" column="6">
+        <widget class="QLabel" name="label_43">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;pz&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_46">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Ultimate strength, fu (MPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="6">
+        <widget class="QLabel" name="label_31">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Modulus of elasticity, E (GPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="7">
+        <widget class="QLineEdit" name="lineEdit_Mass_Column"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_UltimateStrength_Column"/>
+       </item>
+       <item row="20" column="7">
+        <widget class="QLineEdit" name="lineEdit_RogY_Column"/>
+       </item>
+       <item row="18" column="7">
+        <widget class="QLineEdit" name="lineEdit_MomentOfAreaY_Column"/>
+       </item>
+       <item row="19" column="7">
+        <widget class="QLineEdit" name="lineEdit_RogZ_Column"/>
+       </item>
+       <item row="3" column="7">
+        <widget class="QLineEdit" name="lineEdit_ModElasticity_Column"/>
+       </item>
+       <item row="17" column="7">
+        <widget class="QLineEdit" name="lineEdit_MomentOfAreaZ_Column"/>
+       </item>
+       <item row="16" column="7">
+        <widget class="QLineEdit" name="lineEdit_SectionalArea_Column"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_32">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Mechanical Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item row="21" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModZ_Column"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Designation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="23" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModPZ_Column"/>
+       </item>
+       <item row="22" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModY_Column"/>
+       </item>
+       <item row="0" column="11">
+        <widget class="QLineEdit" name="lineEdit_Source_Column"/>
+       </item>
+       <item row="3" column="11">
+        <widget class="QLineEdit" name="lineEdit_PoissionsRatio_Column"/>
+       </item>
+       <item row="0" column="10">
+        <widget class="QLabel" name="label_35">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Source&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QLabel" name="label_41">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="6">
+        <widget class="QLabel" name="label_34">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area, I&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt;(cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="30" column="0" colspan="12">
+        <widget class="Line" name="line_10">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="5" rowspan="17">
+        <widget class="Line" name="line_9">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="6">
+        <widget class="QLabel" name="label_53">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Mass, M (kg/m)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="21" column="6">
+        <widget class="QLabel" name="label_42">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="6">
+        <widget class="QLabel" name="label_52">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Sectional Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="6">
+        <widget class="QLabel" name="label_51">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="6">
+        <widget class="QLabel" name="label_33">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="22" column="6">
+        <widget class="QLabel" name="label_44">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="6">
+        <widget class="QLabel" name="label_29">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area,I&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="6">
+        <widget class="QLabel" name="label_57">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="8" rowspan="17">
+        <widget class="Line" name="line_7">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="10" rowspan="16">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>../../../ResourceFiles/images/user_section1.png</pixmap>
+         </property>
+        </widget>
+       </item>
+       <item row="24" column="6">
+        <widget class="QLabel" name="label_56">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;py&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="24" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModPY_Column"/>
+       </item>
+       <item row="4" column="10">
+        <widget class="QLabel" name="label_86">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thermal expansion &lt;/p&gt;&lt;p&gt;coeff.&lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(x10&lt;span style=&quot; vertical-align:super;&quot;&gt;-6&lt;/span&gt;/&lt;span style=&quot; vertical-align:super;&quot;&gt;0&lt;/span&gt;C)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_55">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Yield Strength , fy (MPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_YieldStrength_Column"/>
+       </item>
+       <item row="4" column="6">
+        <widget class="QLabel" name="label_37">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Modulus of rigidity, G (GPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="7">
+        <widget class="QLineEdit" name="lineEdit_ModulusOfRigidity_Column"/>
+       </item>
+       <item row="33" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QPushButton" name="pushButton_Clear_Column">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_Add_Column">
+           <property name="text">
+            <string>Add</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="33" column="8" colspan="4">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QPushButton" name="pushButton_Download_Column">
+           <property name="text">
+            <string>Download xlsx format</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_Import_Column">
+           <property name="text">
+            <string>Import xlsx file</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="11">
+        <widget class="QLineEdit" name="lineEdit_ThermalExpansion_Column"/>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_Beam">
       <attribute name="title">
        <string>Beam</string>
       </attribute>
-      <widget class="QLabel" name="label_58">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>90</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Modulus of elasticity, E (GPa)</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_59">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>231</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Flange width, B (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModPZ_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>440</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_61">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>261</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Flange thickness, T (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_62">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>199</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Mass, M (kg/m)</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RogY_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>350</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="Line" name="line_12">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>170</y>
-         <width>31</width>
-         <height>331</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Add_Beam">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>510</y>
-         <width>89</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Add</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeThickness_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>261</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_63">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>11</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Type</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_64">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>11</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Designation</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_YieldStrength_Beam">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>130</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Designation_Beam">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>10</y>
-         <width>241</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Import_Beam">
-       <property name="geometry">
-        <rect>
-         <x>800</x>
-         <y>510</y>
-         <width>121</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Import xlsx file</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_66">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>130</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Modulus of rigidity, G (GPa)</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_69">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>291</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Web thickness, t (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Depth_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>201</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Clear_Beam">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>510</y>
-         <width>89</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Clear</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ModElasticity_Beam">
-       <property name="geometry">
-        <rect>
-         <x>550</x>
-         <y>90</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_Download_Beam">
-       <property name="geometry">
-        <rect>
-         <x>590</x>
-         <y>510</y>
-         <width>171</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Download xlsx format</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeWidth_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>231</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_MomentOfAreaY_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>290</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ToeRadius_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>381</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RogZ_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>320</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_WeBThickness_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>291</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModPY_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>470</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_73">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>351</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Root radius, R1 (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_74">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>11</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Source</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_75">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>160</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Sectional Properties</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_UltimateStrength_Beam">
-       <property name="geometry">
-        <rect>
-         <x>200</x>
-         <y>90</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_FlangeSlope_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>321</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModZ_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>380</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_77">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>161</y>
-         <width>71</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Dimensions</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_78">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>381</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Toe radius, R2 (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_79">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>90</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Ultimate strength, fu (MPa)</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_MomentOfAreaZ_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>260</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_80">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>201</y>
-         <width>181</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Depth, D (mm)*</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ElasticModY_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>410</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Source_Beam">
-       <property name="geometry">
-        <rect>
-         <x>700</x>
-         <y>10</y>
-         <width>221</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_81">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>51</y>
-         <width>131</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Ubuntu Condensed</family>
-         <weight>75</weight>
-         <italic>false</italic>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Mechanical Properties</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ModulusOfRigidity_Beam">
-       <property name="geometry">
-        <rect>
-         <x>550</x>
-         <y>130</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_82">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>130</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Yield Strength , fy (MPa)</string>
-       </property>
-      </widget>
-      <widget class="Line" name="line_13">
-       <property name="geometry">
-        <rect>
-         <x>300</x>
-         <y>171</y>
-         <width>31</width>
-         <height>331</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_SectionalArea_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>230</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="Line" name="line_14">
-       <property name="geometry">
-        <rect>
-         <x>-10</x>
-         <y>491</y>
-         <width>971</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_RootRadius_Beam">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>351</y>
-         <width>113</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_Mass_Beam">
-       <property name="geometry">
-        <rect>
-         <x>540</x>
-         <y>199</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboBox_Beam">
-       <property name="geometry">
-        <rect>
-         <x>380</x>
-         <y>10</y>
-         <width>261</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <item>
-        <property name="text">
-         <string>Rolled</string>
-        </property>
+      <layout class="QGridLayout" name="gridLayout_23">
+       <item row="11" column="10" rowspan="13" colspan="2">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap>../../../ResourceFiles/images/user_section1.png</pixmap>
+         </property>
+        </widget>
        </item>
-       <item>
-        <property name="text">
-         <string>Welded</string>
-        </property>
+       <item row="27" column="0" colspan="12">
+        <widget class="Line" name="line_14">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
        </item>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_ThermalExpansion_Beam">
-       <property name="geometry">
-        <rect>
-         <x>810</x>
-         <y>130</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_PoissonsRatio_Beam">
-       <property name="geometry">
-        <rect>
-         <x>810</x>
-         <y>90</y>
-         <width>111</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_88">
-       <property name="geometry">
-        <rect>
-         <x>670</x>
-         <y>90</y>
-         <width>111</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Poissons ratio, v</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_14">
-       <property name="geometry">
-        <rect>
-         <x>700</x>
-         <y>120</y>
-         <width>241</width>
-         <height>411</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="pixmap">
-        <pixmap>../../../ResourceFiles/images/user_section1.png</pixmap>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_89">
-       <property name="geometry">
-        <rect>
-         <x>670</x>
-         <y>120</y>
-         <width>161</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thermal expansion &lt;/p&gt;&lt;p&gt;coeff.&lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(x10&lt;span style=&quot; vertical-align:super;&quot;&gt;-6&lt;/span&gt;/&lt;span style=&quot; vertical-align:super;&quot;&gt;0&lt;/span&gt;C)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_72">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>320</y>
-         <width>181</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flange Slope, &lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(deg.)*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_145">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>410</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_146">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>260</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area, I&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt;(cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_147">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>230</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_148">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>470</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;py&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_149">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>290</y>
-         <width>201</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area,I&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_150">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>320</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_151">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>380</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_152">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>440</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;pz&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_153">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>350</y>
-         <width>191</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
+       <item row="28" column="6" colspan="6">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="pushButton_Download_Beam">
+           <property name="text">
+            <string>Download xlsx format</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_Import_Beam">
+           <property name="text">
+            <string>Import xlsx file</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="11">
+        <widget class="QLineEdit" name="lineEdit_Source_Beam"/>
+       </item>
+       <item row="0" column="10">
+        <widget class="QLabel" name="label_74">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Source&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="28" column="0" colspan="4">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pushButton_Clear_Beam">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_Add_Beam">
+           <property name="text">
+            <string>Add</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="7" column="9" rowspan="18">
+        <widget class="Line" name="line_12">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLineEdit" name="lineEdit_Designation_Beam"/>
+       </item>
+       <item row="14" column="2">
+        <widget class="QLineEdit" name="lineEdit_RootRadius_Beam"/>
+       </item>
+       <item row="12" column="2">
+        <widget class="QLineEdit" name="lineEdit_WeBThickness_Beam"/>
+       </item>
+       <item row="4" column="1" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_UltimateStrength_Beam"/>
+       </item>
+       <item row="7" column="4">
+        <widget class="QLabel" name="label_75">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Sectional Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0" rowspan="2">
+        <widget class="QLabel" name="label_77">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Dimensions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="QLabel" name="label_58">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Modulus of elasticity, E (GPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5" colspan="3">
+        <widget class="QComboBox" name="comboBox_Beam">
+         <item>
+          <property name="text">
+           <string>Rolled</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Welded</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="4">
+        <widget class="QLabel" name="label_66">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Modulus of rigidity, G (GPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_79">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Ultimate strength, fu (MPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_81">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Mechanical Properties</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="10">
+        <widget class="QLabel" name="label_88">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Poissons ratio, v</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="10" rowspan="2">
+        <widget class="QLabel" name="label_89">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thermal expansion &lt;/p&gt;&lt;p&gt;coeff.&lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(x10&lt;span style=&quot; vertical-align:super;&quot;&gt;-6&lt;/span&gt;/&lt;span style=&quot; vertical-align:super;&quot;&gt;0&lt;/span&gt;C)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QLabel" name="label_80">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Depth, D (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="7">
+        <widget class="QLineEdit" name="lineEdit_ModElasticity_Beam"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_64">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Designation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QLabel" name="label_63">
+         <property name="font">
+          <font>
+           <family>Ubuntu Condensed</family>
+           <weight>75</weight>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="4">
+        <widget class="QLabel" name="label_150">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="16" column="4">
+        <widget class="QLabel" name="label_145">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="0">
+        <widget class="QLabel" name="label_78">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Toe radius, R2 (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="4">
+        <widget class="QLabel" name="label_147">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sectional area, a (mm&lt;span style=&quot; vertical-align:super;&quot;&gt;2&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="4">
+        <widget class="QLabel" name="label_152">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;pz&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="7">
+        <widget class="QLineEdit" name="lineEdit_MomentOfAreaY_Beam"/>
+       </item>
+       <item row="14" column="4">
+        <widget class="QLabel" name="label_153">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Radius of gyration, r&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_82">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Yield Strength , fy (MPa)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_72">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Flange Slope, &lt;span style=&quot; font-family:'Symbol'; font-size:large;&quot;&gt;a &lt;/span&gt;(deg.)*&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_73">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Root radius, R1 (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="4">
+        <widget class="QLabel" name="label_151">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Elastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_61">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Flange thickness, T (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="7">
+        <widget class="QLineEdit" name="lineEdit_SectionalArea_Beam"/>
+       </item>
+       <item row="11" column="7">
+        <widget class="QLineEdit" name="lineEdit_MomentOfAreaZ_Beam"/>
+       </item>
+       <item row="9" column="7">
+        <widget class="QLineEdit" name="lineEdit_Mass_Beam"/>
+       </item>
+       <item row="11" column="2">
+        <widget class="QLineEdit" name="lineEdit_FlangeThickness_Beam"/>
+       </item>
+       <item row="9" column="4">
+        <widget class="QLabel" name="label_62">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Mass, M (kg/m)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="15" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModZ_Beam"/>
+       </item>
+       <item row="16" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModY_Beam"/>
+       </item>
+       <item row="11" column="4">
+        <widget class="QLabel" name="label_146">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area, I&lt;span style=&quot; vertical-align:sub;&quot;&gt;z&lt;/span&gt;(cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="7">
+        <widget class="QLineEdit" name="lineEdit_ModulusOfRigidity_Beam"/>
+       </item>
+       <item row="9" column="2">
+        <widget class="QLineEdit" name="lineEdit_Depth_Beam"/>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_59">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Flange width, B (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="4">
+        <widget class="QLabel" name="label_149">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;2nd Moment of area,I&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QLabel" name="label_69">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Web thickness, t (mm)*</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" colspan="2">
+        <widget class="QLineEdit" name="lineEdit_YieldStrength_Beam"/>
+       </item>
+       <item row="18" column="4">
+        <widget class="QLabel" name="label_148">
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Plastic modulus, Z&lt;span style=&quot; vertical-align:sub;&quot;&gt;py&lt;/span&gt; (cm&lt;span style=&quot; vertical-align:super;&quot;&gt;3&lt;/span&gt; )&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="11">
+        <widget class="QLineEdit" name="lineEdit_PoissonsRatio_Beam"/>
+       </item>
+       <item row="5" column="11">
+        <widget class="QLineEdit" name="lineEdit_ThermalExpansion_Beam"/>
+       </item>
+       <item row="10" column="2">
+        <widget class="QLineEdit" name="lineEdit_FlangeWidth_Beam"/>
+       </item>
+       <item row="13" column="7">
+        <widget class="QLineEdit" name="lineEdit_RogZ_Beam"/>
+       </item>
+       <item row="17" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModPZ_Beam"/>
+       </item>
+       <item row="14" column="7">
+        <widget class="QLineEdit" name="lineEdit_RogY_Beam"/>
+       </item>
+       <item row="18" column="7">
+        <widget class="QLineEdit" name="lineEdit_ElasticModPY_Beam"/>
+       </item>
+       <item row="13" column="2">
+        <widget class="QLineEdit" name="lineEdit_FlangeSlope_Beam"/>
+       </item>
+       <item row="15" column="2">
+        <widget class="QLineEdit" name="lineEdit_ToeRadius_Beam"/>
+       </item>
+       <item row="7" column="3" rowspan="18">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_Bolt">
       <attribute name="title">
        <string>Bolt</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_22">
-       <item row="0" column="2">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0" rowspan="2">
         <layout class="QGridLayout" name="gridLayout_21">
          <item row="1" column="0">
@@ -1997,158 +1204,6 @@ bolt and select corresponding bolt grade.</string>
             </spacer>
            </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="2">
-        <widget class="QLabel" name="label_11">
-         <property name="font">
-          <font>
-           <family>Arial</family>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" rowspan="3" colspan="2">
-        <layout class="QGridLayout" name="gridLayout_19">
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_8">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="font">
-              <font>
-               <family>Arial</family>
-              </font>
-             </property>
-             <property name="text">
-              <string>Description</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="Line" name="line_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="1" column="0">
-          <widget class="QTextBrowser" name="textBrowser">
-           <property name="minimumSize">
-            <size>
-             <width>210</width>
-             <height>320</height>
-            </size>
-           </property>
-           <property name="html">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Arial'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;
-&lt;tr&gt;
-&lt;td colspan=&quot;3&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;IS 800 Table 20 Typical Average Values for Coefficient of Friction (&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:9pt;&quot;&gt;µ&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:9pt; vertical-align:sub;&quot;&gt;f&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;
-&lt;tr&gt;
-&lt;td width=&quot;26&quot;&gt;&lt;/td&gt;
-&lt;td width=&quot;383&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Treatment of Surfaces&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td width=&quot;78&quot;&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  µ_f&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;i)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces not treated&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.2&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;ii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit with any loose rust removed, no pitting&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.5&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;iii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit and hot-dip galvanized&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;iv)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit and spray - metallized with zinc (thickness 50-70 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.25&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;v)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 30-60 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;vi)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Sand blasted surface, after light rusting&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.52&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;vii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 60-80 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;viii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with alcalizinc silicate coat (thickness 60-80 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;ix)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and spray metallized with aluminium (thickness &amp;gt;50 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.5&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;x)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Clean mill scale&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.33&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;xi)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Sand blasted surface&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.48&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;xii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Red lead painted surface&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
-&lt;td&gt;
-&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.1&lt;/span&gt;&lt;/p&gt;
-&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
          </item>
         </layout>
        </item>
@@ -2422,7 +1477,178 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </item>
+       <item row="0" column="1" rowspan="3" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_19">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_8">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="font">
+              <font>
+               <family>Arial</family>
+              </font>
+             </property>
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="Line" name="line_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QTextBrowser" name="textBrowser">
+           <property name="minimumSize">
+            <size>
+             <width>210</width>
+             <height>320</height>
+            </size>
+           </property>
+           <property name="html">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Arial'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;
+&lt;tr&gt;
+&lt;td colspan=&quot;3&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;IS 800 Table 20 Typical Average Values for Coefficient of Friction (&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:9pt;&quot;&gt;µ&lt;/span&gt;&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:9pt; vertical-align:sub;&quot;&gt;f&lt;/span&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;table border=&quot;0&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px;&quot; cellspacing=&quot;2&quot; cellpadding=&quot;0&quot;&gt;
+&lt;tr&gt;
+&lt;td width=&quot;26&quot;&gt;&lt;/td&gt;
+&lt;td width=&quot;383&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Treatment of Surfaces&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td width=&quot;78&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  µ_f&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;i)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces not treated&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.2&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;ii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit with any loose rust removed, no pitting&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.5&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;iii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit and hot-dip galvanized&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.1&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;iv)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with short or grit and spray - metallized with zinc (thickness 50-70 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.25&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;v)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 30-60 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;vi)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Sand blasted surface, after light rusting&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.52&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;vii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with ethylzinc silicate coat (thickness 60-80 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;viii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and painted with alcalizinc silicate coat (thickness 60-80 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.3&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;ix)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Surfaces blasted with shot or grit and spray metallized with aluminium (thickness &amp;gt;50 µm)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.5&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;x)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Clean mill scale&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.33&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;xi)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Sand blasted surface&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.48&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;xii)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;Red lead painted surface&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p align=&quot;justify&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;  0.1&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
+      <widget class="QLabel" name="label_9">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>9</y>
+         <width>276</width>
+         <height>255</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_11">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>405</y>
+         <width>276</width>
+         <height>134</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_Weld">
       <attribute name="title">

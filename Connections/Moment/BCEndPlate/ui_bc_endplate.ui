@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1344</width>
+    <width>1141</width>
     <height>768</height>
    </rect>
   </property>
@@ -331,7 +331,16 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
          <number>1</number>
         </property>
         <item>
@@ -403,8 +412,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1344</width>
-     <height>25</height>
+     <width>1141</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -634,13 +643,13 @@ QMenu::item:selected {
    </property>
    <property name="minimumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3055,64 +3064,6 @@ QMenu::item:selected {
       <bool>false</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_Reset">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>650</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Alt+R</string>
-     </property>
-     <property name="text">
-      <string>Reset</string>
-     </property>
-     <property name="shortcut">
-      <string>Alt+R</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_Design">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>650</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Alt+D</string>
-     </property>
-     <property name="text">
-      <string>Design</string>
-     </property>
-     <property name="shortcut">
-      <string>Alt+D</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QComboBox" name="combo_flangeSize">
      <property name="geometry">
       <rect>
@@ -3545,6 +3496,64 @@ QMenu::item:selected {
       <string>Type *</string>
      </property>
     </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>640</y>
+       <width>251</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="btn_Reset">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Alt+R</string>
+        </property>
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+R</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_Design">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Alt+D</string>
+        </property>
+        <property name="text">
+         <string>Design</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+D</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="outputDock">
@@ -3556,13 +3565,13 @@ QMenu::item:selected {
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3868,7 +3877,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>614</y>
+       <y>590</y>
        <width>200</width>
        <height>30</height>
       </rect>
@@ -3887,7 +3896,7 @@ QMenu::item:selected {
      <property name="geometry">
       <rect>
        <x>50</x>
-       <y>650</y>
+       <y>620</y>
        <width>200</width>
        <height>30</height>
       </rect>

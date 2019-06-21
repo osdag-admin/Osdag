@@ -441,7 +441,7 @@
      <x>0</x>
      <y>0</y>
      <width>1455</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -657,14 +657,14 @@ QMenu::item:selected {
   </widget>
   <widget class="QDockWidget" name="inputDock">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>1</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3076,8 +3076,8 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_Reset">
      <property name="geometry">
       <rect>
-       <x>41</x>
-       <y>570</y>
+       <x>50</x>
+       <y>530</y>
        <width>93</width>
        <height>33</height>
       </rect>
@@ -3102,8 +3102,8 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_Design">
      <property name="geometry">
       <rect>
-       <x>141</x>
-       <y>570</y>
+       <x>150</x>
+       <y>530</y>
        <width>93</width>
        <height>33</height>
       </rect>
@@ -3153,14 +3153,14 @@ QMenu::item:selected {
   </widget>
   <widget class="QDockWidget" name="outputDock">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3993,8 +3993,8 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_SaveMessages">
      <property name="geometry">
       <rect>
-       <x>51</x>
-       <y>613</y>
+       <x>50</x>
+       <y>610</y>
        <width>190</width>
        <height>30</height>
       </rect>
@@ -4009,8 +4009,8 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_CreateDesign">
      <property name="geometry">
       <rect>
-       <x>51</x>
-       <y>650</y>
+       <x>50</x>
+       <y>640</y>
        <width>190</width>
        <height>30</height>
       </rect>

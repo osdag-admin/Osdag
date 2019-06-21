@@ -1651,7 +1651,10 @@ class Maincontroller(QMainWindow):
       '''
       self.ExtObj = self.create_extended_both_ways()
       if self.component == "Beam":
-         final_model = self.ExtObj.get_beam_models()
+         cadlist = self.ExtObj.get_beam_models()
+         final_model = cadlist[0]
+         for model in cadlist[1:]:
+             final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
       elif self.component == "Connector":
          cadlist = self.ExtObj.get_connector_models()

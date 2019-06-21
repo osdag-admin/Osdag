@@ -782,6 +782,19 @@ class OnewayEnd2DFront(object):
 			dwg.add(dwg.polyline(points=[self.BB6, self.BB5, self.BB4, self.BB6], stroke='black', fill='black',
 								 stroke_width=2.5))
 
+		pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+										   patternTransform="rotate(45 2 2)"))
+		pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+		dwg.add(dwg.rect(insert=self.S1  , size=(self.data_object.stiffener_weldsize, self.data_object.stiffener_height),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.SS1- self.data_object.stiffener_weldsize * np.array([1,0]), size=(self.data_object.stiffener_weldsize, self.data_object.stiffener_height),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.AA1 - self.data_object.stiffener_weldsize * np.array([0,1]), size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.SS4 - self.data_object.stiffener_weldsize * np.array([0,1]) , size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+
+
 		botfr = self.data_object.bolts_outside_top_flange_row
 		bitfr = self.data_object.bolts_inside_top_flange_row
 		bolt_r = int(self.data_object.bolt_diameter) / 2
@@ -886,7 +899,7 @@ class OnewayEnd2DFront(object):
 		no_of_bolts_flange = self.data_object.bolts_inside_top_flange_row * self.data_object.no_of_columns
 		point = np.array(pt_inside_top_column_list[0])
 		theta = 60
-		offset = 50
+		offset = 25
 		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
@@ -897,7 +910,7 @@ class OnewayEnd2DFront(object):
 		no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
 		point = np.array(pt_inside_bottom_column_list[1])
 		theta = 60
-		offset = 50
+		offset = 25
 		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
@@ -990,13 +1003,13 @@ class OnewayEnd2DFront(object):
 		# ------------------------------------------  Sectional arrow -------------------------------------------
 		pt_a1 = self.A1 + (500) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
-		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		txt_1 = pt_b1 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
 		text = "A"
 		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
 		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1) * np.array([1, 0])
 		pt_b2 = pt_a2 + (50 * np.array([0, 1]))
-		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		txt_2 = pt_b2 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
 		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
@@ -1170,7 +1183,7 @@ class OnewayEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-80 -700 1900 1800'))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-80 -700 2000 1750'))
 		dwg.add(dwg.line(self.A5, self.AS8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.AS8, self.A8).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A6, self.AS7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1338,34 +1351,34 @@ class OnewayEnd2DTop(object):
 			self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 	# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A4 - (200) * np.array([0, -1])
+		pt_a1 = self.A4 - (300) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
-		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		txt_1 = pt_b1 + (20 * np.array([-1, 0])) + (75 * np.array([0, -1]))
 		text = "C"
 		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
 		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1) * np.array([1, 0])
 		pt_b2 = pt_a2 + (50 * np.array([0, -1]))
-		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		txt_2 = pt_b2 + (20 * np.array([-1, 0])) + (75 * np.array([0, -1]))
 		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-		pt_a3 = self.AA2 + (200) * np.array([1, 0])
+		pt_a3 = self.AA2 + (300) * np.array([1, 0])
 		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
-		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		txt_3 = pt_b3 + (20 * np.array([0, 1])) + (75 * np.array([-1, 0]))
 		text = "B"
 		self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
 
 		pt_a4 = pt_a3 + (self.data_object.beam_width_B1 * np.array([0, 1]))
 		pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
-		txt_4 = pt_b4 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		txt_4 = pt_b4 + 20 * np.array([0, 1]) + (75 * np.array([-1, 0]))
 		self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
 
 		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5,linecap='square'))
 
 		# ------------------------------------------  View details -------------------------------------------
-		ptx = self.P4 - 50 * np.array([1, 0]) + 300 * np.array([0, 1])
+		ptx = self.P4 - 50 * np.array([1, 0]) + 400 * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))

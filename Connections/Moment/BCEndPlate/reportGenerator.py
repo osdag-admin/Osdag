@@ -2191,7 +2191,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('td  align="center" class=" header2"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
 
-            row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )", " "]
+            row = [0, "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) <= 12mm, single bevel groove welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )", " "]
             rstr += t('tr')
             rstr += t('td colspan="1" class=" detail1"') + space(row[0]) + row[1] + t('/td')
             rstr += t('/tr')
@@ -2203,7 +2203,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('/tr')
 
             row = [0,
-                   "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   "Note :- As flange thickness, <i>t</i><sub>f</sub> (" + str(float(beam_tf)) + "mm) >= 12mm, double bevel groove welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
                    " "]
             rstr += t('tr')
             rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
@@ -2216,7 +2216,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('/tr')
 
             row = [0,
-                   "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) <= 12mm, single bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   "Note :- As web thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) <= 12mm, single bevel groove welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
                    " "]
             rstr += t('tr')
             rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')
@@ -2229,7 +2229,7 @@ def save_html(outObj, uiObj, dictcolumndata, dictbeamdata, filename, reportsumma
             rstr += t('/tr')
 
             row = [0,
-                   "Note :- As flange thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) >= 12mm, double bevel butt welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
+                   "Note :- As web thickness, <i>t</i><sub>w</sub> (" + str(float(beam_tw)) + "mm) >= 12mm, double bevel groove welding is provided [Reference: IS 9595: 1996] (All dimensions are in mm )",
                    " "]
             rstr += t('tr')
             rstr += t('td colspan="2" class=" detail1"') + space(row[0]) + row[1] + t('/td')

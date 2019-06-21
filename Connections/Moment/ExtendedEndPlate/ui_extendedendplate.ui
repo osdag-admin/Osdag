@@ -3847,84 +3847,6 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Plate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_criticalWeb">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>550</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_163">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>520</y>
-       <width>201</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Critical stress (at flange)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_164">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>550</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Critical stress (web)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_criticalFlange">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>520</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_166">
      <property name="geometry">
       <rect>
@@ -4346,10 +4268,6 @@ QMenu::item:selected {
     <zorder>label_157</zorder>
     <zorder>label_158</zorder>
     <zorder>label_161</zorder>
-    <zorder>txt_criticalWeb</zorder>
-    <zorder>label_163</zorder>
-    <zorder>label_164</zorder>
-    <zorder>txt_criticalFlange</zorder>
     <zorder>label_166</zorder>
     <zorder>btn_SaveMessages</zorder>
     <zorder>btn_CreateDesign</zorder>
@@ -4874,8 +4792,6 @@ QMenu::item:selected {
   <tabstop>txt_gauge</tabstop>
   <tabstop>txt_crossGauge</tabstop>
   <tabstop>txt_endDist</tabstop>
-  <tabstop>txt_criticalFlange</tabstop>
-  <tabstop>txt_criticalWeb</tabstop>
   <tabstop>btn_SaveMessages</tabstop>
   <tabstop>btn_CreateDesign</tabstop>
   <tabstop>btnReset_3</tabstop>

@@ -51,6 +51,8 @@ class OnewayEndPlate(object):
         self.plate_thickness_p2 = int(output_dict['ContPlateComp']['Thickness'])
         self.weld_plate_thickness_p2 = int(output_dict['ContPlateComp']['Weld'])
 
+        self.plate_width_B2 = int(output_dict['ContPlateComp']['Width'])
+        self.plate_length_L2 = int(output_dict['ContPlateComp']['Length'])
 
         self.plate_width_B1 = float(output_dict['Plate']['Width'])
 
@@ -926,7 +928,7 @@ class Oneway2DFront(object):
         no_of_bolts_flange = self.data_object.bolts_inside_top_flange_row * self.data_object.no_of_columns
         point = np.array(pt_inside_top_column_list[0])
         theta = 60
-        offset = 50
+        offset = 25
         textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
             self.data_object.bolt_type) + " bolts (grade " + str(
@@ -938,7 +940,7 @@ class Oneway2DFront(object):
         no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
         point = np.array(pt_inside_bottom_column_list[1])
         theta = 60
-        offset = 50
+        offset = 25
         textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
             self.data_object.bolt_type) + " bolts (grade " + str(
@@ -1345,6 +1347,17 @@ class Oneway2DTop(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
+        # ------------------------------------------ Continuity Plate-------------------------------------------
+        point = self.A8 + self.data_object.column_depth_D1 / 4 * np.array([1, 0])
+        theta = 60
+        offset = 50
+        textup = "Continuity Plate" + str(self.data_object.plate_length_L2) + "x" + str(
+            self.data_object.plate_width_B2) + "x" + str(
+            self.data_object.plate_thickness_p2)
+        textdown = " "
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+
         # ------------------------------------------  Weld label --------------------------------------------------
         # point = self.AA1 + 2
         # theta = 60
@@ -1353,6 +1366,14 @@ class Oneway2DTop(object):
         # textdown = " "
         # element = "weld"
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+
+        point = self.A3 - self.data_object.column_width_B1 / 4 * np.array([0, 1])
+        theta = 1
+        offset = 1
+        textup = "          z " + str(self.data_object.weld_plate_thickness_p2)
+        textdown = "          z " + str(self.data_object.weld_plate_thickness_p2)
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
         if self.data_object.no_of_bolts == 12:
             self.data_object.stiffener_weld = 1
@@ -2050,7 +2071,7 @@ class Oneway2DSide(object):
         # ------------------------------------------  End Plate 1 -------------------------------------------
         point = self.P2
         theta = 60
-        offset = 50
+        offset = 25
         textup = "End plate " + str(self.data_object.plate_length_L1) + "x" + str(
             self.data_object.plate_width_B1) + "x" + str(
             self.data_object.plate_thickness_p1)

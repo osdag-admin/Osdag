@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'finPlate.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -147,7 +147,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.splitter)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1328, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1328, 21))
         self.menubar.setStyleSheet("")
         self.menubar.setNativeMenuBar(False)
         self.menubar.setObjectName("menubar")
@@ -302,8 +302,8 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.inputDock.sizePolicy().hasHeightForWidth())
         self.inputDock.setSizePolicy(sizePolicy)
-        self.inputDock.setMinimumSize(QtCore.QSize(125, 710))
-        self.inputDock.setMaximumSize(QtCore.QSize(310, 710))
+        self.inputDock.setMinimumSize(QtCore.QSize(320, 710))
+        self.inputDock.setMaximumSize(QtCore.QSize(320, 710))
         self.inputDock.setBaseSize(QtCore.QSize(310, 710))
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -1075,7 +1075,7 @@ class Ui_MainWindow(object):
         self.txtPlateWidth.setFont(font)
         self.txtPlateWidth.setObjectName("txtPlateWidth")
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect(20, 630, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect(30, 620, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1084,7 +1084,7 @@ class Ui_MainWindow(object):
         self.btn_Reset.setAutoDefault(True)
         self.btn_Reset.setObjectName("btn_Reset")
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect(140, 630, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect(140, 620, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1144,7 +1144,7 @@ class Ui_MainWindow(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.outputDock.sizePolicy().hasHeightForWidth())
         self.outputDock.setSizePolicy(sizePolicy)
-        self.outputDock.setMinimumSize(QtCore.QSize(125, 710))
+        self.outputDock.setMinimumSize(QtCore.QSize(320, 710))
         self.outputDock.setMaximumSize(QtCore.QSize(310, 710))
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -1408,11 +1408,11 @@ class Ui_MainWindow(object):
         self.label_166.setFont(font)
         self.label_166.setObjectName("label_166")
         self.btn_SaveMessages = QtWidgets.QPushButton(self.dockWidgetContents_2)
-        self.btn_SaveMessages.setGeometry(QtCore.QRect(50, 610, 200, 30))
+        self.btn_SaveMessages.setGeometry(QtCore.QRect(50, 600, 200, 30))
         self.btn_SaveMessages.setAutoDefault(True)
         self.btn_SaveMessages.setObjectName("btn_SaveMessages")
         self.btn_CreateDesign = QtWidgets.QPushButton(self.dockWidgetContents_2)
-        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 648, 200, 30))
+        self.btn_CreateDesign.setGeometry(QtCore.QRect(50, 630, 200, 30))
         self.btn_CreateDesign.setAutoDefault(True)
         self.btn_CreateDesign.setObjectName("btn_CreateDesign")
         self.plateHeight = QtWidgets.QLabel(self.dockWidgetContents_2)

@@ -29,11 +29,11 @@ class FlushEndPlate(object):
         print "calculation", input_dict
         self.folder = folder
 
-        self.column_length_L1 = 1000
-        self.beam_length_L2 = 500
-
         self.column_depth_D1 = int(column_data["D"])
         self.beam_depth_D2 = int(beam_data["D"])
+
+        self.column_length_L1 = self.beam_depth_D2 + 500
+        self.beam_length_L2 = 500
 
         self.beam_designation = beam_data['Designation']
         self.column_designation = column_data['Designation']
@@ -695,10 +695,9 @@ class FlushEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-        vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
-        vb_ht = (int(3 * self.data_object.plate_length_L1))
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-600 -400 2000 1800'))
+        wd = (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 500))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd, ht))
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
@@ -722,14 +721,14 @@ class FlushEnd2DFront(object):
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
                                            patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.S1 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])),size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-                (self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-        dwg.add(dwg.rect(insert=self.S4,size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-                (self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
-        dwg.add(dwg.rect(insert=(self.S5 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])),size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-             (self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
-        dwg.add(dwg.rect(insert=self.S8,size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-                (self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
+        dwg.add(dwg.rect(insert=(self.S1 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])),size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.S4,size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
+        dwg.add(dwg.rect(insert=(self.S5 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])),size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+             float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.S8,size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
 
         if self.data_object.weld == "Fillet Weld":
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
@@ -1093,7 +1092,10 @@ class FlushEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1500'))
+        wd = (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 700))
+        ht = (int(self.data_object.column_width_B1 + 400 + 300 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd, ht))
+        # dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1500'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
@@ -1129,25 +1131,25 @@ class FlushEnd2DTop(object):
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A5 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(
-            (self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-            self.data_object.weld_plate_thickness_p2),
+            float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+            float(self.data_object.weld_plate_thickness_p2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A9 - self.data_object.weld_plate_thickness_p2 * np.array([1, 0])), size=(
-            self.data_object.weld_plate_thickness_p2,
-            (self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+            float(self.data_object.weld_plate_thickness_p2),
+            float(self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=self.A8, size=(self.data_object.weld_plate_thickness_p2, (
+        dwg.add(dwg.rect(insert=self.A8, size=(float(self.data_object.weld_plate_thickness_p2),float (
                 self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=self.A8, size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-                 self.data_object.weld_plate_thickness_p2), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.A8, size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                 float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.A7 - self.data_object.weld_plate_thickness_p2 * np.array([1, 0])), size=(
-            self.data_object.weld_plate_thickness_p2,
-            (self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+        dwg.add(dwg.rect(insert=(self.A7 - self.data_object.weld_plate_thickness_p2 * np.array([1, 0])), size=(float(
+            self.data_object.weld_plate_thickness_p2),
+            float(self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
         nofc = self.data_object.no_of_columns
@@ -1504,7 +1506,9 @@ class FlushEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 1500'))
+        wd = (int(self.data_object.column_width_B1 + 1100))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(
             points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],

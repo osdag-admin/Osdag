@@ -30,12 +30,11 @@ class ExtendedEndPlate_WW(object):
         print "calculation", input_dict
         self.folder = folder
 
-
-        self.column_length_L1 = 1000
-        self.beam_length_L2 = 500
-
         self.column_depth_D1 = int(column_data["D"])
         self.beam_depth_D2 = int(beam_data["D"])
+
+        self.column_length_L1 = self.beam_depth_D2 + 500
+        self.beam_length_L2 = 500
 
         self.beam_designation = beam_data['Designation']
         self.column_designation = column_data['Designation']
@@ -792,10 +791,10 @@ class ExtendedEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-        vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
-        vb_ht = (int(3 * self.data_object.plate_length_L1))
+        wd = (int(self.data_object.column_width_B1 + self.data_object.beam_length_L2 + 700+400))
+        ht = (int(self.data_object.column_length_L1 + 400 + 400))
         dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-800 -400 2000 1800'))
+            '-700 -400 {} {}').format(wd,ht))
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
@@ -1317,7 +1316,10 @@ class ExtendedEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1750 1500'))
+        wd = (int(self.data_object.column_width_B1 + self.data_object.beam_length_L2 + 600 + 400))
+        ht = (int(self.data_object.column_depth_D1 + 400 + 500))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
+            '-600 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A5, self.A6, self.A7, self.A8, self.A5], stroke='black', fill='none',
@@ -1370,11 +1372,11 @@ class ExtendedEnd2DTop(object):
         dwg.add(dwg.rect(insert=self.A4, size=((self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1/2),
              self.data_object.weld_plate_thickness_p2),fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=self.A9 - self.data_object.weld_plate_thickness_p2 * np.array([1,0]) , size=(self.data_object.weld_plate_thickness_p2 , (self.data_object.column_depth_D1 - 2* self.data_object.flange_thickness_T1)),
+        dwg.add(dwg.rect(insert=self.A9 - self.data_object.weld_plate_thickness_p2 * np.array([1,0]) , size=(float(self.data_object.weld_plate_thickness_p2) , float(self.data_object.column_depth_D1 - 2* self.data_object.flange_thickness_T1)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A5 - self.data_object.weld_plate_thickness_p2 * np.array([0,1])),size=((self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2),
-                    self.data_object.weld_plate_thickness_p2), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
+                   float (self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white',stroke_width=1.0))
 
 
         nofc = self.data_object.no_of_columns
@@ -1514,7 +1516,7 @@ class ExtendedEnd2DTop(object):
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 150) * np.array([1, 0])
+        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 300) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
         txt_3 = pt_b3 + (75 * np.array([-1, 0])) + (20 * np.array([0, 1]))
         text = "B"
@@ -1528,7 +1530,7 @@ class ExtendedEnd2DTop(object):
         dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
 
         # ------------------------------------------  View details -------------------------------------------
-        ptx = self.P4 - 50 * np.array([1, 0]) + 350 * np.array([0, 1])
+        ptx = self.P4 - 50 * np.array([1, 0]) + 400 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(
@@ -1740,7 +1742,10 @@ class ExtendedEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 2000'))
+        wd = (int(self.data_object.column_depth_D1 + 500 + 300))
+        ht = (int(self.data_object.column_length_L1 + 400 + 400))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
+            '-500 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(
             points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],

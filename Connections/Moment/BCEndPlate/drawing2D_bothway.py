@@ -29,11 +29,11 @@ class ExtendedEndPlate(object):
         print "calculation", input_dict
         self.folder = folder
 
-        self.column_length_L1 = 1000
-        self.beam_length_L2 = 500
-
         self.column_depth_D1 = int(column_data["D"])
         self.beam_depth_D2 = int(beam_data["D"])
+
+        self.column_length_L1 = self.beam_depth_D2 + 500
+        self.beam_length_L2 = 500
 
         self.beam_designation = beam_data['Designation']
         self.column_designation = column_data['Designation']
@@ -766,9 +766,9 @@ class ExtendedEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-        vb_width = (int(2 * self.data_object.column_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
-        vb_ht = (int(3 * self.data_object.plate_length_L1))
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -400 2000 1800'))
+        wd= (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 500))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd,ht))
         """
 		drawing line as per co-ordinate defined to create the required view
 		"""
@@ -793,16 +793,16 @@ class ExtendedEnd2DFront(object):
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
                                            patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.S1 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=( (
-                    self.data_object.column_depth_D1 - 2*self.data_object.flange_thickness_T1),(self.data_object.weld_plate_thickness_p2 )),
+        dwg.add(dwg.rect(insert=(self.S1 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(float(
+                    self.data_object.column_depth_D1 - 2*self.data_object.flange_thickness_T1),(self.data_object.weld_plate_thickness_p2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-        dwg.add(dwg.rect(insert=self.S4, size=((
+        dwg.add(dwg.rect(insert=self.S4, size=(float(
                 self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),(self.data_object.weld_plate_thickness_p2 )),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-        dwg.add(dwg.rect(insert=(self.S5 -  self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=( (
+        dwg.add(dwg.rect(insert=(self.S5 -  self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(float(
                 self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),(self.data_object.weld_plate_thickness_p2 )),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
-        dwg.add(dwg.rect(insert=self.S8, size=((
+        dwg.add(dwg.rect(insert=self.S8, size=(float(
                 self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),(self.data_object.weld_plate_thickness_p2 )),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
@@ -1301,7 +1301,9 @@ class ExtendedEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -500 2000 1750'))
+        wd = (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 700))
+        ht = (int(self.data_object.column_width_B1 + 400 + 300 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
@@ -1350,21 +1352,21 @@ class ExtendedEnd2DTop(object):
         pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
                                            patternTransform="rotate(45 2 2)"))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=self.A2, size=(self.data_object.weld_plate_thickness_p2 , (self.data_object.column_width_B1/2- self.data_object.web_thickness_tw1/2)),
+        dwg.add(dwg.rect(insert=self.A2, size=(float(self.data_object.weld_plate_thickness_p2) , float(self.data_object.column_width_B1/2- self.data_object.web_thickness_tw1/2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.A5 - self.data_object.weld_plate_thickness_p2*np.array([0,1])), size=((self.data_object.column_depth_D1 - 2*self.data_object.flange_thickness_T1) , self.data_object.weld_plate_thickness_p2 ),
+        dwg.add(dwg.rect(insert=(self.A5 - self.data_object.weld_plate_thickness_p2*np.array([0,1])), size=(float(self.data_object.column_depth_D1 - 2*self.data_object.flange_thickness_T1) , float(self.data_object.weld_plate_thickness_p2) ),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=(self.A9  - self.data_object.weld_plate_thickness_p2*np.array([1,0])), size=(self.data_object.weld_plate_thickness_p2, (self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1 / 2)),
+        dwg.add(dwg.rect(insert=(self.A9  - self.data_object.weld_plate_thickness_p2*np.array([1,0])), size=(float(self.data_object.weld_plate_thickness_p2), float(self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1 / 2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=self.A8, size=(self.data_object.weld_plate_thickness_p2, (
                     self.data_object.column_width_B1/2 - self.data_object.web_thickness_tw1 / 2)),
                          fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-        dwg.add(dwg.rect(insert=self.A8, size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
-        self.data_object.weld_plate_thickness_p2), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.A8, size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+        float(self.data_object.weld_plate_thickness_p2)), fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
         dwg.add(dwg.rect(insert=(self.A7 - self.data_object.weld_plate_thickness_p2*np.array([1,0])), size=(
         self.data_object.weld_plate_thickness_p2,
@@ -1728,22 +1730,54 @@ class ExtendedEnd2DSide(object):
         self.S8 = np.array([ptS8x, ptS8y])
 
         # =========================  Stiffener UP =========================
-        ptSU1x = ptA11x
-        ptSU1y = ptA11y - self.data_object.flange_thickness_T2
+        ptT1x = ptA1x + self.data_object.beam_width_B2/2
+        ptT1y = ptA1y
+        self.T1 = np.array([ptT1x, ptT1y])
+
+        ptT2x = ptP1x + self.data_object.plate_width_B1/2
+        ptT2y = ptP1y
+        self.T2 = np.array([ptT2x, ptT2y])
+
+        ptSU1x = ptT1x - self.data_object.stiffener_thickness
+        ptSU1y = ptT1y
         self.SU1 = np.array([ptSU1x, ptSU1y])
 
-        ptSU2x = ptA4x
-        ptSU2y = ptA4y - self.data_object.flange_thickness_T2
+        ptSU2x = ptT1x + self.data_object.stiffener_thickness
+        ptSU2y = ptT1y
         self.SU2 = np.array([ptSU2x, ptSU2y])
 
+        ptSU3x = ptT2x - self.data_object.stiffener_thickness
+        ptSU3y = ptT2y
+        self.SU3 = np.array([ptSU3x, ptSU3y])
+
+        ptSU4x = ptT2x + self.data_object.stiffener_thickness
+        ptSU4y = ptT2y
+        self.SU4 = np.array([ptSU4x, ptSU4y])
+
         # =========================  Stiffener DOWN =========================
-        ptSD1x = ptA10x
-        ptSD1y = ptA10y + self.data_object.flange_thickness_T2
+        ptT3x = ptA8x + self.data_object.beam_width_B2 / 2
+        ptT3y = ptA8y
+        self.T3 = np.array([ptT3x, ptT3y])
+
+        ptT4x = ptP4x + self.data_object.plate_width_B1 / 2
+        ptT4y = ptP4y
+        self.T4 = np.array([ptT4x, ptT4y])
+
+        ptSD1x = ptT3x - self.data_object.stiffener_thickness
+        ptSD1y = ptT3y
         self.SD1 = np.array([ptSD1x, ptSD1y])
 
-        ptSD2x = ptA5x
-        ptSD2y = ptA5y + self.data_object.flange_thickness_T2
+        ptSD2x = ptT3x + self.data_object.stiffener_thickness
+        ptSD2y = ptT3y
         self.SD2 = np.array([ptSD2x, ptSD2y])
+
+        ptSD3x = ptT4x - self.data_object.stiffener_thickness
+        ptSD3y = ptT4y
+        self.SD3 = np.array([ptSD3x, ptSD3y])
+
+        ptSD4x = ptT4x + self.data_object.stiffener_thickness
+        ptSD4y = ptT4y
+        self.SD4 = np.array([ptSD4x, ptSD4y])
 
 
     def call_ExtndBoth_side(self, filename):
@@ -1756,7 +1790,10 @@ class ExtendedEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 1800'))
+
+        wd = (int(self.data_object.column_width_B1 + 1100))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(
             points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],
@@ -1786,18 +1823,18 @@ class ExtendedEnd2DSide(object):
         dwg.add(dwg.line(self.S8, self.A2).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 
         if self.data_object.no_of_bolts == 20:
-            dwg.add(dwg.line(self.AA12, self.SU1).stroke('black', width=2.5, linecap='square'))
-            dwg.add(dwg.line(self.AA11, self.SU2).stroke('black', width=2.5, linecap='square'))
-            dwg.add(dwg.line(self.AA13, self.SD1).stroke('black', width=2.5, linecap='square'))
-            dwg.add(dwg.line(self.AA14, self.SD2).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.SU3, self.SU1).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.SU4, self.SU2).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.SD3, self.SD1).stroke('black', width=2.5, linecap='square'))
+            dwg.add(dwg.line(self.SD4, self.SD2).stroke('black', width=2.5, linecap='square'))
             pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",
                                                patternTransform="rotate(45 1 1)"))
             pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-            dwg.add(dwg.rect(insert=self.AA11 ,
+            dwg.add(dwg.rect(insert= (self.SU3 - self.data_object.stiffener_weldsize * np.array([1, 0])) ,
                              size=(self.data_object.stiffener_weldsize,(self.data_object.stiffener_height)),
                              fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
             pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
-            dwg.add(dwg.rect(insert=self.AA12 - self.data_object.stiffener_weldsize * np.array([1, 0]),
+            dwg.add(dwg.rect(insert=self.SU4,
                              size=(self.data_object.stiffener_weldsize, (self.data_object.stiffener_height)),
                              fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
             pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))

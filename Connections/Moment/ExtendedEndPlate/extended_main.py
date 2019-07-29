@@ -1,7 +1,7 @@
 """
-Created on 24-Aug-2017
+Created on 29-JUly-2019
 
-@author: Reshma
+@author: Darshan
 """
 
 from ui_extendedendplate import Ui_MainWindow
@@ -18,9 +18,9 @@ from ui_ask_question import Ui_AskQuestion
 from bbExtendedEndPlateSpliceCalc import bbExtendedEndPlateSplice
 import bbExtendedEndPlateSpliceCalc as db_value
 from reportGenerator import save_html
-from drawing_2D_ExtendedBothways import ExtendedEndPlate
-from drawing_2D_Extendedoneway import OnewayEndPlate
-from drawing_2D_BBFlush import FlushEndPlate
+from drawing2D_Endplate import EndPlate
+# from drawing_2D_Extendedoneway import OnewayEndPlate
+# from drawing_2D_BBFlush import FlushEndPlate
 
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
@@ -1554,13 +1554,17 @@ class Maincontroller(QMainWindow):
       self.alist = self.designParameters()
       self.result_obj = bbExtendedEndPlateSplice(self.alist)
       self.beam_data = self.fetchBeamPara()
+      beam_beam = EndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
 
-      if self.alist["Member"]["Connectivity"] == "Extended both ways":
-         beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
-      elif self.alist["Member"]["Connectivity"] == "Extended one way":
-         beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
-      elif self.alist["Member"]["Connectivity"] == "Flush":
-         beam_beam = FlushEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+      # if self.alist["Member"]["Connectivity"] == "Extended both ways":
+      #
+      #
+      # else:
+      #     pass
+      # # elif self.alist["Member"]["Connectivity"] == "Extended one way":
+      # #    beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
+      # # elif self.alist["Member"]["Connectivity"] == "Flush":
+      # #    beam_beam = FlushEndPlate(self.alist, self.result_obj, self.beam_data, self.folder)
 
 
       status = self.resultObj['Bolt']['status']

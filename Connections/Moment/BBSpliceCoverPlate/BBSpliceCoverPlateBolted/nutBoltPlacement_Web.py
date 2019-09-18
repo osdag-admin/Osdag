@@ -98,6 +98,7 @@ class NutBoltArray_Web():
         :param boltDirW: Bolt screwing direction
         :return: 
         """
+
         self.originW = originW
         self.gaugeDirW = gaugeDirW
         self.pitchDirW = pitchDirW

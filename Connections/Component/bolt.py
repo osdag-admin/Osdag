@@ -10,6 +10,9 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeCylinder
 from OCC.gp import gp_Ax2
 from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
+# from OCC.Display.SimpleGui import init_display
+# display, start_display, add_menu, add_function_to_menu = init_display()
+
 
 class Bolt(object):
     '''
@@ -88,3 +91,21 @@ a4  X                   XXXXXXXXXXXXXXXXX  a1
         whole_Bolt = BRepAlgoAPI_Fuse(boltHead, boltCylinder).Shape()
 
         return whole_Bolt
+
+
+# R = 10
+# T = 5
+# H = 25
+# r = 4
+#
+# origin = numpy.array([0.,0.,0.])
+# uDir = numpy.array([1.,0.,0.])
+# shaftDir = numpy.array([0.,0.,1.])
+#
+# channel = Bolt(R,T,H,r)
+# angles = channel.place(origin, uDir, shaftDir)
+# point = channel.compute_params()
+# prism = channel.create_model()
+# display.DisplayShape(prism, update=True)
+# display.DisableAntiAliasing()
+# start_display()

@@ -8,6 +8,7 @@ import numpy
 from ModelUtils import *
 
 
+
 class Plate(object):
     '''
 
@@ -71,5 +72,6 @@ v dir                                    |   |                          |
         aFace = makeFaceFromWire(wire)
         extrudeDir = self.W * self.wDir  # extrudeDir is a numpy array
         prism = makePrismFromFace(aFace, extrudeDir)
+
 
         return prism

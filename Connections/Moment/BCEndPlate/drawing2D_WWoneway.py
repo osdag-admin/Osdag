@@ -873,19 +873,19 @@ class Oneway2DFront(object):
         pt_outside_top_column_list = []
         for i in range(1, botfr + 1):
             if self.data_object.no_of_bolts == 12:
-                ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) \
+                ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) \
                       * np.array([1, 0]) + (i - 1) * self.data_object.pitch12 * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_diameter
-                rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+                rect_width = float(self.data_object.bolt_diameter)
+                rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
                 dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
                                  stroke_width=2.5))
             else:
                 ptx = self.P2 + (self.data_object.end_dist) * np.array([0, 1]) - \
-                      (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array([1, 0])
+                      (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array([1, 0])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_diameter
-                rect_length = self.data_object.plate_thickness_p1 +  self.data_object.flange_thickness_T1
+                rect_width = float(self.data_object.bolt_diameter)
+                rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
                 dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
                                  stroke_width=2.5))
 
@@ -904,17 +904,17 @@ class Oneway2DFront(object):
         for i in range(bitfr):
             if self.data_object.no_of_bolts == 6:
                 ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.Lv) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array(
                     [1, 0])
             else:
                 ptx = self.AA1 - (self.data_object.flange_thickness_T2 + self.Lv) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array(
                     [1, 0]) + i * self.data_object.pitch23 * np.array([0, 1])
 
 
             ptx1 = ptx - bolt_r * np.array([0, 1])
-            rect_width = self.data_object.bolt_diameter
-            rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+            rect_width = float(self.data_object.bolt_diameter)
+            rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
             dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
             pt_Cx = ptx + np.array([1, 0])
@@ -934,12 +934,12 @@ class Oneway2DFront(object):
         pt_inside_bottom_column_list = []
         for i in range(bibfr):
              ptx = self.AA6 + ( self.data_object.flange_thickness_T2 + self.Lv) \
-                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1) * np.array(
+                      * np.array([0, -1]) - (self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1) * np.array(
                     [1, 0])
 
         ptx1 = ptx - bolt_r * np.array([0, 1])
-        rect_width = self.data_object.bolt_diameter
-        rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+        rect_width = float(self.data_object.bolt_diameter)
+        rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
         dwg.add(
             dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black', stroke_width=2.5))
 
@@ -1288,11 +1288,11 @@ class Oneway2DTop(object):
         if nofc >= 1:
             for i in range(nofc):
                 ptx = self.P2 + self.data_object.edge_dist * np.array([0, 1]) - \
-                      (self.data_object.flange_thickness_T1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + \
+                      (self.data_object.web_thickness_tw1 + self.data_object.plate_thickness_p1) * np.array([1, 0]) + \
                       i * self.data_object.cross_centre_gauge_dist * np.array([0, 1])
                 ptx1 = ptx - bolt_r * np.array([0, 1])
-                rect_width = self.data_object.bolt_diameter
-                rect_length = self.data_object.plate_thickness_p1 + self.data_object.flange_thickness_T1
+                rect_width = float(self.data_object.bolt_diameter)
+                rect_length = float(self.data_object.plate_thickness_p1 + self.data_object.web_thickness_tw1)
                 dwg.add(dwg.rect(insert=ptx1, size=(rect_length, rect_width), fill='black', stroke='black',
                                  stroke_width=2.5))
 
@@ -1404,7 +1404,7 @@ class Oneway2DTop(object):
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-        pt_a3 = self.A2 + (self.data_object.beam_length_L2) * np.array([1, 0])
+        pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 150) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
         txt_3 = pt_b3 + (-20 * np.array([0, 1])) + (40 * np.array([1, 0]))
         text = "B"
@@ -1620,7 +1620,7 @@ class Oneway2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 2000'))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 1500'))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],stroke='black', fill= 'none', stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='black', fill='none',

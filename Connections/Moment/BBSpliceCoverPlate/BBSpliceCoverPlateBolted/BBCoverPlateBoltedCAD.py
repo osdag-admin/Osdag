@@ -58,7 +58,7 @@ class BBCoverPlateBoltedCAD(object):
 
     def create_3DModel(self):
         '''
-        :return:  CAD model of each of the followings. Debugging each command below would give give clear picture
+        :return:  CAD model of each of the followings. Debugging each command below would give clear picture
         '''
         self.createBeamLGeometry()
         self.createBeamRGeometry()

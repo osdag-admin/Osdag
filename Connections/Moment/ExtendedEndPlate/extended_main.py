@@ -1664,14 +1664,9 @@ class Maincontroller(QMainWindow):
 
         elif self.component == "Connector":
             final_model = self.ExtObj.get_connector_models()
-            # final_model = cadlist[0]
-            # for model in cadlist[1:]:
-            #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
+
         else:
             final_model = self.ExtObj.get_models()
-            # final_model = cadlist[0]
-            # for model in cadlist[1:]:
-            #     final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
 
         return final_model
 
@@ -1771,6 +1766,10 @@ class Maincontroller(QMainWindow):
         self.ui.textEdit.clear()
 
     def create_CadModel(self):
+        """
+        Calls the CAD components like beam, plate, stiffeners, fillet and grove weld, nut and bolt. Also calls CAD file
+        :return: creates CAD model
+        """
 
         beam_data = self.fetchBeamPara()
 
@@ -1848,13 +1847,7 @@ class Maincontroller(QMainWindow):
 
         if alist["Weld"]["Type"] == "Fillet Weld":
 
-            ###########################
-            #       WELD SECTIONS     #
-            ###########################
-            '''
-         Following sections are for creating Fillet Welds. 
-         Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
-         '''
+            # Fillet Weld for connecting end plate to beam
 
             # Followings welds are welds above beam flange, Qty = 4
             bbWeldAbvFlang = FilletWeld(b=float(alist["Weld"]["Flange (mm)"]), h=float(alist["Weld"]["Flange (mm)"]),
@@ -1878,6 +1871,8 @@ class Maincontroller(QMainWindow):
             return extbothWays
 
         else:  # Groove Weld
+
+            # Grove Weld for connecting end plate to beam
             bbWeldFlang = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h=float(beam_data["T"]),
                                      L=beam_B)  # outputobj["Weld"]["Size"]
 
@@ -1885,9 +1880,7 @@ class Maincontroller(QMainWindow):
             bbWeldWeb = GrooveWeld(b=outputobj['Stiffener']['WeldSize'], h=float(beam_data["tw"]),
                                    L=beam_d - 2 * beam_T)  # outputobj["Weld"]["Size"]
 
-            #######################################
-            #       WELD SECTIONS QUARTER CONE    #
-            #######################################
+
 
             extbothWays = CADGroove(beam_Left, beam_Right, plate_Left, plate_Right, bbNutBoltArray, bbWeldFlang,
                                     bbWeldWeb,

@@ -15,7 +15,6 @@ class CADFillet(object):
                  bbWeldBelwFlang, bbWeldSideWeb, contWeldD, contWeldB, bcWeldStiffHeight, bcWeldStiffLength,
                  contPlates, beam_stiffeners, endplate_type, conn_type, outputobj):
         """
-
         :param columnLeft:
         :param beamRight:
         :param plateRight:

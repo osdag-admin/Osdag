@@ -1,0 +1,37 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="Finplate", shape="box"];
+"1" [label="Finplate.ISectionold", shape="box"];
+"2" [label="Finplate.Svg_Window", shape="box"];
+"3" [label="Finplate.beamWebBeamWebConnectivity", shape="box"];
+"4" [label="Finplate.colFlangeBeamWebConnectivity", shape="box"];
+"5" [label="Finplate.colWebBeamWebConnectivity", shape="box"];
+"6" [label="Finplate.drawing_2D", shape="box"];
+"7" [label="Finplate.finPlateCalc", shape="box"];
+"8" [label="Finplate.finPlateMain", shape="box"];
+"9" [label="Finplate.icons_rc", shape="box"];
+"10" [label="Finplate.model", shape="box"];
+"11" [label="Finplate.nutBoltPlacement", shape="box"];
+"12" [label="Finplate.reportGenerator", shape="box"];
+"13" [label="Finplate.reportGeneratorOld", shape="box"];
+"14" [label="Finplate.test_fin_plate_calc", shape="box"];
+"15" [label="Finplate.test_report_generator_fin_plate", shape="box"];
+"16" [label="Finplate.ui_design_preferences", shape="box"];
+"17" [label="Finplate.ui_finPlate", shape="box"];
+"18" [label="Finplate.ui_finPlateOld", shape="box"];
+"19" [label="Finplate.ui_summary_popup", shape="box"];
+"7" -> "10" [arrowhead="open", arrowtail="none"];
+"8" -> "2" [arrowhead="open", arrowtail="none"];
+"8" -> "10" [arrowhead="open", arrowtail="none"];
+"8" -> "16" [arrowhead="open", arrowtail="none"];
+"8" -> "17" [arrowhead="open", arrowtail="none"];
+"8" -> "19" [arrowhead="open", arrowtail="none"];
+"15" -> "7" [arrowhead="open", arrowtail="none"];
+"15" -> "10" [arrowhead="open", arrowtail="none"];
+"15" -> "10" [arrowhead="open", arrowtail="none"];
+"15" -> "12" [arrowhead="open", arrowtail="none"];
+"15" -> "14" [arrowhead="open", arrowtail="none"];
+"17" -> "9" [arrowhead="open", arrowtail="none"];
+"18" -> "9" [arrowhead="open", arrowtail="none"];
+}

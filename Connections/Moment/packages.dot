@@ -1,0 +1,54 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="BCEndPlate", shape="box"];
+"1" [label="BCEndPlate.WeldBelwFlang", shape="box"];
+"2" [label="BCEndPlate.WeldSideWeb", shape="box"];
+"3" [label="BCEndPlate.bc_endplate_calc", shape="box"];
+"4" [label="BCEndPlate.bc_endplate_main", shape="box"];
+"5" [label="BCEndPlate.drawing2D_WWbothway", shape="box"];
+"6" [label="BCEndPlate.drawing2D_WWflush", shape="box"];
+"7" [label="BCEndPlate.drawing2D_WWoneway", shape="box"];
+"8" [label="BCEndPlate.drawing2D_bothway", shape="box"];
+"9" [label="BCEndPlate.drawing2D_flush", shape="box"];
+"10" [label="BCEndPlate.drawing2D_oneway", shape="box"];
+"11" [label="BCEndPlate.drawing_2D", shape="box"];
+"12" [label="BCEndPlate.extendedBothWays", shape="box"];
+"13" [label="BCEndPlate.icons_rc", shape="box"];
+"14" [label="BCEndPlate.model", shape="box"];
+"15" [label="BCEndPlate.nutBoltPlacement", shape="box"];
+"16" [label="BCEndPlate.reportGenerator", shape="box"];
+"17" [label="BCEndPlate.svg_window", shape="box"];
+"18" [label="BCEndPlate.ui_bc_endplate", shape="box"];
+"19" [label="BCEndPlate.ui_design_preferences", shape="box"];
+"20" [label="BCEndPlate.ui_design_summary", shape="box"];
+"21" [label="BCEndPlate.ui_pitch", shape="box"];
+"22" [label="BCEndPlate.ui_plate", shape="box"];
+"23" [label="BCEndPlate.ui_plate_bottom", shape="box"];
+"24" [label="BCEndPlate.ui_stiffener", shape="box"];
+"25" [label="BCEndPlate.ui_weld_details_1", shape="box"];
+"26" [label="BCEndPlate.ui_weld_details_2", shape="box"];
+"3" -> "14" [arrowhead="open", arrowtail="none"];
+"4" -> "3" [arrowhead="open", arrowtail="none"];
+"4" -> "3" [arrowhead="open", arrowtail="none"];
+"4" -> "5" [arrowhead="open", arrowtail="none"];
+"4" -> "6" [arrowhead="open", arrowtail="none"];
+"4" -> "7" [arrowhead="open", arrowtail="none"];
+"4" -> "9" [arrowhead="open", arrowtail="none"];
+"4" -> "10" [arrowhead="open", arrowtail="none"];
+"4" -> "11" [arrowhead="open", arrowtail="none"];
+"4" -> "14" [arrowhead="open", arrowtail="none"];
+"4" -> "16" [arrowhead="open", arrowtail="none"];
+"4" -> "17" [arrowhead="open", arrowtail="none"];
+"4" -> "18" [arrowhead="open", arrowtail="none"];
+"4" -> "19" [arrowhead="open", arrowtail="none"];
+"4" -> "20" [arrowhead="open", arrowtail="none"];
+"4" -> "21" [arrowhead="open", arrowtail="none"];
+"4" -> "22" [arrowhead="open", arrowtail="none"];
+"4" -> "23" [arrowhead="open", arrowtail="none"];
+"4" -> "24" [arrowhead="open", arrowtail="none"];
+"4" -> "25" [arrowhead="open", arrowtail="none"];
+"4" -> "26" [arrowhead="open", arrowtail="none"];
+"18" -> "13" [arrowhead="open", arrowtail="none"];
+"21" -> "13" [arrowhead="open", arrowtail="none"];
+}

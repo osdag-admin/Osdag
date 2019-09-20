@@ -1,0 +1,28 @@
+digraph "packages" {
+charset="utf-8"
+rankdir=BT
+"0" [label="Component", shape="box"];
+"1" [label="Component.ISection", shape="box"];
+"2" [label="Component.ModelUtils", shape="box"];
+"3" [label="Component.angle", shape="box"];
+"4" [label="Component.bolt", shape="box"];
+"5" [label="Component.filletweld", shape="box"];
+"6" [label="Component.groove_weld", shape="box"];
+"7" [label="Component.notch", shape="box"];
+"8" [label="Component.nut", shape="box"];
+"9" [label="Component.plate", shape="box"];
+"10" [label="Component.quarterCone", shape="box"];
+"11" [label="Component.stiffener", shape="box"];
+"12" [label="Component.stiffener_plate", shape="box"];
+"13" [label="Component.weld", shape="box"];
+"1" -> "2" [arrowhead="open", arrowtail="none"];
+"3" -> "2" [arrowhead="open", arrowtail="none"];
+"4" -> "2" [arrowhead="open", arrowtail="none"];
+"6" -> "2" [arrowhead="open", arrowtail="none"];
+"7" -> "2" [arrowhead="open", arrowtail="none"];
+"8" -> "2" [arrowhead="open", arrowtail="none"];
+"9" -> "2" [arrowhead="open", arrowtail="none"];
+"11" -> "2" [arrowhead="open", arrowtail="none"];
+"12" -> "2" [arrowhead="open", arrowtail="none"];
+"13" -> "2" [arrowhead="open", arrowtail="none"];
+}

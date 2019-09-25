@@ -124,9 +124,9 @@ class CADFillet(object):
         self.create_bcWeldStiff()
 
         # call for create_model of filletweld from Components directory
-        self.beamLModel = self.column.create_model()
-        self.beamRModel = self.beam.create_model()
-        self.plateRModel = self.plate.create_model()
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.plateModel = self.plate.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
         self.contPlate_L1Model = self.contPlate_L1.create_model()
         self.contPlate_L2Model = self.contPlate_L2.create_model()
@@ -604,7 +604,7 @@ class CADFillet(object):
         :return: CAD model of the column
         """
 
-        final_column = self.beamLModel
+        final_column = self.columnModel
         bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:
             final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
@@ -615,21 +615,21 @@ class CADFillet(object):
 
         :return:  CAD model of the beam
         """
-        return self.beamRModel
+        return self.beamModel
 
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             if self.numberOfBolts == 12:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
             else:
-                connector_plate = [self.plateRModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
         elif self.endplate_type == "both_way":
             if self.numberOfBolts == 20:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.beam_stiffener_2Model,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
             else:
-                connector_plate = [self.plateRModel,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
         elif self.endplate_type == "flush":
-            connector_plate = [self.plateRModel,
+            connector_plate = [self.plateModel,
                     self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,]
 
         plates = connector_plate[0]
@@ -900,16 +900,16 @@ class CADColWebFillet(CADFillet):
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             if self.numberOfBolts == 12:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model, self.contPlate_L2Model, ]
             else:
-                connector_plate = [self.plateRModel, self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, ]
         elif self.endplate_type == "both_way":
             if self.numberOfBolts == 20:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.beam_stiffener_2Model,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.contPlate_L1Model, self.contPlate_L2Model, ]
             else:
-                connector_plate = [self.plateRModel,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, ]
         elif self.endplate_type == "flush":
-            connector_plate = [self.plateRModel,
+            connector_plate = [self.plateModel,
                     self.contPlate_L1Model, self.contPlate_L2Model,]
 
         plates = connector_plate[0]
@@ -1121,9 +1121,9 @@ class CADGroove(object):
         self.create_contWelds()
 
         # call for create_model of filletweld from Components directory
-        self.beamLModel = self.column.create_model()
-        self.beamRModel = self.beam.create_model()
-        self.plateRModel = self.plate.create_model()
+        self.columnModel = self.column.create_model()
+        self.beamModel = self.beam.create_model()
+        self.plateModel = self.plate.create_model()
         self.nutBoltArrayModels = self.nut_bolt_array.create_model()
         self.contPlate_L1Model = self.contPlate_L1.create_model()
         self.contPlate_L2Model = self.contPlate_L2.create_model()
@@ -1559,7 +1559,7 @@ class CADGroove(object):
         :return: CAD model of the column
         """
 
-        final_column = self.beamLModel
+        final_column = self.columnModel
         bolt_list = self.nut_bolt_array.get_bolt_list()
         for bolt in bolt_list[:]:
             final_column = BRepAlgoAPI_Cut(final_column, bolt).Shape()  # TODO: Anand #cuts the colum in section shape
@@ -1570,21 +1570,21 @@ class CADGroove(object):
 
         :return:  CAD model of the beam
         """
-        return self.beamRModel
+        return self.beamModel
 
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             if self.numberOfBolts == 12:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
             else:
-                connector_plate = [self.plateRModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
         elif self.endplate_type == "both_way":
             if self.numberOfBolts == 20:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.beam_stiffener_2Model,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
             else:
-                connector_plate = [self.plateRModel,self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model]
         elif self.endplate_type == "flush":
-            connector_plate = [self.plateRModel,
+            connector_plate = [self.plateModel,
                     self.contPlate_L1Model, self.contPlate_L2Model, self.contPlate_R1Model, self.contPlate_R2Model,]
 
         plates = connector_plate[0]
@@ -1840,16 +1840,16 @@ class CADcolwebGroove(CADGroove):
     def get_plate_connector_models(self):
         if self.endplate_type == "one_way":
             if self.numberOfBolts == 12:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.contPlate_L1Model, self.contPlate_L2Model, ]
             else:
-                connector_plate = [self.plateRModel, self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, ]
         elif self.endplate_type == "both_way":
             if self.numberOfBolts == 20:
-                connector_plate = [self.plateRModel, self.beam_stiffener_1Model,self.beam_stiffener_2Model,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.beam_stiffener_1Model, self.beam_stiffener_2Model, self.contPlate_L1Model, self.contPlate_L2Model, ]
             else:
-                connector_plate = [self.plateRModel,self.contPlate_L1Model, self.contPlate_L2Model,]
+                connector_plate = [self.plateModel, self.contPlate_L1Model, self.contPlate_L2Model, ]
         elif self.endplate_type == "flush":
-            connector_plate = [self.plateRModel,
+            connector_plate = [self.plateModel,
                     self.contPlate_L1Model, self.contPlate_L2Model,]
 
         plates = connector_plate[0]

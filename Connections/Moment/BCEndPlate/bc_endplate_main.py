@@ -2247,11 +2247,11 @@ class Maincontroller(QMainWindow):
 		# Displays the beams #TODO ANAND
 		if component == "Column":
 			self.display.View_Iso()
-			osdag_display_shape(self.display, self.ExtObj.beamLModel, update=True)
+			osdag_display_shape(self.display, self.ExtObj.columnModel, update=True)
 
 		elif component == "Beam":
 			self.display.View_Iso()
-			osdag_display_shape(self.display, self.ExtObj.beamRModel, update=True, material= Graphic3d_NOT_2D_ALUMINUM)  # , color = 'Dark Gray'
+			osdag_display_shape(self.display, self.ExtObj.beamModel, update=True, material= Graphic3d_NOT_2D_ALUMINUM)  # , color = 'Dark Gray'
 
 		elif component == "Connector":
 			osdag_display_shape(self.display, self.ExtObj.get_plate_connector_models(), update=True, color='Blue')

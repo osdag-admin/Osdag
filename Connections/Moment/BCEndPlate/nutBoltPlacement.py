@@ -8,6 +8,7 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeSphere
 from Connections.Component.ModelUtils import getGpPt
 from Connections.Component.bolt import Bolt
 from Connections.Component.nut import Nut
+from OCC.BRepAlgoAPI import BRepAlgoAPI_Fuse
 
 
 class NutBoltArray(object):
@@ -671,6 +672,8 @@ class NutBoltArray(object):
 
         dbg = self.dbgSphere(self.origin)
         self.models.append(dbg)
+
+
 
     def dbgSphere(self, pt):
         return BRepPrimAPI_MakeSphere(getGpPt(pt), 0.1).Shape()

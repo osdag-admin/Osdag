@@ -1442,12 +1442,13 @@ class MainController(QMainWindow):
 		nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
 
 		numOfBoltsF = 2 * int(outputobj["FlangeBolt"]["BoltsRequiredF"])  # Number of flange bolts for both beams
-		nutSpaceF = float(
-			alist["FlangePlate"]["Thickness (mm)"]) + beam_T  # Space between bolt head and nut for flange bolts
+		if self.ui.combo_flange_preference.currentText() != 'Outside':		# Space between bolt head and nut for flange bolts
+			nutSpaceF = float(alist["FlangePlate"]["Thickness (mm)"]) + float(outputobj["FlangeBolt"]["InnerFlangePlateThickness"]) + beam_T
+		else:
+			nutSpaceF = float(alist["FlangePlate"]["Thickness (mm)"]) + beam_T
 
 		numOfBoltsW = 2 * int(outputobj["WebBolt"]["BoltsRequired"])  # Number of web bolts for both beams
-		nutSpaceW = 2 * float(
-			alist["WebPlate"]["Thickness (mm)"]) + beam_tw  # Space between bolt head and nut for web bolts
+		nutSpaceW = 2 * float(alist["WebPlate"]["Thickness (mm)"]) + beam_tw  # Space between bolt head and nut for web bolts
 
 		# Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
 		bolting_AF = NutBoltArray_AF(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF)

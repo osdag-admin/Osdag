@@ -92,7 +92,7 @@ class NutBoltArray_Web():
 
     def placeW(self, originW, gaugeDirW, pitchDirW, boltDirW):
         """
-        :param originW: Origin for bolt placement 
+        :param originW: Origin for bolt placement A
         :param gaugeDirW: Gauge direction for gauge distance
         :param pitchDirW: Pitch direction for pitch distance
         :param boltDirW: Bolt screwing direction

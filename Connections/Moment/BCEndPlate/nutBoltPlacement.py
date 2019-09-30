@@ -48,7 +48,8 @@ class NutBoltArray(object):
 
     def initialiseNutBolts(self):
         '''
-        Initialise the Nut and Bolt 
+
+        :return: Initialise the Nut and Bolt
         '''
         b = self.bolt
         n = self.nut

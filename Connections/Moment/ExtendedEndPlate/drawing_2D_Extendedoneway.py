@@ -718,10 +718,10 @@ class OnewayEnd2DFront(object):
 			Saves the image in the folder
 
 		"""
-		vb_width = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 300))
-		vb_ht = (int(3 * self.data_object.plate_length_L1))
+		wd = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 500))
+		ht = (int(self.data_object.plate_length_L1 + 500 + 200 + 100))
 		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-			'-350 -600 2000 1740'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
+			'-300 -500 {} {}').format(wd, ht)) # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='blue', fill='none', stroke_width=2.5))
 		dwg.add(dwg.line(self.A5, self.A6).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A8, self.A7).stroke('blue', width=2.5, linecap='square'))
@@ -781,6 +781,19 @@ class OnewayEnd2DFront(object):
 								 stroke_width=2.5))
 			dwg.add(dwg.polyline(points=[self.BB6, self.BB5, self.BB4, self.BB6], stroke='black', fill='black',
 								 stroke_width=2.5))
+
+		pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+										   patternTransform="rotate(45 2 2)"))
+		pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+		dwg.add(dwg.rect(insert=self.S1  , size=(self.data_object.stiffener_weldsize, self.data_object.stiffener_height),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.SS1- self.data_object.stiffener_weldsize * np.array([1,0]), size=(self.data_object.stiffener_weldsize, self.data_object.stiffener_height),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.AA1 - self.data_object.stiffener_weldsize * np.array([0,1]), size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+		dwg.add(dwg.rect(insert=self.SS4 - self.data_object.stiffener_weldsize * np.array([0,1]) , size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+						 fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+
 
 		botfr = self.data_object.bolts_outside_top_flange_row
 		bitfr = self.data_object.bolts_inside_top_flange_row
@@ -886,7 +899,7 @@ class OnewayEnd2DFront(object):
 		no_of_bolts_flange = self.data_object.bolts_inside_top_flange_row * self.data_object.no_of_columns
 		point = np.array(pt_inside_top_column_list[0])
 		theta = 60
-		offset = 50
+		offset = 25
 		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
@@ -897,7 +910,7 @@ class OnewayEnd2DFront(object):
 		no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
 		point = np.array(pt_inside_bottom_column_list[1])
 		theta = 60
-		offset = 50
+		offset = 25
 		textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
 		textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(self.data_object.bolt_type) + " bolts (grade " + str(
 			self.data_object.grade) + ")"
@@ -988,15 +1001,15 @@ class OnewayEnd2DFront(object):
 		self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
 
 		# ------------------------------------------  Sectional arrow -------------------------------------------
-		pt_a1 = self.A1 + (500) * np.array([0, -1])
+		pt_a1 = self.A1 + (400) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, 1]))
-		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		txt_1 = pt_b1 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
 		text = "A"
 		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
 		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1) * np.array([1, 0])
 		pt_b2 = pt_a2 + (50 * np.array([0, 1]))
-		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+		txt_2 = pt_b2 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
 		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
@@ -1170,7 +1183,9 @@ class OnewayEnd2DTop(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-80 -700 1900 1800'))
+		wd = (int(2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1 + 200 + 500))
+		ht = (int(self.data_object.plate_width_B1 + 300 + 300))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-200 -300 {} {}').format(wd, ht))
 		dwg.add(dwg.line(self.A5, self.AS8).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
 		dwg.add(dwg.line(self.AS8, self.A8).stroke('blue', width=2.5, linecap='square'))
 		dwg.add(dwg.line(self.A6, self.AS7).stroke('red', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1340,32 +1355,32 @@ class OnewayEnd2DTop(object):
 	# ------------------------------------------  Sectional arrow -------------------------------------------
 		pt_a1 = self.A4 - (200) * np.array([0, -1])
 		pt_b1 = pt_a1 + (50 * np.array([0, -1]))
-		txt_1 = pt_b1 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		txt_1 = pt_b1 + (20 * np.array([-1, 0])) + (50 * np.array([0, -1]))
 		text = "C"
 		self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
 		pt_a2 = pt_a1 + (2 * self.data_object.beam_length_L1 + 2 * self.data_object.plate_thickness_p1) * np.array([1, 0])
 		pt_b2 = pt_a2 + (50 * np.array([0, -1]))
-		txt_2 = pt_b2 + (10 * np.array([-1, 0])) + (40 * np.array([0, -1]))
+		txt_2 = pt_b2 + (20 * np.array([-1, 0])) + (50 * np.array([0, -1]))
 		self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
 		dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
-		pt_a3 = self.AA2 + (200) * np.array([1, 0])
+		pt_a3 = self.AA2 + (300) * np.array([1, 0])
 		pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
-		txt_3 = pt_b3 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		txt_3 = pt_b3 + (20 * np.array([0, 1])) + (75 * np.array([-1, 0]))
 		text = "B"
 		self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
 
 		pt_a4 = pt_a3 + (self.data_object.beam_width_B1 * np.array([0, 1]))
 		pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
-		txt_4 = pt_b4 + (10 * np.array([0, 1])) + (60 * np.array([-1, 0]))
+		txt_4 = pt_b4 + 20 * np.array([0, 1]) + (75 * np.array([-1, 0]))
 		self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
 
 		dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5,linecap='square'))
 
 		# ------------------------------------------  View details -------------------------------------------
-		ptx = self.P4 - 50 * np.array([1, 0]) + 300 * np.array([0, 1])
+		ptx = self.P4 - 50 * np.array([1, 0]) + 250 * np.array([0, 1])
 		dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
 		ptx1 = ptx + 40 * np.array([0, 1])
 		dwg.add(dwg.text('(All dimensions are in "mm")', insert=ptx1, fill='black', font_family="sans-serif", font_size=30))
@@ -1476,7 +1491,9 @@ class OnewayEnd2DSide(object):
 			Saves the image in the folder
 
 		"""
-		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-450 -500 1200 1400'))
+		wd = (int(self.data_object.plate_width_B1 + 800))
+		ht = (int(self.data_object.plate_length_L1 + 300 + 300))
+		dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -300 {} {}').format(wd, ht))
 		dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11, self.A12, self.A1],
 			stroke='blue', fill='#E0E0E0', stroke_width=2.5))
 		dwg.add(dwg.polyline(points=[self.P1, self.P2, self.P3, self.P4, self.P1], stroke='blue', fill='none', stroke_width='2.5'))

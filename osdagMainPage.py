@@ -54,6 +54,7 @@ class MyAskQuestion(QDialog):
 
 class OsdagMainWindow(QMainWindow):
 
+
     def __init__(self):
         QMainWindow.__init__(self)
         #show_msg = pyqtSignal()
@@ -64,7 +65,7 @@ class OsdagMainWindow(QMainWindow):
 
         self.ui.myStackedWidget.setCurrentIndex(list_of_items['Osdagpage'])
         self.ui.btn_connection.clicked.connect(lambda: self.change_desgin_page(list_of_items['connectionpage'], list_of_items['Osdagpage']))
-        self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
+       # self.ui.myListWidget.currentItemChanged.connect(self.change_desgin_page)
         self.ui.btn_start.clicked.connect(self.show_shear_connection)
         self.ui.btn_start_2.clicked.connect(self.show_moment_connection)
         self.ui.btn_start_3.clicked.connect(self.show_moment_connection_bc)
@@ -144,6 +145,7 @@ class OsdagMainWindow(QMainWindow):
         # while ' ' in folder:
         # 	"""
         # 	The workspace folder shouldn't have any spaces
+
         #
         # 	As long as the user enters spaces in the name of the workspace folder,
         # 	this while loops prompts the user not to use spaces and prompts the user again

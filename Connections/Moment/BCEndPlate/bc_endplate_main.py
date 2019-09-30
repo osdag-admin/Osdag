@@ -15,14 +15,16 @@ import bc_endplate_calc as db_value
 from ui_weld_details_1 import Ui_Weld_Details_1
 from ui_weld_details_2 import Ui_Weld_Details_2
 from reportGenerator import save_html
-from drawing_2D import ExtendedEndPlate
+# from drawing_2D import ExtendedEndPlate
 from OCC.Graphic3d import Graphic3d_NOT_2D_ALUMINUM
-from drawing2D_bothway import ExtendedEndPlate
-from drawing2D_oneway import OnewayEndPlate
-from drawing2D_flush import FlushEndPlate
-from drawing2D_WWbothway import ExtendedEndPlate_WW
-from drawing2D_WWoneway import OnewayEndPlate_WW
-from drawing2D_WWflush import FlushEndPlate_WW
+# from drawing2D_bothway import ExtendedEndPlate
+# from drawing2D_oneway import OnewayEndPlate
+# from drawing2D_flush import FlushEndPlate
+from drawing2D_FW import Flange_to_Web
+from drawing2D_WW import Web_to_Web
+# from drawing2D_WWbothway import ExtendedEndPlate_WW
+# from drawing2D_WWoneway import OnewayEndPlate_WW
+# from drawing2D_WWflush import FlushEndPlate_WW
 
 from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QFontDialog, QFileDialog
 from PyQt5.Qt import QColor, QBrush, Qt, QIntValidator, QDoubleValidator, QFile, QTextStream, pyqtSignal, QColorDialog, \
@@ -64,6 +66,10 @@ from OCC.STEPControl import STEPControl_Writer, STEPControl_AsIs
 
 from utilities import osdag_display_shape
 import copy
+
+
+
+
 
 
 class MyTutorials(QDialog):
@@ -1602,29 +1608,29 @@ class Maincontroller(QMainWindow):
 		self.beam_data = self.fetchBeamPara()
 
 		if self.alist['Member']['Connectivity'] == "Column web-Beam web":
-			# conn_type = 'col_web_connectivity'
-			if self.alist['Member']['EndPlate_type'] == "Extended both ways":
-				self.endplate_type = "both_way"
-				beam_beam = ExtendedEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
+			# # conn_type = 'col_web_connectivity'
+			# if self.alist['Member']['EndPlate_type'] == "Extended both ways":
+			# 	self.endplate_type = "both_way"
+			beam_beam = Web_to_Web(self.alist, self.result_obj, self.column_data, self.beam_data,
 												self.folder)
-			elif self.alist['Member']['EndPlate_type'] == "Extended one way":
-				self.endplate_type = "one_way"
-				beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
-											  self.folder)
-			else:
-				self.endplate_type = "flush"
-				beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			# elif self.alist['Member']['EndPlate_type'] == "Extended one way":
+			# 	self.endplate_type = "one_way"
+			# 	beam_beam = OnewayEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data,
+			# 								  self.folder)
+			# else:
+			# 	self.endplate_type = "flush"
+			# 	beam_beam = FlushEndPlate_WW(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		else:  # "Column flange-Beam web"
 			# conn_type = 'col_flange_connectivity'
-			if self.alist['Member']['EndPlate_type'] == "Extended one way":
-				self.endplate_type = "one_way"
-				beam_beam = OnewayEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
-			elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
-				self.endplate_type = "flush"
-				beam_beam = FlushEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
-			else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
-				self.endplate_type = "both_way"
-				beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			# if self.alist['Member']['EndPlate_type'] == "Extended one way":
+			# 	self.endplate_type = "one_way"
+			beam_beam = Flange_to_Web(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			# elif self.alist['Member']['EndPlate_type'] == "Flush end plate":
+			# 	self.endplate_type = "flush"
+			# 	beam_beam = FlushEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
+			# else:  # uiObj['Member']['EndPlate_type'] == "Extended both ways":
+			# 	self.endplate_type = "both_way"
+			# 	beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 
 		# beam_beam = ExtendedEndPlate(self.alist, self.result_obj, self.column_data, self.beam_data, self.folder)
 		status = self.resultObj['Bolt']['status']

@@ -35,11 +35,11 @@ class OnewayEndPlate(object):
         print "calculation", input_dict
         self.folder = folder
 
-        self.column_length_L1 = 1000
-        self.beam_length_L2 = 500
-
         self.column_depth_D1 = int(column_data["D"])
         self.beam_depth_D2 = int(beam_data["D"])
+
+        self.column_length_L1 = self.beam_depth_D2 + 500
+        self.beam_length_L2 = 500
 
         self.beam_designation = beam_data['Designation']
         self.column_designation = column_data['Designation']
@@ -49,6 +49,10 @@ class OnewayEndPlate(object):
 
         self.plate_thickness_p1 = float(output_dict['Plate']['Thickness'])
         self.plate_thickness_p2 = int(output_dict['ContPlateComp']['Thickness'])
+        self.weld_plate_thickness_p2 = int(output_dict['ContPlateComp']['Weld'])
+
+        self.plate_width_B2 = int(output_dict['ContPlateComp']['Width'])
+        self.plate_length_L2 = int(output_dict['ContPlateComp']['Length'])
 
         self.plate_width_B1 = float(output_dict['Plate']['Width'])
 
@@ -738,12 +742,9 @@ class Oneway2DFront(object):
 			Saves the image in the folder
 
 		"""
-        # width = (int(self.data_object.column_depth_D1 + self.data_object.plate_thickness_p1 + self.data_object.beam_length_L2 +500)/2)
-        # ht = (int(self.data_object.column_length_L1/2 + 500)/2)
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-            '-600 -400 2000 1800'))  # 200 = move towards left , 600= move towards down, 2300= width of view, 1740= height of view
-        # dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=(
-        #     '-width -ht width ht'))
+        wd = (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 500))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd, ht))
 
         """
 		drawing line as per co-ordinate defined to create the required view
@@ -765,9 +766,32 @@ class Oneway2DFront(object):
         dwg.add(dwg.line(self.S5, self.S6).stroke('black', width=2.5, linecap='square'))
         dwg.add(dwg.line(self.S7, self.S8).stroke('black', width=2.5, linecap='square'))
 
+        pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+                                           patternTransform="rotate(45 2 2)"))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=(self.S1 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                    float(self.data_object.weld_plate_thickness_p2)),fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.S4, size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                    float(self.data_object.weld_plate_thickness_p2)),fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=(self.S5 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                    float(self.data_object.weld_plate_thickness_p2)),fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        dwg.add(dwg.rect(insert=self.S8, size=(float(self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                    float(self.data_object.weld_plate_thickness_p2)),fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+
         if self.data_object.no_of_bolts == 12:
             dwg.add(dwg.polyline(points=[self.SU1, self.SU2, self.SU3, self.SU4, self.SU5,self.SU6, self.SU1], stroke='black', fill='none',
                                  stroke_width='2.5'))
+            pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+                                               patternTransform="rotate(45 2 2)"))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=self.SU1, size=((self.data_object.stiffener_weldsize),
+                                                    (self.data_object.stiffener_height)), fill="url(#diagonalHatch)",
+                             stroke='white', stroke_width=1.0))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=(self.AA1 - self.data_object.stiffener_weldsize * np.array([0, 1])),
+                             size=((self.data_object.stiffener_length), (self.data_object.stiffener_weldsize)),
+                             fill="url(#diagonalHatch)",
+                             stroke='white', stroke_width=1.0))
         else:
             pass
 
@@ -901,7 +925,7 @@ class Oneway2DFront(object):
         no_of_bolts_flange = self.data_object.bolts_inside_top_flange_row * self.data_object.no_of_columns
         point = np.array(pt_inside_top_column_list[0])
         theta = 60
-        offset = 50
+        offset = 25
         textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
             self.data_object.bolt_type) + " bolts (grade " + str(
@@ -913,7 +937,7 @@ class Oneway2DFront(object):
         no_of_bolts_flange = self.data_object.bolts_inside_bottom_flange_row * self.data_object.no_of_columns
         point = np.array(pt_inside_bottom_column_list[1])
         theta = 60
-        offset = 50
+        offset = 25
         textup = str(no_of_bolts_flange) + " nos " + str(self.data_object.bolt_hole_diameter) + u'\u00d8' + " holes"
         textdown = "for M" + str(self.data_object.bolt_diameter) + " " + str(
             self.data_object.bolt_type) + " bolts (grade " + str(
@@ -1000,17 +1024,31 @@ class Oneway2DFront(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
+        # ------------------------------------------ Stiffener -------------------------------------------
+        if self.data_object.no_of_bolts == 12:
+            point = self.SU2
+            theta = 60
+            offset = 50
+            textup = "Stiffener " + str(self.data_object.stiffener_length) + "x" + str(
+                self.data_object.stiffener_height) + "x" + str(self.data_object.stiffener_thickness)
+            textdown = " "
+            element = " "
+            self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+        else:
+            pass
+
         # ------------------------------------------  Sectional arrow -------------------------------------------
         pt_a1 = self.A1 + (300) * np.array([0, -1])
         pt_b1 = pt_a1 + (50 * np.array([0, 1]))
-        txt_1 = pt_b1 + (80 * np.array([-1, 0])) + (60 * np.array([0, 1]))
+        txt_1 = pt_b1 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
         text = "A"
         self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
-        pt_a2 = pt_a1 + (self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
+        pt_a2 = pt_a1 + (
+                self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
             [1, 0])
         pt_b2 = pt_a2 + (50 * np.array([0, 1]))
-        txt_2 = pt_b2 + (40 * np.array([1, 0])) + (60 * np.array([0, 1]))
+        txt_2 = pt_b2 + (20 * np.array([-1, 0])) + (75 * np.array([0, 1]))
         self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
@@ -1174,7 +1212,9 @@ class Oneway2DTop(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-400 -500 1750 1500'))
+        wd = (int(self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + 500 + 700))
+        ht = (int(self.data_object.column_width_B1 + 400 + 300 + 200))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-500 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(points=[self.A1, self.A2, self.A3, self.A4, self.A1], stroke='black', fill='none',
                              stroke_width=2.5))
         dwg.add(dwg.polyline(points=[self.A9, self.A10, self.A11, self.A12, self.A9], stroke='black', fill='none',
@@ -1197,6 +1237,15 @@ class Oneway2DTop(object):
             dwg.add(dwg.line(self.AA8, self.AS8).stroke('black', width=2.5, linecap='square'))
             dwg.add(dwg.line(self.AS8, self.AA7).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
             dwg.add(dwg.line(self.AS8, self.AS5).stroke('black', width=2.5, linecap='square'))
+            pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+                                               patternTransform="rotate(45 2 2)"))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=self.AA5 - self.data_object.stiffener_weldsize * np.array([0, 1]),
+                             size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+                             fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=self.AA8, size=(self.data_object.stiffener_length, self.data_object.stiffener_weldsize),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         else:
             dwg.add(dwg.line(self.AA5, self.AA6).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
             dwg.add(dwg.line(self.AA7, self.AA8).stroke('black', width=2.5, linecap='square').dasharray(dasharray=[5, 5]))
@@ -1209,6 +1258,37 @@ class Oneway2DTop(object):
                          fill="url(#diagonalHatch)",stroke='white', stroke_width=1.0))
         else:
             pass
+
+        pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(6, 6), patternUnits="userSpaceOnUse",
+                                           patternTransform="rotate(45 2 2)"))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=self.A2, size=(self.data_object.weld_plate_thickness_p2, (
+                    self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=(self.A5 - self.data_object.weld_plate_thickness_p2 * np.array([0, 1])), size=(
+        (self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+        self.data_object.weld_plate_thickness_p2),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=(self.A9 - self.data_object.weld_plate_thickness_p2 * np.array([1, 0])), size=(
+        self.data_object.weld_plate_thickness_p2,
+        (self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=self.A8, size=(self.data_object.weld_plate_thickness_p2, (
+                self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=self.A8,
+                         size=((self.data_object.column_depth_D1 - 2 * self.data_object.flange_thickness_T1),
+                               self.data_object.weld_plate_thickness_p2), fill="url(#diagonalHatch)", stroke='white',
+                         stroke_width=1.0))
+        pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+        dwg.add(dwg.rect(insert=(self.A7 - self.data_object.weld_plate_thickness_p2 * np.array([1, 0])), size=(
+            self.data_object.weld_plate_thickness_p2,
+            (self.data_object.column_width_B1 / 2 - self.data_object.web_thickness_tw1 / 2)),
+                         fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
 
         nofc = self.data_object.no_of_columns
         bolt_r = int(self.data_object.bolt_diameter) / 2
@@ -1246,7 +1326,7 @@ class Oneway2DTop(object):
         self.data_object.draw_faint_line(ptx2, pty2, dwg)
 
         point1 = ptx2 + (self.data_object.cross_centre_gauge_dist) * np.array([0, -1])
-        params = {"offset": (60), "textoffset": 10, "lineori": "right",
+        params = {"offset": (self.data_object.beam_length_L2 + 60), "textoffset": 10, "lineori": "right",
                   "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, ptx2, point1, str(self.data_object.cross_centre_gauge_dist),
                                                     params)
@@ -1279,6 +1359,17 @@ class Oneway2DTop(object):
         element = " "
         self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
 
+        # ------------------------------------------ Continuity Plate-------------------------------------------
+        point = self.A8 + self.data_object.column_depth_D1 / 4 * np.array([1, 0])
+        theta = 60
+        offset = 50
+        textup = "Continuity Plate" + str(self.data_object.plate_length_L2) + "x" + str(
+            self.data_object.plate_width_B2) + "x" + str(
+            self.data_object.plate_thickness_p2)
+        textdown = " "
+        element = " "
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+
         # ------------------------------------------  Weld label --------------------------------------------------
         # point = self.AA1 + 2
         # theta = 60
@@ -1287,6 +1378,15 @@ class Oneway2DTop(object):
         # textdown = " "
         # element = "weld"
         # self.data_object.draw_oriented_arrow(dwg, point, theta, "NE", offset, textup, textdown, element)
+        self.data_object.stiffener_weld = 1
+        point = self.A3 - self.data_object.column_width_B1 / 4 * np.array([0, 1])
+        theta = 1
+        offset = 1
+        textup = "          z " + str(self.data_object.weld_plate_thickness_p2)
+        textdown = "          z " + str(self.data_object.weld_plate_thickness_p2)
+        element = "weld"
+        self.data_object.draw_oriented_arrow(dwg, point, theta, "NW", offset, textup, textdown, element)
+        self.data_object.stiffener_weld = 0
 
         if self.data_object.no_of_bolts == 12:
             self.data_object.stiffener_weld = 1
@@ -1322,33 +1422,33 @@ class Oneway2DTop(object):
         # ------------------------------------------  Sectional arrow -------------------------------------------
         pt_a1 = self.A4 - (200) * np.array([0, -1]) - (100 * np.array([1, 0]))
         pt_b1 = pt_a1 + (50 * np.array([0, -1]))
-        txt_1 = pt_b1 + (40 * np.array([-1, 0])) + (40 * np.array([0, 1]))
+        txt_1 = pt_b1 + (50 * np.array([0, -1])) + (20 * np.array([-1, 0]))
         text = "C"
         self.data_object.draw_cross_section(dwg, pt_a1, pt_b1, txt_1, text)
 
-        pt_a2 = pt_a1 + (self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
+        pt_a2 = pt_a1 + (
+                    self.data_object.column_depth_D1 + self.data_object.beam_length_L2 + self.data_object.plate_thickness_p1) * np.array(
             [1, 0]) + 200 * np.array([1, 0])
         pt_b2 = pt_a2 + (50 * np.array([0, -1]))
-        txt_2 = pt_b2 + (10 * np.array([1, 0])) + (40 * np.array([0, 1]))
+        txt_2 = pt_b2 + (50 * np.array([0, -1])) + (20 * np.array([-1, 0]))
         self.data_object.draw_cross_section(dwg, pt_a2, pt_b2, txt_2, text)
 
         dwg.add(dwg.line(pt_a1, pt_a2).stroke('black', width=1.5, linecap='square'))
 
         pt_a3 = self.A2 + (self.data_object.beam_length_L2 + 750) * np.array([1, 0])
         pt_b3 = pt_a3 + (50 * np.array([-1, 0]))
-        txt_3 = pt_b3 + (-20 * np.array([0, 1])) + (40 * np.array([1, 0]))
+        txt_3 = pt_b3 + (75 * np.array([-1, 0])) + (20 * np.array([0, 1]))
         text = "B"
         self.data_object.draw_cross_section(dwg, pt_a3, pt_b3, txt_3, text)
 
         pt_a4 = pt_a3 + (self.data_object.column_width_B1 * np.array([0, 1]))
         pt_b4 = pt_a4 + (50 * np.array([-1, 0]))
-        txt_4 = pt_b4 + (50 * np.array([0, 1])) + (40 * np.array([1, 0]))
+        txt_4 = pt_b4 + (75 * np.array([-1, 0])) + (20 * np.array([0, 1]))
         self.data_object.draw_cross_section(dwg, pt_a4, pt_b4, txt_4, text)
 
         dwg.add(dwg.line(pt_a3, pt_a4).stroke('black', width=1.5, linecap='square'))
-
         # ------------------------------------------  View details -------------------------------------------
-        ptx = self.P4 - 50 * np.array([1, 0]) + 300 * np.array([0, 1])
+        ptx = self.P4 - 50 * np.array([1, 0]) + 400 * np.array([0, 1])
         dwg.add(dwg.text('Top view (Sec A-A) ', insert=ptx, fill='black', font_family="sans-serif", font_size=30))
         ptx1 = ptx + 40 * np.array([0, 1])
         dwg.add(
@@ -1582,7 +1682,9 @@ class Oneway2DSide(object):
 			Saves the image in the folder
 
 		"""
-        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -500 1500 1500'))
+        wd = (int(self.data_object.column_width_B1 + 1100))
+        ht = (int(self.data_object.column_length_L1 + 400 + 100))
+        dwg = svgwrite.Drawing(filename, size=('100%', '100%'), viewBox=('-600 -400 {} {}').format(wd, ht))
         dwg.add(dwg.polyline(
             points=[self.A1, self.A2, self.A3, self.A4, self.A5, self.A6, self.A7, self.A8, self.A9, self.A10, self.A11,
                     self.A12, self.A1],
@@ -1614,6 +1716,16 @@ class Oneway2DSide(object):
         if self.data_object.no_of_bolts == 12:
             dwg.add(dwg.line(self.P5, self.SU1).stroke('black', width=2.5, linecap='square'))
             dwg.add(dwg.line(self.P6, self.SU2).stroke('black', width=2.5, linecap='square'))
+            pattern = dwg.defs.add(dwg.pattern(id="diagonalHatch", size=(2, 6), patternUnits="userSpaceOnUse",
+                                               patternTransform="rotate(45 1 1)"))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=self.AA11,
+                             size=(self.data_object.stiffener_weldsize, (self.data_object.stiffener_height)),
+                             fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
+            pattern.add(dwg.path(d="M 0,1 l 6,0", stroke='#000000', stroke_width=2.5))
+            dwg.add(dwg.rect(insert=self.AA12 - self.data_object.stiffener_weldsize * np.array([1, 0]),
+                             size=(self.data_object.stiffener_weldsize, (self.data_object.stiffener_height)),
+                             fill="url(#diagonalHatch)", stroke='white', stroke_width=1.0))
         else:
             pass
 
@@ -1805,7 +1917,7 @@ class Oneway2DSide(object):
                       "endlinedim": 10, "arrowlen": 20}
             self.data_object.draw_dimension_outer_arrow(dwg, ptxx2, point2, str(self.data_object.Lv), params)
 
-        point3= ptxx2 + self.data_object.Lv * np.array([0, -1])
+        point3= ptxx2 + self.data_object.end_dist * np.array([0, -1])
         params = {"offset": (self.data_object.beam_width_B2 + 50), "textoffset": 10, "lineori": "left",
                   "endlinedim": 10, "arrowlen": 20}
         self.data_object.draw_dimension_outer_arrow(dwg, point3, ptxx2, str(self.data_object.end_dist), params)
@@ -1974,7 +2086,7 @@ class Oneway2DSide(object):
         # ------------------------------------------  End Plate 1 -------------------------------------------
         point = self.P2
         theta = 60
-        offset = 50
+        offset = 25
         textup = "End plate " + str(self.data_object.plate_length_L1) + "x" + str(
             self.data_object.plate_width_B1) + "x" + str(
             self.data_object.plate_thickness_p1)
@@ -2030,7 +2142,7 @@ class Oneway2DSide(object):
             self.data_object.stiffener_weld = 1
             point = self.P6
             theta = 60
-            offset = 50
+            offset = 100
             textup = "           z " + str(self.data_object.stiffener_weldsize)
             textdown = "           z " + str(self.data_object.stiffener_weldsize)
             element = "weld"

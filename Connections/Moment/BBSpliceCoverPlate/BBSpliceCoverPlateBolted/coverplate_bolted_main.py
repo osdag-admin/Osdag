@@ -44,7 +44,7 @@ from Connections.Component.nut import Nut
 from Connections.Component.bolt import Bolt
 from Connections.Component.filletweld import FilletWeld
 from Connections.Component.plate import Plate
-from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.cadFile import BBCoverPlateBoltedCAD
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement_AF import NutBoltArray_AF
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement_BF import NutBoltArray_BF
 from Connections.Moment.BBSpliceCoverPlate.BBSpliceCoverPlateBolted.nutBoltPlacement_Web import NutBoltArray_Web
@@ -1442,12 +1442,13 @@ class MainController(QMainWindow):
 		nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
 
 		numOfBoltsF = 2 * int(outputobj["FlangeBolt"]["BoltsRequiredF"])  # Number of flange bolts for both beams
-		nutSpaceF = float(
-			alist["FlangePlate"]["Thickness (mm)"]) + beam_T  # Space between bolt head and nut for flange bolts
+		if self.ui.combo_flange_preference.currentText() != 'Outside':		# Space between bolt head and nut for flange bolts
+			nutSpaceF = float(alist["FlangePlate"]["Thickness (mm)"]) + float(outputobj["FlangeBolt"]["InnerFlangePlateThickness"]) + beam_T
+		else:
+			nutSpaceF = float(alist["FlangePlate"]["Thickness (mm)"]) + beam_T
 
 		numOfBoltsW = 2 * int(outputobj["WebBolt"]["BoltsRequired"])  # Number of web bolts for both beams
-		nutSpaceW = 2 * float(
-			alist["WebPlate"]["Thickness (mm)"]) + beam_tw  # Space between bolt head and nut for web bolts
+		nutSpaceW = 2 * float(alist["WebPlate"]["Thickness (mm)"]) + beam_tw  # Space between bolt head and nut for web bolts
 
 		# Bolt placement for Above Flange bolts, call to nutBoltPlacement_AF.py
 		bolting_AF = NutBoltArray_AF(alist, beam_data, outputobj, nut, bolt, numOfBoltsF, nutSpaceF)
@@ -1458,7 +1459,7 @@ class MainController(QMainWindow):
 		# Bolt placement for Web Plate bolts, call to nutBoltPlacement_Web.py
 		bolting_Web = NutBoltArray_Web(alist, beam_data, outputobj, nut, bolt, numOfBoltsW, nutSpaceW)
 
-		# bbCoverPlateBolted is an object which is passed BBCoverPlateBoltedCAD.py file, which initialized the parameters of each CAD component
+		# bbCoverPlateBolted is an object which is passed cadFile.py file, which initialized the parameters of each CAD component
 		bbCoverPlateBolted = BBCoverPlateBoltedCAD(beam_Left, beam_Right, plateAbvFlange, plateBelwFlange, innerplateAbvFlangeFront,
 												   innerplateAbvFlangeBack, innerplateBelwFlangeFront, innerplateBelwFlangeBack,
 												   WebPlateLeft, WebPlateRight, bolting_AF, bolting_BF, bolting_Web, alist)
@@ -1618,71 +1619,30 @@ class MainController(QMainWindow):
 
 		if component == "Beam":
 			# Displays both beams
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamsModel(), update=True)
 
 		elif component == "Connector":
-			# Displays the Flange Plates
-			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
+
+			osdag_display_shape(self.display, self.CPBoltedObj.get_flangewebplatesModel(), update=True, color='Blue')
+
 			if self.ui.combo_flange_preference.currentText() != 'Outside':
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
-			# Displays the Web Plates
-			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
-			# Displays the bolts which are above the Flange Plate, debugging will give more clarity
-			nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-			for nutboltAF in nutboltlistAF:
-				osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
-
-			# Displays the bolts which are below the Flange Plate, debugging will give more clarity
-			nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
-			for nutboltBF in nutboltlistBF:
-				osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
-
-			# Displays the bolts which are on the right side of web plate, debugging will give more clarity
-			nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-			for nutboltW in nutboltlistW:
-				osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
 
 		elif component == "Model":
-			# Displays both beams
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamLModel(), update=True)
-			osdag_display_shape(self.display, self.CPBoltedObj.get_beamRModel(), update=True)
 
-			# Displays the Flange Plates
-			osdag_display_shape(self.display, self.CPBoltedObj.get_plateAbvFlangeModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_plateBelwFlangeModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_beamsModel(), update=True)
+
+			osdag_display_shape(self.display, self.CPBoltedObj.get_flangewebplatesModel(), update=True, color='Blue')
+
 			if self.ui.combo_flange_preference.currentText() != 'Outside':
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeFront(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateAbvFlangeBack(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeFront(), update=True,color='Blue')
-				osdag_display_shape(self.display, self.CPBoltedObj.get_innerplateBelwFlangeBack(), update=True,color='Blue')
+				osdag_display_shape(self.display, self.CPBoltedObj.get_innetplatesModels(), update=True,color='Blue')
 
-			# Displays the Web Plates
-			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateLeftModel(), update=True, color='Blue')
-			osdag_display_shape(self.display, self.CPBoltedObj.get_WebPlateRightModel(), update=True, color='Blue')
+			osdag_display_shape(self.display, self.CPBoltedObj.get_nut_bolt_arrayModels(), update=True, color=Quantity_NOC_SADDLEBROWN)
 
-			# Displays the bolts which are above the Flange Plate, debugging will give more clarity
-			nutboltlistAF = self.CPBoltedObj.nut_bolt_array_AF.get_modelsAF()
-			for nutboltAF in nutboltlistAF:
-				osdag_display_shape(self.display, nutboltAF, color=Quantity_NOC_SADDLEBROWN, update=True)
-
-			# Displays the bolts which are below the Flange Plate, debugging will give more clarity
-			nutboltlistBF = self.CPBoltedObj.nut_bolt_array_BF.get_modelsBF()
-			for nutboltBF in nutboltlistBF:
-				osdag_display_shape(self.display, nutboltBF, update=True, color=Quantity_NOC_SADDLEBROWN)
-
-			# Displays the bolts which are on the right side of web plate, debugging will give more clarity
-			nutboltlistW = self.CPBoltedObj.nut_bolt_array_Web.get_modelsW()
-			for nutboltW in nutboltlistW:
-				osdag_display_shape(self.display, nutboltW, update=True, color=Quantity_NOC_SADDLEBROWN)
 
 			# ============================================================================================
 	def open_about_osdag(self):

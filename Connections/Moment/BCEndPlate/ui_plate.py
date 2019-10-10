@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'ui_plate.ui'
+#
+# Created by: PyQt5 UI code generator 5.9.2
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_Plate(object):
+    def setupUi(self, Plate):
+        Plate.setObjectName("Plate")
+        Plate.resize(287, 227)
+        self.gridLayout = QtWidgets.QGridLayout(Plate)
+        self.gridLayout.setObjectName("gridLayout")
+        self.plateHeight = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.plateHeight.setFont(font)
+        self.plateHeight.setObjectName("plateHeight")
+        self.gridLayout.addWidget(self.plateHeight, 1, 0, 1, 1)
+        self.txt_plateThickness = QtWidgets.QLineEdit(Plate)
+        self.txt_plateThickness.setObjectName("txt_plateThickness")
+        self.gridLayout.addWidget(self.txt_plateThickness, 4, 1, 1, 1)
+        self.label = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+        self.txt_plateWidth = QtWidgets.QLineEdit(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.txt_plateWidth.setFont(font)
+        self.txt_plateWidth.setReadOnly(True)
+        self.txt_plateWidth.setObjectName("txt_plateWidth")
+        self.gridLayout.addWidget(self.txt_plateWidth, 2, 1, 1, 1)
+        self.txt_plateLength = QtWidgets.QLineEdit(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.txt_plateLength.setFont(font)
+        self.txt_plateLength.setReadOnly(True)
+        self.txt_plateLength.setObjectName("txt_plateLength")
+        self.gridLayout.addWidget(self.txt_plateLength, 1, 1, 1, 1)
+        self.label_2 = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setWeight(50)
+        self.label_2.setFont(font)
+        self.label_2.setObjectName("label_2")
+        self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
+        self.label_4 = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_4.setFont(font)
+        self.label_4.setObjectName("label_4")
+        self.gridLayout.addWidget(self.label_4, 4, 0, 1, 1)
+        self.txt_plateno = QtWidgets.QLineEdit(Plate)
+        self.txt_plateno.setObjectName("txt_plateno")
+        self.gridLayout.addWidget(self.txt_plateno, 0, 1, 1, 1)
+        self.label_5 = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_5.setFont(font)
+        self.label_5.setObjectName("label_5")
+        self.gridLayout.addWidget(self.label_5, 6, 0, 1, 1)
+        self.txt_WeldSize = QtWidgets.QLineEdit(Plate)
+        self.txt_WeldSize.setObjectName("txt_WeldSize")
+        self.gridLayout.addWidget(self.txt_WeldSize, 6, 1, 1, 1)
+        self.txt_NotchSize = QtWidgets.QLineEdit(Plate)
+        self.txt_NotchSize.setObjectName("txt_NotchSize")
+        self.gridLayout.addWidget(self.txt_NotchSize, 5, 1, 1, 1)
+        self.label_6 = QtWidgets.QLabel(Plate)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_6.setFont(font)
+        self.label_6.setObjectName("label_6")
+        self.gridLayout.addWidget(self.label_6, 5, 0, 1, 1)
+
+        self.retranslateUi(Plate)
+        QtCore.QMetaObject.connectSlotsByName(Plate)
+
+    def retranslateUi(self, Plate):
+        _translate = QtCore.QCoreApplication.translate
+        Plate.setWindowTitle(_translate("Plate", "Top Continuity Plate"))
+        self.plateHeight.setText(_translate("Plate", "Length (mm)"))
+        self.label.setText(_translate("Plate", "Number"))
+        self.label_2.setText(_translate("Plate", "Width (mm)"))
+        self.label_4.setText(_translate("Plate", "Thickness (mm)"))
+        self.label_5.setText(_translate("Plate", "Weld Size (mm)"))
+        self.label_6.setText(_translate("Plate", "Notch Size (mm)"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Plate = QtWidgets.QDialog()
+    ui = Ui_Plate()
+    ui.setupUi(Plate)
+    Plate.show()
+    sys.exit(app.exec_())
+

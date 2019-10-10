@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>317</width>
-    <height>231</height>
+    <width>620</width>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -222,6 +222,16 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Moment capacity (kNm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>20</y>
+     <width>291</width>
+     <height>191</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>txt_stiffnrHeight</zorder>
   <zorder>plateHeight</zorder>
   <zorder>label_2</zorder>
@@ -232,6 +242,7 @@
   <zorder>txt_stiffnrThickness_3</zorder>
   <zorder>label_165</zorder>
   <zorder>label_164</zorder>
+  <zorder>widget</zorder>
  </widget>
  <resources/>
  <connections/>

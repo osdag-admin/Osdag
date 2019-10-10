@@ -2,27 +2,27 @@
 
 # Form implementation generated from reading ui file 'ui_design_preferences.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_DesignPreferences(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(808, 519)
-        self.gridLayout_5 = QtWidgets.QGridLayout(Dialog)
+    def setupUi(self, DesignPreferences):
+        DesignPreferences.setObjectName("DesignPreferences")
+        DesignPreferences.resize(808, 522)
+        self.gridLayout_5 = QtWidgets.QGridLayout(DesignPreferences)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.btn_save = QtWidgets.QPushButton(Dialog)
+        self.btn_save = QtWidgets.QPushButton(DesignPreferences)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_save.setFont(font)
         self.btn_save.setObjectName("btn_save")
         self.gridLayout_2.addWidget(self.btn_save, 0, 2, 1, 1)
-        self.btn_close = QtWidgets.QPushButton(Dialog)
+        self.btn_close = QtWidgets.QPushButton(DesignPreferences)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_close.setFont(font)
@@ -32,24 +32,18 @@ class Ui_DesignPreferences(object):
         self.gridLayout_2.addItem(spacerItem, 0, 4, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(28, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem1, 0, 0, 1, 1)
-        self.btn_defaults = QtWidgets.QPushButton(Dialog)
+        self.btn_defaults = QtWidgets.QPushButton(DesignPreferences)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.btn_defaults.setFont(font)
         self.btn_defaults.setObjectName("btn_defaults")
         self.gridLayout_2.addWidget(self.btn_defaults, 0, 1, 1, 1)
         self.gridLayout_5.addLayout(self.gridLayout_2, 1, 0, 1, 1)
-        self.tabWidget = QtWidgets.QTabWidget(Dialog)
+        self.tabWidget = QtWidgets.QTabWidget(DesignPreferences)
         font = QtGui.QFont()
         font.setFamily("Arial")
         self.tabWidget.setFont(font)
         self.tabWidget.setObjectName("tabWidget")
-        self.tab_Column = QtWidgets.QWidget()
-        self.tab_Column.setObjectName("tab_Column")
-        self.tabWidget.addTab(self.tab_Column, "")
-        self.tab_Beam = QtWidgets.QWidget()
-        self.tab_Beam.setObjectName("tab_Beam")
-        self.tabWidget.addTab(self.tab_Beam, "")
         self.tab_Bolt = QtWidgets.QWidget()
         self.tab_Bolt.setObjectName("tab_Bolt")
         self.gridLayout_22 = QtWidgets.QGridLayout(self.tab_Bolt)
@@ -344,44 +338,42 @@ class Ui_DesignPreferences(object):
         self.tabWidget.addTab(self.tab_Design, "")
         self.gridLayout_5.addWidget(self.tabWidget, 0, 0, 1, 1)
 
-        self.retranslateUi(Dialog)
+        self.retranslateUi(DesignPreferences)
         self.tabWidget.setCurrentIndex(0)
         self.combo_slipfactor.setCurrentIndex(8)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(DesignPreferences)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, DesignPreferences):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Design preferences"))
-        self.btn_save.setText(_translate("Dialog", "Save"))
-        self.btn_close.setText(_translate("Dialog", "Save"))
-        self.btn_defaults.setText(_translate("Dialog", "Defaults"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Column), _translate("Dialog", "Column"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Beam), _translate("Dialog", "Beam"))
-        self.label.setText(_translate("Dialog", "Bolt type"))
-        self.combo_boltHoleType.setItemText(0, _translate("Dialog", "Standard"))
-        self.combo_boltHoleType.setItemText(1, _translate("Dialog", "Over-sized"))
-        self.label_8.setText(_translate("Dialog", "Fu"))
-        self.txt_boltFu.setText(_translate("Dialog", "800"))
-        self.combo_boltType.setItemText(0, _translate("Dialog", "Pretensioned"))
-        self.combo_boltType.setItemText(1, _translate("Dialog", "Non-pretensioned"))
-        self.label_4.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
-        self.label_2.setText(_translate("Dialog", "Bolt hole type"))
-        self.label_7.setText(_translate("Dialog", "HSFG bolt design parameters:"))
-        self.label_15.setText(_translate("Dialog", "Slip factor (µ_f)"))
-        self.combo_slipfactor.setItemText(0, _translate("Dialog", "0.2"))
-        self.combo_slipfactor.setItemText(1, _translate("Dialog", "0.5"))
-        self.combo_slipfactor.setItemText(2, _translate("Dialog", "0.1"))
-        self.combo_slipfactor.setItemText(3, _translate("Dialog", "0.25"))
-        self.combo_slipfactor.setItemText(4, _translate("Dialog", "0.3"))
-        self.combo_slipfactor.setItemText(5, _translate("Dialog", "0.33"))
-        self.combo_slipfactor.setItemText(6, _translate("Dialog", "0.48"))
-        self.combo_slipfactor.setItemText(7, _translate("Dialog", "0.52"))
-        self.combo_slipfactor.setItemText(8, _translate("Dialog", "0.55"))
-        self.label_5.setText(_translate("Dialog", "Inputs"))
-        self.label_note.setText(_translate("Dialog", "NOTE : If slip is permitted under the design load, design the bolt as a bearing\n"
+        DesignPreferences.setWindowTitle(_translate("DesignPreferences", "Design preferences"))
+        self.btn_save.setText(_translate("DesignPreferences", "Save"))
+        self.btn_close.setText(_translate("DesignPreferences", "Save"))
+        self.btn_defaults.setText(_translate("DesignPreferences", "Defaults"))
+        self.label.setText(_translate("DesignPreferences", "Bolt type"))
+        self.combo_boltHoleType.setItemText(0, _translate("DesignPreferences", "Standard"))
+        self.combo_boltHoleType.setItemText(1, _translate("DesignPreferences", "Over-sized"))
+        self.label_8.setText(_translate("DesignPreferences", "Fu"))
+        self.txt_boltFu.setText(_translate("DesignPreferences", "800"))
+        self.combo_boltType.setItemText(0, _translate("DesignPreferences", "Pretensioned"))
+        self.combo_boltType.setItemText(1, _translate("DesignPreferences", "Non-pretensioned"))
+        self.label_4.setText(_translate("DesignPreferences", "Material grade overwrite (MPa)"))
+        self.label_2.setText(_translate("DesignPreferences", "Bolt hole type"))
+        self.label_7.setText(_translate("DesignPreferences", "HSFG bolt design parameters:"))
+        self.label_15.setText(_translate("DesignPreferences", "Slip factor (µ_f)"))
+        self.combo_slipfactor.setItemText(0, _translate("DesignPreferences", "0.2"))
+        self.combo_slipfactor.setItemText(1, _translate("DesignPreferences", "0.5"))
+        self.combo_slipfactor.setItemText(2, _translate("DesignPreferences", "0.1"))
+        self.combo_slipfactor.setItemText(3, _translate("DesignPreferences", "0.25"))
+        self.combo_slipfactor.setItemText(4, _translate("DesignPreferences", "0.3"))
+        self.combo_slipfactor.setItemText(5, _translate("DesignPreferences", "0.33"))
+        self.combo_slipfactor.setItemText(6, _translate("DesignPreferences", "0.48"))
+        self.combo_slipfactor.setItemText(7, _translate("DesignPreferences", "0.52"))
+        self.combo_slipfactor.setItemText(8, _translate("DesignPreferences", "0.55"))
+        self.label_5.setText(_translate("DesignPreferences", "Inputs"))
+        self.label_note.setText(_translate("DesignPreferences", "NOTE : If slip is permitted under the design load, design the bolt as a bearing\n"
 "bolt and select corresponding bolt grade."))
-        self.label_3.setText(_translate("Dialog", "Description"))
-        self.textBrowser.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.label_3.setText(_translate("DesignPreferences", "Description"))
+        self.textBrowser.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -482,33 +474,33 @@ class Ui_DesignPreferences(object):
 "<td>\n"
 "<p align=\"justify\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  0.1</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></td></tr></table></body></html>"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("Dialog", "Bolt"))
-        self.label_16.setText(_translate("Dialog", "Inputs"))
-        self.label_17.setText(_translate("Dialog", "Description"))
-        self.textBrowser_weldDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Bolt), _translate("DesignPreferences", "Bolt"))
+        self.label_16.setText(_translate("DesignPreferences", "Inputs"))
+        self.label_17.setText(_translate("DesignPreferences", "Description"))
+        self.textBrowser_weldDescription.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Shop weld takes a material safety factor of 1.25</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Field weld takes a material safety factor of 1.5</span></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">(IS 800 - cl. 5. 4. 1 or Table 5)</span></p></body></html>"))
-        self.label_6.setText(_translate("Dialog", "Material grade overwrite (MPa)"))
-        self.combo_weldType.setItemText(0, _translate("Dialog", "Shop weld"))
-        self.combo_weldType.setItemText(1, _translate("Dialog", "Field weld"))
-        self.label_22.setText(_translate("Dialog", "Type of weld"))
-        self.txt_weldFu.setText(_translate("Dialog", "410"))
-        self.label_10.setText(_translate("Dialog", "Fu"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("Dialog", "Weld"))
-        self.label_38.setText(_translate("Dialog", "Inputs"))
-        self.label_39.setText(_translate("Dialog", "Type of edges"))
-        self.combo_detailingEdgeType.setItemText(0, _translate("Dialog", "a - Sheared or hand flame cut"))
-        self.combo_detailingEdgeType.setItemText(1, _translate("Dialog", "b - Rolled, machine-flame cut, sawn and planed"))
-        self.label_40.setText(_translate("Dialog", "Are the members exposed to\n"
+        self.label_6.setText(_translate("DesignPreferences", "Material grade overwrite (MPa)"))
+        self.combo_weldType.setItemText(0, _translate("DesignPreferences", "Shop weld"))
+        self.combo_weldType.setItemText(1, _translate("DesignPreferences", "Field weld"))
+        self.label_22.setText(_translate("DesignPreferences", "Type of weld"))
+        self.txt_weldFu.setText(_translate("DesignPreferences", "410"))
+        self.label_10.setText(_translate("DesignPreferences", "Fu"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Weld), _translate("DesignPreferences", "Weld"))
+        self.label_38.setText(_translate("DesignPreferences", "Inputs"))
+        self.label_39.setText(_translate("DesignPreferences", "Type of edges"))
+        self.combo_detailingEdgeType.setItemText(0, _translate("DesignPreferences", "a - Sheared or hand flame cut"))
+        self.combo_detailingEdgeType.setItemText(1, _translate("DesignPreferences", "b - Rolled, machine-flame cut, sawn and planed"))
+        self.label_40.setText(_translate("DesignPreferences", "Are the members exposed to\n"
 "corrosive influences?"))
-        self.combo_detailing_memebers.setItemText(0, _translate("Dialog", "No"))
-        self.combo_detailing_memebers.setItemText(1, _translate("Dialog", "Yes"))
-        self.label_18.setText(_translate("Dialog", "Description"))
-        self.textBrowser_detailingDescription.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.combo_detailing_memebers.setItemText(0, _translate("DesignPreferences", "No"))
+        self.combo_detailing_memebers.setItemText(1, _translate("DesignPreferences", "Yes"))
+        self.label_18.setText(_translate("DesignPreferences", "Description"))
+        self.textBrowser_detailingDescription.setHtml(_translate("DesignPreferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -518,20 +510,20 @@ class Ui_DesignPreferences(object):
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'Calibri\'; font-size:8pt;\"><br /></p>\n"
 "<p align=\"justify\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">Specifying whether the members are exposed to corrosive influences, here, only affects the calculation of the maximum edge distance as per cl. 10.2.4.3</span></p>\n"
 "<p align=\"justify\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("Dialog", "Detailing"))
-        self.label_19.setText(_translate("Dialog", "Design Method"))
-        self.combo_design_method.setItemText(0, _translate("Dialog", "Limit State Design"))
-        self.combo_design_method.setItemText(1, _translate("Dialog", "Limit State (Capacity based) Design"))
-        self.combo_design_method.setItemText(2, _translate("Dialog", "Working Stress Design"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Design), _translate("Dialog", "Design"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Detailing), _translate("DesignPreferences", "Detailing"))
+        self.label_19.setText(_translate("DesignPreferences", "Design Method"))
+        self.combo_design_method.setItemText(0, _translate("DesignPreferences", "Limit State Design"))
+        self.combo_design_method.setItemText(1, _translate("DesignPreferences", "Limit State (Capacity based) Design"))
+        self.combo_design_method.setItemText(2, _translate("DesignPreferences", "Working Stress Design"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Design), _translate("DesignPreferences", "Design"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
+    DesignPreferences = QtWidgets.QDialog()
     ui = Ui_DesignPreferences()
-    ui.setupUi(Dialog)
-    Dialog.show()
+    ui.setupUi(DesignPreferences)
+    DesignPreferences.show()
     sys.exit(app.exec_())
 

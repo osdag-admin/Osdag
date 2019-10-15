@@ -48,7 +48,7 @@ class Ui_Weld_Details(object):
 
     def retranslateUi(self, Weld_Details):
         _translate = QtCore.QCoreApplication.translate
-        Weld_Details.setWindowTitle(_translate("Weld_Details", "Typical Butt Weld Details"))
+        Weld_Details.setWindowTitle(_translate("Weld_Details", "Typical Groove Weld Details"))
         self.label_note_1.setText(_translate("Weld_Details", "Note1"))
         self.label_note_2.setText(_translate("Weld_Details", "Note2"))
         self.label_note_3.setText(_translate("Weld_Details", "Note3"))

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1422</width>
-    <height>769</height>
+    <width>1361</width>
+    <height>895</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,107 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QFrame" name="frame_2">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="lineWidth">
+        <number>1</number>
+       </property>
+       <property name="midLineWidth">
+        <number>1</number>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>1</number>
+        </property>
+        <property name="topMargin">
+         <number>1</number>
+        </property>
+        <property name="rightMargin">
+         <number>1</number>
+        </property>
+        <property name="bottomMargin">
+         <number>1</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="mytabWidget">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>450</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+            <weight>75</weight>
+            <italic>true</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::NoFocus</enum>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QTabBar::tab { height: 75px; width: 1px;  }</string>
+          </property>
+          <property name="tabPosition">
+           <enum>QTabWidget::West</enum>
+          </property>
+          <property name="currentIndex">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QTextEdit" name="textEdit">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>125</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="overwriteMode">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="0" column="0">
      <widget class="QFrame" name="frame">
       <property name="minimumSize">
        <size>
@@ -279,105 +378,6 @@
       </widget>
      </widget>
     </item>
-    <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <widget class="QFrame" name="frame_2">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::Box</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="lineWidth">
-        <number>1</number>
-       </property>
-       <property name="midLineWidth">
-        <number>1</number>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
-         <number>1</number>
-        </property>
-        <item>
-         <widget class="QTabWidget" name="mytabWidget">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>450</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>8</pointsize>
-            <weight>75</weight>
-            <italic>true</italic>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QTabBar::tab { height: 75px; width: 1px;  }</string>
-          </property>
-          <property name="tabPosition">
-           <enum>QTabWidget::West</enum>
-          </property>
-          <property name="currentIndex">
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QTextEdit" name="textEdit">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>125</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOn</enum>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-       <property name="overwriteMode">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -385,8 +385,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1422</width>
-     <height>22</height>
+     <width>1361</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -615,14 +615,14 @@ QMenu::item:selected {
    </property>
    <property name="minimumSize">
     <size>
-     <width>310</width>
-     <height>710</height>
+     <width>320</width>
+     <height>790</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
-     <height>710</height>
+     <width>320</width>
+     <height>790</height>
     </size>
    </property>
    <property name="baseSize">
@@ -3119,64 +3119,6 @@ QMenu::item:selected {
       <string>0</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="btn_Reset">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>660</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Alt+R</string>
-     </property>
-     <property name="text">
-      <string>Reset</string>
-     </property>
-     <property name="shortcut">
-      <string>Alt+R</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btn_Design">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>660</y>
-       <width>100</width>
-       <height>30</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Alt+D</string>
-     </property>
-     <property name="text">
-      <string>Design</string>
-     </property>
-     <property name="shortcut">
-      <string>Alt+D</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QComboBox" name="combo_flangeSize">
      <property name="geometry">
       <rect>
@@ -3507,6 +3449,64 @@ QMenu::item:selected {
       </property>
      </item>
     </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>650</y>
+       <width>281</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="btn_Reset">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Alt+R</string>
+        </property>
+        <property name="text">
+         <string>Reset</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+R</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_Design">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Alt+D</string>
+        </property>
+        <property name="text">
+         <string>Design</string>
+        </property>
+        <property name="shortcut">
+         <string>Alt+D</string>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
   <widget class="QDockWidget" name="outputDock">
@@ -3518,13 +3518,13 @@ QMenu::item:selected {
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3847,84 +3847,6 @@ QMenu::item:selected {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;Plate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="txt_criticalWeb">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>550</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_163">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>520</y>
-       <width>201</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Critical stress (at flange)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_164">
-     <property name="geometry">
-      <rect>
-       <x>2</x>
-       <y>550</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Critical stress (web)</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="txt_criticalFlange">
-     <property name="geometry">
-      <rect>
-       <x>202</x>
-       <y>520</y>
-       <width>100</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_166">
      <property name="geometry">
       <rect>
@@ -3946,10 +3868,10 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_SaveMessages">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>614</y>
+       <x>60</x>
+       <y>520</y>
        <width>200</width>
-       <height>30</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="toolTip">
@@ -3965,8 +3887,8 @@ QMenu::item:selected {
     <widget class="QPushButton" name="btn_CreateDesign">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>650</y>
+       <x>60</x>
+       <y>550</y>
        <width>200</width>
        <height>30</height>
       </rect>
@@ -4346,10 +4268,6 @@ QMenu::item:selected {
     <zorder>label_157</zorder>
     <zorder>label_158</zorder>
     <zorder>label_161</zorder>
-    <zorder>txt_criticalWeb</zorder>
-    <zorder>label_163</zorder>
-    <zorder>label_164</zorder>
-    <zorder>txt_criticalFlange</zorder>
     <zorder>label_166</zorder>
     <zorder>btn_SaveMessages</zorder>
     <zorder>btn_CreateDesign</zorder>
@@ -4874,8 +4792,6 @@ QMenu::item:selected {
   <tabstop>txt_gauge</tabstop>
   <tabstop>txt_crossGauge</tabstop>
   <tabstop>txt_endDist</tabstop>
-  <tabstop>txt_criticalFlange</tabstop>
-  <tabstop>txt_criticalWeb</tabstop>
   <tabstop>btn_SaveMessages</tabstop>
   <tabstop>btn_CreateDesign</tabstop>
   <tabstop>btnReset_3</tabstop>

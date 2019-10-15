@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1329</width>
-    <height>736</height>
+    <height>810</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
      <widget class="QFrame" name="frame">
       <property name="minimumSize">
        <size>
@@ -357,12 +357,18 @@
       </widget>
      </widget>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QFrame" name="frame_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -396,6 +402,12 @@
         </property>
         <item>
          <widget class="QTabWidget" name="mytabWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -424,6 +436,12 @@
        </layout>
       </widget>
       <widget class="QTextEdit" name="textEdit">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -456,7 +474,7 @@
      <x>0</x>
      <y>0</y>
      <width>1329</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -672,14 +690,14 @@ QMenu::item:selected {
   </widget>
   <widget class="QDockWidget" name="inputDock">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>1</horstretch>
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+     <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>310</width>
      <height>710</height>
     </size>
    </property>
@@ -3161,14 +3179,14 @@ QMenu::item:selected {
   </widget>
   <widget class="QDockWidget" name="outputDock">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>125</width>
+     <width>310</width>
      <height>710</height>
     </size>
    </property>
@@ -3193,6 +3211,12 @@ QMenu::item:selected {
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <widget class="QLineEdit" name="txtNoBolts">
      <property name="geometry">
       <rect>

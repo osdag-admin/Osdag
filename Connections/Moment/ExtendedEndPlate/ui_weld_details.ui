@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Typical Butt Weld Details</string>
+   <string>Typical Groove Weld Details</string>
   </property>
   <widget class="QScrollArea" name="scrollArea">
    <property name="geometry">

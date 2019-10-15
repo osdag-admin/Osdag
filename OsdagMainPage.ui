@@ -17,7 +17,7 @@
    <string>Osdag</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../ResourceFiles/osdagMainPageIcons.qrc">
+   <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
     <normaloff>:/newPrefix/images/Osdag.png</normaloff>:/newPrefix/images/Osdag.png</iconset>
   </property>
   <property name="styleSheet">
@@ -1035,7 +1035,7 @@ color:#ffffff;
        <enum>QFrame::Plain</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Osdagpage">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -1063,7 +1063,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Osdag_header.png</pixmap>
+           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Osdag_header.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1155,7 +1155,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Fossee_logo.png</pixmap>
+           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/Fossee_logo.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1180,7 +1180,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../../../ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/logoiitb.png</pixmap>
+           <pixmap resource="ResourceFiles/osdagMainPageIcons.qrc">:/newPrefix/images/logoiitb.png</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -1253,7 +1253,7 @@ border-bottom-right-radius: 0px ;
            <enum>QTabWidget::Triangular</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <property name="documentMode">
            <bool>true</bool>
@@ -1374,7 +1374,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>../../../ResourceFiles/images/finplate.png</normaloff>../../../ResourceFiles/images/finplate.png</iconset>
+                  <normaloff>ResourceFiles/images/finplate.png</normaloff>ResourceFiles/images/finplate.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1473,7 +1473,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>../../../ResourceFiles/images/cleatAngle.png</normaloff>../../../ResourceFiles/images/cleatAngle.png</iconset>
+                  <normaloff>ResourceFiles/images/cleatAngle.png</normaloff>ResourceFiles/images/cleatAngle.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1574,7 +1574,7 @@ border-bottom-right-radius: 0px ;
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>../../../ResourceFiles/images/endplate.png</normaloff>../../../ResourceFiles/images/endplate.png</iconset>
+                  <normaloff>ResourceFiles/images/endplate.png</normaloff>ResourceFiles/images/endplate.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -1643,7 +1643,7 @@ border-bottom-right-radius: 0px ;
                  <string/>
                 </property>
                 <property name="icon">
-                 <iconset resource="../../../ResourceFiles/osdagMainPageIcons.qrc">
+                 <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
                   <normaloff>:/newPrefix/images/seatedAngle1.png</normaloff>:/newPrefix/images/seatedAngle1.png</iconset>
                 </property>
                 <property name="iconSize">
@@ -1913,7 +1913,7 @@ border-bottom-right-radius: 0px ;
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="../../../ResourceFiles/osdagMainPageIcons.qrc">
+                     <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
                       <normaloff>:/newPrefix/images/coverplate.png</normaloff>:/newPrefix/images/coverplate.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -1976,7 +1976,7 @@ border-bottom-right-radius: 0px ;
                      <string/>
                     </property>
                     <property name="icon">
-                     <iconset resource="../../../ResourceFiles/osdagMainPageIcons.qrc">
+                     <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
                       <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
                     </property>
                     <property name="iconSize">
@@ -2647,7 +2647,7 @@ color:#ffffff;
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="../../../ResourceFiles/osdagMainPageIcons.qrc">
+           <iconset resource="ResourceFiles/osdagMainPageIcons.qrc">
             <normaloff>:/newPrefix/images/extended.png</normaloff>:/newPrefix/images/extended.png</iconset>
           </property>
           <property name="iconSize">
@@ -2714,16 +2714,16 @@ color:#ffffff;
      <x>0</x>
      <y>0</y>
      <width>1050</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="../../../ResourceFiles/osdagMainPageIcons.qrc"/>
-  <include location="../../../ResourceFiles/osdagMainPageIcons.qrc"/>
   <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
+  <include location="ResourceFiles/osdagMainPageIcons.qrc"/>
+  <include location="../../../ResourceFiles/osdagMainPageIcons.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1139,7 +1139,7 @@ class Ui_MainWindow(object):
         self.comboBox_help.setCurrentIndex(0)
         self.myStackedWidget.setCurrentIndex(1)
         self.mytabWidget.setCurrentIndex(0)
-        self.mytabWidget_2.setCurrentIndex(1)
+        self.mytabWidget_2.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

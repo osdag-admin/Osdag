@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 **/*.log
 *.pyo
 *.xml
@@ -10,3 +11,11 @@
 *.log
 output/*
 Osdag_Workspace/*
+=======
+**/.DS_Store
+*.pyc
+*~
+*.swp
+*.xml
+*.iml
+>>>>>>> restructuring

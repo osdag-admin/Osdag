@@ -1,7 +1,9 @@
-from app.design_type.design_type import DesignType
+from app.utils.common.component import Bolt, Weld, Plate, Angle, Beam, Column
+from app.utils.common.load import Load
+from app.utils.common.material import Material
+from app.main import Main
 
-
-class Connection (DesignType):
+class Connection(Main):
     pass
 
 

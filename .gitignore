@@ -1,21 +1,19 @@
-<<<<<<< HEAD
 **/*.log
+**/*.bak
+**/__pycache__/
 *.pyo
+*.pyc
+**/*.pyc
 *.xml
 **/*.txt
-*.pyc
-.idea/
+**/.idea/
 *~
 *.html
-*.xml
 *.log
+*.bak
+.project
+.pydevproject
 output/*
 Osdag_Workspace/*
-=======
-**/.DS_Store
-*.pyc
-*~
-*.swp
-*.xml
-*.iml
->>>>>>> restructuring
+/Osdag.config
+

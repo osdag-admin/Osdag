@@ -14,14 +14,44 @@ from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.fin_plate_connection import FinPlateConnection
+from gui.ui_template import Ui_ModuleWindow
+
+from design_type.connection import main_controller
 import os
 import os.path
 import subprocess
 import shutil
 import configparser
+from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
+from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from gui.ui_design_preferences import Ui_Dialog
+import os
+import json
+import logging
+from drawing_2D.Svg_Window import SvgWindow
+import sys
 
+from OCC.Core import BRepTools
+from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+from OCC.Core import IGESControl
+from OCC.Core.STEPControl import STEPControl_Writer, STEPControl_AsIs
+from OCC.Core.Interface import Interface_Static_SetCVal
+from OCC.Core.IFSelect import IFSelect_RetDone
+from OCC.Core.StlAPI import StlAPI_Writer
+
+import pdfkit
+import subprocess
+import os.path
+import pickle
+import shutil
+import cairosvg
+import configparser
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_template import Ui_ModuleWindow
+# from design_type.connection.main_controller import MainController
 
 
 class MyTutorials(QDialog):
@@ -150,8 +180,10 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
-            Ui_ModuleWindow.launchwindow(self, FinPlateConnection, folder)
-            self.ui.myStackedWidget.setCurrentIndex(0)
+            window = Ui_ModuleWindow(FinPlateConnection,folder)
+            window.show()
+            # MainController.launchwindow(self, Ui_ModuleWindow, FinPlateConnection,folder)
+            # self.ui.myStackedWidget.setCurrentIndex(0)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
@@ -192,6 +224,67 @@ class OsdagMainWindow(QMainWindow):
     def unavailable(self):
          QMessageBox.about(self, "INFO", "This module is not available in the current version.")
 
+class MainController(QMainWindow):
+    # closed = pyqtSignal()
+    def __init__(self, Ui_ModuleWindow, main, folder):
+        QMainWindow.__init__(self)
+        self.ui = Ui_ModuleWindow()
+        self.ui.setupUi(self, main)
+        self.folder = folder
+        self.connection = "Finplate"
+
+    def launchwindow(self, modulewindow, main, folder):
+        try:
+            print(self, modulewindow, main, folder)
+            # MainController.set_osdaglogger(self)
+            rawLogger = logging.getLogger("raw")
+            rawLogger.setLevel(logging.INFO)
+            fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
+            formatter = logging.Formatter('''%(message)s''')
+            fh.setFormatter(formatter)
+            rawLogger.addHandler(fh)
+            rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
+            MainController.module_setup(self)
+            print(self, modulewindow, main, folder)
+            window = MainController(modulewindow, main, folder)
+            print(window)
+            OsdagMainWindow.hide(self)
+            window.show()
+            window.closed.connect(OsdagMainWindow.show)
+        except BaseException as e:
+            print("ERROR1", str(e))
+
+    def set_osdaglogger(self):
+        global logger
+        logger = None
+        if logger is None:
+            logger = logging.getLogger("osdag")
+        else:
+            for handler in logger.handlers[:]:
+                logger.removeHandler(handler)
+
+        logger.setLevel(logging.DEBUG)
+
+        # create the logging file handler
+        fh = logging.FileHandler("design_type/connection/fin.log", mode="a")
+
+        # ,datefmt='%a, %d %b %Y %H:%M:%S'
+        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        formatter = logging.Formatter('''
+        <div  class="LOG %(levelname)s">
+            <span class="DATE">%(asctime)s</span>
+            <span class="LEVEL">%(levelname)s</span>
+            <span class="MSG">%(message)s</span>
+        </div>''')
+        formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+
+    def module_setup(self):
+        global logger
+        logger = logging.getLogger("osdag.model")
+
 # Back up the reference to the exceptionhook
 sys._excepthook = sys.excepthook
 
@@ -215,12 +308,11 @@ def the_exception_hook(exctype, value, traceback):
 # Set the exception hook to our wrapping function
 sys.excepthook = the_exception_hook
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()
     try:
         sys.exit(app.exec_())
-    except:
-        print("ERROR")
+    except BaseException as e:
+        print("ERROR", e)

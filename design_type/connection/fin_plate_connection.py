@@ -14,7 +14,6 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtGui import QTextCharFormat
 from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from gui.ui_template import MainController
 import pickle
 
 connectivity = "column_flange_beam_web"
@@ -37,7 +36,10 @@ logger = None
 def module_setup():
     global logger
     logger = logging.getLogger("osdag.finPlateCalc")
+
+
 module_setup()
+
 
 class FinPlateConnection(ShearConnection):
 
@@ -50,27 +52,33 @@ class FinPlateConnection(ShearConnection):
         self.weld_size_list = []
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
 
-    def input_values(self):
+    def input_values(self, current_values={}):
         option_list = []
-        option_list.append(["connectivity", "Connectivity*", "combo_box", "Select Connectivity",["Select Connectivity","cfbw","cwbw"]])
+        option_list.append(["connectivity", "Connectivity*", "combo_box", "Select Connectivity",["Select Connectivity","cfbw","cwbw","bb"]])
+        connectivity = current_values["connectivity"] if "connectivity" in current_values else "bb"
+        if connectivity == "bb":
+            beam_list=["select list"]
+            beam_list.extend(["MB200", "MB300"])
+            option_list.append(["supporting section", "primary*", "combo_box", "Select beam", beam_list])
+        print(option_list)
         return option_list
 
     def get_weld(self):
         return self.weld
 
-    def set_weld(self,weld):
-        self.weld=weld
+    def set_weld(self, weld):
+        self.weld = weld
 
-    def set_weld_by_size(self, weld_size,length=0,material=Material()):
-        self.weld=Weld(weld_size,length,material)
-
+    def set_weld_by_size(self, weld_size, length=0, material=Material()):
+        self.weld = Weld(weld_size,length,material)
 
 
 # fin_plate_input = FinPlateConnectionInput(connectivity, supporting_member_section, supported_member_section, material)
 
 
-fin_plate_input = FinPlateConnection(connectivity, supporting_member_section, supported_member_section, fu, fy, shear_force,axial_force,
-                 bolt_diameter, bolt_type, bolt_grade, weld_size, plate_thickness)
+fin_plate_input = FinPlateConnection(connectivity, supporting_member_section, supported_member_section, fu, fy,
+                                     shear_force, axial_force, bolt_diameter, bolt_type, bolt_grade,
+                                     weld_size, plate_thickness)
 bolt = Bolt(grade=bolt_grade, diameter=bolt_diameter, bolt_type=bolt_type, material=material)
 load = Load(shear_force=shear_force)
 plate = Plate(thickness=plate_thickness, material=material)

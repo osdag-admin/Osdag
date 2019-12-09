@@ -1,4 +1,4 @@
-!!python/object:__main__.FinPlateConnection
+!!python/object:design_type.connection.fin_plate_connection.FinPlateConnection
 bolt: !!python/object:utils.common.component.Bolt
   bearing_capacity: 0.0
   bolt_capacity: 0.0

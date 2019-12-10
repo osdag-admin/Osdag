@@ -14,6 +14,7 @@ from gui.ui_tutorial import Ui_Tutorial
 from gui.ui_aboutosdag import Ui_AboutOsdag
 from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.fin_plate_connection import FinPlateConnection
+from design_type.connection.main_controller import launchwindow
 from gui.ui_template import Ui_ModuleWindow
 
 from design_type.connection import main_controller
@@ -180,10 +181,10 @@ class OsdagMainWindow(QMainWindow):
                     os.mkdir(os.path.join(root_path, create_folder))
 
         if self.ui.rdbtn_finplate.isChecked():
-            window = Ui_ModuleWindow(FinPlateConnection,folder)
-            window.show()
-            # MainController.launchwindow(self, Ui_ModuleWindow, FinPlateConnection,folder)
-            # self.ui.myStackedWidget.setCurrentIndex(0)
+            # window = Ui_ModuleWindow(FinPlateConnection,folder)
+            # window.show()
+            launchwindow(self,FinPlateConnection,folder)
+            self.ui.myStackedWidget.setCurrentIndex(0)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
@@ -224,35 +225,35 @@ class OsdagMainWindow(QMainWindow):
     def unavailable(self):
          QMessageBox.about(self, "INFO", "This module is not available in the current version.")
 
-class MainController(QMainWindow):
-    # closed = pyqtSignal()
-    def __init__(self, Ui_ModuleWindow, main, folder):
-        QMainWindow.__init__(self)
-        self.ui = Ui_ModuleWindow()
-        self.ui.setupUi(self, main)
-        self.folder = folder
-        self.connection = "Finplate"
-
-    def launchwindow(self, modulewindow, main, folder):
-        try:
-            print(self, modulewindow, main, folder)
-            # MainController.set_osdaglogger(self)
-            rawLogger = logging.getLogger("raw")
-            rawLogger.setLevel(logging.INFO)
-            fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
-            formatter = logging.Formatter('''%(message)s''')
-            fh.setFormatter(formatter)
-            rawLogger.addHandler(fh)
-            rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
-            MainController.module_setup(self)
-            print(self, modulewindow, main, folder)
-            window = MainController(modulewindow, main, folder)
-            print(window)
-            OsdagMainWindow.hide(self)
-            window.show()
-            window.closed.connect(OsdagMainWindow.show)
-        except BaseException as e:
-            print("ERROR1", str(e))
+# class MainController(QMainWindow):
+#     # closed = pyqtSignal()
+#     def __init__(self, Ui_ModuleWindow, main, folder):
+#         QMainWindow.__init__(self)
+#         self.ui = Ui_ModuleWindow()
+#         self.ui.setupUi(self, main)
+#         self.folder = folder
+#         self.connection = "Finplate"
+#
+#     def launchwindow(self, modulewindow, main, folder):
+#         try:
+#             print(self, modulewindow, main, folder)
+#             # MainController.set_osdaglogger(self)
+#             rawLogger = logging.getLogger("raw")
+#             rawLogger.setLevel(logging.INFO)
+#             fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
+#             formatter = logging.Formatter('''%(message)s''')
+#             fh.setFormatter(formatter)
+#             rawLogger.addHandler(fh)
+#             rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
+#             MainController.module_setup(self)
+#             print(self, modulewindow, main, folder)
+#             window = MainController(modulewindow, main, folder)
+#             print(window)
+#             OsdagMainWindow.hide(self)
+#             window.show()
+#             window.closed.connect(OsdagMainWindow.show)
+#         except BaseException as e:
+#             print("ERROR1", str(e))
 
     def set_osdaglogger(self):
         global logger
@@ -312,6 +313,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = OsdagMainWindow()
     window.show()
+    # app.exec_()
+    # sys.exit(app.exec_())
     try:
         sys.exit(app.exec_())
     except BaseException as e:

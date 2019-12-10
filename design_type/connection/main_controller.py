@@ -42,11 +42,12 @@ import configparser
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_template import Ui_ModuleWindow
 class MainController(QMainWindow):
-    # closed = pyqtSignal()
-    def __init__(self, Ui_ModuleWindow, main, folder):
+    closed = pyqtSignal()
+    def __init__(self, main, folder):
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
         self.ui.setupUi(self, main)
+        # self.showMaximized()
         self.folder = folder
         self.connection = "Finplate"
         # MainController.set_osdaglogger(self)
@@ -71,56 +72,57 @@ class MainController(QMainWindow):
         # self.ui.show()
         # window.closed.connect(Ui_ModuleWindow.show)
 
-    def launchwindow(self, modulewindow, main, folder):
-        try:
-            self.set_osdaglogger()
-            rawLogger = logging.getLogger("raw")
-            rawLogger.setLevel(logging.INFO)
-            fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
-            formatter = logging.Formatter('''%(message)s''')
-            fh.setFormatter(formatter)
-            rawLogger.addHandler(fh)
-            rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
-            self.module_setup()
-            print(self, modulewindow, main, folder)
-            window = MainController(modulewindow, main, folder)
-            print (window)
-            self.hide()
-            window.show()
-            window.closed.connect(self.show)
-        except BaseException as e:
-            print("ERROR1", str(e))
 
-    def set_osdaglogger(self):
-        global logger
-        logger = None
-        if logger is None:
-            logger = logging.getLogger("osdag")
-        else:
-            for handler in logger.handlers[:]:
-                logger.removeHandler(handler)
 
-        logger.setLevel(logging.DEBUG)
+def set_osdaglogger(self):
+    global logger
+    logger = None
+    if logger is None:
+        logger = logging.getLogger("osdag")
+    else:
+        for handler in logger.handlers[:]:
+            logger.removeHandler(handler)
 
-        # create the logging file handler
-        fh = logging.FileHandler("design_type/connection/fin.log", mode="a")
+    logger.setLevel(logging.DEBUG)
 
-        # ,datefmt='%a, %d %b %Y %H:%M:%S'
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # create the logging file handler
+    fh = logging.FileHandler("design_type/connection/fin.log", mode="a")
 
-        formatter = logging.Formatter('''
-        <div  class="LOG %(levelname)s">
-            <span class="DATE">%(asctime)s</span>
-            <span class="LEVEL">%(levelname)s</span>
-            <span class="MSG">%(message)s</span>
-        </div>''')
-        formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    # ,datefmt='%a, %d %b %Y %H:%M:%S'
+    # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    formatter = logging.Formatter('''
+    <div  class="LOG %(levelname)s">
+        <span class="DATE">%(asctime)s</span>
+        <span class="LEVEL">%(levelname)s</span>
+        <span class="MSG">%(message)s</span>
+    </div>''')
+    formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+def module_setup(self):
+    global logger
+    logger = logging.getLogger("osdag.model")
+
+def launchwindow(osdagMainWindow, main, folder):
+        set_osdaglogger(osdagMainWindow)
+        rawLogger = logging.getLogger("raw")
+        rawLogger.setLevel(logging.INFO)
+        fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
+        formatter = logging.Formatter('''%(message)s''')
         fh.setFormatter(formatter)
-        logger.addHandler(fh)
+        rawLogger.addHandler(fh)
+        rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
+        module_setup(osdagMainWindow)
+        # print(osdagMainWindow,main, folder)
+        window = MainController(main, folder)
+        # print(window)
+        osdagMainWindow.hide()
+        window.show()
+        # print(osdagMainWindow)
+        window.closed.connect(osdagMainWindow.show)
 
-    def module_setup(self):
-        global logger
-        logger = logging.getLogger("osdag.model")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -131,7 +133,7 @@ if __name__ == '__main__':
     if not os.path.exists(image_folder_path):
         os.mkdir(image_folder_path, 0o755)
     print(Ui_ModuleWindow,FinPlateConnection,folder_path)
-    window = MainController(Ui_ModuleWindow,FinPlateConnection,folder_path)
+    window = MainController(FinPlateConnection,folder_path)
     print(window)
     window.show()
     try:

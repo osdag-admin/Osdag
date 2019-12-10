@@ -14,6 +14,8 @@
 .project
 .pydevproject
 output/*
+venv/*
 Osdag_Workspace/*
 /Osdag.config
+/backup
 

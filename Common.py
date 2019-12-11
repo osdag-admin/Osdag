@@ -38,7 +38,6 @@ VALUES_CONN_2=['Beam-Beam']
 KEY_SUPTNGSEC='Member.Supporting_Section'
 KEY_DISP_COLSEC='Column Section *'
 VALUES_COLSEC=connectdb("Columns")
-print(VALUES_COLSEC)
 
 KEY_DISP_PRIBM='Primary beam *'
 VALUES_PRIBM=['Select section','JB 150','JB 175','JB 200','JB 225']
@@ -66,22 +65,25 @@ DISP_TITLE_BOLT='Bolt'
 
 KEY_D='Bolt.Diameter'
 KEY_DISP_D='Diameter(mm)*'
-VALUES_D=['Diameter of Bolt',12,16,20,24,30,36]
+VALUES_D=['Diameter of Bolt','12','16','20','24','30','36']
 
 KEY_TYP='Bolt.Type'
 KEY_DISP_TYP='Type *'
 VALUES_TYP=['Select Type','Friction Grip Bolt','Bearing Bolt']
+VALUES_TYP_1=['Friction Grip Bolt']
+VALUES_TYP_2=['Bearing Bolt']
 
 KEY_GRD='Bolt.Grade'
 KEY_DISP_GRD='Grade *'
-VALUES_GRD_1=[8.8,10.9]
-VALUES_GRD_2=[3.6,4.6,4.8,5.6,5.8,6.8,8.8,9.8,10.9,12.9]
+VALUES_GRD_1=['8.8','10.9']
+VALUES_GRD_2=['3.6','4.6','4.8','5.6','5.8','6.8','8.8','9.8','10.9','12.9']
+VALUES_GRD_3=['Select']
 
 DISP_TITLE_PLATE='Plate'
 
 KEY_PLATETHK='Plate.Thickness'
 KEY_DISP_PLATETHK='Thickness(mm)*'
-VALUES_PLATETHK=['Select plate thickness',3,4,5,6,8,10,12,14,16,18,20]
+VALUES_PLATETHK=['Select plate thickness','3','4','5','6','8','10','12','14','16','18','20']
 
 KEY_PLATEHT='Plate.Height'
 KEY_DISP_PLATEHT='Height(mm)'
@@ -91,9 +93,9 @@ KEY_DISP_PLATEWD='Width(mm)'
 
 DISP_TITLE_WELD='Weld'
 
-KEY_WELDTHK='Weld.Thickness'
-KEY_DISP_WELDTHK='Thickness(mm)*'
-VALUES_WELDTHK=['Select weld thickness',3,4,5,6,8,10,12,14,16]
+KEY_WELDSIZE='Weld.Size'
+KEY_DISP_WELDSIZE='Thickness(mm)*'
+VALUES_WELDSIZE=['Select weld thickness','3','4','5','6','8','10','12','14','16']
 
 DISP_TITLE_CLEAT='Cleat Angle'
 
@@ -161,7 +163,7 @@ KEY_DISP_PLTHICK = 'Plate Thickness'
 
 KEY_DIAM = 'Diameter'
 KEY_DISP_DIAM = 'Diameter (mm)'
-VALUES_DIAM = ['Select diameter',12,16,20,24,30,36]
+VALUES_DIAM = ['Select diameter','12','16','20','24','30','36']
 
 KEY_NOROWS = 'No of Rows of Bolts'
 KEY_DISP_NOROWS = 'No of Rows of Bolts'

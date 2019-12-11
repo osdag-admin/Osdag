@@ -57,7 +57,7 @@ class FinPlateConnection(ShearConnection):
 
         options_list = []
 
-        if KEY_CONN in existingvalues and existingvalues[KEY_CONN] in VALUES_CONN:
+        if KEY_CONN in existingvalues:
             existingvalue_key_conn = existingvalues[KEY_CONN]
         else:
             existingvalue_key_conn = ''
@@ -117,10 +117,10 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platewd = ''
 
-        if KEY_WELDTHK in existingvalues:
-            existingvalue_key_weldthk = existingvalues[KEY_WELDTHK]
+        if KEY_WELDSIZE in existingvalues:
+            existingvalue_key_weldsize = existingvalues[KEY_WELDSIZE]
         else:
-            existingvalue_key_weldthk = ''
+            existingvalue_key_weldsize = ''
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
@@ -165,19 +165,19 @@ class FinPlateConnection(ShearConnection):
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         options_list.append(t11)
 
-        if existingvalue_key_typ in ['Friction Grip Bolt']:
+        if existingvalue_key_typ in VALUES_TYP_1:
 
             t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_1)
             options_list.append(t12)
 
-        elif existingvalue_key_typ in ['Bearing Bolt']:
+        elif existingvalue_key_typ in VALUES_TYP_2:
 
-            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalues_key_grd, VALUES_GRD_2)
+            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_2)
             options_list.append(t12)
 
         else:
 
-            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, None)
+            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_3)
             options_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
@@ -195,10 +195,14 @@ class FinPlateConnection(ShearConnection):
         t17 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, None)
         options_list.append(t17)
 
-        t18 = (KEY_WELDTHK, KEY_DISP_WELDTHK, TYPE_COMBOBOX, existingvalue_key_weldthk, VALUES_WELDTHK)
+        t18 = (KEY_WELDSIZE, KEY_DISP_WELDSIZE, TYPE_COMBOBOX, existingvalue_key_weldsize, VALUES_WELDSIZE)
         options_list.append(t18)
 
         return options_list
+
+    #def dictionary(self):
+
+
 
     def get_weld(self):
         return self.weld

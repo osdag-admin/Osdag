@@ -358,7 +358,7 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         #self.lbl_column.setFont(font)
         #self.lbl_column.setObjectName("lbl_column")
-        self.comboConnLoc = QtWidgets.QComboBox(self.dockWidgetContents)
+        """self.comboConnLoc = QtWidgets.QComboBox(self.dockWidgetContents)
         self.comboConnLoc.setGeometry(QtCore.QRect(150, 40, 160, 27))
         font = QtGui.QFont()
         font.setPointSize(11)
@@ -369,7 +369,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.comboConnLoc.addItem("")
         self.comboConnLoc.addItem("")
         self.comboConnLoc.addItem("")
-        self.comboConnLoc.addItem("")
+        self.comboConnLoc.addItem("")"""
         """self.txtFu = QtWidgets.QLineEdit(self.dockWidgetContents)
         self.txtFu.setGeometry(QtCore.QRect(150, 187, 160, 27))
         font = QtGui.QFont()
@@ -378,8 +378,8 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         self.txtFu.setFont(font)
         self.txtFu.setObjectName("txtFu")"""
-        self.label = QtWidgets.QLabel(self.dockWidgetContents)
-        self.label.setGeometry(QtCore.QRect(3, 15, 221, 21))
+        #self.label = QtWidgets.QLabel(self.dockWidgetContents)
+        #self.label.setGeometry(QtCore.QRect(3, 15, 221, 21))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 127))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -390,32 +390,42 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
-        self.label.setPalette(palette)
+        """self.label.setPalette(palette)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(True)
         font.setItalic(True)
         font.setWeight(75)
         self.label.setFont(font)
-        self.label.setObjectName("label")
+        self.label.setObjectName("label")"""
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
-        i=0
+        i = 0
         for option in option_list:
             lable = option[1]
-            print(option)
-            l = QtWidgets.QLabel(self.dockWidgetContents)
-            l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))
-            font = QtGui.QFont()
-            font.setPointSize(11)
-            font.setBold(False)
-            font.setWeight(50)
-            l.setFont(font)
-            l.setObjectName("label_4")
-            l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-
             type = option[2]
-            if type == "combo_box":
+            #value = option[4]
+            print(option)
+            if type != 3:
+                l = QtWidgets.QLabel(self.dockWidgetContents)
+                l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName("label_4")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == 3:
+                q = QtWidgets.QLabel(self.dockWidgetContents)
+                q.setGeometry(QtCore.QRect(3, 40+i, 201, 25))
+                q.setFont(font)
+                q.setObjectName("q")
+                q.setText(_translate("MainWindow",
+                                                 "<html><head/><body><p><span style=\" font-weight:600;\">"+ lable +"</span></p></body></html>"))
+
+            if type == 1:
                 e = QtWidgets.QComboBox(self.dockWidgetContents)
                 e.setGeometry(QtCore.QRect(150, 40+i, 160, 27))
                 font = QtGui.QFont()
@@ -426,6 +436,16 @@ class Ui_ModuleWindow(QMainWindow):
                 e.setObjectName("comboConnLoc")
                 for item in option[4]:
                     e.addItem(item)
+
+            if type == 2:
+                r = QtWidgets.QLineEdit(self.dockWidgetContents)
+                r.setGeometry(QtCore.QRect(150, 40+i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName("r")
             i=i+30
         # self.label_4 = QtWidgets.QLabel(self.dockWidgetContents)
         # self.label_4.setGeometry(QtCore.QRect(6, 40, 120, 25))
@@ -469,14 +489,14 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         self.label_18.setFont(font)
         self.label_18.setObjectName("label_18")
-        self.lbl_shear = QtWidgets.QLabel(self.dockWidgetContents)
-        self.lbl_shear.setGeometry(QtCore.QRect(6, 280, 151, 25))
+        #self.lbl_shear = QtWidgets.QLabel(self.dockWidgetContents)
+        #self.lbl_shear.setGeometry(QtCore.QRect(6, 280, 151, 25))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
-        self.lbl_shear.setFont(font)
-        self.lbl_shear.setObjectName("lbl_shear")
+        #self.lbl_shear.setFont(font)
+        #self.lbl_shear.setObjectName("lbl_shear")
         """self.txtShear = QtWidgets.QLineEdit(self.dockWidgetContents)
         self.txtShear.setGeometry(QtCore.QRect(150, 277, 160, 27))
         font = QtGui.QFont()
@@ -1895,7 +1915,7 @@ class Ui_ModuleWindow(QMainWindow):
         # self.comboConnLoc.setItemText(2, _translate("MainWindow", "Column web-Beam web"))
         # self.comboConnLoc.setItemText(3, _translate("MainWindow", "Beam-Beam"))
         #self.txtFu.setPlaceholderText(_translate("MainWindow", "000.0"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p>Connecting members</p></body></html>"))
+        #self.label.setText(_translate("MainWindow", "<html><head/><body><p>Connecting members</p></body></html>"))
         """self.label_4.setText(_translate("MainWindow", "<html><head/><body><p>Connectivity *</p></body></html>"))
         self.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">f</span><span style=\" font-style:italic; vertical-align:sub;\">u </span>(MPa) * </p></body></html>"))
         self.lbl_fy.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">f</span><span style=\" vertical-align:sub;\">y </span>(MPa) *</p></body></html>"))

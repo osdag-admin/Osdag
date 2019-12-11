@@ -45,8 +45,11 @@ class MainController(QMainWindow):
     closed = pyqtSignal()
     def __init__(self, main, folder):
         QMainWindow.__init__(self)
+        print (1)
         self.ui = Ui_ModuleWindow()
+        print(2)
         self.ui.setupUi(self, main)
+        print(3)
         # self.showMaximized()
         self.folder = folder
         self.connection = "Finplate"

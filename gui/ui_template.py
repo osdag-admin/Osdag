@@ -401,6 +401,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.label.setObjectName("label")
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
+
         for option in option_list:
             lable = option[1]
             print(option)
@@ -2110,5 +2111,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
+        print("Done")
 
 from . import icons_rc

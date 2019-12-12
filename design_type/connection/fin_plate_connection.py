@@ -60,7 +60,7 @@ class FinPlateConnection(ShearConnection):
             beam_list=["select list"]
             beam_list.extend(["MB200", "MB300"])
             option_list.append(["supporting section", "primary*", "combo_box", "Select beam", beam_list])
-        print(option_list)
+        # print(option_list)
         return option_list
 
     def get_weld(self):

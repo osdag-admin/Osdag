@@ -3,9 +3,10 @@ TYPE_TEXTBOX=2
 TYPE_TITLE=3
 
 import sqlite3
+from utils.common.component import Component
 def connectdb(table_name):
-   
-    conn=sqlite3.connect(r'C:\Users\Win10\Desktop\Osdag3-master\ResourceFiles\Database\Intg_osdag.sqlite')
+    a=Component()
+    conn=sqlite3.connect(a.path_to_database)
     lst=[]
     if table_name=="Angles":
         cursor=conn.execute("SELECT Designation FROM Angles")

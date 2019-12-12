@@ -14,7 +14,7 @@
    <string>Fin Plate</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="ResourceFiles/icons.qrc">
+   <iconset>
     <normaloff>:/newPrefix/images/finwindow.png</normaloff>:/newPrefix/images/finwindow.png</iconset>
   </property>
   <property name="iconSize">
@@ -67,7 +67,7 @@
         <string>input</string>
        </property>
        <property name="icon">
-        <iconset resource="ResourceFiles/icons.qrc">
+        <iconset>
          <normaloff>:/newPrefix/images/input.png</normaloff>:/newPrefix/images/input.png</iconset>
        </property>
        <property name="iconSize">
@@ -96,7 +96,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="ResourceFiles/icons.qrc">
+        <iconset>
          <normaloff>:/newPrefix/images/output.png</normaloff>:/newPrefix/images/output.png</iconset>
        </property>
        <property name="iconSize">
@@ -125,7 +125,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="ResourceFiles/icons.qrc">
+        <iconset>
          <normaloff>:/newPrefix/images/X-Y.png</normaloff>:/newPrefix/images/X-Y.png</iconset>
        </property>
        <property name="iconSize">
@@ -154,7 +154,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="ResourceFiles/icons.qrc">
+        <iconset>
          <normaloff>:/newPrefix/images/Z-X.png</normaloff>:/newPrefix/images/Z-X.png</iconset>
        </property>
        <property name="iconSize">
@@ -183,7 +183,7 @@
         <string>...</string>
        </property>
        <property name="icon">
-        <iconset resource="ResourceFiles/icons.qrc">
+        <iconset>
          <normaloff>:/newPrefix/images/Z-Y.png</normaloff>:/newPrefix/images/Z-Y.png</iconset>
        </property>
        <property name="iconSize">
@@ -331,16 +331,7 @@
         <number>1</number>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
-        <property name="leftMargin">
-         <number>1</number>
-        </property>
-        <property name="topMargin">
-         <number>1</number>
-        </property>
-        <property name="rightMargin">
-         <number>1</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>1</number>
         </property>
         <item>
@@ -408,7 +399,7 @@
      <x>0</x>
      <y>0</y>
      <width>1328</width>
-     <height>21</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -644,7 +635,7 @@ QMenu::item:selected {
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>
@@ -3338,7 +3329,7 @@ QMenu::item:selected {
    </property>
    <property name="maximumSize">
     <size>
-     <width>310</width>
+     <width>320</width>
      <height>710</height>
     </size>
    </property>

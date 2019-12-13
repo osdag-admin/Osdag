@@ -1,6 +1,6 @@
-TYPE_COMBOBOX=1
-TYPE_TEXTBOX=2
-TYPE_TITLE=3
+TYPE_COMBOBOX='ComboBox'
+TYPE_TEXTBOX='TextBox'
+TYPE_TITLE='Title'
 
 import sqlite3
 def connectdb(table_name):

@@ -200,7 +200,11 @@ class FinPlateConnection(ShearConnection):
 
         return options_list
 
-    #def dictionary(self):
+    def diction(self):
+
+
+        return d
+
 
 
 

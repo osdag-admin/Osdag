@@ -5,11 +5,13 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5.QtWidgets import QMessageBox, qApp
+from PyQt5.QtWidgets import QMessageBox, qApp, QComboBox
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
+from Common import *
+from functools import partial
 import os
 import json
 import logging
@@ -34,6 +36,7 @@ import configparser
 
 class Ui_ModuleWindow(QMainWindow):
     def setupUi(self, MainWindow, main):
+        self.l = []
         print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -358,7 +361,7 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         #self.lbl_column.setFont(font)
         #self.lbl_column.setObjectName("lbl_column")
-        self.comboConnLoc = QtWidgets.QComboBox(self.dockWidgetContents)
+        """self.comboConnLoc = QtWidgets.QComboBox(self.dockWidgetContents)
         self.comboConnLoc.setGeometry(QtCore.QRect(150, 40, 160, 27))
         font = QtGui.QFont()
         font.setPointSize(11)
@@ -369,7 +372,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.comboConnLoc.addItem("")
         self.comboConnLoc.addItem("")
         self.comboConnLoc.addItem("")
-        self.comboConnLoc.addItem("")
+        self.comboConnLoc.addItem("")"""
         """self.txtFu = QtWidgets.QLineEdit(self.dockWidgetContents)
         self.txtFu.setGeometry(QtCore.QRect(150, 187, 160, 27))
         font = QtGui.QFont()
@@ -378,8 +381,8 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         self.txtFu.setFont(font)
         self.txtFu.setObjectName("txtFu")"""
-        self.label = QtWidgets.QLabel(self.dockWidgetContents)
-        self.label.setGeometry(QtCore.QRect(3, 15, 221, 21))
+        #self.label = QtWidgets.QLabel(self.dockWidgetContents)
+        #self.label.setGeometry(QtCore.QRect(3, 15, 221, 21))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 127))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -390,43 +393,73 @@ class Ui_ModuleWindow(QMainWindow):
         brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
         brush.setStyle(QtCore.Qt.SolidPattern)
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Link, brush)
-        self.label.setPalette(palette)
+        """self.label.setPalette(palette)
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(True)
         font.setItalic(True)
         font.setWeight(75)
         self.label.setFont(font)
-        self.label.setObjectName("label")
+        self.label.setObjectName("label")"""
+
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
-        i=0
+        i = 0
+        lisst = []
         for option in option_list:
             lable = option[1]
-            print(option)
-            l = QtWidgets.QLabel(self.dockWidgetContents)
-            l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))
-            font = QtGui.QFont()
-            font.setPointSize(11)
-            font.setBold(False)
-            font.setWeight(50)
-            l.setFont(font)
-            l.setObjectName("label_4")
-            l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-
             type = option[2]
-            if type == "combo_box":
-                e = QtWidgets.QComboBox(self.dockWidgetContents)
-                e.setGeometry(QtCore.QRect(150, 40+i, 160, 27))
+            # value = option[4]
+            print(option)
+            if type != TYPE_TITLE:
+                l = QtWidgets.QLabel(self.dockWidgetContents)
+                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
                 font.setWeight(50)
-                e.setFont(font)
-                e.setObjectName("comboConnLoc")
+                l.setFont(font)
+                l.setObjectName(option[0])
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_COMBOBOX:
+
+                self.comboC = QtWidgets.QComboBox(self.dockWidgetContents)
+                self.comboC.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                self.comboC.setFont(font)
+                self.comboC.setObjectName(option[0])
                 for item in option[4]:
-                    e.addItem(item)
-            i=i+30
+                    self.comboC.addItem(item)
+                #print(comboC)
+                self.comboC.currentIndexChanged.connect(self.comboCh)
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(self.dockWidgetContents)
+                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+                r.textChanged.connect(lambda: self.comboCh)
+
+            if type == TYPE_TITLE:
+                q = QtWidgets.QLabel(self.dockWidgetContents)
+                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
+                font = QtGui.QFont()
+                q.setFont(font)
+                q.setObjectName("q")
+                q.setText(_translate("MainWindow",
+                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+
+            i = i + 30
+
+
         # self.label_4 = QtWidgets.QLabel(self.dockWidgetContents)
         # self.label_4.setGeometry(QtCore.QRect(6, 40, 120, 25))
         # font = QtGui.QFont()
@@ -469,14 +502,14 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(50)
         self.label_18.setFont(font)
         self.label_18.setObjectName("label_18")
-        self.lbl_shear = QtWidgets.QLabel(self.dockWidgetContents)
-        self.lbl_shear.setGeometry(QtCore.QRect(6, 280, 151, 25))
+        #self.lbl_shear = QtWidgets.QLabel(self.dockWidgetContents)
+        #self.lbl_shear.setGeometry(QtCore.QRect(6, 280, 151, 25))
         font = QtGui.QFont()
         font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
-        self.lbl_shear.setFont(font)
-        self.lbl_shear.setObjectName("lbl_shear")
+        #self.lbl_shear.setFont(font)
+        #self.lbl_shear.setObjectName("lbl_shear")
         """self.txtShear = QtWidgets.QLineEdit(self.dockWidgetContents)
         self.txtShear.setGeometry(QtCore.QRect(150, 277, 160, 27))
         font = QtGui.QFont()
@@ -1861,6 +1894,7 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.setTabOrder(self.txtExtMomnt_2, self.txtMomntCapacity_2)
         MainWindow.setTabOrder(self.txtMomntCapacity_2, self.lineEdit_3)
 
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
@@ -1895,7 +1929,7 @@ class Ui_ModuleWindow(QMainWindow):
         # self.comboConnLoc.setItemText(2, _translate("MainWindow", "Column web-Beam web"))
         # self.comboConnLoc.setItemText(3, _translate("MainWindow", "Beam-Beam"))
         #self.txtFu.setPlaceholderText(_translate("MainWindow", "000.0"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p>Connecting members</p></body></html>"))
+        #self.label.setText(_translate("MainWindow", "<html><head/><body><p>Connecting members</p></body></html>"))
         """self.label_4.setText(_translate("MainWindow", "<html><head/><body><p>Connectivity *</p></body></html>"))
         self.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">f</span><span style=\" font-style:italic; vertical-align:sub;\">u </span>(MPa) * </p></body></html>"))
         self.lbl_fy.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">f</span><span style=\" vertical-align:sub;\">y </span>(MPa) *</p></body></html>"))
@@ -2111,5 +2145,27 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
+
+    def comboCh(self,index,combo):
+        _translate = QtCore.QCoreApplication.translate
+        #ob = self.findChild(QtWidgets.QComboBox, obj)
+
+        txt = self.comboC.itemText(index)
+        print(txt)
+
+        #if typ == TYPE_COMBOBOX:
+
+            #txt = ob.currentText()
+            #self.l.append(txt)
+            #print(txt)
+        #if typ == TYPE_TEXTBOX:
+            #txt = combo.Text()
+            #self.l.append(txt)
+            #print(self.l)
+
+
+
+
+
 
 from . import icons_rc

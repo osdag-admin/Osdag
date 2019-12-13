@@ -434,9 +434,9 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 e.setFont(font)
                 e.setObjectName("comboConnLoc")
-                for item in option[4]:
+                #for item in option[4]:
                 #     print(item)
-                    e.addItem(item)
+                    #e.addItem(item)
 
             if type == 2:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)

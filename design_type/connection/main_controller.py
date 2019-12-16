@@ -125,7 +125,8 @@ class MainController(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
-    folder_path = r'C:\Users\Win10\Desktop'
+    # folder_path = r'C:\Users\Win10\Desktop'
+    folder_path = r'C:\Users\pc\Desktop'
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0o755)
     image_folder_path = os.path.join(folder_path, 'images_html')

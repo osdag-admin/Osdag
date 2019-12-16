@@ -36,7 +36,6 @@ import configparser
 
 class Ui_ModuleWindow(QMainWindow):
     def setupUi(self, MainWindow, main):
-        self.l = []
         print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -402,31 +401,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.label.setFont(font)
         self.label.setObjectName("label")"""
 
-        def comboCh():
-            d = {}
-            txt1 = comboConn.currentText()
-            print(txt1)
-            d1 = {KEY_CONN:txt1}
-            txt2 = comboD.currentText()
-            print(txt2)
-            d2 = {KEY_D: txt2}
-            txt3 = comboTyp.currentText()
-            print(txt3)
-            d3 = {KEY_TYP: txt3}
-            txt4 = comboGrd.currentText()
-            print(txt4)
-            d4 = {KEY_GRD: txt4}
-            txt5 = comboWS.currentText()
-            print(txt5)
-            d5 = {KEY_WELDSIZE: txt5}
-            d.update(d1)
-            d.update(d2)
-            d.update(d3)
-            d.update(d4)
-            d.update(d5)
-            print(d)
-            return d
-
         option_list = main.input_values(self)
         _translate = QtCore.QCoreApplication.translate
         i = 0
@@ -458,7 +432,31 @@ class Ui_ModuleWindow(QMainWindow):
                     comboConn.setObjectName(option[0])
                     for item in option[4]:
                         comboConn.addItem(item)
-                    comboConn.currentIndexChanged.connect(comboCh)
+                    # comboConn.currentIndexChanged.connect(lambda: comboCh(KEY_CONN))
+                elif option[0] == KEY_SUPTNGSEC:
+                    comboStng = QtWidgets.QComboBox(self.dockWidgetContents)
+                    comboStng.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                    font = QtGui.QFont()
+                    font.setPointSize(11)
+                    font.setBold(False)
+                    font.setWeight(50)
+                    comboStng.setFont(font)
+                    comboStng.setObjectName(option[0])
+                    for item in option[4]:
+                        comboStng.addItem(item)
+                #    comboStng.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTNGSEC))
+                elif option[0] == KEY_SUPTDSEC:
+                    comboStd = QtWidgets.QComboBox(self.dockWidgetContents)
+                    comboStd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                    font = QtGui.QFont()
+                    font.setPointSize(11)
+                    font.setBold(False)
+                    font.setWeight(50)
+                    comboStd.setFont(font)
+                    comboStd.setObjectName(option[0])
+                    for item in option[4]:
+                        comboStd.addItem(item)
+                    # comboStd.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTDSEC))
                 elif option[0] == KEY_D:
                     comboD = QtWidgets.QComboBox(self.dockWidgetContents)
                     comboD.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
@@ -470,7 +468,7 @@ class Ui_ModuleWindow(QMainWindow):
                     comboD.setObjectName(option[0])
                     for item in option[4]:
                         comboD.addItem(item)
-                    comboD.currentIndexChanged.connect(comboCh)
+                    #comboD.currentIndexChanged.connect(lambda: comboCh(KEY_D))
                 elif option[0] == KEY_TYP:
                     comboTyp = QtWidgets.QComboBox(self.dockWidgetContents)
                     comboTyp.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
@@ -482,7 +480,7 @@ class Ui_ModuleWindow(QMainWindow):
                     comboTyp.setObjectName(option[0])
                     for item in option[4]:
                         comboTyp.addItem(item)
-                    comboTyp.currentIndexChanged.connect(comboCh)
+                    # comboTyp.currentIndexChanged.connect(lambda: comboCh(KEY_TYP))
                 elif option[0] == KEY_GRD:
                     comboGrd = QtWidgets.QComboBox(self.dockWidgetContents)
                     comboGrd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
@@ -494,22 +492,21 @@ class Ui_ModuleWindow(QMainWindow):
                     comboGrd.setObjectName(option[0])
                     for item in option[4]:
                         comboGrd.addItem(item)
-                    comboGrd.currentIndexChanged.connect(comboCh)
-                elif option[0] == KEY_WELDSIZE:
-                    comboWS = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboWS.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                    # comboGrd.currentIndexChanged.connect(lambda: comboCh(KEY_GRD))
+                elif option[0] == KEY_PLATETHK:
+                    comboPltthk = QtWidgets.QComboBox(self.dockWidgetContents)
+                    comboPltthk.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
                     font = QtGui.QFont()
                     font.setPointSize(11)
                     font.setBold(False)
                     font.setWeight(50)
-                    comboWS.setFont(font)
-                    comboWS.setObjectName(option[0])
+                    comboPltthk.setFont(font)
+                    comboPltthk.setObjectName(option[0])
                     for item in option[4]:
-                        comboWS.addItem(item)
-                    comboWS.currentIndexChanged.connect(comboCh)
+                        comboPltthk.addItem(item)
+                    # comboPltthk.currentIndexChanged.connect(lambda: comboCh(KEY_PLATETHK))
                 else:
                     pass
-
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
@@ -520,7 +517,6 @@ class Ui_ModuleWindow(QMainWindow):
                 font.setWeight(50)
                 r.setFont(font)
                 r.setObjectName(option[0])
-                r.textChanged.connect(lambda: self.comboCh)
 
             if type == TYPE_TITLE:
                 q = QtWidgets.QLabel(self.dockWidgetContents)
@@ -532,6 +528,50 @@ class Ui_ModuleWindow(QMainWindow):
                                      "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
 
             i = i + 30
+
+        #def fn_call():
+
+            # def di(key, txt):
+            #     d1 = {key: txt}
+            #     d.update(d1)
+            #     if d != {KEY_CONN: comboConn.itemText(0), KEY_SUPTNGSEC: '', KEY_SUPTDSEC: '', KEY_FU: '', KEY_FY: '', KEY_VERSH: '',
+            #              KEY_D: '', KEY_TYP: '', KEY_GRD: '', KEY_PLATETHK: '', KEY_PLATEHT: '', KEY_PLATEWD: ''}:
+            #         fn_call()
+            #
+            # def comboCh(box):
+            #     if box == KEY_CONN:
+            #         txt1 = comboConn.currentText()
+            #         print(txt1)
+            #         di(KEY_CONN, txt1)
+            #     elif box == KEY_SUPTNGSEC:
+            #         txt6 = comboStng.currentText()
+            #         print(txt6)
+            #         di(KEY_SUPTNGSEC, txt6)
+            #     elif box == KEY_SUPTDSEC:
+            #         txt7 = comboStd.currentText()
+            #         print(txt7)
+            #         di(KEY_SUPTDSEC, txt7)
+            #     elif box == KEY_D:
+            #         txt2 = comboD.currentText()
+            #         print(txt2)
+            #         di(KEY_D, txt2)
+            #     elif box == KEY_TYP:
+            #         txt3 = comboTyp.currentText()
+            #         print(txt3)
+            #         di(KEY_TYP, txt3)
+            #     elif box == KEY_GRD:
+            #         txt4 = comboGrd.currentText()
+            #         print(txt4)
+            #         di(KEY_GRD, txt4)
+            #     elif box == KEY_PLATETHK:
+            #         txt8 = comboPltthk.currentText()
+            #         print(txt8)
+            #         di(KEY_PLATETHK, txt8)
+            #     else:
+            #         pass
+            #     return d
+        #fn_call()
+
 
 
         # self.label_4 = QtWidgets.QLabel(self.dockWidgetContents)
@@ -2221,16 +2261,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
 
 
-
-        #if typ == TYPE_COMBOBOX:
-
-            #txt = ob.currentText()
-            #self.l.append(txt)
-            #print(txt)
-        #if typ == TYPE_TEXTBOX:
-            #txt = combo.Text()
-            #self.l.append(txt)
-            #print(self.l)
 
 
 

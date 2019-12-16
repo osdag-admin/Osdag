@@ -53,7 +53,7 @@ class FinPlateConnection(ShearConnection):
         self.weld_size_list = []
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
 
-    def input_values(self, existingvalues={}):
+    def input_values(self, existingvalues = {}):
 
         options_list = []
 
@@ -63,7 +63,7 @@ class FinPlateConnection(ShearConnection):
             existingvalue_key_conn = ''
 
         if KEY_SUPTNGSEC in existingvalues:
-            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+           existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
         else:
             existingvalue_key_suptngsec = ''
 
@@ -107,20 +107,6 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
-        if KEY_PLATEHT in existingvalues:
-            existingvalue_key_plateht = existingvalues[KEY_PLATEHT]
-        else:
-            existingvalue_key_plateht = ''
-
-        if KEY_PLATEWD in existingvalues:
-            existingvalue_key_platewd = existingvalues[KEY_PLATEWD]
-        else:
-            existingvalue_key_platewd = ''
-
-        if KEY_WELDSIZE in existingvalues:
-            existingvalue_key_weldsize = existingvalues[KEY_WELDSIZE]
-        else:
-            existingvalue_key_weldsize = ''
 
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
@@ -128,21 +114,11 @@ class FinPlateConnection(ShearConnection):
         t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
         options_list.append(t2)
 
-        if existingvalue_key_conn in VALUES_CONN_1:
+        t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+        options_list.append(t3)
 
-            t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
-            options_list.append(t3)
-
-            t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
-            options_list.append(t4)
-
-        elif existingvalue_key_conn in VALUES_CONN_2:
-
-            t3 = (KEY_SUPTNGSEC, KEY_DISP_PRIBM, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_PRIBM)
-            options_list.append(t3)
-
-            t4 = (KEY_SUPTDSEC, KEY_DISP_SECBM, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_SECBM)
-            options_list.append(t4)
+        t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+        options_list.append(t4)
 
         t5 = (KEY_FU, KEY_DISP_FU, TYPE_TEXTBOX, existingvalue_key_fu, None)
         options_list.append(t5)
@@ -165,20 +141,8 @@ class FinPlateConnection(ShearConnection):
         t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
         options_list.append(t11)
 
-        if existingvalue_key_typ in VALUES_TYP_1:
-
-            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_1)
-            options_list.append(t12)
-
-        elif existingvalue_key_typ in VALUES_TYP_2:
-
-            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_2)
-            options_list.append(t12)
-
-        else:
-
-            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_3)
-            options_list.append(t12)
+        t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD)
+        options_list.append(t12)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
         options_list.append(t13)
@@ -186,27 +150,7 @@ class FinPlateConnection(ShearConnection):
         t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX, existingvalue_key_platethk, VALUES_PLATETHK)
         options_list.append(t14)
 
-        t15 = (KEY_PLATEHT, KEY_DISP_PLATEHT, TYPE_TEXTBOX, existingvalue_key_plateht, None)
-        options_list.append(t15)
-
-        t16 = (KEY_PLATEWD, KEY_DISP_PLATEWD, TYPE_TEXTBOX, existingvalue_key_platewd, None)
-        options_list.append(t16)
-
-        t17 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, None)
-        options_list.append(t17)
-
-        t18 = (KEY_WELDSIZE, KEY_DISP_WELDSIZE, TYPE_COMBOBOX, existingvalue_key_weldsize, VALUES_WELDSIZE)
-        options_list.append(t18)
-
         return options_list
-
-    def diction(self):
-
-
-        return d
-
-
-
 
     def get_weld(self):
         return self.weld

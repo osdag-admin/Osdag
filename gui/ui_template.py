@@ -401,141 +401,12 @@ class Ui_ModuleWindow(QMainWindow):
         self.label.setFont(font)
         self.label.setObjectName("label")"""
 
-        option_list = main.input_values(self)
-        _translate = QtCore.QCoreApplication.translate
-        i = 0
-        for option in option_list:
-            lable = option[1]
-            type = option[2]
-            # value = option[4]
-            print(option)
-            if type != TYPE_TITLE:
-                l = QtWidgets.QLabel(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                font.setBold(False)
-                font.setWeight(50)
-                l.setFont(font)
-                l.setObjectName(option[0])
-                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
-
-            if type == TYPE_COMBOBOX:
-                if option[0] == KEY_CONN:
-                    comboConn = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboConn.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboConn.setFont(font)
-                    comboConn.setObjectName(option[0])
-                    for item in option[4]:
-                        comboConn.addItem(item)
-                    # comboConn.currentIndexChanged.connect(lambda: comboCh(KEY_CONN))
-                elif option[0] == KEY_SUPTNGSEC:
-                    comboStng = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboStng.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboStng.setFont(font)
-                    comboStng.setObjectName(option[0])
-                    for item in option[4]:
-                        comboStng.addItem(item)
-                #    comboStng.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTNGSEC))
-                elif option[0] == KEY_SUPTDSEC:
-                    comboStd = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboStd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboStd.setFont(font)
-                    comboStd.setObjectName(option[0])
-                    for item in option[4]:
-                        comboStd.addItem(item)
-                    # comboStd.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTDSEC))
-                elif option[0] == KEY_D:
-                    comboD = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboD.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboD.setFont(font)
-                    comboD.setObjectName(option[0])
-                    for item in option[4]:
-                        comboD.addItem(item)
-                    #comboD.currentIndexChanged.connect(lambda: comboCh(KEY_D))
-                elif option[0] == KEY_TYP:
-                    comboTyp = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboTyp.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboTyp.setFont(font)
-                    comboTyp.setObjectName(option[0])
-                    for item in option[4]:
-                        comboTyp.addItem(item)
-                    # comboTyp.currentIndexChanged.connect(lambda: comboCh(KEY_TYP))
-                elif option[0] == KEY_GRD:
-                    comboGrd = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboGrd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboGrd.setFont(font)
-                    comboGrd.setObjectName(option[0])
-                    for item in option[4]:
-                        comboGrd.addItem(item)
-                    # comboGrd.currentIndexChanged.connect(lambda: comboCh(KEY_GRD))
-                elif option[0] == KEY_PLATETHK:
-                    comboPltthk = QtWidgets.QComboBox(self.dockWidgetContents)
-                    comboPltthk.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    font.setBold(False)
-                    font.setWeight(50)
-                    comboPltthk.setFont(font)
-                    comboPltthk.setObjectName(option[0])
-                    for item in option[4]:
-                        comboPltthk.addItem(item)
-                    # comboPltthk.currentIndexChanged.connect(lambda: comboCh(KEY_PLATETHK))
-                else:
-                    pass
-
-            if type == TYPE_TEXTBOX:
-                r = QtWidgets.QLineEdit(self.dockWidgetContents)
-                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                font.setBold(False)
-                font.setWeight(50)
-                r.setFont(font)
-                r.setObjectName(option[0])
-
-            if type == TYPE_TITLE:
-                q = QtWidgets.QLabel(self.dockWidgetContents)
-                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
-                font = QtGui.QFont()
-                q.setFont(font)
-                q.setObjectName("q")
-                q.setText(_translate("MainWindow",
-                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
-            i = i + 30
-
-        #def fn_call():
-
             # def di(key, txt):
             #     d1 = {key: txt}
             #     d.update(d1)
-            #     if d != {KEY_CONN: comboConn.itemText(0), KEY_SUPTNGSEC: '', KEY_SUPTDSEC: '', KEY_FU: '', KEY_FY: '', KEY_VERSH: '',
-            #              KEY_D: '', KEY_TYP: '', KEY_GRD: '', KEY_PLATETHK: '', KEY_PLATEHT: '', KEY_PLATEWD: ''}:
+            #     if d != {KEY_CONN: comboConn.itemText(0), KEY_SUPTNGSEC: '', KEY_SUPTDSEC: '', KEY_FU: '', KEY_FY: '',
+            #              KEY_VERSH: '',
+            #              KEY_D: '', KEY_TYP: '', KEY_GRD: '', KEY_PLATETHK: ''}:
             #         fn_call()
             #
             # def comboCh(box):
@@ -570,9 +441,157 @@ class Ui_ModuleWindow(QMainWindow):
             #     else:
             #         pass
             #     return d
-        #fn_call()
 
+            # elif option[0] == KEY_SUPTNGSEC:
+            #     comboStng = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboStng.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboStng.setFont(font)
+            #     comboStng.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboStng.addItem(item)
+            #     comboStng.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTNGSEC))
+            # elif option[0] == KEY_SUPTDSEC:
+            #     comboStd = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboStd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboStd.setFont(font)
+            #     comboStd.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboStd.addItem(item)
+            #     comboStd.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTDSEC))
+            # elif option[0] == KEY_D:
+            #     comboD = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboD.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboD.setFont(font)
+            #     comboD.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboD.addItem(item)
+            #     comboD.currentIndexChanged.connect(lambda: comboCh(KEY_D))
+            # elif option[0] == KEY_TYP:
+            #     comboTyp = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboTyp.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboTyp.setFont(font)
+            #     comboTyp.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboTyp.addItem(item)
+            #     comboTyp.currentIndexChanged.connect(lambda: comboCh(KEY_TYP))
+            # elif option[0] == KEY_GRD:
+            #     comboGrd = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboGrd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboGrd.setFont(font)
+            #     comboGrd.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboGrd.addItem(item)
+            #     comboGrd.currentIndexChanged.connect(lambda: comboCh(KEY_GRD))
+            # elif option[0] == KEY_PLATETHK:
+            #     comboPltthk = QtWidgets.QComboBox(self.dockWidgetContents)
+            #     comboPltthk.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+            #     font = QtGui.QFont()
+            #     font.setPointSize(11)
+            #     font.setBold(False)
+            #     font.setWeight(50)
+            #     comboPltthk.setFont(font)
+            #     comboPltthk.setObjectName(option[0])
+            #     for item in option[4]:
+            #         comboPltthk.addItem(item)
+            #     comboPltthk.currentIndexChanged.connect(lambda: comboCh(KEY_PLATETHK))
+            # else:
+            #     pass
 
+        option_list = main.input_values(self)
+        _translate = QtCore.QCoreApplication.translate
+        i = 0
+        for option in option_list:
+            lable = option[1]
+            type = option[2]
+            # value = option[4]
+            print(option)
+            if type != TYPE_TITLE:
+                l = QtWidgets.QLabel(self.dockWidgetContents)
+                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                l.setFont(font)
+                l.setObjectName(option[0]+"_label")
+                l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
+
+            if type == TYPE_COMBOBOX:
+                combo = QtWidgets.QComboBox(self.dockWidgetContents)
+                combo.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                combo.setFont(font)
+                combo.setObjectName(option[0])
+                for item in option[4]:
+                    combo.addItem(item)
+
+            if type == TYPE_TEXTBOX:
+                r = QtWidgets.QLineEdit(self.dockWidgetContents)
+                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                font = QtGui.QFont()
+                font.setPointSize(11)
+                font.setBold(False)
+                font.setWeight(50)
+                r.setFont(font)
+                r.setObjectName(option[0])
+
+            if type == TYPE_TITLE:
+                q = QtWidgets.QLabel(self.dockWidgetContents)
+                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
+                font = QtGui.QFont()
+                q.setFont(font)
+                q.setObjectName("_title")
+                q.setText(_translate("MainWindow",
+                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
+
+            i = i + 30
+
+        new_list = main.input_value_changed()
+
+        for t in new_list:
+            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+            key_changed.currentIndexChanged.connect(lambda: change(key_changed, new_list))
+
+        def change(k1, new):
+
+            for tup in new:
+                if tup[0] != k1.objectName():
+                    continue
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, tup[1])
+                typ = tup[2]
+                f = tup[3]
+                val = f(k1.currentText())
+                k2.clear()
+                if typ == TYPE_COMBOBOX:
+                    for values in val:
+                        k2.addItem(values)
+                elif typ == TYPE_LABEL:
+                    k2.setText(val)
+                else:
+                    pass
 
         # self.label_4 = QtWidgets.QLabel(self.dockWidgetContents)
         # self.label_4.setGeometry(QtCore.QRect(6, 40, 120, 25))

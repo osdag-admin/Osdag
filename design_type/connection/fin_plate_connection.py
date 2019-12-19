@@ -17,6 +17,7 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import pickle
 
+
 connectivity = "column_flange_beam_web"
 supporting_member_section = "HB 400"
 supported_member_section = "MB 300"
@@ -151,7 +152,7 @@ class FinPlateConnection(ShearConnection):
         options_list.append(t14)
 
         return options_list
-
+    def
     def get_weld(self):
         return self.weld
 

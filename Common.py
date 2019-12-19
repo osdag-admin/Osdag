@@ -16,6 +16,8 @@ def connectdb(table_name):
        
     elif table_name == "Beams":
         cursor = conn.execute("SELECT Designation FROM Beams")
+    elif table_name == "Bolt":
+        cursor = conn.execute("SELECT Diameter_of_bolt FROM Bolt")
 
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
@@ -84,12 +86,14 @@ VALUES_TYP_2 = ['Bearing Bolt']
 KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
 VALUES_GRD = ['All','Customized']
+VALUES_GRD_CUSTOMIZED = []
 
 DISP_TITLE_PLATE = 'Plate'
 
 KEY_PLATETHK = 'Plate.Thickness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All','Customized']
+VALUES_PLATETHK_CUSTOMIZED = ['3','4','5','6','8','10','12','14','16','18','20']
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 

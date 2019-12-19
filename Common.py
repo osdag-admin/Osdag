@@ -52,7 +52,7 @@ KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
 
 KEY_DISP_PRIBM = 'Primary beam *'
-VALUES_PRIBM = ['Select', 'JB 150', 'JB 175', 'JB 200', 'JB 225']
+VALUES_PRIBM = connectdb("Beams")
 
 
 KEY_SUPTDSEC = 'Member.Supported_Section'
@@ -61,7 +61,7 @@ KEY_DISP_BEAMSEC = 'Beam Section *'
 VALUES_BEAMSEC = connectdb("Beams")
 
 KEY_DISP_SECBM = 'Secondary beam *'
-VALUES_SECBM = ['Select', 'JB 150', 'JB 175', 'JB 200', 'JB 225']
+VALUES_SECBM = connectdb("Beams")
 
 KEY_FU = 'Member.fu'
 KEY_DISP_FU = 'fu(MPa)*'

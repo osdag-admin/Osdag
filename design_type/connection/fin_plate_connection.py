@@ -54,7 +54,7 @@ class FinPlateConnection(ShearConnection):
         self.weld_size_list = []
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
 
-    def input_values(self, existingvalues = {}):
+    def input_values(self, existingvalues={}):
 
         options_list = []
 
@@ -108,7 +108,6 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_platethk = ''
 
-
         t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
         options_list.append(t1)
 
@@ -152,7 +151,62 @@ class FinPlateConnection(ShearConnection):
         options_list.append(t14)
 
         return options_list
-    def
+
+
+    def input_value_changed():
+
+        def fn_conn_suptngsec_lbl(v):
+
+            if v in VALUES_CONN_1:
+                return KEY_DISP_COLSEC
+            elif v in VALUES_CONN_2:
+                return KEY_DISP_PRIBM
+            else:
+                return ''
+
+        def fn_conn_suptdsec_lbl(v):
+
+            if v in VALUES_CONN_1:
+                return KEY_DISP_BEAMSEC
+            elif v in VALUES_CONN_2:
+                return KEY_DISP_SECBM
+            else:
+                return ''
+
+        def fn_conn_suptngsec(v):
+
+            if v in VALUES_CONN_1:
+                return VALUES_COLSEC
+            elif v in VALUES_CONN_2:
+                return VALUES_PRIBM
+            else:
+                return []
+
+        def fn_conn_suptdsec(v):
+
+            if v in VALUES_CONN_1:
+                return VALUES_BEAMSEC
+            elif v in VALUES_CONN_2:
+                return VALUES_SECBM
+            else:
+                return []
+
+        lst = []
+
+        t1 = (KEY_CONN, KEY_SUPTNGSEC + "_label", TYPE_LABEL, fn_conn_suptngsec_lbl)
+        lst.append(t1)
+
+        t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, fn_conn_suptngsec)
+        lst.append(t2)
+
+        t3 = (KEY_CONN, KEY_SUPTDSEC + "_label", TYPE_LABEL, fn_conn_suptdsec_lbl)
+        lst.append(t3)
+
+        t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, fn_conn_suptdsec)
+        lst.append(t4)
+
+        return lst
+
     def get_weld(self):
         return self.weld
 

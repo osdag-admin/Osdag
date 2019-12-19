@@ -40,7 +40,7 @@ import shutil
 import cairosvg
 import configparser
 from gui.ui_OsdagMainPage import Ui_MainWindow
-from gui.ui_template_personal import Ui_ModuleWindow
+from gui.ui_template import Ui_ModuleWindow
 class MainController(QMainWindow):
     # closed = pyqtSignal()
     def __init__(self, Ui_ModuleWindow, main, folder):

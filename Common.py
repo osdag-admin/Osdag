@@ -1,12 +1,15 @@
 TYPE_COMBOBOX = 'ComboBox'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
+TYPE_LABEL = 'Label'
 
 import sqlite3
 from utils.common.component import Component
+
+
 def connectdb(table_name):
    
-    conn=sqlite3.connect(Component().path_to_database)
+    conn = sqlite3.connect(Component().path_to_database)
     lst = []
     if table_name == "Angles":
         cursor = conn.execute("SELECT Designation FROM Angles")
@@ -26,12 +29,12 @@ def connectdb(table_name):
     for row in rows:
         lst.append(row)
    
-    final_lst = l(lst)
+    final_lst = tuple_to_str(lst)
     return final_lst
 
 
-def l(tl):
-    arr = ['Select']
+def tuple_to_str(tl):
+    arr = ['Select Section']
     for v in tl:
         val = ''.join(v)
         arr.append(val)
@@ -41,24 +44,26 @@ DISP_TITLE_CM = 'Connecting members'
 
 KEY_CONN = 'Connectivity'
 KEY_DISP_CONN = 'Connectivity *'
-VALUES_CONN = ['Select Connectivity','Column flange-Beam web','Colum web-Beam web','Beam-Beam']
-VALUES_CONN_1 = ['Column flange-Beam web','Column web-Beam web']
+VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
+VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
+KEY_DISP_SUPTNGSEC = 'Supporting Section'
 KEY_DISP_COLSEC = 'Column Section *'
 VALUES_COLSEC = connectdb("Columns")
 
 KEY_DISP_PRIBM = 'Primary beam *'
-VALUES_PRIBM = ['Select section','JB 150','JB 175','JB 200','JB 225']
+VALUES_PRIBM = connectdb("Beams")
 
 
 KEY_SUPTDSEC = 'Member.Supported_Section'
+KEY_DISP_SUPTDSEC = 'Supported Section'
 KEY_DISP_BEAMSEC = 'Beam Section *'
 VALUES_BEAMSEC = connectdb("Beams")
 
 KEY_DISP_SECBM = 'Secondary beam *'
-VALUES_SECBM = ['Select section','JB 150','JB 175','JB 200','JB 225']
+VALUES_SECBM = connectdb("Beams")
 
 KEY_FU = 'Member.fu'
 KEY_DISP_FU = 'fu(MPa)*'
@@ -85,8 +90,10 @@ VALUES_TYP_2 = ['Bearing Bolt']
 
 KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
-VALUES_GRD = ['All','Customized']
-VALUES_GRD_CUSTOMIZED = []
+
+VALUES_GRD = ['All', 'Customized']
+VALUES_GRD_1 = ['All']
+VALUES_GRD_2 = ['Customized']
 
 DISP_TITLE_PLATE = 'Plate'
 

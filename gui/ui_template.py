@@ -1293,9 +1293,9 @@ class Ui_ModuleWindow(QMainWindow):
         font.setBold(False)
         font.setWeight(50)
         self.txtPlateWidth.setFont(font)
-        self.txtPlateWidth.setObjectName("txtPlateWidth")
+        self.txtPlateWidth.setObjectName("txtPlateWidth")"""
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect(30, 620, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect(30, 600, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1304,7 +1304,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Reset.setAutoDefault(True)
         self.btn_Reset.setObjectName("btn_Reset")
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect(140, 620, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect(140, 600, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1312,7 +1312,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-        self.combo_Beam = QtWidgets.QComboBox(self.dockWidgetContents)
+        """self.combo_Beam = QtWidgets.QComboBox(self.dockWidgetContents)
         self.combo_Beam.setGeometry(QtCore.QRect(150, 157, 160, 27))
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -2027,6 +2027,33 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.setTabOrder(self.txtExtMomnt_2, self.txtMomntCapacity_2)
         MainWindow.setTabOrder(self.txtMomntCapacity_2, self.lineEdit_3)
 
+        # def reset_fn():
+        #     for widget in self.dockWidgetContents.children():
+        #         if widget.objectName() in [KEY_CONN, KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_MATERIAL, KEY_D, KEY_TYP,KEY_GRD, KEY_PLATETHK]:
+        #             w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
+        #             w.setCurrentIndex(0)
+        #         elif widget.objectName() in [KEY_VERSH, KEY_AXIAL]:
+        #             w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
+        #             w.setText('')
+        #         else:
+        #             pass
+
+        def reset_fn():
+            for widget in self.dockWidgetContents.children():
+                for op in option_list:
+                    if widget.objectName() == op[0]:
+                        if op[2] == TYPE_COMBOBOX:
+                            w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
+                            w.setCurrentIndex(0)
+                        elif op[2] == TYPE_TEXTBOX:
+                            w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
+                            w.setText('')
+                        else:
+                            pass
+                    else:
+                        pass
+
+        self.btn_Reset.clicked.connect(reset_fn)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -2162,13 +2189,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnReset_4.setText(_translate("MainWindow", "Reset"))
         self.btnDesign_4.setText(_translate("MainWindow", "Design"))
         #self.txtPlateWidth.setPlaceholderText(_translate("MainWindow", "0"))
-        """self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
+        self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
         self.btn_Reset.setText(_translate("MainWindow", "Reset"))
         self.btn_Reset.setShortcut(_translate("MainWindow", "Alt+R"))
         self.btn_Design.setToolTip(_translate("MainWindow", "Alt+D"))
         self.btn_Design.setText(_translate("MainWindow", "Design"))
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
-        self.comboWldSize.setItemText(0, _translate("MainWindow", "Select weld thickness"))
+        """self.comboWldSize.setItemText(0, _translate("MainWindow", "Select weld thickness"))
         self.comboWldSize.setItemText(1, _translate("MainWindow", "3"))
         self.comboWldSize.setItemText(2, _translate("MainWindow", "4"))
         self.comboWldSize.setItemText(3, _translate("MainWindow", "5"))

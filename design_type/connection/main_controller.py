@@ -41,6 +41,8 @@ import cairosvg
 import configparser
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_template import Ui_ModuleWindow
+
+
 class MainController(QMainWindow):
     # closed = pyqtSignal()
     def __init__(self, Ui_ModuleWindow, main, folder):
@@ -122,11 +124,12 @@ class MainController(QMainWindow):
         global logger
         logger = logging.getLogger("osdag.model")
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
-    # folder_path = r'C:\Users\Win10\Desktop'
-    folder_path = r'C:\Users\pc\Desktop'
+    folder_path = r'C:\Users\Win10\Desktop'
+    # folder_path = r'C:\Users\pc\Desktop'
     if not os.path.exists(folder_path):
         os.mkdir(folder_path, 0o755)
     image_folder_path = os.path.join(folder_path, 'images_html')

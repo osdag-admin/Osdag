@@ -46,8 +46,6 @@ class Ui_ModuleWindow(QMainWindow):
         self.window.show()
 
     def setupUi(self, MainWindow, main):
-
-        print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
         icon = QtGui.QIcon()
@@ -422,9 +420,6 @@ class Ui_ModuleWindow(QMainWindow):
         for option in option_list:
             lable = option[1]
             type = option[2]
-            #value = option[4]
-            print(option)
-
             if type != TYPE_TITLE:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))
@@ -481,6 +476,7 @@ class Ui_ModuleWindow(QMainWindow):
             else:
                 pass
 
+
         def popup(key, for_custom_list):
             for c_tup in for_custom_list:
                 if c_tup[0] != key.objectName():
@@ -493,6 +489,24 @@ class Ui_ModuleWindow(QMainWindow):
                     self.openWidget(options)
                 else:
                     print(f())
+
+        def change(k1, new):
+
+            for tup in new:
+                (object_name, k2_key, typ, f) = tup
+                if object_name != k1.objectName():
+                    continue
+                if typ == TYPE_LABEL:
+                    k2_key = k2_key + "_label"
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
+                val = f(k1.currentText())
+                k2.clear()
+                if typ == TYPE_COMBOBOX:
+                    for values in val:
+                        k2.addItem(values)
+                elif typ == TYPE_LABEL:
+                    k2.setText(val)
+                
 
         """self.lbl_fu = QtWidgets.QLabel(self.dockWidgetContents)
         self.lbl_fu.setGeometry(QtCore.QRect(6, 187, 120, 25))
@@ -1186,9 +1200,9 @@ class Ui_ModuleWindow(QMainWindow):
         font.setBold(False)
         font.setWeight(50)
         self.txtPlateWidth.setFont(font)
-        self.txtPlateWidth.setObjectName("txtPlateWidth")
+        self.txtPlateWidth.setObjectName("txtPlateWidth")"""
         self.btn_Reset = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Reset.setGeometry(QtCore.QRect(30, 620, 100, 30))
+        self.btn_Reset.setGeometry(QtCore.QRect(30, 600, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1201,7 +1215,7 @@ class Ui_ModuleWindow(QMainWindow):
 
 
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
-        self.btn_Design.setGeometry(QtCore.QRect(140, 620, 100, 30))
+        self.btn_Design.setGeometry(QtCore.QRect(140, 600, 100, 30))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -1930,6 +1944,43 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.setTabOrder(self.txtExtMomnt_2, self.txtMomntCapacity_2)
         MainWindow.setTabOrder(self.txtMomntCapacity_2, self.lineEdit_3)
 
+        def reset_fn():
+            for widget in self.dockWidgetContents.children():
+                for op in option_list:
+                    if widget.objectName() == op[0]:
+                        if op[2] == TYPE_COMBOBOX:
+                            widget.setCurrentIndex(0)
+                        elif op[2] == TYPE_TEXTBOX:
+                            widget.setText('')
+                        else:
+                            pass
+                    else:
+                        pass
+
+        self.btn_Reset.clicked.connect(reset_fn)
+
+        def design_fn():
+            design_dictionary = {}
+            for widget in self.dockWidgetContents.children():
+                for op in option_list:
+                    if widget.objectName() == op[0]:
+                        if op[2] == TYPE_COMBOBOX:
+                            des_key = widget.objectName()
+                            des_val = widget.currentText()
+                            d1 = {des_key: des_val}
+                        elif op[2] == TYPE_TEXTBOX:
+                            des_key = widget.objectName()
+                            des_val = widget.text()
+                            d1 = {des_key: des_val}
+                        else:
+                            pass
+                        design_dictionary.update(d1)
+                    else:
+                        pass
+            print(design_dictionary)
+
+        self.btn_Design.clicked.connect(design_fn)
+        
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
@@ -2065,13 +2116,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnReset_4.setText(_translate("MainWindow", "Reset"))
         self.btnDesign_4.setText(_translate("MainWindow", "Design"))
         #self.txtPlateWidth.setPlaceholderText(_translate("MainWindow", "0"))
-        """self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
+        self.btn_Reset.setToolTip(_translate("MainWindow", "Alt+R"))
         self.btn_Reset.setText(_translate("MainWindow", "Reset"))
         self.btn_Reset.setShortcut(_translate("MainWindow", "Alt+R"))
         self.btn_Design.setToolTip(_translate("MainWindow", "Alt+D"))
         self.btn_Design.setText(_translate("MainWindow", "Design"))
         self.btn_Design.setShortcut(_translate("MainWindow", "Alt+D"))
-        self.comboWldSize.setItemText(0, _translate("MainWindow", "Select weld thickness"))
+        """self.comboWldSize.setItemText(0, _translate("MainWindow", "Select weld thickness"))
         self.comboWldSize.setItemText(1, _translate("MainWindow", "3"))
         self.comboWldSize.setItemText(2, _translate("MainWindow", "4"))
         self.comboWldSize.setItemText(3, _translate("MainWindow", "5"))

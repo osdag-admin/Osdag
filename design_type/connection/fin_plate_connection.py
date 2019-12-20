@@ -75,20 +75,20 @@ class FinPlateConnection(ShearConnection):
         else:
             existingvalue_key_suptdsec = ''
 
-        if KEY_FU in existingvalues:
-            existingvalue_key_fu = existingvalues[KEY_FU]
+        if KEY_MATERIAL in existingvalues:
+            existingvalue_key_mtrl = existingvalues[KEY_MATERIAL]
         else:
-            existingvalue_key_fu = ''
-
-        if KEY_FY in existingvalues:
-            existingvalue_key_fy = existingvalues[KEY_FY]
-        else:
-            existingvalue_key_fy = ''
+            existingvalue_key_mtrl = ''
 
         if KEY_VERSH in existingvalues:
             existingvalue_key_versh = existingvalues[KEY_VERSH]
         else:
             existingvalue_key_versh = ''
+
+        if KEY_AXIAL in existingvalues:
+            existingvalue_key_axial = existingvalues[KEY_AXIAL]
+        else:
+            existingvalue_key_axial = ''
 
         if KEY_D in existingvalues:
             existingvalue_key_d = existingvalues[KEY_D]
@@ -122,16 +122,16 @@ class FinPlateConnection(ShearConnection):
         t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
         options_list.append(t4)
 
-        t5 = (KEY_FU, KEY_DISP_FU, TYPE_TEXTBOX, existingvalue_key_fu, None)
+        t5 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, existingvalue_key_mtrl, VALUES_MATERIAL)
         options_list.append(t5)
 
-        t6 = (KEY_FY, KEY_DISP_FY, TYPE_TEXTBOX, existingvalue_key_fy, None)
+        t6 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
         options_list.append(t6)
 
-        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        t7 = (KEY_VERSH, KEY_DISP_VERSH, TYPE_TEXTBOX, existingvalue_key_versh, None)
         options_list.append(t7)
 
-        t8 = (KEY_VERSH, KEY_DISP_VERSH, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        t8 = (KEY_AXIAL, KEY_DISP_AXIAL, TYPE_TEXTBOX, existingvalue_key_axial, None)
         options_list.append(t8)
 
         t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
@@ -177,10 +177,6 @@ class FinPlateConnection(ShearConnection):
         list1.append(t3)
         return list1
 
-
-
-
-
     def input_value_changed():
 
         def fn_conn_suptngsec_lbl(v):
@@ -221,13 +217,13 @@ class FinPlateConnection(ShearConnection):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC + "_label", TYPE_LABEL, fn_conn_suptngsec_lbl)
+        t1 = (KEY_CONN, KEY_SUPTNGSEC , TYPE_LABEL, fn_conn_suptngsec_lbl)
         lst.append(t1)
 
         t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC + "_label", TYPE_LABEL, fn_conn_suptdsec_lbl)
+        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, fn_conn_suptdsec_lbl)
         lst.append(t3)
 
         t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, fn_conn_suptdsec)
@@ -261,7 +257,7 @@ fin_plate_input.load = load
 fin_plate_input.plate = plate
 fin_plate_input.weld = weld
 
-print(fin_plate_input.bolt)
+# print(fin_plate_input.bolt)
 
 with open("filename", 'w') as out_file:
     yaml.dump(fin_plate_input, out_file)

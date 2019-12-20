@@ -462,6 +462,7 @@ class Ui_ModuleWindow(QMainWindow):
                 r.setFont(font)
                 r.setObjectName("r")
             i=i+30
+
         new_list = main.customized_input()
         for t in new_list:
             if t[0] == KEY_PLATETHK:
@@ -490,6 +491,12 @@ class Ui_ModuleWindow(QMainWindow):
                 else:
                     print(f())
 
+        updated_list = main.input_value_changed()
+
+        for t in updated_list:
+            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+            key_changed.currentIndexChanged.connect(lambda: change(key_changed, updated_list))
+
         def change(k1, new):
 
             for tup in new:
@@ -506,6 +513,8 @@ class Ui_ModuleWindow(QMainWindow):
                         k2.addItem(values)
                 elif typ == TYPE_LABEL:
                     k2.setText(val)
+                else:
+                    pass
                 
 
         """self.lbl_fu = QtWidgets.QLabel(self.dockWidgetContents)

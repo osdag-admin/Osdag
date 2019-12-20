@@ -36,7 +36,6 @@ import configparser
 
 class Ui_ModuleWindow(QMainWindow):
     def setupUi(self, MainWindow, main):
-        print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
         icon = QtGui.QIcon()
@@ -524,7 +523,7 @@ class Ui_ModuleWindow(QMainWindow):
             lable = option[1]
             type = option[2]
             # value = option[4]
-            print(option)
+            # print(option)
             if type != TYPE_TITLE:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))

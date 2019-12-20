@@ -234,7 +234,7 @@ fin_plate_input.load = load
 fin_plate_input.plate = plate
 fin_plate_input.weld = weld
 
-print(fin_plate_input.bolt)
+# print(fin_plate_input.bolt)
 
 with open("filename", 'w') as out_file:
     yaml.dump(fin_plate_input, out_file)

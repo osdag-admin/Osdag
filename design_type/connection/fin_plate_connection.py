@@ -1,6 +1,7 @@
 from utils.common.material import Material
 from design_type.connection.shear_connection import ShearConnection
 from utils.common.component import Bolt, Plate, Weld
+from Common import *
 from utils.common.load import Load
 import yaml
 import os
@@ -52,16 +53,152 @@ class FinPlateConnection(ShearConnection):
         self.weld_size_list = []
         self.plate = Plate(thickness=plate_thickness, height=plate_height, width=plate_width, material=self.material)
 
-    def input_values(self, current_values={}):
-        option_list = []
-        option_list.append(["connectivity", "Connectivity*", "combo_box", "Select Connectivity",["Select Connectivity","cfbw","cwbw","bb"]])
-        connectivity = current_values["connectivity"] if "connectivity" in current_values else "bb"
-        if connectivity == "bb":
-            beam_list=["select list"]
-            beam_list.extend(["MB200", "MB300"])
-            option_list.append(["supporting section", "primary*", "combo_box", "Select beam", beam_list])
-        print(option_list)
-        return option_list
+    def input_values(self, existingvalues={}):
+
+        options_list = []
+
+        if KEY_CONN in existingvalues and existingvalues[KEY_CONN] in VALUES_CONN:
+            existingvalue_key_conn = existingvalues[KEY_CONN]
+        else:
+            existingvalue_key_conn = ''
+
+        if KEY_SUPTNGSEC in existingvalues:
+            existingvalue_key_suptngsec = existingvalues[KEY_SUPTNGSEC]
+        else:
+            existingvalue_key_suptngsec = ''
+
+        if KEY_SUPTDSEC in existingvalues:
+            existingvalue_key_suptdsec = existingvalues[KEY_SUPTDSEC]
+        else:
+            existingvalue_key_suptdsec = ''
+
+        if KEY_FU in existingvalues:
+            existingvalue_key_fu = existingvalues[KEY_FU]
+        else:
+            existingvalue_key_fu = ''
+
+        if KEY_FY in existingvalues:
+            existingvalue_key_fy = existingvalues[KEY_FY]
+        else:
+            existingvalue_key_fy = ''
+
+        if KEY_VERSH in existingvalues:
+            existingvalue_key_versh = existingvalues[KEY_VERSH]
+        else:
+            existingvalue_key_versh = ''
+
+        if KEY_D in existingvalues:
+            existingvalue_key_d = existingvalues[KEY_D]
+        else:
+            existingvalue_key_d = ''
+
+        if KEY_TYP in existingvalues:
+            existingvalue_key_typ = existingvalues[KEY_TYP]
+        else:
+            existingvalue_key_typ = ''
+
+        if KEY_GRD in existingvalues:
+            existingvalue_key_grd = existingvalues[KEY_GRD]
+        else:
+            existingvalue_key_grd = ''
+
+        if KEY_PLATETHK in existingvalues:
+            existingvalue_key_platethk = existingvalues[KEY_PLATETHK]
+        else:
+            existingvalue_key_platethk = ''
+
+        if KEY_PLATEHT in existingvalues:
+            existingvalue_key_plateht = existingvalues[KEY_PLATEHT]
+        else:
+            existingvalue_key_plateht = ''
+
+        if KEY_PLATEWD in existingvalues:
+            existingvalue_key_platewd = existingvalues[KEY_PLATEWD]
+        else:
+            existingvalue_key_platewd = ''
+
+        if KEY_WELDTHK in existingvalues:
+            existingvalue_key_weldthk = existingvalues[KEY_WELDTHK]
+        else:
+            existingvalue_key_weldthk = ''
+
+        t1 = (None, DISP_TITLE_CM, TYPE_TITLE, None, None)
+        options_list.append(t1)
+
+        t2 = (KEY_CONN, KEY_DISP_CONN, TYPE_COMBOBOX, existingvalue_key_conn, VALUES_CONN)
+        options_list.append(t2)
+
+        if existingvalue_key_conn in VALUES_CONN_1:
+
+            t3 = (KEY_SUPTNGSEC, KEY_DISP_COLSEC, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_COLSEC)
+            options_list.append(t3)
+
+            t4 = (KEY_SUPTDSEC, KEY_DISP_BEAMSEC, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_BEAMSEC)
+            options_list.append(t4)
+
+        elif existingvalue_key_conn in VALUES_CONN_2:
+
+            t3 = (KEY_SUPTNGSEC, KEY_DISP_PRIBM, TYPE_COMBOBOX, existingvalue_key_suptngsec, VALUES_PRIBM)
+            options_list.append(t3)
+
+            t4 = (KEY_SUPTDSEC, KEY_DISP_SECBM, TYPE_COMBOBOX, existingvalue_key_suptdsec, VALUES_SECBM)
+            options_list.append(t4)
+
+        t5 = (KEY_FU, KEY_DISP_FU, TYPE_TEXTBOX, existingvalue_key_fu, None)
+        options_list.append(t5)
+
+        t6 = (KEY_FY, KEY_DISP_FY, TYPE_TEXTBOX, existingvalue_key_fy, None)
+        options_list.append(t6)
+
+        t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, None)
+        options_list.append(t7)
+
+        t8 = (KEY_VERSH, KEY_DISP_VERSH, TYPE_TEXTBOX, existingvalue_key_versh, None)
+        options_list.append(t8)
+
+        t9 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, None)
+        options_list.append(t9)
+
+        t10 = (KEY_D, KEY_DISP_D, TYPE_COMBOBOX, existingvalue_key_d, VALUES_D)
+        options_list.append(t10)
+
+        t11 = (KEY_TYP, KEY_DISP_TYP, TYPE_COMBOBOX, existingvalue_key_typ, VALUES_TYP)
+        options_list.append(t11)
+
+        if existingvalue_key_typ in ['Friction Grip Bolt']:
+
+            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, VALUES_GRD_1)
+            options_list.append(t12)
+
+        elif existingvalue_key_typ in ['Bearing Bolt']:
+
+            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalues_key_grd, VALUES_GRD_2)
+            options_list.append(t12)
+
+        else:
+
+            t12 = (KEY_GRD, KEY_DISP_GRD, TYPE_COMBOBOX, existingvalue_key_grd, None)
+            options_list.append(t12)
+
+        t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, None)
+        options_list.append(t13)
+
+        t14 = (KEY_PLATETHK, KEY_DISP_PLATETHK, TYPE_COMBOBOX, existingvalue_key_platethk, VALUES_PLATETHK)
+        options_list.append(t14)
+
+        t15 = (KEY_PLATEHT, KEY_DISP_PLATEHT, TYPE_TEXTBOX, existingvalue_key_plateht, None)
+        options_list.append(t15)
+
+        t16 = (KEY_PLATEWD, KEY_DISP_PLATEWD, TYPE_TEXTBOX, existingvalue_key_platewd, None)
+        options_list.append(t16)
+
+        t17 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, None)
+        options_list.append(t17)
+
+        t18 = (KEY_WELDTHK, KEY_DISP_WELDTHK, TYPE_COMBOBOX, existingvalue_key_weldthk, VALUES_WELDTHK)
+        options_list.append(t18)
+
+        return options_list
 
     def get_weld(self):
         return self.weld

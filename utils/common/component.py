@@ -7,7 +7,7 @@ class Component(object):
 
     def __init__(self, material=Material()):
         self.material = material
-        self.path_to_database = "../../ResourceFiles/Database/Intg_osdag.sqlite"
+        self.path_to_database = "ResourceFiles/Database/Intg_osdag.sqlite"
 
 class Bolt(Component):
 

@@ -7,7 +7,7 @@ Created on 31-Mar-2016
 
 import sys
 # from PyQt5 import Qt
-# from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot,pyqtSignal, QObject
 from PyQt5.QtWidgets import QMainWindow, QDialog,QMessageBox, QFileDialog, QApplication
 from gui.ui_OsdagMainPage import Ui_MainWindow
 from gui.ui_tutorial import Ui_Tutorial
@@ -16,7 +16,7 @@ from gui.ui_ask_question import Ui_AskQuestion
 from design_type.connection.fin_plate_connection import FinPlateConnection
 from gui.ui_template import Ui_ModuleWindow
 
-from design_type.connection import main_controller
+# from design_type.connection.main_controller import MainController
 import os
 import os.path
 import subprocess
@@ -120,28 +120,24 @@ class OsdagMainWindow(QMainWindow):
             self.about_osdag()
         elif loc == "Ask Us a Question":
             self.ask_question()
-    # elif loc == "FAQ":
-    #     pass
+        # elif loc == "FAQ":
+        #     pass
 
     def disable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(False)
         self.ui.btn_compression.setEnabled(False)
         self.ui.btn_connection.setEnabled(False)
         self.ui.btn_flexural.setEnabled(False)
-        self.ui.btn_gantry.setEnabled(False)
         self.ui.btn_plate.setEnabled(False)
         self.ui.btn_tension.setEnabled(False)
-        self.ui.btn_help.setEnabled(False)
 
     def enable_desgin_buttons(self):
         self.ui.btn_beamCol.setEnabled(True)
         self.ui.btn_compression.setEnabled(True)
         self.ui.btn_connection.setEnabled(True)
         self.ui.btn_flexural.setEnabled(True)
-        self.ui.btn_gantry.setEnabled(True)
         self.ui.btn_plate.setEnabled(True)
         self.ui.btn_tension.setEnabled(True)
-        self.ui.btn_help.setEnabled(True)
 
     def change_desgin_page(self, current, previous):
         if not current:
@@ -155,37 +151,6 @@ class OsdagMainWindow(QMainWindow):
         desktop_path = config.get("desktop_path", "path1")
         folder = QFileDialog.getExistingDirectory(self, "Select Workspace Folder (Don't use spaces in the folder name)", desktop_path)
         return folder
-
-    def show_shear_connection(self):
-        folder = self.select_workspace_folder()
-        folder = str(folder)
-        if not os.path.exists(folder):
-            if folder == '':
-                pass
-            else:
-                os.mkdir(folder, 0o755)
-
-        root_path = folder
-        images_html_folder = ['images_html']
-        flag = True
-        for create_folder in images_html_folder:
-            if root_path == '':
-                flag = False
-                return flag
-            else:
-                try:
-                    os.mkdir(os.path.join(root_path, create_folder))
-                except OSError:
-                    shutil.rmtree(os.path.join(folder, create_folder))
-                    os.mkdir(os.path.join(root_path, create_folder))
-
-        if self.ui.rdbtn_finplate.isChecked():
-            window = Ui_ModuleWindow(FinPlateConnection,folder)
-            window.show()
-            # MainController.launchwindow(self, Ui_ModuleWindow, FinPlateConnection,folder)
-            # self.ui.myStackedWidget.setCurrentIndex(0)
-        else:
-            QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
     # ********************************* Help Action *********************************************************************************************
 
@@ -224,70 +189,49 @@ class OsdagMainWindow(QMainWindow):
     def unavailable(self):
          QMessageBox.about(self, "INFO", "This module is not available in the current version.")
 
+    @pyqtSlot()
+    def show_shear_connection(self):
+        folder = self.select_workspace_folder()
+        folder = str(folder)
+        if not os.path.exists(folder):
+            if folder == '':
+                pass
+            else:
+                os.mkdir(folder, 0o755)
+
+        root_path = folder
+        images_html_folder = ['images_html']
+        flag = True
+        for create_folder in images_html_folder:
+            if root_path == '':
+                flag = False
+                return flag
+            else:
+                try:
+                    os.mkdir(os.path.join(root_path, create_folder))
+                except OSError:
+                    shutil.rmtree(os.path.join(folder, create_folder))
+                    os.mkdir(os.path.join(root_path, create_folder))
+
+        if self.ui.rdbtn_finplate.isChecked():
+            self.hide()
+            self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            self.window.show()
+            self.window.closed.connect(self.show)
+        else:
+            QMessageBox.about(self, "INFO", "Please select appropriate connection")
+
 class MainController(QMainWindow):
-    # closed = pyqtSignal()
+    closed = pyqtSignal()
     def __init__(self, Ui_ModuleWindow, main, folder):
+        super(MainController,self).__init__()
         QMainWindow.__init__(self)
         self.ui = Ui_ModuleWindow()
         self.ui.setupUi(self, main)
         self.folder = folder
-        self.connection = "Finplate"
-
-    def launchwindow(self, modulewindow, main, folder):
-        try:
-            print(self, modulewindow, main, folder)
-            # MainController.set_osdaglogger(self)
-            rawLogger = logging.getLogger("raw")
-            rawLogger.setLevel(logging.INFO)
-            fh = logging.FileHandler("design_type/connection/fin.log", mode="w")
-            formatter = logging.Formatter('''%(message)s''')
-            fh.setFormatter(formatter)
-            rawLogger.addHandler(fh)
-            rawLogger.info('''<link rel="stylesheet" type="text/css" href="Connections/Shear/Finplate/log.css"/>''')
-            MainController.module_setup(self)
-            print(self, modulewindow, main, folder)
-            window = MainController(modulewindow, main, folder)
-            print(window)
-            OsdagMainWindow.hide(self)
-            window.show()
-            window.closed.connect(OsdagMainWindow.show)
-        except BaseException as e:
-            print("ERROR1", str(e))
-
-    def set_osdaglogger(self):
-        global logger
-        logger = None
-        if logger is None:
-            logger = logging.getLogger("osdag")
-        else:
-            for handler in logger.handlers[:]:
-                logger.removeHandler(handler)
-
-        logger.setLevel(logging.DEBUG)
-
-        # create the logging file handler
-        fh = logging.FileHandler("design_type/connection/fin.log", mode="a")
-
-        # ,datefmt='%a, %d %b %Y %H:%M:%S'
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-        formatter = logging.Formatter('''
-        <div  class="LOG %(levelname)s">
-            <span class="DATE">%(asctime)s</span>
-            <span class="LEVEL">%(levelname)s</span>
-            <span class="MSG">%(message)s</span>
-        </div>''')
-        formatter.datefmt = '%a, %d %b %Y %H:%M:%S'
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-
-    def module_setup(self):
-        global logger
-        logger = logging.getLogger("osdag.model")
 
 # Back up the reference to the exceptionhook
 sys._excepthook = sys.excepthook
-
 def the_exception_hook(exctype, value, traceback):
     '''Finds the error occurs when Osdag crashes
 
@@ -307,9 +251,12 @@ def the_exception_hook(exctype, value, traceback):
 
 # Set the exception hook to our wrapping function
 sys.excepthook = the_exception_hook
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    # folder_path = r'C:\Users\Deepthi\Desktop\OsdagWorkspace'
+    # # folder_path = r'C:\Users\Win10\Desktop'
+    # # folder_path = r'C:\Users\pc\Desktop'
+    # window = MainController(Ui_ModuleWindow, FinPlateConnection, folder_path)
     window = OsdagMainWindow()
     window.show()
     try:

@@ -20,6 +20,12 @@ def connectdb(table_name):
     elif table_name == "Beams":
         cursor = conn.execute("SELECT Designation FROM Beams")
 
+    elif table_name == "Bolt":
+        cursor = conn.execute("SELECT Diameter_of_bolt FROM Bolt")
+
+    elif table_name == "Material":
+        cursor = conn.execute("SELECT Grade FROM Material")
+
     else:
         cursor = conn.execute("SELECT Designation FROM Columns")
     rows = cursor.fetchall()
@@ -37,6 +43,7 @@ def tuple_to_str(tl):
         val = ''.join(v)
         arr.append(val)
     return arr
+
 
 DISP_TITLE_CM = 'Connecting members'
 
@@ -63,43 +70,41 @@ VALUES_BEAMSEC = connectdb("Beams")
 KEY_DISP_SECBM = 'Secondary beam *'
 VALUES_SECBM = connectdb("Beams")
 
-KEY_FU = 'Member.fu'
-KEY_DISP_FU = 'fu(MPa)*'
-
-KEY_FY = 'Member.fy'
-KEY_DISP_FY = 'fy(MPa)*'
+KEY_MATERIAL = 'Member.Material'
+KEY_DISP_MATERIAL = 'Material *'
+VALUES_MATERIAL = connectdb("Material")
 
 DISP_TITLE_FSL = 'Factored shear load'
 
 KEY_VERSH = 'Load.Vertical_Shear'
 KEY_DISP_VERSH = 'Vert. Shear(kN)*'
 
+KEY_AXIAL = 'Load.Axial'
+KEY_DISP_AXIAL = 'Axial (kN) *'
+
 DISP_TITLE_BOLT = 'Bolt'
 
 KEY_D = 'Bolt.Diameter'
 KEY_DISP_D = 'Diameter(mm)*'
-VALUES_D = ['All','Customized']
+VALUES_D = ['All', 'Customized']
 
 KEY_TYP = 'Bolt.Type'
 KEY_DISP_TYP = 'Type *'
-VALUES_TYP = ['Select Type','Friction Grip Bolt','Bearing Bolt']
+VALUES_TYP = ['Select Type', 'Friction Grip Bolt', 'Bearing Bolt']
 VALUES_TYP_1 = ['Friction Grip Bolt']
 VALUES_TYP_2 = ['Bearing Bolt']
 
 KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
+
 VALUES_GRD = ['All', 'Customized']
-VALUES_GRD_1 = ['All']
-VALUES_GRD_2 = ['Customized']
 
 DISP_TITLE_PLATE = 'Plate'
 
 KEY_PLATETHK = 'Plate.Thickness'
 KEY_DISP_PLATETHK = 'Thickness(mm)*'
 VALUES_PLATETHK = ['All', 'Customized']
-
-
-LABEL_LIST = [KEY_CONN, KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_FU, KEY_FY, KEY_VERSH, KEY_D, KEY_TYP, KEY_GRD]
+VALUES_PLATETHK_CUSTOMIZED = ['3', '4', '5', '6', '8', '10', '12', '14', '16', '18', '20']
 
 DISP_TITLE_CLEAT = 'Cleat Angle'
 

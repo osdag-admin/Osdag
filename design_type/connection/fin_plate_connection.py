@@ -17,6 +17,8 @@ from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
 import pickle
 
+#from ...gui.newnew import Ui_Form
+#newnew_object = Ui_Form()
 
 connectivity = "column_flange_beam_web"
 supporting_member_section = "HB 400"
@@ -151,6 +153,32 @@ class FinPlateConnection(ShearConnection):
         options_list.append(t14)
 
         return options_list
+
+    def pltthk_customized():
+        a = VALUES_PLATETHK_CUSTOMIZED
+        return a
+
+    def grdval_customized():
+        b = VALUES_GRD_CUSTOMIZED
+        return b
+
+    def diam_bolt_customized():
+        c = connectdb1()
+        return c
+
+    def customized_input():
+
+        list1 = []
+        t1 = (KEY_GRD, FinPlateConnection.grdval_customized)
+        list1.append(t1)
+        t2 = (KEY_PLATETHK, FinPlateConnection.pltthk_customized)
+        list1.append(t2)
+        t3 = (KEY_D, FinPlateConnection.diam_bolt_customized)
+        list1.append(t3)
+        return list1
+
+
+
 
 
     def input_value_changed():

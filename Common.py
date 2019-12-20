@@ -7,6 +7,17 @@ import sqlite3
 from utils.common.component import Component
 
 
+def connectdb1():
+    lst = []
+    conn = sqlite3.connect('C:/Users/pc/Desktop/demo database/DBbolt.db')
+    cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
+    rows = cursor.fetchall()
+    for row in rows:
+        lst.append(row)
+    l2 = tuple_to_str(lst)
+    return l2
+
+
 def connectdb(table_name):
    
     conn = sqlite3.connect(Component().path_to_database)
@@ -34,7 +45,7 @@ def connectdb(table_name):
 
 
 def tuple_to_str(tl):
-    arr = ['Select Section']
+    arr = []
     for v in tl:
         val = ''.join(v)
         arr.append(val)
@@ -92,8 +103,8 @@ KEY_GRD = 'Bolt.Grade'
 KEY_DISP_GRD = 'Grade *'
 
 VALUES_GRD = ['All', 'Customized']
-VALUES_GRD_1 = ['All']
-VALUES_GRD_2 = ['Customized']
+VALUES_GRD_CUSTOMIZED = ['3.6','4.6','4.8','5.6','5.8','6.8','8.8','9.8','10.9','12.9']
+
 
 DISP_TITLE_PLATE = 'Plate'
 

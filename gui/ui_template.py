@@ -5,18 +5,19 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
-from PyQt5.QtWidgets import QMessageBox, qApp, QComboBox
+from PyQt5.QtWidgets import QMessageBox, qApp
 from PyQt5.QtGui import QDoubleValidator, QIntValidator, QPixmap, QPalette
 from PyQt5.QtCore import QFile, pyqtSignal, QTextStream, Qt, QIODevice
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QFontDialog, QApplication, QFileDialog, QColorDialog
-from Common import *
-from functools import partial
 import os
 import json
 import logging
 from drawing_2D.Svg_Window import SvgWindow
 import sys
+import sqlite3
+
+from Common import *
 
 from OCC.Core import BRepTools
 from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
@@ -34,8 +35,18 @@ import shutil
 import cairosvg
 import configparser
 
+from .customized_popup import Ui_Form
+
 class Ui_ModuleWindow(QMainWindow):
+    def openWidget(self, op):
+        self.window = QtWidgets.QDialog()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self.window)
+        self.ui.addAvailableItems(op)
+        self.window.show()
+
     def setupUi(self, MainWindow, main):
+
         print(self,MainWindow,main)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1328, 769)
@@ -65,6 +76,9 @@ class Ui_ModuleWindow(QMainWindow):
         self.btnOutput = QtWidgets.QToolButton(self.frame)
         self.btnOutput.setGeometry(QtCore.QRect(30, 0, 28, 28))
         self.btnOutput.setFocusPolicy(QtCore.Qt.TabFocus)
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(440, 412, 111, 51))
+        self.pushButton.setObjectName("pushButton")
         icon2 = QtGui.QIcon()
         icon2.addPixmap(QtGui.QPixmap(":/newPrefix/images/output.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.btnOutput.setIcon(icon2)
@@ -400,207 +414,86 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(75)
         self.label.setFont(font)
         self.label.setObjectName("label")"""
-
-            # def di(key, txt):
-            #     d1 = {key: txt}
-            #     d.update(d1)
-            #     if d != {KEY_CONN: comboConn.itemText(0), KEY_SUPTNGSEC: '', KEY_SUPTDSEC: '', KEY_FU: '', KEY_FY: '',
-            #              KEY_VERSH: '',
-            #              KEY_D: '', KEY_TYP: '', KEY_GRD: '', KEY_PLATETHK: ''}:
-            #         fn_call()
-            #
-            # def comboCh(box):
-            #     if box == KEY_CONN:
-            #         txt1 = comboConn.currentText()
-            #         print(txt1)
-            #         di(KEY_CONN, txt1)
-            #     elif box == KEY_SUPTNGSEC:
-            #         txt6 = comboStng.currentText()
-            #         print(txt6)
-            #         di(KEY_SUPTNGSEC, txt6)
-            #     elif box == KEY_SUPTDSEC:
-            #         txt7 = comboStd.currentText()
-            #         print(txt7)
-            #         di(KEY_SUPTDSEC, txt7)
-            #     elif box == KEY_D:
-            #         txt2 = comboD.currentText()
-            #         print(txt2)
-            #         di(KEY_D, txt2)
-            #     elif box == KEY_TYP:
-            #         txt3 = comboTyp.currentText()
-            #         print(txt3)
-            #         di(KEY_TYP, txt3)
-            #     elif box == KEY_GRD:
-            #         txt4 = comboGrd.currentText()
-            #         print(txt4)
-            #         di(KEY_GRD, txt4)
-            #     elif box == KEY_PLATETHK:
-            #         txt8 = comboPltthk.currentText()
-            #         print(txt8)
-            #         di(KEY_PLATETHK, txt8)
-            #     else:
-            #         pass
-            #     return d
-
-            # elif option[0] == KEY_SUPTNGSEC:
-            #     comboStng = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboStng.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboStng.setFont(font)
-            #     comboStng.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboStng.addItem(item)
-            #     comboStng.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTNGSEC))
-            # elif option[0] == KEY_SUPTDSEC:
-            #     comboStd = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboStd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboStd.setFont(font)
-            #     comboStd.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboStd.addItem(item)
-            #     comboStd.currentIndexChanged.connect(lambda: comboCh(KEY_SUPTDSEC))
-            # elif option[0] == KEY_D:
-            #     comboD = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboD.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboD.setFont(font)
-            #     comboD.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboD.addItem(item)
-            #     comboD.currentIndexChanged.connect(lambda: comboCh(KEY_D))
-            # elif option[0] == KEY_TYP:
-            #     comboTyp = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboTyp.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboTyp.setFont(font)
-            #     comboTyp.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboTyp.addItem(item)
-            #     comboTyp.currentIndexChanged.connect(lambda: comboCh(KEY_TYP))
-            # elif option[0] == KEY_GRD:
-            #     comboGrd = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboGrd.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboGrd.setFont(font)
-            #     comboGrd.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboGrd.addItem(item)
-            #     comboGrd.currentIndexChanged.connect(lambda: comboCh(KEY_GRD))
-            # elif option[0] == KEY_PLATETHK:
-            #     comboPltthk = QtWidgets.QComboBox(self.dockWidgetContents)
-            #     comboPltthk.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
-            #     font = QtGui.QFont()
-            #     font.setPointSize(11)
-            #     font.setBold(False)
-            #     font.setWeight(50)
-            #     comboPltthk.setFont(font)
-            #     comboPltthk.setObjectName(option[0])
-            #     for item in option[4]:
-            #         comboPltthk.addItem(item)
-            #     comboPltthk.currentIndexChanged.connect(lambda: comboCh(KEY_PLATETHK))
-            # else:
-            #     pass
-
         option_list = main.input_values(self)
+
+        list_selection = Ui_Form()
         _translate = QtCore.QCoreApplication.translate
         i = 0
+
         for option in option_list:
             lable = option[1]
             type = option[2]
-            # value = option[4]
+            #value = option[4]
             print(option)
             if type != TYPE_TITLE:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
-                l.setGeometry(QtCore.QRect(6, 40 + i, 120, 25))
+                l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
                 font.setWeight(50)
                 l.setFont(font)
-                l.setObjectName(option[0]+"_label")
+                l.setObjectName("label_4")
                 l.setText(_translate("MainWindow", "<html><head/><body><p>" + lable + "</p></body></html>"))
 
+            if type == TYPE_TITLE:
+                q = QtWidgets.QLabel(self.dockWidgetContents)
+                q.setGeometry(QtCore.QRect(3, 40+i, 201, 25))
+                q.setFont(font)
+                q.setObjectName("q")
+                q.setText(_translate("MainWindow",
+                                                 "<html><head/><body><p><span style=\" font-weight:600;\">"+ lable +"</span></p></body></html>"))
+
             if type == TYPE_COMBOBOX:
-                combo = QtWidgets.QComboBox(self.dockWidgetContents)
-                combo.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                e = QtWidgets.QComboBox(self.dockWidgetContents)
+                e.setGeometry(QtCore.QRect(150, 40+i, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
                 font.setWeight(50)
-                combo.setFont(font)
-                combo.setObjectName(option[0])
+                e.setFont(font)
+                e.setObjectName(option[0])
+
                 for item in option[4]:
-                    combo.addItem(item)
+                    e.addItem(item)
 
             if type == TYPE_TEXTBOX:
                 r = QtWidgets.QLineEdit(self.dockWidgetContents)
-                r.setGeometry(QtCore.QRect(150, 40 + i, 160, 27))
+                r.setGeometry(QtCore.QRect(150, 40+i, 160, 27))
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 font.setBold(False)
                 font.setWeight(50)
                 r.setFont(font)
-                r.setObjectName(option[0])
-
-            if type == TYPE_TITLE:
-                q = QtWidgets.QLabel(self.dockWidgetContents)
-                q.setGeometry(QtCore.QRect(3, 40 + i, 201, 25))
-                font = QtGui.QFont()
-                q.setFont(font)
-                q.setObjectName("_title")
-                q.setText(_translate("MainWindow",
-                                     "<html><head/><body><p><span style=\" font-weight:600;\">" + lable + "</span></p></body></html>"))
-
-            i = i + 30
-
-        new_list = main.input_value_changed()
-
+                r.setObjectName("r")
+            i=i+30
+        new_list = main.customized_input()
         for t in new_list:
-            key_changed = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
-            key_changed.currentIndexChanged.connect(lambda: change(key_changed, new_list))
+            if t[0] == KEY_PLATETHK:
+                key_customized_1 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_1.activated.connect(lambda: popup(key_customized_1, new_list))
+            elif t[0] == KEY_GRD:
+                key_customized_2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_2.activated.connect(lambda: popup(key_customized_2, new_list))
+            elif t[0] == KEY_D:
+                key_customized_3 = self.dockWidgetContents.findChild(QtWidgets.QWidget, t[0])
+                key_customized_3.activated.connect(lambda: popup(key_customized_3, new_list))
+            else:
+                pass
 
-        def change(k1, new):
-
-            for tup in new:
-                if tup[0] != k1.objectName():
+        def popup(key, for_custom_list):
+            for c_tup in for_custom_list:
+                if c_tup[0] != key.objectName():
                     continue
-                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, tup[1])
-                typ = tup[2]
-                f = tup[3]
-                val = f(k1.currentText())
-                k2.clear()
-                if typ == TYPE_COMBOBOX:
-                    for values in val:
-                        k2.addItem(values)
-                elif typ == TYPE_LABEL:
-                    k2.setText(val)
+                selected = key.currentText()
+                print(c_tup)
+                f = c_tup[1]
+                options = f()
+                if selected == "Customized":
+                    self.openWidget(options)
                 else:
-                    pass
+                    print(f())
 
-        # self.label_4 = QtWidgets.QLabel(self.dockWidgetContents)
-        # self.label_4.setGeometry(QtCore.QRect(6, 40, 120, 25))
-        # font = QtGui.QFont()
-        # font.setPointSize(11)
-        # font.setBold(False)
-        # font.setWeight(50)
-        # self.label_4.setFont(font)
-        # self.label_4.setObjectName("label_4")
         """self.lbl_fu = QtWidgets.QLabel(self.dockWidgetContents)
         self.lbl_fu.setGeometry(QtCore.QRect(6, 187, 120, 25))
         font = QtGui.QFont()
@@ -1302,7 +1195,11 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(75)
         self.btn_Reset.setFont(font)
         self.btn_Reset.setAutoDefault(True)
-        self.btn_Reset.setObjectName("btn_Reset")
+        self.btn_Reset.setObjectName("btn_Reset") """
+
+
+
+
         self.btn_Design = QtWidgets.QPushButton(self.dockWidgetContents)
         self.btn_Design.setGeometry(QtCore.QRect(140, 620, 100, 30))
         font = QtGui.QFont()
@@ -1312,7 +1209,13 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setFont(font)
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
-        self.combo_Beam = QtWidgets.QComboBox(self.dockWidgetContents)
+        self.btn_Design.setText("sub")
+        self.btn_Design.clicked.connect(self.openWidget)
+
+
+
+
+        """ self.combo_Beam = QtWidgets.QComboBox(self.dockWidgetContents)
         self.combo_Beam.setGeometry(QtCore.QRect(150, 157, 160, 27))
         font = QtGui.QFont()
         font.setFamily("Arial")
@@ -2027,7 +1930,6 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.setTabOrder(self.txtExtMomnt_2, self.txtMomntCapacity_2)
         MainWindow.setTabOrder(self.txtMomntCapacity_2, self.lineEdit_3)
 
-
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Fin Plate"))
@@ -2055,6 +1957,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuGraphics.setTitle(_translate("MainWindow", "Graphics"))
         self.inputDock.setWindowTitle(_translate("MainWindow", "Input dock"))
+        self.pushButton.setText(_translate("MainWindow", "PushButton"))
         #self.txtFy.setPlaceholderText(_translate("MainWindow", "000.0"))
         #self.lbl_column.setText(_translate("MainWindow", "<html><head/><body><p>Column section *</p></body></html>"))
         # self.comboConnLoc.setItemText(0, _translate("MainWindow", "Select Connectivity"))
@@ -2278,12 +2181,18 @@ class Ui_ModuleWindow(QMainWindow):
         self.actionfinPlate_quit.setShortcut(_translate("MainWindow", "Shift+Q"))
         self.actio_load_input.setText(_translate("MainWindow", "Load input"))
         self.actio_load_input.setShortcut(_translate("MainWindow", "Ctrl+L"))
-
-
-
-
-
-
-
-
+# class Customize(QDialog):
+#     def __init__(self,parent=None):
+#         QDialog.__init__(self, parent)
+#         self.ui = TwoListSelection()
+#         self.ui.setup_layout(self)
+#
 from . import icons_rc
+if __name__ == '__main__':
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_ModuleWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

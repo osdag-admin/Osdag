@@ -6,7 +6,6 @@ TYPE_LABEL = 'Label'
 import sqlite3
 from utils.common.component import Component
 
-
 def connectdb1():
     lst = []
     conn = sqlite3.connect('C:/Users/pc/Desktop/demo database/DBbolt.db')

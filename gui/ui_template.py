@@ -419,12 +419,12 @@ class Ui_ModuleWindow(QMainWindow):
         list_selection = Ui_Form()
         _translate = QtCore.QCoreApplication.translate
         i = 0
-
         for option in option_list:
             lable = option[1]
             type = option[2]
             #value = option[4]
             print(option)
+
             if type != TYPE_TITLE:
                 l = QtWidgets.QLabel(self.dockWidgetContents)
                 l.setGeometry(QtCore.QRect(6, 40+i, 120, 25))

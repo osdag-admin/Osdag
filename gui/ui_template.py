@@ -1209,7 +1209,7 @@ class Ui_ModuleWindow(QMainWindow):
         font.setWeight(75)
         self.btn_Reset.setFont(font)
         self.btn_Reset.setAutoDefault(True)
-        self.btn_Reset.setObjectName("btn_Reset") """
+        self.btn_Reset.setObjectName("btn_Reset")
 
 
 
@@ -1224,7 +1224,7 @@ class Ui_ModuleWindow(QMainWindow):
         self.btn_Design.setAutoDefault(True)
         self.btn_Design.setObjectName("btn_Design")
         self.btn_Design.setText("sub")
-        self.btn_Design.clicked.connect(self.openWidget)
+        # self.btn_Design.clicked.connect(self.openWidget)
 
 
 

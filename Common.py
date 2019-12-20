@@ -8,7 +8,7 @@ from utils.common.component import Component
 
 def connectdb1():
     lst = []
-    conn = sqlite3.connect('C:/Users/pc/Desktop/demo database/DBbolt.db')
+    conn = sqlite3.connect(Component().path_to_database)
     cursor = conn.execute("SELECT Bolt_diameter FROM Bolt")
     rows = cursor.fetchall()
     for row in rows:

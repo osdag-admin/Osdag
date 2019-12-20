@@ -192,13 +192,13 @@ class FinPlateConnection(ShearConnection):
 
         lst = []
 
-        t1 = (KEY_CONN, KEY_SUPTNGSEC + "_label", TYPE_LABEL, fn_conn_suptngsec_lbl)
+        t1 = (KEY_CONN, KEY_SUPTNGSEC , TYPE_LABEL, fn_conn_suptngsec_lbl)
         lst.append(t1)
 
         t2 = (KEY_CONN, KEY_SUPTNGSEC, TYPE_COMBOBOX, fn_conn_suptngsec)
         lst.append(t2)
 
-        t3 = (KEY_CONN, KEY_SUPTDSEC + "_label", TYPE_LABEL, fn_conn_suptdsec_lbl)
+        t3 = (KEY_CONN, KEY_SUPTDSEC , TYPE_LABEL, fn_conn_suptdsec_lbl)
         lst.append(t3)
 
         t4 = (KEY_CONN, KEY_SUPTDSEC, TYPE_COMBOBOX, fn_conn_suptdsec)

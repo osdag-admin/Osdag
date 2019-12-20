@@ -577,11 +577,12 @@ class Ui_ModuleWindow(QMainWindow):
         def change(k1, new):
 
             for tup in new:
-                if tup[0] != k1.objectName():
+                (object_name, k2_key, typ, f) = tup
+                if object_name != k1.objectName():
                     continue
-                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, tup[1])
-                typ = tup[2]
-                f = tup[3]
+                if typ == TYPE_LABEL:
+                    k2_key = k2_key + "_label"
+                k2 = self.dockWidgetContents.findChild(QtWidgets.QWidget, k2_key)
                 val = f(k1.currentText())
                 k2.clear()
                 if typ == TYPE_COMBOBOX:
@@ -2026,33 +2027,42 @@ class Ui_ModuleWindow(QMainWindow):
         MainWindow.setTabOrder(self.txtExtMomnt_2, self.txtMomntCapacity_2)
         MainWindow.setTabOrder(self.txtMomntCapacity_2, self.lineEdit_3)
 
-        # def reset_fn():
-        #     for widget in self.dockWidgetContents.children():
-        #         if widget.objectName() in [KEY_CONN, KEY_SUPTNGSEC, KEY_SUPTDSEC, KEY_MATERIAL, KEY_D, KEY_TYP,KEY_GRD, KEY_PLATETHK]:
-        #             w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
-        #             w.setCurrentIndex(0)
-        #         elif widget.objectName() in [KEY_VERSH, KEY_AXIAL]:
-        #             w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
-        #             w.setText('')
-        #         else:
-        #             pass
-
         def reset_fn():
             for widget in self.dockWidgetContents.children():
                 for op in option_list:
                     if widget.objectName() == op[0]:
                         if op[2] == TYPE_COMBOBOX:
-                            w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
-                            w.setCurrentIndex(0)
+                            widget.setCurrentIndex(0)
                         elif op[2] == TYPE_TEXTBOX:
-                            w = self.dockWidgetContents.findChild(QtWidgets.QWidget, widget.objectName())
-                            w.setText('')
+                            widget.setText('')
                         else:
                             pass
                     else:
                         pass
 
         self.btn_Reset.clicked.connect(reset_fn)
+
+        def design_fn():
+            design_dictionary = {}
+            for widget in self.dockWidgetContents.children():
+                for op in option_list:
+                    if widget.objectName() == op[0]:
+                        if op[2] == TYPE_COMBOBOX:
+                            des_key = widget.objectName()
+                            des_val = widget.currentText()
+                            d1 = {des_key: des_val}
+                        elif op[2] == TYPE_TEXTBOX:
+                            des_key = widget.objectName()
+                            des_val = widget.text()
+                            d1 = {des_key: des_val}
+                        else:
+                            pass
+                        design_dictionary.update(d1)
+                    else:
+                        pass
+            print(design_dictionary)
+
+        self.btn_Design.clicked.connect(design_fn)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

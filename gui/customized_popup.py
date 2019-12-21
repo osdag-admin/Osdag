@@ -10,7 +10,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sqlite3
 
-class Ui_Form(object):
+class Ui_Popup(object):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QDialog()
-    ui = Ui_Form()
+    ui = Ui_Popup()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

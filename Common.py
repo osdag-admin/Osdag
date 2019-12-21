@@ -13,7 +13,7 @@ def connectdb1():
     rows = cursor.fetchall()
     for row in rows:
         lst.append(row)
-    l2 = tuple_to_str(lst)
+    l2 = tuple_to_str_popup(lst)
     return l2
 
 
@@ -48,13 +48,19 @@ def connectdb(table_name):
     return final_lst
 
 
-def tuple_to_str(tl):
+def tuple_to_str_popup(tl):
     arr = []
     for v in tl:
         val = ''.join(v)
         arr.append(val)
     return arr
 
+def tuple_to_str(tl):
+    arr = ['Select Section']
+    for v in tl:
+        val = ''.join(v)
+        arr.append(val)
+    return arr
 
 DISP_TITLE_CM = 'Connecting members'
 

@@ -215,9 +215,13 @@ class OsdagMainWindow(QMainWindow):
 
         if self.ui.rdbtn_finplate.isChecked():
             self.hide()
-            self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
-            self.window.show()
-            self.window.closed.connect(self.show)
+            self.ui2 = Ui_ModuleWindow()
+            self.ui2.setupUi(self.ui2, FinPlateConnection)
+            self.ui2.show()
+            self.ui2.closed.connect(self.show)
+            # self.window = MainController(Ui_ModuleWindow, FinPlateConnection, folder)
+            # self.window.show()
+            # self.window.closed.connect(self.show)
         else:
             QMessageBox.about(self, "INFO", "Please select appropriate connection")
 
@@ -229,6 +233,35 @@ class MainController(QMainWindow):
         self.ui = Ui_ModuleWindow()
         self.ui.setupUi(self, main)
         self.folder = folder
+        self.ui.btnInput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.inputDock))
+        self.ui.btnOutput.clicked.connect(lambda: self.dockbtn_clicked(self.ui.outputDock))
+
+    def dockbtn_clicked(self, widget):
+
+        '''(QWidget) -> None
+
+        This method dock and undock widget(QdockWidget)
+        '''
+
+        flag = widget.isHidden()
+        if (flag):
+
+            widget.show()
+        else:
+            widget.hide()
+
+    def closeEvent(self, event):
+        '''
+        Closing finPlate window.
+        '''
+        reply = QMessageBox.question(self, 'Message',
+                                     "Are you sure you want to quit?", QMessageBox.Yes, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            self.closed.emit()
+            event.accept()
+        else:
+            event.ignore()
 
 # Back up the reference to the exceptionhook
 sys._excepthook = sys.excepthook

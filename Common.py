@@ -2,6 +2,7 @@ TYPE_COMBOBOX = 'ComboBox'
 TYPE_TEXTBOX = 'TextBox'
 TYPE_TITLE = 'Title'
 TYPE_LABEL = 'Label'
+TYPE_IMAGE= 'Image'
 
 import sqlite3
 from utils.common.component import Component
@@ -69,6 +70,8 @@ KEY_DISP_CONN = 'Connectivity *'
 VALUES_CONN = ['Column flange-Beam web', 'Column web-Beam web', 'Beam-Beam']
 VALUES_CONN_1 = ['Column flange-Beam web', 'Column web-Beam web']
 VALUES_CONN_2 = ['Beam-Beam']
+
+KEY_IMAGE = 'Image'
 
 KEY_SUPTNGSEC = 'Member.Supporting_Section'
 KEY_DISP_SUPTNGSEC = 'Supporting Section'
